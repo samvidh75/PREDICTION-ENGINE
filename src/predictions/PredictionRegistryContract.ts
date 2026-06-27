@@ -127,7 +127,7 @@ export interface CreatePredictionInput {
   createdBy?: RegistryCreatedBy;
 }
 
-// ── Classification Mapping (StockStory → Registry) ─────────────────
+// ── Classification Mapping (StockStory to Registry) ────────────────
 
 /**
  * StockStory classifications map to registry classifications.
@@ -157,11 +157,11 @@ export const REGISTRY_TO_STOCKSTORY_CLASSIFICATION: Record<RegistryClassificatio
 
 /** These column names must NOT appear in any production query against prediction_registry. */
 export const OBSOLETE_COLUMNS = [
-  'health_score',   // → ranking_score
-  'predicted_at',   // → prediction_date
-  'factors',        // → quality/growth/value/momentum/risk/sector_score
+  'health_score',   // use ranking_score
+  'predicted_at',   // use prediction_date
+  'factors',        // use quality/growth/value/momentum/risk/sector_score
   'sample_size',    // removed
-  'prediction_level', // → confidence_level
+  'prediction_level', // use confidence_level
 ] as const;
 
 // ── Validation Helpers ──────────────────────────────────────────────

@@ -1,10 +1,12 @@
 import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "path";
+import { localApiPlugin } from "./vite-plugin-local-api";
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
   const apiTarget = env.VITE_API_TARGET ?? "http://localhost:4001";
+  const useLocalApi = env.VITE_LOCAL_API !== "false";
 
   return {
     resolve: {
@@ -16,17 +18,19 @@ export default defineConfig(({ mode }) => {
         "@/services": path.resolve(__dirname, "src/services/index.ts"),
       },
     },
-    plugins: [react()],
+    plugins: [react(), ...(useLocalApi ? [localApiPlugin()] : [])],
     server: {
       port: 5174,
       strictPort: false,
-      proxy: {
-        "/api": {
-          target: apiTarget,
-          changeOrigin: true,
-          secure: false,
-        },
-      },
+      proxy: useLocalApi
+        ? undefined
+        : {
+            "/api": {
+              target: apiTarget,
+              changeOrigin: true,
+              secure: false,
+            },
+          },
     },
     preview: {
       port: 4173,

@@ -112,7 +112,7 @@ export class PredictionCredibilityScorer {
     const { total, hits } = result.rows[0];
     if (total === 0) return 0;
     const hitRate = Number(hits) / Number(total);
-    // Scale: 50% hit rate → 50 points, 100% hit rate → 100 points
+    // Scale: 50% hit rate maps to 50 points, 100% hit rate maps to 100 points
     return Math.min(100, Math.round(hitRate * 100));
   }
 
@@ -123,7 +123,7 @@ export class PredictionCredibilityScorer {
        WHERE validation_status = 'validated' AND alpha IS NOT NULL`
     );
     const meanAlpha = Number(result.rows[0]?.mean_alpha ?? 0);
-    // Scale: 0% alpha → 30 points, 5% alpha → 100 points
+    // Scale: 0% alpha maps to 30 points, 5% alpha maps to 100 points
     const scaled = 30 + (meanAlpha / 5) * 70;
     return Math.max(0, Math.min(100, Math.round(scaled)));
   }
@@ -163,9 +163,9 @@ export class PredictionCredibilityScorer {
     try {
       const result = await statisticalValidationEngine.validateAlpha();
       if (result.is_significant) return 100;
-      // Lower p-value → higher score, capped
+      // Lower p-value maps to a higher score, capped
       if (result.p_value === 1 && result.sample_size > 0) return 0;
-      // Score inversely related to p-value: p=0.05 → 50, p=0.01 → 90
+      // Score inversely related to p-value: p=0.05 maps to 50, p=0.01 maps to 90
       const pScore = Math.max(0, (1 - result.p_value) * 100);
       return Math.min(100, Math.round(pScore));
     } catch {

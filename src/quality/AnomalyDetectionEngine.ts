@@ -115,7 +115,7 @@ export class AnomalyDetectionEngine {
           symbol, type: 'MarginCollapse', field: 'grossMargin',
           currentValue: currentFinancials.grossMargin, previousValue: previousFin.grossMargin,
           severity: 'medium',
-          description: `Gross margin collapsed ${(marginDrop * 100).toFixed(0)}pp: ${(previousFin.grossMargin * 100).toFixed(0)}% → ${(currentFinancials.grossMargin * 100).toFixed(0)}%`,
+          description: `Gross margin collapsed ${(marginDrop * 100).toFixed(0)}pp from ${(previousFin.grossMargin * 100).toFixed(0)}% to ${(currentFinancials.grossMargin * 100).toFixed(0)}%`,
           timestamp: new Date().toISOString(),
         });
       }
@@ -128,7 +128,7 @@ export class AnomalyDetectionEngine {
           symbol, type: 'MarginCollapse', field: 'operatingMargin',
           currentValue: currentFinancials.operatingMargin, previousValue: previousFin.operatingMargin,
           severity: 'medium',
-          description: `Operating margin collapsed ${(marginDrop * 100).toFixed(0)}pp: ${(previousFin.operatingMargin * 100).toFixed(0)}% → ${(currentFinancials.operatingMargin * 100).toFixed(0)}%`,
+          description: `Operating margin collapsed ${(marginDrop * 100).toFixed(0)}pp from ${(previousFin.operatingMargin * 100).toFixed(0)}% to ${(currentFinancials.operatingMargin * 100).toFixed(0)}%`,
           timestamp: new Date().toISOString(),
         });
       }
@@ -150,7 +150,7 @@ export class AnomalyDetectionEngine {
             symbol, type: 'FactorSpike', field,
             currentValue: current, previousValue: previous,
             severity: 'medium',
-            description: `${field} jumped ${Math.abs(current - previous).toFixed(0)} points: ${previous} → ${current}`,
+            description: `${field} jumped ${Math.abs(current - previous).toFixed(0)} points from ${previous} to ${current}`,
             timestamp: new Date().toISOString(),
           });
         }

@@ -1,312 +1,363 @@
-import { useState, useEffect, useMemo } from 'react';
-import { ArrowLeft, ArrowUp, ArrowDown, TrendingUp, Shield, BarChart3, Newspaper } from 'lucide-react';
-import { color, font, space, radius, typeScale, layout } from '../design/tokens';
-import { Button } from '../components/ui/Button';
-import { Card, CardLabel } from '../components/ui/Card';
-import { Stat } from '../components/ui/Stat';
-import { Badge } from '../components/ui/Badge';
-import { useMediaQuery } from '../hooks/useMediaQuery';
-import { getStockBySymbol } from '../services/scanner/scoringEngine';
-import type { FactorScores } from '../services/scanner/scoringEngine';
-import type { StockFundamentals } from '../services/scanner/stockUniverse';
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, BarChart3, Building2, Landmark, ShieldAlert } from "lucide-react";
+import { useNavigate, useParams } from "react-router-dom";
+import { Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, XAxis, YAxis } from "recharts";
+import { Badge } from "../ui/Badge";
+import { Button } from "../ui/Button";
+import { Card, CardLabel } from "../ui/Card";
+import { Stat } from "../ui/Stat";
+import { useResponsiveValue } from "../ui/responsive";
 
-interface StockData extends StockFundamentals, FactorScores {}
+type StockResearchDetail = {
+  symbol: string;
+  companyName: string;
+  exchange: "NSE" | "BSE";
+  sector: string;
+  industry: string;
+  price: { current: number; changeAbs: number; changePercent: number; marketCap: number };
+  fundamentals: {
+    pe: number | null;
+    industryPe: number | null;
+    pb: number | null;
+    dividendYield: number | null;
+    eps: number | null;
+  };
+  roe: number | null;
+  debtToEquity: number | null;
+  revenueGrowth: number | null;
+  profitGrowth: number | null;
+  rsi: number | null;
+  scores: { quality: number | null; valuation: number | null; growth: number | null; momentum: number | null; risk: number | null; health: number | null; riskAdjusted: number | null };
+  confidenceMeter: number;
+  timeline: Array<{ day: string; health: number }>;
+  whatChanged: string[];
+  sectorRelative: Array<{ label: string; company: string; sectorMedian: string }>;
+  description: string;
+  companyProfile: { founded: string; ceo: string; hq: string; employees: string; website: string; isin: string; businessSegments: string[] };
+  financials: { revenue: Array<{ period: string; value: number }>; profit: Array<{ period: string; value: number }> };
+  shareholding: Array<{ period: string; promoter: number; fii: number; dii: number; retail: number; deltas: { promoter: number; fii: number; dii: number; retail: number } }>;
+  news: Array<{ headline: string; source: string; time: string }>;
+  thesis: { thesis: string; bullCase: string; bearCase: string; whatToWatch: string; stance: "High conviction" | "Watch" | "Needs review" | "Risk rising" | "Avoid for now" };
+  priceHistory: Record<string, Array<{ label: string; price: number }>>;
+};
 
-const TIMEFRAMES = ['1W', '1M', '3M', '1Y', '5Y'] as const;
+const TIMEFRAMES = ["1W", "1M", "3M", "1Y", "5Y"] as const;
 
-function generatePrices(base: number, days: number, seed: number): number[] {
-  const prices: number[] = [base];
-  let p = base;
-  for (let i = 1; i < days; i++) {
-    const change = (Math.sin(seed + i * 0.3) * 0.015 + (Math.random() - 0.48) * 0.02) * base;
-    p = Math.max(p + change, base * 0.5);
-    prices.push(p);
-  }
-  return prices;
+function Ring({ label, value }: { label: string; value: number }) {
+  const circumference = 2 * Math.PI * 40;
+  const strokeDashoffset = circumference - (value / 100) * circumference;
+  const color = value >= 75 ? "var(--green)" : value >= 50 ? "var(--brand)" : "var(--red)";
+  return (
+    <div style={{ display: "grid", justifyItems: "center", gap: "8px" }}>
+      <svg width="96" height="96" viewBox="0 0 96 96">
+        <circle cx="48" cy="48" r="40" fill="none" stroke="var(--border)" strokeWidth="8" />
+        <circle
+          cx="48"
+          cy="48"
+          r="40"
+          fill="none"
+          stroke={color}
+          strokeWidth="8"
+          strokeDasharray={circumference}
+          strokeDashoffset={strokeDashoffset}
+          strokeLinecap="round"
+          transform="rotate(-90 48 48)"
+        />
+        <text x="48" y="52" textAnchor="middle" fontSize="20" fontWeight="600" fill="var(--text-primary)">
+          {value}
+        </text>
+      </svg>
+      <span style={{ color: "var(--text-500)", fontSize: "12px", letterSpacing: "0.04em", textTransform: "uppercase" }}>{label}</span>
+    </div>
+  );
 }
 
 function StockSkeleton() {
   return (
-    <div style={{ maxWidth: layout.maxContentWidth, margin: '0 auto', padding: `0 ${space[3]}` }}>
-      <div style={{ height: 24, width: 120, background: color.bgAlt, borderRadius: radius.sm, marginBottom: space[4] }} />
-      <div style={{ height: 36, width: 200, background: color.bgAlt, borderRadius: radius.sm, marginBottom: space[2] }} />
-      <div style={{ height: 16, width: 160, background: color.bgAlt, borderRadius: radius.sm, marginBottom: space[8] }} />
-      <div style={{ height: 240, background: color.bgAlt, borderRadius: radius.md, marginBottom: space[6] }} />
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: space[4] }}>
-        <div style={{ height: 120, background: color.bgAlt, borderRadius: radius.md }} />
-        <div style={{ height: 120, background: color.bgAlt, borderRadius: radius.md }} />
-      </div>
+    <div style={{ display: "grid", gap: "16px" }}>
+      <div style={{ height: "24px", width: "120px", background: "var(--chip)", borderRadius: "6px" }} />
+      <div style={{ height: "40px", width: "240px", background: "var(--chip)", borderRadius: "8px" }} />
+      <div style={{ height: "240px", background: "var(--chip)", borderRadius: "8px" }} />
     </div>
   );
 }
 
 function StockError({ symbol }: { symbol: string }) {
-  return (
-    <div style={{ textAlign: 'center', padding: `${space[12]} ${space[3]}` }}>
-      <p style={{ fontSize: '18px', fontWeight: 600, color: color.text, marginBottom: space[2] }}>
-        Stock not found
-      </p>
-      <p style={{ fontSize: '14px', color: color.textMuted }}>
-        We could not find data for {symbol}.
-      </p>
-    </div>
-  );
+  return <div>We could not load research for {symbol}.</div>;
 }
 
-interface Props {
-  symbol?: string;
-}
-
-export default function StockDetailPage({ symbol: rawSymbol }: Props) {
-  const symbol = rawSymbol ?? 'TCS';
-  const [stock, setStock] = useState<StockData | null>(null);
-  const [status, setStatus] = useState<'loading' | 'error' | 'ready'>('loading');
-  const [timeframe, setTimeframe] = useState<typeof TIMEFRAMES[number]>('1Y');
-  const [tracking, setTracking] = useState(false);
-  const isDesktop = useMediaQuery('(min-width: 768px)');
-
-  useEffect(() => {
-    setStatus('loading');
-    const timer = setTimeout(() => {
-      const result = getStockBySymbol(symbol);
-      if (result) {
-        setStock(result);
-        setStatus('ready');
-      } else {
-        setStatus('error');
-      }
-    }, 200);
-    return () => clearTimeout(timer);
-  }, [symbol]);
-
-  const prices = useMemo(() => {
-    if (!stock) return [];
-    const days = timeframe === '1W' ? 7 : timeframe === '1M' ? 30 : timeframe === '3M' ? 90 : timeframe === '1Y' ? 365 : 1825;
-    return generatePrices(stock.price, days, stock.price);
-  }, [stock, timeframe]);
-
-  if (status === 'loading') return <StockSkeleton />;
-  if (status === 'error' || !stock) return <StockError symbol={symbol} />;
-
-  const isUp = stock.change >= 0;
-  const lineColor = isUp ? color.success : color.danger;
-
-  const FACTORS = [
-    { label: 'Quality', value: stock.quality },
-    { label: 'Valuation', value: stock.valuation },
-    { label: 'Growth', value: stock.growth },
-    { label: 'Risk', value: stock.risk },
-    { label: 'Technical', value: stock.technical },
+function StockView({ stock }: { stock: StockResearchDetail }) {
+  const navigate = useNavigate();
+  const [timeframe, setTimeframe] = useState<(typeof TIMEFRAMES)[number]>("1Y");
+  const [period, setPeriod] = useState(stock.shareholding[0]?.period ?? "Mar'26");
+  const sectionGap = useResponsiveValue("48px", "80px");
+  const isUp = stock.price.changeAbs >= 0;
+  const trendColor = isUp ? "var(--green)" : "var(--red)";
+  const shareholding = stock.shareholding.find((item) => item.period === period) ?? stock.shareholding[0];
+  const factorBadges = [
+    { label: "Quality", value: stock.scores.quality ?? 0 },
+    { label: "Valuation", value: stock.scores.valuation ?? 0 },
+    { label: "Growth", value: stock.scores.growth ?? 0 },
+    { label: "Momentum", value: stock.scores.momentum ?? 0 },
+    { label: "Risk", value: stock.scores.risk ?? 0 },
   ];
 
-  const width = 600;
-  const height = 200;
-  const min = Math.min(...prices);
-  const max = Math.max(...prices);
-  const range = max - min || 1;
-  const pathData = prices.map((p, i) => {
-    const x = (i / (prices.length - 1)) * width;
-    const y = height - ((p - min) / range) * (height - 20) - 10;
-    return `${i === 0 ? 'M' : 'L'}${x.toFixed(0)},${y.toFixed(0)}`;
-  }).join(' ');
-
-  const areaPath = pathData + ` L${width},${height} L0,${height} Z`;
-
-  const sectionGap = isDesktop ? space[8] : space[6];
-  const pagePadX = isDesktop ? space[6] : space[3];
-
   return (
-    <div style={{ background: color.bg, minHeight: '100vh' }}>
-      <div style={{ maxWidth: layout.maxContentWidth, margin: '0 auto', paddingLeft: pagePadX, paddingRight: pagePadX }}>
-
-        {/* 1. Header row */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: space[3], marginBottom: space[4] }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: space[3] }}>
-            <Button variant="ghost" onClick={() => window.history.back()} style={{ padding: 0, height: 'auto', width: 'auto' }}>
-              <ArrowLeft size={18} color={color.textMuted} />
-            </Button>
-            <div>
-              <h1 style={{ fontFamily: font, fontSize: '28px', fontWeight: 600, lineHeight: '1.2', color: color.text, margin: 0 }}>
-                {symbol}
-              </h1>
-              <span style={{ fontSize: '14px', color: color.textMuted }}>{stock.name}</span>
-            </div>
+    <div style={{ display: "grid", gap: sectionGap }}>
+      <section style={{ display: "flex", justifyContent: "space-between", gap: "16px", flexWrap: "wrap" }}>
+        <div style={{ display: "grid", gap: "12px" }}>
+          <button
+            onClick={() => navigate(-1)}
+            style={{ border: "none", background: "transparent", padding: 0, display: "inline-flex", alignItems: "center", gap: "8px", color: "var(--text-500)", cursor: "pointer" }}
+          >
+            <ArrowLeft size={16} />
+            <span>Back</span>
+          </button>
+          <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
+            <Badge value={60} label={stock.exchange} />
+            <h1 style={{ color: "var(--text-primary)", fontSize: "var(--sz-2xl)", fontWeight: 600, lineHeight: "1.25" }}>{stock.symbol}</h1>
           </div>
-          <div style={{ display: 'flex', gap: space[2], flexWrap: 'wrap' }}>
-            <Button variant="secondary" onClick={() => setTracking(!tracking)}>
-              {tracking ? 'Tracking' : 'Track'}
+          <p style={{ color: "var(--text-500)", fontSize: "var(--sz-base)", fontWeight: 400, lineHeight: "1.6" }}>{stock.companyName}</p>
+        </div>
+        <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
+          <Button variant="secondary">Track</Button>
+          <Button variant="secondary">Compare</Button>
+          <Button>
+            <span>Invest via broker</span>
+            <ArrowRight size={16} />
+          </Button>
+        </div>
+      </section>
+
+      <section style={{ display: "grid", gap: "12px" }}>
+        <div style={{ color: "var(--text-primary)", fontSize: "var(--sz-3xl)", fontWeight: 600, lineHeight: "1.1" }}>₹{stock.price.current.toLocaleString("en-IN")}</div>
+        <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", color: trendColor }}>
+          {isUp ? <ArrowUp size={16} /> : <ArrowDown size={16} />}
+          <span>{`${isUp ? "+" : ""}${stock.price.changeAbs.toFixed(2)} (${stock.price.changePercent.toFixed(2)}%)`}</span>
+        </div>
+      </section>
+
+      <Card>
+        <div style={{ display: "flex", gap: "12px", marginBottom: "16px", flexWrap: "wrap" }}>
+          {TIMEFRAMES.map((value) => (
+            <Button key={value} variant={value === timeframe ? "primary" : "ghost"} onClick={() => setTimeframe(value)}>
+              {value}
             </Button>
-            <Button variant="secondary">Compare</Button>
-            <Button variant="primary">Invest</Button>
+          ))}
+        </div>
+        <div style={{ width: "100%", height: "280px" }}>
+          <ResponsiveContainer>
+            <AreaChart data={stock.priceHistory[timeframe]}>
+              <defs>
+                <linearGradient id="trendFill" x1="0" x2="0" y1="0" y2="1">
+                  <stop offset="0%" stopColor={trendColor} stopOpacity="0.2" />
+                  <stop offset="100%" stopColor={trendColor} stopOpacity="0" />
+                </linearGradient>
+              </defs>
+              <CartesianGrid vertical={false} stroke="var(--border)" />
+              <XAxis dataKey="label" stroke="var(--text-300)" />
+              <YAxis stroke="var(--text-300)" domain={["dataMin", "dataMax"]} />
+              <Area dataKey="price" stroke={trendColor} fill="url(#trendFill)" strokeWidth={2} />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
+      </Card>
+
+      <section style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "16px" }}>
+        <Card>
+          <CardLabel>Score overview</CardLabel>
+          <div style={{ display: "flex", justifyContent: "space-around", gap: "16px", flexWrap: "wrap", marginBottom: "16px" }}>
+            <Ring label="Health" value={stock.scores.health ?? 0} />
+            <Ring label="Risk" value={stock.scores.risk ?? 0} />
+          </div>
+          <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+            {factorBadges.map((factor) => (
+              <Badge key={factor.label} value={factor.value} label={factor.label} />
+            ))}
+          </div>
+        </Card>
+        <Card>
+          <CardLabel>Thesis confidence</CardLabel>
+          <div style={{ display: "grid", gap: "12px" }}>
+            <Ring label="Confidence" value={stock.confidenceMeter} />
+            <Badge value={stock.scores.riskAdjusted ?? stock.scores.health ?? 0} label="Risk-adjusted" />
+            <p style={{ color: "var(--text-500)", fontSize: "var(--sz-base)", lineHeight: "1.6" }}>
+              Timeline drift: {stock.timeline.map((item) => item.health).join(" • ")}
+            </p>
+          </div>
+        </Card>
+      </section>
+
+      <Card>
+        <CardLabel>Key metrics</CardLabel>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "16px" }}>
+          <Stat label="Market Cap" value={`₹${Math.round(stock.price.marketCap).toLocaleString("en-IN")} Cr`} />
+          <Stat label="PE (TTM)" value={stock.fundamentals.pe?.toFixed(1) ?? "—"} />
+          <Stat label="PB Ratio" value={stock.fundamentals.pb?.toFixed(1) ?? "—"} />
+          <Stat label="ROE" value={stock.roe != null ? `${stock.roe.toFixed(1)}%` : "—"} />
+          <Stat label="Debt/Equity" value={stock.debtToEquity != null ? stock.debtToEquity.toFixed(2) : "—"} />
+          <Stat label="Dividend Yield" value={stock.fundamentals.dividendYield != null ? `${stock.fundamentals.dividendYield.toFixed(2)}%` : "—"} />
+          <Stat label="Revenue Growth" value={stock.revenueGrowth != null ? `${stock.revenueGrowth.toFixed(1)}%` : "—"} />
+          <Stat label="Profit Growth" value={stock.profitGrowth != null ? `${stock.profitGrowth.toFixed(1)}%` : "—"} />
+          <Stat label="EPS" value={stock.fundamentals.eps != null ? `₹${stock.fundamentals.eps.toFixed(1)}` : "—"} />
+          <Stat label="RSI" value={stock.rsi != null ? String(stock.rsi) : "—"} />
+        </div>
+      </Card>
+
+      <Card>
+        <CardLabel>About company</CardLabel>
+        <p style={{ color: "var(--text-700)", fontSize: "var(--sz-base)", fontWeight: 400, lineHeight: "1.6", marginBottom: "16px" }}>
+          {stock.description}
+        </p>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "16px", marginBottom: "16px" }}>
+          <Stat label="Founded" value={stock.companyProfile.founded} />
+          <Stat label="CEO" value={stock.companyProfile.ceo} />
+          <Stat label="HQ" value={stock.companyProfile.hq} />
+          <Stat label="Employees" value={stock.companyProfile.employees} />
+          <Stat label="Website" value={stock.companyProfile.website} />
+          <Stat label="Exchange" value={stock.exchange} />
+          <Stat label="ISIN" value={stock.companyProfile.isin} />
+          <Stat label="Sector" value={stock.sector} />
+          <Stat label="Industry" value={stock.industry} />
+        </div>
+        <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+          {stock.companyProfile.businessSegments.map((segment) => (
+            <Badge key={segment} value={60} label={segment} />
+          ))}
+        </div>
+      </Card>
+
+      <Card>
+        <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", flexWrap: "wrap", marginBottom: "16px" }}>
+          <CardLabel>Financials</CardLabel>
+          <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
+            <Button variant="secondary">Revenue</Button>
+            <Button variant="ghost">Net Profit</Button>
+            <Button variant="secondary">Quarterly</Button>
+            <Button variant="ghost">Yearly</Button>
           </div>
         </div>
-
-        {/* 2. Price block */}
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: space[2], marginBottom: space[6] }}>
-          <span style={{ fontFamily: '"SFMono-Regular", Consolas, monospace', fontSize: '32px', fontWeight: 600, color: color.text }}>
-            ₹{stock.price.toLocaleString('en-IN')}
-          </span>
-          <span style={{
-            display: 'inline-flex', alignItems: 'center', gap: 4,
-            fontSize: '14px', fontWeight: 600, color: lineColor,
-          }}>
-            {isUp ? <ArrowUp size={14} /> : <ArrowDown size={14} />}
-            {isUp ? '+' : ''}{stock.change.toFixed(2)} ({stock.changePercent.toFixed(2)}%)
-          </span>
+        <div style={{ width: "100%", height: "280px" }}>
+          <ResponsiveContainer>
+            <BarChart data={stock.financials.revenue.map((item, index) => ({ period: item.period, revenue: item.value, profit: stock.financials.profit[index]?.value ?? 0 }))}>
+              <CartesianGrid vertical={false} stroke="var(--border)" />
+              <XAxis dataKey="period" stroke="var(--text-300)" />
+              <YAxis stroke="var(--text-300)" />
+              <Bar dataKey="revenue" radius={[6, 6, 0, 0]}>
+                {stock.financials.revenue.map((entry) => (
+                  <Cell key={entry.period} fill="var(--brand)" />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
         </div>
+        <p style={{ color: "var(--text-300)", fontSize: "12px", marginTop: "12px" }}>all values in ₹ Cr</p>
+      </Card>
 
-        {/* 3. Price chart */}
-        <Card padding="md" style={{ marginBottom: sectionGap }}>
-          <div style={{ display: 'flex', gap: space[2], marginBottom: space[3], flexWrap: 'wrap' }}>
-            {TIMEFRAMES.map((tf) => (
-              <Button key={tf} variant={timeframe === tf ? 'primary' : 'ghost'} onClick={() => setTimeframe(tf)} style={{ height: '32px', padding: '0 12px', fontSize: '12px' }}>
-                {tf}
+      <Card>
+        <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", flexWrap: "wrap", marginBottom: "16px" }}>
+          <CardLabel>Shareholdings</CardLabel>
+          <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
+            {stock.shareholding.map((value) => (
+              <Button key={value.period} variant={value.period === period ? "secondary" : "ghost"} onClick={() => setPeriod(value.period)}>
+                {value.period}
               </Button>
             ))}
           </div>
-          <svg viewBox={`0 0 ${width} ${height}`} style={{ width: '100%', height: 'auto' }}>
-            <defs>
-              <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor={lineColor} stopOpacity="0.15" />
-                <stop offset="100%" stopColor={lineColor} stopOpacity="0" />
-              </linearGradient>
-            </defs>
-            <path d={areaPath} fill="url(#chartGrad)" />
-            <path d={pathData} fill="none" stroke={lineColor} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </Card>
-
-        {/* 4. Score overview */}
-        <div style={{ display: 'grid', gridTemplateColumns: isDesktop ? '1fr 1fr' : '1fr', gap: space[4], marginBottom: sectionGap }}>
-          <Card padding="md">
-            <CardLabel>Health</CardLabel>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: space[2], marginBottom: space[4] }}>
-              <span style={{ fontSize: '36px', fontWeight: 700, color: color.text }}>{stock.overall}</span>
-              <span style={{ fontSize: '14px', color: color.textMuted }}>/100</span>
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: space[2] }}>
-              {FACTORS.map((f) => (
-                <div key={f.label} style={{ textAlign: 'center' }}>
-                  <div style={{ fontSize: '14px', fontWeight: 600, color: color.primary }}>{f.value}</div>
-                  <div style={{ fontSize: '10px', color: color.textMuted, textTransform: 'uppercase' }}>{f.label}</div>
-                </div>
-              ))}
-            </div>
-          </Card>
-          <Card padding="md">
-            <CardLabel>Risk</CardLabel>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: space[2], marginBottom: space[4] }}>
-              <span style={{ fontSize: '36px', fontWeight: 700, color: color.text }}>{stock.risk}</span>
-              <span style={{ fontSize: '14px', color: color.textMuted }}>/100</span>
-            </div>
-            <div style={{ display: 'flex', gap: space[2], flexWrap: 'wrap' }}>
-              <Badge value={stock.quality} label="Q" />
-              <Badge value={stock.valuation} label="V" />
-              <Badge value={stock.growth} label="G" />
-              <Badge value={stock.risk} label="R" />
-              <Badge value={stock.technical} label="T" />
-            </div>
-          </Card>
         </div>
-
-        {/* 5. Key metrics grid */}
-        <Card padding="md" style={{ marginBottom: sectionGap }}>
-          <CardLabel>Key Metrics</CardLabel>
-          <div style={{ display: 'grid', gridTemplateColumns: isDesktop ? 'repeat(3, 1fr)' : 'repeat(2, 1fr)', gap: space[4] }}>
-            <Stat label="Market Cap" value={`₹${(stock.marketCap / 100).toFixed(0)}Cr`} />
-            <Stat label="PE (TTM)" value={stock.pe.toFixed(1)} />
-            <Stat label="PB Ratio" value={stock.pb.toFixed(1)} />
-            <Stat label="ROE" value={`${stock.roe.toFixed(1)}%`} />
-            <Stat label="Debt/Equity" value={stock.debtToEquity.toFixed(2)} />
-            <Stat label="Dividend Yield" value={`${stock.dividendYield.toFixed(2)}%`} />
-            <Stat label="Revenue Growth" value={`${stock.revenueGrowth.toFixed(1)}%`} />
-            <Stat label="Profit Growth" value={`${stock.profitGrowth.toFixed(1)}%`} />
-            <Stat label="RSI" value={stock.rsi.toFixed(0)} />
-          </div>
-        </Card>
-
-        {/* 6. About company */}
-        <Card padding="md" style={{ marginBottom: sectionGap }}>
-          <CardLabel>About</CardLabel>
-          <p style={{ fontSize: '14px', lineHeight: 1.6, color: color.text, marginBottom: space[4] }}>
-            {stock.name} is a leading {stock.industry.toLowerCase()} company in the {stock.sector.toLowerCase()} sector.
-          </p>
-          <div style={{ display: 'grid', gridTemplateColumns: isDesktop ? 'repeat(4, 1fr)' : 'repeat(2, 1fr)', gap: space[3] }}>
-            <Stat label="Sector" value={stock.sector} />
-            <Stat label="Industry" value={stock.industry} />
-            <Stat label="Exchange" value="NSE" />
-            <Stat label="Symbol" value={stock.symbol} />
-          </div>
-        </Card>
-
-        {/* 7. Financials (simplified) */}
-        <Card padding="md" style={{ marginBottom: sectionGap }}>
-          <CardLabel>Financials</CardLabel>
-          <div style={{ display: 'grid', gridTemplateColumns: isDesktop ? 'repeat(2, 1fr)' : '1fr', gap: space[4] }}>
-            <div>
-              <div style={{ fontSize: '12px', color: color.textMuted, marginBottom: space[2] }}>Revenue</div>
-              <div style={{ height: 8, background: color.border, borderRadius: radius.sm, overflow: 'hidden' }}>
-                <div style={{ height: '100%', width: `${Math.min(100, stock.revenueGrowth * 3)}%`, background: color.primary, borderRadius: radius.sm }} />
-              </div>
-              <div style={{ fontSize: '12px', color: color.textMuted, marginTop: space[1] }}>{stock.revenueGrowth.toFixed(1)}% YoY</div>
-            </div>
-            <div>
-              <div style={{ fontSize: '12px', color: color.textMuted, marginBottom: space[2] }}>Profit</div>
-              <div style={{ height: 8, background: color.border, borderRadius: radius.sm, overflow: 'hidden' }}>
-                <div style={{ height: '100%', width: `${Math.min(100, stock.profitGrowth * 3)}%`, background: color.success, borderRadius: radius.sm }} />
-              </div>
-              <div style={{ fontSize: '12px', color: color.textMuted, marginTop: space[1] }}>{stock.profitGrowth.toFixed(1)}% YoY</div>
-            </div>
-          </div>
-        </Card>
-
-        {/* 8. Shareholdings (simplified) */}
-        <Card padding="md" style={{ marginBottom: sectionGap }}>
-          <CardLabel>Shareholding Pattern</CardLabel>
-          <div style={{ display: 'grid', gap: space[3] }}>
-            {[
-              { label: 'Promoter', pct: stock.debtToEquity < 0.5 ? 52 : 35 },
-              { label: 'FII', pct: stock.debtToEquity < 0.5 ? 28 : 22 },
-              { label: 'DII', pct: stock.debtToEquity < 0.5 ? 12 : 18 },
-              { label: 'Retail', pct: stock.debtToEquity < 0.5 ? 8 : 25 },
-            ].map((s) => (
-              <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: space[3] }}>
-                <span style={{ fontSize: '12px', color: color.textMuted, width: 70, flexShrink: 0 }}>{s.label}</span>
-                <div style={{ flex: 1, height: 6, background: color.border, borderRadius: radius.sm, overflow: 'hidden' }}>
-                  <div style={{ height: '100%', width: `${s.pct}%`, background: color.primary, borderRadius: radius.sm }} />
-                </div>
-                <span style={{ fontSize: '12px', fontWeight: 600, color: color.text, width: 40, textAlign: 'right' }}>{s.pct}%</span>
-              </div>
-            ))}
-          </div>
-        </Card>
-
-        {/* 9. News */}
-        <Card padding="md" style={{ marginBottom: sectionGap }}>
-          <CardLabel>Recent News</CardLabel>
+        <div style={{ display: "grid", gap: "16px" }}>
           {[
-            { headline: `${stock.name} posts strong quarterly results`, source: 'Reuters', time: '2h ago' },
-            { headline: `Analysts remain bullish on ${stock.symbol}`, source: 'ET', time: '4h ago' },
-            { headline: `${stock.symbol} shows improved fundamentals`, source: 'Bloomberg', time: '1d ago' },
-            { headline: `${stock.sector} sector outlook remains positive`, source: 'Mint', time: '2d ago' },
-            { headline: `${stock.name} among top performers in ${stock.industry}`, source: 'CNBC', time: '3d ago' },
-          ].map((article, i) => (
-            <div key={i} style={{
-              paddingBottom: i < 4 ? space[3] : 0,
-              borderBottom: i < 4 ? `1px solid ${color.border}` : 'none',
-              marginBottom: i < 4 ? space[3] : 0,
-            }}>
-              <p style={{ fontSize: '14px', fontWeight: 600, color: color.text, marginBottom: 2 }}>
-                {article.headline}
-              </p>
-              <p style={{ fontSize: '12px', color: color.textMuted, margin: 0 }}>
-                {article.source} · {article.time}
-              </p>
-            </div>
-          ))}
-        </Card>
+            { label: "Promoter", value: shareholding.promoter, delta: shareholding.deltas.promoter },
+            { label: "FII", value: shareholding.fii, delta: shareholding.deltas.fii },
+            { label: "DII", value: shareholding.dii, delta: shareholding.deltas.dii },
+            { label: "Retail", value: shareholding.retail, delta: shareholding.deltas.retail },
+          ].map((item) => {
+            const positive = item.delta >= 0;
+            return (
+              <div key={item.label} style={{ display: "grid", gap: "8px" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", gap: "12px" }}>
+                  <span>{item.label}</span>
+                  <span style={{ display: "inline-flex", alignItems: "center", gap: "4px", color: positive ? "var(--green)" : "var(--red)" }}>
+                    {positive ? <ArrowUp size={14} /> : <ArrowDown size={14} />}
+                    {item.value.toFixed(1)}%
+                  </span>
+                </div>
+                <div style={{ height: "8px", background: "var(--border)", borderRadius: "var(--radius-xl)", overflow: "hidden" }}>
+                  <div style={{ width: `${item.value}%`, height: "100%", background: "var(--brand)" }} />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </Card>
 
-      </div>
+      <Card>
+        <CardLabel>News</CardLabel>
+        <div style={{ display: "grid", gap: "16px" }}>
+          {stock.news.map((item, index) => {
+            const icons = [Building2, Landmark, BarChart3, ShieldAlert, Building2] as const;
+            const Icon = icons[index] ?? Building2;
+            return (
+              <div key={item.headline} style={{ display: "flex", gap: "12px" }}>
+                <Icon color="var(--brand)" size={18} />
+                <div style={{ display: "grid", gap: "4px" }}>
+                  <div style={{ color: "var(--text-primary)" }}>{item.headline}</div>
+                  <div style={{ color: "var(--text-300)", fontSize: "12px" }}>{`${item.source} · ${item.time}`}</div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </Card>
+
+      <Card>
+        <CardLabel>Research thesis</CardLabel>
+        <div style={{ display: "grid", gap: "12px" }}>
+          <Badge value={stock.scores.health ?? 0} label={stock.thesis.stance} />
+          <p style={{ color: "var(--text-500)", fontSize: "var(--sz-base)", lineHeight: "1.6" }}>{stock.thesis.thesis}</p>
+          <p style={{ color: "var(--text-700)", fontSize: "var(--sz-base)", lineHeight: "1.6" }}>{`Bull case: ${stock.thesis.bullCase}`}</p>
+          <p style={{ color: "var(--text-700)", fontSize: "var(--sz-base)", lineHeight: "1.6" }}>{`Bear case: ${stock.thesis.bearCase}`}</p>
+          <p style={{ color: "var(--text-500)", fontSize: "var(--sz-base)", lineHeight: "1.6" }}>{`What to watch: ${stock.thesis.whatToWatch}`}</p>
+        </div>
+      </Card>
+
+      <Card>
+        <CardLabel>What changed</CardLabel>
+        <div style={{ display: "grid", gap: "12px" }}>
+          {stock.whatChanged.map((item) => (
+            <p key={item} style={{ color: "var(--text-500)", fontSize: "var(--sz-base)", lineHeight: "1.6" }}>
+              {item}
+            </p>
+          ))}
+        </div>
+      </Card>
+
+      <Card>
+        <CardLabel>Sector-relative view</CardLabel>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "16px" }}>
+          {stock.sectorRelative.map((item) => (
+            <Stat key={item.label} label={`${item.label} vs sector`} value={`${item.company} / ${item.sectorMedian}`} />
+          ))}
+        </div>
+      </Card>
     </div>
   );
+}
+
+export default function StockPage() {
+  const { symbol = "HDFCBANK" } = useParams();
+  const { data, status } = useQuery({
+    queryKey: ["stock", symbol],
+    staleTime: 5 * 60 * 1000,
+    queryFn: async () => {
+      const response = await fetch(`/api/stock/${encodeURIComponent(symbol)}`);
+      if (!response.ok) return null;
+      return response.json() as Promise<StockResearchDetail>;
+    },
+  });
+
+  if (status === "pending") return <StockSkeleton />;
+  if (!data) return <StockError symbol={symbol} />;
+  return <StockView stock={data} />;
 }

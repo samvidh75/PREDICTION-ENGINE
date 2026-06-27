@@ -1,5 +1,4 @@
 @import './styles/tokens.css';
-@import './styles/theme.css';
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -10,10 +9,10 @@ html, body, #root {
 
 html {
   font-family: var(--font);
-  font-size: 16px;
+  font-size: var(--sz-base);
   line-height: 1.55;
-  color: var(--text-primary);
-  background: var(--bg-page) !important;
+  color: var(--text-700);
+  background: var(--page) !important;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
@@ -22,96 +21,17 @@ html {
 body {
   min-height: 100vh;
   overflow-x: clip;
-  background: var(--bg-page) !important;
+  background: var(--page) !important;
 }
 
 a { color: var(--brand); text-decoration: none; }
 a:hover { text-decoration: underline; }
 
-button { font-family: var(--font); cursor: pointer; }
-input, select, textarea { font-family: var(--font); }
+button { cursor: pointer; }
+input, button, a { font-family: var(--font); }
 
 *:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 2px rgba(99,91,255,0.25);
-  border-radius: 6px;
-}
-
-/* ── AppShell responsive layout ── */
-
-/* Mobile top bar — visible < 768px */
-.mobile-header {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  background: var(--bg-card);
-  border-bottom: 1px solid var(--border);
-  padding: 12px 16px;
-  display: flex;
-  align-items: center;
-}
-
-/* Mobile bottom tab bar — visible < 768px */
-.tabbar {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 56px;
-  display: flex;
-  border-top: 1px solid var(--border);
-  background: var(--bg-card);
-  z-index: 100;
-}
-
-/* Desktop left rail — visible ≥ 768px */
-.rail {
-  display: none;
-}
-
-/* Content area */
-.content {
-  padding: 16px;
-  padding-bottom: 72px; /* room for tab bar */
-  max-width: 100%;
-}
-
-/* Desktop footer — visible ≥ 768px */
-.desktop-footer {
-  display: none;
-}
-
-@media (min-width: 768px) {
-  .mobile-header { display: none; }
-  .tabbar      { display: none; }
-
-  .rail {
-    display: flex;
-    flex-direction: column;
-    width: 240px;
-    position: fixed;
-    top: 0;
-    bottom: 0;
-    border-right: 1px solid var(--border);
-    padding: 24px;
-    background: var(--bg-card);
-  }
-
-  .content {
-    margin-left: 240px;
-    padding: 48px;
-    padding-bottom: 48px;
-    max-width: 1120px;
-  }
-
-  .desktop-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 24px 48px;
-    margin-left: 240px;
-    max-width: 1120px;
-    border-top: 1px solid var(--border);
-    background: var(--bg-card);
-  }
+  box-shadow: var(--sh-focus);
+  border-radius: var(--r-sm);
 }

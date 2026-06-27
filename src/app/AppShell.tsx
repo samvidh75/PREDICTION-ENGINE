@@ -1,128 +1,158 @@
-import { Home, Search, Star, GitCompare, ArrowLeft } from 'lucide-react';
-import { color, font, space, radius, layout } from '../design/tokens';
+import type { ReactNode } from "react";
+import { GitCompare, Home, Search, Star } from "lucide-react";
+import { NavLink } from "react-router-dom";
 
-type PageType = 'home' | 'scanner' | 'watchlist' | 'compare';
+const NAV = [
+  { to: "/", label: "Home", icon: Home },
+  { to: "/scanner", label: "Scanner", icon: Search },
+  { to: "/watchlist", label: "Watchlist", icon: Star },
+  { to: "/compare", label: "Compare", icon: GitCompare },
+] as const;
 
-interface NavItem {
-  to: PageType;
-  label: string;
-  icon: typeof Home;
-}
-
-const NAV: NavItem[] = [
-  { to: 'home',      label: 'Home',      icon: Home },
-  { to: 'scanner',   label: 'Scanner',   icon: Search },
-  { to: 'watchlist', label: 'Watchlist', icon: Star },
-  { to: 'compare',   label: 'Compare',   icon: GitCompare },
-];
-
-interface AppShellProps {
-  children: React.ReactNode;
-  currentPage: PageType;
-  onNavigate: (page: PageType) => void;
-  title?: string;
-  onBack?: () => void;
-}
-
-export function AppShell({ children, currentPage, onNavigate, title, onBack }: AppShellProps) {
+export function AppShell({ children }: { children: ReactNode }) {
   return (
-    <div style={{ fontFamily: font, color: color.text, background: color.bg, minHeight: '100vh' }}>
-      {/* Desktop left rail — hidden on mobile */}
+    <div
+      style={{
+        fontFamily: "var(--font)",
+        color: "var(--text-700)",
+        background: "var(--page)",
+        minHeight: "100vh",
+      }}
+    >
       <aside className="rail">
-        <div
-          style={{ fontWeight: 700, fontSize: '16px', color: color.text, cursor: 'pointer', marginBottom: space[8] }}
-          onClick={() => onNavigate('home')}
-        >
+        <NavLink to="/" className="brand-link">
           StockStory
-        </div>
-        <nav style={{ display: 'flex', flexDirection: 'column', gap: space[1] }}>
-          {NAV.map((item) => {
-            const active = currentPage === item.to;
-            return (
-              <button
-                key={item.to}
-                onClick={() => onNavigate(item.to)}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: space[3],
-                  padding: `${space[2]} ${space[3]}`,
-                  borderRadius: radius.sm,
-                  border: 'none',
-                  background: active ? color.bgAlt : 'transparent',
-                  color: active ? color.primary : color.textMuted,
-                  fontWeight: active ? 600 : 400,
-                  fontSize: '14px',
-                  cursor: 'pointer',
-                  textAlign: 'left',
-                }}
-              >
-                <item.icon size={18} strokeWidth={active ? 2 : 1.5} />
-                {item.label}
-              </button>
-            );
-          })}
+        </NavLink>
+        <nav className="nav-stack" aria-label="Primary">
+          {NAV.map((item) => (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              className={({ isActive }) => `nav-link${isActive ? " is-active" : ""}`}
+            >
+              <item.icon size={18} strokeWidth={1.75} />
+              <span>{item.label}</span>
+            </NavLink>
+          ))}
         </nav>
       </aside>
 
-      {/* Mobile top bar — visible only on mobile */}
-      <header className="mobile-header">
-        {onBack ? (
-          <button
-            onClick={onBack}
-            style={{
-              display: 'flex', alignItems: 'center', gap: space[2],
-              border: 'none', background: 'transparent', cursor: 'pointer',
-              color: color.text, padding: 0,
-            }}
-          >
-            <ArrowLeft size={18} />
-            <span style={{ fontWeight: 600, fontSize: '16px' }}>StockStory</span>
-          </button>
-        ) : (
-          <span style={{ fontWeight: 700, fontSize: '16px' }}>StockStory</span>
-        )}
+      <header className="mobile-brand">
+        <NavLink to="/" className="mobile-brand-link">
+          StockStory
+        </NavLink>
       </header>
 
-      {/* Mobile bottom tab bar — hidden on desktop */}
-      <nav className="tabbar">
-        {NAV.map((item) => {
-          const active = currentPage === item.to;
-          return (
-            <button
-              key={item.to}
-              onClick={() => onNavigate(item.to)}
-              style={{
-                display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                gap: 2, border: 'none', background: 'transparent', cursor: 'pointer',
-                color: active ? color.primary : color.textMuted,
-                flex: 1, padding: `${space[1]} 0`,
-              }}
-            >
-              <item.icon size={20} strokeWidth={active ? 2 : 1.5} />
-              <span style={{ fontSize: '10px', fontWeight: active ? 600 : 400 }}>{item.label}</span>
-            </button>
-          );
-        })}
+      <nav className="tabbar" aria-label="Primary">
+        {NAV.map((item) => (
+          <NavLink
+            key={item.to}
+            to={item.to}
+            className={({ isActive }) => `tab-link${isActive ? " is-active" : ""}`}
+          >
+            <item.icon size={20} strokeWidth={1.75} />
+            <span>{item.label}</span>
+          </NavLink>
+        ))}
       </nav>
 
-      {/* Content area */}
-      <main className="content">
-        {title && (
-          <h1 style={{ fontSize: '28px', fontWeight: 600, lineHeight: '1.2', margin: `0 0 ${space[6]} 0` }}>
-            {title}
-          </h1>
-        )}
-        {children}
-      </main>
+      <main className="content">{children}</main>
 
-      {/* Desktop footer */}
-      <footer className="desktop-footer">
-        <p style={{ fontSize: '12px', color: color.textMuted, margin: 0 }}>
-          &copy; 2025 StockStory India. Not SEBI-registered. Not investment advice.
-        </p>
-        <p style={{ fontSize: '12px', color: color.textMuted, margin: 0 }}>StockStory</p>
-      </footer>
+      <style>{`
+        .rail { display:none; }
+        .mobile-brand {
+          display:flex;
+          align-items:center;
+          height:56px;
+          padding:0 16px;
+          border-bottom:1px solid var(--border);
+          background:var(--page);
+        }
+        .mobile-brand-link {
+          color:var(--text-primary);
+          font-size:18px;
+          font-weight:600;
+          line-height:1.3;
+          text-decoration:none;
+        }
+        .tabbar {
+          position:fixed;
+          bottom:0;
+          left:0;
+          right:0;
+          height:56px;
+          display:flex;
+          border-top:1px solid var(--border);
+          background:var(--page);
+          z-index:10;
+        }
+        .content {
+          padding:16px;
+          padding-bottom:72px;
+          width:100%;
+        }
+        .brand-link {
+          color:var(--text-primary);
+          font-size:20px;
+          font-weight:600;
+          line-height:1.3;
+          text-decoration:none;
+          margin-bottom:32px;
+        }
+        .nav-stack {
+          display:flex;
+          flex-direction:column;
+          gap:4px;
+        }
+        .nav-link,
+        .tab-link {
+          color:var(--text-500);
+          text-decoration:none;
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          gap:8px;
+        }
+        .nav-link {
+          min-height:44px;
+          justify-content:flex-start;
+          border-radius:6px;
+          padding:0 12px;
+        }
+        .tab-link {
+          flex:1;
+          flex-direction:column;
+          font-size:12px;
+          font-weight:500;
+          line-height:1.4;
+        }
+        .nav-link.is-active,
+        .tab-link.is-active {
+          color:var(--brand);
+          background:var(--chip);
+        }
+        @media (min-width:768px) {
+          .mobile-brand { display:none; }
+          .rail {
+            display:flex;
+            flex-direction:column;
+            width:240px;
+            position:fixed;
+            top:0;
+            bottom:0;
+            border-right:1px solid var(--border);
+            padding:24px;
+            background:var(--page);
+          }
+          .tabbar { display:none; }
+          .content {
+            margin-left:240px;
+            padding:48px;
+            padding-bottom:48px;
+            max-width:1120px;
+          }
+        }
+      `}</style>
     </div>
   );
 }
