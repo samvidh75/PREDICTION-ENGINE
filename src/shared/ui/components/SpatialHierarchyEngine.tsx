@@ -1,27 +1,24 @@
 import React from "react";
+import { spacing } from "../../../styles";
 
 export type SpatialSplit = "balanced" | "hero" | "editorial";
 export type SpatialAlign = "start" | "center";
+
+export type SpacingKey = keyof typeof spacing;
 
 type SpatialHierarchyEngineProps = {
   primary: React.ReactNode;
   secondary?: React.ReactNode;
   supporting?: React.ReactNode;
 
-  /**
-   * Controls column split only for >= lg screens.
-   * Mobile/tablet always stack vertically.
-   */
   split?: SpatialSplit;
-
   align?: SpatialAlign;
-  gapClassName?: string;
+
+  /** Key into spacing object. Default: "lg" (24px). */
+  gap?: SpacingKey;
+
   className?: string;
 
-  /**
-   * Optional debug label to help enforce “primary/secondary/support” discipline.
-   * Adds `data-ss-hierarchy`.
-   */
   debugLabel?: string;
 };
 
@@ -41,19 +38,13 @@ function alignClass(align: SpatialAlign | undefined): string {
   return align === "center" ? "items-center" : "items-start";
 }
 
-/**
- * Spatial Hierarchy Engine (foundation primitive)
- * - Enforces: primary focus, secondary focus, supporting intelligence, background context (optional via caller).
- * - Arranges zones spatially with a consistent 12-col grid.
- * - DOES NOT apply background/atmosphere; screens own the atmosphere layer order.
- */
 export default function SpatialHierarchyEngine({
   primary,
   secondary,
   supporting,
   split = "balanced",
   align = "start",
-  gapClassName = "gap-6",
+  gap = "lg",
   className,
   debugLabel,
 }: SpatialHierarchyEngineProps): JSX.Element {
@@ -61,7 +52,8 @@ export default function SpatialHierarchyEngine({
 
   return (
     <div
-      className={["grid grid-cols-1 lg:grid-cols-12", gapClassName, alignClass(align), className ?? ""].join(" ").trim()}
+      className={["grid grid-cols-1 lg:grid-cols-12", alignClass(align), className ?? ""].join(" ").trim()}
+      style={{ gap: spacing[gap] }}
       data-ss-hierarchy={debugLabel ?? undefined}
     >
       <div className={[primaryCol, "min-w-0"].join(" ")} data-ss-zone="primary">
@@ -75,7 +67,7 @@ export default function SpatialHierarchyEngine({
       )}
 
       {supporting !== undefined && (
-        <div className={["lg:col-span-12", "mt-6"].join(" ")} data-ss-zone="supporting">
+        <div className="lg:col-span-12" style={{ marginTop: spacing.lg }} data-ss-zone="supporting">
           {supporting}
         </div>
       )}

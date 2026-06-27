@@ -46,7 +46,7 @@ export default function Modal({ open, onClose, title, children, width = 520 }: M
 
         {title && (
           <h2 style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-900)',
-                       letterSpacing: '-0.4px', marginBottom: 6,
+                       letterSpacing: '-0.4px', marginBottom: 8,
                        paddingRight: 32 }}>
             {title}
           </h2>

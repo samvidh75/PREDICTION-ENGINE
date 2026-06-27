@@ -14,10 +14,7 @@
     <!-- ── Google Search Console ────────────────────────────────────────── -->
     <meta name="google-site-verification" content="WnKlTQpoqijYSd0gZeEU9fczCAZZddxpfuI4jYYzCEc" />
 
-    <!-- ── Preconnect ───────────────────────────────────────────────────── -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet" />
+    <!-- ── Analytics ────────────────────────────────────────────────────── -->
     <link rel="preconnect" href="https://www.googletagmanager.com" />
     <link rel="preconnect" href="https://www.google-analytics.com" />
 
@@ -69,15 +66,6 @@
       gtag('config', 'G-ZX8Y4BFK6Z', {
         send_page_view: true,
         cookie_flags: 'max-age=7200;secure;samesite=none'
-      });
-    </script>
-
-    <!-- ── WebGPU AI (Transformers.js, client-side, ₹0) ─────────────────── -->
-    <script type="module">
-      import { pipeline } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers';
-      window.Transformers = { pipeline };
-      pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2').then(() => {
-        console.log('✅ Models loaded in browser, ready for offline AI');
       });
     </script>
 

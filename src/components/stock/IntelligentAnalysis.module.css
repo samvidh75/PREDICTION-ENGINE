@@ -154,7 +154,7 @@
 .factor {
   font-size: var(--sz-2xs);
   background-color: var(--page);
-  padding: 2px 6px;
+  padding: 4px 8px;
   border-radius: var(--r-xs);
   border: 1px solid var(--border);
 }

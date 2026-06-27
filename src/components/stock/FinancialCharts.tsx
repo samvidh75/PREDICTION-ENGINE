@@ -57,30 +57,30 @@ const FinancialTooltip = ({ active, payload, label, data, activeTab }: any) => {
   return (
     <div style={{
       background:'var(--surface)', border:'1px solid var(--border)',
-      borderRadius:'var(--r-lg)', padding:'16px 20px',
+      borderRadius:'var(--r-lg)', padding: '16px 20px',
       boxShadow:'var(--sh-float)', fontFamily:'var(--font)',
       minWidth:190,
     }}>
       <div style={{ fontSize:'var(--sz-xs)', fontWeight:700, color:'var(--text-300)',
-        textTransform:'uppercase', letterSpacing:'0.06em', marginBottom:10 }}>
+        textTransform:'uppercase', letterSpacing:'0.06em', marginBottom: 12 }}>
         {label}{isTTM ? ' (TTM)' : ''}
       </div>
 
-      <div style={{ fontSize:'var(--sz-xs)', color:'var(--text-300)', marginBottom:4 }}>
+      <div style={{ fontSize:'var(--sz-xs)', color:'var(--text-300)', marginBottom: 4 }}>
         {tabLabels[activeTab] || 'Revenue'}
       </div>
 
       <div style={{ fontSize:22, fontWeight:800, color:'var(--text-900)',
-        letterSpacing:'-0.025em', marginBottom:8 }}>
+        letterSpacing:'-0.025em', marginBottom: 8 }}>
         {formatChartValue(val)}
       </div>
 
       {yoy !== null && (
         <div style={{
-          display:'inline-flex', alignItems:'center', gap:5,
+          display:'inline-flex', alignItems:'center', gap: 4,
           fontSize:'var(--sz-sm)', fontWeight:700,
           color: yoy >= 0 ? 'var(--green-text)' : 'var(--red-text)',
-          padding:'5px 10px', borderRadius:'var(--r-pill)',
+          padding: '4px 12px', borderRadius:'var(--r-pill)',
           background: yoy >= 0 ? 'var(--green-tint)' : 'var(--red-tint)',
         }}>
           {yoy >= 0 ? '▲' : '▼'} {Math.abs(yoy).toFixed(1)}% YoY
@@ -130,26 +130,26 @@ export const FinancialCharts = ({ data }: FinancialChartsProps) => {
   return (
     <div style={{
       background:'var(--surface)', border:'1px solid var(--border)',
-      borderRadius:'var(--r-lg)', padding:'24px',
-      margin:'12px 0',
+      borderRadius:'var(--r-lg)', padding: '24px',
+      margin: '12px 0',
     }}>
       <div style={{ fontSize:'var(--sz-xs)', fontWeight:700, color:'var(--text-300)',
-        textTransform:'uppercase', letterSpacing:'0.08em', marginBottom:16 }}>
+        textTransform:'uppercase', letterSpacing:'0.08em', marginBottom: 16 }}>
         Financial Performance
       </div>
 
       {!hasData ? (
-        <div style={{ fontSize:'var(--sz-sm)', color:'var(--text-300)', textAlign:'center', padding:'24px 0' }}>
+        <div style={{ fontSize:'var(--sz-sm)', color:'var(--text-300)', textAlign:'center', padding: '24px 0' }}>
           Annual financial history is being compiled.
         </div>
       ) : (
         <>
           {/* Segmented tabs */}
           <div style={{ display:'flex', background:'var(--chip)', borderRadius:'var(--r-md)',
-            padding:4, gap:2, width:'fit-content', marginBottom:20 }}>
+            padding: 4, gap: 4, width:'fit-content', marginBottom: 20 }}>
             {visibleTabs.map(tab => (
               <button key={tab.key} onClick={() => setActiveTab(tab.key as any)} style={{
-                padding:'7px 16px', fontSize:'var(--sz-sm)', fontWeight: activeTab === tab.key ? 700 : 500,
+                padding: '8px 16px', fontSize:'var(--sz-sm)', fontWeight: activeTab === tab.key ? 700 : 500,
                 color: activeTab === tab.key ? 'var(--text-900)' : 'var(--text-500)',
                 background: activeTab === tab.key ? 'var(--surface)' : 'transparent',
                 border:'none', borderRadius:'var(--r-sm)', cursor:'pointer',
@@ -207,7 +207,7 @@ export const FinancialCharts = ({ data }: FinancialChartsProps) => {
           {chartData.some(d => d.year === currentFY) && (
             <div style={{
               fontSize:'var(--sz-xs)', color:'var(--amber)', fontWeight:600,
-              textAlign:'right', marginTop:6,
+              textAlign:'right', marginTop: 8,
             }}>
               * {currentFY} data is trailing twelve months (TTM)
             </div>

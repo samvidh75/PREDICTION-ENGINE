@@ -31,7 +31,7 @@ export default function ThesisCard({ symbol, companyName }: ThesisCardProps) {
         background: "#FFFFFF",
         border: "1px solid var(--border)",
         borderRadius: 12,
-        padding: 18,
+        padding: 20,
         boxShadow: "var(--shadow-sm)",
       }}
     >
@@ -71,7 +71,7 @@ export default function ThesisCard({ symbol, companyName }: ThesisCardProps) {
             style={{
               width: "100%",
               minHeight: 80,
-              padding: 10,
+              padding: 12,
               borderRadius: 8,
               border: "1px solid var(--border)",
               fontSize: 13,
@@ -87,7 +87,7 @@ export default function ThesisCard({ symbol, companyName }: ThesisCardProps) {
               onClick={save}
               style={{
                 height: 32,
-                padding: "0 14px",
+                padding: "0 16px",
                 borderRadius: 6,
                 border: "none",
                 background: "var(--action)",
@@ -97,7 +97,7 @@ export default function ThesisCard({ symbol, companyName }: ThesisCardProps) {
                 cursor: "pointer",
                 display: "flex",
                 alignItems: "center",
-                gap: 6,
+                gap: 8,
               }}
             >
               <Check size={13} /> Save
@@ -106,7 +106,7 @@ export default function ThesisCard({ symbol, companyName }: ThesisCardProps) {
               onClick={cancel}
               style={{
                 height: 32,
-                padding: "0 14px",
+                padding: "0 16px",
                 borderRadius: 6,
                 border: "1px solid var(--border)",
                 background: "transparent",
@@ -116,7 +116,7 @@ export default function ThesisCard({ symbol, companyName }: ThesisCardProps) {
                 cursor: "pointer",
                 display: "flex",
                 alignItems: "center",
-                gap: 6,
+                gap: 8,
               }}
             >
               <X size={13} /> Cancel

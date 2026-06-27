@@ -21,10 +21,10 @@ export default function CompanyHeader({
         gap: 16, marginBottom: 12,
       }}>
         <div>
-          <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6, flexWrap: "wrap" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8, flexWrap: "wrap" }}>
             <span style={{
               fontSize: 10, fontWeight: 600, color: "var(--text-300)",
-              background: "var(--chip)", borderRadius: 4, padding: "1px 6px",
+              background: "var(--chip)", borderRadius: 4, padding: "4px 8px",
               letterSpacing: "0.05em",
             }}>
               {exchange}
@@ -35,7 +35,7 @@ export default function CompanyHeader({
                 <span style={{ fontSize: 11, color: "var(--text-300)" }}>\u00B7</span>
                 <span style={{
                   fontSize: "var(--sz-xs)", fontWeight: 700,
-                  padding: "2px 8px", borderRadius: "var(--r-pill)",
+                  padding: "4px 8px", borderRadius: "var(--r-pill)",
                   background: "var(--chip)", color: "var(--text-500)",
                 }}>
                   {sector}
@@ -58,7 +58,7 @@ export default function CompanyHeader({
             background: "var(--surface)", color: "var(--text-500)",
             border: "1px solid var(--border)", fontSize: 14,
             fontWeight: 600, cursor: "pointer", fontFamily: "var(--font)",
-            display: "flex", alignItems: "center", gap: 5,
+            display: "flex", alignItems: "center", gap: 4,
           }}>
             \u2661 Track
           </button>
@@ -66,7 +66,7 @@ export default function CompanyHeader({
             height: 40, padding: "0 16px", borderRadius: "var(--r-md)",
             background: "var(--surface)", color: "var(--text-500)",
             border: "1px solid var(--border)", fontSize: 14,
-            fontWeight: 600, display: "flex", alignItems: "center", gap: 5,
+            fontWeight: 600, display: "flex", alignItems: "center", gap: 4,
             textDecoration: "none", lineHeight: 1,
           }}>
             \u2295 Compare
@@ -82,7 +82,7 @@ export default function CompanyHeader({
           <div style={{
             fontSize: "var(--sz-4xl)", fontWeight: 800,
             letterSpacing: "-0.03em", color: "var(--text-900)",
-            lineHeight: 1, marginBottom: 6,
+            lineHeight: 1, marginBottom: 8,
           }}>
             {price !== null
               ? `\u20B9${price.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
@@ -107,7 +107,7 @@ export default function CompanyHeader({
           background: "var(--brand)", color: "var(--text-inverse)",
           border: "none", fontSize: 14, fontWeight: 600,
           cursor: "pointer", fontFamily: "var(--font)",
-          display: "flex", alignItems: "center", gap: 6,
+          display: "flex", alignItems: "center", gap: 8,
           whiteSpace: "nowrap",
         }}>
           Invest via broker \u2192

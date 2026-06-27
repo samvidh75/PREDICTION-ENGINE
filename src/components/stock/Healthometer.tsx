@@ -80,13 +80,13 @@ export default function Healthometer({
           }}>
             {score}
           </div>
-          <div style={{ fontSize: "var(--sz-sm)", color: "var(--text-300)", marginBottom: 10 }}>
+          <div style={{ fontSize: "var(--sz-sm)", color: "var(--text-300)", marginBottom: 12 }}>
             out of 100
           </div>
           {stateLabel && (
             <div style={{
-              display: "inline-flex", alignItems: "center", gap: 5,
-              padding: "4px 10px", borderRadius: "var(--r-pill)",
+              display: "inline-flex", alignItems: "center", gap: 4,
+              padding: "4px 12px", borderRadius: "var(--r-pill)",
               background: badgeStyle.bg, color: badgeStyle.text,
               fontSize: "var(--sz-xs)", fontWeight: 700,
             }}>
@@ -97,7 +97,7 @@ export default function Healthometer({
               {stateLabel}
             </div>
           )}
-          <div style={{ marginTop: 10, fontSize: "var(--sz-sm)", fontWeight: 600, color: cfg.color }}>
+          <div style={{ marginTop: 12, fontSize: "var(--sz-sm)", fontWeight: 600, color: cfg.color }}>
             {cfg.label}
           </div>
         </div>
@@ -105,7 +105,7 @@ export default function Healthometer({
         <div style={{ flex: 1, minWidth: 200 }}>
           {FACTORS.map(({ label, value }) => (
             <div key={label} style={{ marginBottom: 12 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
                 <span style={{ fontSize: "var(--sz-sm)", color: "var(--text-500)", fontWeight: 500 }}>
                   {label}
                 </span>
@@ -139,7 +139,7 @@ export default function Healthometer({
       )}
 
       <div style={{ borderTop: "1px solid var(--border)", paddingTop: 16 }}>
-        <div style={{ fontSize: "var(--sz-base)", fontWeight: 700, color: "var(--text-900)", marginBottom: 14 }}>
+        <div style={{ fontSize: "var(--sz-base)", fontWeight: 700, color: "var(--text-900)", marginBottom: 16 }}>
           Why {score}/100 \u2014 specific to this stock
         </div>
         {(details && details.length > 0 ? details : [
@@ -151,7 +151,7 @@ export default function Healthometer({
           const isNegative = d.startsWith("\u2717");
           return (
             <div key={i} style={{
-              fontSize: "var(--sz-sm)", fontWeight: 500, marginBottom: 7,
+              fontSize: "var(--sz-sm)", fontWeight: 500, marginBottom: 8,
               display: "flex", gap: 8,
               color: isPositive ? "var(--green-text)" : isNegative ? "var(--red-text)" : "var(--text-500)",
             }}>

@@ -62,7 +62,7 @@ export default function TrustIndicatorsWidget(): JSX.Element {
           background: "rgba(255,255,255,0.03)",
           border: "1px solid rgba(255,255,255,0.08)",
           borderRadius: 12,
-          padding: "14px 20px",
+          padding: "16px 20px",
           textAlign: "center",
           minWidth: 140,
         }}>

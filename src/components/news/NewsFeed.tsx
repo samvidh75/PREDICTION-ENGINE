@@ -184,7 +184,7 @@ export default function NewsFeed({ symbol }: { symbol: string }) {
                 rel="noopener noreferrer"
                 style={{
                   display: "block",
-                  padding: "14px 16px",
+                  padding: "16px 16px",
                   marginBottom: 8,
                   borderRadius: "var(--r-md)",
                   border: "1px solid var(--brand-tint)",
@@ -192,10 +192,10 @@ export default function NewsFeed({ symbol }: { symbol: string }) {
                   textDecoration: "none",
                 }}
               >
-                <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
                   <span style={{
                     fontSize: 8, fontWeight: 800, color: "var(--brand-text)",
-                    background: "var(--brand-tint)", padding: "1px 6px",
+                    background: "var(--brand-tint)", padding: "4px 8px",
                     borderRadius: "var(--r-xs)", letterSpacing: "0.08em",
                     textTransform: "uppercase",
                   }}>
@@ -224,7 +224,7 @@ export default function NewsFeed({ symbol }: { symbol: string }) {
               rel="noopener noreferrer"
               style={{
                 display: "block",
-                padding: "14px 16px",
+                padding: "16px 16px",
                 marginBottom: 8,
                 borderRadius: "var(--r-md)",
                 border: "1px solid var(--border)",
@@ -235,7 +235,7 @@ export default function NewsFeed({ symbol }: { symbol: string }) {
               onMouseOver={e => { e.currentTarget.style.borderColor = "var(--border-strong)"; }}
               onMouseOut={e => { e.currentTarget.style.borderColor = "var(--border)"; }}
             >
-              <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
                 <Newspaper size={12} style={{ color: "var(--text-300)" }} />
                 <span style={{ fontSize: 10, color: "var(--text-300)", fontWeight: 500 }}>
                   {item.source}

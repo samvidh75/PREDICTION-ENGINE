@@ -85,13 +85,13 @@ export default function PriceChart({ symbol, height }: PriceChartProps) {
         </div>
 
         {/* Time range selector — top right */}
-        <div style={{ display: "flex", gap: 6, flexWrap: "wrap", justifyContent: "flex-end" }}>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "flex-end" }}>
           {RANGES.map((r) => (
             <button
               key={r}
               onClick={() => setRange(r)}
               style={{
-                padding: "6px 11px", fontSize: 11, fontWeight: 700,
+                padding: "8px 12px", fontSize: 11, fontWeight: 700,
                 background: r === range ? "var(--brand-tint)" : "transparent",
                 color: r === range ? "var(--brand)" : "var(--text-300)",
                 border: r === range ? "1px solid var(--brand)" : "1px solid var(--border-strong)",
@@ -137,7 +137,7 @@ export default function PriceChart({ symbol, height }: PriceChartProps) {
               return (
                 <div style={{
                   background: "var(--surface)", border: "1px solid var(--border-strong)",
-                  borderRadius: 10, padding: "12px 14px", fontFamily: "var(--font)",
+                  borderRadius: 10, padding: "12px 16px", fontFamily: "var(--font)",
                   boxShadow: "var(--sh-float)",
                 }}>
                   <div style={{ fontSize: 12, color: "var(--text-500)", marginBottom: 4 }}>{label}</div>

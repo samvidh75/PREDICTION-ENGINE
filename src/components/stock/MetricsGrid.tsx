@@ -75,7 +75,7 @@ function MetricTile({
         background: 'var(--surface)',
         border: '1px solid var(--border)',
         borderRadius: 'var(--r-lg)',
-        padding: '16px 18px',
+        padding: '16px 20px',
         position: 'relative',
         cursor: isBlurred ? 'pointer' : 'default',
         transition: 'border-color var(--t-fast)',
@@ -84,7 +84,7 @@ function MetricTile({
       <div style={{
         fontSize: 'var(--sz-xs)', fontWeight: 700,
         color: 'var(--text-300)', textTransform: 'uppercase',
-        letterSpacing: '0.06em', marginBottom: 10, lineHeight: 1,
+        letterSpacing: '0.06em', marginBottom: 12, lineHeight: 1,
       }}>
         {label}
       </div>
@@ -114,7 +114,7 @@ function MetricTile({
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           background: 'rgba(249,249,247,0.6)',
           backdropFilter: 'blur(0.5px)',
-          gap: 6, flexDirection: 'column',
+          gap: 8, flexDirection: 'column',
         }}>
           <span style={{ fontSize: 18 }}>{String.fromCodePoint(0x1F512)}</span>
           <span style={{ fontSize: 'var(--sz-xs)', color: 'var(--text-300)', fontWeight: 600 }}>Pro</span>
@@ -163,7 +163,7 @@ export default function MetricsGrid({ fundamentals, price, isPro, onUpgradeClick
 
       <div
         className="metrics-grid"
-        style={{ display: 'grid', gap: 10, gridTemplateColumns: 'repeat(4, 1fr)' }}
+        style={{ display: 'grid', gap: 12, gridTemplateColumns: 'repeat(4, 1fr)' }}
       >
         {allMetrics.map(m => (
           <MetricTile key={m.label} label={m.label} value={m.value} signal={m.signal} isBlurred={false} />
