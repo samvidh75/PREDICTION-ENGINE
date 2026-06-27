@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { getPersistedStockResearch } from "../../src/lib/stockResearchSnapshot.js";
+import { getPersistedStockResearch } from "../src/lib/stockResearchSnapshot.js";
 
 const CACHE = new Map<string, { data: unknown; expiresAt: number }>();
 const CACHE_TTL = 5 * 60 * 1000;

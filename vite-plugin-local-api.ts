@@ -33,8 +33,9 @@ export function localApiPlugin(): Plugin {
             return;
           }
 
-          if (url.startsWith("/api/stock/")) {
-            const symbol = decodeURIComponent(url.replace("/api/stock/", "").split("?")[0] ?? "");
+          if (url.startsWith("/api/stock")) {
+            const parsed = new URL(url, "http://localhost");
+            const symbol = (parsed.searchParams.get("symbol") ?? decodeURIComponent(url.replace("/api/stock/", "").split("?")[0] ?? "")).toUpperCase();
             const { getPersistedStockResearch } = await loadSnapshot(server);
             const research = await getPersistedStockResearch(symbol);
             if (!research) {

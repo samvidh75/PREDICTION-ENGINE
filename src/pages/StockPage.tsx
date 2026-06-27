@@ -351,7 +351,7 @@ export default function StockPage() {
     queryKey: ["stock", symbol],
     staleTime: 5 * 60 * 1000,
     queryFn: async () => {
-      const response = await fetch(`/api/stock/${encodeURIComponent(symbol)}`);
+      const response = await fetch(`/api/stock?symbol=${encodeURIComponent(symbol)}`);
       if (!response.ok) return null;
       return response.json() as Promise<StockResearchDetail>;
     },
