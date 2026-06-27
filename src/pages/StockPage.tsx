@@ -1,40 +1,56 @@
-import { useState, useEffect } from 'react';
-import { spacing, typography, colors } from '../styles';
+import { useState, useEffect, useMemo } from 'react';
+import { ArrowLeft, ArrowUp, ArrowDown, TrendingUp, Shield, BarChart3, Newspaper } from 'lucide-react';
+import { color, font, space, radius, typeScale, layout } from '../design/tokens';
 import { Button } from '../components/ui/Button';
-import { Card } from '../components/ui/Card';
+import { Card, CardLabel } from '../components/ui/Card';
+import { Stat } from '../components/ui/Stat';
+import { Badge } from '../components/ui/Badge';
+import { useMediaQuery } from '../hooks/useMediaQuery';
 import { getStockBySymbol } from '../services/scanner/scoringEngine';
 import type { FactorScores } from '../services/scanner/scoringEngine';
 import type { StockFundamentals } from '../services/scanner/stockUniverse';
 
-interface NewsArticle {
-  headline: string;
-  source: string;
-  time: string;
-}
+interface StockData extends StockFundamentals, FactorScores {}
 
-type StockData = StockFundamentals & FactorScores & { news: NewsArticle[] };
+const TIMEFRAMES = ['1W', '1M', '3M', '1Y', '5Y'] as const;
 
-const TIMEFRAMES = ['1W', '1M', '3M', '1Y', '5Y'];
-
-function generatePricePath(prices: number[], width = 600, height = 240): string {
-  const min = Math.min(...prices);
-  const max = Math.max(...prices);
-  const range = max - min || 1;
-  const xStep = width / (prices.length - 1);
-  return prices.map((p, i) => {
-    const x = i * xStep;
-    const y = height - ((p - min) / range) * height * 0.85 - height * 0.075;
-    return `${i === 0 ? 'M' : 'L'}${x.toFixed(0)},${y.toFixed(0)}`;
-  }).join(' ');
-}
-
-function generatePrices(basePrice: number, days: number): number[] {
-  const prices: number[] = [basePrice];
+function generatePrices(base: number, days: number, seed: number): number[] {
+  const prices: number[] = [base];
+  let p = base;
   for (let i = 1; i < days; i++) {
-    const change = (Math.random() - 0.48) * basePrice * 0.02;
-    prices.push(Math.max(prices[i - 1] + change, basePrice * 0.5));
+    const change = (Math.sin(seed + i * 0.3) * 0.015 + (Math.random() - 0.48) * 0.02) * base;
+    p = Math.max(p + change, base * 0.5);
+    prices.push(p);
   }
   return prices;
+}
+
+function StockSkeleton() {
+  return (
+    <div style={{ maxWidth: layout.maxContentWidth, margin: '0 auto', padding: `0 ${space[3]}` }}>
+      <div style={{ height: 24, width: 120, background: color.bgAlt, borderRadius: radius.sm, marginBottom: space[4] }} />
+      <div style={{ height: 36, width: 200, background: color.bgAlt, borderRadius: radius.sm, marginBottom: space[2] }} />
+      <div style={{ height: 16, width: 160, background: color.bgAlt, borderRadius: radius.sm, marginBottom: space[8] }} />
+      <div style={{ height: 240, background: color.bgAlt, borderRadius: radius.md, marginBottom: space[6] }} />
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: space[4] }}>
+        <div style={{ height: 120, background: color.bgAlt, borderRadius: radius.md }} />
+        <div style={{ height: 120, background: color.bgAlt, borderRadius: radius.md }} />
+      </div>
+    </div>
+  );
+}
+
+function StockError({ symbol }: { symbol: string }) {
+  return (
+    <div style={{ textAlign: 'center', padding: `${space[12]} ${space[3]}` }}>
+      <p style={{ fontSize: '18px', fontWeight: 600, color: color.text, marginBottom: space[2] }}>
+        Stock not found
+      </p>
+      <p style={{ fontSize: '14px', color: color.textMuted }}>
+        We could not find data for {symbol}.
+      </p>
+    </div>
+  );
 }
 
 interface Props {
@@ -44,51 +60,36 @@ interface Props {
 export default function StockDetailPage({ symbol: rawSymbol }: Props) {
   const symbol = rawSymbol ?? 'TCS';
   const [stock, setStock] = useState<StockData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [timeframe, setTimeframe] = useState('1W');
+  const [status, setStatus] = useState<'loading' | 'error' | 'ready'>('loading');
+  const [timeframe, setTimeframe] = useState<typeof TIMEFRAMES[number]>('1Y');
   const [tracking, setTracking] = useState(false);
+  const isDesktop = useMediaQuery('(min-width: 768px)');
 
   useEffect(() => {
-    setLoading(true);
+    setStatus('loading');
     const timer = setTimeout(() => {
       const result = getStockBySymbol(symbol);
       if (result) {
-        setStock({
-          ...result,
-          news: [
-            { headline: `${result.name} posts strong quarterly results`, source: 'Reuters', time: '2h ago' },
-            { headline: `Analysts remain bullish on ${result.symbol}`, source: 'ET', time: '4h ago' },
-            { headline: `${result.symbol} shows improved fundamentals`, source: 'Bloomberg', time: '1d ago' },
-          ],
-        });
+        setStock(result);
+        setStatus('ready');
+      } else {
+        setStatus('error');
       }
-      setLoading(false);
-    }, 150);
+    }, 200);
     return () => clearTimeout(timer);
   }, [symbol]);
 
-  if (loading) {
-    return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh', background: colors.bg.primary }}>
-        <p style={{ ...typography.bodyText, color: colors.text.secondary }}>Loading stock data...</p>
-      </div>
-    );
-  }
+  const prices = useMemo(() => {
+    if (!stock) return [];
+    const days = timeframe === '1W' ? 7 : timeframe === '1M' ? 30 : timeframe === '3M' ? 90 : timeframe === '1Y' ? 365 : 1825;
+    return generatePrices(stock.price, days, stock.price);
+  }, [stock, timeframe]);
 
-  if (!stock) {
-    return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh', background: colors.bg.primary }}>
-        <p style={{ ...typography.bodyText, color: colors.error }}>Stock not found</p>
-      </div>
-    );
-  }
+  if (status === 'loading') return <StockSkeleton />;
+  if (status === 'error' || !stock) return <StockError symbol={symbol} />;
 
-  const prices = generatePrices(stock.price, timeframe === '1W' ? 7 : timeframe === '1M' ? 30 : timeframe === '3M' ? 90 : 365,);
-  const pathData = generatePricePath(prices);
   const isUp = stock.change >= 0;
-  const lineColor = isUp ? colors.success : colors.error;
-
-  const scoreColor = stock.overall >= 75 ? colors.success : stock.overall >= 60 ? colors.primary : stock.overall >= 45 ? colors.warning : colors.error;
+  const lineColor = isUp ? color.success : color.danger;
 
   const FACTORS = [
     { label: 'Quality', value: stock.quality },
@@ -96,114 +97,215 @@ export default function StockDetailPage({ symbol: rawSymbol }: Props) {
     { label: 'Growth', value: stock.growth },
     { label: 'Risk', value: stock.risk },
     { label: 'Technical', value: stock.technical },
-  ] as const;
+  ];
+
+  const width = 600;
+  const height = 200;
+  const min = Math.min(...prices);
+  const max = Math.max(...prices);
+  const range = max - min || 1;
+  const pathData = prices.map((p, i) => {
+    const x = (i / (prices.length - 1)) * width;
+    const y = height - ((p - min) / range) * (height - 20) - 10;
+    return `${i === 0 ? 'M' : 'L'}${x.toFixed(0)},${y.toFixed(0)}`;
+  }).join(' ');
+
+  const areaPath = pathData + ` L${width},${height} L0,${height} Z`;
+
+  const sectionGap = isDesktop ? space[8] : space[6];
+  const pagePadX = isDesktop ? space[6] : space[3];
 
   return (
-    <div style={{ background: colors.bg.secondary, minHeight: '100vh', paddingTop: spacing.xl, paddingBottom: spacing.xxl }}>
-      <div style={{ maxWidth: '1060px', margin: '0 auto', paddingLeft: spacing.xl, paddingRight: spacing.xl }}>
-        <div style={{ marginBottom: spacing.base }}>
-          <Button variant="ghost" size="sm" onClick={() => window.history.back()}>
-            ← Back to home
-          </Button>
+    <div style={{ background: color.bg, minHeight: '100vh' }}>
+      <div style={{ maxWidth: layout.maxContentWidth, margin: '0 auto', paddingLeft: pagePadX, paddingRight: pagePadX }}>
+
+        {/* 1. Header row */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: space[3], marginBottom: space[4] }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: space[3] }}>
+            <Button variant="ghost" onClick={() => window.history.back()} style={{ padding: 0, height: 'auto', width: 'auto' }}>
+              <ArrowLeft size={18} color={color.textMuted} />
+            </Button>
+            <div>
+              <h1 style={{ fontFamily: font, fontSize: '28px', fontWeight: 600, lineHeight: '1.2', color: color.text, margin: 0 }}>
+                {symbol}
+              </h1>
+              <span style={{ fontSize: '14px', color: color.textMuted }}>{stock.name}</span>
+            </div>
+          </div>
+          <div style={{ display: 'flex', gap: space[2], flexWrap: 'wrap' }}>
+            <Button variant="secondary" onClick={() => setTracking(!tracking)}>
+              {tracking ? 'Tracking' : 'Track'}
+            </Button>
+            <Button variant="secondary">Compare</Button>
+            <Button variant="primary">Invest</Button>
+          </div>
         </div>
 
-        <div style={{ marginBottom: spacing.xl }}>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: spacing.base, marginBottom: spacing.xs }}>
-            <h1 style={{ ...typography.pageTitle, color: colors.text.primary, margin: 0 }}>{symbol}</h1>
-            <span style={{ ...typography.cardTitle, color: colors.text.secondary }}>{stock.name}</span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: spacing.base }}>
-            <span style={{ ...typography.sectionTitle, color: colors.text.primary }}>
-              ₹{stock.price.toLocaleString()}
-            </span>
-            <span style={{ ...typography.bodyEmphasis, color: lineColor }}>
-              {isUp ? '+' : ''}{stock.change.toFixed(2)} ({stock.changePercent.toFixed(2)}%)
-            </span>
-          </div>
+        {/* 2. Price block */}
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: space[2], marginBottom: space[6] }}>
+          <span style={{ fontFamily: '"SFMono-Regular", Consolas, monospace', fontSize: '32px', fontWeight: 600, color: color.text }}>
+            ₹{stock.price.toLocaleString('en-IN')}
+          </span>
+          <span style={{
+            display: 'inline-flex', alignItems: 'center', gap: 4,
+            fontSize: '14px', fontWeight: 600, color: lineColor,
+          }}>
+            {isUp ? <ArrowUp size={14} /> : <ArrowDown size={14} />}
+            {isUp ? '+' : ''}{stock.change.toFixed(2)} ({stock.changePercent.toFixed(2)}%)
+          </span>
         </div>
 
-        <Card padding="md" style={{ marginBottom: spacing.base }}>
-          <div style={{ display: 'flex', gap: spacing.sm, marginBottom: spacing.base, flexWrap: 'wrap' }}>
-            {TIMEFRAMES.map((p) => (
-              <Button key={p} variant={timeframe === p ? 'primary' : 'secondary'} size="sm" onClick={() => setTimeframe(p)}>
-                {p}
+        {/* 3. Price chart */}
+        <Card padding="md" style={{ marginBottom: sectionGap }}>
+          <div style={{ display: 'flex', gap: space[2], marginBottom: space[3], flexWrap: 'wrap' }}>
+            {TIMEFRAMES.map((tf) => (
+              <Button key={tf} variant={timeframe === tf ? 'primary' : 'ghost'} onClick={() => setTimeframe(tf)} style={{ height: '32px', padding: '0 12px', fontSize: '12px' }}>
+                {tf}
               </Button>
             ))}
           </div>
-          <svg viewBox="0 0 600 240" style={{ width: '100%', height: 'auto', maxHeight: '240px' }}>
+          <svg viewBox={`0 0 ${width} ${height}`} style={{ width: '100%', height: 'auto' }}>
+            <defs>
+              <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor={lineColor} stopOpacity="0.15" />
+                <stop offset="100%" stopColor={lineColor} stopOpacity="0" />
+              </linearGradient>
+            </defs>
+            <path d={areaPath} fill="url(#chartGrad)" />
             <path d={pathData} fill="none" stroke={lineColor} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </Card>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: spacing.base, marginBottom: spacing.xl }}>
-          <Card padding="md" style={{ marginBottom: 0 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: spacing.sm }}>
-              <h3 style={{ ...typography.cardTitle, color: colors.text.primary, margin: 0 }}>Healthometer</h3>
-              <span style={{ ...typography.cardTitle, color: scoreColor }}>{stock.overall}/100</span>
+        {/* 4. Score overview */}
+        <div style={{ display: 'grid', gridTemplateColumns: isDesktop ? '1fr 1fr' : '1fr', gap: space[4], marginBottom: sectionGap }}>
+          <Card padding="md">
+            <CardLabel>Health</CardLabel>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: space[2], marginBottom: space[4] }}>
+              <span style={{ fontSize: '36px', fontWeight: 700, color: color.text }}>{stock.overall}</span>
+              <span style={{ fontSize: '14px', color: color.textMuted }}>/100</span>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: spacing.sm }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: space[2] }}>
               {FACTORS.map((f) => (
                 <div key={f.label} style={{ textAlign: 'center' }}>
-                  <div style={{ ...typography.bodyEmphasis, color: colors.primary, marginBottom: spacing.xs }}>{f.value}</div>
-                  <div style={{ ...typography.caption, color: colors.text.secondary }}>{f.label}</div>
+                  <div style={{ fontSize: '14px', fontWeight: 600, color: color.primary }}>{f.value}</div>
+                  <div style={{ fontSize: '10px', color: color.textMuted, textTransform: 'uppercase' }}>{f.label}</div>
                 </div>
               ))}
             </div>
           </Card>
-
-          <Card padding="md" style={{ marginBottom: 0 }}>
-            <div style={{ display: 'flex', gap: spacing.sm, flexWrap: 'wrap' }}>
-              <Button variant={tracking ? 'primary' : 'secondary'} size="sm" onClick={() => setTracking(!tracking)}>
-                {tracking ? 'Tracking' : 'Track Stock'}
-              </Button>
-              <Button variant="secondary" size="sm">Compare Peers</Button>
-              <Button variant="primary" size="sm">Invest via Broker</Button>
+          <Card padding="md">
+            <CardLabel>Risk</CardLabel>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: space[2], marginBottom: space[4] }}>
+              <span style={{ fontSize: '36px', fontWeight: 700, color: color.text }}>{stock.risk}</span>
+              <span style={{ fontSize: '14px', color: color.textMuted }}>/100</span>
             </div>
-            <p style={{ ...typography.caption, color: colors.text.secondary, marginTop: spacing.base, marginBottom: 0 }}>
-              {tracking ? 'You are tracking this stock' : 'Track to get updates on this stock'}
-            </p>
+            <div style={{ display: 'flex', gap: space[2], flexWrap: 'wrap' }}>
+              <Badge value={stock.quality} label="Q" />
+              <Badge value={stock.valuation} label="V" />
+              <Badge value={stock.growth} label="G" />
+              <Badge value={stock.risk} label="R" />
+              <Badge value={stock.technical} label="T" />
+            </div>
           </Card>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: spacing.base, marginBottom: spacing.xl }}>
-          <Card padding="md" style={{ marginBottom: 0 }}>
-            <h3 style={{ ...typography.cardTitle, color: colors.text.primary, marginBottom: spacing.base }}>Company Information</h3>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: spacing.base }}>
-              {[
-                { label: 'Sector', value: stock.sector },
-                { label: 'Industry', value: stock.industry },
-                { label: 'Market Cap', value: `₹${(stock.marketCap / 100).toFixed(0)}Cr` },
-                { label: 'PE Ratio', value: stock.pe.toFixed(1) },
-                { label: 'PB Ratio', value: stock.pb.toFixed(1) },
-                { label: 'ROE', value: `${stock.roe.toFixed(1)}%` },
-                { label: 'Debt/Equity', value: stock.debtToEquity.toFixed(2) },
-                { label: 'Dividend Yield', value: `${stock.dividendYield.toFixed(2)}%` },
-                { label: 'Revenue Growth', value: `${stock.revenueGrowth.toFixed(1)}%` },
-                { label: 'Profit Growth', value: `${stock.profitGrowth.toFixed(1)}%` },
-                { label: 'RSI', value: stock.rsi.toFixed(0) },
-              ].map((item) => (
-                <div key={item.label}>
-                  <p style={{ ...typography.caption, color: colors.text.secondary, marginBottom: 2 }}>{item.label}</p>
-                  <p style={{ ...typography.bodyEmphasis, color: colors.text.primary, margin: 0 }}>{item.value}</p>
-                </div>
-              ))}
-            </div>
-          </Card>
+        {/* 5. Key metrics grid */}
+        <Card padding="md" style={{ marginBottom: sectionGap }}>
+          <CardLabel>Key Metrics</CardLabel>
+          <div style={{ display: 'grid', gridTemplateColumns: isDesktop ? 'repeat(3, 1fr)' : 'repeat(2, 1fr)', gap: space[4] }}>
+            <Stat label="Market Cap" value={`₹${(stock.marketCap / 100).toFixed(0)}Cr`} />
+            <Stat label="PE (TTM)" value={stock.pe.toFixed(1)} />
+            <Stat label="PB Ratio" value={stock.pb.toFixed(1)} />
+            <Stat label="ROE" value={`${stock.roe.toFixed(1)}%`} />
+            <Stat label="Debt/Equity" value={stock.debtToEquity.toFixed(2)} />
+            <Stat label="Dividend Yield" value={`${stock.dividendYield.toFixed(2)}%`} />
+            <Stat label="Revenue Growth" value={`${stock.revenueGrowth.toFixed(1)}%`} />
+            <Stat label="Profit Growth" value={`${stock.profitGrowth.toFixed(1)}%`} />
+            <Stat label="RSI" value={stock.rsi.toFixed(0)} />
+          </div>
+        </Card>
 
-          <Card padding="md" style={{ marginBottom: 0 }}>
-            <h3 style={{ ...typography.cardTitle, color: colors.text.primary, marginBottom: spacing.base }}>Recent News</h3>
-            {stock.news.map((article, i) => (
-              <div key={i} style={{
-                paddingBottom: spacing.sm,
-                borderBottom: i !== stock.news.length - 1 ? `1px solid ${colors.bg.tertiary}` : 'none',
-                marginBottom: i !== stock.news.length - 1 ? spacing.sm : '0',
-              }}>
-                <p style={{ ...typography.bodyEmphasis, color: colors.text.primary, marginBottom: 2 }}>{article.headline}</p>
-                <p style={{ ...typography.caption, color: colors.text.secondary, margin: 0 }}>{article.source} • {article.time}</p>
+        {/* 6. About company */}
+        <Card padding="md" style={{ marginBottom: sectionGap }}>
+          <CardLabel>About</CardLabel>
+          <p style={{ fontSize: '14px', lineHeight: 1.6, color: color.text, marginBottom: space[4] }}>
+            {stock.name} is a leading {stock.industry.toLowerCase()} company in the {stock.sector.toLowerCase()} sector.
+          </p>
+          <div style={{ display: 'grid', gridTemplateColumns: isDesktop ? 'repeat(4, 1fr)' : 'repeat(2, 1fr)', gap: space[3] }}>
+            <Stat label="Sector" value={stock.sector} />
+            <Stat label="Industry" value={stock.industry} />
+            <Stat label="Exchange" value="NSE" />
+            <Stat label="Symbol" value={stock.symbol} />
+          </div>
+        </Card>
+
+        {/* 7. Financials (simplified) */}
+        <Card padding="md" style={{ marginBottom: sectionGap }}>
+          <CardLabel>Financials</CardLabel>
+          <div style={{ display: 'grid', gridTemplateColumns: isDesktop ? 'repeat(2, 1fr)' : '1fr', gap: space[4] }}>
+            <div>
+              <div style={{ fontSize: '12px', color: color.textMuted, marginBottom: space[2] }}>Revenue</div>
+              <div style={{ height: 8, background: color.border, borderRadius: radius.sm, overflow: 'hidden' }}>
+                <div style={{ height: '100%', width: `${Math.min(100, stock.revenueGrowth * 3)}%`, background: color.primary, borderRadius: radius.sm }} />
+              </div>
+              <div style={{ fontSize: '12px', color: color.textMuted, marginTop: space[1] }}>{stock.revenueGrowth.toFixed(1)}% YoY</div>
+            </div>
+            <div>
+              <div style={{ fontSize: '12px', color: color.textMuted, marginBottom: space[2] }}>Profit</div>
+              <div style={{ height: 8, background: color.border, borderRadius: radius.sm, overflow: 'hidden' }}>
+                <div style={{ height: '100%', width: `${Math.min(100, stock.profitGrowth * 3)}%`, background: color.success, borderRadius: radius.sm }} />
+              </div>
+              <div style={{ fontSize: '12px', color: color.textMuted, marginTop: space[1] }}>{stock.profitGrowth.toFixed(1)}% YoY</div>
+            </div>
+          </div>
+        </Card>
+
+        {/* 8. Shareholdings (simplified) */}
+        <Card padding="md" style={{ marginBottom: sectionGap }}>
+          <CardLabel>Shareholding Pattern</CardLabel>
+          <div style={{ display: 'grid', gap: space[3] }}>
+            {[
+              { label: 'Promoter', pct: stock.debtToEquity < 0.5 ? 52 : 35 },
+              { label: 'FII', pct: stock.debtToEquity < 0.5 ? 28 : 22 },
+              { label: 'DII', pct: stock.debtToEquity < 0.5 ? 12 : 18 },
+              { label: 'Retail', pct: stock.debtToEquity < 0.5 ? 8 : 25 },
+            ].map((s) => (
+              <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: space[3] }}>
+                <span style={{ fontSize: '12px', color: color.textMuted, width: 70, flexShrink: 0 }}>{s.label}</span>
+                <div style={{ flex: 1, height: 6, background: color.border, borderRadius: radius.sm, overflow: 'hidden' }}>
+                  <div style={{ height: '100%', width: `${s.pct}%`, background: color.primary, borderRadius: radius.sm }} />
+                </div>
+                <span style={{ fontSize: '12px', fontWeight: 600, color: color.text, width: 40, textAlign: 'right' }}>{s.pct}%</span>
               </div>
             ))}
-          </Card>
-        </div>
+          </div>
+        </Card>
+
+        {/* 9. News */}
+        <Card padding="md" style={{ marginBottom: sectionGap }}>
+          <CardLabel>Recent News</CardLabel>
+          {[
+            { headline: `${stock.name} posts strong quarterly results`, source: 'Reuters', time: '2h ago' },
+            { headline: `Analysts remain bullish on ${stock.symbol}`, source: 'ET', time: '4h ago' },
+            { headline: `${stock.symbol} shows improved fundamentals`, source: 'Bloomberg', time: '1d ago' },
+            { headline: `${stock.sector} sector outlook remains positive`, source: 'Mint', time: '2d ago' },
+            { headline: `${stock.name} among top performers in ${stock.industry}`, source: 'CNBC', time: '3d ago' },
+          ].map((article, i) => (
+            <div key={i} style={{
+              paddingBottom: i < 4 ? space[3] : 0,
+              borderBottom: i < 4 ? `1px solid ${color.border}` : 'none',
+              marginBottom: i < 4 ? space[3] : 0,
+            }}>
+              <p style={{ fontSize: '14px', fontWeight: 600, color: color.text, marginBottom: 2 }}>
+                {article.headline}
+              </p>
+              <p style={{ fontSize: '12px', color: color.textMuted, margin: 0 }}>
+                {article.source} · {article.time}
+              </p>
+            </div>
+          ))}
+        </Card>
+
       </div>
     </div>
   );
