@@ -59,6 +59,49 @@ export class MarketBrainResearchError extends Error {
 
 const normalizeSymbol = (symbol: string): string => symbol.trim().toUpperCase();
 
+const EMPTY_EVIDENCE_REVIEW: MarketBrainEvidenceReviewView = {
+  needsReview: false,
+  partial: [],
+  missing: [],
+  summary: 'Research evidence status is unavailable for this view.',
+};
+
+const asStringArray = (value: unknown): string[] => (Array.isArray(value)
+  ? value.filter((item): item is string => typeof item === 'string' && item.trim().length > 0)
+  : []);
+
+const normalizeEvidenceReview = (value: Partial<MarketBrainEvidenceReviewView> | undefined): MarketBrainEvidenceReviewView => {
+  if (!value) return EMPTY_EVIDENCE_REVIEW;
+  const partial = Array.isArray(value.partial) ? value.partial : [];
+  const missing = Array.isArray(value.missing) ? value.missing : [];
+  const needsReview = Boolean(value.needsReview ?? partial.length > 0 || missing.length > 0);
+
+  return {
+    needsReview,
+    partial,
+    missing,
+    summary: typeof value.summary === 'string' && value.summary.trim().length > 0
+      ? value.summary
+      : EMPTY_EVIDENCE_REVIEW.summary,
+  };
+};
+
+const normalizeResearchResponse = (payload: Partial<MarketBrainResearchResponse>): MarketBrainResearchResponse => {
+  const research = payload.research as Partial<MarketBrainResearchView>;
+  return {
+    symbol: typeof payload.symbol === 'string' ? payload.symbol : String(research.symbol ?? '').toUpperCase(),
+    companyName: typeof payload.companyName === 'string' ? payload.companyName : String(research.companyName ?? ''),
+    research: {
+      ...(research as MarketBrainResearchView),
+      thesis: asStringArray(research.thesis),
+      risksToReview: asStringArray(research.risksToReview),
+      whatToWatch: asStringArray(research.whatToWatch),
+      evidenceReview: normalizeEvidenceReview(research.evidenceReview),
+      factorViews: Array.isArray(research.factorViews) ? research.factorViews : [],
+    },
+  };
+};
+
 export async function fetchMarketBrainResearch(symbol: string, init?: RequestInit): Promise<MarketBrainResearchResponse> {
   const normalized = normalizeSymbol(symbol);
   if (!normalized) {
@@ -90,5 +133,5 @@ export async function fetchMarketBrainResearch(symbol: string, init?: RequestIni
     throw new MarketBrainResearchError('Research response was incomplete.', response.status, 'INCOMPLETE_RESEARCH_RESPONSE');
   }
 
-  return payload as MarketBrainResearchResponse;
+  return normalizeResearchResponse(payload);
 }
