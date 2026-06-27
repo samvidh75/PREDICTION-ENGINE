@@ -7,7 +7,7 @@ import {
   searchStocks,
   type StockResearchDetail,
   type StockResearchSummary,
-} from "./stockResearch";
+} from "./stockResearch.js";
 
 interface PersistedUniverseEntry {
   symbol: string;

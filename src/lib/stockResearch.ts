@@ -1,6 +1,6 @@
-import { generate500Stocks, type BaseStockCandidate } from "../services/stocks/generate500Stocks";
-import { STOCK_UNIVERSE, type StockFundamentals } from "../services/scanner/stockUniverse";
-import { computeFactorScores, confidenceFromCoverage, type FactorScoreSet } from "./scoring";
+import { generate500Stocks, type BaseStockCandidate } from "../services/stocks/generate500Stocks.js";
+import { STOCK_UNIVERSE, type StockFundamentals } from "../services/scanner/stockUniverse.js";
+import { computeFactorScores, confidenceFromCoverage, type FactorScoreSet } from "./scoring.js";
 
 const TARGET_UNIVERSE = 5200;
 
@@ -173,7 +173,7 @@ function buildBaseUniverse(): BaseStockCandidate[] {
   return expandUniverse([...merged.values()]);
 }
 
-const fundamentalsBySymbol = new Map(STOCK_UNIVERSE.map((stock) => [stock.symbol.toUpperCase(), stock]));
+const fundamentalsBySymbol = new Map<string, StockFundamentals>(STOCK_UNIVERSE.map((stock) => [stock.symbol.toUpperCase(), stock]));
 
 function buildSummary(stock: BaseStockCandidate): StockResearchSummary {
   const known = fundamentalsBySymbol.get(stock.symbol.toUpperCase());
