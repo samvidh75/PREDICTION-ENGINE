@@ -6,6 +6,12 @@ vi.mock("../../hooks/useStockData", () => ({
   useStockData: vi.fn(),
 }));
 
+vi.mock("../../components/research/MarketBrainResearchPanel", () => ({
+  default: ({ symbol }: { symbol: string }) => (
+    <section aria-label="Market brain research">Market Brain research panel for {symbol}</section>
+  ),
+}));
+
 import { useStockData } from "../../hooks/useStockData";
 
 const mockFullData = {
@@ -127,6 +133,22 @@ describe("StockResearchPage", () => {
       expect(screen.getByText("Tata Consultancy Services")).toBeDefined();
     });
     expect(screen.getByText("TCS")).toBeDefined();
+  });
+
+  it("renders Market Brain research panel in the main research column", async () => {
+    (useStockData as ReturnType<typeof vi.fn>).mockReturnValue({
+      data: mockFullData,
+      loading: false,
+      error: null,
+      refetch: vi.fn(),
+    });
+
+    render(<StockResearchPage symbol="TCS" />);
+
+    await waitFor(() => {
+      expect(screen.getByLabelText("Market brain research")).toBeDefined();
+    });
+    expect(screen.getByText("Market Brain research panel for TCS")).toBeDefined();
   });
 
   it("renders Healthometer section", async () => {
