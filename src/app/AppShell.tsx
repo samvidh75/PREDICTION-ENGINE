@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { GitCompare, Home, Search, Star } from "lucide-react";
 import { NavLink } from "react-router-dom";
+import { colors, typography, space, radius, layout, components } from "../design/tokens";
 
 const NAV = [
   { to: "/", label: "Home", icon: Home },
@@ -13,17 +14,17 @@ export function AppShell({ children }: { children: ReactNode }) {
   return (
     <div
       style={{
-        fontFamily: "var(--font)",
-        color: "var(--text-700)",
-        background: "var(--page)",
+        fontFamily: typography.fontFamily,
+        color: colors.gray900,
+        background: colors.white,
         minHeight: "100vh",
       }}
     >
       <aside className="rail">
-        <NavLink to="/" className="brand-link">
+        <NavLink to="/" style={brandLinkStyle}>
           StockStory
         </NavLink>
-        <nav className="nav-stack" aria-label="Primary">
+        <nav style={navStackStyle} aria-label="Primary">
           {NAV.map((item) => (
             <NavLink
               key={item.to}
@@ -38,7 +39,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       </aside>
 
       <header className="mobile-brand">
-        <NavLink to="/" className="mobile-brand-link">
+        <NavLink to="/" style={mobileBrandLinkStyle}>
           StockStory
         </NavLink>
       </header>
@@ -60,99 +61,108 @@ export function AppShell({ children }: { children: ReactNode }) {
 
       <style>{`
         .rail { display:none; }
+        .rail .nav-link,
+        .tab-link {
+          color:${colors.gray600};
+          text-decoration:none;
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          gap:${space[2]};
+        }
+        .rail .nav-link {
+          min-height:${components.button.heightDesktop};
+          justify-content:flex-start;
+          border-radius:${radius.md};
+          padding:0 ${space[3]};
+          font-size:${typography.body.desktop.size};
+          font-weight:500;
+        }
+        .rail .nav-link.is-active {
+          color:${colors.primary};
+          background:${colors.gray50};
+        }
         .mobile-brand {
           display:flex;
           align-items:center;
-          height:56px;
-          padding:0 16px;
-          border-bottom:1px solid var(--border);
-          background:var(--page);
-        }
-        .mobile-brand-link {
-          color:var(--text-primary);
-          font-size:18px;
-          font-weight:600;
-          line-height:1.3;
-          text-decoration:none;
+          height:${components.navBar.heightMobile};
+          padding:0 ${layout.pagePaddingMobile};
+          border-bottom:${layout.borderWidth} solid ${colors.gray100};
+          background:${colors.white};
         }
         .tabbar {
           position:fixed;
           bottom:0;
           left:0;
           right:0;
-          height:56px;
+          height:${components.navBar.heightMobile};
           display:flex;
-          border-top:1px solid var(--border);
-          background:var(--page);
+          border-top:${layout.borderWidth} solid ${colors.gray100};
+          background:${colors.white};
           z-index:10;
-        }
-        .content {
-          padding:16px;
-          padding-bottom:72px;
-          width:100%;
-        }
-        .brand-link {
-          color:var(--text-primary);
-          font-size:20px;
-          font-weight:600;
-          line-height:1.3;
-          text-decoration:none;
-          margin-bottom:32px;
-        }
-        .nav-stack {
-          display:flex;
-          flex-direction:column;
-          gap:4px;
-        }
-        .nav-link,
-        .tab-link {
-          color:var(--text-500);
-          text-decoration:none;
-          display:flex;
-          align-items:center;
-          justify-content:center;
-          gap:8px;
-        }
-        .nav-link {
-          min-height:44px;
-          justify-content:flex-start;
-          border-radius:6px;
-          padding:0 12px;
         }
         .tab-link {
           flex:1;
           flex-direction:column;
-          font-size:12px;
+          font-size:${typography.caption.desktop.size};
           font-weight:500;
-          line-height:1.4;
+          line-height:${typography.caption.desktop.line};
         }
-        .nav-link.is-active,
         .tab-link.is-active {
-          color:var(--brand);
-          background:var(--chip);
+          color:${colors.primary};
+        }
+        .content {
+          padding:${layout.pagePaddingMobile};
+          padding-bottom:calc(${components.navBar.heightMobile} + ${space[4]});
+          width:100%;
         }
         @media (min-width:768px) {
           .mobile-brand { display:none; }
           .rail {
             display:flex;
             flex-direction:column;
-            width:240px;
+            width:${layout.sidebarWidth};
             position:fixed;
             top:0;
             bottom:0;
-            border-right:1px solid var(--border);
-            padding:24px;
-            background:var(--page);
+            border-right:${layout.borderWidth} solid ${colors.gray100};
+            padding:${space[6]};
+            background:${colors.white};
+            overflow-y:auto;
           }
           .tabbar { display:none; }
           .content {
-            margin-left:240px;
-            padding:48px;
-            padding-bottom:48px;
-            max-width:1120px;
+            margin-left:${layout.sidebarWidth};
+            padding:${layout.pagePaddingDesktop};
+            padding-bottom:${layout.pagePaddingDesktop};
+            max-width:${layout.contentMaxWidth};
           }
         }
       `}</style>
     </div>
   );
 }
+
+const brandLinkStyle = {
+  color: colors.gray900,
+  fontSize: typography.h2.desktop.size,
+  fontWeight: 600,
+  lineHeight: typography.h2.desktop.line,
+  textDecoration: "none",
+  marginBottom: space[8],
+  display: "block",
+} as const;
+
+const navStackStyle = {
+  display: "flex",
+  flexDirection: "column" as const,
+  gap: space[1],
+};
+
+const mobileBrandLinkStyle = {
+  color: colors.gray900,
+  fontSize: typography.h3.desktop.size,
+  fontWeight: 600,
+  lineHeight: typography.h3.desktop.line,
+  textDecoration: "none",
+} as const;

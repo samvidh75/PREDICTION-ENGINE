@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "../ui/Button";
 import { Card } from "../ui/Card";
 import { useResponsiveValue } from "../ui/responsive";
+import { colors, typography, space, layout, media } from "../design/tokens";
 
 const DISCOVER = [
   { icon: TrendingUp, title: "Quality Compounders", body: "High return businesses with durable operating discipline." },
@@ -18,7 +19,8 @@ export default function HomePage() {
   const navigate = useNavigate();
   const [query, setQuery] = useState("");
   const [searchResults, setSearchResults] = useState<Array<{ symbol: string; name: string }>>([]);
-  const sectionGap = useResponsiveValue("48px", "80px");
+  const sectionGap = useResponsiveValue(layout.sectionGapMobile, layout.sectionGapDesktop);
+
   useEffect(() => {
     let cancelled = false;
     const normalized = query.trim();
@@ -44,40 +46,41 @@ export default function HomePage() {
 
   return (
     <div style={{ display: "grid", gap: sectionGap }}>
+      {/* HERO */}
       <section
         style={{
-          paddingTop: sectionGap,
-          paddingBottom: sectionGap,
           display: "grid",
           justifyItems: "center",
           textAlign: "center",
+          paddingTop: layout.pagePaddingDesktop,
+          paddingBottom: layout.pagePaddingDesktop,
         }}
       >
-        <div style={{ maxWidth: "600px", display: "grid", gap: "24px" }}>
-          <div style={{ display: "grid", gap: "16px" }}>
+        <div style={{ maxWidth: "600px", display: "grid", gap: space[6] }}>
+          <div style={{ display: "grid", gap: space[4] }}>
             <h1
               style={{
-                color: "var(--text-primary)",
-                fontSize: "var(--sz-3xl)",
-                fontWeight: 600,
-                lineHeight: "1.1",
-                letterSpacing: "-0.02em",
+                color: colors.gray900,
+                fontSize: typography.hero.desktop.size,
+                fontWeight: typography.hero.desktop.weight,
+                lineHeight: typography.hero.desktop.line,
+                letterSpacing: typography.hero.desktop.track,
               }}
             >
               Research Indian stocks before you invest.
             </h1>
             <p
               style={{
-                color: "var(--text-500)",
-                fontSize: "var(--sz-base)",
+                color: colors.gray600,
+                fontSize: typography.body.desktop.size,
                 fontWeight: 400,
-                lineHeight: "1.6",
+                lineHeight: typography.body.desktop.line,
               }}
             >
               Build conviction with calmer research flows, cleaner comparisons, and the key numbers that changed.
             </p>
           </div>
-          <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", justifyContent: "center" }}>
+          <div style={{ display: "flex", gap: space[3], flexWrap: "wrap", justifyContent: "center" }}>
             <input
               aria-label="Search stocks"
               placeholder="Search HDFCBANK, TCS, Infosys"
@@ -89,37 +92,39 @@ export default function HomePage() {
                 }
               }}
               style={{
-                height: "52px",
+                height: "44px",
                 minWidth: "240px",
                 flex: "1 1 280px",
-                borderRadius: "var(--radius-xl)",
-                border: "1px solid var(--border)",
-                padding: "0 16px",
-                color: "var(--text-700)",
-                background: "var(--page)",
+                borderRadius: "6px",
+                border: `1px solid ${colors.gray100}`,
+                padding: "0 12px",
+                fontSize: typography.body.desktop.size,
+                color: colors.gray900,
+                background: colors.white,
+                outline: "none",
               }}
             />
             <Button onClick={() => navigate(`/stock/${searchResults[0]?.symbol ?? "HDFCBANK"}`)}>Research</Button>
           </div>
           {searchResults.length > 0 ? (
-            <div style={{ display: "grid", gap: "8px", textAlign: "left" }}>
+            <div style={{ display: "grid", gap: space[2], textAlign: "left" }}>
               {searchResults.map((result) => (
                 <button
                   key={result.symbol}
                   onClick={() => navigate(`/stock/${result.symbol}`)}
                   style={{
-                    border: "1px solid var(--border)",
-                    borderRadius: "var(--radius-md)",
-                    background: "var(--chip)",
-                    padding: "12px",
+                    border: `1px solid ${colors.gray100}`,
+                    borderRadius: "6px",
+                    background: colors.gray50,
+                    padding: space[3],
                     display: "flex",
                     justifyContent: "space-between",
-                    gap: "12px",
+                    gap: space[3],
                     cursor: "pointer",
                   }}
                 >
                   <span>{result.symbol}</span>
-                  <span style={{ color: "var(--text-500)" }}>{result.name}</span>
+                  <span style={{ color: colors.gray600 }}>{result.name}</span>
                 </button>
               ))}
             </div>
@@ -127,25 +132,47 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section style={{ display: "grid", gap: "24px" }}>
-        <h2 style={{ color: "var(--text-primary)", fontSize: "var(--sz-2xl)", fontWeight: 600, lineHeight: "1.25" }}>
+      {/* DISCOVER */}
+      <section style={{ display: "grid", gap: space[6] }}>
+        <h2
+          style={{
+            color: colors.gray900,
+            fontSize: typography.h1.desktop.size,
+            fontWeight: typography.h1.desktop.weight,
+            lineHeight: typography.h1.desktop.line,
+          }}
+        >
           Discover opportunities
         </h2>
         <div
           style={{
             display: "grid",
             gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
-            gap: "24px",
+            gap: space[6],
           }}
         >
           {DISCOVER.map((item) => (
             <Card key={item.title}>
-              <div style={{ display: "grid", gap: "12px" }}>
-                <item.icon color="var(--brand)" size={20} strokeWidth={1.75} />
-                <h3 style={{ color: "var(--text-primary)", fontSize: "var(--sz-lg)", fontWeight: 600, lineHeight: "1.3" }}>
+              <div style={{ display: "grid", gap: space[3] }}>
+                <item.icon color={colors.primary} size={20} strokeWidth={1.75} />
+                <h3
+                  style={{
+                    color: colors.gray900,
+                    fontSize: typography.h3.desktop.size,
+                    fontWeight: typography.h3.desktop.weight,
+                    lineHeight: typography.h3.desktop.line,
+                  }}
+                >
                   {item.title}
                 </h3>
-                <p style={{ color: "var(--text-500)", fontSize: "var(--sz-base)", fontWeight: 400, lineHeight: "1.6" }}>
+                <p
+                  style={{
+                    color: colors.gray600,
+                    fontSize: typography.body.desktop.size,
+                    fontWeight: 400,
+                    lineHeight: typography.body.desktop.line,
+                  }}
+                >
                   {item.body}
                 </p>
               </div>
@@ -154,11 +181,19 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section style={{ display: "grid", gap: "24px" }}>
-        <h2 style={{ color: "var(--text-primary)", fontSize: "var(--sz-2xl)", fontWeight: 600, lineHeight: "1.25" }}>
+      {/* RECENT */}
+      <section style={{ display: "grid", gap: space[6] }}>
+        <h2
+          style={{
+            color: colors.gray900,
+            fontSize: typography.h1.desktop.size,
+            fontWeight: typography.h1.desktop.weight,
+            lineHeight: typography.h1.desktop.line,
+          }}
+        >
           Recently researched
         </h2>
-        <div style={{ display: "flex", gap: "12px", overflowX: "auto", paddingBottom: "8px" }}>
+        <div style={{ display: "flex", gap: space[3], overflowX: "auto", paddingBottom: space[2] }}>
           {RECENT.map((symbol) => (
             <Button key={symbol} variant="secondary" onClick={() => navigate(`/stock/${symbol}`)}>
               {symbol}
@@ -166,6 +201,14 @@ export default function HomePage() {
           ))}
         </div>
       </section>
+
+      {/* Responsive overrides */}
+      <style>{`
+        @media ${media.mobile} {
+          h1 { font-size:${typography.hero.mobile.size} !important; }
+          h2 { font-size:${typography.h1.mobile.size} !important; }
+        }
+      `}</style>
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import type { CSSProperties, ReactNode } from "react";
 import { useResponsiveValue } from "./responsive";
+import { colors, radius, layout } from "../design/tokens";
 
 export function Card({
   children,
@@ -8,15 +9,14 @@ export function Card({
   children: ReactNode;
   style?: CSSProperties;
 }) {
-  const padding = useResponsiveValue("16px", "24px");
+  const padding = useResponsiveValue(layout.cardPaddingMobile, layout.cardPaddingDesktop);
 
   return (
     <section
       style={{
-        background: "var(--chip)",
-        border: "1px solid var(--border)",
-        boxShadow: "var(--sh-card)",
-        borderRadius: "var(--radius-md)",
+        background: colors.gray50,
+        border: `${layout.borderWidth} solid ${colors.gray100}`,
+        borderRadius: radius.lg,
         padding,
         ...style,
       }}
@@ -30,7 +30,7 @@ export function CardLabel({ children }: { children: ReactNode }) {
   return (
     <div
       style={{
-        color: "var(--text-500)",
+        color: colors.gray600,
         fontSize: "12px",
         fontWeight: 500,
         lineHeight: "1.4",
