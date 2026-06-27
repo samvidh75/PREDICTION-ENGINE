@@ -117,5 +117,157 @@ function scoreQuality(fin?: IndiaEquityFundamentals): FactorScore {
   return {
     score,
     drivers: [
-      ...(score >= 70 ? ['Quality metrics support the business thesis.'] : []),
-      ...((fin?.roe ?? 0) >= 18 ? ['Return on equity is a positive quality signal.'] : []),
+      ...(score >= 70 ? ['Quality metrics strengthen the research thesis.'] : []),
+      ...((fin?.roe ?? 0) >= 18 ? ['Return on equity is a favorable quality signal.'] : []),
+      ...((fin?.roic ?? 0) >= 18 ? ['Capital efficiency is a favorable quality signal.'] : []),
+    ],
+    risks: score < 45 ? ['Quality evidence is not strong enough yet.'] : [],
+  };
+}
+
+function scoreGrowth(fin?: IndiaEquityFundamentals): FactorScore {
+  const score = average([
+    { score: higherIsBetter(fin?.revenueGrowth, -5, 25), weight: 1.5 },
+    { score: higherIsBetter(fin?.profitGrowth, -10, 30), weight: 1.7 },
+  ]);
+  return {
+    score,
+    drivers: score >= 70 ? ['Growth trends strengthen the thesis.'] : [],
+    risks: (fin?.profitGrowth ?? 0) < 0 && finite(fin?.profitGrowth) ? ['Profit growth is negative and needs review.'] : [],
+  };
+}
+
+function scoreValuation(fin?: IndiaEquityFundamentals): FactorScore {
+  const score = average([
+    { score: lowerIsBetter(fin?.peRatio, 10, 60), weight: 1.5 },
+    { score: lowerIsBetter(fin?.pbRatio, 1, 12), weight: 1 },
+    { score: lowerIsBetter(fin?.evEbitda, 6, 35), weight: 1.1 },
+    { score: higherIsBetter(fin?.fcfYield, 0, 8), weight: 1 },
+  ]);
+  return {
+    score,
+    drivers: score >= 70 ? ['Valuation metrics appear constructive relative to core inputs.'] : [],
+    risks: (fin?.peRatio ?? 0) > 60 ? ['Earnings multiple is elevated and needs justification.'] : [],
+  };
+}
+
+function scoreStability(fin?: IndiaEquityFundamentals, tech?: IndiaEquityTechnicals): FactorScore {
+  const marketCap = fin?.marketCap;
+  const sizeScore = finite(marketCap) ? clamp((Math.log10(Math.max(marketCap, 1)) - 9) * 16) : 50;
+  const score = average([
+    { score: lowerIsBetter(fin?.debtToEquity, 0, 3), weight: 1.7 },
+    { score: higherIsBetter(fin?.currentRatio, 0.7, 2.5), weight: 0.8 },
+    { score: lowerIsBetter(tech?.volatility, 10, 75), weight: 1 },
+    { score: sizeScore, weight: 0.8 },
+  ]);
+  return {
+    score,
+    drivers: score >= 70 ? ['Stability signals are constructive.'] : [],
+    risks: (fin?.debtToEquity ?? 0) > 2 ? ['Leverage is elevated and needs review.'] : [],
+  };
+}
+
+function scoreMomentum(tech?: IndiaEquityTechnicals): FactorScore {
+  const score = average([
+    { score: higherIsBetter(tech?.momentum, -20, 35), weight: 1.5 },
+    { score: higherIsBetter(tech?.relativeStrength, -20, 30), weight: 1.3 },
+    { score: higherIsBetter(tech?.trendStrength, -20, 30), weight: 0.8 },
+    { score: lowerIsBetter(tech?.volatility, 10, 75), weight: 0.5 },
+  ]);
+  return {
+    score,
+    drivers: score >= 70 ? ['Momentum is constructive.'] : [],
+    risks: (tech?.rsi ?? 0) > 75 ? ['Momentum may be overheated.'] : [],
+  };
+}
+
+function scoreRisk(fin?: IndiaEquityFundamentals, tech?: IndiaEquityTechnicals, own?: IndiaEquityOwnership): FactorScore {
+  const score = average([
+    { score: higherIsBetter(fin?.debtToEquity, 0, 3), weight: 1.5 },
+    { score: higherIsBetter(tech?.volatility, 10, 75), weight: 1.1 },
+    { score: higherIsBetter(own?.promoterPledge, 0, 50), weight: 1.4 },
+  ]);
+  return {
+    score,
+    drivers: score <= 35 ? ['Risk signals are contained.'] : [],
+    risks: [
+      ...((own?.promoterPledge ?? 0) > 10 ? ['Promoter pledge is a governance risk to review.'] : []),
+      ...((fin?.debtToEquity ?? 0) > 2 ? ['Leverage risk is elevated.'] : []),
+      ...((tech?.volatility ?? 0) > 55 ? ['Volatility is elevated.'] : []),
+    ],
+  };
+}
+
+function scoreOwnership(own?: IndiaEquityOwnership): FactorScore {
+  const score = average([
+    { score: higherIsBetter(own?.promoterHolding, 20, 70), weight: 0.9 },
+    { score: lowerIsBetter(own?.promoterPledge, 0, 30), weight: 1.6 },
+    { score: higherIsBetter(own?.fiiHolding, 0, 25), weight: 0.5 },
+    { score: higherIsBetter(own?.diiHolding, 0, 25), weight: 0.5 },
+  ]);
+  return {
+    score,
+    drivers: score >= 70 ? ['Ownership signals strengthen the research view.'] : [],
+    risks: (own?.promoterPledge ?? 0) > 10 ? ['Promoter pledge weakens governance comfort.'] : [],
+  };
+}
+
+function researchState(convictionScore: number, riskScore: number, unusableCount: number): ResearchState {
+  if (riskScore >= 72) return 'Risk rising';
+  if (unusableCount >= 3) return 'Needs review';
+  if (convictionScore >= 78 && riskScore <= 45) return 'High conviction';
+  if (convictionScore >= 68 && riskScore <= 55) return 'Thesis improving';
+  return 'Watch';
+}
+
+export function evaluateIndiaEquity(packet: IndiaEquityPacket): IndiaMarketBrainResult {
+  const quality = scoreQuality(packet.fundamentals);
+  const growth = scoreGrowth(packet.fundamentals);
+  const valuation = scoreValuation(packet.fundamentals);
+  const stability = scoreStability(packet.fundamentals, packet.technicals);
+  const momentum = scoreMomentum(packet.technicals);
+  const risk = scoreRisk(packet.fundamentals, packet.technicals, packet.ownership);
+  const ownership = scoreOwnership(packet.ownership);
+  const evidenceCoverage = normalizeEvidenceCoverage(packet.evidence);
+  const missing = evidenceCoverage.missing;
+  const partial = evidenceCoverage.partial;
+
+  const convictionScore = average([
+    { score: quality.score, weight: 2 },
+    { score: growth.score, weight: 1.4 },
+    { score: valuation.score, weight: 1.4 },
+    { score: stability.score, weight: 1.5 },
+    { score: momentum.score, weight: 0.9 },
+    { score: ownership.score, weight: 0.8 },
+    { score: 100 - risk.score, weight: 2 },
+  ]);
+
+  const thesis = unique([quality.drivers, growth.drivers, valuation.drivers, stability.drivers, momentum.drivers, ownership.drivers]);
+  const risksToReview = unique([quality.risks, growth.risks, valuation.risks, stability.risks, momentum.risks, risk.risks, ownership.risks]);
+
+  return {
+    symbol: packet.symbol.toUpperCase(),
+    companyName: packet.companyName,
+    researchState: researchState(convictionScore, risk.score, evidenceCoverage.missing.length),
+    convictionScore,
+    quality,
+    growth,
+    valuation,
+    stability,
+    momentum,
+    risk,
+    ownership,
+    thesis: thesis.length > 0 ? thesis : ['More research evidence is needed before forming a stronger thesis.'],
+    risksToReview,
+    whatToWatch: [
+      'Next result and margin trend.',
+      'Valuation versus sector peers.',
+      'Risk changes from leverage, volatility, pledge, or adverse events.',
+      'Whether the original thesis improves or weakens after new evidence.',
+    ],
+    missingEvidence: missing,
+    partialEvidence: partial,
+    complianceNote: 'Research-only output.',
+    generatedAt: new Date().toISOString(),
+  };
+}
