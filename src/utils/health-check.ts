@@ -37,12 +37,7 @@ export async function runHealthCheck() {
     results.errors.push(`Groq error: ${String(e)}`);
   }
 
-  try {
-    const response = await fetch('https://cdn.jsdelivr.net/npm/@xenova/transformers/package.json');
-    results.services.transformers = response.ok;
-  } catch (e) {
-    results.errors.push(`Transformers.js CDN error: ${String(e)}`);
-  }
+  results.services.transformers = false;
 
   return results;
 }
