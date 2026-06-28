@@ -316,3 +316,292 @@ export interface RiskScore {
   reasoning: string;                   // Plain English explanation
   timestamp: Date;
 }
+
+// ============= VALUATION METRICS INPUT =============
+export interface ValuationMetrics {
+  peRatio?: number | null;           // Price-to-Earnings ratio
+  pbRatio?: number | null;           // Price-to-Book ratio
+  evEbitda?: number | null;          // Enterprise Value / EBITDA
+  fcfYield?: number | null;          // Free Cash Flow Yield (0.05 = 5%)
+  dividendYield?: number | null;     // Dividend Yield (0.03 = 3%)
+  lastUpdated: Date;
+  symbol?: string;
+}
+
+// ============= VALUATION ENGINE OUTPUT =============
+export interface ValuationScore {
+  overall: number;                   // 0-100 (higher = better value)
+  peScore: number;                   // 0-25
+  pbScore: number;                   // 0-25
+  evEbitdaScore: number;             // 0-20
+  fcfYieldScore: number;             // 0-15
+  dividendYieldScore: number;        // 0-15
+  valuation: 'undervalued' | 'fair_value' | 'premium' | 'expensive';
+  details: {
+    pe: { score: number; ratio?: number; level: string };
+    pb: { score: number; ratio?: number; level: string };
+    evEbitda: { score: number; ratio?: number; level: string };
+    fcfYield: { score: number; yield?: number; level: string };
+    dividend: { score: number; yield?: number; level: string };
+  };
+  dataCompleteness: number;
+  confidence: number;
+  reasoning: string;
+  timestamp: Date;
+}
+
+// ============= EVENT METRICS INPUT =============
+export interface CatalystEvent {
+  type: 'earnings' | 'dividend' | 'deal' | 'approval' | 'product' | 'strategic' | 'other';
+  description: string;
+  expectedDate?: Date;
+  probability?: number;                    // 0-1
+  expectedImpact: 'high' | 'medium' | 'low';
+  direction: 'bullish' | 'bearish' | 'neutral';
+  source?: string;                         // "Management guidance", "Analyst estimates", etc.
+}
+
+export interface EventMetrics {
+  events: CatalystEvent[];
+  nextEarningsDate?: Date;
+  nextDividendDate?: Date;
+  nextSplitDate?: Date;
+  pendingDeals?: string[];
+  pendingApprovals?: string[];
+  productLaunchesPlanned?: string[];
+  managementChanges?: string[];
+  eventCount90Days?: number;
+  bullishEventCount?: number;
+  bearishEventCount?: number;
+  catalystHistorySuccess?: number;
+  catalystHistoryVolatility?: number;
+  lastUpdated: Date;
+  fiscalYear: number;
+  currency: string;
+}
+
+// ============= EVENTS ENGINE OUTPUT =============
+export interface EventScore {
+  overall: number;
+  catalystDetectionScore: number;
+  eventImpactScore: number;
+  timingProbabilityScore: number;
+  strategicCatalystScore: number;
+  catalystRichnessScore: number;
+  nextCatalyst: string;
+  daysToCatalyst?: number;
+  catalystDirection: 'bullish' | 'bearish' | 'neutral';
+  opportunityWindow: 'immediate' | 'near_term' | 'medium_term' | 'distant' | 'limited';
+  catalystRichness: 'catalyst_heavy' | 'moderate' | 'sparse';
+  upcomingEvents: {
+    event: string;
+    date: Date;
+    impact: 'high' | 'medium' | 'low';
+    direction: 'bullish' | 'bearish' | 'neutral';
+    daysAway: number;
+    probability?: number;
+  }[];
+  expectedVolatility?: number;
+  expectedMoveRange?: { low: number; high: number };
+  details: {
+    bullishCatalysts: string[];
+    bearishCatalysts: string[];
+    timingCertainty: 'high' | 'medium' | 'low';
+  };
+  dataCompleteness: number;
+  confidence: number;
+  reasoning: string;
+  timestamp: Date;
+}
+
+// ============= NEWS / SENTIMENT METRICS INPUT =============
+export interface NewsArticle {
+  headline: string;
+  source: string;
+  time: string;
+  link?: string;
+}
+
+export interface NewsMetrics {
+  articles: NewsArticle[];
+  symbol?: string;
+  lastUpdated: Date;
+}
+
+// ============= NEWS ENGINE OUTPUT =============
+export interface NewsScore {
+  overall: number;
+  volumeScore: number;
+  sentimentScore: number;
+  credibilityScore: number;
+  recencyScore: number;
+  sentiment: 'bullish' | 'bearish' | 'neutral' | 'unknown';
+  articleCount: number;
+  topKeywords: string[];
+  details: {
+    volume: { score: number; count: number; level: string };
+    sentiment: { score: number; polarity: string; bullish: number; bearish: number; keywords: string[] };
+    credibility: { score: number; credibleCount: number; level: string };
+    recency: { score: number; avgAgeHours: number; level: string };
+  };
+  dataCompleteness: number;
+  confidence: number;
+  reasoning: string;
+  timestamp: Date;
+}
+
+// ============= SECTOR METRICS INPUT =============
+export interface SectorMetrics {
+  stockPE?: number | null;
+  stockPB?: number | null;
+  stockEVEbitda?: number | null;
+  stockROE?: number | null;
+  stockNetMargin?: number | null;
+  stockRevGrowth?: number | null;
+  stockEPSGrowth?: number | null;
+  peerPE?: number | null;
+  peerPB?: number | null;
+  peerEVEbitda?: number | null;
+  peerROE?: number | null;
+  peerNetMargin?: number | null;
+  peerRevGrowth?: number | null;
+  peerEPSGrowth?: number | null;
+  sectorReturn1M?: number | null;
+  sectorReturn3M?: number | null;
+  relativeStrength?: number | null;
+  analystUpgrades?: number | null;
+  analystDowngrades?: number | null;
+  marketCapRank?: number | null;
+  sectorPeerCount?: number | null;
+  brandStrength?: number | null;
+  customerStickiness?: number | null;
+  symbol?: string;
+  sectorName?: string;
+  lastUpdated: Date;
+}
+
+// ============= SECTOR ENGINE OUTPUT =============
+export interface SectorScore {
+  overall: number;
+  relativeValuationScore: number;
+  relativeQualityScore: number;
+  relativeGrowthScore: number;
+  sectorMomentumScore: number;
+  competitivePositionScore: number;
+  peerRank: number;
+  relativeValuation: 'discount' | 'fair' | 'premium';
+  sectorMomentum: 'up' | 'neutral' | 'down';
+  competitivePosition: 'leader' | 'competitive' | 'weak';
+  details: {
+    relativeValuation: { score: number; peVsPeer: number | null; pbVsPeer: number | null; level: string };
+    relativeQuality: { score: number; roeVsPeer: number | null; marginVsPeer: number | null; level: string };
+    relativeGrowth: { score: number; revGrowthVsPeer: number | null; epsGrowthVsPeer: number | null; level: string };
+    sectorMomentum: { score: number; sectorTrend: number | null; level: string };
+    competitivePosition: { score: number; marketCapRank: number | null; level: string };
+  };
+  dataCompleteness: number;
+  confidence: number;
+  reasoning: string;
+  timestamp: Date;
+}
+
+// ============= RAG / KNOWLEDGE BASE METRICS INPUT =============
+export interface PatternRecord {
+  id: string;
+  description: string;
+  similarity: number;
+  successRate: number;
+  outcomeReturn?: number;
+  occurrences: number;
+  timeframe: string;
+}
+
+export interface KnowledgeItem {
+  id: string;
+  content: string;
+  type: 'pattern' | 'note' | 'macro' | 'learning';
+  relevance: number;
+  confidence: number;
+  createdAt: Date;
+}
+
+export interface MacroSignal {
+  indicator: string;
+  value: number;
+  direction: 'positive' | 'negative' | 'neutral';
+  impactOnStock: number;
+}
+
+export interface RAGMetrics {
+  patterns: PatternRecord[];
+  knowledgeItems: KnowledgeItem[];
+  macroSignals: MacroSignal[];
+  sectorPhase?: string;
+  institutionalCoverage?: number;
+  learningCount?: number;
+  symbol?: string;
+  lastUpdated: Date;
+}
+
+// ============= RAG ENGINE OUTPUT =============
+export interface RAGScore {
+  overall: number;
+  patternMatchScore: number;
+  knowledgeCoverageScore: number;
+  outcomeQualityScore: number;
+  macroContextScore: number;
+  patternMatchCount: number;
+  bestPattern?: string;
+  bestPatternSuccessRate?: number;
+  knowledgeConfidence: 'high' | 'moderate' | 'low';
+  macroEnvironment: 'favorable' | 'neutral' | 'unfavorable';
+  details: {
+    patternMatch: { score: number; matchCount: number; topSimilarity: number; level: string };
+    knowledgeCoverage: { score: number; itemCount: number; avgRelevance: number; level: string };
+    outcomeQuality: { score: number; avgSuccessRate: number; provenPatterns: number; level: string };
+    macroContext: { score: number; signalCount: number; netDirection: string; level: string };
+  };
+  dataCompleteness: number;
+  confidence: number;
+  reasoning: string;
+  timestamp: Date;
+}
+
+// ============= ORCHESTRATOR OUTPUT =============
+export type InvestmentState = 'high_conviction' | 'watch' | 'needs_review' | 'risk_rising' | 'avoid';
+
+export interface OrchestratorResult {
+  symbol: string;
+  overallScore: number;
+  investmentState: InvestmentState;
+  confidence: number;
+  engines: {
+    financial: { score: number; confidence: number };
+    technical: { score: number; confidence: number };
+    valuation: { score: number; confidence: number };
+    earnings: { score: number; confidence: number };
+    risk: { score: number; confidence: number; riskProfile: string };
+    sector: { score: number; confidence: number };
+    news: { score: number; confidence: number; sentiment: string };
+    events: { score: number; confidence: number };
+    rag: { score: number; confidence: number };
+  };
+  thesis: {
+    bullCase: string[];
+    bearCase: string[];
+    whatToWatch: string[];
+    disclaimer: string;
+  };
+  weights: {
+    financial: number;
+    valuation: number;
+    earnings: number;
+    risk: number;
+    technical: number;
+    sector: number;
+    news: number;
+    events: number;
+    rag: number;
+  };
+  timestamp: Date;
+}
