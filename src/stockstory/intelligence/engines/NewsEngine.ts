@@ -48,10 +48,11 @@ export class NewsEngine {
   private scoreSentiment(s: IntelligenceInput['sentiment']): number {
     let score = 25; // neutral baseline
     if (s.overallScore !== null) score += s.overallScore * 25;
-    if (s.avgRecentSentiment !== null) score += s.avgRecentSentiment * 15;
+    if (s.avgRecentSentiment !== null) score += s.avgRecentSentiment * 20;
 
-    if (s.positiveRatio !== null && s.positiveRatio > 0.6) score += 10;
-    else if (s.positiveRatio !== null && s.positiveRatio < 0.3) score -= 5;
+    if (s.positiveRatio !== null && s.positiveRatio > 0.5) score += 10;
+    else if (s.positiveRatio !== null && s.positiveRatio > 0.3) score += 3;
+    else if (s.positiveRatio !== null && s.positiveRatio < 0.2) score -= 5;
 
     return clampScore(score);
   }
@@ -61,8 +62,8 @@ export class NewsEngine {
   private scoreVolume(s: IntelligenceInput['sentiment']): number {
     let score = 5; // low volume baseline
     if (s.recentHeadlines !== null && s.recentHeadlines >= 20) score = 25;
-    else if (s.recentHeadlines !== null && s.recentHeadlines >= 10) score = 18;
-    else if (s.recentHeadlines !== null && s.recentHeadlines >= 5) score = 12;
+    else if (s.recentHeadlines !== null && s.recentHeadlines >= 10) score = 20;
+    else if (s.recentHeadlines !== null && s.recentHeadlines >= 5) score = 14;
     else if (s.recentHeadlines !== null && s.recentHeadlines >= 2) score = 8;
 
     if (s.trending) score = Math.min(25, score + 5);
