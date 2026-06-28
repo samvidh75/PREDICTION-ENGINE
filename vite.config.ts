@@ -44,6 +44,8 @@ export default defineConfig(({ mode }) => {
       },
     },
     build: {
+      outDir: "dist/public",
+      emptyOutDir: true,
       sourcemap: false,
       rollupOptions: {
         output: {

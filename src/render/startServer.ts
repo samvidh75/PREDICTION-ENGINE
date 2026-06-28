@@ -1,31 +1,26 @@
 /**
- * Render entry point — serves both the SPA (from dist/) and API.
- * API calls are proxied to the Vercel deployment at VERCEL_API_URL
- * so existing /api/* serverless functions continue working.
+ * Render entry point — serves both the SPA (from dist/public/) and API.
+ * Health endpoints work even without DB.
  *
  * Architecture:
- *   Frontend (SPA) + Backend (API proxy) → Render
- *   Vercel host the /api/* serverless functions
+ *   Frontend (SPA) + Backend (API) → Render
  *   Database → Neon (PostgreSQL)
  *   Cache → Upstash (Redis)
- *
- * Health endpoints work even without DB.
  */
 import Fastify from "fastify";
 import cors from "@fastify/cors";
 import staticFiles from "@fastify/static";
-import proxy from "@fastify/http-proxy";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
 import { dbAdapter } from "../db/DatabaseAdapter";
 import { MigrationRunner } from "../db/MigrationRunner";
+import registerApiRoutes from "./apiRouter.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const PORT = parseInt(process.env.PORT ?? "10000", 10);
 const HOST = process.env.HOST ?? "0.0.0.0";
-const VERCEL_API_URL = process.env.VERCEL_API_URL ?? "https://prediction-engine-4ygdhv5fy-samvidh75s-projects.vercel.app";
 const SELF_ORIGIN = process.env.SELF_ORIGIN ?? "https://stockstory-api.onrender.com";
 
 async function bootstrap() {
@@ -67,39 +62,25 @@ async function bootstrap() {
     node: process.version,
     env: process.env.NODE_ENV ?? "development",
     db: process.env.DATABASE_URL ? "configured" : "missing",
-    vercelApi: VERCEL_API_URL,
+    api: "native (Render)",
   }));
 
-  // ── API proxy: forward /api/* to Vercel ────────────────────────────
-  await server.register(proxy, {
-    upstream: VERCEL_API_URL,
-    prefix: "/api",
-    rewritePrefix: "/api",
-    http2: false,
-    replyOptions: {
-      rewriteRequestHeaders: (_req, headers) => {
-        headers.host = new URL(VERCEL_API_URL).host;
-        return headers;
-      },
-    },
-  });
+  // ── API routes: /api/stock, /api/search ────────────────────────────
+  await registerApiRoutes(server);
 
-  // ── Static SPA: serve dist/ folder ─────────────────────────────────
-  const distPath = join(__dirname, "..", "..", "dist");
+  // ── Static SPA: serve dist/public/ folder ───────────────────────────
+  const distPath = join(__dirname, "..", "..", "dist", "public");
   await server.register(staticFiles, {
     root: distPath,
     prefix: "/",
-    // wildcard: false — let @fastify/static serve matching files automatically
   });
 
   // ── SPA fallback: serve index.html for client-side routes ──────────
-  // Must come after the proxy + static routes so it only catches unmatched paths.
   server.setNotFoundHandler((_req, reply) => {
-    // Do not swallow API 404s — they were already proxied to Vercel
     if (_req.url.startsWith("/api/")) {
       return reply.status(404).send({ error: "not found" });
     }
-    return reply.sendFile("index.html"); // client-side routing fallback
+    return reply.sendFile("index.html");
   });
 
   // ── Database initialization (non-fatal) ────────────────────────────
