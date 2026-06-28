@@ -18,6 +18,7 @@ import { ragEngine } from "../services/intelligence/engines/RAGEngine/index.js";
 import { orchestrator } from "../services/intelligence/Orchestrator.js";
 import type { AllEngineInputs } from "../services/intelligence/Orchestrator.js";
 import type { EarningsMetrics, EventMetrics, FinancialMetrics, NewsMetrics, RAGMetrics, RiskMetrics, SectorMetrics, TechnicalMetrics, ValuationMetrics } from "../services/intelligence/types.js";
+import intelligenceQualityGate from "./intelligenceQualityGate.js";
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -389,6 +390,8 @@ const SEARCH_CACHE_TTL = 60_000;
 // ── Routes ──────────────────────────────────────────────────────────────────
 
 export default async function registerApiRoutes(server: FastifyInstance) {
+  // Register intelligence quality gate (sanitizes all /api/intelligence/* responses)
+  await server.register(intelligenceQualityGate);
   // GET /api/stock?symbol=TCS
   server.get("/api/stock", async (req, reply) => {
     const symbol = String((req.query as any)?.symbol ?? "").toUpperCase().trim();
