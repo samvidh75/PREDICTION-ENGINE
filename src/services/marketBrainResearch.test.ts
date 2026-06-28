@@ -334,6 +334,23 @@ describe('fetchMarketBrainResearch', () => {
     expect(result.research.factorViews.map((factorView) => factorView.score)).toEqual([0, 100]);
   });
 
+  it('throws a typed incomplete error for malformed successful research payloads', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({
+        ...responsePayload,
+        research: null,
+      }),
+    }));
+
+    await expect(fetchMarketBrainResearch('TCS')).rejects.toMatchObject({
+      code: 'INCOMPLETE_RESEARCH_RESPONSE',
+      message: 'Research response was incomplete.',
+      status: 200,
+    });
+  });
+
   it('throws a typed public-safe error for unavailable research', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
       ok: false,
@@ -348,6 +365,20 @@ describe('fetchMarketBrainResearch', () => {
       code: 'PROVIDER_UPSTREAM_FAILURE',
       message: 'Research is temporarily unavailable for this company.',
       status: 503,
+    });
+  });
+
+  it('throws public-safe error copy when unavailable research returns a non-object payload', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+      ok: false,
+      status: 502,
+      json: async () => 'upstream adapter failure',
+    }));
+
+    await expect(fetchMarketBrainResearch('TCS')).rejects.toMatchObject({
+      code: undefined,
+      message: 'Research is temporarily unavailable for this company.',
+      status: 502,
     });
   });
 });
