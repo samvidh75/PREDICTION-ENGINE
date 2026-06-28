@@ -98,6 +98,8 @@ const EMPTY_EVIDENCE_REVIEW: MarketBrainEvidenceReviewView = {
   summary: 'Research evidence status is unavailable for this view.',
 };
 
+const PUBLIC_RESEARCH_UNAVAILABLE_MESSAGE = 'Research is temporarily unavailable for this company.';
+
 const asTrimmedString = (value: unknown): string => (typeof value === 'string' ? value.trim() : '');
 
 const asResearchState = (value: unknown): MarketBrainResearchState => {
@@ -210,7 +212,7 @@ export async function fetchMarketBrainResearch(symbol: string, init?: RequestIni
 
   if (!response.ok) {
     throw new MarketBrainResearchError(
-      payload?.message ?? 'Research is temporarily unavailable for this company.',
+      PUBLIC_RESEARCH_UNAVAILABLE_MESSAGE,
       response.status,
       payload?.code,
     );
