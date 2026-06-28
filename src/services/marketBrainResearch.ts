@@ -91,6 +91,16 @@ const MARKET_BRAIN_FACTOR_KEYS = new Set<MarketBrainFactorKey>([
   'ownership',
 ]);
 
+const MARKET_BRAIN_FORBIDDEN_PUBLIC_TERMS = [
+  'Strong Buy',
+  'Buy now',
+  'Hold recommendation',
+  'Sell immediately',
+  'Guaranteed return',
+  'Sure shot',
+  'Multibagger guarantee',
+] as const;
+
 const EMPTY_EVIDENCE_REVIEW: MarketBrainEvidenceReviewView = {
   needsReview: false,
   partial: [],
@@ -107,6 +117,16 @@ const isRecord = (value: unknown): value is Record<string, unknown> => (
 
 const asTrimmedString = (value: unknown): string => (typeof value === 'string' ? value.trim() : '');
 
+const containsForbiddenPublicCopy = (value: string): boolean => {
+  const normalized = value.toLowerCase();
+  return MARKET_BRAIN_FORBIDDEN_PUBLIC_TERMS.some((term) => normalized.includes(term.toLowerCase()));
+};
+
+const asPublicText = (value: unknown): string => {
+  const text = asTrimmedString(value);
+  return text.length > 0 && !containsForbiddenPublicCopy(text) ? text : '';
+};
+
 const asResearchState = (value: unknown): MarketBrainResearchState => {
   const state = asTrimmedString(value);
   return MARKET_BRAIN_RESEARCH_STATES.has(state as MarketBrainResearchState)
@@ -115,7 +135,7 @@ const asResearchState = (value: unknown): MarketBrainResearchState => {
 };
 
 const asStringArray = (value: unknown): string[] => (Array.isArray(value)
-  ? value.map(asTrimmedString).filter((item) => item.length > 0)
+  ? value.map(asPublicText).filter((item) => item.length > 0)
   : []);
 
 const asEvidenceDomains = (value: unknown): MarketBrainEvidenceDomain[] => (Array.isArray(value)
@@ -135,7 +155,7 @@ const asFactorViews = (value: unknown): MarketBrainFactorView[] => (Array.isArra
     if (!item || typeof item !== 'object') return [];
     const candidate = item as Partial<MarketBrainFactorView>;
     const label = asTrimmedString(candidate.label);
-    const summary = asTrimmedString(candidate.summary);
+    const summary = asPublicText(candidate.summary);
     if (!(typeof candidate.key === 'string'
       && MARKET_BRAIN_FACTOR_KEYS.has(candidate.key as MarketBrainFactorKey)
       && label.length > 0
@@ -158,7 +178,7 @@ const normalizeEvidenceReview = (value: unknown): MarketBrainEvidenceReviewView 
   const candidate = value as Partial<MarketBrainEvidenceReviewView>;
   const partial = asEvidenceDomains(candidate.partial);
   const missing = asEvidenceDomains(candidate.missing);
-  const summary = asTrimmedString(candidate.summary) || EMPTY_EVIDENCE_REVIEW.summary;
+  const summary = asPublicText(candidate.summary) || EMPTY_EVIDENCE_REVIEW.summary;
   const needsReview = typeof candidate.needsReview === 'boolean'
     ? candidate.needsReview
     : partial.length > 0 || missing.length > 0;
@@ -188,13 +208,13 @@ const normalizeResearchResponse = (
       companyName,
       state: asResearchState(research.state),
       convictionScore: asPublicScore(research.convictionScore),
-      headline: asTrimmedString(research.headline),
+      headline: asPublicText(research.headline),
       thesis: asStringArray(research.thesis),
       risksToReview: asStringArray(research.risksToReview),
       whatToWatch: asStringArray(research.whatToWatch),
       evidenceReview: normalizeEvidenceReview(research.evidenceReview),
       factorViews: asFactorViews(research.factorViews),
-      methodNote: asTrimmedString(research.methodNote),
+      methodNote: asPublicText(research.methodNote),
       generatedAt: asTrimmedString(research.generatedAt),
     },
   };
