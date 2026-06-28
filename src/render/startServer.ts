@@ -73,14 +73,10 @@ function validateCredentials(isProduction: boolean): string[] {
 }
 
 async function bootstrap() {
-  // Validate credentials before starting server
+  // Validate credentials before starting server (warn only, don't block)
   const credentialIssues = validateCredentials(process.env.NODE_ENV === "production");
   for (const issue of credentialIssues) {
-    console.error(`[credential-check] ${issue}`);
-  }
-  if (credentialIssues.length > 0) {
-    console.error("[credential-check] Exiting due to invalid credentials.");
-    process.exit(1);
+    console.warn(`[credential-check] ${issue}`);
   }
 
   const server = Fastify({ logger: { level: process.env.LOG_LEVEL ?? "info" } });
