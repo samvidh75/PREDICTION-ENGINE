@@ -28,13 +28,24 @@ describe('PostgreSQL migration upgrade safety', () => {
   });
 
   afterAll(async () => {
-    try { await resetSchema(); } catch { /* ignore */ }
+    try { await cleanupTestData(); } catch { /* ignore */ }
     await dbAdapter.reset();
     for (const d of tempDirs) {
       try { fs.rmSync(d, { recursive: true, force: true }); } catch { /* ignore */ }
     }
     process.env = { ...originalEnv };
   });
+
+  // Clean up only test-specific rows, never drop shared warehouse tables.
+  async function cleanupTestData() {
+    const testSymbols = ['TESTUP1', 'TESTUP2'];
+    for (const sym of testSymbols) {
+      try { await dbAdapter.query('DELETE FROM financial_snapshots WHERE symbol = $1', [sym]); } catch { /* ignore */ }
+      try { await dbAdapter.query('DELETE FROM prediction_registry WHERE symbol = $1', [sym]); } catch { /* ignore */ }
+      try { await dbAdapter.query('DELETE FROM symbols WHERE symbol = $1', [sym]); } catch { /* ignore */ }
+    }
+    try { await dbAdapter.query("DELETE FROM user_profiles WHERE uid = $1", ['test-uid']); } catch { /* ignore */ }
+  }
 
   async function resetSchema() {
     const cleanTables = [
@@ -82,7 +93,7 @@ describe('PostgreSQL migration upgrade safety', () => {
     const status1 = await runner.runPending();
     expect(status1.appliedCount).toBe(historicalFiles.length);
 
-    // 3. Insert representative existing rows (including multiple symbols and multiple snapshot dates)
+    // 3. Insert representative existing rows
     await dbAdapter.query(
       `INSERT INTO user_profiles (uid, payload, created_at)
        VALUES ($1, $2, NOW()) ON CONFLICT (uid) DO NOTHING`,
@@ -95,7 +106,6 @@ describe('PostgreSQL migration upgrade safety', () => {
       ['TESTUP1', 'NSE', 'Test Upgrade Co 1', 'Active', 'TESTUP2', 'NSE', 'Test Upgrade Co 2', 'Active']
     );
 
-    // Insert multiple snapshot dates for the same symbol
     await dbAdapter.query(
       `INSERT INTO financial_snapshots (symbol, period_end, snapshot_date, pe_ratio, pb_ratio)
        VALUES ($1, $2, $3, $4, $5)`,
@@ -108,14 +118,12 @@ describe('PostgreSQL migration upgrade safety', () => {
       ['TESTUP1', '2026-06-10', '2026-06-10', 16.0, 2.5]
     );
 
-    // Insert row for second symbol
     await dbAdapter.query(
       `INSERT INTO financial_snapshots (symbol, period_end, snapshot_date, pe_ratio, pb_ratio)
        VALUES ($1, $2, $3, $4, $5)`,
       ['TESTUP2', '2026-06-10', '2026-06-10', 20.0, 3.0]
     );
 
-    // Record row count and values before upgrade
     const fsBefore = await dbAdapter.query('SELECT * FROM financial_snapshots');
     expect(fsBefore.rows.length).toBe(3);
 
@@ -132,23 +140,20 @@ describe('PostgreSQL migration upgrade safety', () => {
     const fsAfter = await dbAdapter.query('SELECT * FROM financial_snapshots ORDER BY symbol, period_end');
     expect(fsAfter.rows.length).toBe(3);
 
-    // First row
     expect(fsAfter.rows[0].symbol).toBe('TESTUP1');
     expect(fsAfter.rows[0].period_end).toBe('2026-06-09');
     expect(Number(fsAfter.rows[0].pe_ratio)).toBe(15.0);
-    expect(fsAfter.rows[0].eps).toBeNull(); // new column
+    expect(fsAfter.rows[0].eps).toBeNull();
 
-    // Second row
     expect(fsAfter.rows[1].symbol).toBe('TESTUP1');
     expect(fsAfter.rows[1].period_end).toBe('2026-06-10');
     expect(Number(fsAfter.rows[1].pe_ratio)).toBe(16.0);
 
-    // Third row
     expect(fsAfter.rows[2].symbol).toBe('TESTUP2');
     expect(fsAfter.rows[2].period_end).toBe('2026-06-10');
     expect(Number(fsAfter.rows[2].pe_ratio)).toBe(20.0);
 
-    // 7. Assert primary key correct by inserting row with duplicate snapshot_date but different period_end
+    // 7. Assert primary key correct
     await dbAdapter.query(
       `INSERT INTO financial_snapshots (symbol, period_end, snapshot_date, pe_ratio)
        VALUES ($1, $2, $3, $4)`,
@@ -164,12 +169,10 @@ describe('PostgreSQL migration upgrade safety', () => {
     // 9. Verify duplicate-collision safety:
     await resetSchema();
 
-    // Run up to 011 again
     const runnerCollision = new MigrationRunner(dbAdapter, tempMigDir);
     fs.unlinkSync(path.join(tempMigDir, file012));
     await runnerCollision.runPending();
 
-    // Insert user, symbols
     await dbAdapter.query(
       `INSERT INTO user_profiles (uid, payload, created_at)
        VALUES ($1, $2, NOW()) ON CONFLICT (uid) DO NOTHING`,
@@ -181,7 +184,6 @@ describe('PostgreSQL migration upgrade safety', () => {
       ['TESTUP1', 'NSE', 'Test Upgrade Co 1', 'Active']
     );
 
-    // Temporarily drop constraint and insert duplicate symbol/period_end row
     await dbAdapter.query('ALTER TABLE financial_snapshots DROP CONSTRAINT IF EXISTS financial_snapshots_pkey');
     await dbAdapter.query(
       `INSERT INTO financial_snapshots (symbol, period_end, snapshot_date, pe_ratio)
@@ -189,10 +191,8 @@ describe('PostgreSQL migration upgrade safety', () => {
       ['TESTUP1', '2026-06-10', '2026-06-10', 15.0, 'TESTUP1', '2026-06-10', '2026-06-09', 16.0]
     );
 
-    // Copy 012 back
     fs.copyFileSync(path.join(srcMigDir, file012), path.join(tempMigDir, file012));
 
-    // Try to run 012 - it must fail loudly
     await expect(runnerCollision.runPending()).rejects.toThrow(/MIGRATION_COLLISION_DETECTED/);
   });
 });
