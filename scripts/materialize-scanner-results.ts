@@ -6,7 +6,7 @@
  *
  * Usage:
  *   npx tsx scripts/materialize-scanner-results.ts
- *   railway run npx tsx scripts/materialize-scanner-results.ts
+ *   npx tsx scripts/materialize-scanner-results.ts
  */
 
 import { query } from "../src/db/index";

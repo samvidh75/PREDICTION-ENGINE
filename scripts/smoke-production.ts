@@ -3,7 +3,7 @@ export {};
  * Production Smoke Test Script
  *
  * Checks live production endpoints for the StockStory India frontend,
- * Vercel API proxy, and Railway backend. Exits non-zero on failure.
+ * Vercel API proxy, and Render backend. Exits non-zero on failure.
  *
  * Usage:
  *   npx tsx scripts/smoke-production.ts
@@ -13,7 +13,7 @@ export {};
  */
 
 const FRONTEND_URL = "https://www.stockstory-india.com";
-const RAILWAY_URL = "https://prediction-engine-production-f7a8.up.railway.app";
+const RENDER_URL = "https://stockstory-api.onrender.com";
 
 const TIMEOUT_MS = parseInt(process.env.SMOKE_TIMEOUT_MS || "15000", 10);
 
@@ -121,15 +121,15 @@ async function main(): Promise<void> {
 
   // Railway backend direct
   results.push(
-    await checkEndpoint("RAILWAY_HEALTH", `${RAILWAY_URL}/api/ops/health`, [
+    await checkEndpoint("RENDER_HEALTH", `${RENDER_URL}/api/ops/health`, [
       "status",
       "metrics.db_health",
     ])
   );
   results.push(
     await checkEndpoint(
-      "RAILWAY_COVERAGE",
-      `${RAILWAY_URL}/api/ops/data-coverage`,
+      "RENDER_COVERAGE",
+      `${RENDER_URL}/api/ops/data-coverage`,
       ["ok", "coverage.symbols.count", "coverage.dailyPrices.rowCount"]
     )
   );
@@ -155,7 +155,7 @@ async function main(): Promise<void> {
   // Health endpoints must return provider status
   for (const [label, url] of [
     ["HEALTH_PROVIDER_STATUS_V", `${FRONTEND_URL}/api/ops/health`] as const,
-    ["HEALTH_PROVIDER_STATUS_R", `${RAILWAY_URL}/api/ops/health`] as const,
+    ["HEALTH_PROVIDER_STATUS_RENDER", `${RENDER_URL}/api/ops/health`] as const,
   ]) {
     try {
       const body = await fetchJson(url, TIMEOUT_MS);
@@ -246,7 +246,7 @@ async function main(): Promise<void> {
   // Data-coverage endpoints: no deprecated providers
   for (const [label, url] of [
     ["COVERAGE_NO_DEPRECATED_V", `${FRONTEND_URL}/api/ops/data-coverage`] as const,
-    ["COVERAGE_NO_DEPRECATED_R", `${RAILWAY_URL}/api/ops/data-coverage`] as const,
+    ["COVERAGE_NO_DEPRECATED_RENDER", `${RENDER_URL}/api/ops/data-coverage`] as const,
   ]) {
     try {
       const body = await fetchJson(url, TIMEOUT_MS);
@@ -289,8 +289,8 @@ async function main(): Promise<void> {
   for (const [label, url] of [
     ["NO_PYTHON_TRACE_V_HEALTH", `${FRONTEND_URL}/api/ops/health`] as const,
     ["NO_PYTHON_TRACE_V_COVERAGE", `${FRONTEND_URL}/api/ops/data-coverage`] as const,
-    ["NO_PYTHON_TRACE_R_HEALTH", `${RAILWAY_URL}/api/ops/health`] as const,
-    ["NO_PYTHON_TRACE_R_COVERAGE", `${RAILWAY_URL}/api/ops/data-coverage`] as const,
+    ["NO_PYTHON_TRACE_RENDER_HEALTH", `${RENDER_URL}/api/ops/health`] as const,
+    ["NO_PYTHON_TRACE_RENDER_COVERAGE", `${RENDER_URL}/api/ops/data-coverage`] as const,
   ]) {
     try {
       const response = await fetchWithTimeout(url, TIMEOUT_MS);
