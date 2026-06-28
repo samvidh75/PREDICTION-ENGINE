@@ -69,10 +69,13 @@ async function bootstrap() {
   await registerApiRoutes(server);
 
   // ── Static SPA: serve dist/public/ folder ───────────────────────────
-  const distPath = join(__dirname, "..", "..", "dist", "public");
+  const distPath = join(process.cwd(), "dist", "public");
+  server.log.info(`Serving static files from ${distPath}`);
+
   await server.register(staticFiles, {
     root: distPath,
     prefix: "/",
+    index: ["index.html"],
   });
 
   // ── SPA fallback: serve index.html for client-side routes ──────────
