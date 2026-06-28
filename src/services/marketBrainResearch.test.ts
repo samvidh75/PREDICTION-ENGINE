@@ -93,6 +93,24 @@ describe('fetchMarketBrainResearch', () => {
     expect(result.research.companyName).toBe('Tata Consultancy Services');
   });
 
+  it('falls back from invalid conviction scores before public rendering', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({
+        ...responsePayload,
+        research: {
+          ...responsePayload.research,
+          convictionScore: 101,
+        },
+      }),
+    }));
+
+    const result = await fetchMarketBrainResearch('TCS');
+
+    expect(result.research.convictionScore).toBe(0);
+  });
+
   it('filters unknown evidence domains from public client metadata', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
       ok: true,
