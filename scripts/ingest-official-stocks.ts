@@ -51,8 +51,21 @@ interface PersistedUniverseFile {
 const NSE_EQUITY_CSV_URL =
   "https://archives.nseindia.com/content/equities/EQUITY_L.csv";
 
-const BSE_EQUITY_CSV_URL =
-  "https://www.bseindia.com/download/BhavCopy/Equity/EQ_ISINCODE_$(date).zip";
+const BSE_API_URL =
+  "https://api.bseindia.com/BseIndiaAPI/api/ListofScripData/w?segment=Equity";
+
+interface BSEApiEntry {
+  SCRIP_CD: string;
+  Scrip_Name: string;
+  Status: string;
+  GROUP: string;
+  ISIN_NUMBER: string;
+  INDUSTRY: string | null;
+  scrip_id: string;
+  Segment: string;
+  Issuer_Name: string;
+  Mktcap: string;
+}
 
 // Sector classification by symbol/name keywords
 function inferSector(symbol: string, name: string): string {
@@ -205,76 +218,75 @@ async function fetchNSEStocks(): Promise<RawStockEntry[]> {
 }
 
 async function fetchBSEStocks(): Promise<RawStockEntry[]> {
-  console.log("[BSE] Using BSE listing data via SEBI-registered ISIN lookup...");
+  console.log(`[BSE] Fetching equity listings from BSE API...`);
   try {
-    // BSE provides a listing CSV via their public data portal
-    // Fallback: generate BSE symbols from the NSE universe + scrip code range
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 20000);
-
-    // Try BSE's publicly available listed securities file
-    const response = await fetch(
-      "https://www.bseindia.com/download/BhavCopy/Equity/EQ_ISINCODE_$(date).zip".replace("$(date)", ""),
-      {
-        signal: controller.signal,
-        headers: {
-          "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
-          Accept: "*/*",
-        },
+    const timeout = setTimeout(() => controller.abort(), 60000);
+    const response = await fetch(BSE_API_URL, {
+      signal: controller.signal,
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
+        Referer: "https://www.bseindia.com/",
+        Accept: "application/json, */*",
       },
-    );
+    });
     clearTimeout(timeout);
 
     if (!response.ok) {
-      console.log(`[BSE] HTTP ${response.status} — generating BSE symbols from scrip codes`);
+      console.log(`[BSE] HTTP ${response.status} — falling back to NSE-only universe`);
       return [];
     }
 
-    // BSE ZIP parsing would go here — for now we use NSE → BSE mapping
-    console.log("[BSE] ZIP parsing not yet implemented — generating from scrip codes");
-    return [];
-  } catch (err) {
-    const message = err instanceof Error ? err.message : String(err);
-    console.log(`[BSE] Fetch failed: ${message} — generating BSE symbols from scrip codes`);
-    return [];
-  }
-}
+    const data = (await response.json()) as BSEApiEntry[];
+    if (!Array.isArray(data) || data.length === 0) {
+      console.log("[BSE] API returned empty data — falling back to NSE-only universe");
+      return [];
+    }
 
-function generateBSEEntries(nseStocks: RawStockEntry[]): RawStockEntry[] {
-  const bseEntries: RawStockEntry[] = [];
-  const seen = new Set<string>();
+    let activeCount = 0;
+    let suspendedCount = 0;
+    let skippedCount = 0;
+    const entries: RawStockEntry[] = [];
 
-  // Map NSE stocks to BSE equivalents (different ISIN but same company)
-  for (const nse of nseStocks) {
-    const bseSymbol = nse.symbol; // Many symbols match across exchanges
-    if (!seen.has(bseSymbol)) {
-      seen.add(bseSymbol);
-      bseEntries.push({
-        ...nse,
+    for (const item of data) {
+      // Include only Active and Suspended stocks (exclude Delisted and other non-tradable)
+      if (item.Status === "Delisted") {
+        skippedCount++;
+        continue;
+      }
+      if (!item.SCRIP_CD || !item.Scrip_Name) {
+        skippedCount++;
+        continue;
+      }
+
+      const symbol = item.SCRIP_CD.trim();
+      const name = item.Scrip_Name.trim();
+      const isin = item.ISIN_NUMBER?.trim() || `INE${String(hash(symbol)).padStart(9, "0").slice(0, 9)}0`;
+      const series = item.GROUP?.trim() || "EQ";
+
+      if (item.Status === "Active") activeCount++;
+      else if (item.Status === "Suspended") suspendedCount++;
+
+      entries.push({
+        symbol,
+        name,
+        isin,
+        series,
         exchange: "BSE",
-        isin: `INE${String(hash(`BSE:${nse.symbol}`)).padStart(9, "0").slice(0, 9)}0`,
+        sector: inferSector(symbol, name),
+        industry: inferIndustry(inferSector(symbol, name)),
       });
     }
-  }
 
-  // Add additional BSE-specific scrip codes not mapped from NSE
-  for (let scrip = 500002; bseEntries.length < 3200 && scrip <= 599999; scrip += 1) {
-    const symbol = `BSE${scrip}`;
-    if (seen.has(symbol)) continue;
-    seen.add(symbol);
-    const name = `BSE Listed ${scrip}`;
-    bseEntries.push({
-      symbol,
-      name,
-      isin: `INE${String(hash(`BSE:GENERATED:${scrip}`)).padStart(9, "0").slice(0, 9)}0`,
-      series: "EQ",
-      exchange: "BSE",
-      sector: inferSector(symbol, name),
-      industry: inferIndustry(inferSector(symbol, name)),
-    });
+    console.log(
+      `[BSE] Parsed ${entries.length} stocks (Active: ${activeCount}, Suspended: ${suspendedCount}, Skipped/De-listed: ${skippedCount})`,
+    );
+    return entries;
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.log(`[BSE] Fetch failed: ${message} — falling back to NSE-only universe`);
+    return [];
   }
-
-  return bseEntries;
 }
 
 function buildUniverseEntry(raw: RawStockEntry): UniverseEntry {
@@ -334,12 +346,10 @@ async function main(): Promise<void> {
   let allRaw: RawStockEntry[] = [];
   if (nseStocks.length > 0) {
     allRaw = nseStocks;
-    // Fetch/generate BSE stocks
+    // Fetch real BSE stocks from API
     const bseStocks = await fetchBSEStocks();
     if (bseStocks.length > 0) {
       allRaw = [...allRaw, ...bseStocks];
-    } else {
-      allRaw = [...allRaw, ...generateBSEEntries(nseStocks)];
     }
   } else {
     // Fallback: use existing universe entries
@@ -396,7 +406,7 @@ async function main(): Promise<void> {
   const universe: PersistedUniverseFile = {
     totalUniverse: entries.length,
     generatedAt: new Date().toISOString(),
-    sources: nseStocks.length > 0 ? ["NSE Equity Master CSV", "BSE Scrip Codes"] : ["Existing Universe Fallback"],
+    sources: nseStocks.length > 0 ? ["NSE Equity Master CSV", "BSE API (Active + Suspended)"] : ["Existing Universe Fallback"],
     entries,
   };
 
