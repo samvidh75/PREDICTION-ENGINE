@@ -2,7 +2,8 @@
 node_modules/
 
 # Build outputs
-dist/
+dist/*
+!dist/public/
 build/
 .next/
 coverage/

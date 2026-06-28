@@ -183,6 +183,7 @@
     "@qdrant/js-client-rest": "^1.18.0",
     "@supabase/supabase-js": "^2.108.2",
     "@tanstack/react-query": "^5.101.0",
+    "@vitejs/plugin-react": "^6.0.2",
     "axios": "^1.18.1",
     "clsx": "^2.1.1",
     "dotenv": "^17.4.2",
@@ -206,15 +207,15 @@
     "recharts": "^3.9.0",
     "redis": "^5.12.1",
     "sql.js": "^1.14.1",
-    "vite": "^8.0.16",
-    "@vitejs/plugin-react": "^6.0.2",
-    "typescript": "^5.5.4"
+    "typescript": "^5.5.4",
+    "vite": "^8.0.16"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.60.0",
     "@railway/cli": "^5.23.1",
     "@rolldown/plugin-babel": "^0.2.3",
+    "@rolldown/pluginutils": "^1.0.1",
     "@tailwindcss/typography": "^0.5.20",
     "@testing-library/jest-dom": "^6.0.0",
     "@testing-library/react": "^14.0.0",
