@@ -46,7 +46,7 @@ export class StockStoryOrchestrator {
    * Run the full intelligence pipeline for a single stock.
    */
   async analyze(input: IntelligenceInput): Promise<StockIntelligenceReport> {
-    const startTime = Date.now();
+    const startTime = performance.now();
 
     // ── Run all engines ─────────────────────────────────────────
     const [financial, technical, valuation, risk, sector, news, earnings, event, rag] =
@@ -102,7 +102,7 @@ export class StockStoryOrchestrator {
       opportunities: [],
       dataFreshness,
       metadata: {
-        computationTimeMs: Date.now() - startTime,
+        computationTimeMs: Math.round(performance.now() - startTime),
         engineVersions: {
           financial: '1.0.0',
           technical: '1.0.0',
