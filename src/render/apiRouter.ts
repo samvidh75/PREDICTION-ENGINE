@@ -9,15 +9,22 @@ import { getPersistedStockResearch } from "../lib/stockResearchSnapshot.js";
 import { financialEngine } from "../services/intelligence/engines/FinancialEngine/index.js";
 import { technicalEngine } from "../services/intelligence/engines/TechnicalEngine/index.js";
 import { earningsEngine } from "../services/intelligence/engines/EarningsEngine/index.js";
+import { eventEngine } from "../services/intelligence/engines/EventEngine/index.js";
 import { riskEngine } from "../services/intelligence/engines/RiskEngine/index.js";
-import type { EarningsMetrics, FinancialMetrics, RiskMetrics, TechnicalMetrics } from "../services/intelligence/types.js";
+import { valuationEngine } from "../services/intelligence/engines/ValuationEngine/index.js";
+import { newsEngine } from "../services/intelligence/engines/NewsEngine/index.js";
+import { sectorEngine } from "../services/intelligence/engines/SectorEngine/index.js";
+import { ragEngine } from "../services/intelligence/engines/RAGEngine/index.js";
+import { orchestrator } from "../services/intelligence/Orchestrator.js";
+import type { AllEngineInputs } from "../services/intelligence/Orchestrator.js";
+import type { EarningsMetrics, EventMetrics, FinancialMetrics, NewsMetrics, RAGMetrics, RiskMetrics, SectorMetrics, TechnicalMetrics, ValuationMetrics } from "../services/intelligence/types.js";
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
-function n(v: unknown): number | null {
-  if (v == null || v === "") return null;
+function n(v: unknown): number | undefined {
+  if (v == null || v === "") return undefined;
   const p = typeof v === "number" ? v : Number.parseFloat(String(v));
-  return Number.isFinite(p) ? p : null;
+  return Number.isFinite(p) ? p : undefined;
 }
 
 // ── Sector config ──────────────────────────────────────────────────────────
@@ -785,6 +792,433 @@ export default async function registerApiRoutes(server: FastifyInstance) {
       };
     } catch (err: any) {
       return reply.status(502).send({ error: err.message || String(err), symbol });
+    }
+  });
+
+  // GET /api/intelligence/events?symbol=TCS
+  // Identifies near-term catalysts: earnings, deals, approvals, launches
+  server.get("/api/intelligence/events", async (req, reply) => {
+    const symbol = String((req.query as any)?.symbol ?? "").toUpperCase().trim();
+    if (!symbol) return reply.status(400).send({ error: "symbol required" });
+
+    try {
+      const [yahoo, fund, synthetic] = await Promise.all([
+        yahooQuote(symbol),
+        indianApiFunds(symbol),
+        getPersistedStockResearch(symbol).catch(() => null),
+      ]);
+
+      const fundData = fund || {};
+
+      // Build catalyst events from available data
+      const events: Array<{
+        type: 'earnings' | 'dividend' | 'deal' | 'approval' | 'product' | 'strategic' | 'other';
+        description: string;
+        expectedDate?: Date;
+        probability?: number;
+        expectedImpact: 'high' | 'medium' | 'low';
+        direction: 'bullish' | 'bearish' | 'neutral';
+      }> = [];
+
+      // Estimate next earnings (~90 days cycle)
+      const now = new Date();
+      const quarterMs = 90 * 24 * 60 * 60 * 1000;
+      const nextEarningsDate = new Date(now.getTime() + quarterMs);
+
+      events.push({
+        type: 'earnings',
+        description: `Next quarterly earnings (est. ${nextEarningsDate.toLocaleDateString('en-IN')})`,
+        expectedDate: nextEarningsDate,
+        probability: 0.95,
+        expectedImpact: 'high',
+        direction: 'neutral',
+      });
+
+      const revenueGrowth = n(fundData.revenue_growth_1y ?? fundData.revenue_growth) ?? synthetic?.revenueGrowth ?? 0;
+
+      const metrics: EventMetrics = {
+        events,
+        nextEarningsDate,
+        eventCount90Days: 1,
+        bullishEventCount: revenueGrowth > 10 ? 1 : 0,
+        bearishEventCount: revenueGrowth < 0 ? 1 : 0,
+        lastUpdated: new Date(),
+        fiscalYear: new Date().getFullYear(),
+        currency: 'INR',
+      };
+
+      const result = await eventEngine.analyze(metrics);
+
+      reply.header("Cache-Control", "public, s-maxage=300");
+      return {
+        symbol,
+        engine: "events",
+        score: result.overall,
+        nextCatalyst: result.nextCatalyst,
+        daysToCatalyst: result.daysToCatalyst,
+        catalystDirection: result.catalystDirection,
+        opportunityWindow: result.opportunityWindow,
+        catalystRichness: result.catalystRichness,
+        upcomingEvents: result.upcomingEvents,
+        confidence: result.confidence,
+        details: result,
+        timestamp: new Date().toISOString(),
+      };
+    } catch (err: any) {
+      return reply.status(502).send({ error: err.message || String(err), symbol });
+    }
+  });
+
+  // GET /api/intelligence/valuation?symbol=TCS
+  // Scores value attractiveness: PE, PB, EV/EBITDA, FCF yield, dividend yield
+  server.get("/api/intelligence/valuation", async (req, reply) => {
+    const symbol = String((req.query as any)?.symbol ?? "").toUpperCase().trim();
+    if (!symbol) return reply.status(400).send({ error: "symbol required" });
+
+    try {
+      const [yahoo, fund] = await Promise.all([
+        yahooQuote(symbol),
+        indianApiFunds(symbol),
+      ]);
+
+      const fundData = fund || {};
+      const price = n(yahoo?.price) ?? 0;
+
+      const metrics: ValuationMetrics = {
+        peRatio: n(fundData.pe_ratio),
+        pbRatio: n(fundData.pb_ratio),
+        evEbitda: n(fundData.ev_ebitda ?? fundData.enterprise_value_ebitda),
+        fcfYield: n(fundData.fcf_yield ?? fundData.free_cash_flow_yield),
+        dividendYield: n(fundData.dividend_yield),
+        lastUpdated: new Date(),
+        symbol,
+      };
+
+      const result = await valuationEngine.analyze(metrics);
+
+      reply.header("Cache-Control", "public, s-maxage=600");
+      return {
+        symbol,
+        engine: "valuation",
+        score: result.overall,
+        valuation: result.valuation,
+        peScore: result.peScore,
+        pbScore: result.pbScore,
+        evEbitdaScore: result.evEbitdaScore,
+        fcfYieldScore: result.fcfYieldScore,
+        dividendYieldScore: result.dividendYieldScore,
+        confidence: result.confidence,
+        details: result,
+        timestamp: new Date().toISOString(),
+      };
+    } catch (err: any) {
+      return reply.status(502).send({ error: err.message || String(err), symbol });
+    }
+  });
+
+  // GET /api/intelligence/news?symbol=TCS
+  // Scores news sentiment: volume, polarity, source credibility, recency
+  server.get("/api/intelligence/news", async (req, reply) => {
+    const symbol = String((req.query as any)?.symbol ?? "").toUpperCase().trim();
+    if (!symbol) return reply.status(400).send({ error: "symbol required" });
+
+    try {
+      const newsUrl = `https://query1.finance.yahoo.com/v1/finance/search?q=${encodeURIComponent(symbol)}&lang=en-IN&region=IN&quotesCount=0&newsCount=8`;
+      let articles: { headline: string; source: string; time: string; link?: string }[] = [];
+      try {
+        const resp = await fetch(newsUrl, { headers: { "User-Agent": "Mozilla/5.0" } });
+        const data = await resp.json() as any;
+        articles = ((data?.news ?? []) as any[]).slice(0, 8).map((item: any) => ({
+          headline: String(item.title ?? item.headline ?? ""),
+          source: String(item.publisher ?? item.source ?? "Unknown"),
+          time: String(item.providerPublishTime ? new Date(item.providerPublishTime * 1000).toISOString()
+            : item.publishedAt ?? item.createdAt ?? new Date().toISOString()),
+          link: item.link ?? undefined,
+        }));
+      } catch {
+        // Proceed with empty articles
+      }
+
+      const metrics: NewsMetrics = { articles, symbol, lastUpdated: new Date() };
+      const result = await newsEngine.analyze(metrics);
+
+      reply.header("Cache-Control", "public, s-maxage=600");
+      return {
+        symbol,
+        engine: "news",
+        score: result.overall,
+        sentiment: result.sentiment,
+        articleCount: result.articleCount,
+        volumeScore: result.volumeScore,
+        sentimentScore: result.sentimentScore,
+        credibilityScore: result.credibilityScore,
+        recencyScore: result.recencyScore,
+        topKeywords: result.topKeywords,
+        confidence: result.confidence,
+        details: result,
+        timestamp: new Date().toISOString(),
+      };
+    } catch (err: any) {
+      return reply.status(502).send({ error: err.message || String(err), symbol });
+    }
+  });
+
+  // GET /api/intelligence/sector?symbol=TCS
+  // Scores sector positioning: relative valuation, quality, growth, momentum, competitive position
+  server.get("/api/intelligence/sector", async (req, reply) => {
+    const symbol = String((req.query as any)?.symbol ?? "").toUpperCase().trim();
+    if (!symbol) return reply.status(400).send({ error: "symbol required" });
+
+    try {
+      const [fund, synthetic] = await Promise.all([
+        indianApiFunds(symbol),
+        getPersistedStockResearch(symbol),
+      ]);
+
+      const fundData = fund || {};
+      const synData = (synthetic || {}) as any;
+
+      const sectorName = String(synData.sector ?? fundData.sector ?? "");
+
+      // Build metrics from available data
+      const metrics: SectorMetrics = {
+        stockPE: n(fundData.pe_ratio),
+        stockPB: n(fundData.pb_ratio),
+        stockEVEbitda: n(fundData.ev_ebitda ?? fundData.enterprise_value_ebitda),
+        stockROE: n(fundData.roe ?? fundData.return_on_equity),
+        stockNetMargin: n(fundData.net_margin ?? fundData.net_profit_margin),
+        stockRevGrowth: n(fundData.revenue_growth ?? fundData.rev_growth_1y),
+        stockEPSGrowth: n(fundData.eps_growth ?? fundData.eps_growth_1y),
+
+        // Peer averages from synthetic/persisted data
+        peerPE: n(synData.sectorPe ?? synData.peerPE),
+        peerPB: n(synData.sectorPb ?? synData.peerPB),
+        peerEVEbitda: n(synData.sectorEvEbitda ?? synData.peerEVEbitda),
+        peerROE: n(synData.sectorRoe ?? synData.peerROE),
+        peerNetMargin: n(synData.sectorNetMargin ?? synData.peerNetMargin),
+        peerRevGrowth: n(synData.sectorRevGrowth ?? synData.peerRevGrowth),
+        peerEPSGrowth: n(synData.sectorEpsGrowth ?? synData.peerEPSGrowth),
+
+        sectorReturn1M: n(synData.sectorReturn1M ?? fundData.sector_return_1m),
+        sectorReturn3M: n(synData.sectorReturn3M ?? fundData.sector_return_3m),
+        relativeStrength: n(synData.relativeStrength ?? synData.sectorRs),
+        analystUpgrades: n(synData.analystUpgrades),
+        analystDowngrades: n(synData.analystDowngrades),
+
+        marketCapRank: n(synData.marketCapRank ?? synData.peerRank),
+        sectorPeerCount: n(synData.sectorPeerCount ?? synData.peerCount),
+        brandStrength: n(synData.brandStrength),
+        customerStickiness: n(synData.customerStickiness),
+
+        symbol,
+        sectorName,
+        lastUpdated: new Date(),
+      };
+
+      const result = await sectorEngine.analyze(metrics);
+
+      reply.header("Cache-Control", "public, s-maxage=600");
+      return {
+        symbol,
+        engine: "sector",
+        sector: sectorName,
+        score: result.overall,
+        peerRank: result.peerRank,
+        relativeValuation: result.relativeValuation,
+        sectorMomentum: result.sectorMomentum,
+        competitivePosition: result.competitivePosition,
+        relativeValuationScore: result.relativeValuationScore,
+        relativeQualityScore: result.relativeQualityScore,
+        relativeGrowthScore: result.relativeGrowthScore,
+        sectorMomentumScore: result.sectorMomentumScore,
+        competitivePositionScore: result.competitivePositionScore,
+        confidence: result.confidence,
+        details: result,
+        timestamp: new Date().toISOString(),
+      };
+    } catch (err: any) {
+      return reply.status(502).send({ error: err.message || String(err), symbol });
+    }
+  });
+
+  // ── RAG / Knowledge Base Intelligence ──────────────────────────────────────
+  server.get("/api/intelligence/rag", async (request, reply) => {
+    const { symbol } = request.query as { symbol?: string };
+    if (!symbol || typeof symbol !== "string" || !/^[A-Z0-9&.-]{1,20}$/i.test(symbol.trim())) {
+      return reply.status(400).send({ error: "Valid ?symbol query parameter is required" });
+    }
+    const cleanSymbol = symbol.trim().toUpperCase();
+
+    try {
+      const synData = (await getPersistedStockResearch(cleanSymbol).catch(() => null) || {}) as any;
+
+      const metrics: RAGMetrics = {
+        patterns: Array.isArray(synData.patterns) ? synData.patterns : [],
+        knowledgeItems: Array.isArray(synData.knowledgeItems) ? synData.knowledgeItems : [],
+        macroSignals: Array.isArray(synData.macroSignals) ? synData.macroSignals : [],
+        sectorPhase: synData.sectorPhase ?? undefined,
+        institutionalCoverage: n(synData.institutionalCoverage) ?? undefined,
+        learningCount: n(synData.learningCount) ?? undefined,
+        symbol: cleanSymbol,
+        lastUpdated: new Date(),
+      };
+
+      const result = await ragEngine.analyze(metrics);
+
+      reply.header("Cache-Control", "public, s-maxage=600");
+      return {
+        symbol: cleanSymbol,
+        engine: "rag",
+        score: result.overall,
+        patternMatchScore: result.patternMatchScore,
+        knowledgeCoverageScore: result.knowledgeCoverageScore,
+        outcomeQualityScore: result.outcomeQualityScore,
+        macroContextScore: result.macroContextScore,
+        patternMatchCount: result.patternMatchCount,
+        bestPattern: result.bestPattern,
+        knowledgeConfidence: result.knowledgeConfidence,
+        macroEnvironment: result.macroEnvironment,
+        confidence: result.confidence,
+        details: result,
+        timestamp: new Date().toISOString(),
+      };
+    } catch (err: any) {
+      return reply.status(502).send({ error: err.message || String(err), symbol });
+    }
+  });
+
+  // ── Unified Orchestrator (all 9 engines) ───────────────────────────────────
+  server.get("/api/intelligence/stock", async (request, reply) => {
+    const { symbol } = request.query as { symbol?: string };
+    if (!symbol || typeof symbol !== "string" || !/^[A-Z0-9&.-]{1,20}$/i.test(symbol.trim())) {
+      return reply.status(400).send({ error: "Valid ?symbol query parameter is required" });
+    }
+    const cleanSymbol = symbol.trim().toUpperCase();
+
+    try {
+      // Fetch all data sources once
+      const yahoo = {} as any; // yahooQuote not imported here — used inline by individual routes
+      const synData = (await getPersistedStockResearch(cleanSymbol).catch(() => null) || {}) as any;
+
+      // Build all 9 engine metric inputs with correct field names
+      const inputs: AllEngineInputs = {
+        symbol: cleanSymbol,
+        financial: {
+          roe: n(synData.roe), roa: n(synData.roa), roic: n(synData.roic),
+          netMargin: n(synData.netMargin), operatingMargin: n(synData.operatingMargin),
+          revenueGrowth: n(synData.revenueGrowth), epsGrowth: n(synData.epsGrowth),
+          ebitdaGrowth: n(synData.ebitdaGrowth), profitGrowth: n(synData.profitGrowth),
+          debtToEquity: n(synData.debtToEquity), debtToAssets: n(synData.debtToAssets),
+          interestCoverage: n(synData.interestCoverage), currentRatio: n(synData.currentRatio),
+          marketCap: n(synData.marketCap), revenue: n(synData.revenue),
+          assetTurnover: n(synData.assetTurnover), equityTurnover: n(synData.equityTurnover),
+          lastUpdated: new Date(), fiscalYear: 2025,
+        },
+        technical: {
+          currentPrice: n(synData.price) ?? 0,
+          rsi: n(synData.rsi), macd: n(synData.macd), macdSignal: n(synData.macdSignal),
+          macdHistogram: n(synData.macdHistogram),
+          ma20: n(synData.ma20), ma50: n(synData.ma50), ma200: n(synData.ma200),
+          priceChange1W: n(synData.priceChange1W), priceChange1M: n(synData.priceChange1M),
+          priceChange3M: n(synData.priceChange3M), priceChange6M: n(synData.priceChange6M),
+          priceChange1Y: n(synData.priceChange1Y),
+          volatility30: n(synData.volatility30), beta: n(synData.beta), atr: n(synData.atr),
+          volume: n(synData.volume), avgVolume: n(synData.avgVolume),
+          volumeRatio: n(synData.volumeRatio),
+          lastUpdated: new Date(),
+          period: "1D",
+        },
+        valuation: {
+          peRatio: n(synData.peRatio ?? synData.pe),
+          pbRatio: n(synData.pbRatio ?? synData.pb),
+          evEbitda: n(synData.evEbitda),
+          fcfYield: n(synData.fcfYield), dividendYield: n(synData.dividendYield),
+          lastUpdated: new Date(),
+        },
+        earnings: {
+          history: Array.isArray(synData.earningsHistory) ? synData.earningsHistory : [],
+          currentGuidance: {
+            epsGrowth: n(synData.guidanceEpsGrowth) ?? 0,
+            revenueGrowth: n(synData.guidanceRevenueGrowth) ?? 0,
+          },
+          forwardPE: n(synData.forwardPE), peg: n(synData.peg),
+          oneTimeItems: n(synData.oneTimeItems), capexToRevenue: n(synData.capexToRevenue),
+          fcfMargin: n(synData.fcfMargin),
+          fiscalYear: 2025, lastUpdated: new Date(),
+        },
+        risk: {
+          volatility: n(synData.volatility), beta: n(synData.beta),
+          maxDrawdown: n(synData.maxDrawdown),
+          weeklyRange: n(synData.weeklyRange),
+          debtToEquity: n(synData.debtToEquity ?? synData.debtToEquity),
+          currentRatio: n(synData.currentRatio),
+          interestCoverage: n(synData.interestCoverage),
+          cashReserves: n(synData.cashReserves),
+          customerConcentration: n(synData.customerConcentration),
+          revenuePredictability: n(synData.revenuePredictability),
+          competitiveMoat: n(synData.competitiveMoat),
+          executionRisk: n(synData.executionRisk),
+          profitabilityAtMinus20Revenue: synData.profitabilityAtMinus20Revenue ?? true,
+          regulatoryRisk: n(synData.regulatoryRisk) ?? 0.2,
+          litigationRisk: n(synData.litigationRisk) ?? 0.2,
+          obsolescenceRisk: n(synData.obsolescenceRisk) ?? 0.2,
+          disruptionRisk: n(synData.disruptionRisk) ?? 0.3,
+          lastUpdated: new Date(),
+        },
+        sector: {
+          stockPE: n(synData.pe), stockPB: n(synData.pb), stockEVEbitda: n(synData.evEbitda),
+          stockROE: n(synData.roe), stockNetMargin: n(synData.netMargin),
+          stockRevGrowth: n(synData.revenueGrowth), stockEPSGrowth: n(synData.epsGrowth),
+          peerPE: n(synData.peerPE), peerPB: n(synData.peerPB), peerEVEbitda: n(synData.peerEVEbitda),
+          peerROE: n(synData.peerROE), peerNetMargin: n(synData.peerNetMargin),
+          peerRevGrowth: n(synData.peerRevGrowth), peerEPSGrowth: n(synData.peerEPSGrowth),
+          sectorReturn1M: n(synData.sectorReturn1M), sectorReturn3M: n(synData.sectorReturn3M),
+          relativeStrength: n(synData.relativeStrength),
+          analystUpgrades: n(synData.analystUpgrades), analystDowngrades: n(synData.analystDowngrades),
+          marketCapRank: n(synData.marketCapRank), sectorPeerCount: n(synData.sectorPeerCount),
+          brandStrength: n(synData.brandStrength), customerStickiness: n(synData.customerStickiness),
+          symbol: cleanSymbol, sectorName: synData.sectorName ?? synData.sector,
+          lastUpdated: new Date(),
+        },
+        news: {
+          articles: Array.isArray(synData.newsArticles) ? synData.newsArticles : [],
+          symbol: cleanSymbol, lastUpdated: new Date(),
+        },
+        events: {
+          events: Array.isArray(synData.events) ? synData.events : [],
+          nextEarningsDate: synData.nextEarningsDate,
+          nextDividendDate: synData.nextDividendDate,
+          eventCount90Days: n(synData.eventCount90Days),
+          bullishEventCount: n(synData.bullishEventCount),
+          bearishEventCount: n(synData.bearishEventCount),
+          lastUpdated: new Date(), fiscalYear: 2025, currency: 'INR',
+        },
+        rag: {
+          patterns: Array.isArray(synData.patterns) ? synData.patterns : [],
+          knowledgeItems: Array.isArray(synData.knowledgeItems) ? synData.knowledgeItems : [],
+          macroSignals: Array.isArray(synData.macroSignals) ? synData.macroSignals : [],
+          sectorPhase: synData.sectorPhase,
+          institutionalCoverage: n(synData.institutionalCoverage),
+          learningCount: n(synData.learningCount),
+          symbol: cleanSymbol, lastUpdated: new Date(),
+        },
+      };
+
+      const result = await orchestrator.analyzeStock(inputs);
+
+      reply.header("Cache-Control", "public, s-maxage=300");
+      return {
+        symbol: cleanSymbol,
+        overallScore: result.overallScore,
+        investmentState: result.investmentState,
+        confidence: result.confidence,
+        engines: result.engines,
+        thesis: result.thesis,
+        weights: result.weights,
+        timestamp: result.timestamp.toISOString(),
+      };
+    } catch (err: any) {
+      return reply.status(502).send({ error: err.message || String(err), symbol: cleanSymbol });
     }
   });
 }
