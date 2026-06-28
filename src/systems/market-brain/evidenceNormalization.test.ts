@@ -5,6 +5,7 @@ import {
   normalizeEvidenceState,
   REQUIRED_MARKET_BRAIN_EVIDENCE,
 } from './evidenceNormalization';
+import { MARKET_BRAIN_EVIDENCE_DOMAINS } from './marketBrainGuardrails';
 
 describe('market brain evidence normalization', () => {
   it('treats absent evidence as missing rather than usable', () => {
@@ -15,6 +16,18 @@ describe('market brain evidence normalization', () => {
     expect(coverage.missing).toEqual(REQUIRED_MARKET_BRAIN_EVIDENCE);
     expect(coverage.usableCount).toBe(0);
     expect(coverage.coverageRatio).toBe(0);
+  });
+
+  it('keeps required evidence domains inside the shared public evidence contract', () => {
+    expect(REQUIRED_MARKET_BRAIN_EVIDENCE.every((domain) => MARKET_BRAIN_EVIDENCE_DOMAINS.includes(domain))).toBe(true);
+    expect(REQUIRED_MARKET_BRAIN_EVIDENCE).toEqual([
+      'instrument_master',
+      'prices',
+      'fundamentals',
+      'financial_statements',
+      'technicals',
+      'sector_context',
+    ]);
   });
 
   it('keeps partial evidence usable but marked for review', () => {
