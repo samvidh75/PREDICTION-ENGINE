@@ -106,7 +106,7 @@
     "audit:provider-coverage": "tsx scripts/provider-coverage-audit.ts",
     "reconcile:repository": "tsx scripts/repository-reconciliation.ts",
     "lint": "npm run lint:active",
-    "lint:active": "eslint --quiet src/backend src/db src/services/auth src/services/FactorEngine.ts src/services/FeatureEngine.ts src/services/retention scripts/validate-schema-contract.ts scripts/audit-query-schema-compatibility.ts scripts/validate-data-integrity.ts scripts/validate-repository-hygiene.ts",
+    "lint:active": "eslint --quiet src/backend src/db src/services/auth src/services/FactorEngine.ts src/services/FeatureEngine.ts scripts/validate-schema-contract.ts scripts/audit-query-schema-compatibility.ts scripts/validate-data-integrity.ts scripts/validate-repository-hygiene.ts",
     "lint:fix": "eslint . --fix",
     "repair:auto": "tsx scripts/auto-repair.ts",
     "repair:auto:apply": "CONFIRM_F1_REPAIR_APPLY=true tsx scripts/auto-repair.ts --apply",

@@ -66,6 +66,95 @@ export type { OrchestratorOptions } from './orchestrator/StockStoryOrchestrator'
 
 export { IntelligenceCache, globalIntelligenceCache } from './persistence/IntelligenceCache';
 
+// ─── Scenario Simulation ──────────────────────────────────────────
+
+export { ScenarioOrchestrator, scenarioOrchestrator } from './scenario/ScenarioOrchestrator';
+export type { ScenarioOrchestrationInput, ScenarioOrchestrationResult, BaseScores } from './scenario/ScenarioOrchestrator';
+
+export type {
+  ScenarioKind,
+  ScenarioSeverity,
+  ScenarioAssumptions,
+  ScenarioInput,
+  ScenarioOutput,
+  ScenarioImpact,
+  ScenarioValidationResult,
+  SimulationTrait,
+  PeerScenarioResult,
+  PeerScenarioComparison,
+  SimResult,
+  FinancialSimResult,
+  ValuationSimResult,
+  EarningsSimResult,
+  RiskSimResult,
+  TechnicalSimResult,
+  SectorSimResult,
+  PeerSimResult,
+  ThesisAssessment,
+  CompoundThesis,
+  TrackedCompanyStress,
+  PortfolioStressOutput,
+} from './scenario/ScenarioTypes';
+
+export { ScenarioRegistry } from './scenario/ScenarioRegistry';
+export { ScenarioValidator } from './scenario/ScenarioValidator';
+export {
+  SCENARIO_PRESETS,
+  buildPresetScenario,
+} from './scenario/ScenarioPresets';
+
+export {
+  FinancialStressSimulator,
+} from './scenario/FinancialStressSimulator';
+export {
+  ValuationStressSimulator,
+} from './scenario/ValuationStressSimulator';
+export {
+  EarningsStressSimulator,
+} from './scenario/EarningsStressSimulator';
+export {
+  RiskStressSimulator,
+} from './scenario/RiskStressSimulator';
+export {
+  TechnicalStressSimulator,
+} from './scenario/TechnicalStressSimulator';
+export {
+  SectorStressSimulator,
+} from './scenario/SectorStressSimulator';
+export {
+  PeerStressSimulator,
+} from './scenario/PeerStressSimulator';
+
+export {
+  ThesisLifecycleEngine,
+} from './scenario/ThesisLifecycleEngine';
+export {
+  WatchlistEngine,
+} from './scenario/WatchlistEngine';
+export type {
+  WatchlistReport,
+  WatchlistItem,
+} from './scenario/WatchlistEngine';
+export {
+  PortfolioStressEngine,
+} from './scenario/PortfolioStressEngine';
+export {
+  ExplainabilityEngine,
+} from './scenario/ExplainabilityEngine';
+export type {
+  ScenarioExplanation,
+  ExplanationSegment,
+} from './scenario/ExplainabilityEngine';
+
+export {
+  deriveDeltas,
+  safeSimulatedScore,
+  scoreDelta,
+  computeScenarioConfidence,
+  containsForbiddenLanguage,
+  assertComplianceSafe,
+} from './scenario/ScenarioUtils';
+
 // ─── Mappers ──────────────────────────────────────────────────────
 
 export {

@@ -20,7 +20,7 @@ import type {
   CompanyAggregateScores,
   CompanyNarrative,
 } from './CompanyTypes';
-import { clampScore } from '../../scoring';
+import { clampScore } from '../scoring';
 
 export class CompanyProfileBuilder {
   /**

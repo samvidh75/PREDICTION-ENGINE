@@ -18,7 +18,7 @@ export default defineConfig({
     globals: true,
     include: isIntegration
       ? ["src/__tests__/integration/**/*.test.ts"]
-      : ["src/**/*.test.{ts,tsx}", "scripts/**/*.test.ts", "tests/**/*.test.ts"],
+      : ["src/**/*.test.{ts,tsx}", "scripts/**/*.test.ts", "tests/**/*.test.ts", "__tests__/**/*.test.ts"],
     exclude: isIntegration
       ? ["node_modules/**", "dist/**", "coverage/**"]
       : ["src/__tests__/integration/**", "node_modules/**", "dist/**"],

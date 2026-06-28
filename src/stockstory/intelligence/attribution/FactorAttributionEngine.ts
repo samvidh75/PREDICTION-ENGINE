@@ -9,7 +9,7 @@
  */
 
 import type { IntelligenceInput } from '../../types';
-import { clampScore } from '../../scoring';
+import { clampScore } from '../scoring';
 
 export interface FactorAttribution {
   symbol: string;
