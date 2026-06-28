@@ -10,6 +10,7 @@ const CACHE_TTL = 300_000;
 
 async function yahooQuote(symbol: string): Promise<{
   price: number; change: number; changePercent: number; volume: number; marketCap: number;
+  shortName?: string; longName?: string;
 } | null> {
   try {
     const ticker = `${symbol}.NS`;
@@ -29,6 +30,8 @@ async function yahooQuote(symbol: string): Promise<{
       changePercent: prev > 0 ? Number((((latest - prev) / prev) * 100).toFixed(2)) : 0,
       volume: meta.regularMarketVolume ?? 0,
       marketCap: meta.marketCap ?? 0,
+      shortName: meta.shortName || null,
+      longName: meta.longName || null,
     };
   } catch { return null; }
 }
@@ -78,7 +81,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const payload = {
       success: true,
       symbol,
-      companyName: synthetic?.companyName || synthetic?.name || symbol,
+      companyName: synthetic?.companyName || synthetic?.name || realQuote?.longName || realQuote?.shortName || symbol,
       exchange: synthetic?.exchangeBadge || (synthetic?.exchange ?? "NSE"),
       sector: synthetic?.sector || null,
       industry: synthetic?.industry || null,
