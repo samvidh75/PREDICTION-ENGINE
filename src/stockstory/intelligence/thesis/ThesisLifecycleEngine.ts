@@ -10,7 +10,7 @@
 
 import type { IntelligenceInput } from '../../types';
 import type { CompanyIntelligenceProfile } from '../company/CompanyTypes';
-import { clampScore } from '../../scoring';
+import { clampScore } from '../scoring';
 
 export type ThesisState = 'forming' | 'validating' | 'confirmed' | 'weakening' | 'invalidated' | 'no_thesis';
 

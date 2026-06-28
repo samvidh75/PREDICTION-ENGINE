@@ -7,7 +7,7 @@
  */
 
 import type { IntelligenceInput } from '../../types';
-import { clampScore } from '../../scoring';
+import { clampScore } from '../scoring';
 
 export interface OwnershipReport {
   symbol: string;

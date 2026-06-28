@@ -14,7 +14,7 @@ import type {
   IndiaSectorContext,
   SectorAggregate,
 } from './SectorTypes';
-import { clampScore } from '../../scoring';
+import { clampScore } from '../scoring';
 
 export class SectorProfileBuilder {
   build(input: IntelligenceInput): SectorIntelligenceProfile {
