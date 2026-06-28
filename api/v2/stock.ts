@@ -78,6 +78,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const payload = {
       success: true,
       symbol,
+      companyName: synthetic?.companyName || synthetic?.name || symbol,
+      exchange: synthetic?.exchangeBadge || (synthetic?.exchange ?? "NSE"),
+      sector: synthetic?.sector || null,
+      industry: synthetic?.industry || null,
       quote: {
         price: realQuote?.price ?? synthetic?.price ?? null,
         change: realQuote?.change ?? synthetic?.change ?? null,
