@@ -93,6 +93,26 @@ describe('fetchMarketBrainResearch', () => {
     expect(result.research.companyName).toBe('Tata Consultancy Services');
   });
 
+  it('falls back to the requested symbol when stale payload identity is blank', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({
+        ...responsePayload,
+        symbol: '   ',
+        research: {
+          ...responsePayload.research,
+          symbol: '',
+        },
+      }),
+    }));
+
+    const result = await fetchMarketBrainResearch(' infy ');
+
+    expect(result.symbol).toBe('INFY');
+    expect(result.research.symbol).toBe('INFY');
+  });
+
   it('normalizes public narrative text before rendering', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
       ok: true,
