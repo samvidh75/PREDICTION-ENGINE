@@ -307,6 +307,30 @@ describe('fetchMarketBrainResearch', () => {
     expect(result.research.evidenceReview.missing).toEqual(['sector_context']);
   });
 
+  it('deduplicates evidence domains before public rendering', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({
+        ...responsePayload,
+        research: {
+          ...responsePayload.research,
+          evidenceReview: {
+            needsReview: true,
+            partial: ['fundamentals', 'fundamentals', 'news', 'news'],
+            missing: ['sector_context', 'sector_context', 'technicals'],
+            summary: 'Some research evidence needs review.',
+          },
+        },
+      }),
+    }));
+
+    const result = await fetchMarketBrainResearch('TCS');
+
+    expect(result.research.evidenceReview.partial).toEqual(['fundamentals', 'news']);
+    expect(result.research.evidenceReview.missing).toEqual(['sector_context', 'technicals']);
+  });
+
   it('filters malformed factor views from public client output', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
       ok: true,
