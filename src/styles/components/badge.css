@@ -1,0 +1,261 @@
+/* ============================================================================
+   BADGES — Labels, tags, and status indicators
+   ============================================================================ */
+
+/* BASE BADGE */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+  text-decoration: none;
+  cursor: default;
+  user-select: none;
+  transition: all var(--t-base);
+}
+
+.badge a {
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* BADGE SIZES */
+.badge-sm {
+  padding: 2px 8px;
+  font-size: 11px;
+}
+
+.badge-md {
+  padding: 4px 10px;
+  font-size: 12px;
+}
+
+.badge-lg {
+  padding: 6px 14px;
+  font-size: 13px;
+}
+
+/* BADGE VARIANTS */
+
+/* PRIMARY */
+.badge-primary {
+  background-color: var(--brand-light);
+  color: var(--brand);
+}
+
+.badge-primary:hover {
+  background-color: #DDE5F7;
+}
+
+/* SECONDARY */
+.badge-secondary {
+  background-color: var(--bg-chip);
+  color: var(--text-body);
+  border: 1px solid var(--border);
+}
+
+.badge-secondary:hover {
+  background-color: #F0F0F0;
+  border-color: var(--border-strong);
+}
+
+/* SUCCESS */
+.badge-success {
+  background-color: var(--green-light);
+  color: var(--green);
+}
+
+.badge-success:hover {
+  background-color: #E1F7ED;
+}
+
+/* WARNING */
+.badge-warning {
+  background-color: var(--amber-light);
+  color: var(--amber);
+}
+
+.badge-warning:hover {
+  background-color: #FFF5E1;
+}
+
+/* ERROR */
+.badge-error {
+  background-color: var(--red-light);
+  color: var(--red);
+}
+
+.badge-error:hover {
+  background-color: #FEE8E6;
+}
+
+/* MUTED */
+.badge-muted {
+  background-color: var(--bg-chip);
+  color: var(--text-muted);
+}
+
+.badge-muted:hover {
+  background-color: #F0F0F0;
+}
+
+/* SOLID VARIANTS */
+.badge-primary-solid {
+  background-color: var(--brand);
+  color: #FFFFFF;
+}
+
+.badge-primary-solid:hover {
+  background-color: var(--brand-dark);
+}
+
+.badge-success-solid {
+  background-color: var(--green);
+  color: #FFFFFF;
+}
+
+.badge-success-solid:hover {
+  background-color: #157A3F;
+}
+
+.badge-error-solid {
+  background-color: var(--red);
+  color: #FFFFFF;
+}
+
+.badge-error-solid:hover {
+  background-color: #D91E1E;
+}
+
+.badge-warning-solid {
+  background-color: var(--amber);
+  color: #FFFFFF;
+}
+
+.badge-warning-solid:hover {
+  background-color: #D97704;
+}
+
+/* OUTLINE VARIANTS */
+.badge-outline {
+  background-color: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-body);
+}
+
+.badge-outline:hover {
+  border-color: var(--border-strong);
+  background-color: var(--bg-chip);
+}
+
+.badge-outline-primary {
+  border-color: var(--brand);
+  color: var(--brand);
+}
+
+.badge-outline-primary:hover {
+  background-color: var(--brand-light);
+}
+
+.badge-outline-success {
+  border-color: var(--green);
+  color: var(--green);
+}
+
+.badge-outline-success:hover {
+  background-color: var(--green-light);
+}
+
+.badge-outline-error {
+  border-color: var(--red);
+  color: var(--red);
+}
+
+.badge-outline-error:hover {
+  background-color: var(--red-light);
+}
+
+/* ROUNDED BADGE */
+.badge-rounded {
+  border-radius: var(--radius-lg);
+}
+
+.badge-pill {
+  border-radius: 100px;
+  padding: 4px 12px;
+}
+
+/* BADGE WITH ICON */
+.badge-icon {
+  width: 16px;
+  height: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.badge-close {
+  background: none;
+  border: none;
+  padding: 0;
+  margin-left: 4px;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity var(--t-base);
+}
+
+.badge-close:hover {
+  opacity: 1;
+}
+
+/* BADGE DOT */
+.badge-dot {
+  padding: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.badge-dot-primary {
+  background-color: var(--brand);
+}
+
+.badge-dot-success {
+  background-color: var(--green);
+}
+
+.badge-dot-error {
+  background-color: var(--red);
+}
+
+.badge-dot-warning {
+  background-color: var(--amber);
+}
+
+.badge-dot-muted {
+  background-color: var(--text-muted);
+}
+
+/* RESPONSIVE */
+@media (max-width: 767px) {
+  .badge {
+    font-size: 11px;
+    padding: 3px 8px;
+  }
+
+  .badge-sm {
+    padding: 2px 6px;
+    font-size: 10px;
+  }
+
+  .badge-lg {
+    padding: 4px 10px;
+    font-size: 12px;
+  }
+}

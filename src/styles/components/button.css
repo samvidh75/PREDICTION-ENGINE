@@ -1,0 +1,307 @@
+/* ============================================================================
+   BUTTONS — All variants with Stripe minimalism + Apple polish
+   ============================================================================ */
+
+/* BASE BUTTON */
+button,
+.button,
+[role="button"] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition:
+    background-color var(--t-base),
+    color var(--t-base),
+    box-shadow var(--t-base),
+    border-color var(--t-base),
+    transform var(--t-fast);
+  text-decoration: none;
+  white-space: nowrap;
+  user-select: none;
+  outline: none;
+  position: relative;
+}
+
+button:disabled,
+.button:disabled,
+[role="button"]:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* SIZE VARIANTS */
+.button-lg {
+  padding: 16px 32px;
+  font-size: 16px;
+  height: 48px;
+}
+
+.button-md {
+  padding: 12px 24px;
+  font-size: 14px;
+  height: 40px;
+}
+
+.button-sm {
+  padding: 8px 16px;
+  font-size: 13px;
+  height: 32px;
+}
+
+.button-xs {
+  padding: 6px 12px;
+  font-size: 12px;
+  height: 28px;
+}
+
+/* PRIMARY BUTTON */
+.button-primary,
+button:not([class*="button-"]):not([class*="ghost"]):not([class*="danger"]):not([class*="secondary"]) {
+  background-color: var(--brand);
+  color: #FFFFFF;
+  box-shadow: var(--shadow-card);
+}
+
+.button-primary:hover:not(:disabled),
+button:not([class*="button-"]):not([class*="ghost"]):not([class*="danger"]):not([class*="secondary"]):hover:not(:disabled) {
+  background-color: var(--brand-dark);
+  box-shadow: var(--shadow-raised);
+  transform: translateY(-1px);
+}
+
+.button-primary:active:not(:disabled),
+button:not([class*="button-"]):not([class*="ghost"]):not([class*="danger"]):not([class*="secondary"]):active:not(:disabled) {
+  background-color: var(--brand-dark);
+  box-shadow: var(--shadow-card);
+  transform: translateY(0);
+}
+
+.button-primary:focus-visible,
+button:not([class*="button-"]):not([class*="ghost"]):not([class*="danger"]):not([class*="secondary"]):focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+/* SECONDARY BUTTON */
+.button-secondary {
+  background-color: var(--bg-chip);
+  color: var(--text-body);
+  border: 1px solid var(--border);
+}
+
+.button-secondary:hover:not(:disabled) {
+  background-color: #F0F0F0;
+  border-color: var(--border-strong);
+}
+
+.button-secondary:active:not(:disabled) {
+  background-color: #E8E8E8;
+  border-color: var(--border-strong);
+}
+
+.button-secondary:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+/* GHOST BUTTON */
+.button-ghost {
+  background-color: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+}
+
+.button-ghost:hover:not(:disabled) {
+  background-color: var(--bg-chip);
+  color: var(--text-body);
+  border-color: var(--border-strong);
+}
+
+.button-ghost:active:not(:disabled) {
+  background-color: #F0F0F0;
+  color: var(--text-body);
+  border-color: var(--border-strong);
+}
+
+.button-ghost:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+/* DANGER BUTTON */
+.button-danger {
+  background-color: var(--red);
+  color: #FFFFFF;
+  box-shadow: var(--shadow-card);
+}
+
+.button-danger:hover:not(:disabled) {
+  background-color: #D91E1E;
+  box-shadow: var(--shadow-raised);
+  transform: translateY(-1px);
+}
+
+.button-danger:active:not(:disabled) {
+  background-color: #D91E1E;
+  box-shadow: var(--shadow-card);
+  transform: translateY(0);
+}
+
+.button-danger:focus-visible {
+  outline: 2px solid var(--red);
+  outline-offset: 2px;
+}
+
+/* LINK BUTTON */
+.button-link {
+  background-color: transparent;
+  color: var(--brand);
+  padding: 0;
+  height: auto;
+  font-weight: 500;
+}
+
+.button-link:hover:not(:disabled) {
+  color: var(--brand-dark);
+  text-decoration: underline;
+}
+
+.button-link:active:not(:disabled) {
+  color: var(--brand-dark);
+}
+
+.button-link:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* ICON BUTTON */
+.button-icon {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border-radius: var(--radius-md);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.button-icon.button-lg {
+  width: 48px;
+  height: 48px;
+}
+
+.button-icon.button-sm {
+  width: 32px;
+  height: 32px;
+}
+
+.button-icon.button-xs {
+  width: 28px;
+  height: 28px;
+}
+
+/* STATES */
+.button:focus {
+  outline: none;
+}
+
+.button:disabled,
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ICON SPACING */
+.button svg,
+.button i {
+  width: 1em;
+  height: 1em;
+  display: inline-block;
+}
+
+.button-icon svg,
+.button-icon i {
+  width: 24px;
+  height: 24px;
+}
+
+.button-icon.button-lg svg,
+.button-icon.button-lg i {
+  width: 28px;
+  height: 28px;
+}
+
+.button-icon.button-sm svg,
+.button-icon.button-sm i {
+  width: 20px;
+  height: 20px;
+}
+
+.button-icon.button-xs svg,
+.button-icon.button-xs i {
+  width: 16px;
+  height: 16px;
+}
+
+/* LOADING STATE */
+.button.is-loading {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.button.is-loading::after {
+  content: "";
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* FULL WIDTH */
+.button-full {
+  width: 100%;
+}
+
+/* RESPONSIVE */
+@media (max-width: 767px) {
+  button,
+  .button,
+  [role="button"] {
+    padding: 12px 20px;
+    min-height: 44px;
+  }
+
+  .button-lg {
+    padding: 14px 24px;
+    min-height: 48px;
+  }
+
+  .button-icon {
+    width: 44px;
+    height: 44px;
+  }
+
+  .button-icon svg,
+  .button-icon i {
+    width: 24px;
+    height: 24px;
+  }
+}

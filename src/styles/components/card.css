@@ -1,0 +1,221 @@
+/* ============================================================================
+   CARDS — Stripe minimalism with Apple polish
+   ============================================================================ */
+
+/* BASE CARD */
+.card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px 24px;
+  box-shadow: var(--shadow-card);
+  transition: all var(--t-base);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-raised);
+  border-color: var(--border-strong);
+}
+
+/* CARD VARIANTS */
+.card-elevated {
+  box-shadow: var(--shadow-raised);
+  border-color: var(--border-strong);
+}
+
+.card-elevated:hover {
+  box-shadow: var(--shadow-modal);
+}
+
+.card-flat {
+  border: none;
+  box-shadow: none;
+  background-color: var(--bg-chip);
+}
+
+.card-flat:hover {
+  background-color: #F0F0F0;
+}
+
+.card-ghost {
+  background-color: transparent;
+  border: 1px dashed var(--border);
+  box-shadow: none;
+}
+
+.card-brand {
+  background: linear-gradient(135deg, var(--brand-light) 0%, #F9F0FF 100%);
+  border-color: var(--brand);
+}
+
+/* CARD SECTIONS */
+.card-header {
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.card-header:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.card-body {
+  margin: 16px 0;
+}
+
+.card-body:first-child {
+  margin-top: 0;
+}
+
+.card-body:last-child {
+  margin-bottom: 0;
+}
+
+.card-footer {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+/* CARD TITLE & DESCRIPTION */
+.card-title {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.card-description {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  margin: 8px 0 0 0;
+}
+
+/* CARD WITH ICON */
+.card-with-icon {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.card-with-icon .icon {
+  flex: 0 0 auto;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  background-color: var(--brand-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--brand);
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.card-with-icon .content {
+  flex: 1;
+}
+
+/* CARD GRID */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+/* CARD LIST */
+.card-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.card-list li {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-list li:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+/* CARD STATE INDICATORS */
+.card.is-loading {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.card.is-loading::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card.has-error {
+  border-color: var(--red);
+  background-color: #FFF9F9;
+}
+
+.card.has-success {
+  border-color: var(--green);
+  background-color: #F9FFF9;
+}
+
+.card.has-warning {
+  border-color: var(--amber);
+  background-color: #FFFBF0;
+}
+
+/* RESPONSIVE */
+@media (max-width: 767px) {
+  .card {
+    padding: 16px;
+    border-radius: var(--radius-md);
+  }
+
+  .card-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .card-footer {
+    flex-direction: column;
+    justify-content: stretch;
+  }
+
+  .card-footer button {
+    width: 100%;
+  }
+
+  .card-with-icon {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .card-with-icon .icon {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto;
+  }
+}
