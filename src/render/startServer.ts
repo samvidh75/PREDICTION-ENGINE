@@ -9,10 +9,9 @@
  */
 import Fastify from "fastify";
 import cors from "@fastify/cors";
-import staticFiles from "@fastify/static";
 import { fileURLToPath } from "url";
-import { dirname, join } from "path";
-import { readFileSync, existsSync } from "fs";
+import { dirname, join, extname } from "path";
+import { existsSync, readFile } from "fs";
 import { dbAdapter } from "../db/DatabaseAdapter";
 import { MigrationRunner } from "../db/MigrationRunner";
 import registerApiRoutes from "./apiRouter.js";
@@ -73,48 +72,72 @@ async function bootstrap() {
   // ── Static SPA: serve dist/public/ folder ───────────────────────────
   const distPath = join(process.cwd(), "dist", "public");
   const indexPath = join(distPath, "index.html");
-  server.log.info(`Serving static files from ${distPath}, index exists: ${existsSync(indexPath)}`);
+  server.log.info(
+    `Serving static files from ${distPath}, dist exists: ${existsSync(distPath)}, index exists: ${existsSync(indexPath)}`
+  );
 
-  // Read index.html into memory for direct serving (avoids @fastify/static sendFile issues)
-  let indexHtml: string | null = null;
-  try {
-    if (existsSync(indexPath)) {
-      indexHtml = readFileSync(indexPath, "utf-8");
-      server.log.info(`Loaded index.html (${indexHtml.length} bytes)`);
-    } else {
-      server.log.warn(`index.html not found at ${indexPath}`);
-    }
-  } catch (err) {
-    server.log.warn(`Failed to read index.html: ${err}`);
-  }
+  // MIME types for common web assets
+  const MIME_TYPES: Record<string, string> = {
+    ".html": "text/html",
+    ".js": "application/javascript",
+    ".css": "text/css",
+    ".svg": "image/svg+xml",
+    ".png": "image/png",
+    ".jpg": "image/jpeg",
+    ".jpeg": "image/jpeg",
+    ".gif": "image/gif",
+    ".webp": "image/webp",
+    ".ico": "image/x-icon",
+    ".json": "application/json",
+    ".woff": "font/woff",
+    ".woff2": "font/woff2",
+    ".ttf": "font/ttf",
+    ".txt": "text/plain",
+    ".xml": "application/xml",
+    ".map": "application/json",
+  };
 
-  // Register @fastify/static for assets (JS, CSS, images)
-  await server.register(staticFiles, {
-    root: distPath,
-    prefix: "/",
-    wildcard: false,
-  });
+  // ── Generic handler for static assets ────────────────────────────
+  server.get("*", async (req, reply) => {
+    const url = new URL(req.url, "http://localhost");
 
-  // ── Serve index.html for root and SPA routes ─────────────────────
-  async function serveIndex(reply: any) {
-    if (indexHtml) {
-      reply.type("text/html").send(indexHtml);
-    } else {
-      // Fallback: try sendFile
-      reply.sendFile("index.html");
-    }
-  }
-
-  server.get("/", (req, reply) => {
-    return serveIndex(reply);
-  });
-
-  // ── SPA fallback: serve index.html for client-side routes ──────────
-  server.setNotFoundHandler((_req, reply) => {
-    if (_req.url.startsWith("/api/")) {
+    // ── Unknown API routes should return JSON 404 ──────────────────
+    if (url.pathname.startsWith("/api/")) {
       return reply.status(404).send({ error: "not found" });
     }
-    return serveIndex(reply);
+
+    let filePath = join(distPath, url.pathname);
+
+    // Security: prevent directory traversal
+    if (!filePath.startsWith(distPath)) {
+      return reply.status(403).send({ error: "forbidden" });
+    }
+
+    try {
+      const content = await new Promise<Buffer>((resolve, reject) => {
+        readFile(filePath, (err, data) => {
+          if (err) reject(err);
+          else resolve(data);
+        });
+      });
+
+      const ext = extname(filePath).toLowerCase();
+      const mime = MIME_TYPES[ext] || "application/octet-stream";
+      return reply.type(mime).send(content);
+    } catch {
+      // File not found → serve index.html for SPA client-side routing
+      try {
+        const indexContent = await new Promise<Buffer>((resolve, reject) => {
+          readFile(indexPath, (err, data) => {
+            if (err) reject(err);
+            else resolve(data);
+          });
+        });
+        return reply.type("text/html").send(indexContent);
+      } catch {
+        return reply.status(404).send({ error: "not found" });
+      }
+    }
   });
 
   // ── Database initialization (non-fatal) ────────────────────────────
