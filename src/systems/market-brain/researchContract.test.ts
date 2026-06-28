@@ -140,6 +140,26 @@ describe('toMarketBrainResearchView', () => {
     expect(result.missingEvidence).toEqual(['sector_context']);
   });
 
+  it('returns narrative arrays without mutating the engine result arrays', () => {
+    const result = evaluateIndiaEquity({
+      ...basePacket,
+      evidence: completeEvidence,
+    });
+    const originalThesis = [...result.thesis];
+    const originalRisks = [...result.risksToReview];
+    const originalWatch = [...result.whatToWatch];
+
+    const view = toMarketBrainResearchView(result);
+
+    view.thesis.push('UI-only thesis mutation.');
+    view.risksToReview.push('UI-only risk mutation.');
+    view.whatToWatch.push('UI-only watch mutation.');
+
+    expect(result.thesis).toEqual(originalThesis);
+    expect(result.risksToReview).toEqual(originalRisks);
+    expect(result.whatToWatch).toEqual(originalWatch);
+  });
+
   it('renders public evidence labels without raw domain keys', () => {
     const result = evaluateIndiaEquity({
       ...basePacket,
