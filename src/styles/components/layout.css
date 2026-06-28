@@ -1,0 +1,379 @@
+/* ============================================================================
+   LAYOUTS — Grids, containers, and page structure
+   ============================================================================ */
+
+/* CONTAINER */
+.container {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 24px;
+  padding-right: 24px;
+}
+
+.container-sm {
+  max-width: 640px;
+}
+
+.container-md {
+  max-width: 896px;
+}
+
+.container-lg {
+  max-width: 1152px;
+}
+
+.container-xl {
+  max-width: 1408px;
+}
+
+.container-full {
+  max-width: 100%;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* GRID SYSTEM */
+.grid {
+  display: grid;
+  gap: 20px;
+}
+
+.grid-1 { grid-template-columns: 1fr; }
+.grid-2 { grid-template-columns: repeat(2, 1fr); }
+.grid-3 { grid-template-columns: repeat(3, 1fr); }
+.grid-4 { grid-template-columns: repeat(4, 1fr); }
+.grid-6 { grid-template-columns: repeat(6, 1fr); }
+.grid-12 { grid-template-columns: repeat(12, 1fr); }
+
+/* GRID GAPS */
+.grid-gap-1 { gap: 8px; }
+.grid-gap-2 { gap: 16px; }
+.grid-gap-3 { gap: 20px; }
+.grid-gap-4 { gap: 24px; }
+.grid-gap-5 { gap: 32px; }
+
+/* GRID SPANS */
+.col-span-1 { grid-column: span 1; }
+.col-span-2 { grid-column: span 2; }
+.col-span-3 { grid-column: span 3; }
+.col-span-4 { grid-column: span 4; }
+.col-span-6 { grid-column: span 6; }
+.col-span-12 { grid-column: span 12; }
+
+.row-span-1 { grid-row: span 1; }
+.row-span-2 { grid-row: span 2; }
+.row-span-3 { grid-row: span 3; }
+
+/* AUTO GRID */
+.grid-auto {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+}
+
+.grid-auto-sm {
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+}
+
+.grid-auto-md {
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+}
+
+.grid-auto-lg {
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+}
+
+/* FLEX LAYOUT */
+.flex {
+  display: flex;
+  gap: 20px;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.flex-row {
+  flex-direction: row;
+}
+
+.flex-wrap {
+  flex-wrap: wrap;
+}
+
+.flex-nowrap {
+  flex-wrap: nowrap;
+}
+
+.flex-gap-1 { gap: 8px; }
+.flex-gap-2 { gap: 16px; }
+.flex-gap-3 { gap: 20px; }
+.flex-gap-4 { gap: 24px; }
+
+/* SIDEBAR LAYOUT */
+.layout-sidebar {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 0;
+  min-height: 100vh;
+}
+
+.layout-sidebar-content {
+  overflow-y: auto;
+}
+
+/* MAIN + ASIDE LAYOUT */
+.layout-with-aside {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 32px;
+}
+
+.layout-main {
+  min-width: 0;
+}
+
+.layout-aside {
+  min-width: 0;
+}
+
+/* HEADER + MAIN LAYOUT */
+.layout-with-header {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.layout-header {
+  flex: 0 0 auto;
+}
+
+.layout-content {
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* SECTION LAYOUT */
+.section {
+  padding: 32px 24px;
+}
+
+.section-sm {
+  padding: 16px;
+}
+
+.section-md {
+  padding: 24px;
+}
+
+.section-lg {
+  padding: 40px 32px;
+}
+
+.section-separator {
+  border-bottom: 1px solid var(--border);
+}
+
+/* PAGE LAYOUT */
+.page {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto 1fr;
+  min-height: 100vh;
+  width: 100%;
+}
+
+.page-header {
+  background-color: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+}
+
+.page-body {
+  overflow-y: auto;
+}
+
+.page-content {
+  flex: 1;
+}
+
+/* TWO COLUMN LAYOUT */
+.layout-two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+}
+
+.layout-two-col-unequal {
+  grid-template-columns: 2fr 1fr;
+}
+
+.layout-two-col-unequal.reverse {
+  grid-template-columns: 1fr 2fr;
+}
+
+/* THREE COLUMN LAYOUT */
+.layout-three-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 32px;
+}
+
+/* CONTENT AREA */
+.content-area {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.content-narrow {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.content-wide {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* STACK LAYOUT */
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.stack-sm { gap: 8px; }
+.stack-md { gap: 16px; }
+.stack-lg { gap: 24px; }
+.stack-xl { gap: 32px; }
+
+/* INLINE LAYOUT */
+.inline-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+/* SPACER */
+.spacer {
+  flex: 1;
+}
+
+.spacer-h {
+  height: 24px;
+}
+
+.spacer-h-sm {
+  height: 12px;
+}
+
+.spacer-h-lg {
+  height: 32px;
+}
+
+.spacer-h-xl {
+  height: 48px;
+}
+
+.spacer-v {
+  width: 24px;
+}
+
+.spacer-v-sm {
+  width: 12px;
+}
+
+.spacer-v-lg {
+  width: 32px;
+}
+
+/* FULL BLEED */
+.full-bleed {
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+}
+
+/* RESPONSIVE */
+@media (max-width: 1023px) {
+  .container {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .grid-3 { grid-template-columns: repeat(2, 1fr); }
+  .grid-4 { grid-template-columns: repeat(2, 1fr); }
+  .grid-6 { grid-template-columns: repeat(3, 1fr); }
+  .grid-12 { grid-template-columns: repeat(6, 1fr); }
+
+  .layout-with-aside {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .layout-two-col,
+  .layout-two-col-unequal,
+  .layout-three-col {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .section {
+    padding: 24px 16px;
+  }
+}
+
+@media (max-width: 767px) {
+  .layout-sidebar {
+    grid-template-columns: 1fr;
+  }
+
+  .layout-sidebar-content {
+    padding-bottom: 64px;
+  }
+
+  .container {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .grid,
+  .grid-auto {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .grid-2 { grid-template-columns: 1fr; }
+  .grid-3 { grid-template-columns: 1fr; }
+  .grid-4 { grid-template-columns: 1fr; }
+  .grid-6 { grid-template-columns: 1fr; }
+  .grid-12 { grid-template-columns: 1fr; }
+
+  .col-span-2,
+  .col-span-3,
+  .col-span-4,
+  .col-span-6,
+  .col-span-12 {
+    grid-column: span 1;
+  }
+
+  .flex {
+    flex-direction: column;
+  }
+
+  .section {
+    padding: 16px 12px;
+  }
+
+  .spacer-h {
+    height: 16px;
+  }
+
+  .spacer-v {
+    width: 16px;
+  }
+}
