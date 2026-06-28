@@ -28,69 +28,58 @@ export const colors = {
   border:      '#E5E5EA',
 } as const;
 
-// TYPOGRAPHY — Apple SF Pro text style hierarchy
+// TYPOGRAPHY — DESIGN.md spec (Inter font, Apple HIG spirit)
+// Font: Inter (system-ui fallback)
+// Tabular numbers for all financial values
+// Letter-spacing: -0.02em for headings, normal for body
+// Line-height: 1.3 headings, 1.6 body, 1.4 captions
 export const typography = {
-  fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Segoe UI", Roboto, sans-serif',
+  fontFamily: '\'Inter\', -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, sans-serif',
 
-  // Large Title
-  hero: {
-    desktop: { size: '34px', weight: 700, line: '1.16', track: '-0.012em' },
-    mobile:  { size: '28px', weight: 700, line: '1.18', track: '-0.012em' },
-  },
-  // Title 1
+  // h1: 32px/800 → mobile: 28px
   h1: {
-    desktop: { size: '28px', weight: 600, line: '1.2',  track: '-0.01em' },
-    mobile:  { size: '24px', weight: 600, line: '1.22', track: '-0.01em' },
+    desktop: { size: '32px', weight: 800, line: '1.15', track: '-0.02em' },
+    mobile:  { size: '28px', weight: 800, line: '1.15', track: '-0.02em' },
   },
-  // Title 2
+  // h2: 20px/700 → mobile: 18px
   h2: {
-    desktop: { size: '22px', weight: 600, line: '1.27' },
-    mobile:  { size: '20px', weight: 600, line: '1.3' },
+    desktop: { size: '20px', weight: 700, line: '1.3', track: '-0.02em' },
+    mobile:  { size: '18px', weight: 700, line: '1.3', track: '-0.02em' },
   },
-  // Title 3
+  // h3: 16px/700 → mobile: 15px
   h3: {
-    desktop: { size: '20px', weight: 600, line: '1.3' },
-    mobile:  { size: '18px', weight: 600, line: '1.33' },
+    desktop: { size: '16px', weight: 700, line: '1.3', track: '-0.02em' },
+    mobile:  { size: '15px', weight: 700, line: '1.3', track: '-0.02em' },
   },
-  // Body (SF Pro 17px default)
+  // body: 14px/400 → mobile: 15px (readability)
   body: {
-    desktop: { size: '17px', weight: 400, line: '1.45' },
-    mobile:  { size: '17px', weight: 400, line: '1.45' },
+    desktop: { size: '14px', weight: 400, line: '1.6' },
+    mobile:  { size: '15px', weight: 400, line: '1.6' },
+  },
+  // caption: 12px/500
+  caption: {
+    desktop: { size: '12px', weight: 500, line: '1.4' },
+    mobile:  { size: '12px', weight: 500, line: '1.4' },
+  },
+  // micro: 11px/600 → uppercase, letter-spacing 0.04em
+  micro: {
+    desktop: { size: '11px', weight: 600, line: '1.3', track: '0.04em', uppercase: true },
+    mobile:  { size: '11px', weight: 600, line: '1.3', track: '0.04em', uppercase: true },
   },
   // Callout
   callout: {
-    desktop: { size: '16px', weight: 400, line: '1.4' },
-    mobile:  { size: '16px', weight: 400, line: '1.4' },
+    desktop: { size: '15px', weight: 400, line: '1.5' },
+    mobile:  { size: '15px', weight: 400, line: '1.5' },
   },
-  // Subhead
-  subhead: {
-    desktop: { size: '15px', weight: 400, line: '1.35' },
-    mobile:  { size: '15px', weight: 400, line: '1.35' },
-  },
-  // Footnote
-  footnote: {
-    desktop: { size: '13px', weight: 400, line: '1.3' },
-    mobile:  { size: '13px', weight: 400, line: '1.3' },
-  },
-  // Caption 1
-  caption: {
-    desktop: { size: '12px', weight: 400, line: '1.25' },
-    mobile:  { size: '12px', weight: 400, line: '1.25' },
-  },
-  // Caption 2
-  caption2: {
-    desktop: { size: '11px', weight: 400, line: '1.2' },
-    mobile:  { size: '11px', weight: 400, line: '1.2' },
-  },
-  // Label (all-caps for section headers)
+  // Label (uppercase section headers)
   label: {
-    desktop: { size: '13px', weight: 500, line: '1.3', track: '0.02em' },
-    mobile:  { size: '13px', weight: 500, line: '1.3', track: '0.02em' },
+    desktop: { size: '12px', weight: 600, line: '1.3', track: '0.04em', uppercase: true },
+    mobile:  { size: '12px', weight: 600, line: '1.3', track: '0.04em', uppercase: true },
   },
-  // Mono (SF Mono)
+  // Mono (for code/financial symbols)
   mono: {
-    desktop: { size: '15px', weight: 500, line: '1.3', fontFamily: 'SF Mono, Menlo, Monaco, monospace' },
-    mobile:  { size: '15px', weight: 500, line: '1.3', fontFamily: 'SF Mono, Menlo, Monaco, monospace' },
+    desktop: { size: '13px', weight: 500, line: '1.4', fontFamily: '\'JetBrains Mono\', \'Fira Code\', Menlo, Monaco, monospace' },
+    mobile:  { size: '13px', weight: 500, line: '1.4', fontFamily: '\'JetBrains Mono\', \'Fira Code\', Menlo, Monaco, monospace' },
   },
 } as const;// SPACING — Apple 4pt grid (8pt increments preferred at system level)
 export const space = {

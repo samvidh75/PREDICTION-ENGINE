@@ -63,10 +63,10 @@ export default function HomePage() {
             <h1
               style={{
                 color: colors.textPrimary,
-                fontSize: typography.hero.desktop.size,
-                fontWeight: typography.hero.desktop.weight,
-                lineHeight: typography.hero.desktop.line,
-                letterSpacing: typography.hero.desktop.track,
+                fontSize: typography.h1.desktop.size,
+                fontWeight: typography.h1.desktop.weight,
+                lineHeight: typography.h1.desktop.line,
+                letterSpacing: typography.h1.desktop.track,
               }}
             >
               Research Indian stocks before you invest.
@@ -220,7 +220,7 @@ export default function HomePage() {
       {/* Responsive overrides */}
       <style>{`
         @media ${media.mobile} {
-          h1 { font-size:${typography.hero.mobile.size} !important; }
+          h1 { font-size:${typography.h1.mobile.size} !important; }
           h2 { font-size:${typography.h1.mobile.size} !important; }
         }
       `}</style>

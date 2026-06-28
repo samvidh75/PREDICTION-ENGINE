@@ -147,7 +147,7 @@ function StockView({ stock }: { stock: StockResearchDetail }) {
   const selectedFinancialSeries = stock.financials[financialPeriod][financialMetric];
   const financialChartData = selectedFinancialSeries.map((item) => ({
     period: item.period,
-    value: Math.round(item.value / 10000000),
+    value: Math.round(item.value),
   }));
   const newsItems = stock.news.slice(0, 5);
   const factorBadges = [
@@ -187,7 +187,7 @@ function StockView({ stock }: { stock: StockResearchDetail }) {
       </section>
 
       <section style={{ display: "grid", gap: "12px" }}>
-        <div style={{ color: colors.textPrimary, fontSize: typography.hero.desktop.size, fontWeight: 600, lineHeight: "1.1" }}>₹{stock.price.current.toLocaleString("en-IN")}</div>
+        <div style={{ color: colors.textPrimary, fontSize: typography.h1.desktop.size, fontWeight: 700, lineHeight: "1.15" }}>₹{stock.price.current.toLocaleString("en-IN")}</div>
         <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", color: trendColor }}>
           {isUp ? <ArrowUp size={16} /> : <ArrowDown size={16} />}
           <span>{`${isUp ? "+" : ""}${stock.price.changeAbs.toFixed(2)} (${stock.price.changePercent.toFixed(2)}%)`}</span>

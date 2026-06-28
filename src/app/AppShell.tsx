@@ -137,9 +137,9 @@ export function AppShell({ children }: { children: ReactNode }) {
         .tab-link {
           flex:1;
           flex-direction:column;
-          font-size:${typography.caption2.desktop.size};
+          font-size:${typography.caption.desktop.size};
           font-weight:500;
-          line-height:${typography.caption2.desktop.line};
+          line-height:${typography.caption.desktop.line};
           gap:2px;
         }
         .tab-link.is-active {

@@ -153,7 +153,7 @@ function expandUniverse(base: BaseStockCandidate[]): BaseStockCandidate[] {
     const sector = inferSector(symbol, String(scrip));
     merged.set(bseKey, {
       symbol,
-      name: `BSE Listed Company ${scrip}`,
+      name: `BSE${scrip}`,
       sector,
       industry: inferIndustry(sector),
       exchange: "BSE",
@@ -306,42 +306,71 @@ function buildPriceHistory(symbol: string, price: number): StockResearchDetail["
   return output;
 }
 
-function buildFinancialSeries(symbol: string, marketCap: number): StockResearchDetail["financials"] {
-  const baseRevenue = marketCap / 180;
-  const baseProfit = marketCap / 720;
-  const baseEbitda = marketCap / 540;
-  // 8 annual periods: FY2018 → FY2025
+function buildFinancialSeries(summary: StockResearchSummary): StockResearchDetail["financials"] {
+  const { symbol, marketCap, price, eps, sector } = summary;
+  // Derive realistic financials from fundamentals
+  // Estimate shares outstanding (in Cr) from marketCap / price
+  const sharesCr = price > 0 ? marketCap / price : marketCap / 100;
+  // Net Profit (₹ Cr) = EPS * shares — use EPS if available, else estimate from marketCap
+  const currentProfit = eps != null && eps > 0
+    ? round(eps * sharesCr, 0)
+    : round(marketCap / 220, 0);
+  // Typical net profit margins by sector
+  const marginBySector: Record<string, number> = {
+    "Technology": 0.20, "Financial Services": 0.18, "Banking": 0.15,
+    "Consumer Cyclical": 0.10, "Consumer Defensive": 0.08,
+    "Healthcare": 0.14, "Energy": 0.08, "Basic Materials": 0.10,
+    "Industrials": 0.12, "Utilities": 0.14, "Real Estate": 0.12,
+    "Communication Services": 0.15,
+  };
+  const profitMargin = Object.entries(marginBySector).find(([key]) =>
+    sector?.toLowerCase().includes(key.toLowerCase())
+  )?.[1] ?? 0.12;
+  const ebitdaMargin = profitMargin + 0.12; // ~24-32% typical EBITDA margin
+  const currentRevenue = currentProfit / profitMargin;
+  const currentEbitda = currentRevenue * ebitdaMargin;
+
+  // 8 annual periods: FY2018 → FY2025 with ~10% CAGR
   const annualPeriods = ["FY2018", "FY2019", "FY2020", "FY2021", "FY2022", "FY2023", "FY2024", "FY2025"];
+  const annualGrowthRates = [0.65, 0.72, 0.68, 0.75, 0.82, 0.88, 0.95, 1.0]; // cumulative growth factor
+  function annualValue(base: number, index: number, seed: string): number {
+    return round(base * annualGrowthRates[index] * (1 + seeded(seed, -0.05, 0.08, 3)), 0);
+  }
+
   // 8 quarterly periods: most recent first
   const quarterlyPeriods = ["Q2 FY26", "Q1 FY26", "Q4 FY25", "Q3 FY25", "Q2 FY25", "Q1 FY25", "Q4 FY24", "Q3 FY24"];
-  // Growth trend: revenue grows ~8-15% YoY across the 8-year window
+  function quarterlyValue(base: number, index: number, seed: string): number {
+    const share = base * annualGrowthRates[Math.min(index, 7)] / 4 * (0.85 + 0.035 * (7 - index));
+    return round(share * (1 + seeded(seed, -0.08, 0.10, 3)), 0);
+  }
+
   return {
     annual: {
-      revenue: annualPeriods.map((period, index) => ({
+      revenue: annualPeriods.map((period, i) => ({
         period,
-        value: round(baseRevenue * (0.55 + index * 0.065) * (1 + seeded(`${symbol}:annual:rev:${index}`, -0.06, 0.12, 3)), 0),
+        value: annualValue(currentRevenue, i, `${symbol}:ann:rev:${i}`),
       })),
-      profit: annualPeriods.map((period, index) => ({
+      profit: annualPeriods.map((period, i) => ({
         period,
-        value: round(baseProfit * (0.48 + index * 0.07) * (1 + seeded(`${symbol}:annual:pat:${index}`, -0.08, 0.15, 3)), 0),
+        value: annualValue(currentProfit, i, `${symbol}:ann:pat:${i}`),
       })),
-      ebitda: annualPeriods.map((period, index) => ({
+      ebitda: annualPeriods.map((period, i) => ({
         period,
-        value: round(baseEbitda * (0.5 + index * 0.068) * (1 + seeded(`${symbol}:annual:ebitda:${index}`, -0.07, 0.14, 3)), 0),
+        value: annualValue(currentEbitda, i, `${symbol}:ann:ebt:${i}`),
       })),
     },
     quarterly: {
-      revenue: quarterlyPeriods.map((period, index) => ({
+      revenue: quarterlyPeriods.map((period, i) => ({
         period,
-        value: round((baseRevenue / 4) * (0.78 + index * 0.028) * (1 + seeded(`${symbol}:quarterly:rev:${index}`, -0.1, 0.12, 3)), 0),
+        value: quarterlyValue(currentRevenue, i, `${symbol}:qtr:rev:${i}`),
       })),
-      profit: quarterlyPeriods.map((period, index) => ({
+      profit: quarterlyPeriods.map((period, i) => ({
         period,
-        value: round((baseProfit / 4) * (0.72 + index * 0.035) * (1 + seeded(`${symbol}:quarterly:pat:${index}`, -0.12, 0.14, 3)), 0),
+        value: quarterlyValue(currentProfit, i, `${symbol}:qtr:pat:${i}`),
       })),
-      ebitda: quarterlyPeriods.map((period, index) => ({
+      ebitda: quarterlyPeriods.map((period, i) => ({
         period,
-        value: round((baseEbitda / 4) * (0.75 + index * 0.032) * (1 + seeded(`${symbol}:quarterly:ebitda:${index}`, -0.11, 0.13, 3)), 0),
+        value: quarterlyValue(currentEbitda, i, `${symbol}:qtr:ebt:${i}`),
       })),
     },
   };
@@ -530,7 +559,7 @@ export function getStockResearch(symbol: string): StockResearchDetail | null {
     description: `${summary.name} is tracked for its position in ${normalizedIndustry} within the ${normalizedSector} sector, with research centered on business quality, valuation context, conviction, and risk.`,
     businessSegments: [normalizedIndustry, `${normalizedSector} Core`, "Domestic operations"],
     priceHistory: buildPriceHistory(summary.symbol, summary.price),
-    financials: buildFinancialSeries(summary.symbol, summary.marketCap),
+    financials: buildFinancialSeries(summary),
     shareholding: buildShareholding(summary.symbol),
     news: buildNews(summary),
     thesis: buildThesis(summary),
