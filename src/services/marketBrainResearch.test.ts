@@ -93,6 +93,51 @@ describe('fetchMarketBrainResearch', () => {
     expect(result.research.companyName).toBe('Tata Consultancy Services');
   });
 
+  it('normalizes public narrative text before rendering', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({
+        ...responsePayload,
+        research: {
+          ...responsePayload.research,
+          headline: '  Research headline  ',
+          thesis: ['  Quality metrics support the business thesis.  ', '', '   '],
+          risksToReview: ['  Margin volatility remains a risk to review.  '],
+          whatToWatch: ['  Next result and margin trend.  '],
+          evidenceReview: {
+            ...responsePayload.research.evidenceReview,
+            summary: '  Required research evidence is available for this view.  ',
+          },
+          factorViews: [{
+            key: 'quality',
+            label: '  Quality  ',
+            score: 78,
+            summary: '  Quality evidence is available for this research view.  ',
+          }],
+          methodNote: '  Research-only output. Not personal investment advice.  ',
+          generatedAt: '  2026-06-27T00:00:00.000Z  ',
+        },
+      }),
+    }));
+
+    const result = await fetchMarketBrainResearch('TCS');
+
+    expect(result.research.headline).toBe('Research headline');
+    expect(result.research.thesis).toEqual(['Quality metrics support the business thesis.']);
+    expect(result.research.risksToReview).toEqual(['Margin volatility remains a risk to review.']);
+    expect(result.research.whatToWatch).toEqual(['Next result and margin trend.']);
+    expect(result.research.evidenceReview.summary).toBe('Required research evidence is available for this view.');
+    expect(result.research.factorViews).toEqual([{
+      key: 'quality',
+      label: 'Quality',
+      score: 78,
+      summary: 'Quality evidence is available for this research view.',
+    }]);
+    expect(result.research.methodNote).toBe('Research-only output. Not personal investment advice.');
+    expect(result.research.generatedAt).toBe('2026-06-27T00:00:00.000Z');
+  });
+
   it('falls back from invalid conviction scores before public rendering', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
       ok: true,
