@@ -48,14 +48,15 @@ async function bootstrap() {
   });
 
   // ── Global error handler: sanitize all errors ─────────────────────
-  server.setErrorHandler((error, _request, reply) => {
-    const statusCode = error.statusCode ?? 500;
+  server.setErrorHandler((error: unknown, _request, reply) => {
+    const err = error as { statusCode?: number; message?: string };
+    const statusCode = err.statusCode ?? 500;
     if (statusCode >= 500) {
-      server.log.error({ err: error }, `Unhandled error: ${error.message}`);
+      server.log.error({ err: error }, `Unhandled error: ${err.message ?? String(error)}`);
     }
     return reply.status(statusCode).send({
-      error: statusCode < 500 ? error.message : "Internal server error",
-      ...(process.env.NODE_ENV === "development" && { details: error.message }),
+      error: statusCode < 500 ? (err.message ?? "Unknown error") : "Internal server error",
+      ...(process.env.NODE_ENV === "development" && { details: err.message ?? String(error) }),
     });
   });
 

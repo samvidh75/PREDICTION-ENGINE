@@ -1,15 +1,17 @@
 import type { ReactNode } from "react";
-import { GitCompare, Home, Search, Star, CreditCard } from "lucide-react";
-import { NavLink } from "react-router-dom";
+import { Home, Search, Star, CreditCard, MessageSquareText, ArrowUpRight } from "lucide-react";
+import { NavLink, Link } from "react-router-dom";
 import { colors, typography, space, radius, layout, components, shadows, animation } from "../design/tokens";
 import { NotificationBell } from "../components/NotificationBell";
 import { ResearchProfileModal } from "../components/ResearchProfileModal";
+import BetaBadge from "../components/BetaBadge";
+import FeedbackWidget from "../components/FeedbackWidget";
+import PrivacyConsentBanner from "../components/PrivacyConsentBanner";
 
 const NAV = [
   { to: "/", label: "Home", icon: Home },
   { to: "/scanner", label: "Scanner", icon: Search },
   { to: "/watchlist", label: "Watchlist", icon: Star },
-  { to: "/compare", label: "Compare", icon: GitCompare },
   { to: "/pricing", label: "Pricing", icon: CreditCard },
 ] as const;
 
@@ -26,7 +28,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       {/* DESKTOP SIDEBAR */}
       <aside className="rail">
         <NavLink to="/" style={brandLinkStyle}>
-          StockStory
+          StockStory<BetaBadge />
         </NavLink>
         <nav style={navStackStyle} aria-label="Primary">
           {NAV.map((item) => (
@@ -48,6 +50,10 @@ export function AppShell({ children }: { children: ReactNode }) {
           paddingTop: space[4],
           borderTop: `1px solid ${colors.border}`,
         }}>
+          <Link to="/changelog" className="nav-link" style={{ gap: space[2] }}>
+            <ArrowUpRight size={20} strokeWidth={1.75} />
+            <span>What's New</span>
+          </Link>
           <NavLink
             to="/watchlist"
             className={({ isActive }) => `nav-link${isActive ? " is-active" : ""}`}
@@ -65,9 +71,12 @@ export function AppShell({ children }: { children: ReactNode }) {
       {/* MOBILE TOP BAR */}
       <header className="mobile-brand" style={{ justifyContent: "space-between" }}>
         <NavLink to="/" style={mobileBrandLinkStyle}>
-          StockStory
+          StockStory<BetaBadge />
         </NavLink>
         <div style={{ display: "flex", alignItems: "center", gap: space[3] }}>
+          <Link to="/changelog" style={{ color: colors.textSecondary, display: "flex" }}>
+            <ArrowUpRight size={20} strokeWidth={1.75} />
+          </Link>
           <NotificationBell />
           <ResearchProfileModal />
         </div>
@@ -103,6 +112,87 @@ export function AppShell({ children }: { children: ReactNode }) {
           </p>
         </footer>
       </main>
+
+      {/* FEEDBACK FAB */}
+      <button
+        id="feedback-fab"
+        onClick={() => {
+          const existing = document.getElementById("feedback-widget-root");
+          if (existing) {
+            existing.remove();
+            return;
+          }
+          const root = document.createElement("div");
+          root.id = "feedback-widget-root";
+          document.body.appendChild(root);
+          // Simple mount via DOM — React would need a portal, this is a lightweight toggle
+          root.innerHTML = `<div style="position:fixed;bottom:80px;right:24px;z-index:100;background:#fff;border-radius:16px;padding:20px;box-shadow:0 4px 24px rgba(0,0,0,0.12);width:360px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+              <h3 style="margin:0;font-size:16px;font-weight:700;">Send Feedback</h3>
+              <button id="feedback-close" style="background:none;border:none;cursor:pointer;font-size:18px;">×</button>
+            </div>
+            <form id="feedback-form" style="display:flex;flex-direction:column;gap:12px;font-size:14px;">
+              <select id="fb-category" style="padding:8px 12px;border-radius:10px;border:1px solid #e5e5ea;font-size:14px;">
+                <option value="bug">Bug Report</option>
+                <option value="feature-request">Feature Request</option>
+                <option value="accuracy">Accuracy Concern</option>
+                <option value="ux">User Experience</option>
+                <option value="data-quality">Data Quality</option>
+                <option value="other">Other</option>
+              </select>
+              <input id="fb-title" type="text" required placeholder="Brief title" style="padding:8px 12px;border-radius:10px;border:1px solid #e5e5ea;font-size:14px;" />
+              <textarea id="fb-body" required rows="4" placeholder="Describe your feedback..." style="padding:8px 12px;border-radius:10px;border:1px solid #e5e5ea;font-size:14px;resize:vertical;font-family:inherit;"></textarea>
+              <div id="fb-error" style="color:#ff3b30;font-size:14px;display:none;"></div>
+              <button type="submit" style="padding:8px 20px;border-radius:10px;border:none;background:#007aff;color:#fff;font-size:14px;font-weight:600;cursor:pointer;">Submit Feedback</button>
+            </form>
+          </div>`;
+
+          document.getElementById("feedback-close")?.addEventListener("click", () => root.remove());
+          document.getElementById("feedback-form")?.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const cat = (document.getElementById("fb-category") as HTMLSelectElement).value;
+            const title = (document.getElementById("fb-title") as HTMLInputElement).value;
+            const body = (document.getElementById("fb-body") as HTMLTextAreaElement).value;
+            const errEl = document.getElementById("fb-error")!;
+            try {
+              const res = await fetch("/api/feedback", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ category: cat, title, body, pageUrl: window.location.href }),
+              });
+              if (!res.ok) throw new Error();
+              root.innerHTML = '<div style="padding:20px;text-align:center;"><h3 style="margin:0 0 12px;">Thank you!</h3><p style="color:#8e8e93;font-size:14px;">Your feedback helps us improve.</p></div>';
+              setTimeout(() => root.remove(), 3000);
+            } catch {
+              errEl.style.display = "block";
+              errEl.textContent = "Could not submit feedback. Try again.";
+            }
+          });
+        }}
+        style={{
+          position: "fixed",
+          bottom: "96px",
+          right: "24px",
+          zIndex: 99,
+          width: "48px",
+          height: "48px",
+          borderRadius: "50%",
+          border: "none",
+          background: colors.primary,
+          color: "#fff",
+          cursor: "pointer",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          boxShadow: "0 4px 12px rgba(0,122,255,0.3)",
+        }}
+        aria-label="Send feedback"
+      >
+        <MessageSquareText size={20} />
+      </button>
+
+      {/* PRIVACY CONSENT BANNER */}
+      <PrivacyConsentBanner />
 
       <style>{`
         /* ===== DESKTOP SIDEBAR ===== */

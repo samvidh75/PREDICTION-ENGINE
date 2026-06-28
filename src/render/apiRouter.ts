@@ -21,6 +21,7 @@ import type { EarningsMetrics, EventMetrics, FinancialMetrics, NewsMetrics, RAGM
 import intelligenceQualityGate from "./intelligenceQualityGate.js";
 import type { UserResearchProfile, AlertChangeView, SavedScannerPreset, DailyResearchDigest, WatchlistThesisView } from "../research/contracts/productContracts.js";
 import { saveProfile, getProfile, createDefaultProfile } from "../services/personalization/researchProfileStore.js";
+import { verifyFirebaseToken } from "../config/firebaseAdmin.js";
 import { loadAuthSession } from "../services/auth/sessionStore";
 import { ingestAlerts, getAlerts, getAlertsBySymbol, acknowledgeAlert, removeAlert } from "../services/personalization/AlertStore.js";
 import { DigestGenerator } from "../services/personalization/DailyResearchDigestGenerator.js";
@@ -40,15 +41,27 @@ function n(v: unknown): number | undefined {
   return Number.isFinite(p) ? p : undefined;
 }
 
-/** Lightweight auth preHandler — verifies Firebase JWT on write routes.
- *  TODO: Replace with Firebase Admin SDK verification once auth is enabled. */
+/** Auth preHandler — verifies Firebase ID token via Admin SDK on write routes. */
 async function requireAuth(req: any, reply: any) {
-  const uid = extractUid(req);
-  if (!uid) {
-    req.log.warn({ url: req.url }, "Unauthenticated write attempt");
-    // Don't block — auth is not enforced yet; log for observability
+  try {
+    const auth = req.headers?.authorization;
+    if (!auth || !auth.startsWith("Bearer ")) {
+      req.log.warn({ url: req.url }, "Unauthenticated write attempt — no Bearer token");
+      (req as any).uid = null;
+      return;
+    }
+    const token = auth.slice(7);
+    const decoded = await verifyFirebaseToken(token);
+    if (!decoded) {
+      req.log.warn({ url: req.url }, "Invalid Firebase token");
+      (req as any).uid = null;
+      return;
+    }
+    (req as any).uid = decoded.uid;
+  } catch (err) {
+    req.log.warn({ url: req.url, err }, "Firebase token verification failed");
+    (req as any).uid = null;
   }
-  (req as any).uid = uid;
 }
 
 /**
@@ -1274,24 +1287,6 @@ export default async function registerApiRoutes(server: FastifyInstance) {
   // ═══════════════════════════════════════════════════════════════════════════
   // PERSONAL RESEARCH OS — API Routes
   // ═══════════════════════════════════════════════════════════════════════════
-
-  /**
-   * Extract Firebase UID from Bearer token (lightweight JWT decode).
-   * Returns null if not authenticated.
-   */
-  function extractUid(req: any): string | null {
-    try {
-      const auth = req.headers?.authorization;
-      if (!auth || !auth.startsWith("Bearer ")) return null;
-      const token = auth.slice(7);
-      const payload = token.split(".")[1];
-      if (!payload) return null;
-      const json = JSON.parse(Buffer.from(payload, "base64url").toString("utf8"));
-      return json.sub ?? null;
-    } catch {
-      return null;
-    }
-  }
 
   // ── Research Profile ──────────────────────────────────────────────────────
 
