@@ -56,7 +56,7 @@ export async function buildDashboardData(
     scenarioUsefulness,
     premiumIntent,
   ] = await Promise.all([
-    PmfAggregationService.buildSnapshot(ctx),
+    new PmfAggregationService(store).generateSnapshot({ periodStart, periodEnd }),
     new FunnelAggregator().aggregate(ctx),
     new RetentionAggregator().aggregate(ctx),
     new ResearchQualityAggregator().aggregate(ctx),

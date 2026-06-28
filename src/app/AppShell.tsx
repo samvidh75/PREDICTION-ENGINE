@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Home, Search, Star, CreditCard, MessageSquareText, ArrowUpRight } from "lucide-react";
+import { Home, Search, Star, CreditCard, LayoutGrid, BookOpen, Shield, MessageSquareText, ArrowUpRight } from "lucide-react";
 import { NavLink, Link } from "react-router-dom";
 import { colors, typography, space, radius, layout, components, shadows, animation } from "../design/tokens";
 import { NotificationBell } from "../components/NotificationBell";
@@ -11,8 +11,14 @@ import PrivacyConsentBanner from "../components/PrivacyConsentBanner";
 const NAV = [
   { to: "/", label: "Home", icon: Home },
   { to: "/scanner", label: "Scanner", icon: Search },
+  { to: "/sectors", label: "Sectors", icon: LayoutGrid },
   { to: "/watchlist", label: "Watchlist", icon: Star },
   { to: "/pricing", label: "Pricing", icon: CreditCard },
+] as const;
+
+const SECONDARY_NAV = [
+  { to: "/methodology", label: "Methodology", icon: BookOpen },
+  { to: "/trust", label: "Trust & Safety", icon: Shield },
 ] as const;
 
 export function AppShell({ children }: { children: ReactNode }) {
@@ -42,6 +48,23 @@ export function AppShell({ children }: { children: ReactNode }) {
             </NavLink>
           ))}
         </nav>
+        <div style={{ marginTop: space[4], paddingTop: space[4], borderTop: `1px solid ${colors.border}` }}>
+          <p style={{ fontSize: typography.caption.desktop.size, color: colors.textSecondary, margin: `0 0 ${space[2]} 0`, paddingLeft: space[3], fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em" }}>
+            Resources
+          </p>
+          <nav style={navStackStyle} aria-label="Resources">
+            {SECONDARY_NAV.map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                className={({ isActive }) => `nav-link${isActive ? " is-active" : ""}`}
+              >
+                <item.icon size={20} strokeWidth={1.75} />
+                <span>{item.label}</span>
+              </NavLink>
+            ))}
+          </nav>
+        </div>
         <div style={{
           marginTop: "auto",
           display: "flex",
