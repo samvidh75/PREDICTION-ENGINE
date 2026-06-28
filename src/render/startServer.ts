@@ -12,6 +12,7 @@ import cors from "@fastify/cors";
 import staticFiles from "@fastify/static";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
+import { readFileSync, existsSync } from "fs";
 import { dbAdapter } from "../db/DatabaseAdapter";
 import { MigrationRunner } from "../db/MigrationRunner";
 import registerApiRoutes from "./apiRouter.js";
@@ -71,16 +72,41 @@ async function bootstrap() {
 
   // ── Static SPA: serve dist/public/ folder ───────────────────────────
   const distPath = join(process.cwd(), "dist", "public");
-  server.log.info(`Serving static files from ${distPath}`);
+  const indexPath = join(distPath, "index.html");
+  server.log.info(`Serving static files from ${distPath}, index exists: ${existsSync(indexPath)}`);
 
+  // Read index.html into memory for direct serving (avoids @fastify/static sendFile issues)
+  let indexHtml: string | null = null;
+  try {
+    if (existsSync(indexPath)) {
+      indexHtml = readFileSync(indexPath, "utf-8");
+      server.log.info(`Loaded index.html (${indexHtml.length} bytes)`);
+    } else {
+      server.log.warn(`index.html not found at ${indexPath}`);
+    }
+  } catch (err) {
+    server.log.warn(`Failed to read index.html: ${err}`);
+  }
+
+  // Register @fastify/static for assets (JS, CSS, images)
   await server.register(staticFiles, {
     root: distPath,
     prefix: "/",
+    wildcard: false,
   });
 
-  // ── Root explicitly serves index.html ───────────────────────────────
+  // ── Serve index.html for root and SPA routes ─────────────────────
+  async function serveIndex(reply: any) {
+    if (indexHtml) {
+      reply.type("text/html").send(indexHtml);
+    } else {
+      // Fallback: try sendFile
+      reply.sendFile("index.html");
+    }
+  }
+
   server.get("/", (req, reply) => {
-    return reply.sendFile("index.html");
+    return serveIndex(reply);
   });
 
   // ── SPA fallback: serve index.html for client-side routes ──────────
@@ -88,7 +114,7 @@ async function bootstrap() {
     if (_req.url.startsWith("/api/")) {
       return reply.status(404).send({ error: "not found" });
     }
-    return reply.sendFile("index.html");
+    return serveIndex(reply);
   });
 
   // ── Database initialization (non-fatal) ────────────────────────────
