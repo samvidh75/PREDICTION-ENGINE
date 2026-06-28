@@ -90,8 +90,6 @@ export type {
   TechnicalSimResult,
   SectorSimResult,
   PeerSimResult,
-  ThesisAssessment,
-  CompoundThesis,
   TrackedCompanyStress,
   PortfolioStressOutput,
 } from './scenario/ScenarioTypes';
@@ -127,6 +125,9 @@ export {
 
 export {
   ThesisLifecycleEngine,
+} from './scenario/ThesisLifecycleEngine';
+export type {
+  ThesisAssessment,
 } from './scenario/ThesisLifecycleEngine';
 export {
   WatchlistEngine,
