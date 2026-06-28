@@ -6,6 +6,9 @@
  */
 import type { FastifyInstance } from "fastify";
 import { getPersistedStockResearch } from "../lib/stockResearchSnapshot.js";
+import { financialEngine } from "../services/intelligence/engines/FinancialEngine/index.js";
+import { technicalEngine } from "../services/intelligence/engines/TechnicalEngine/index.js";
+import type { FinancialMetrics, TechnicalMetrics } from "../services/intelligence/types.js";
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -270,6 +273,91 @@ function generateThesis(scores: Record<string, number | null>, pe: number | null
   };
 }
 
+// ── Technical Indicator Helpers ────────────────────────────────────────────
+
+type PricePoint = { label: string; price: number };
+
+function computeSMA(prices: number[], period: number): number {
+  const slice = prices.slice(-period);
+  if (slice.length === 0) return 0;
+  return slice.reduce((a, b) => a + b, 0) / slice.length;
+}
+
+function computeRSI(prices: number[], period: number = 14): number {
+  if (prices.length < period + 1) return 50;
+  let gains = 0, losses = 0;
+  for (let i = prices.length - period; i < prices.length; i++) {
+    const delta = prices[i] - prices[i - 1];
+    if (delta > 0) gains += delta; else losses -= delta;
+  }
+  const avgGain = gains / period;
+  const avgLoss = losses / period;
+  if (avgLoss === 0) return 100;
+  const rs = avgGain / avgLoss;
+  return Math.round((100 - 100 / (1 + rs)) * 10) / 10;
+}
+
+function computePriceChanges(frames: Record<string, PricePoint[]>): {
+  change1W?: number; change1M?: number; change3M?: number; change6M?: number; change1Y?: number;
+} {
+  const changes: Record<string, number | undefined> = {};
+  const keys: [string, string][] = [["1W", "change1W"], ["1M", "change1M"], ["3M", "change3M"], ["1Y", "change1Y"]];
+  for (const [frameKey, changeKey] of keys) {
+    const pts = frames[frameKey];
+    if (pts && pts.length >= 2) {
+      const first = pts[0].price;
+      const last = pts[pts.length - 1].price;
+      if (first > 0) changes[changeKey] = Number((((last - first) / first) * 100).toFixed(1));
+    }
+  }
+  return changes;
+}
+
+function computeVolatility(prices: number[]): number {
+  if (prices.length < 5) return 25;
+  const returns: number[] = [];
+  for (let i = 1; i < prices.length; i++) {
+    if (prices[i - 1] > 0) returns.push(Math.log(prices[i] / prices[i - 1]));
+  }
+  if (returns.length === 0) return 25;
+  const mean = returns.reduce((a, b) => a + b, 0) / returns.length;
+  const variance = returns.reduce((s, r) => s + (r - mean) ** 2, 0) / (returns.length - 1);
+  return Number((Math.sqrt(variance) * Math.sqrt(252) * 100).toFixed(1));
+}
+
+function buildTechnicalMetrics(
+  symbol: string,
+  price: number,
+  frames: Record<string, PricePoint[]>,
+): TechnicalMetrics {
+  const allPrices = Object.values(frames).flat().map(p => p.price).filter(p => p > 0);
+  const dailyFrame = frames["1M"] || frames["3M"] || [];
+  const dailyPrices = dailyFrame.map(p => p.price).filter(p => p > 0);
+  const priceChanges = computePriceChanges(frames);
+
+  return {
+    currentPrice: price,
+    ma50: allPrices.length >= 50 ? computeSMA(allPrices, 50) : undefined,
+    ma200: allPrices.length >= 200 ? computeSMA(allPrices, 200) : undefined,
+    rsi: dailyPrices.length >= 15 ? computeRSI(dailyPrices) : undefined,
+    macd: undefined,
+    macdSignal: undefined,
+    macdHistogram: undefined,
+    priceChange1W: priceChanges.change1W,
+    priceChange1M: priceChanges.change1M,
+    priceChange3M: priceChanges.change3M,
+    priceChange6M: priceChanges.change6M,
+    priceChange1Y: priceChanges.change1Y,
+    volatility30: dailyPrices.length >= 5 ? computeVolatility(dailyPrices) : undefined,
+    beta: undefined,
+    volume: undefined,
+    avgVolume: undefined,
+    volumeRatio: undefined,
+    lastUpdated: new Date(),
+    period: "1D",
+  };
+}
+
 // ── Caches ──────────────────────────────────────────────────────────────────
 
 const CACHE_TTL = 300_000;
@@ -442,4 +530,90 @@ export default async function registerApiRoutes(server: FastifyInstance) {
 
   // GET /api/research?action=scanner&preset=quality&limit=20
   // (research endpoint with scanner, compare, watchlist, broker — handled here)
+
+  // ── Intelligence Engine Routes ──────────────────────────────────────────
+
+  // GET /api/intelligence/financial?symbol=TCS
+  server.get("/api/intelligence/financial", async (req, reply) => {
+    const symbol = String((req.query as any)?.symbol ?? "").toUpperCase().trim();
+    if (!symbol) return reply.status(400).send({ error: "symbol required" });
+
+    try {
+      const [yahoo, fund, synthetic] = await Promise.all([
+        yahooQuote(symbol),
+        indianApiFunds(symbol),
+        getPersistedStockResearch(symbol).catch(() => null),
+      ]);
+
+      const fundData = fund || {};
+      const price = yahoo?.price ?? synthetic?.price ?? 0;
+      const marketCapCr = Math.round(((yahoo?.marketCap ?? synthetic?.marketCap ?? 0) / 1e7) * 100) / 100;
+      const sector = synthetic?.sector || "Diversified";
+
+      const metrics: FinancialMetrics = {
+        roe: n(fundData.roe ?? fundData.return_on_equity) ?? synthetic?.roe ?? undefined,
+        netMargin: n(fundData.net_margin ?? fundData.net_profit_margin) ?? undefined,
+        operatingMargin: n(fundData.operating_margin ?? fundData.ebitda_margin) ?? undefined,
+        revenueGrowth: n(fundData.revenue_growth_3y ?? fundData.revenue_growth) ?? synthetic?.revenueGrowth ?? undefined,
+        epsGrowth: n(fundData.eps_growth_3y ?? fundData.eps_growth) ?? undefined,
+        debtToEquity: n(fundData.debt_to_equity) ?? synthetic?.debtToEquity ?? undefined,
+        interestCoverage: n(fundData.interest_coverage) ?? undefined,
+        marketCap: marketCapCr,
+        currentRatio: n(fundData.current_ratio) ?? undefined,
+        lastUpdated: new Date(),
+        fiscalYear: new Date().getFullYear(),
+      };
+
+      const result = await financialEngine.analyze(metrics);
+
+      reply.header("Cache-Control", "public, s-maxage=300");
+      return {
+        symbol,
+        engine: "financial",
+        score: result.overall,
+        confidence: result.confidence,
+        direction: result.overall >= 60 ? "strong" : result.overall >= 40 ? "moderate" : "weak",
+        details: result,
+        timestamp: new Date().toISOString(),
+      };
+    } catch (err: any) {
+      return reply.status(502).send({ error: err.message || String(err), symbol });
+    }
+  });
+
+  // GET /api/intelligence/technical?symbol=TCS
+  server.get("/api/intelligence/technical", async (req, reply) => {
+    const symbol = String((req.query as any)?.symbol ?? "").toUpperCase().trim();
+    if (!symbol) return reply.status(400).send({ error: "symbol required" });
+
+    try {
+      const [yahoo, priceHistory] = await Promise.all([
+        yahooQuote(symbol),
+        yahooPriceHistory(symbol),
+      ]);
+
+      const price = yahoo?.price ?? 0;
+      if (!price) {
+        return reply.status(502).send({ error: "Unable to fetch price data", symbol });
+      }
+
+      const metrics = buildTechnicalMetrics(symbol, price, priceHistory);
+      const result = technicalEngine.analyze(metrics);
+
+      reply.header("Cache-Control", "public, s-maxage=300");
+      return {
+        symbol,
+        engine: "technical",
+        score: result.overall,
+        confidence: result.confidence,
+        direction: result.direction,
+        trend: result.trend,
+        momentumStatus: result.momentumStatus,
+        details: result,
+        timestamp: new Date().toISOString(),
+      };
+    } catch (err: any) {
+      return reply.status(502).send({ error: err.message || String(err), symbol });
+    }
+  });
 }
