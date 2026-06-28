@@ -73,7 +73,6 @@ src/components/src/
 .env*
 !.env.example
 !.env.production.example
-!.env.production
 .playwright-mcp/
 
 # Stray artifacts

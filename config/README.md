@@ -18,12 +18,12 @@ config/
 | File | Purpose | Scope |
 |------|---------|-------|
 | `.env.example` (root + `config/environments/`) | Complete env variable inventory | All environments |
-| `.env.production.example` | Production-specific (YFINANCE, Railway) | Railway backend |
+| `.env.production.example` | Production-specific (YFINANCE, Render) | Render backend |
 | `config/environments/schema.env.example` | Minimal schema (5 lines) | Reference only |
 
 ### Rules
 - Never commit live secrets to `.env` files
-- Keep `config/environments/.env.example` in sync with Railway and Vercel
+- Keep `config/environments/.env.example` in sync with Render and Vercel
 - Root `.env.example` is the developer copy target; `config/environments/` is the canonical source
 
 ## tsconfig Hierarchy
