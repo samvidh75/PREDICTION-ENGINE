@@ -61,6 +61,14 @@ export class MarketBrainResearchError extends Error {
 
 const normalizeSymbol = (symbol: string): string => symbol.trim().toUpperCase();
 
+const MARKET_BRAIN_RESEARCH_STATES = new Set<MarketBrainResearchState>([
+  'High conviction',
+  'Thesis improving',
+  'Watch',
+  'Needs review',
+  'Risk rising',
+]);
+
 const MARKET_BRAIN_EVIDENCE_DOMAINS = new Set<MarketBrainEvidenceDomain>([
   'instrument_master',
   'prices',
@@ -91,6 +99,13 @@ const EMPTY_EVIDENCE_REVIEW: MarketBrainEvidenceReviewView = {
 };
 
 const asTrimmedString = (value: unknown): string => (typeof value === 'string' ? value.trim() : '');
+
+const asResearchState = (value: unknown): MarketBrainResearchState => {
+  const state = asTrimmedString(value);
+  return MARKET_BRAIN_RESEARCH_STATES.has(state as MarketBrainResearchState)
+    ? state as MarketBrainResearchState
+    : 'Needs review';
+};
 
 const asStringArray = (value: unknown): string[] => (Array.isArray(value)
   ? value.map(asTrimmedString).filter((item) => item.length > 0)
@@ -158,6 +173,7 @@ const normalizeResearchResponse = (payload: Partial<MarketBrainResearchResponse>
       ...(research as MarketBrainResearchView),
       symbol: normalizeSymbol(symbol),
       companyName,
+      state: asResearchState(research.state),
       convictionScore: asPublicScore(research.convictionScore),
       headline: asTrimmedString(research.headline),
       thesis: asStringArray(research.thesis),
