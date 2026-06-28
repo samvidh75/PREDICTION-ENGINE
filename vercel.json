@@ -1,14 +1,18 @@
 {
   "version": 2,
   "buildCommand": "",
-  "outputDirectory": ".",
+  "outputDirectory": "dist/public",
   "github": {
     "silent": true
   },
   "rewrites": [
     {
+      "source": "/api/(.*)",
+      "destination": "https://stockstory-api.onrender.com/api/$1"
+    },
+    {
       "source": "/(.*)",
-      "destination": "https://stockstory-api.onrender.com/$1"
+      "destination": "/index.html"
     }
   ]
 }
