@@ -24,7 +24,7 @@ export class RiskEngine {
     const redFlags = this.collectRedFlags(fin, risk, input.technicals);
     const requiredFields = [
       fin.debtToEquity, fin.currentRatio, fin.interestCoverage,
-      risk.governanceScore, risk.pledgedShares,
+      risk?.governanceScore, risk?.pledgedShares,
     ];
     const dc = confidenceWeight(requiredFields, 5);
     const confidence = Math.min(0.99, dc);
@@ -104,17 +104,17 @@ export class RiskEngine {
 
   private scoreGovernanceRisk(risk: IntelligenceInput['risks']): number {
     let score = 0;
-    if (risk.auditorChange) score += 5;
-    if (risk.relatedPartyTransactions) score += 5;
-    if (risk.outstandingWarrants) score += 3;
+    if (risk?.auditorChange) score += 5;
+    if (risk?.relatedPartyTransactions) score += 5;
+    if (risk?.outstandingWarrants) score += 3;
 
-    if (risk.pledgedShares !== null && risk.pledgedShares > 50) score += 6;
-    else if (risk.pledgedShares !== null && risk.pledgedShares > 25) score += 3;
+    if (risk?.pledgedShares !== null && risk?.pledgedShares !== undefined && risk.pledgedShares > 50) score += 6;
+    else if (risk?.pledgedShares !== null && risk?.pledgedShares !== undefined && risk.pledgedShares > 25) score += 3;
 
-    if (risk.governanceScore !== null && risk.governanceScore < 30) score += 6;
-    else if (risk.governanceScore !== null && risk.governanceScore < 50) score += 3;
+    if (risk?.governanceScore !== null && risk?.governanceScore !== undefined && risk.governanceScore < 30) score += 6;
+    else if (risk?.governanceScore !== null && risk?.governanceScore !== undefined && risk.governanceScore < 50) score += 3;
 
-    if (risk.litigationRisk !== null && risk.litigationRisk > 0.5) score += 5;
+    if (risk?.litigationRisk !== null && risk?.litigationRisk !== undefined && risk.litigationRisk > 0.5) score += 5;
 
     return score;
   }
@@ -133,13 +133,13 @@ export class RiskEngine {
       flags.push('Interest coverage below 1.5x');
     if (fin.currentRatio !== null && fin.currentRatio < 0.8)
       flags.push('Current ratio below 0.8');
-    if (risk.pledgedShares !== null && risk.pledgedShares > 50)
+    if (risk?.pledgedShares !== null && risk?.pledgedShares !== undefined && risk.pledgedShares > 50)
       flags.push(`Promoter pledge at ${risk.pledgedShares.toFixed(0)}%`);
-    if (risk.auditorChange)
+    if (risk?.auditorChange)
       flags.push('Recent auditor change');
-    if (risk.relatedPartyTransactions)
+    if (risk?.relatedPartyTransactions)
       flags.push('Related-party transactions detected');
-    if (risk.litigationRisk !== null && risk.litigationRisk > 0.7)
+    if (risk?.litigationRisk !== null && risk?.litigationRisk !== undefined && risk.litigationRisk > 0.7)
       flags.push('Significant litigation exposure');
     if (t.volatility !== null && t.volatility > 60)
       flags.push('Extreme price volatility');
