@@ -67,4 +67,60 @@ describe('fetchMarketBrainResearch factor normalization', () => {
     expect(result.research.factorViews.map((factorView) => factorView.key)).toEqual(['quality', 'growth']);
     expect(result.research.factorViews).toHaveLength(2);
   });
+
+  it('keeps the first valid public factor view when duplicate keys are returned', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({
+        ...responsePayload,
+        research: {
+          ...responsePayload.research,
+          factorViews: [
+            {
+              key: 'quality',
+              label: 'Quality',
+              score: 72,
+              summary: 'Quality evidence is available for this research view.',
+            },
+            {
+              key: 'quality',
+              label: 'Duplicate Quality',
+              score: 58,
+              summary: 'Duplicate quality evidence should not render twice.',
+            },
+            {
+              key: 'valuation',
+              label: 'Valuation',
+              score: 49,
+              summary: 'Valuation evidence is available for this research view.',
+            },
+            {
+              key: 'valuation',
+              label: 'Duplicate Valuation',
+              score: 51,
+              summary: 'Duplicate valuation evidence should not render twice.',
+            },
+          ],
+        },
+      }),
+    }));
+
+    const result = await fetchMarketBrainResearch('TCS');
+
+    expect(result.research.factorViews).toEqual([
+      {
+        key: 'quality',
+        label: 'Quality',
+        score: 72,
+        summary: 'Quality evidence is available for this research view.',
+      },
+      {
+        key: 'valuation',
+        label: 'Valuation',
+        score: 49,
+        summary: 'Valuation evidence is available for this research view.',
+      },
+    ]);
+  });
 });
