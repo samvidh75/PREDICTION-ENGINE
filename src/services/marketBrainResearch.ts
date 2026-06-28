@@ -1,4 +1,9 @@
-export type MarketBrainResearchState = 'High conviction' | 'Thesis improving' | 'Watch' | 'Needs review' | 'Risk rising';
+import {
+  MARKET_BRAIN_ALLOWED_STATES,
+  containsForbiddenRecommendationLanguage,
+} from '../systems/market-brain/marketBrainGuardrails';
+
+export type MarketBrainResearchState = typeof MARKET_BRAIN_ALLOWED_STATES[number];
 
 export type MarketBrainEvidenceDomain =
   | 'instrument_master'
@@ -61,13 +66,7 @@ export class MarketBrainResearchError extends Error {
 
 const normalizeSymbol = (symbol: string): string => symbol.trim().toUpperCase();
 
-const MARKET_BRAIN_RESEARCH_STATES = new Set<MarketBrainResearchState>([
-  'High conviction',
-  'Thesis improving',
-  'Watch',
-  'Needs review',
-  'Risk rising',
-]);
+const MARKET_BRAIN_RESEARCH_STATES = new Set<MarketBrainResearchState>(MARKET_BRAIN_ALLOWED_STATES);
 
 const MARKET_BRAIN_EVIDENCE_DOMAINS = new Set<MarketBrainEvidenceDomain>([
   'instrument_master',
@@ -91,16 +90,6 @@ const MARKET_BRAIN_FACTOR_KEYS = new Set<MarketBrainFactorKey>([
   'ownership',
 ]);
 
-const MARKET_BRAIN_FORBIDDEN_PUBLIC_TERMS = [
-  'Strong Buy',
-  'Buy now',
-  'Hold recommendation',
-  'Sell immediately',
-  'Guaranteed return',
-  'Sure shot',
-  'Multibagger guarantee',
-] as const;
-
 const EMPTY_EVIDENCE_REVIEW: MarketBrainEvidenceReviewView = {
   needsReview: false,
   partial: [],
@@ -117,14 +106,9 @@ const isRecord = (value: unknown): value is Record<string, unknown> => (
 
 const asTrimmedString = (value: unknown): string => (typeof value === 'string' ? value.trim() : '');
 
-const containsForbiddenPublicCopy = (value: string): boolean => {
-  const normalized = value.toLowerCase();
-  return MARKET_BRAIN_FORBIDDEN_PUBLIC_TERMS.some((term) => normalized.includes(term.toLowerCase()));
-};
-
 const asPublicText = (value: unknown): string => {
   const text = asTrimmedString(value);
-  return text.length > 0 && !containsForbiddenPublicCopy(text) ? text : '';
+  return text.length > 0 && !containsForbiddenRecommendationLanguage(text) ? text : '';
 };
 
 const asResearchState = (value: unknown): MarketBrainResearchState => {
