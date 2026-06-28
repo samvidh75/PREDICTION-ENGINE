@@ -57,14 +57,28 @@ async function bootstrap() {
     }
   });
 
-  server.get("/version", async () => ({
-    name: "stockstory-render",
-    node: process.version,
-    env: process.env.NODE_ENV ?? "development",
-    db: process.env.DATABASE_URL ? "configured" : "missing",
-    api: "native (Render)",
-    cwd: process.cwd(),
-  }));
+  server.get("/version", async () => {
+    const distPath = join(process.cwd(), "dist", "public");
+    const indexPath = join(distPath, "index.html");
+    let indexExists = false;
+    let distFiles: string[] = [];
+    try {
+      indexExists = existsSync(indexPath);
+      const { readdirSync } = await import("fs");
+      distFiles = readdirSync(distPath).slice(0, 20);
+    } catch {}
+    return {
+      name: "stockstory-render",
+      node: process.version,
+      env: process.env.NODE_ENV ?? "development",
+      db: process.env.DATABASE_URL ? "configured" : "missing",
+      api: "native (Render)",
+      cwd: process.cwd(),
+      distPath,
+      indexExists,
+      distFiles,
+    };
+  });
 
   // ── API routes: /api/stock, /api/search ────────────────────────────
   await registerApiRoutes(server);
@@ -72,9 +86,9 @@ async function bootstrap() {
   // ── Static file serving ─────────────────────────────────────────
   const distPath = join(process.cwd(), "dist", "public");
   const indexPath = join(distPath, "index.html");
-  const distExists = existsSync(distPath);
-  const indexExists = existsSync(indexPath);
-  server.log.info(`Serving static files from ${distPath}, dist exists: ${distExists}, index exists: ${indexExists}`);
+  server.log.info(
+    `Starting static file server, dist: ${distPath}, exists: ${existsSync(distPath)}, index: ${existsSync(indexPath)}`
+  );
 
   const MIME_TYPES: Record<string, string> = {
     ".html": "text/html",
@@ -96,76 +110,43 @@ async function bootstrap() {
     ".map": "application/json",
   };
 
-  function getContentType(filePath: string): string {
-    return MIME_TYPES[extname(filePath).toLowerCase()] || "application/octet-stream";
+  function getContentType(p: string): string {
+    return MIME_TYPES[extname(p).toLowerCase()] || "application/octet-stream";
   }
 
-  async function tryServeFile(filePath: string, reply: any): Promise<boolean> {
-    try {
-      const content = await new Promise<Buffer>((resolve, reject) => {
-        readFile(filePath, (err, data) => {
-          if (err) reject(err);
-          else resolve(data);
-        });
+  function tryReadFile(p: string): Promise<Buffer | null> {
+    return new Promise((resolve) => {
+      readFile(p, (err, data) => {
+        resolve(err ? null : data);
       });
-      reply.type(getContentType(filePath)).send(content);
-      return true;
-    } catch {
-      return false;
-    }
+    });
   }
 
-  async function serveIndex(reply: any): Promise<void> {
-    try {
-      const content = await new Promise<Buffer>((resolve, reject) => {
-        readFile(indexPath, (err, data) => {
-          if (err) reject(err);
-          else resolve(data);
-        });
-      });
-      reply.type("text/html").send(content);
-    } catch {
-      reply.status(404).send({ error: "not found" });
-    }
-  }
+  // ── Catch-all: serve static files or fall back to SPA index.html ─
+  server.setNotFoundHandler(async (_req, reply) => {
+    const url = new URL(_req.url, "http://localhost");
 
-  // ── Serve known extension routes statically ────────────────────
-  server.get("/assets/*", async (req, reply) => {
-    const pathname = new URL(req.url, "http://localhost").pathname;
-    const filePath = join(distPath, pathname);
-    if (!filePath.startsWith(distPath)) return reply.status(403).send({ error: "forbidden" });
-    if (await tryServeFile(filePath, reply)) return;
-    return serveIndex(reply);
-  });
-
-  server.get("/fonts/*", async (req, reply) => {
-    const pathname = new URL(req.url, "http://localhost").pathname;
-    const filePath = join(distPath, pathname);
-    if (!filePath.startsWith(distPath)) return reply.status(403).send({ error: "forbidden" });
-    if (await tryServeFile(filePath, reply)) return;
-    return serveIndex(reply);
-  });
-
-  // ── Root → index.html ──────────────────────────────────────────
-  server.get("/", async (_req, reply) => {
-    return serveIndex(reply);
-  });
-
-  // ── Root-level files (favicon, robots.txt, sitemap, etc.) ──────
-  server.get("/:file", async (req, reply) => {
-    const url = new URL(req.url, "http://localhost");
-    const filePath = join(distPath, url.pathname);
-    if (!filePath.startsWith(distPath)) return reply.status(403).send({ error: "forbidden" });
-    if (await tryServeFile(filePath, reply)) return;
-    return serveIndex(reply);
-  });
-
-  // ── SPA fallback: serve index.html for client-side routes ──────
-  server.setNotFoundHandler((_req, reply) => {
-    if (_req.url.startsWith("/api/")) {
+    // API routes → JSON 404
+    if (url.pathname.startsWith("/api/")) {
       return reply.status(404).send({ error: "not found" });
     }
-    return serveIndex(reply);
+
+    // Try to serve the requested file from dist
+    const filePath = join(distPath, url.pathname);
+    if (filePath.startsWith(distPath)) {
+      const content = await tryReadFile(filePath);
+      if (content) {
+        return reply.type(getContentType(filePath)).send(content);
+      }
+    }
+
+    // SPA fallback: serve index.html
+    const indexContent = await tryReadFile(indexPath);
+    if (indexContent) {
+      return reply.type("text/html").send(indexContent);
+    }
+
+    return reply.status(404).send({ error: "not found" });
   });
 
   // ── Database initialization (non-fatal) ────────────────────────────
