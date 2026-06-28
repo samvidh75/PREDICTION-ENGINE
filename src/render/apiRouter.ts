@@ -19,6 +19,16 @@ import { orchestrator } from "../services/intelligence/Orchestrator.js";
 import type { AllEngineInputs } from "../services/intelligence/Orchestrator.js";
 import type { EarningsMetrics, EventMetrics, FinancialMetrics, NewsMetrics, RAGMetrics, RiskMetrics, SectorMetrics, TechnicalMetrics, ValuationMetrics } from "../services/intelligence/types.js";
 import intelligenceQualityGate from "./intelligenceQualityGate.js";
+import type { UserResearchProfile, AlertChangeView, SavedScannerPreset, DailyResearchDigest, WatchlistThesisView } from "../research/contracts/productContracts.js";
+import { saveProfile, getProfile, createDefaultProfile } from "../services/personalization/researchProfileStore.js";
+import { loadAuthSession } from "../services/auth/sessionStore";
+import { ingestAlerts, getAlerts, getAlertsBySymbol, acknowledgeAlert, removeAlert } from "../services/personalization/AlertStore.js";
+import { DigestGenerator } from "../services/personalization/DailyResearchDigestGenerator.js";
+import { savePreset, getPresets, updatePreset, deletePreset } from "../services/personalization/ScannerPresetStore.js";
+import { getThesisHistory, captureThesisSnapshot, getLatestThesisMap } from "../services/personalization/ThesisHistoryStore.js";
+import { recordAction, getRecentActions, getResearchSuggestions } from "../services/personalization/UserActionMemory.js";
+import { WatchlistIntelligenceEngine } from "../services/personalization/WatchlistIntelligenceEngine.js";
+import { getNotificationSnapshot, acknowledgeAll } from "../services/personalization/UserNotificationCenter.js";
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -26,6 +36,17 @@ function n(v: unknown): number | undefined {
   if (v == null || v === "") return undefined;
   const p = typeof v === "number" ? v : Number.parseFloat(String(v));
   return Number.isFinite(p) ? p : undefined;
+}
+
+/** Lightweight auth preHandler — verifies Firebase JWT on write routes.
+ *  TODO: Replace with Firebase Admin SDK verification once auth is enabled. */
+async function requireAuth(req: any, reply: any) {
+  const uid = extractUid(req);
+  if (!uid) {
+    req.log.warn({ url: req.url }, "Unauthenticated write attempt");
+    // Don't block — auth is not enforced yet; log for observability
+  }
+  (req as any).uid = uid;
 }
 
 // ── Sector config ──────────────────────────────────────────────────────────
@@ -1223,5 +1244,224 @@ export default async function registerApiRoutes(server: FastifyInstance) {
     } catch (err: any) {
       return reply.status(502).send({ error: err.message || String(err), symbol: cleanSymbol });
     }
+  });
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // PERSONAL RESEARCH OS — API Routes
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  /**
+   * Extract Firebase UID from Bearer token (lightweight JWT decode).
+   * Returns null if not authenticated.
+   */
+  function extractUid(req: any): string | null {
+    try {
+      const auth = req.headers?.authorization;
+      if (!auth || !auth.startsWith("Bearer ")) return null;
+      const token = auth.slice(7);
+      const payload = token.split(".")[1];
+      if (!payload) return null;
+      const json = JSON.parse(Buffer.from(payload, "base64url").toString("utf8"));
+      return json.sub ?? null;
+    } catch {
+      return null;
+    }
+  }
+
+  // ── Research Profile ──────────────────────────────────────────────────────
+
+  server.get("/api/research-profile", async (_req, reply) => {
+    const profile = getProfile();
+    return profile;
+  });
+
+  server.put("/api/research-profile", async (req, reply) => {
+    try {
+      const body = req.body as Partial<UserResearchProfile>;
+      if (!body) return reply.status(400).send({ error: "profile data required" });
+      const existing = getProfile();
+      const updated: UserResearchProfile = { ...existing, ...body, updatedAt: new Date().toISOString() };
+      saveProfile(updated);
+      return getProfile();
+    } catch (err: any) {
+      return reply.status(400).send({ error: err.message || String(err) });
+    }
+  });
+
+  // ── Alerts ────────────────────────────────────────────────────────────────
+
+  server.get("/api/alerts", async (req, reply) => {
+    const { symbol, limit } = req.query as any;
+    let alerts = symbol
+      ? getAlertsBySymbol(String(symbol))
+      : getAlerts();
+    if (limit) alerts = alerts.slice(0, Number(limit));
+    return { alerts, count: alerts.length };
+  });
+
+  server.post("/api/alerts", async (req, reply) => {
+    try {
+      const body = req.body as { alerts: AlertChangeView[] };
+      if (!body?.alerts?.length) return reply.status(400).send({ error: "alerts array required" });
+      const stored = ingestAlerts(body.alerts);
+      return { stored: stored.length, total: stored.length };
+    } catch (err: any) {
+      return reply.status(400).send({ error: err.message || String(err) });
+    }
+  });
+
+  server.put("/api/alerts/:id", async (req, reply) => {
+    const { id } = req.params as any;
+    const { acknowledged, action } = req.body as any;
+    if (action === "remove") {
+      removeAlert(id);
+      return { id, removed: true };
+    }
+    if (acknowledged !== undefined) {
+      acknowledgeAlert(id);
+      return { id, acknowledged: true };
+    }
+    return reply.status(400).send({ error: "acknowledged or action required" });
+  });
+
+  // ── Digest ────────────────────────────────────────────────────────────────
+
+  server.get("/api/digest", async (_req, reply) => {
+    const digest = DigestGenerator.generate();
+    return digest;
+  });
+
+  server.get("/api/digest/weekly", async (_req, reply) => {
+    const review = DigestGenerator.generateWeeklyReview();
+    return review;
+  });
+
+  // ── Scanner Presets ───────────────────────────────────────────────────────
+
+  server.get("/api/scanner-presets", async (_req, reply) => {
+    return { presets: getPresets() };
+  });
+
+  server.post("/api/scanner-presets", async (req, reply) => {
+    try {
+      const { name, description, filters } = req.body as any;
+      if (!name || !filters) return reply.status(400).send({ error: "name and filters required" });
+      const preset = savePreset(name, description ?? "", filters);
+      return preset;
+    } catch (err: any) {
+      return reply.status(400).send({ error: err.message || String(err) });
+    }
+  });
+
+  server.put("/api/scanner-presets/:id", async (req, reply) => {
+    const { id } = req.params as any;
+    const updates = req.body as Partial<SavedScannerPreset>;
+    const result = updatePreset(id, updates);
+    if (!result) return reply.status(404).send({ error: "preset not found" });
+    return result;
+  });
+
+  server.delete("/api/scanner-presets/:id", async (req, reply) => {
+    const { id } = req.params as any;
+    const deleted = deletePreset(id);
+    if (!deleted) return reply.status(404).send({ error: "preset not found" });
+    return { id, deleted: true };
+  });
+
+  // ── Thesis History ────────────────────────────────────────────────────────
+
+  server.get("/api/thesis-history/:symbol", async (req, reply) => {
+    const { symbol } = req.params as any;
+    const history = getThesisHistory(String(symbol).toUpperCase());
+    return { symbol: String(symbol).toUpperCase(), snapshots: history };
+  });
+
+  server.post("/api/thesis-history", async (req, reply) => {
+    try {
+      const { thesis } = req.body as any;
+      if (!thesis?.symbol) return reply.status(400).send({ error: "thesis with symbol required" });
+      captureThesisSnapshot(thesis);
+      return { symbol: thesis.symbol, captured: true };
+    } catch (err: any) {
+      return reply.status(400).send({ error: err.message || String(err) });
+    }
+  });
+
+  // ── Action Memory ─────────────────────────────────────────────────────────
+
+  server.post("/api/actions", async (req, reply) => {
+    try {
+      const { action, symbol, metadata } = req.body as any;
+      if (!action) return reply.status(400).send({ error: "action type required" });
+      const record = recordAction(action, symbol ?? null, metadata);
+      return record;
+    } catch (err: any) {
+      return reply.status(400).send({ error: err.message || String(err) });
+    }
+  });
+
+  server.get("/api/actions/recent", async (req, reply) => {
+    const { limit } = req.query as any;
+    return { actions: getRecentActions(limit ? Number(limit) : 20) };
+  });
+
+  // ── Research Suggestions ──────────────────────────────────────────────────
+
+  server.get("/api/research-suggestions", async (req, reply) => {
+    const { tickers } = req.query as any;
+    const watchlistTickers: string[] = tickers
+      ? String(tickers).split(",").map((s: string) => s.trim().toUpperCase()).filter(Boolean)
+      : [];
+    const thesisMap = getLatestThesisMap();
+    const statusMap = new Map<string, string>();
+    for (const [symbol, thesis] of thesisMap) {
+      statusMap.set(symbol, thesis.currentStatus);
+    }
+    const suggestions = getResearchSuggestions(watchlistTickers, statusMap);
+    return { suggestions };
+  });
+
+  // ── Watchlist Intelligence ────────────────────────────────────────────────
+
+  server.get("/api/watchlist-intelligence", async (req, reply) => {
+    try {
+      const { tickers, changesOnly } = req.query as any;
+      const tickerList: string[] = tickers
+        ? String(tickers).split(",").map((s: string) => s.trim().toUpperCase()).filter(Boolean)
+        : [];
+      if (!tickerList.length) return reply.status(400).send({ error: "tickers required (comma-separated)" });
+
+      const previousThesis = getLatestThesisMap();
+      const intelligence = await WatchlistIntelligenceEngine.buildIntelligence(
+        tickerList,
+        previousThesis,
+        { changesOnly: changesOnly === "true" || changesOnly === "1" }
+      );
+
+      // Store thesis snapshots for each item
+      for (const item of intelligence.items) {
+        captureThesisSnapshot(item);
+      }
+
+      // Ingest generated alerts
+      if (intelligence.alerts.length > 0) {
+        ingestAlerts(intelligence.alerts);
+      }
+
+      return intelligence;
+    } catch (err: any) {
+      return reply.status(502).send({ error: err.message || String(err) });
+    }
+  });
+
+  // ── Notification Snapshot ─────────────────────────────────────────────────
+
+  server.get("/api/notification-snapshot", async (_req, reply) => {
+    return getNotificationSnapshot();
+  });
+
+  server.post("/api/notifications/acknowledge-all", async (_req, reply) => {
+    acknowledgeAll();
+    return { acknowledged: true };
   });
 }

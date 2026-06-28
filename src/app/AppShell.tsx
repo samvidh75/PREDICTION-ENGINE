@@ -1,13 +1,16 @@
 import type { ReactNode } from "react";
-import { GitCompare, Home, Search, Star } from "lucide-react";
+import { GitCompare, Home, Search, Star, CreditCard } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { colors, typography, space, radius, layout, components, shadows, animation } from "../design/tokens";
+import { NotificationBell } from "../components/NotificationBell";
+import { ResearchProfileModal } from "../components/ResearchProfileModal";
 
 const NAV = [
   { to: "/", label: "Home", icon: Home },
   { to: "/scanner", label: "Scanner", icon: Search },
   { to: "/watchlist", label: "Watchlist", icon: Star },
   { to: "/compare", label: "Compare", icon: GitCompare },
+  { to: "/pricing", label: "Pricing", icon: CreditCard },
 ] as const;
 
 export function AppShell({ children }: { children: ReactNode }) {
@@ -37,13 +40,37 @@ export function AppShell({ children }: { children: ReactNode }) {
             </NavLink>
           ))}
         </nav>
+        <div style={{
+          marginTop: "auto",
+          display: "flex",
+          flexDirection: "column",
+          gap: space[3],
+          paddingTop: space[4],
+          borderTop: `1px solid ${colors.border}`,
+        }}>
+          <NavLink
+            to="/watchlist"
+            className={({ isActive }) => `nav-link${isActive ? " is-active" : ""}`}
+            style={{ gap: space[2] }}
+          >
+            <NotificationBell />
+            <span>Alerts</span>
+          </NavLink>
+          <div style={{ display: "flex", justifyContent: "center" }}>
+            <ResearchProfileModal />
+          </div>
+        </div>
       </aside>
 
       {/* MOBILE TOP BAR */}
-      <header className="mobile-brand">
+      <header className="mobile-brand" style={{ justifyContent: "space-between" }}>
         <NavLink to="/" style={mobileBrandLinkStyle}>
           StockStory
         </NavLink>
+        <div style={{ display: "flex", alignItems: "center", gap: space[3] }}>
+          <NotificationBell />
+          <ResearchProfileModal />
+        </div>
       </header>
 
       {/* MOBILE TAB BAR */}

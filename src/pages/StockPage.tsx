@@ -9,6 +9,10 @@ import { Card, CardLabel } from "../ui/Card";
 import { Stat } from "../ui/Stat";
 import { useResponsiveValue } from "../ui/responsive";
 import { SEBIComplianceBanner } from "../components/SEBICompliance";
+import { BrokerHandoffModal } from "../components/BrokerHandoffModal";
+import { ThesisHistory } from "../components/ThesisHistory";
+import { listAvailableBrokers } from "../commercial/BrokerHandoffService";
+import type { BrokerEntry } from "../commercial/BrokerRegistry";
 import { fallbackAnalysis, generateStockAnalysis } from "../services/llm/AIAnalysisService";
 import type { AIAnalysis } from "../services/llm/AIAnalysisService";
 import { colors, typography, radius } from "../design/tokens";
@@ -140,6 +144,9 @@ function StockView({ stock }: { stock: StockResearchDetail }) {
   const [financialPeriod, setFinancialPeriod] = useState<FinancialPeriod>("annual");
   const shareholdingSeries = stock.shareholdings ?? stock.shareholding ?? [];
   const [period, setPeriod] = useState(shareholdingSeries[0]?.period ?? "Mar'26");
+  const [brokerModalOpen, setBrokerModalOpen] = useState(false);
+  const availableBrokers = listAvailableBrokers();
+  const primaryBroker = availableBrokers[0] ?? null;
   const sectionGap = useResponsiveValue("48px", "80px");
   const isUp = stock.price.changeAbs >= 0;
   const trendColor = isUp ? colors.success : colors.danger;
@@ -179,8 +186,8 @@ function StockView({ stock }: { stock: StockResearchDetail }) {
         <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
           <Button variant="secondary">Track</Button>
           <Button variant="secondary">Compare</Button>
-          <Button>
-            <span>Invest via broker</span>
+          <Button onClick={() => setBrokerModalOpen(true)} disabled={!primaryBroker}>
+            <span>Continue with broker</span>
             <ArrowRight size={16} />
           </Button>
         </div>
@@ -392,6 +399,8 @@ function StockView({ stock }: { stock: StockResearchDetail }) {
         </div>
       </Card>
 
+      <ThesisHistory symbol={symbol} />
+
       {ai && (
         <Card>
           <CardLabel>AI Analysis</CardLabel>
@@ -433,6 +442,17 @@ function StockView({ stock }: { stock: StockResearchDetail }) {
           ))}
         </div>
       </Card>
+
+      {brokerModalOpen && primaryBroker && (
+        <BrokerHandoffModal
+          broker={primaryBroker}
+          stockSymbol={stock.symbol}
+          direction={stock.price.changeAbs >= 0 ? "long" : "short"}
+          rationale={stock.thesis?.thesis ?? "Fundamental analysis"}
+          confidence={stock.confidenceMeter}
+          onClose={() => setBrokerModalOpen(false)}
+        />
+      )}
     </div>
   );
 }

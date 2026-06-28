@@ -37,6 +37,28 @@ async function bootstrap() {
     credentials: true,
   });
 
+  // ── Security headers ──────────────────────────────────────────────
+  server.addHook("onSend", async (_request, reply, payload) => {
+    reply.header("X-Content-Type-Options", "nosniff");
+    reply.header("X-Frame-Options", "DENY");
+    reply.header("X-XSS-Protection", "0");
+    reply.header("Referrer-Policy", "strict-origin-when-cross-origin");
+    reply.header("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
+    return payload;
+  });
+
+  // ── Global error handler: sanitize all errors ─────────────────────
+  server.setErrorHandler((error, _request, reply) => {
+    const statusCode = error.statusCode ?? 500;
+    if (statusCode >= 500) {
+      server.log.error({ err: error }, `Unhandled error: ${error.message}`);
+    }
+    return reply.status(statusCode).send({
+      error: statusCode < 500 ? error.message : "Internal server error",
+      ...(process.env.NODE_ENV === "development" && { details: error.message }),
+    });
+  });
+
   // ── Health & status endpoints (always respond, even without DB) ────
   server.get("/healthz", async () => {
     try {
