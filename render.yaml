@@ -1,29 +1,30 @@
 # render.yaml
 # Render Blueprint — StockStory India
 # Architecture:
-#   Frontend (SPA) → Vercel (stockstory-india.com)
-#   Backend (API)  → Render  (api.stockstory-india.com)
-#   Database       → Neon    (PostgreSQL)
-#   Cache          → Upstash (Redis)
-# Deploys the backend API service on Render free tier.
+#   Frontend (SPA) + Backend (API proxy) → Render
+#   API serverless functions → Vercel
+#   Database → Neon (PostgreSQL)
+#   Cache → Upstash (Redis)
+# Deploys both the SPA (from dist/) and API proxy on Render free tier.
 #
-# ── Manual Dashboard setup required (sync: false) ──────────────────────────
-#   DATABASE_URL  → Neon PostgreSQL connection string
-#   COOKIE_SECRET → openssl rand -base64 64
-#   INDIANAPI_KEY → from stock.indianapi.in (optional, for live market data)
+# ── Required Environment Variables (set in Render Dashboard) ───────────
+#   DATABASE_URL    → Neon PostgreSQL connection string
+#   COOKIE_SECRET   → openssl rand -base64 64
+#   INDIANAPI_KEY   → from stock.indianapi.in
+#   VERCEL_API_URL  → URL of the Vercel deployment hosting /api/* (optional)
 #
-# ── Optional but recommended ────────────────────────────────────────────────
-#   REDIS_URL     → Upstash Redis free tier (for rate limiting + cache)
-#   GROQ_API_KEY → Groq LLM API key (free, for AI analysis features)
+# ── Optional ───────────────────────────────────────────────────────────
+#   REDIS_URL       → Upstash Redis free tier (for rate limiting + cache)
+#   GROQ_API_KEY    → Groq LLM API key (free, for AI analysis features)
 
 services:
   - type: web
-    name: stockstory-api
+    name: stockstory-app
     runtime: node
     region: singapore
     plan: free
     branch: main
-    buildCommand: npm ci && npm run compile:backend
+    buildCommand: npm ci && npm run build:docker
     startCommand: npm start
     healthCheckPath: /healthz
     autoDeploy: true
@@ -40,6 +41,14 @@ services:
         value: 10000
       - key: LOG_LEVEL
         value: info
+
+      # ── API Proxy: Vercel deployment hosting /api/* serverless fns ────
+      - key: VERCEL_API_URL
+        sync: false
+
+      # ── Self origin (for CORS when accessed via onrender.com domain) ──
+      - key: SELF_ORIGIN
+        sync: false
 
       # ── Database (PostgreSQL via Neon free tier) ───────────────────────
       - key: DATABASE_URL
@@ -60,7 +69,7 @@ services:
 
       # ── CORS ───────────────────────────────────────────────────────────
       - key: EXTRA_ALLOWED_ORIGINS
-        value: https://stockstory-india.com
+        value: https://stockstory-india.com,https://www.stockstory-india.com
 
       # ── Redis (optional — backend uses in-memory cache when absent) ────
       - key: REDIS_URL
