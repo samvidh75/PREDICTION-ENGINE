@@ -174,6 +174,29 @@ describe('fetchMarketBrainResearch', () => {
     expect(result.research.convictionScore).toBe(0);
   });
 
+  it('normalizes malformed evidence review flags before public rendering', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({
+        ...responsePayload,
+        research: {
+          ...responsePayload.research,
+          evidenceReview: {
+            needsReview: 'yes',
+            partial: ['fundamentals'],
+            missing: [],
+            summary: 'Some research evidence needs review.',
+          },
+        },
+      }),
+    }));
+
+    const result = await fetchMarketBrainResearch('TCS');
+
+    expect(result.research.evidenceReview.needsReview).toBe(true);
+  });
+
   it('filters unknown evidence domains from public client metadata', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
       ok: true,
