@@ -26,7 +26,7 @@
     "typecheck:vercel": "npm run typecheck:frontend",
     "typecheck:backend": "tsc -p tsconfig.backend.json --noEmit",
     "typecheck:active": "npm run typecheck:frontend && npm run typecheck:backend",
-    "prepare": "husky",
+    "prepare": "husky || true",
     "test": "vitest run",
     "test:unit": "node scripts/run-vitest-ci.mjs",
     "test:unit:ci": "npm run test:unit",
