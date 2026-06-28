@@ -121,6 +121,25 @@ describe('toMarketBrainResearchView', () => {
     expect(view.evidenceReview.summary).toContain('Needs review: Fundamentals.');
   });
 
+  it('returns evidence review arrays without mutating the engine result arrays', () => {
+    const result = evaluateIndiaEquity({
+      ...basePacket,
+      evidence: {
+        ...completeEvidence,
+        fundamentals: 'partial',
+        sector_context: 'missing',
+      },
+    });
+
+    const view = toMarketBrainResearchView(result);
+
+    view.evidenceReview.partial.push('prices');
+    view.evidenceReview.missing.push('technicals');
+
+    expect(result.partialEvidence).toEqual(['fundamentals']);
+    expect(result.missingEvidence).toEqual(['sector_context']);
+  });
+
   it('renders public evidence labels without raw domain keys', () => {
     const result = evaluateIndiaEquity({
       ...basePacket,
