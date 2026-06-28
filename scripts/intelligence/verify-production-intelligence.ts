@@ -109,6 +109,69 @@ async function main() {
     console.log(`  ${r.status === 'pass' ? '✅' : '❌'} ${symbols[i]}: ${r.detail} (${r.durationMs}ms)`);
   }
 
+  // 5. Analyst desk routes
+  console.log('\n── Analyst Desk Routes ──');
+  const analystRoutes = [
+  { name: 'Deep dive', path: `/api/analyst/company/${sampleSymbol}/deep-dive` },
+  { name: 'Earnings note', path: `/api/analyst/company/${sampleSymbol}/earnings-note` },
+  { name: 'Filing briefs', path: `/api/analyst/company/${sampleSymbol}/filing-briefs` },
+  { name: 'Sector brief', path: '/api/analyst/sector/Technology/brief' },
+  ];
+  for (const route of analystRoutes) {
+    const r = await checkEndpoint(`${url}${route.path}`);
+    results.push({ ...r, name: `Analyst: ${route.name}` });
+    const bodyCheck = r.status === 'pass';
+    const forbidden = /Buy now|Strong Buy|provider|backend|undefined|null|NaN/i.test(r.detail);
+    if (forbidden) {
+      results.push({ name: `Analyst safety: ${route.name}`, status: 'fail', detail: 'Forbidden language in response' });
+    }
+    console.log(`  ${bodyCheck ? '✅' : '❌'} ${route.name}: ${r.detail.slice(0, 80)}`);
+  }
+
+  // Q&A research question
+  try {
+    const qaRes = await fetch(`${url}/api/analyst/qa`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ question: 'Why is risk elevated?', symbol: sampleSymbol }),
+      signal: AbortSignal.timeout(15000),
+    });
+    const qaBody = await qaRes.json();
+    const qaText = JSON.stringify(qaBody);
+    const qaOk = qaRes.ok && qaBody?.data?.answer;
+    const qaForbidden = /Buy now|Strong Buy|provider|backend/i.test(qaText);
+    results.push({
+      name: 'Analyst: Q&A research',
+      status: qaOk && !qaForbidden ? 'pass' : 'fail',
+      detail: qaOk ? 'Research answer returned' : 'Q&A failed',
+    });
+    console.log(`  ${qaOk ? '✅' : '❌'} Q&A research question`);
+  } catch (err: any) {
+    results.push({ name: 'Analyst: Q&A research', status: 'fail', detail: err.message });
+    console.log(`  ❌ Q&A research question: ${err.message}`);
+  }
+
+  // Q&A advice request — must redirect safely
+  try {
+    const adviceRes = await fetch(`${url}/api/analyst/qa`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ question: 'Should I buy this stock?' }),
+      signal: AbortSignal.timeout(15000),
+    });
+    const adviceBody = await adviceRes.json();
+    const adviceText = String(adviceBody?.data?.answer ?? '');
+    const safe = adviceText.includes('research') && !/Buy now|Strong Buy/i.test(adviceText);
+    results.push({
+      name: 'Analyst: Q&A advice redirect',
+      status: safe ? 'pass' : 'fail',
+      detail: safe ? 'Safely redirected' : 'Unsafe advice response',
+    });
+    console.log(`  ${safe ? '✅' : '❌'} Q&A advice redirect`);
+  } catch (err: any) {
+    results.push({ name: 'Analyst: Q&A advice redirect', status: 'fail', detail: err.message });
+  }
+
   // Summary
   const passed = results.filter(r => r.status === 'pass').length;
   const failed = results.filter(r => r.status === 'fail').length;
