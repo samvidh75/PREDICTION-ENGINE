@@ -32,6 +32,8 @@ async function yahooQuote(symbol: string) {
       changePercent: prev > 0 ? Number((((latest - prev) / prev) * 100).toFixed(2)) : 0,
       volume: meta.regularMarketVolume ?? 0,
       marketCap: meta.marketCap ?? 0,
+      shortName: meta.shortName || null,
+      longName: meta.longName || null,
     };
   } catch { return null; }
 }
@@ -74,7 +76,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const payload = {
       success: true,
       symbol,
-      companyName: synthetic?.companyName || synthetic?.name || symbol,
+      companyName: synthetic?.companyName || synthetic?.name || yahoo?.longName || yahoo?.shortName || symbol,
       exchange: synthetic?.exchangeBadge || (synthetic?.exchange ?? "NSE"),
       exchangeBadge: synthetic?.exchangeBadge || "NSE",
       sector: synthetic?.sector || null,
