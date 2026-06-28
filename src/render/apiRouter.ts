@@ -8,7 +8,9 @@ import type { FastifyInstance } from "fastify";
 import { getPersistedStockResearch } from "../lib/stockResearchSnapshot.js";
 import { financialEngine } from "../services/intelligence/engines/FinancialEngine/index.js";
 import { technicalEngine } from "../services/intelligence/engines/TechnicalEngine/index.js";
-import type { FinancialMetrics, TechnicalMetrics } from "../services/intelligence/types.js";
+import { earningsEngine } from "../services/intelligence/engines/EarningsEngine/index.js";
+import { riskEngine } from "../services/intelligence/engines/RiskEngine/index.js";
+import type { EarningsMetrics, FinancialMetrics, RiskMetrics, TechnicalMetrics } from "../services/intelligence/types.js";
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -77,11 +79,23 @@ const KNOWN: Record<string, { founded: string; employees: string; segments: stri
   JSWSTEEL: { founded: "1982", employees: "40,000+", segments: ["Steel", "Power", "Cement"] },
 };
 
+// ── Symbol Normalization ──────────────────────────────────────────────────
+
+/** Normalize a stock symbol: strip BSE/NSE prefix, return clean symbol and Yahoo exchange suffix. */
+function parseSymbol(raw: string): { cleanSymbol: string; symbol: string; exchangeSuffix: string } {
+  const upper = raw.toUpperCase().trim();
+  if (upper.startsWith("BSE")) return { cleanSymbol: upper.slice(3), symbol: upper, exchangeSuffix: "BO" };
+  if (upper.startsWith("NSE")) return { cleanSymbol: upper.slice(3), symbol: upper.slice(3), exchangeSuffix: "NS" };
+  // If symbol is all digits, it's a BSE ISIN code → use .BO
+  if (/^\d+$/.test(upper)) return { cleanSymbol: upper, symbol: upper, exchangeSuffix: "BO" };
+  return { cleanSymbol: upper, symbol: upper, exchangeSuffix: "NS" };
+}
+
 // ── Yahoo Finance ──────────────────────────────────────────────────────────
 
-async function yahooQuote(symbol: string) {
+async function yahooQuote(symbol: string, exchangeSuffix = "NS") {
   try {
-    const ticker = `${symbol}.NS`;
+    const ticker = `${symbol}.${exchangeSuffix}`;
     const r = await fetch(
       `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(ticker)}?range=1d&interval=1m`,
       { headers: { "User-Agent": "Mozilla/5.0 StockStory/2.0" }, signal: AbortSignal.timeout(5_000) }
@@ -103,7 +117,7 @@ async function yahooQuote(symbol: string) {
   } catch { return null; }
 }
 
-async function yahooPriceHistory(symbol: string): Promise<Record<string, { label: string; price: number }[]>> {
+async function yahooPriceHistory(symbol: string, exchangeSuffix = "NS"): Promise<Record<string, { label: string; price: number }[]>> {
   const frames: Record<string, { label: string; price: number }[]> = {};
   const configs: [string, string, string][] = [
     ["1W", "5d", "15m"], ["1M", "1mo", "1d"], ["3M", "3mo", "1d"],
@@ -111,7 +125,7 @@ async function yahooPriceHistory(symbol: string): Promise<Record<string, { label
   ];
   for (const [key, range, interval] of configs) {
     try {
-      const ticker = `${symbol}.NS`;
+      const ticker = `${symbol}.${exchangeSuffix}`;
       const r = await fetch(
         `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(ticker)}?range=${range}&interval=${interval}`,
         { headers: { "User-Agent": "Mozilla/5.0 StockStory/2.0" }, signal: AbortSignal.timeout(6_000) }
@@ -373,6 +387,9 @@ export default async function registerApiRoutes(server: FastifyInstance) {
     const symbol = String((req.query as any)?.symbol ?? "").toUpperCase().trim();
     if (!symbol) return reply.status(400).send({ error: "symbol required" });
 
+    // Normalize exchange-prefixed symbols (BSE502865 → clean=502865, suffix=BO)
+    const { cleanSymbol, exchangeSuffix } = parseSymbol(symbol);
+
     const cached = stockCache.get(symbol);
     if (cached && Date.now() < cached.expiresAt) {
       reply.header("X-Cache", "HIT");
@@ -381,11 +398,11 @@ export default async function registerApiRoutes(server: FastifyInstance) {
     }
 
     const [yahoo, fund, synthetic, priceHistory, news] = await Promise.all([
-      yahooQuote(symbol),
-      indianApiFunds(symbol),
-      getPersistedStockResearch(symbol).catch(() => null),
-      yahooPriceHistory(symbol),
-      yahooNews(symbol),
+      yahooQuote(cleanSymbol, exchangeSuffix),
+      indianApiFunds(cleanSymbol),
+      getPersistedStockResearch(cleanSymbol).catch(() => null),
+      yahooPriceHistory(cleanSymbol, exchangeSuffix),
+      yahooNews(cleanSymbol),
     ]);
 
     const fundData = fund || {};
@@ -405,9 +422,9 @@ export default async function registerApiRoutes(server: FastifyInstance) {
     const scores = (synthetic?.scores ?? {}) as Record<string, number>;
     const health = scores.health ?? Math.round((scores.quality ?? 50) * 0.6 + (scores.risk ?? 50) * 0.4);
     const industryPe = SECTOR_PE_MEDIAN[sector] || 20;
-    const known = KNOWN[symbol];
+    const known = KNOWN[cleanSymbol];
     const financialsData = deriveFinancials(marketCapCr, pe, sector, revGrowth, profGrowth);
-    const shareholdingData = deriveShareholding(symbol, sector);
+    const shareholdingData = deriveShareholding(cleanSymbol, sector);
     const thesisData = generateThesis(scores, pe, roe);
 
     const payload = {
@@ -492,8 +509,9 @@ export default async function registerApiRoutes(server: FastifyInstance) {
           let yahooPrice: number | null = null;
           let yahooChange: number | null = null;
           let yahooChangePct: number | null = null;
+          const exchSuffix = r.exchange === "BSE" ? "BO" : "NS";
           try {
-            const ticker = `${r.symbol}.NS`;
+            const ticker = `${r.symbol}.${exchSuffix}`;
             const yr = await fetch(
               `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(ticker)}?range=1d&interval=1m`,
               { headers: { "User-Agent": "Mozilla/5.0 StockStory/2.0" }, signal: AbortSignal.timeout(3_000) }
@@ -537,12 +555,13 @@ export default async function registerApiRoutes(server: FastifyInstance) {
   server.get("/api/intelligence/financial", async (req, reply) => {
     const symbol = String((req.query as any)?.symbol ?? "").toUpperCase().trim();
     if (!symbol) return reply.status(400).send({ error: "symbol required" });
+    const { cleanSymbol, exchangeSuffix } = parseSymbol(symbol);
 
     try {
       const [yahoo, fund, synthetic] = await Promise.all([
-        yahooQuote(symbol),
-        indianApiFunds(symbol),
-        getPersistedStockResearch(symbol).catch(() => null),
+        yahooQuote(cleanSymbol, exchangeSuffix),
+        indianApiFunds(cleanSymbol),
+        getPersistedStockResearch(cleanSymbol).catch(() => null),
       ]);
 
       const fundData = fund || {};
@@ -585,11 +604,12 @@ export default async function registerApiRoutes(server: FastifyInstance) {
   server.get("/api/intelligence/technical", async (req, reply) => {
     const symbol = String((req.query as any)?.symbol ?? "").toUpperCase().trim();
     if (!symbol) return reply.status(400).send({ error: "symbol required" });
+    const { cleanSymbol, exchangeSuffix } = parseSymbol(symbol);
 
     try {
       const [yahoo, priceHistory] = await Promise.all([
-        yahooQuote(symbol),
-        yahooPriceHistory(symbol),
+        yahooQuote(cleanSymbol, exchangeSuffix),
+        yahooPriceHistory(cleanSymbol, exchangeSuffix),
       ]);
 
       const price = yahoo?.price ?? 0;
@@ -609,6 +629,157 @@ export default async function registerApiRoutes(server: FastifyInstance) {
         direction: result.direction,
         trend: result.trend,
         momentumStatus: result.momentumStatus,
+        details: result,
+        timestamp: new Date().toISOString(),
+      };
+    } catch (err: any) {
+      return reply.status(502).send({ error: err.message || String(err), symbol });
+    }
+  });
+
+  // GET /api/intelligence/risk?symbol=TCS
+  // HIGHER score = LOWER risk
+  server.get("/api/intelligence/risk", async (req, reply) => {
+    const symbol = String((req.query as any)?.symbol ?? "").toUpperCase().trim();
+    if (!symbol) return reply.status(400).send({ error: "symbol required" });
+    const { cleanSymbol, exchangeSuffix } = parseSymbol(symbol);
+
+    try {
+      const [yahoo, fund, synthetic, priceHistory] = await Promise.all([
+        yahooQuote(cleanSymbol, exchangeSuffix),
+        indianApiFunds(cleanSymbol),
+        getPersistedStockResearch(cleanSymbol).catch(() => null),
+        yahooPriceHistory(cleanSymbol, exchangeSuffix),
+      ]);
+
+      const fundData = fund || {};
+      const price = yahoo?.price ?? synthetic?.price ?? 0;
+      const marketCapCr = Math.round(((yahoo?.marketCap ?? synthetic?.marketCap ?? 0) / 1e7) * 100) / 100;
+
+      // Compute volatility from price history
+      const dailyFrame = priceHistory["1M"] || priceHistory["3M"] || [];
+      const dailyPrices = dailyFrame.map((p: { price: number }) => p.price).filter((p: number) => p > 0);
+      const volatility = dailyPrices.length >= 5
+        ? computeVolatility(dailyPrices)
+        : undefined;
+
+      // Compute 52-week range
+      const yearFrame = priceHistory["1Y"] || [];
+      const yearPrices = yearFrame.map((p: { price: number }) => p.price).filter((p: number) => p > 0);
+      let weeklyRange: number | undefined;
+      if (yearPrices.length > 1 && price > 0) {
+        const yearLow = Math.min(...yearPrices);
+        if (yearLow > 0) {
+          weeklyRange = Number((((price - yearLow) / yearLow) * 100).toFixed(1));
+        }
+      }
+
+      const metrics: RiskMetrics = {
+        volatility,
+        beta: undefined, // Requires market index comparison — not available in basic fetch
+        maxDrawdown: undefined,
+        weeklyRange,
+        debtToEquity: n(fundData.debt_to_equity) ?? synthetic?.debtToEquity ?? undefined,
+        currentRatio: n(fundData.current_ratio) ?? undefined,
+        interestCoverage: n(fundData.interest_coverage) ?? undefined,
+        cashReserves: undefined,
+        customerConcentration: undefined,
+        revenuePredictability: undefined,
+        competitiveMoat: undefined,
+        executionRisk: undefined,
+        profitabilityAtMinus20Revenue: undefined,
+        sharpeRatio: undefined,
+        valueAtRisk: undefined,
+        regulatoryRisk: undefined,
+        litigationRisk: undefined,
+        obsolescenceRisk: undefined,
+        disruptionRisk: undefined,
+        lastUpdated: new Date(),
+        symbol,
+      };
+
+      const result = riskEngine.analyze(metrics);
+
+      reply.header("Cache-Control", "public, s-maxage=300");
+      return {
+        symbol,
+        engine: "risk",
+        score: result.overall,
+        riskProfile: result.riskProfile,
+        confidence: result.confidence,
+        volatility,
+        debtToEquity: metrics.debtToEquity,
+        maxDrawdown: metrics.maxDrawdown,
+        sharpeRatio: metrics.sharpeRatio,
+        details: result,
+        timestamp: new Date().toISOString(),
+      };
+    } catch (err: any) {
+      return reply.status(502).send({ error: err.message || String(err), symbol });
+    }
+  });
+
+  // GET /api/intelligence/earnings?symbol=TCS
+  // Considers: consistency + forward + beat + quality + guidance
+  server.get("/api/intelligence/earnings", async (req, reply) => {
+    const symbol = String((req.query as any)?.symbol ?? "").toUpperCase().trim();
+    if (!symbol) return reply.status(400).send({ error: "symbol required" });
+    const { cleanSymbol, exchangeSuffix } = parseSymbol(symbol);
+
+    try {
+      const [yahoo, fund, synthetic] = await Promise.all([
+        yahooQuote(cleanSymbol, exchangeSuffix),
+        indianApiFunds(cleanSymbol),
+        getPersistedStockResearch(cleanSymbol).catch(() => null),
+      ]);
+
+      const fundData = fund || {};
+      const price = yahoo?.price ?? synthetic?.price ?? 0;
+
+      // Build synthetic earnings history from available data
+      const eps = n(fundData.eps) ?? synthetic?.eps ?? 0;
+      const revenueGrowthYoY = n(fundData.revenue_growth_1y ?? fundData.revenue_growth) ?? synthetic?.revenueGrowth ?? 0;
+      const profitGrowth = n(fundData.profit_growth) ?? synthetic?.profitGrowth ?? 0;
+      const netMargin = n(fundData.net_margin ?? fundData.net_profit_margin) ?? undefined;
+      const forwardPE = n(fundData.forward_pe ?? fundData.pe_ratio) ?? undefined;
+      const peg = n(fundData.peg_ratio) ?? undefined;
+      const fcfMargin = n(fundData.fcf_margin ?? fundData.free_cash_flow_margin) ?? undefined;
+
+      // Construct minimal earnings history from available growth rates
+      const history = price > 0 && eps > 0
+        ? [
+            { quarter: `Q2${new Date().getFullYear()}`, eps, epsYoY: profitGrowth, revenue: 0, revenueYoY: revenueGrowthYoY, margin: netMargin ?? 0, surprise: 0, guidanceHit: true },
+          ]
+        : [];
+
+      const metrics: EarningsMetrics = {
+        history,
+        currentGuidance: {
+          epsGrowth: profitGrowth > 0 ? profitGrowth : 0,
+          revenueGrowth: revenueGrowthYoY > 0 ? revenueGrowthYoY : 0,
+        },
+        forwardPE,
+        peg,
+        fcfMargin,
+        oneTimeItems: undefined,
+        capexToRevenue: undefined,
+        lastUpdated: new Date(),
+        fiscalYear: new Date().getFullYear(),
+      };
+
+      const result = await earningsEngine.analyze(metrics);
+
+      reply.header("Cache-Control", "public, s-maxage=300");
+      return {
+        symbol,
+        engine: "earnings",
+        score: result.overall,
+        confidence: result.confidence,
+        epsGrowth5Y: result.epsGrowth5Y,
+        epsGrowthTrend: result.epsGrowthTrend,
+        beatStreak: result.beatStreak,
+        earningsQuality: result.earningsQuality,
+        revenueQuality: result.revenueQuality,
         details: result,
         timestamp: new Date().toISOString(),
       };
