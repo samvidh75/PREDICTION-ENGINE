@@ -63,6 +63,7 @@ async function bootstrap() {
     env: process.env.NODE_ENV ?? "development",
     db: process.env.DATABASE_URL ? "configured" : "missing",
     api: "native (Render)",
+    cwd: process.cwd(),
   }));
 
   // ── API routes: /api/stock, /api/search ────────────────────────────
@@ -75,7 +76,11 @@ async function bootstrap() {
   await server.register(staticFiles, {
     root: distPath,
     prefix: "/",
-    index: ["index.html"],
+  });
+
+  // ── Root explicitly serves index.html ───────────────────────────────
+  server.get("/", (req, reply) => {
+    return reply.sendFile("index.html");
   });
 
   // ── SPA fallback: serve index.html for client-side routes ──────────
