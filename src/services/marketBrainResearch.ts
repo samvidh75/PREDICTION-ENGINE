@@ -128,8 +128,14 @@ const asFactorViews = (value: unknown): MarketBrainFactorView[] => (Array.isArra
   })
   : []);
 
+const copyEmptyEvidenceReview = (): MarketBrainEvidenceReviewView => ({
+  ...EMPTY_EVIDENCE_REVIEW,
+  partial: [...EMPTY_EVIDENCE_REVIEW.partial],
+  missing: [...EMPTY_EVIDENCE_REVIEW.missing],
+});
+
 const normalizeEvidenceReview = (value: unknown): MarketBrainEvidenceReviewView => {
-  if (!isRecord(value)) return EMPTY_EVIDENCE_REVIEW;
+  if (!isRecord(value)) return copyEmptyEvidenceReview();
   const candidate = value as Partial<MarketBrainEvidenceReviewView>;
   const partial = asEvidenceDomains(candidate.partial);
   const missing = asEvidenceDomains(candidate.missing);
