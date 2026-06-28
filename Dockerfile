@@ -10,7 +10,7 @@ WORKDIR /app
 
 # Install dependencies (leverages Docker layer cache)
 COPY package.json package-lock.json ./
-RUN npm ci --frozen-lockfile
+RUN npm install
 
 # Copy source and build
 COPY . .
@@ -31,7 +31,7 @@ ENV NODE_ENV=production
 
 # Install all dependencies (tsx needed for runtime path alias resolution)
 COPY package.json package-lock.json ./
-RUN npm ci --frozen-lockfile
+RUN npm install
 
 # Remove dev dependencies except tsx (needed for runtime)
 RUN npm prune --omit=dev || true && \
