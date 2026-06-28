@@ -93,11 +93,26 @@ const asStringArray = (value: unknown): string[] => (Array.isArray(value)
   ? value.map(asPublicText).filter((item) => item.length > 0)
   : []);
 
-const asEvidenceDomains = (value: unknown): MarketBrainEvidenceDomain[] => (Array.isArray(value)
-  ? value.filter((item): item is MarketBrainEvidenceDomain => (
-    typeof item === 'string' && MARKET_BRAIN_EVIDENCE_DOMAINS.has(item as MarketBrainEvidenceDomain)
-  ))
-  : []);
+const asEvidenceDomains = (value: unknown): MarketBrainEvidenceDomain[] => {
+  if (!Array.isArray(value)) return [];
+
+  const domains: MarketBrainEvidenceDomain[] = [];
+  const seen = new Set<MarketBrainEvidenceDomain>();
+
+  value.forEach((item) => {
+    if (!(typeof item === 'string' && MARKET_BRAIN_EVIDENCE_DOMAINS.has(item as MarketBrainEvidenceDomain))) {
+      return;
+    }
+
+    const domain = item as MarketBrainEvidenceDomain;
+    if (!seen.has(domain)) {
+      seen.add(domain);
+      domains.push(domain);
+    }
+  });
+
+  return domains;
+};
 
 const isPublicScore = (value: unknown): value is number => (
   typeof value === 'number' && Number.isFinite(value) && value >= 0 && value <= 100
