@@ -18,23 +18,7 @@
   ],
   "rewrites": [
     {
-      "source": "/stock/:symbol",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/scanner",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/watchlist",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/compare",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/((?!api/).*)",
+      "source": "/(.*)",
       "destination": "/index.html"
     }
   ]
