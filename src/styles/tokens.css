@@ -5,9 +5,9 @@
   --bg-card-hover:  #FAFAFA;
   --bg-chip:        #F5F5F5;
 
-  --brand:          #635BFF;
-  --brand-light:    #EEEDFF;
-  --brand-dark:     #4E47E6;
+  --brand:          #007AFF;
+  --brand-light:    #E5F1FF;
+  --brand-dark:     #0062CC;
 
   --green:          #13C23E;
   --green-light:    #E8F9ED;
@@ -24,7 +24,7 @@
 
   --border:         #E5E5E5;
   --border-strong:  #D9D9D9;
-  --border-focus:   #635BFF;
+  --border-focus:   #007AFF;
 
   --font-sans:      -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font:           -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -46,7 +46,7 @@
   --surface-hover:  var(--bg-card-hover);
 
   --brand-hover:    var(--brand-dark);
-  --brand-tint:     rgba(99,91,255,0.15);
+  --brand-tint:     rgba(0,122,255,0.15);
 
   --text-900:       var(--text-primary);
   --text-700:       var(--text-body);
@@ -60,7 +60,7 @@
   --sh-card:        var(--shadow-card);
   --sh-raised:      var(--shadow-raised);
   --sh-float:       var(--shadow-modal);
-  --sh-focus:       0 0 0 2px rgba(99,91,255,0.25);
+  --sh-focus:       0 0 0 2px rgba(0,122,255,0.25);
 
   --r-xs:           var(--radius-sm);
   --r-md:           var(--radius-md);
