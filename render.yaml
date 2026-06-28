@@ -1,7 +1,11 @@
 # render.yaml
 # Render Blueprint — StockStory India
+# Architecture:
+#   Frontend (SPA) → Vercel (stockstory-india.com)
+#   Backend (API)  → Render  (api.stockstory-india.com)
+#   Database       → Neon    (PostgreSQL)
+#   Cache          → Upstash (Redis)
 # Deploys the backend API service on Render free tier.
-# Frontend remains on Vercel.
 #
 # ── Manual Dashboard setup required (sync: false) ──────────────────────────
 #   DATABASE_URL  → Neon PostgreSQL connection string
