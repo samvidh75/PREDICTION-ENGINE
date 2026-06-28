@@ -23,7 +23,66 @@ const PORT = parseInt(process.env.PORT ?? "10000", 10);
 const HOST = process.env.HOST ?? "0.0.0.0";
 const SELF_ORIGIN = process.env.SELF_ORIGIN ?? "https://stockstory-api.onrender.com";
 
+// ── Lightweight metrics for /metrics endpoint ────────────────────
+const metrics = {
+  startTime: Date.now(),
+  requestCount: 0,
+  apiRequestCount: 0,
+  lastRequestTime: 0,
+  errors: 0,
+};
+
+// ── Credential validation at startup ─────────────────────────────
+const PLACEHOLDER_PATTERNS = [
+  /^your[-_]/, /^changeme$/i, /^test$/, /^placeholder$/i,
+  /^sk-[a-zA-Z0-9]+$/, /^pk-[a-zA-Z0-9]+$/, // raw "sk-" / "pk-" without proper key suffix
+  /^[a-zA-Z0-9]{8}$/,                        // too short to be real
+];
+
+const REQUIRED_PROD_SECRETS = [
+  { key: "COOKIE_SECRET", minLen: 32, hint: "openssl rand -base64 64" },
+  { key: "DATABASE_URL", minLen: 20, hint: "Neon PostgreSQL connection string" },
+  { key: "FIREBASE_PRIVATE_KEY", minLen: 50, hint: "Firebase Admin private key" },
+  { key: "INDIANAPI_KEY", minLen: 10, hint: "API key from stock.indianapi.in" },
+];
+
+function validateCredentials(isProduction: boolean): string[] {
+  const issues: string[] = [];
+  if (!isProduction) return issues;
+
+  for (const { key, minLen, hint } of REQUIRED_PROD_SECRETS) {
+    const val = process.env[key];
+    if (!val || val.length < minLen) {
+      issues.push(`INVALID: ${key} is missing or too short (min ${minLen} chars). Expected: ${hint}`);
+      continue;
+    }
+    for (const pattern of PLACEHOLDER_PATTERNS) {
+      if (pattern.test(val)) {
+        issues.push(`INVALID: ${key} matches a placeholder pattern (${pattern.source}). Replace with a real credential.`);
+      }
+    }
+  }
+
+  // FIREBASE_PRIVATE_KEY must contain PEM header
+  const fbKey = process.env.FIREBASE_PRIVATE_KEY;
+  if (fbKey && !fbKey.includes("BEGIN PRIVATE KEY")) {
+    issues.push("INVALID: FIREBASE_PRIVATE_KEY does not contain 'BEGIN PRIVATE KEY'. It must be a valid PEM-formatted private key.");
+  }
+
+  return issues;
+}
+
 async function bootstrap() {
+  // Validate credentials before starting server
+  const credentialIssues = validateCredentials(process.env.NODE_ENV === "production");
+  for (const issue of credentialIssues) {
+    console.error(`[credential-check] ${issue}`);
+  }
+  if (credentialIssues.length > 0) {
+    console.error("[credential-check] Exiting due to invalid credentials.");
+    process.exit(1);
+  }
+
   const server = Fastify({ logger: { level: process.env.LOG_LEVEL ?? "info" } });
 
   // ── CORS: allow the production domain + Render origin ──────────────
@@ -45,6 +104,45 @@ async function bootstrap() {
     reply.header("Referrer-Policy", "strict-origin-when-cross-origin");
     reply.header("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
     return payload;
+  });
+
+  // ── Request logging & metrics for /api/* routes ──────────────────
+  server.addHook("onRequest", async (request) => {
+    metrics.requestCount++;
+    if (request.url.startsWith("/api/")) {
+      metrics.apiRequestCount++;
+      (request as any).__startTime = Date.now();
+    }
+  });
+
+  server.addHook("onResponse", async (request, reply) => {
+    if (!request.url.startsWith("/api/")) return;
+    const duration = Date.now() - ((request as any).__startTime ?? Date.now());
+    metrics.lastRequestTime = Date.now();
+    if (reply.statusCode >= 500) metrics.errors++;
+    server.log.info({ method: request.method, url: request.url, status: reply.statusCode, durationMs: duration },
+      `${request.method} ${request.url} → ${reply.statusCode} (${duration}ms)`);
+  });
+
+  // ── Metrics endpoint ─────────────────────────────────────────────
+  server.get("/metrics", async () => {
+    const uptime = Math.floor((Date.now() - metrics.startTime) / 1000);
+    let dbStatus: string;
+    try {
+      await dbAdapter.query("SELECT 1");
+      dbStatus = "connected";
+    } catch {
+      dbStatus = "unavailable";
+    }
+    return {
+      uptime,
+      requestCount: metrics.requestCount,
+      apiRequestCount: metrics.apiRequestCount,
+      errors: metrics.errors,
+      dbStatus,
+      nodeVersion: process.version,
+      env: process.env.NODE_ENV ?? "development",
+    };
   });
 
   // ── Global error handler: sanitize all errors ─────────────────────
@@ -89,7 +187,9 @@ async function bootstrap() {
       indexExists = existsSync(indexPath);
       const { readdirSync } = await import("fs");
       distFiles = readdirSync(distPath).slice(0, 20);
-    } catch {}
+    } catch {
+      // ignore — distPath may not exist on first deploy
+    }
     return {
       name: "stockstory-render",
       node: process.version,
@@ -197,6 +297,11 @@ async function bootstrap() {
 
   await server.listen({ port: PORT, host: HOST });
   server.log.info(`Render server listening on ${HOST}:${PORT} — SPA served from ${distPath}`);
+
+  // ── Warm-up: self-ping to pre-warm DB pool, caches, and connections ─
+  server.inject({ method: "GET", url: "/healthz" }).then(res => {
+    server.log.info(`Warm-up /healthz → ${res.statusCode}`);
+  }).catch(() => {});
 }
 
 bootstrap().catch((err) => {

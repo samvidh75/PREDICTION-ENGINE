@@ -42,12 +42,16 @@ function n(v: unknown): number | undefined {
   return Number.isFinite(p) ? p : undefined;
 }
 
-/** Auth preHandler — verifies Firebase ID token via Admin SDK on write routes. */
+/** Auth preHandler — verifies Firebase ID token via Admin SDK on write routes.
+ *  Blocks unauthenticated requests in production. In development, logs and allows through. */
 async function requireAuth(req: any, reply: any) {
   try {
     const auth = req.headers?.authorization;
     if (!auth || !auth.startsWith("Bearer ")) {
       req.log.warn({ url: req.url }, "Unauthenticated write attempt — no Bearer token");
+      if (process.env.NODE_ENV === "production") {
+        return reply.status(401).send({ error: "Authentication required" });
+      }
       (req as any).uid = null;
       return;
     }
@@ -55,12 +59,18 @@ async function requireAuth(req: any, reply: any) {
     const decoded = await verifyFirebaseToken(token);
     if (!decoded) {
       req.log.warn({ url: req.url }, "Invalid Firebase token");
+      if (process.env.NODE_ENV === "production") {
+        return reply.status(401).send({ error: "Authentication required" });
+      }
       (req as any).uid = null;
       return;
     }
     (req as any).uid = decoded.uid;
   } catch (err) {
     req.log.warn({ url: req.url, err }, "Firebase token verification failed");
+    if (process.env.NODE_ENV === "production") {
+      return reply.status(401).send({ error: "Authentication required" });
+    }
     (req as any).uid = null;
   }
 }

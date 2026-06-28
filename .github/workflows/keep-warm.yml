@@ -1,0 +1,14 @@
+name: Keep Render Warm
+
+on:
+  schedule:
+    # Every 14 min during business hours IST (00:00-18:00 UTC = 05:30-23:30 IST)
+    - cron: '*/14 0-18 * * *'
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping /healthz
+        run: curl -fsS -o /dev/null -w "%{http_code}" https://stockstory-api.onrender.com/healthz
