@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { evaluateIndiaEquity } from './indiaMarketBrain';
+import { MARKET_BRAIN_FACTOR_KEYS } from './marketBrainGuardrails';
 import { toMarketBrainResearchView } from './researchContract';
 
 const basePacket = {
@@ -52,6 +53,7 @@ describe('toMarketBrainResearchView', () => {
     expect(view.symbol).toBe('SAMPLE');
     expect(view.headline).toContain('conviction');
     expect(view.factorViews).toHaveLength(7);
+    expect(view.factorViews.map((factor) => factor.key)).toEqual(MARKET_BRAIN_FACTOR_KEYS);
     expect(view.methodNote).toContain('Research-only');
     expect(view.evidenceReview.needsReview).toBe(false);
     expect(view.evidenceReview.summary).toBe('Required research evidence is available for this view.');
