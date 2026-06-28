@@ -90,8 +90,10 @@ const EMPTY_EVIDENCE_REVIEW: MarketBrainEvidenceReviewView = {
   summary: 'Research evidence status is unavailable for this view.',
 };
 
+const asTrimmedString = (value: unknown): string => (typeof value === 'string' ? value.trim() : '');
+
 const asStringArray = (value: unknown): string[] => (Array.isArray(value)
-  ? value.filter((item): item is string => typeof item === 'string' && item.trim().length > 0)
+  ? value.map(asTrimmedString).filter((item) => item.length > 0)
   : []);
 
 const asEvidenceDomains = (value: unknown): MarketBrainEvidenceDomain[] => (Array.isArray(value)
@@ -107,16 +109,25 @@ const isPublicScore = (value: unknown): value is number => (
 const asPublicScore = (value: unknown): number => (isPublicScore(value) ? value : 0);
 
 const asFactorViews = (value: unknown): MarketBrainFactorView[] => (Array.isArray(value)
-  ? value.filter((item): item is MarketBrainFactorView => {
-    if (!item || typeof item !== 'object') return false;
+  ? value.flatMap((item): MarketBrainFactorView[] => {
+    if (!item || typeof item !== 'object') return [];
     const candidate = item as Partial<MarketBrainFactorView>;
-    return typeof candidate.key === 'string'
+    const label = asTrimmedString(candidate.label);
+    const summary = asTrimmedString(candidate.summary);
+    if (!(typeof candidate.key === 'string'
       && MARKET_BRAIN_FACTOR_KEYS.has(candidate.key as MarketBrainFactorKey)
-      && typeof candidate.label === 'string'
-      && candidate.label.trim().length > 0
-      && typeof candidate.summary === 'string'
-      && candidate.summary.trim().length > 0
-      && isPublicScore(candidate.score);
+      && label.length > 0
+      && summary.length > 0
+      && isPublicScore(candidate.score))) {
+      return [];
+    }
+
+    return [{
+      key: candidate.key as MarketBrainFactorKey,
+      label,
+      score: candidate.score,
+      summary,
+    }];
   })
   : []);
 
@@ -124,19 +135,16 @@ const normalizeEvidenceReview = (value: Partial<MarketBrainEvidenceReviewView> |
   if (!value) return EMPTY_EVIDENCE_REVIEW;
   const partial = asEvidenceDomains(value.partial);
   const missing = asEvidenceDomains(value.missing);
+  const summary = asTrimmedString(value.summary) || EMPTY_EVIDENCE_REVIEW.summary;
   const needsReview = value.needsReview ?? (partial.length > 0 || missing.length > 0);
 
   return {
     needsReview,
     partial,
     missing,
-    summary: typeof value.summary === 'string' && value.summary.trim().length > 0
-      ? value.summary
-      : EMPTY_EVIDENCE_REVIEW.summary,
+    summary,
   };
 };
-
-const asTrimmedString = (value: unknown): string => (typeof value === 'string' ? value.trim() : '');
 
 const normalizeResearchResponse = (payload: Partial<MarketBrainResearchResponse>): MarketBrainResearchResponse => {
   const research = payload.research as Partial<MarketBrainResearchView>;
@@ -151,11 +159,14 @@ const normalizeResearchResponse = (payload: Partial<MarketBrainResearchResponse>
       symbol: normalizeSymbol(symbol),
       companyName,
       convictionScore: asPublicScore(research.convictionScore),
+      headline: asTrimmedString(research.headline),
       thesis: asStringArray(research.thesis),
       risksToReview: asStringArray(research.risksToReview),
       whatToWatch: asStringArray(research.whatToWatch),
       evidenceReview: normalizeEvidenceReview(research.evidenceReview),
       factorViews: asFactorViews(research.factorViews),
+      methodNote: asTrimmedString(research.methodNote),
+      generatedAt: asTrimmedString(research.generatedAt),
     },
   };
 };
