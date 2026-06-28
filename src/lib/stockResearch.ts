@@ -295,13 +295,60 @@ function buildTimeline(symbol: string, health: number | null): Array<{ day: stri
 }
 
 function buildPriceHistory(symbol: string, price: number): StockResearchDetail["priceHistory"] {
-  const frames = { "1W": 7, "1M": 6, "3M": 7, "1Y": 8, "5Y": 8 } as const;
+  // Build realistic price paths with drift and volatility.
+  // Longer timeframes show more compound growth anchored at current price.
+  const frames: Record<string, { count: number; label: string; vol: number; drift: number }> = {
+    "1W": { count: 7,  label: "day",  vol: 0.015, drift: 0.001 },   // 7 trading days
+    "1M": { count: 22, label: "day",  vol: 0.018, drift: 0.002 },   // ~1 trading month
+    "3M": { count: 13, label: "week", vol: 0.035, drift: 0.015 },   // 13 weeks
+    "1Y": { count: 12, label: "mon",  vol: 0.05,  drift: 0.06 },    // 12 months
+    "5Y": { count: 20, label: "q",    vol: 0.09,  drift: 0.35 },    // 20 quarters
+  } as const;
+
   const output: StockResearchDetail["priceHistory"] = { "1W": [], "1M": [], "3M": [], "1Y": [], "5Y": [] };
-  for (const [frame, points] of Object.entries(frames) as Array<[keyof typeof frames, number]>) {
-    output[frame] = Array.from({ length: points }, (_, index) => ({
-      label: `${frame}-${index + 1}`,
-      price: round(price * (1 + seeded(`${symbol}:${frame}:${index}`, -0.08, 0.12, 4)), 2),
-    }));
+
+  // Compute base drift from the stock's daily change to anchor trend direction
+  // (use changePercent to know if stock recently went up/down)
+  const dailyChange = 0.0005; // small default drift
+
+  for (const [frame, cfg] of Object.entries(frames) as Array<[keyof typeof frames, { count: number; label: string; vol: number; drift: number }]>) {
+    // Start with current price, walk backwards to generate price history
+    const prices: number[] = [price];
+    for (let i = 0; i < cfg.count - 1; i++) {
+      const prev = prices[prices.length - 1];
+      // Geometric Brownian Motion style: drift up + random walk
+      const stepDrift = cfg.drift / Math.max(1, Math.sqrt(cfg.count));
+      const stepVol = cfg.vol / Math.max(1, Math.sqrt(cfg.count));
+      const noise = seeded(`${symbol}:${frame}:${i}`, -1, 1, 4);
+      prices.push(round(prev * (1 + stepDrift + stepVol * noise), 2));
+    }
+    // Reverse so oldest → newest for chart display
+    prices.reverse();
+
+    // Generate proper date labels
+    const now = new Date();
+    output[frame] = prices.map((p, i) => {
+      let label: string;
+      if (cfg.label === "day") {
+        const d = new Date(now);
+        d.setDate(d.getDate() - (cfg.count - 1 - i));
+        label = d.toLocaleDateString("en-IN", { day: "2-digit", month: "short" });
+      } else if (cfg.label === "week") {
+        const d = new Date(now);
+        d.setDate(d.getDate() - (cfg.count - 1 - i) * 7);
+        label = d.toLocaleDateString("en-IN", { day: "2-digit", month: "short" });
+      } else if (cfg.label === "mon") {
+        const d = new Date(now);
+        d.setMonth(d.getMonth() - (cfg.count - 1 - i));
+        label = d.toLocaleDateString("en-IN", { month: "short", year: "2-digit" });
+      } else {
+        // quarterly
+        const d = new Date(now);
+        d.setMonth(d.getMonth() - (cfg.count - 1 - i) * 3);
+        label = `Q${Math.ceil((d.getMonth() + 1) / 3)} ${String(d.getFullYear()).slice(2)}`;
+      }
+      return { label, price: p };
+    });
   }
   return output;
 }
@@ -376,26 +423,73 @@ function buildFinancialSeries(summary: StockResearchSummary): StockResearchDetai
   };
 }
 
-function buildShareholding(symbol: string): StockResearchDetail["shareholding"] {
-  const basePromoter = seeded(`${symbol}:promoter`, 18, 58, 1);
-  const baseFii = seeded(`${symbol}:fii`, 12, 34, 1);
-  const baseDii = seeded(`${symbol}:dii`, 10, 28, 1);
-  const baseRetail = clamp(round(100 - basePromoter - baseFii - baseDii, 1), 6, 30);
-  // 6 quarterly periods for richer historical view
+function buildShareholding(symbol: string, sector: string): StockResearchDetail["shareholding"] {
+  // Sector-based realistic shareholding patterns (promoter ranges)
+  const promoterBySector: Record<string, [number, number]> = {
+    "Banking & Finance":      [45, 65],
+    "Information Technology": [40, 65],
+    "Pharmaceuticals":        [45, 70],
+    "Energy & Oil":           [50, 80],
+    "Infrastructure":         [50, 75],
+    "Automotive":             [45, 70],
+    "Materials & Mining":     [50, 75],
+    "Consumer Goods":         [45, 65],
+    "Retail":                 [40, 60],
+    "Telecommunications":     [50, 75],
+    "Media & Entertainment":  [40, 60],
+    "Real Estate":            [45, 65],
+    "Healthcare":             [45, 65],
+    "Utilities":              [55, 80],
+  };
+  const [promMin, promMax] = Object.entries(promoterBySector).find(([key]) =>
+    sector?.toLowerCase().includes(key.toLowerCase())
+  )?.[1] ?? [45, 65];
+
+  const basePromoter = seeded(`${symbol}:promoter_core`, promMin, promMax, 1);
+  const baseRetail = seeded(`${symbol}:retail_core`, 8, 25, 1);
+  const remainingAfterPromoter = clamp(100 - basePromoter, 15, 60);
+  const nonRetailShare = clamp(remainingAfterPromoter - baseRetail, 5, 50);
+  const baseFii = seeded(`${symbol}:fii_core`, 10, 35, 1);
+  const baseDii = seeded(`${symbol}:dii_core`, 8, 25, 1);
+  const totalInst = baseFii + baseDii;
+
+  const baseValues = {
+    promoter: round(clamp(basePromoter, 15, 85), 1),
+    fii: totalInst > 0 ? round(clamp(nonRetailShare * baseFii / totalInst, 3, 40), 1) : round(nonRetailShare / 2, 1),
+    dii: totalInst > 0 ? round(clamp(nonRetailShare * baseDii / totalInst, 3, 30), 1) : round(nonRetailShare / 2, 1),
+    retail: round(clamp(baseRetail, 3, 40), 1),
+  };
+  // Normalize to sum = 100
+  const sum = baseValues.promoter + baseValues.fii + baseValues.dii + baseValues.retail;
+  const norm = (v: number) => round((v / sum) * 100, 1);
+  const normalized = {
+    promoter: norm(baseValues.promoter),
+    fii: norm(baseValues.fii),
+    dii: norm(baseValues.dii),
+    retail: norm(baseValues.retail),
+  };
+
   const periods = ["Mar'26", "Dec'25", "Sep'25", "Jun'25", "Mar'25", "Dec'24"];
-  return periods.map((period, index) => ({
-    period,
-    promoter: round(clamp(basePromoter + seeded(`${symbol}:promoter:${index}`, -1.1, 1.1, 2), 0, 100), 1),
-    fii: round(clamp(baseFii + seeded(`${symbol}:fii:${index}`, -1.1, 1.1, 2), 0, 100), 1),
-    dii: round(clamp(baseDii + seeded(`${symbol}:dii:${index}`, -1.1, 1.1, 2), 0, 100), 1),
-    retail: round(clamp(baseRetail + seeded(`${symbol}:retail:${index}`, -1.1, 1.1, 2), 0, 100), 1),
-    deltas: {
-      promoter: round(seeded(`${symbol}:promoter:delta:${index}`, -1.2, 1.2, 2), 1),
-      fii: round(seeded(`${symbol}:fii:delta:${index}`, -1.2, 1.2, 2), 1),
-      dii: round(seeded(`${symbol}:dii:delta:${index}`, -1.2, 1.2, 2), 1),
-      retail: round(seeded(`${symbol}:retail:delta:${index}`, -1.2, 1.2, 2), 1),
-    },
-  }));
+  return periods.map((period, index) => {
+    const pDelta = seeded(`${symbol}:prom:delta:${index}`, -0.4, 0.4, 1);
+    const fDelta = seeded(`${symbol}:fii:delta:${index}`, -0.5, 0.5, 1);
+    const dDelta = seeded(`${symbol}:dii:delta:${index}`, -0.3, 0.3, 1);
+    const rDelta = round(-(pDelta + fDelta + dDelta) * seeded(`${symbol}:rbal:${index}`, 0.6, 1.4, 1), 1);
+
+    return {
+      period,
+      promoter: round(clamp(normalized.promoter + pDelta, 0, 100), 1),
+      fii:      round(clamp(normalized.fii + fDelta, 0, 100), 1),
+      dii:      round(clamp(normalized.dii + dDelta, 0, 100), 1),
+      retail:   round(clamp(normalized.retail + rDelta, 0, 100), 1),
+      deltas: {
+        promoter: round(pDelta, 1),
+        fii:      round(fDelta, 1),
+        dii:      round(dDelta, 1),
+        retail:   round(rDelta, 1),
+      },
+    };
+  });
 }
 
 function buildNews(stock: StockResearchSummary): StockResearchDetail["news"] {
@@ -560,7 +654,7 @@ export function getStockResearch(symbol: string): StockResearchDetail | null {
     businessSegments: [normalizedIndustry, `${normalizedSector} Core`, "Domestic operations"],
     priceHistory: buildPriceHistory(summary.symbol, summary.price),
     financials: buildFinancialSeries(summary),
-    shareholding: buildShareholding(summary.symbol),
+    shareholding: buildShareholding(summary.symbol, normalizedSector),
     news: buildNews(summary),
     thesis: buildThesis(summary),
     confidenceMeter,
