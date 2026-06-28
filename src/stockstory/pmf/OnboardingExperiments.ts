@@ -34,10 +34,10 @@ export function registerOnboardingExperiments(): void {
       },
     ],
     successMetrics: [
-      'pmf.activation.signup_completed',
+      'pmf.activation.signup',
       'pmf.activation.first_search',
-      'pmf.retention.d1_retention',
-      'pmf.retention.d7_retention',
+      'pmf.retention.d1',
+      'pmf.retention.d7',
     ],
     hypotheses: [
       'Simplified onboarding reduces drop-off at step 2+',
@@ -125,8 +125,8 @@ export function registerOnboardingExperiments(): void {
     ],
     successMetrics: [
       'pmf.activation.first_watchlist_add',
-      'pmf.activation.funnel_watchlist_add',
-      'pmf.retention.d1_retention',
+      'pmf.activation.first_watchlist_add',
+      'pmf.retention.d1',
     ],
     hypotheses: [
       'Earlier watchlist prompt (after search) increases watchlist adds',
@@ -162,9 +162,9 @@ export function registerOnboardingExperiments(): void {
       },
     ],
     successMetrics: [
-      'pmf.activation.funnel_compare',
-      'pmf.retention.d7_retention',
-      'pmf.retention.d30_retention',
+      'pmf.activation.first_compare',
+      'pmf.retention.d7',
+      'pmf.retention.d30',
     ],
     hypotheses: [
       'Contextual prompts increase compare feature usage',

@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { colors, typography, radius, layout, components, shadows } from "../design/tokens";
 import { useResponsiveValue } from "./responsive";
 
-export function Card({ children, style }: { children: ReactNode; style?: React.CSSProperties }) {
+export function Card({ children, style, onClick }: { children: ReactNode; style?: React.CSSProperties; onClick?: React.MouseEventHandler }) {
   const padding = useResponsiveValue(components.card.paddingMobile, components.card.paddingDesktop);
 
   return (
@@ -13,8 +13,10 @@ export function Card({ children, style }: { children: ReactNode; style?: React.C
         borderRadius: radius.lg,
         boxShadow: shadows.card,
         padding,
+        cursor: onClick ? "pointer" : undefined,
         ...style,
       }}
+      onClick={onClick}
     >
       {children}
     </section>

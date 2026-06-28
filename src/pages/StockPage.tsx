@@ -16,6 +16,8 @@ import type { BrokerEntry } from "../commercial/BrokerRegistry";
 import { fallbackAnalysis, generateStockAnalysis } from "../services/llm/AIAnalysisService";
 import type { AIAnalysis } from "../services/llm/AIAnalysisService";
 import { colors, typography, radius } from "../design/tokens";
+import { useSeo } from "../frontend/seo/useSeo";
+import { buildCompanySeo } from "../frontend/seo/companySeo";
 
 type StockResearchDetail = {
   symbol: string;
@@ -468,6 +470,11 @@ export default function StockPage() {
       return response.json() as Promise<StockResearchDetail>;
     },
   });
+
+  const companyName = data?.companyName;
+  const sector = data?.sector;
+  const meta = buildCompanySeo(symbol.toUpperCase(), companyName, sector);
+  useSeo(meta);
 
   if (status === "pending") return <StockSkeleton />;
   if (!data) return <StockError symbol={symbol} />;
