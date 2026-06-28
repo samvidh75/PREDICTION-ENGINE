@@ -12,8 +12,37 @@
       "destination": "https://stockstory-api.onrender.com/api/$1"
     },
     {
-      "source": "/(.*)",
+      "source": "/((?!assets/|favicon.ico|manifest.json|robots.txt|sitemap.xml).*)",
       "destination": "/index.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/assets/(.*)\\.js",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/javascript; charset=utf-8"
+        }
+      ]
+    },
+    {
+      "source": "/assets/(.*)\\.css",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "text/css; charset=utf-8"
+        }
+      ]
+    },
+    {
+      "source": "/manifest.json",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/manifest+json; charset=utf-8"
+        }
+      ]
     }
   ]
 }
