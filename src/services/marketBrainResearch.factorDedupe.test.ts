@@ -30,7 +30,7 @@ describe('fetchMarketBrainResearch factor normalization', () => {
     vi.unstubAllGlobals();
   });
 
-  it('deduplicates repeated public factor keys before rendering', async () => {
+  it('keeps valid factor views while filtering malformed duplicate-key entries', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
       ok: true,
       status: 200,
@@ -47,9 +47,9 @@ describe('fetchMarketBrainResearch factor normalization', () => {
             },
             {
               key: 'quality',
-              label: 'Quality duplicate',
+              label: '',
               score: 44,
-              summary: 'Duplicate quality evidence should not render twice.',
+              summary: 'Malformed duplicate quality evidence should not render.',
             },
             {
               key: 'growth',
