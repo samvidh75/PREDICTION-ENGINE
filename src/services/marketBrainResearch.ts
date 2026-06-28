@@ -1,22 +1,13 @@
 import {
   MARKET_BRAIN_ALLOWED_STATES,
+  MARKET_BRAIN_EVIDENCE_DOMAINS as MARKET_BRAIN_PUBLIC_EVIDENCE_DOMAINS,
+  MARKET_BRAIN_FACTOR_KEYS as MARKET_BRAIN_PUBLIC_FACTOR_KEYS,
   containsForbiddenRecommendationLanguage,
 } from '../systems/market-brain/marketBrainGuardrails';
 
 export type MarketBrainResearchState = typeof MARKET_BRAIN_ALLOWED_STATES[number];
-
-export type MarketBrainEvidenceDomain =
-  | 'instrument_master'
-  | 'prices'
-  | 'fundamentals'
-  | 'financial_statements'
-  | 'shareholding'
-  | 'corporate_actions'
-  | 'news_events'
-  | 'technicals'
-  | 'sector_context';
-
-export type MarketBrainFactorKey = 'quality' | 'growth' | 'valuation' | 'stability' | 'momentum' | 'risk' | 'ownership';
+export type MarketBrainEvidenceDomain = typeof MARKET_BRAIN_PUBLIC_EVIDENCE_DOMAINS[number];
+export type MarketBrainFactorKey = typeof MARKET_BRAIN_PUBLIC_FACTOR_KEYS[number];
 
 export interface MarketBrainFactorView {
   key: MarketBrainFactorKey;
@@ -67,28 +58,8 @@ export class MarketBrainResearchError extends Error {
 const normalizeSymbol = (symbol: string): string => symbol.trim().toUpperCase();
 
 const MARKET_BRAIN_RESEARCH_STATES = new Set<MarketBrainResearchState>(MARKET_BRAIN_ALLOWED_STATES);
-
-const MARKET_BRAIN_EVIDENCE_DOMAINS = new Set<MarketBrainEvidenceDomain>([
-  'instrument_master',
-  'prices',
-  'fundamentals',
-  'financial_statements',
-  'shareholding',
-  'corporate_actions',
-  'news_events',
-  'technicals',
-  'sector_context',
-]);
-
-const MARKET_BRAIN_FACTOR_KEYS = new Set<MarketBrainFactorKey>([
-  'quality',
-  'growth',
-  'valuation',
-  'stability',
-  'momentum',
-  'risk',
-  'ownership',
-]);
+const MARKET_BRAIN_EVIDENCE_DOMAINS = new Set<MarketBrainEvidenceDomain>(MARKET_BRAIN_PUBLIC_EVIDENCE_DOMAINS);
+const MARKET_BRAIN_FACTOR_KEYS = new Set<MarketBrainFactorKey>(MARKET_BRAIN_PUBLIC_FACTOR_KEYS);
 
 const EMPTY_EVIDENCE_REVIEW: MarketBrainEvidenceReviewView = {
   needsReview: false,
