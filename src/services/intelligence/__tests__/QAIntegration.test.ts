@@ -432,7 +432,7 @@ describe('QA & Integration (PROMPT 30)', () => {
     it('includes SEBI disclaimer', async () => {
       const result = await orchestrator.analyzeStock(strongStock('TCS'));
       expect(result.thesis.disclaimer).toContain('SEBI');
-      expect(result.thesis.disclaimer).toContain('not a recommendation');
+      expect(result.thesis.disclaimer).toContain('does not constitute');
     });
 
     it('thesis items are strings', async () => {

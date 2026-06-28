@@ -29,6 +29,7 @@ import { sectorEngine } from './engines/SectorEngine/index';
 import { newsEngine } from './engines/NewsEngine/index';
 import { eventEngine } from './engines/EventEngine/index';
 import { ragEngine } from './engines/RAGEngine/index';
+import { SEBIFilter } from './engines/Orchestrator/SEBIFilter';
 import logger from '../../config/logger';
 
 // ── Weights (sum = 100%) ──────────────────────────────────────────────────
@@ -243,11 +244,12 @@ export class MasterOrchestrator {
       bearCase.push('No significant bearish flags — overall risk profile appears manageable.');
     }
 
+    // Apply SEBI compliance filter to all thesis text
     return {
-      bullCase: bullCase.slice(0, 4),
-      bearCase: bearCase.slice(0, 4),
-      whatToWatch: whatToWatch.slice(0, 4),
-      disclaimer: 'This analysis is for informational purposes only and not a recommendation to buy or sell securities. Past performance does not guarantee future results. Do your own research and consult a SEBI-registered financial advisor before making investment decisions.',
+      bullCase: SEBIFilter.filterThesisArray(bullCase.slice(0, 4)),
+      bearCase: SEBIFilter.filterThesisArray(bearCase.slice(0, 4)),
+      whatToWatch: SEBIFilter.filterThesisArray(whatToWatch.slice(0, 4)),
+      disclaimer: SEBIFilter.generateDisclaimer(),
     };
   }
 }

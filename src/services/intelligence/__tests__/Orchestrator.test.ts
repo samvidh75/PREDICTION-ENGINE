@@ -170,7 +170,7 @@ describe('MasterOrchestrator', () => {
 
   it('includes disclaimer in thesis', async () => {
     const result = await orchestrator.analyzeStock(makeInputs());
-    expect(result.thesis.disclaimer).toContain('not a recommendation');
+    expect(result.thesis.disclaimer).toContain('does not constitute');
     expect(result.thesis.disclaimer).toContain('SEBI');
   });
 });
