@@ -6,6 +6,7 @@ import { Card } from "../ui/Card";
 import { useResponsiveValue } from "../ui/responsive";
 import { colors, typography, radius } from "../design/tokens";
 import { SEBIComplianceBanner } from "../components/SEBICompliance";
+import { ScannerPresets } from "../components/ScannerPresets";
 
 const SCANS: ScanType[] = ["quality", "value", "momentum", "stable"];
 
@@ -59,6 +60,16 @@ export default function ScannerPage() {
             border: `1px solid ${colors.border}`,
             borderRadius: "44px",
             padding: "0 16px",
+          }}
+        />
+        <ScannerPresets
+          scanType={scanType}
+          query={query}
+          onApply={(preset) => {
+            setQuery(preset.filters.query || "");
+            if (preset.filters.scanType && SCANS.includes(preset.filters.scanType as ScanType)) {
+              setScanType(preset.filters.scanType as ScanType);
+            }
           }}
         />
       </div>

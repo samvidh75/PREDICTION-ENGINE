@@ -168,6 +168,9 @@ export interface WatchlistThesisView {
   conviction: string;
   score: number | null;
   lastUpdated: string | null;
+  scoreDirection?: "improving" | "declining" | "stable";
+  lastThesis?: string;
+  scoredAt?: string;
 }
 
 export type AlertTone = "thesis_change" | "risk_change" | "valuation_change" | "watchlist_review" | "price_move" | "peer_change" | "event";
