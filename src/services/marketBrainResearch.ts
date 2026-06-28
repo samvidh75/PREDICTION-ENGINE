@@ -99,6 +99,11 @@ const EMPTY_EVIDENCE_REVIEW: MarketBrainEvidenceReviewView = {
 };
 
 const PUBLIC_RESEARCH_UNAVAILABLE_MESSAGE = 'Research is temporarily unavailable for this company.';
+const INCOMPLETE_RESEARCH_RESPONSE_MESSAGE = 'Research response was incomplete.';
+
+const isRecord = (value: unknown): value is Record<string, unknown> => (
+  Boolean(value) && typeof value === 'object' && !Array.isArray(value)
+);
 
 const asTrimmedString = (value: unknown): string => (typeof value === 'string' ? value.trim() : '');
 
@@ -148,13 +153,14 @@ const asFactorViews = (value: unknown): MarketBrainFactorView[] => (Array.isArra
   })
   : []);
 
-const normalizeEvidenceReview = (value: Partial<MarketBrainEvidenceReviewView> | undefined): MarketBrainEvidenceReviewView => {
-  if (!value) return EMPTY_EVIDENCE_REVIEW;
-  const partial = asEvidenceDomains(value.partial);
-  const missing = asEvidenceDomains(value.missing);
-  const summary = asTrimmedString(value.summary) || EMPTY_EVIDENCE_REVIEW.summary;
-  const needsReview = typeof value.needsReview === 'boolean'
-    ? value.needsReview
+const normalizeEvidenceReview = (value: unknown): MarketBrainEvidenceReviewView => {
+  if (!isRecord(value)) return EMPTY_EVIDENCE_REVIEW;
+  const candidate = value as Partial<MarketBrainEvidenceReviewView>;
+  const partial = asEvidenceDomains(candidate.partial);
+  const missing = asEvidenceDomains(candidate.missing);
+  const summary = asTrimmedString(candidate.summary) || EMPTY_EVIDENCE_REVIEW.summary;
+  const needsReview = typeof candidate.needsReview === 'boolean'
+    ? candidate.needsReview
     : partial.length > 0 || missing.length > 0;
 
   return {
@@ -166,7 +172,7 @@ const normalizeEvidenceReview = (value: Partial<MarketBrainEvidenceReviewView> |
 };
 
 const normalizeResearchResponse = (
-  payload: Partial<MarketBrainResearchResponse>,
+  payload: Record<string, unknown>,
   requestedSymbol: string,
 ): MarketBrainResearchResponse => {
   const research = payload.research as Partial<MarketBrainResearchView>;
@@ -208,21 +214,23 @@ export async function fetchMarketBrainResearch(symbol: string, init?: RequestIni
     },
   });
 
-  const payload = await response.json().catch(() => null) as Partial<MarketBrainResearchResponse> & {
-    message?: string;
-    code?: string;
-  } | null;
+  const payload = await response.json().catch(() => null) as unknown;
 
   if (!response.ok) {
+    const code = isRecord(payload) && typeof payload.code === 'string' ? payload.code : undefined;
     throw new MarketBrainResearchError(
       PUBLIC_RESEARCH_UNAVAILABLE_MESSAGE,
       response.status,
-      payload?.code,
+      code,
     );
   }
 
-  if (!payload?.research) {
-    throw new MarketBrainResearchError('Research response was incomplete.', response.status, 'INCOMPLETE_RESEARCH_RESPONSE');
+  if (!isRecord(payload) || !isRecord(payload.research)) {
+    throw new MarketBrainResearchError(
+      INCOMPLETE_RESEARCH_RESPONSE_MESSAGE,
+      response.status,
+      'INCOMPLETE_RESEARCH_RESPONSE',
+    );
   }
 
   return normalizeResearchResponse(payload, normalized);
