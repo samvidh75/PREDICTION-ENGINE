@@ -11,29 +11,40 @@ const STYLE_MAP: Record<Variant, { background: string; color: string; border: st
   destructive: { background: colors.danger, color: "#FFFFFF", border: `1px solid ${colors.danger}` },
 };
 
+type Size = "sm" | "md" | "lg" | "icon";
+
+const SIZE_MAP: Record<Size, { minHeight: string; fontSize: string; paddingX: string }> = {
+  sm: { minHeight: "32px", fontSize: "13px", paddingX: "12px" },
+  md: { minHeight: "40px", fontSize: typography.callout.desktop.size, paddingX: components.button.paddingX },
+  lg: { minHeight: "48px", fontSize: typography.body.desktop.size, paddingX: "24px" },
+  icon: { minHeight: "36px", fontSize: "13px", paddingX: "8px" },
+};
+
 export function Button({
   variant = "primary",
+  size = "md",
   style,
   children,
   ...props
 }: {
   variant?: Variant;
+  size?: Size;
   children: ReactNode;
 } & ButtonHTMLAttributes<HTMLButtonElement>) {
   const base = STYLE_MAP[variant];
-  const height = useResponsiveValue(components.button.heightMobile, components.button.heightDesktop);
+  const sizeStyles = SIZE_MAP[size];
 
   return (
     <button
       {...props}
       style={{
-        minHeight: height,
-        minWidth: "44px",
+        minHeight: sizeStyles.minHeight,
+        minWidth: size === "sm" ? "36px" : "44px",
         borderRadius: radius.md,
         fontFamily: typography.fontFamily,
-        fontSize: typography.callout.desktop.size,
+        fontSize: sizeStyles.fontSize,
         fontWeight: 600,
-        padding: `0 ${components.button.paddingX}`,
+        padding: `0 ${sizeStyles.paddingX}`,
         display: "inline-flex",
         alignItems: "center",
         justifyContent: "center",

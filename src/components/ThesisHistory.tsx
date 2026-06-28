@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Clock, TrendingDown, TrendingUp } from "lucide-react";
 import type { WatchlistThesisView } from "../research/contracts/productContracts";
+import type { ThesisSnapshot } from "../services/personalization/ThesisHistoryStore";
 import {
   getThesisHistory,
   captureThesisSnapshot,
@@ -23,7 +24,7 @@ const STATUS_STYLES: Record<string, { bg: string; color: string }> = {
 };
 
 export function ThesisHistory({ symbol, currentThesis }: ThesisHistoryProps) {
-  const [history, setHistory] = useState<WatchlistThesisView[]>([]);
+  const [history, setHistory] = useState<ThesisSnapshot[]>([]);
 
   useEffect(() => {
     setHistory(getThesisHistory(symbol));
@@ -56,14 +57,15 @@ export function ThesisHistory({ symbol, currentThesis }: ThesisHistoryProps) {
         <h3 style={{
           margin: 0,
           color: colors.textPrimary,
-          fontSize: typography.h4.desktop.size,
+          fontSize: typography.h3.desktop.size,
           fontWeight: 600,
         }}>
           Thesis History
         </h3>
         <div style={{ display: "grid", gap: space[3] }}>
           {history.slice().reverse().map((entry, i) => {
-            const style = STATUS_STYLES[entry.currentStatus] ?? STATUS_STYLES["Tracking begins now"];
+            const t = entry.thesis;
+            const style = STATUS_STYLES[t.currentStatus] ?? STATUS_STYLES["Tracking begins now"];
             return (
               <div
                 key={i}
@@ -95,17 +97,17 @@ export function ThesisHistory({ symbol, currentThesis }: ThesisHistoryProps) {
                     background: style.bg,
                     color: style.color,
                   }}>
-                    {entry.currentStatus}
+                    {t.currentStatus}
                   </span>
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: space[3], fontSize: "13px" }}>
-                  {entry.score !== null && (
+                  {t.score !== null && (
                     <span style={{ fontWeight: 600, color: colors.textPrimary }}>
-                      {entry.score}
+                      {t.score}
                     </span>
                   )}
                   <span style={{ color: colors.textSecondary, fontSize: "12px" }}>
-                    {entry.scoredAt ? new Date(entry.scoredAt).toLocaleDateString() : "—"}
+                    {entry.capturedAt ? new Date(entry.capturedAt).toLocaleDateString() : "—"}
                   </span>
                 </div>
               </div>

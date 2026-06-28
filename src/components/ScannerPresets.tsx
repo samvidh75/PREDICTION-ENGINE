@@ -29,12 +29,7 @@ export function ScannerPresets({ scanType, query, onApply }: ScannerPresetsProps
   const handleSave = () => {
     const name = saveName.trim();
     if (!name) return;
-    savePreset({
-      name,
-      filters: { ...currentFilters },
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    });
+    savePreset(name, "", { ...currentFilters });
     setSaveName("");
     setShowSave(false);
     refresh();

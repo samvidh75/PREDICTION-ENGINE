@@ -29,6 +29,8 @@ import { getThesisHistory, captureThesisSnapshot, getLatestThesisMap } from "../
 import { recordAction, getRecentActions, getResearchSuggestions } from "../services/personalization/UserActionMemory.js";
 import { WatchlistIntelligenceEngine } from "../services/personalization/WatchlistIntelligenceEngine.js";
 import { getNotificationSnapshot, acknowledgeAll } from "../services/personalization/UserNotificationCenter.js";
+import { usageLimits } from "../commercial/UsageLimits.js";
+import type { UsageMetric } from "../commercial/UsageLimits.js";
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -47,6 +49,29 @@ async function requireAuth(req: any, reply: any) {
     // Don't block — auth is not enforced yet; log for observability
   }
   (req as any).uid = uid;
+}
+
+/**
+ * Create a rate-limit preHandler for a given metric.
+ * Returns 429 with Retry-After when limit is exceeded.
+ * Unauthenticated users default to "free" tier.
+ */
+function rateLimitFor(metric: UsageMetric) {
+  return async function rateLimitHandler(req: any, reply: any) {
+    const userId = req.uid ?? "anonymous";
+    const allowed = usageLimits.checkAndIncrement(userId, metric, null);
+    if (!allowed) {
+      const peek = usageLimits.peek(userId, metric, null);
+      const retryAfterSeconds = Math.ceil((peek.resetAt - Date.now()) / 1000);
+      return reply.status(429).send({
+        error: "Rate limit exceeded",
+        metric,
+        allowed: peek.allowed,
+        used: peek.used,
+        retryAfter: Math.max(1, retryAfterSeconds),
+      });
+    }
+  };
 }
 
 // ── Sector config ──────────────────────────────────────────────────────────
@@ -1275,7 +1300,7 @@ export default async function registerApiRoutes(server: FastifyInstance) {
     return profile;
   });
 
-  server.put("/api/research-profile", async (req, reply) => {
+  server.put("/api/research-profile", { preHandler: [requireAuth, rateLimitFor("api_calls_per_hour")] }, async (req, reply) => {
     try {
       const body = req.body as Partial<UserResearchProfile>;
       if (!body) return reply.status(400).send({ error: "profile data required" });
@@ -1299,7 +1324,7 @@ export default async function registerApiRoutes(server: FastifyInstance) {
     return { alerts, count: alerts.length };
   });
 
-  server.post("/api/alerts", async (req, reply) => {
+  server.post("/api/alerts", { preHandler: [requireAuth, rateLimitFor("api_calls_per_hour")] }, async (req, reply) => {
     try {
       const body = req.body as { alerts: AlertChangeView[] };
       if (!body?.alerts?.length) return reply.status(400).send({ error: "alerts array required" });
@@ -1310,7 +1335,7 @@ export default async function registerApiRoutes(server: FastifyInstance) {
     }
   });
 
-  server.put("/api/alerts/:id", async (req, reply) => {
+  server.put("/api/alerts/:id", { preHandler: [requireAuth, rateLimitFor("api_calls_per_hour")] }, async (req, reply) => {
     const { id } = req.params as any;
     const { acknowledged, action } = req.body as any;
     if (action === "remove") {
@@ -1342,7 +1367,7 @@ export default async function registerApiRoutes(server: FastifyInstance) {
     return { presets: getPresets() };
   });
 
-  server.post("/api/scanner-presets", async (req, reply) => {
+  server.post("/api/scanner-presets", { preHandler: [requireAuth, rateLimitFor("api_calls_per_hour")] }, async (req, reply) => {
     try {
       const { name, description, filters } = req.body as any;
       if (!name || !filters) return reply.status(400).send({ error: "name and filters required" });
@@ -1353,7 +1378,7 @@ export default async function registerApiRoutes(server: FastifyInstance) {
     }
   });
 
-  server.put("/api/scanner-presets/:id", async (req, reply) => {
+  server.put("/api/scanner-presets/:id", { preHandler: [requireAuth, rateLimitFor("api_calls_per_hour")] }, async (req, reply) => {
     const { id } = req.params as any;
     const updates = req.body as Partial<SavedScannerPreset>;
     const result = updatePreset(id, updates);
@@ -1361,7 +1386,7 @@ export default async function registerApiRoutes(server: FastifyInstance) {
     return result;
   });
 
-  server.delete("/api/scanner-presets/:id", async (req, reply) => {
+  server.delete("/api/scanner-presets/:id", { preHandler: [requireAuth, rateLimitFor("api_calls_per_hour")] }, async (req, reply) => {
     const { id } = req.params as any;
     const deleted = deletePreset(id);
     if (!deleted) return reply.status(404).send({ error: "preset not found" });
@@ -1376,7 +1401,7 @@ export default async function registerApiRoutes(server: FastifyInstance) {
     return { symbol: String(symbol).toUpperCase(), snapshots: history };
   });
 
-  server.post("/api/thesis-history", async (req, reply) => {
+  server.post("/api/thesis-history", { preHandler: [requireAuth, rateLimitFor("api_calls_per_hour")] }, async (req, reply) => {
     try {
       const { thesis } = req.body as any;
       if (!thesis?.symbol) return reply.status(400).send({ error: "thesis with symbol required" });
@@ -1389,7 +1414,7 @@ export default async function registerApiRoutes(server: FastifyInstance) {
 
   // ── Action Memory ─────────────────────────────────────────────────────────
 
-  server.post("/api/actions", async (req, reply) => {
+  server.post("/api/actions", { preHandler: [requireAuth, rateLimitFor("api_calls_per_hour")] }, async (req, reply) => {
     try {
       const { action, symbol, metadata } = req.body as any;
       if (!action) return reply.status(400).send({ error: "action type required" });

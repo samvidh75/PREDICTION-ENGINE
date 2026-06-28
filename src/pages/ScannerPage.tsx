@@ -66,7 +66,7 @@ export default function ScannerPage() {
           scanType={scanType}
           query={query}
           onApply={(preset) => {
-            setQuery(preset.filters.query || "");
+            setQuery((preset.filters.query as string) || "");
             if (preset.filters.scanType && SCANS.includes(preset.filters.scanType as ScanType)) {
               setScanType(preset.filters.scanType as ScanType);
             }
