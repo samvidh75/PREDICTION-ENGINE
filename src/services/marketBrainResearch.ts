@@ -151,7 +151,9 @@ const normalizeEvidenceReview = (value: Partial<MarketBrainEvidenceReviewView> |
   const partial = asEvidenceDomains(value.partial);
   const missing = asEvidenceDomains(value.missing);
   const summary = asTrimmedString(value.summary) || EMPTY_EVIDENCE_REVIEW.summary;
-  const needsReview = value.needsReview ?? (partial.length > 0 || missing.length > 0);
+  const needsReview = typeof value.needsReview === 'boolean'
+    ? value.needsReview
+    : partial.length > 0 || missing.length > 0;
 
   return {
     needsReview,
