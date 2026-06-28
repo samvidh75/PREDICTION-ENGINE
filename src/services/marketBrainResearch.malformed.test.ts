@@ -6,6 +6,18 @@ describe('fetchMarketBrainResearch malformed payload handling', () => {
     vi.unstubAllGlobals();
   });
 
+  it('rejects blank symbols before calling the research endpoint', async () => {
+    const fetchMock = vi.fn();
+    vi.stubGlobal('fetch', fetchMock);
+
+    await expect(fetchMarketBrainResearch('   ')).rejects.toMatchObject({
+      code: 'SYMBOL_REQUIRED',
+      message: 'A symbol is required to load research.',
+      status: 400,
+    });
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
   it('rejects successful responses with non-object research payloads', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
       ok: true,
