@@ -134,9 +134,10 @@ const normalizeEvidenceReview = (value: unknown): MarketBrainEvidenceReviewView 
   const partial = asEvidenceDomains(candidate.partial);
   const missing = asEvidenceDomains(candidate.missing);
   const summary = asPublicText(candidate.summary) || EMPTY_EVIDENCE_REVIEW.summary;
-  const needsReview = typeof candidate.needsReview === 'boolean'
+  const hasEvidenceGaps = partial.length > 0 || missing.length > 0;
+  const needsReview = hasEvidenceGaps || (typeof candidate.needsReview === 'boolean'
     ? candidate.needsReview
-    : partial.length > 0 || missing.length > 0;
+    : false);
 
   return {
     needsReview,
