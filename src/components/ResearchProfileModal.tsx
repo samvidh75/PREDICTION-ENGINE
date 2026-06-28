@@ -7,8 +7,8 @@ import { Card } from "../ui/Card";
 import { colors, typography, space } from "../design/tokens";
 
 const EXPERIENCE_OPTIONS: ResearchExperienceLevel[] = ["beginner", "intermediate", "advanced"];
-const HORIZON_OPTIONS: ResearchTimeHorizon[] = ["short_term", "long_term", "both"];
-const RISK_LEVELS: RiskLevel[] = ["Low", "Medium", "High"];
+const HORIZON_OPTIONS: ResearchTimeHorizon[] = ["short_term", "medium_term", "long_term"];
+const RISK_LEVELS: RiskLevel[] = ["Low", "Moderate", "High"];
 
 const TOPIC_OPTIONS = [
   "Technology", "Banking", "Pharma", "Auto",
@@ -47,9 +47,9 @@ export function ResearchProfileModal() {
   if (!profile) return null;
 
   const handleToggleTopic = (topic: string) => {
-    const next = profile.topics?.includes(topic)
-      ? (profile.topics ?? []).filter((t) => t !== topic)
-      : [...(profile.topics ?? []), topic];
+    const next = profile.researchTopics?.includes(topic)
+      ? (profile.researchTopics ?? []).filter((t) => t !== topic)
+      : [...(profile.researchTopics ?? []), topic];
     updateResearchTopics(next);
     setProfile(getProfile());
   };
@@ -198,7 +198,7 @@ export function ResearchProfileModal() {
                 {TOPIC_OPTIONS.map((topic) => (
                   <Button
                     key={topic}
-                    variant={profile.topics?.includes(topic) ? "primary" : "secondary"}
+                    variant={profile.researchTopics?.includes(topic) ? "primary" : "secondary"}
                     size="sm"
                     onClick={() => handleToggleTopic(topic)}
                   >

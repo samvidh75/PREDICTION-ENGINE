@@ -399,7 +399,7 @@ function StockView({ stock }: { stock: StockResearchDetail }) {
         </div>
       </Card>
 
-      <ThesisHistory symbol={symbol} />
+      <ThesisHistory symbol={stock.symbol} />
 
       {ai && (
         <Card>

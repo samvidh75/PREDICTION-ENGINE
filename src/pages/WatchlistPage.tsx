@@ -74,7 +74,7 @@ export default function WatchlistPage() {
   const changedCount = intel?.changedItems?.length ?? 0;
 
   const handleResearch = (symbol: string) => {
-    recordAction({ type: "thesis_check", symbol });
+    recordAction("thesis_check", symbol);
     navigate(`/stock/${symbol}`);
   };
 
@@ -215,7 +215,7 @@ export default function WatchlistPage() {
                     Research
                   </Button>
                   <Button variant="secondary" onClick={() => {
-                    recordAction({ type: "watchlist_remove", symbol: item.symbol });
+                    recordAction("watchlist_remove", item.symbol);
                   }}>
                     <Star size={14} style={{ marginRight: "4px", fill: colors.primary }} />
                     Unwatch
