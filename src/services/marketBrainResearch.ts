@@ -120,9 +120,14 @@ const isPublicScore = (value: unknown): value is number => (
 
 const asPublicScore = (value: unknown): number => (isPublicScore(value) ? value : 0);
 
-const asFactorViews = (value: unknown): MarketBrainFactorView[] => (Array.isArray(value)
-  ? value.flatMap((item): MarketBrainFactorView[] => {
-    if (!item || typeof item !== 'object') return [];
+const asFactorViews = (value: unknown): MarketBrainFactorView[] => {
+  if (!Array.isArray(value)) return [];
+
+  const factors: MarketBrainFactorView[] = [];
+  const seen = new Set<MarketBrainFactorKey>();
+
+  value.forEach((item) => {
+    if (!item || typeof item !== 'object') return;
     const candidate = item as Partial<MarketBrainFactorView>;
     const label = asTrimmedString(candidate.label);
     const summary = asPublicText(candidate.summary);
@@ -131,17 +136,23 @@ const asFactorViews = (value: unknown): MarketBrainFactorView[] => (Array.isArra
       && label.length > 0
       && summary.length > 0
       && isPublicScore(candidate.score))) {
-      return [];
+      return;
     }
 
-    return [{
-      key: candidate.key as MarketBrainFactorKey,
+    const key = candidate.key as MarketBrainFactorKey;
+    if (seen.has(key)) return;
+
+    seen.add(key);
+    factors.push({
+      key,
       label,
       score: candidate.score,
       summary,
-    }];
-  })
-  : []);
+    });
+  });
+
+  return factors;
+};
 
 const copyEmptyEvidenceReview = (): MarketBrainEvidenceReviewView => ({
   ...EMPTY_EVIDENCE_REVIEW,
