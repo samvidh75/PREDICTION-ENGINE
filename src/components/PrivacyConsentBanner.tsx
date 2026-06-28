@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
-import { hasConsented, setConsent } from "../lib/consent";
+import { getConsent, setConsent } from "../lib/consent";
 
 export default function PrivacyConsentBanner() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
     // Show banner if user hasn't made a choice
-    if (hasConsented() === "undecided") {
+    if (getConsent() === "undecided") {
       setVisible(true);
     }
   }, []);
