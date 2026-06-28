@@ -165,9 +165,12 @@ const normalizeEvidenceReview = (value: Partial<MarketBrainEvidenceReviewView> |
   };
 };
 
-const normalizeResearchResponse = (payload: Partial<MarketBrainResearchResponse>): MarketBrainResearchResponse => {
+const normalizeResearchResponse = (
+  payload: Partial<MarketBrainResearchResponse>,
+  requestedSymbol: string,
+): MarketBrainResearchResponse => {
   const research = payload.research as Partial<MarketBrainResearchView>;
-  const symbol = asTrimmedString(payload.symbol) || asTrimmedString(research.symbol);
+  const symbol = asTrimmedString(payload.symbol) || asTrimmedString(research.symbol) || requestedSymbol;
   const companyName = asTrimmedString(payload.companyName) || asTrimmedString(research.companyName);
 
   return {
@@ -222,5 +225,5 @@ export async function fetchMarketBrainResearch(symbol: string, init?: RequestIni
     throw new MarketBrainResearchError('Research response was incomplete.', response.status, 'INCOMPLETE_RESEARCH_RESPONSE');
   }
 
-  return normalizeResearchResponse(payload);
+  return normalizeResearchResponse(payload, normalized);
 }
