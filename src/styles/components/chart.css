@@ -1,0 +1,368 @@
+/* ============================================================================
+   CHARTS & DATA VIZ — Chart containers and data visualization
+   ============================================================================ */
+
+/* CHART CONTAINER */
+.chart {
+  position: relative;
+  width: 100%;
+  height: 400px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.chart-sm {
+  height: 300px;
+}
+
+.chart-md {
+  height: 400px;
+}
+
+.chart-lg {
+  height: 500px;
+}
+
+.chart-xl {
+  height: 600px;
+}
+
+/* CHART HEADER */
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+  gap: 16px;
+}
+
+.chart-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.chart-subtitle {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin: 4px 0 0 0;
+}
+
+.chart-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* CHART LEGEND */
+.chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  font-size: 13px;
+}
+
+.chart-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: opacity var(--t-base);
+}
+
+.chart-legend-item:hover {
+  opacity: 0.8;
+}
+
+.chart-legend-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  background-color: var(--text-body);
+}
+
+.chart-legend-label {
+  color: var(--text-body);
+}
+
+/* CHART TOOLTIP */
+.chart-tooltip {
+  position: absolute;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: #FFFFFF;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 500;
+  pointer-events: none;
+  z-index: 1000;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.chart-tooltip::before {
+  content: "";
+  position: absolute;
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 4px solid rgba(0, 0, 0, 0.8);
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* STAT CARDS */
+.stat-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  transition: all var(--t-base);
+}
+
+.stat-card:hover {
+  box-shadow: var(--shadow-raised);
+  border-color: var(--border-strong);
+}
+
+.stat-label {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+
+.stat-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.2;
+  margin-bottom: 8px;
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-change {
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.stat-change.positive {
+  color: var(--green);
+}
+
+.stat-change.negative {
+  color: var(--red);
+}
+
+.stat-change.neutral {
+  color: var(--text-secondary);
+}
+
+.stat-icon {
+  display: inline-flex;
+  width: 20px;
+  height: 20px;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+/* STAT CARD VARIANTS */
+.stat-card-primary {
+  background: linear-gradient(135deg, var(--brand-light) 0%, #F9F0FF 100%);
+  border-color: var(--brand);
+}
+
+.stat-card-success {
+  background: linear-gradient(135deg, var(--green-light) 0%, #F5FFF9 100%);
+  border-color: var(--green);
+}
+
+.stat-card-error {
+  background: linear-gradient(135deg, var(--red-light) 0%, #FFF5F4 100%);
+  border-color: var(--red);
+}
+
+.stat-card-warning {
+  background: linear-gradient(135deg, var(--amber-light) 0%, #FFFBF0 100%);
+  border-color: var(--amber);
+}
+
+/* SPARKLINE */
+.sparkline {
+  display: inline-flex;
+  align-items: center;
+  height: 20px;
+  margin-left: auto;
+}
+
+.sparkline-bar {
+  width: 2px;
+  background-color: var(--brand);
+  margin-right: 2px;
+  transition: all var(--t-fast);
+}
+
+.sparkline-bar:last-child {
+  margin-right: 0;
+}
+
+.sparkline-bar.positive {
+  background-color: var(--green);
+}
+
+.sparkline-bar.negative {
+  background-color: var(--red);
+}
+
+/* TREND INDICATOR */
+.trend-up {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--green);
+  font-weight: 600;
+}
+
+.trend-up::before {
+  content: "↑";
+}
+
+.trend-down {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--red);
+  font-weight: 600;
+}
+
+.trend-down::before {
+  content: "↓";
+}
+
+.trend-flat {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.trend-flat::before {
+  content: "→";
+}
+
+/* PROGRESS BAR */
+.progress {
+  width: 100%;
+  height: 6px;
+  background-color: var(--bg-chip);
+  border-radius: 3px;
+  overflow: hidden;
+  margin: 12px 0;
+}
+
+.progress-bar {
+  height: 100%;
+  background-color: var(--brand);
+  border-radius: 3px;
+  transition: width var(--t-base);
+}
+
+.progress-bar.success {
+  background-color: var(--green);
+}
+
+.progress-bar.warning {
+  background-color: var(--amber);
+}
+
+.progress-bar.error {
+  background-color: var(--red);
+}
+
+/* HEAT MAP */
+.heatmap {
+  display: grid;
+  gap: 2px;
+  width: 100%;
+}
+
+.heatmap-cell {
+  aspect-ratio: 1;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--t-base);
+  border: 1px solid var(--border);
+}
+
+.heatmap-cell:hover {
+  transform: scale(1.05);
+  box-shadow: var(--shadow-card);
+}
+
+.heatmap-cell.level-0 { background-color: #EEF2FF; }
+.heatmap-cell.level-1 { background-color: #C7D2FE; }
+.heatmap-cell.level-2 { background-color: #A5B4FC; }
+.heatmap-cell.level-3 { background-color: #818CF8; }
+.heatmap-cell.level-4 { background-color: #6366F1; }
+.heatmap-cell.level-5 { background-color: #4F46E5; }
+
+/* RESPONSIVE */
+@media (max-width: 767px) {
+  .chart {
+    height: 280px;
+    padding: 16px;
+  }
+
+  .chart-sm {
+    height: 200px;
+  }
+
+  .chart-md {
+    height: 280px;
+  }
+
+  .chart-lg {
+    height: 350px;
+  }
+
+  .stat-value {
+    font-size: 24px;
+  }
+
+  .stat-card {
+    padding: 16px;
+  }
+
+  .chart-legend {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .chart-header {
+    flex-direction: column;
+    margin-bottom: 12px;
+  }
+
+  .chart-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}
