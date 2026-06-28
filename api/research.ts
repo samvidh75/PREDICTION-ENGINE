@@ -186,7 +186,7 @@ async function getFundamentals(sym: string, entry: { name: string; sector: strin
 
   return {
     symbol: sym,
-    companyName: quoteData.name || fb?.companyName || entry.name,
+    companyName: fb?.companyName || fb?.name || (quoteData.name && quoteData.name !== sym ? quoteData.name : entry.name),
     sector: fb?.sector || entry.sector || quoteData.sector || "Uncategorized",
     price: quoteData.price || fb?.price || 0,
     change: quoteData.change || fb?.change || 0,
