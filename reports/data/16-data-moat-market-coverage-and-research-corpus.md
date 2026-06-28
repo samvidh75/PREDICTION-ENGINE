@@ -1,74 +1,147 @@
-# Phase 16: Data Moat, Indian Market Coverage Expansion, Filing Intelligence, and Research Corpus
+# StockStory India — Phase 16: Data Moat, Market Coverage Expansion & Research Corpus
 
-## Baseline
+**Generated:** 2026-06-29T01:30:00+05:30
+**Baseline Commit:** fb0935791
+**Previous Commit:** 2e13282cb
 
-- **Commit:** `c8322853fa99c20d72a938ae58e1a44a49d0ecde`
-- **Typecheck (frontend):** PASS
-- **Typecheck (backend):** PASS
-- **Lint:** PASS (0 errors)
-- **Hygiene:** PASS (no secrets, 2 warnings pre-existing)
-- **Tests:** 1459 passed, 92 failed (pre-existing PMF-related), 7 skipped
-- **Build (frontend):** PASS
-- **Build (backend):** PASS
+---
+
+## Baseline State
+
+| Check | Status |
+|-------|--------|
+| git pull --ff-only origin main | ✅ Merged (20+ new data infrastructure files) |
+| Working tree | Clean (no uncommitted changes) |
+| Data source registry | ✅ Existing (`src/stockstory/data/sources/`) |
+| Equity universe | ✅ Existing (`src/stockstory/data/universe/`) |
+| Company identity | ✅ Existing (`src/stockstory/data/identity/`) |
+| Data quality/freshness | ✅ Existing (`src/stockstory/data/quality/`) |
+| Evidence/lineage | ✅ Existing (`src/stockstory/data/evidence/`) |
+| Corporate actions | ✅ Existing (`src/stockstory/data/corporate-actions/`, `corporateActions/`) |
+| Exchange filings | ✅ Existing (`src/stockstory/data/filings/`) |
+| Quarterly results | ✅ Existing (`src/stockstory/data/results/`) |
+| Documents/RAG corpus | ✅ Existing (`src/stockstory/data/documents/`) |
+| Transcript corpus | ✅ Existing (`src/stockstory/data/transcripts/`) |
+| Shareholding data | ✅ Existing (`src/stockstory/data/shareholding/`) |
+| Index/sector | ✅ Existing (`src/stockstory/intelligence/sector/`, `src/stockstory/data/identity/`) |
+| Macro/liquidity/derivatives | ❌ Missing (needs creation) |
+| News quality/dedup | ❌ Missing (needs `src/stockstory/data/news/`) |
+| Disclosures (bulk/block/insider) | ❌ Missing (needs `src/stockstory/data/disclosures/`) |
+| Reconciliation/conflict | ❌ Missing (needs `src/stockstory/data/reconciliation/`) |
+| RAG knowledge base | ❌ Missing (needs `src/stockstory/rag/`) |
+| Data ingestion scripts | ⚠️ Partial (1 script exists) |
+| Data validation scripts | ❌ Missing |
+| Internal data operations APIs | ❌ Missing |
+| Frontend integration | ⚠️ Partial |
+| Source policy documentation | ❌ Missing |
+| Data pipeline tests | ❌ Missing |
 
 ## Current Data Sources
 
-| Source | Status | Type |
-|--------|--------|------|
-| IndianAPI Premium | Active ingestion | API (python) |
-| BSE/NSE exchange data | Probes exist | Python libs |
-| Yahoo Finance | Probes exist | API |
-| StockEdge | Probes exist | API |
-| Trendlyne | Probes exist | API |
-| Upstox | Broker config | API |
-| Dhan | Broker config | API |
-| Screener.in | Ingestion script | API |
-| Public fundamentals | Ingestion script | API |
+From `DataSourceRegistry.ts` (15 registered sources):
 
-## Current Universe Coverage
+| Source ID | Status | Domains |
+|-----------|--------|---------|
+| nse-official | active | universe, identity, price, corp actions, index membership |
+| bse-official | active | universe, identity, price, corp actions, index membership |
+| indianapi-premium | active | financials, results, shareholding, corp actions, price |
+| screener-in | active | financials, results, identity |
+| stockedge | probe | financials, results, news |
+| trendlyne | probe | financials, shareholding, news, technical |
+| yahoo-finance | probe | price, financials, identity |
+| upstox | active | price, identity |
+| dhan | active | price, identity |
+| sebi-edgar | probe | filings, documents, disclosures |
+| bse-corp-announcements | active | filings, corp actions |
+| nse-corp-announcements | active | filings, corp actions |
+| nsepy | probe | price, corp actions, index membership |
+| db-stocks-table | active | universe, identity |
+| healthometer | probe | financials |
 
-- **Table:** `stocks` with `symbol`, `name`, `exchange`, `sector`, `sub_sector`, `market_cap`, `isin`
-- **Scripts:** `scripts/generate-stock-universe.ts`, `scripts/sync-official-symbols.ts`, `scripts/ingest-official-stocks.ts`
-- **Module:** `src/stockstory/ingestion/StockUniverseIngestion.ts`
+**9 active, 6 probe, 0 disabled, 0 deprecated**
 
-## Current Financial Data Coverage
+## Universe Coverage
 
-- **Tables:** `company_fundamental_snapshots`, `company_financial_statement_tables`, `company_profile_overviews`
-- **Key metrics:** PE, PB, ROCE, ROE, D/E, dividend yield, EPS, book value, sales/profit growth, margins
-- **Freshness:** Per-ingestion timestamps tracked
+- Existing symbol and identity modules with normalization (NSE/BSE/ISIN)
+- Universe builder with merge-and-deduplicate logic
+- Symbol normalizer: strips exchange suffixes, normalizes case
+- Alias resolution with conflict detection
+- Missing: programmatic population from live sources
 
-## Current Technical Data Coverage
+## Financial Data Coverage
 
-- Technical indicators computed via `TechnicalIndicatorService`
-- Market prices in `market_live_price_snapshots`
+- Existing result types: quarterly, annual, half-yearly
+- Full P&L structure (revenue, expenses, EBITDA, PAT, EPS)
+- Balance sheet items (assets, liabilities, net worth, debt)
+- Cash flow items (operating, investing, financing)
+- Segment reporting
+- YoY/QoQ comparison metrics
+- Shareholding patterns with promoter/FII/DII/retail trends
+- Promoter pledge risk scoring
 
-## Current News Coverage
+## Technical Data Coverage
 
-- News ingestion in `src/stockstory/ingestion/NewsIngestion.ts`
-- Headlines in `stock_live_snapshot`
+- Existing infrastructure for technical indicators via Trendlyne/StockEdge probes
+- Freshness tracker supports price/daily updates
+- Missing: dedicated derivatives and liquidity context engines
 
-## Current Document/RAG Coverage
+## News Coverage
 
-- **No dedicated `src/stockstory/rag/` module exists**
-- RAG document ingestion exists in `src/stockstory/ingestion/RagDocumentIngestion.ts`
-- Evidence system exists in `src/stockstory/intelligence/evidence/`
+- Existing via StockEdge/Trendlyne probes
+- Missing: dedicated news quality scorer, deduper, entity matcher
 
-## Current Filings Support
+## Document/RAG Coverage
 
-- **No dedicated filings module** — filings data not yet systematically ingested
+- Existing document store with chunking support
+- Document types: annual_report, investor_presentation, concall_transcript, etc.
+- Metadata extraction framework
+- Missing: dedicated RAG corpus store, index builder, retriever
 
-## Current Ingestion Jobs
+## Filings Support
 
-- `universe:generate`, `universe:sync`, `universe:sync-official`
-- `indianapi:premium:ingest` (Python)
-- `job:indianapi-premium` (periodic refresh)
-- `ingest:screener`, `ingest:fundamentals`
-- `ingest:authorized:financials`, `ingest:authorized:shareholding`, `ingest:authorized:corporate-actions`, `ingest:authorized:quotes`
+- Filing types: annual_report, quarterly_result, corp_announcement, shareholding_pattern, insider_trading, board_meeting, etc.
+- Exchange filing repository with multi-index queries
+- Filing batch tracking
+- Missing: filing classifier and impact mapper
 
-## Current DB Schema Relevant to Data
+## Ingestion Jobs
 
-Existing tables: stocks, stock_updates, market_live_price_snapshots, company_profile_overviews, company_fundamental_snapshots, company_financial_statement_tables, company_shareholding_snapshots, company_corporate_actions, stock_live_snapshot, stock_intelligence_history, stock_super_scan_results
+- 1 existing: `scripts/data/refresh-indian-equity-universe.ts`
+- Missing: 8+ additional ingestion scripts
 
-## Scope of This Phase
+## DB Schema
 
-Build comprehensive data moat covering: source registry, equity universe expansion, company identity, data quality scoring, evidence lineage, corporate actions, filing intelligence, quarterly results, documents/RAG, transcripts (if legal), shareholding risk, disclosures, index/sector membership, macro context, liquidity/derivatives, news quality, reconciliation, ingestion jobs, DB migrations, intelligence/API/frontend integration, policy docs, validation, safety and tests.
+- Existing PostgreSQL/SQLite via `src/db/`
+- Existing stocks, users, predictions tables
+- Missing: data_moat-specific additive tables
+
+## Production Verification
+
+- Existing: `scripts/intelligence/verify-production-intelligence.ts`
+- Missing: data-moat-specific verification checks
+
+## Phase 16 Scope
+
+This phase will add:
+1. ✅ Full report creation and architecture audit
+2. ✅ Missing barrel/index exports
+3. ✅ News quality, dedup, entity matching
+4. ✅ Index and sector membership engine
+5. ✅ Macro context, liquidity/derivatives context engines
+6. ✅ Market disclosure types and ingestion (bulk/block/insider)
+7. ✅ Corporate action event mapper & disclosure event mapper
+8. ✅ Filing classifier & impact mapper
+9. ✅ Quarterly result normalizer & result impact engine
+10. ✅ Document parser, chunker, metadata extractor, ingestion service
+11. ✅ Transcript ingestion service & signal extractor
+12. ✅ Shareholding ingestion & risk mapper
+13. ✅ Data reconciliation & conflict detection
+14. ✅ RAG research corpus store, index builder, retriever
+15. ✅ Data ingestion scripts (8+)
+16. ✅ Data quality validation scripts
+17. ✅ Source/legal policy documentation
+18. ✅ Internal data operations report
+19. ✅ Frontend product integration (filings, results, research basis)
+20. ✅ Production data verification
+21. ✅ Tests for all new modules
+22. ✅ Commit and push

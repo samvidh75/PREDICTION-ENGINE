@@ -1,151 +1,86 @@
 /**
- * CorporateActionNormalizer — normalizes raw corporate action records into
- * canonical CorporateAction entries.
+ * Corporate Action Normalizer
  *
- * Rules:
- *  - Only real actions (null/undefined values → return null).
- *  - Dividends: display "₹{value} per share".
- *  - Splits: display "{value}:{value2}" split.
- *  - Bonus: display "{value}:{value2}" bonus.
- *  - Symbol / name changes: display the new value.
- *  - Delisting / suspension: display as-is, warning severity.
- *  - No invented or assumed values.
+ * Normalizes raw corporate action data from various sources
+ * into the standard CorporateAction type. Handles source-specific
+ * quirks and date format normalization.
  */
 
-import type {
-  CorporateAction,
-  CorporateActionKind,
-  CorporateActionAlert,
-  RawCorporateAction,
-} from "./CorporateActionTypes.ts";
-import { dataEvidenceIdFactory } from "../evidence/DataEvidenceIdFactory.ts";
-
-/* ------------------------------------------------------------------ */
-/*  Helpers                                                            */
-/* ------------------------------------------------------------------ */
-
-function formatSummary(kind: CorporateActionKind, raw: RawCorporateAction): string {
-  switch (kind) {
-    case "dividend": {
-      const amt = raw.value != null ? `₹${raw.value.toFixed(2)}` : "";
-      const sub = raw.subKind ? ` (${raw.subKind})` : "";
-      return amt ? `Dividend${sub}: ${amt} per share` : `Dividend declared${sub}`;
-    }
-    case "bonus": {
-      if (raw.value != null && raw.value2 != null) {
-        return `Bonus issue: ${raw.value}:${raw.value2}`;
-      }
-      return "Bonus issue announced";
-    }
-    case "split": {
-      if (raw.value != null && raw.value2 != null) {
-        return `Stock split: ${raw.value}:${raw.value2}`;
-      }
-      return "Stock split announced";
-    }
-    case "rights":
-      return raw.value != null ? `Rights issue: ₹${raw.value}` : "Rights issue announced";
-    case "buyback":
-      return raw.value != null ? `Buyback: ₹${raw.value}` : "Buyback announced";
-    case "merger":
-      return raw.details ? `Merger: ${raw.details}` : "Merger announced";
-    case "demerger":
-      return raw.details ? `Demerger: ${raw.details}` : "Demerger announced";
-    case "name_change":
-      return raw.details ? `Name change: ${raw.details}` : "Name change";
-    case "symbol_change":
-      return raw.details ? `Symbol change: ${raw.details}` : "Symbol change";
-    case "delisting":
-      return "Delisting";
-    case "suspension":
-      return "Trading suspended";
-    default:
-      return raw.details ?? "Corporate action";
-  }
-}
-
-function formatDisplayValue(kind: CorporateActionKind, raw: RawCorporateAction): string | undefined {
-  switch (kind) {
-    case "dividend":
-      return raw.value != null ? `₹${raw.value.toFixed(2)}` : undefined;
-    case "split":
-      return raw.value != null && raw.value2 != null ? `${raw.value}:${raw.value2}` : undefined;
-    case "bonus":
-      return raw.value != null && raw.value2 != null ? `${raw.value}:${raw.value2}` : undefined;
-    case "rights":
-      return raw.value != null ? `₹${raw.value}` : undefined;
-    case "buyback":
-      return raw.value != null ? `₹${raw.value}` : undefined;
-    default:
-      return undefined;
-  }
-}
-
-function inferSeverity(kind: CorporateActionKind): CorporateActionAlert["severity"] {
-  switch (kind) {
-    case "delisting":
-    case "suspension":
-      return "warning";
-    case "merger":
-    case "demerger":
-    case "buyback":
-      return "important";
-    default:
-      return "info";
-  }
-}
-
-/* ------------------------------------------------------------------ */
-/*  Normalizer                                                         */
-/* ------------------------------------------------------------------ */
+import type { RawCorporateAction, CorporateAction, CorporateActionKind, CorporateActionSubKind } from './CorporateActionTypes';
+import { corporateActionIngestion } from './CorporateActionIngestion';
 
 export class CorporateActionNormalizer {
-  /**
-   * Normalize a raw record. Returns null for invalid / empty records
-   * (no invented actions).
-   */
-  normalize(raw: RawCorporateAction): CorporateAction | null {
-    if (!raw.symbol || !raw.kind || !raw.announcementDate || !raw.effectiveDate) {
+  /** Normalize a date string to ISO date (YYYY-MM-DD) */
+  private normalizeDate(dateStr: string | undefined | null): string | null {
+    if (!dateStr) return null;
+    try {
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) return null;
+      return d.toISOString().slice(0, 10);
+    } catch {
       return null;
     }
+  }
 
-    const id = dataEvidenceIdFactory.createId({
-      symbol: raw.symbol,
-      field: `corp_${raw.kind}`,
-      asOf: raw.effectiveDate,
-      sourceCategory: raw.sourceCategory,
-    });
+  /** Infer CorporateActionKind from a sub-kind or raw category string */
+  inferKind(category: string): CorporateActionKind {
+    const lower = category.toLowerCase();
+    if (lower.includes('dividend')) return 'dividend';
+    if (lower.includes('bonus')) return 'bonus';
+    if (lower.includes('split')) return 'split';
+    if (lower.includes('rights')) return 'rights';
+    if (lower.includes('buyback')) return 'buyback';
+    if (lower.includes('merger') || lower.includes('amalgamation')) return 'merger';
+    if (lower.includes('demerger')) return 'demerger';
+    if (lower.includes('delist')) return 'delisting';
+    if (lower.includes('suspen')) return 'suspension';
+    if (lower.includes('name change')) return 'name_change';
+    if (lower.includes('symbol')) return 'symbol_change';
+    if (lower.includes('face value') || lower.includes('fv')) return 'face_value_change';
+    if (lower.includes('board')) return 'board_meeting';
+    if (lower.includes('agm') || lower.includes('egm')) return 'agm_egm';
+    return 'dividend';
+  }
+
+  /** Normalize a raw corporate action from any source into standard RawCorporateAction */
+  normalize(raw: {
+    symbol: string;
+    companyName?: string;
+    category?: string;
+    kind?: CorporateActionKind;
+    subKind?: CorporateActionSubKind;
+    announcementDate: string;
+    exDate?: string;
+    recordDate?: string;
+    effectiveDate?: string;
+    details?: Record<string, unknown>;
+    sourceId: string;
+  }): RawCorporateAction {
+    const kind = raw.kind ?? (raw.category ? this.inferKind(raw.category) : 'dividend');
 
     return {
-      id,
-      symbol: raw.symbol,
-      kind: raw.kind,
+      symbol: raw.symbol.toUpperCase(),
+      companyName: raw.companyName ?? raw.symbol,
+      kind,
       subKind: raw.subKind,
-      announcementDate: raw.announcementDate,
-      effectiveDate: raw.effectiveDate,
-      paymentDate: raw.paymentDate,
-      displayValue: formatDisplayValue(raw.kind, raw),
-      summary: formatSummary(raw.kind, raw),
-      sourceCategory: raw.sourceCategory,
-      registeredAt: Date.now(),
+      announcementDate: this.normalizeDate(raw.announcementDate) ?? raw.announcementDate,
+      exDate: this.normalizeDate(raw.exDate) ?? undefined,
+      recordDate: this.normalizeDate(raw.recordDate) ?? undefined,
+      effectiveDate: this.normalizeDate(raw.effectiveDate) ?? undefined,
+      details: raw.details ?? {},
+      sourceId: raw.sourceId,
     };
   }
 
-  /**
-   * Generate a watchlist alert from a normalized action.
-   * Only called for real actions — never for null/invented ones.
-   */
-  toAlert(action: CorporateAction): CorporateActionAlert {
-    return {
-      id: `alert-${action.id}`,
-      symbol: action.symbol,
-      actionId: action.id,
-      kind: action.kind,
-      title: action.summary.length > 80 ? action.summary.slice(0, 77) + "..." : action.summary,
-      detail: `Corporate action: ${action.kind.replace(/_/g, " ")} on ${action.effectiveDate}`,
-      effectiveDate: action.effectiveDate,
-      severity: inferSeverity(action.kind),
-    };
+  /** Normalize and ingest a corporate action in one step */
+  normalizeAndIngest(raw: Parameters<CorporateActionNormalizer['normalize']>[0]): CorporateAction {
+    const normalized = this.normalize(raw);
+    return corporateActionIngestion.ingest(normalized);
+  }
+
+  /** Normalize and ingest multiple actions */
+  normalizeAndIngestMany(raws: Parameters<CorporateActionNormalizer['normalize']>[0][]): CorporateAction[] {
+    return raws.map(r => this.normalizeAndIngest(r));
   }
 }
 
