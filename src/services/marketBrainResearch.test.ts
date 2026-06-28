@@ -314,13 +314,20 @@ describe('fetchMarketBrainResearch', () => {
     expect(result.research.factorViews.map((factorView) => factorView.score)).toEqual([0, 100]);
   });
 
-  it('throws a typed error for unavailable research', async () => {
+  it('throws a typed public-safe error for unavailable research', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
       ok: false,
       status: 503,
-      json: async () => ({ code: 'RESEARCH_TEMPORARILY_UNAVAILABLE', message: 'Research is temporarily unavailable for this company.' }),
+      json: async () => ({
+        code: 'PROVIDER_UPSTREAM_FAILURE',
+        message: 'Backend provider failed because the upstream adapter timed out.',
+      }),
     }));
 
-    await expect(fetchMarketBrainResearch('TCS')).rejects.toBeInstanceOf(MarketBrainResearchError);
+    await expect(fetchMarketBrainResearch('TCS')).rejects.toMatchObject({
+      code: 'PROVIDER_UPSTREAM_FAILURE',
+      message: 'Research is temporarily unavailable for this company.',
+      status: 503,
+    });
   });
 });
