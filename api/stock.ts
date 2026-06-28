@@ -3,11 +3,11 @@ import { getPersistedStockResearch } from "../src/lib/stockResearchSnapshot.js";
 
 // ── Constants ──────────────────────────────────────────────────────────────────
 const RANGE_CFG: Record<string, { range: string; interval: string }> = {
-  "1W": { range: "1w", interval: "1h" },
+  "1W": { range: "5d",  interval: "30m" },
   "1M": { range: "1mo", interval: "1d" },
   "3M": { range: "3mo", interval: "1d" },
-  "1Y": { range: "1y", interval: "1wk" },
-  "5Y": { range: "5y", interval: "1mo" },
+  "1Y": { range: "1y",  interval: "1wk" },
+  "5Y": { range: "5y",  interval: "1mo" },
 };
 const CACHE = new Map<string, { data: unknown; expiresAt: number }>();
 const CACHE_TTL = 5 * 60 * 1000;
