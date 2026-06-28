@@ -81,11 +81,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       results: results.map(r => ({
         symbol: r.symbol,
         companyName: r.companyName,
-        convictionLabel: r.convictionLabel,
-        convictionScore: r.convictionScore,
-        topContributor: r.topContributor,
-        riskFlag: r.riskFlag,
-        scores: r.scores,
+        sector: r.sector,
+        rank: r.rank,
+        conviction: r.conviction,
+        score: r.score,
+        keyReason: r.keyReason,
+        riskMarker: r.riskMarker,
+        oneLineThesis: r.oneLineThesis,
       })),
       _dataSource: "scoring_engine",
     };
