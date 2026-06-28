@@ -104,6 +104,8 @@ const isPublicScore = (value: unknown): value is number => (
   typeof value === 'number' && Number.isFinite(value) && value >= 0 && value <= 100
 );
 
+const asPublicScore = (value: unknown): number => (isPublicScore(value) ? value : 0);
+
 const asFactorViews = (value: unknown): MarketBrainFactorView[] => (Array.isArray(value)
   ? value.filter((item): item is MarketBrainFactorView => {
     if (!item || typeof item !== 'object') return false;
@@ -148,6 +150,7 @@ const normalizeResearchResponse = (payload: Partial<MarketBrainResearchResponse>
       ...(research as MarketBrainResearchView),
       symbol: normalizeSymbol(symbol),
       companyName,
+      convictionScore: asPublicScore(research.convictionScore),
       thesis: asStringArray(research.thesis),
       risksToReview: asStringArray(research.risksToReview),
       whatToWatch: asStringArray(research.whatToWatch),
