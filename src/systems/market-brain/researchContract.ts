@@ -48,8 +48,8 @@ const humanizeDomain = (domain: MarketDataDomain): string => domain
   .join(' ');
 
 const buildEvidenceReview = (result: IndiaMarketBrainResult): MarketBrainEvidenceReviewView => {
-  const partial = result.partialEvidence;
-  const missing = result.missingEvidence;
+  const partial = [...result.partialEvidence];
+  const missing = [...result.missingEvidence];
   const needsReview = partial.length > 0 || missing.length > 0;
   const summary = !needsReview
     ? 'Required research evidence is available for this view.'

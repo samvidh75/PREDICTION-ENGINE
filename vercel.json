@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "buildCommand": "",
+  "buildCommand": "vite build",
   "outputDirectory": "dist/public",
   "trailingSlash": false,
   "github": {
