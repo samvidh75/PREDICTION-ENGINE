@@ -459,7 +459,10 @@ const SEARCH_CACHE_TTL = 60_000;
 
 // ── Routes ──────────────────────────────────────────────────────────────────
 
+import { registerAnalystRoutes } from "../stockstory/analyst/api/analystRoutes.js";
+
 export default async function registerApiRoutes(server: FastifyInstance) {
+  await registerAnalystRoutes(server);
   // Register intelligence quality gate (sanitizes all /api/intelligence/* responses)
   await server.register(intelligenceQualityGate);
   // GET /api/stock?symbol=TCS
@@ -1521,7 +1524,7 @@ export default async function registerApiRoutes(server: FastifyInstance) {
       const countResult = await dbAdapter.query(
         "SELECT COUNT(*) AS cnt FROM waitlist_entries"
       );
-      const position = (Number(countResult.rows[0]?.cnt) ?? 0) + 1;
+      const position = Number(countResult.rows[0]?.cnt ?? 0) + 1;
 
       const result = await dbAdapter.query(
         `INSERT INTO waitlist_entries (email, name, position)

@@ -174,7 +174,13 @@
     "audit:provider-reliability": "tsx scripts/audit-provider-reliability.ts",
     "smoke:trendlyne": "npm run trendlyne:smoke",
     "smoke:stockedge": "npm run stockedge:smoke",
-    "audit:engine-depth": "tsx scripts/audit-engine-depth.ts"
+    "audit:engine-depth": "tsx scripts/audit-engine-depth.ts",
+    "analyst:task": "tsx scripts/analyst/run-analyst-task.ts",
+    "analyst:earnings-notes": "tsx scripts/analyst/generate-earnings-notes.ts",
+    "analyst:filing-briefs": "tsx scripts/analyst/generate-filing-briefs.ts",
+    "analyst:sector-briefs": "tsx scripts/analyst/generate-sector-briefs.ts",
+    "analyst:watchlist-briefs": "tsx scripts/analyst/generate-watchlist-review-briefs.ts",
+    "analyst:validate": "tsx scripts/analyst/validate-analyst-outputs.ts"
   },
   "dependencies": {
     "@fastify/compress": "^8.3.1",

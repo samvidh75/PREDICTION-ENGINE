@@ -18,6 +18,7 @@ import type { AIAnalysis } from "../services/llm/AIAnalysisService";
 import { colors, typography, radius } from "../design/tokens";
 import { useSeo } from "../frontend/seo/useSeo";
 import { buildCompanySeo } from "../frontend/seo/companySeo";
+import { CompanyAnalystSection } from "../components/analyst/CompanyAnalystSection";
 
 type StockResearchDetail = {
   symbol: string;
@@ -168,10 +169,10 @@ function StockView({ stock }: { stock: StockResearchDetail }) {
   ];
 
   return (
-    <div style={{ display: "grid", gap: sectionGap }}>
+    <div className="stock-page" style={{ display: "grid", gap: sectionGap }}>
       <SEBIComplianceBanner />
-      <section style={{ display: "flex", justifyContent: "space-between", gap: "16px", flexWrap: "wrap" }}>
-        <div style={{ display: "grid", gap: "12px" }}>
+      <section className="stock-header" style={{ display: "flex", justifyContent: "space-between", gap: "16px", flexWrap: "wrap" }}>
+        <div className="stock-header-copy" style={{ display: "grid", gap: "12px" }}>
           <button
             onClick={() => navigate(-1)}
             style={{ border: "none", background: "transparent", padding: 0, display: "inline-flex", alignItems: "center", gap: "8px", color: colors.textSecondary, cursor: "pointer" }}
@@ -185,7 +186,7 @@ function StockView({ stock }: { stock: StockResearchDetail }) {
           </div>
           <p style={{ color: colors.textSecondary, fontSize: typography.body.desktop.size, fontWeight: 400, lineHeight: "1.6" }}>{stock.companyName}</p>
         </div>
-        <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
+        <div className="stock-header-actions" style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
           <Button variant="secondary">Track</Button>
           <Button variant="secondary">Compare</Button>
           <Button onClick={() => setBrokerModalOpen(true)} disabled={!primaryBroker}>
@@ -195,16 +196,16 @@ function StockView({ stock }: { stock: StockResearchDetail }) {
         </div>
       </section>
 
-      <section style={{ display: "grid", gap: "12px" }}>
-        <div style={{ color: colors.textPrimary, fontSize: typography.h1.desktop.size, fontWeight: 700, lineHeight: "1.15" }}>₹{stock.price.current.toLocaleString("en-IN")}</div>
+      <section className="stock-price-block" style={{ display: "grid", gap: "12px" }}>
+        <div className="stock-price-value" style={{ color: colors.textPrimary, fontSize: typography.h1.desktop.size, fontWeight: 700, lineHeight: "1.15" }}>₹{stock.price.current.toLocaleString("en-IN")}</div>
         <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", color: trendColor }}>
           {isUp ? <ArrowUp size={16} /> : <ArrowDown size={16} />}
           <span>{`${isUp ? "+" : ""}${stock.price.changeAbs.toFixed(2)} (${stock.price.changePercent.toFixed(2)}%)`}</span>
         </div>
       </section>
 
-      <Card>
-        <div style={{ display: "flex", gap: "12px", marginBottom: "16px", flexWrap: "wrap" }}>
+      <Card className="stock-chart-card">
+        <div className="stock-chart-toolbar" style={{ display: "flex", gap: "12px", marginBottom: "16px", flexWrap: "wrap" }}>
           {TIMEFRAMES.map((value) => (
             <Button key={value} variant={value === timeframe ? "primary" : "ghost"} onClick={() => setTimeframe(value)}>
               {value}
@@ -229,8 +230,8 @@ function StockView({ stock }: { stock: StockResearchDetail }) {
         </div>
       </Card>
 
-      <section style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "16px" }}>
-        <Card>
+      <section className="stock-score-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "16px" }}>
+        <Card className="stock-panel-card">
           <CardLabel>Score overview</CardLabel>
           <div style={{ display: "flex", justifyContent: "space-around", gap: "16px", flexWrap: "wrap", marginBottom: "16px" }}>
             <Ring label="Health" value={stock.scores.health ?? 0} />
@@ -242,7 +243,7 @@ function StockView({ stock }: { stock: StockResearchDetail }) {
             ))}
           </div>
         </Card>
-        <Card>
+        <Card className="stock-panel-card">
           <CardLabel>Thesis confidence</CardLabel>
           <div style={{ display: "grid", gap: "12px" }}>
             <Ring label="Confidence" value={stock.confidenceMeter} />
@@ -254,9 +255,9 @@ function StockView({ stock }: { stock: StockResearchDetail }) {
         </Card>
       </section>
 
-      <Card>
+      <Card className="stock-panel-card">
         <CardLabel>Key metrics</CardLabel>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "16px" }}>
+        <div className="stock-metric-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "16px" }}>
           <Stat label="Market Cap" value={`₹${Math.round(stock.price.marketCap).toLocaleString("en-IN")} Cr`} />
           <Stat label="PE (TTM)" value={stock.fundamentals.pe?.toFixed(1) ?? "—"} />
           <Stat label="PB Ratio" value={stock.fundamentals.pb?.toFixed(1) ?? "—"} />
@@ -270,12 +271,12 @@ function StockView({ stock }: { stock: StockResearchDetail }) {
         </div>
       </Card>
 
-      <Card>
+      <Card className="stock-panel-card">
         <CardLabel>About company</CardLabel>
         <p style={{ color: colors.textPrimary, fontSize: typography.body.desktop.size, fontWeight: 400, lineHeight: "1.6", marginBottom: "16px" }}>
           {stock.description}
         </p>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "16px", marginBottom: "16px" }}>
+        <div className="stock-about-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "16px", marginBottom: "16px" }}>
           <Stat label="Founded" value={stock.companyProfile.founded} />
           <Stat label="CEO" value={stock.companyProfile.ceo} />
           <Stat label="HQ" value={stock.companyProfile.hq} />
@@ -286,14 +287,14 @@ function StockView({ stock }: { stock: StockResearchDetail }) {
           <Stat label="Sector" value={stock.sector} />
           <Stat label="Industry" value={stock.industry} />
         </div>
-        <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+        <div className="stock-chip-row" style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
           {stock.companyProfile.businessSegments.map((segment) => (
             <Badge key={segment} value={60} label={segment} />
           ))}
         </div>
       </Card>
 
-      <Card>
+      <Card className="stock-panel-card">
         <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", flexWrap: "wrap", marginBottom: "16px" }}>
           <CardLabel>Financials</CardLabel>
           <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
@@ -321,7 +322,7 @@ function StockView({ stock }: { stock: StockResearchDetail }) {
         <p style={{ color: colors.textSecondary, fontSize: "12px", marginTop: "12px" }}>All values in ₹ Cr</p>
       </Card>
 
-      <Card>
+      <Card className="stock-panel-card">
         <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", flexWrap: "wrap", marginBottom: "16px" }}>
           <CardLabel>Shareholdings</CardLabel>
           <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
@@ -341,7 +342,7 @@ function StockView({ stock }: { stock: StockResearchDetail }) {
           ].map((item) => {
             const positive = item.delta >= 0;
             return (
-              <div key={item.label} style={{ display: "grid", gap: "8px" }}>
+              <div key={item.label} className="stock-shareholding-list" style={{ display: "grid", gap: "8px" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", gap: "12px" }}>
                   <span>{item.label}</span>
                   <span style={{ display: "inline-flex", alignItems: "center", gap: "4px", color: positive ? colors.success : colors.danger }}>
@@ -349,8 +350,8 @@ function StockView({ stock }: { stock: StockResearchDetail }) {
                     {item.value.toFixed(1)}%
                   </span>
                 </div>
-                <div style={{ height: "8px", background: colors.border, borderRadius: radius.lg, overflow: "hidden" }}>
-                  <div style={{ width: `${item.value}%`, height: "100%", background: colors.primary }} />
+                <div className="stock-shareholding-bar" style={{ height: "8px", background: colors.border, borderRadius: radius.lg, overflow: "hidden" }}>
+                  <div className="stock-shareholding-fill" style={{ width: `${item.value}%`, height: "100%", background: colors.primary }} />
                 </div>
               </div>
             );
@@ -358,13 +359,14 @@ function StockView({ stock }: { stock: StockResearchDetail }) {
         </div>
       </Card>
 
-      <Card>
+      <Card className="stock-panel-card">
         <CardLabel>Latest news</CardLabel>
-        <div style={{ display: "grid", gap: "16px" }}>
+        <div className="stock-news-list" style={{ display: "grid", gap: "16px" }}>
           {newsItems.map((item) => {
             const secondary = formatNewsTime(item.publishedAt) || item.time;
             return (
               <a
+                className="stock-news-item"
                 key={item.headline}
                 href={item.link || "#"}
                 target={item.link ? "_blank" : undefined}
@@ -392,7 +394,7 @@ function StockView({ stock }: { stock: StockResearchDetail }) {
 
       <Card>
         <CardLabel>Research thesis</CardLabel>
-        <div style={{ display: "grid", gap: "12px" }}>
+        <div className="stock-copy-list" style={{ display: "grid", gap: "12px" }}>
           <Badge value={stock.scores.health ?? 0} label={stock.thesis.stance} />
           <p style={{ color: colors.textSecondary, fontSize: typography.body.desktop.size, lineHeight: "1.6" }}>{stock.thesis.thesis}</p>
           <p style={{ color: colors.textPrimary, fontSize: typography.body.desktop.size, lineHeight: "1.6" }}>{`Bull case: ${stock.thesis.bullCase}`}</p>
@@ -404,9 +406,9 @@ function StockView({ stock }: { stock: StockResearchDetail }) {
       <ThesisHistory symbol={stock.symbol} />
 
       {ai && (
-        <Card>
+        <Card className="stock-panel-card">
           <CardLabel>AI Analysis</CardLabel>
-          <div style={{ display: "grid", gap: "12px" }}>
+          <div className="stock-copy-list" style={{ display: "grid", gap: "12px" }}>
             <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
               <div style={{
                 width: "8px", height: "8px", borderRadius: "50%",
@@ -425,9 +427,9 @@ function StockView({ stock }: { stock: StockResearchDetail }) {
         </Card>
       )}
 
-      <Card>
+      <Card className="stock-panel-card">
         <CardLabel>What changed</CardLabel>
-        <div style={{ display: "grid", gap: "12px" }}>
+        <div className="stock-copy-list" style={{ display: "grid", gap: "12px" }}>
           {stock.whatChanged.map((item) => (
             <p key={item} style={{ color: colors.textSecondary, fontSize: typography.body.desktop.size, lineHeight: "1.6" }}>
               {item}
@@ -436,14 +438,16 @@ function StockView({ stock }: { stock: StockResearchDetail }) {
         </div>
       </Card>
 
-      <Card>
+      <Card className="stock-panel-card">
         <CardLabel>Sector-relative view</CardLabel>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "16px" }}>
+        <div className="stock-sector-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "16px" }}>
           {stock.sectorRelative.map((item) => (
             <Stat key={item.label} label={`${item.label} vs sector`} value={`${item.company} / ${item.sectorMedian}`} />
           ))}
         </div>
       </Card>
+
+      <CompanyAnalystSection symbol={stock.symbol} />
 
       {brokerModalOpen && primaryBroker && (
         <BrokerHandoffModal

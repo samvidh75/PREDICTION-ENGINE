@@ -6,6 +6,8 @@ import { Button } from "../ui/Button";
 import { Badge } from "../ui/Badge";
 import { colors, typography, space, radius } from "../design/tokens";
 import { SEBIComplianceBanner } from "../components/SEBICompliance";
+import { AnalystBriefCard } from "../components/analyst/AnalystBriefCard";
+import { watchlistReviewBriefGenerator } from "../stockstory/analyst/watchlist/WatchlistReviewBriefGenerator";
 import type { WatchlistThesisView } from "../research/contracts/productContracts";
 import type { WatchlistIntelligence } from "../services/personalization/WatchlistIntelligenceEngine";
 import { recordAction } from "../services/personalization/UserActionMemory";
@@ -234,6 +236,23 @@ export default function WatchlistPage() {
                     "{item.lastThesis.slice(0, 120)}{item.lastThesis.length > 120 ? "..." : ""}"
                   </div>
                 )}
+
+                {(() => {
+                  const brief = watchlistReviewBriefGenerator.generate({
+                    symbol: item.symbol,
+                    thesisState: item.currentStatus,
+                    riskRising: item.currentStatus === "Weakening" || item.currentStatus === "Needs review",
+                    whatChanged: [],
+                  });
+                  return (
+                    <div style={{ fontSize: "12px", color: colors.textSecondary, borderTop: `1px solid ${colors.border}`, paddingTop: space[2] }}>
+                      <strong>Review brief:</strong> {brief.whatChangedSinceLastReview[0]}
+                      {brief.risksRequiringAttention.length > 0 && (
+                        <span> — {brief.risksRequiringAttention[0]}</span>
+                      )}
+                    </div>
+                  );
+                })()}
               </div>
             </Card>
           ))}
