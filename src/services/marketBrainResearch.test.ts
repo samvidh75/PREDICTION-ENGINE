@@ -258,6 +258,31 @@ describe('fetchMarketBrainResearch', () => {
     expect(result.research.evidenceReview.needsReview).toBe(true);
   });
 
+  it('keeps review enabled when evidence gaps conflict with a stale false flag', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({
+        ...responsePayload,
+        research: {
+          ...responsePayload.research,
+          evidenceReview: {
+            needsReview: false,
+            partial: ['fundamentals'],
+            missing: ['sector_context'],
+            summary: 'Some research evidence needs review.',
+          },
+        },
+      }),
+    }));
+
+    const result = await fetchMarketBrainResearch('TCS');
+
+    expect(result.research.evidenceReview.needsReview).toBe(true);
+    expect(result.research.evidenceReview.partial).toEqual(['fundamentals']);
+    expect(result.research.evidenceReview.missing).toEqual(['sector_context']);
+  });
+
   it('filters unknown evidence domains from public client metadata', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
       ok: true,
