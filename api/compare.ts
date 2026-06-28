@@ -38,13 +38,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   // Fetch research data for all symbols in parallel
-  const researchResults = await Promise.allSettled(
+  const researchResults = await Promise.all(
     symbols.map(s => getPersistedStockResearch(s).catch(() => null))
   );
 
   const inputs: CompareInput[] = [];
   for (let i = 0; i < symbols.length; i++) {
-    const syn = researchResults[i].status === "fulfilled" ? researchResults[i].value : null;
+    const syn = researchResults[i];
     inputs.push({
       symbol: symbols[i],
       companyName: syn?.companyName || symbols[i],
@@ -62,7 +62,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const result = compareCompanies(inputs);
 
   const missingSymbols = researchResults
-    .map((r, i) => (r.status === "rejected" ? symbols[i] : null))
+    .map((r, i) => (r === null ? symbols[i] : null))
     .filter(Boolean) as string[];
 
   const payload = {
