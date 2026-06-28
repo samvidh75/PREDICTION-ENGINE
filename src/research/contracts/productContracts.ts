@@ -193,3 +193,65 @@ export interface InvestReviewContextView {
   whatToWatch: string[];
   missingCriticalData: string[];
 }
+
+// ── Personal Research OS Types ──────────────────────────────────
+
+export type ResearchExperienceLevel = 'beginner' | 'intermediate' | 'advanced';
+
+export type ResearchTimeHorizon = 'short_term' | 'medium_term' | 'long_term';
+
+export interface SectorPreference {
+  sector: string;
+  interested: boolean;
+}
+
+export interface UserResearchProfile {
+  /** Firebase UID — matches user_profiles.uid */
+  uid: string | null;
+  /** Display name for research workspace */
+  displayName: string | null;
+  /** Self-reported research experience level */
+  experienceLevel: ResearchExperienceLevel;
+  /** Preferred investment time horizon for research */
+  timeHorizon: ResearchTimeHorizon;
+  /** Sectors the user wants to follow */
+  sectorPreferences: SectorPreference[];
+  /** Maximum risk level the user wants to see flagged */
+  maxRiskLevel: RiskLevel;
+  /** Topics the user wants to stay informed about */
+  researchTopics: string[];
+  /** Whether onboarding has been completed */
+  onboardingComplete: boolean;
+  /** When the profile was last updated */
+  updatedAt: string;
+  /** When the profile was created */
+  createdAt: string;
+}
+
+export interface ResearchDigestItem {
+  symbol: string;
+  companyName: string;
+  alertType: string;
+  title: string;
+  body: string;
+  thesisStatus: ThesisStatus | null;
+  score: number | null;
+}
+
+export interface DailyResearchDigest {
+  date: string;
+  uid: string;
+  watchlistUpdates: ResearchDigestItem[];
+  alertSummary: { total: number; unread: number; byType: Record<string, number> };
+  thesisChanges: { symbol: string; from: ThesisStatus | null; to: ThesisStatus }[];
+  topMovers: { symbol: string; scoreChange: number }[];
+  generatedAt: string;
+}
+
+export interface SavedScannerPreset {
+  id: string;
+  name: string;
+  description: string;
+  filters: Record<string, unknown>;
+  createdAt: string;
+}

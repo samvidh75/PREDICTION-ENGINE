@@ -23,7 +23,7 @@ import type {
   RiskEngineOutput,
   SectorEngineOutput,
 } from "../types";
-import { clampScore, toScoreBand } from "../scoring";
+import { clampScore } from "../scoring";
 import { financialEngine } from "../engines/FinancialEngine";
 import { technicalEngine } from "../engines/TechnicalEngine";
 import { valuationEngine } from "../engines/ValuationEngine";
@@ -34,10 +34,7 @@ import { earningsEngine } from "../engines/EarningsEngine";
 import type {
   ScenarioInput,
   ScenarioOutput,
-  ScenarioKind,
-  ScenarioAssumptions,
 } from "./ScenarioTypes";
-import { ScenarioRegistry } from "./ScenarioRegistry";
 import { FinancialStressSimulator } from "./FinancialStressSimulator";
 import { ValuationStressSimulator } from "./ValuationStressSimulator";
 import { EarningsStressSimulator } from "./EarningsStressSimulator";
@@ -80,9 +77,9 @@ export interface ScenarioOrchestrationResult {
   peerResults?: import("./ScenarioTypes").PeerScenarioResult[];
 
   /** Thesis assessment across all scenarios */
-  thesisAssessment?: import("./ScenarioTypes").ThesisAssessment;
+  thesisAssessment?: import("./ThesisLifecycleEngine").ThesisAssessment;
   /** Compound multi-scenario thesis view */
-  compoundThesis?: import("./ScenarioTypes").CompoundThesis;
+  compoundThesis?: ReturnType<ThesisLifecycleEngine["assessMultiple"]>;
 
   /** Watchlist items generated from scenario results */
   watchlist?: import("./WatchlistEngine").WatchlistReport;
