@@ -65,7 +65,7 @@ feature_flags:
 
 rollback_procedure:
   steps:
-    - action: "Set ENABLE_SGLANG=false in Railway"
+    - action: "Set ENABLE_SGLANG=false in Render"
       duration: 10s
       impact: "Falls back to deterministic narratives"
     - action: "Verify fallback working via /api/llm-health"

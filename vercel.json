@@ -2,6 +2,7 @@
   "version": 2,
   "buildCommand": "",
   "outputDirectory": "dist/public",
+  "trailingSlash": false,
   "github": {
     "silent": true
   },
