@@ -11,7 +11,8 @@ import Fastify from "fastify";
 import cors from "@fastify/cors";
 import { fileURLToPath } from "url";
 import { dirname, join, extname } from "path";
-import { existsSync, readFile } from "fs";
+import { existsSync, readFile, readdirSync } from "fs";
+import { execSync } from "child_process";
 import { dbAdapter } from "../db/DatabaseAdapter";
 import { MigrationRunner } from "../db/MigrationRunner";
 import registerApiRoutes from "./apiRouter.js";
@@ -87,8 +88,19 @@ async function bootstrap() {
   const distPath = join(process.cwd(), "dist", "public");
   const indexPath = join(distPath, "index.html");
   server.log.info(
-    `Starting static file server, dist: ${distPath}, exists: ${existsSync(distPath)}, index: ${existsSync(indexPath)}`
+    `Static dir: ${distPath}, exists: ${existsSync(distPath)}, index: ${existsSync(indexPath)}`
   );
+
+  // Build frontend if missing (fallback for Render build env)
+  if (!existsSync(indexPath)) {
+    server.log.info("Frontend assets missing — running vite build...");
+    try {
+      execSync("npx vite build", { cwd: process.cwd(), stdio: "pipe", timeout: 120_000 });
+      server.log.info(`Vite build complete — index exists: ${existsSync(indexPath)}`);
+    } catch (e: any) {
+      server.log.warn(`Vite build failed: ${e.message || e}`);
+    }
+  }
 
   const MIME_TYPES: Record<string, string> = {
     ".html": "text/html",
