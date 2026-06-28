@@ -1,7 +1,9 @@
 // api/research.ts — Self-contained Vercel serverless function
-// No src/ imports — calls external APIs directly (Yahoo Finance, IndianAPI)
+// Uses minimal src/ imports that are proven to work on Vercel (same as api/v2/stock.ts)
+// Calls Yahoo Finance + IndianAPI for live data, falls back to seeded research
 // Routes via ?action= scanner | compare | watchlist | broker
 import type { VercelRequest, VercelResponse } from "@vercel/node";
+import { getPersistedStockResearch } from "../src/lib/stockResearchSnapshot.js";
 
 // ── Compact Stock Universe (~85 major NSE/BSE stocks) ────────────────────────
 const UNIVERSE: { sym: string; name: string; sector: string }[] = [
@@ -172,29 +174,37 @@ async function indianApiFunds(symbol: string): Promise<Record<string, unknown>> 
   } catch { return {}; }
 }
 
-// ── Synthesize fundamentals from Yahoo + IndianAPI ───────────────────────────
+// ── Synthesize fundamentals from Yahoo + IndianAPI + seeded fallback ──────────
 async function getFundamentals(sym: string, entry: { name: string; sector: string }) {
-  const [yahoo, fund] = await Promise.all([yahooQuote(sym), indianApiFunds(sym)]);
+  const [yahoo, fund, fallback] = await Promise.all([
+    yahooQuote(sym),
+    indianApiFunds(sym),
+    getPersistedStockResearch(sym).catch(() => null),
+  ]);
+  const fb = fallback;
   const quoteData = yahoo || { price: 0, change: 0, changePercent: 0, volume: 0, marketCap: 0, pe: null, pb: null, roe: null, eps: null, dividendYield: null, name: entry.name, sector: entry.sector };
 
   return {
     symbol: sym,
-    companyName: quoteData.name || entry.name,
-    sector: entry.sector || quoteData.sector || "Uncategorized",
-    price: quoteData.price,
-    change: quoteData.change,
-    changePercent: quoteData.changePercent,
-    marketCap: quoteData.marketCap,
-    pe: n(fund.pe_ratio) ?? quoteData.pe ?? null,
-    pb: n(fund.pb_ratio) ?? quoteData.pb ?? null,
-    roe: n(fund.roe ?? fund.return_on_equity) ?? quoteData.roe ?? null,
-    debtToEquity: n(fund.debt_to_equity) ?? null,
-    eps: n(fund.eps) ?? quoteData.eps ?? null,
-    dividendYield: n(fund.dividend_yield) ?? quoteData.dividendYield ?? null,
-    revenueGrowth: n(fund.revenue_growth_3y ?? fund.revenue_growth) ?? null,
-    profitGrowth: n(fund.profit_growth_3y ?? fund.profit_growth) ?? null,
-    interestCoverage: n(fund.interest_coverage) ?? null,
-    source: { price: yahoo ? "yahoo" : "none", fundamentals: Object.keys(fund).length > 0 ? "indianapi" : yahoo ? "yahoo" : "none" },
+    companyName: quoteData.name || fb?.companyName || entry.name,
+    sector: fb?.sector || entry.sector || quoteData.sector || "Uncategorized",
+    price: quoteData.price || fb?.price || 0,
+    change: quoteData.change || fb?.change || 0,
+    changePercent: quoteData.changePercent || fb?.changePercent || 0,
+    marketCap: quoteData.marketCap || fb?.marketCap || 0,
+    pe: n(fund.pe_ratio) ?? quoteData.pe ?? fb?.pe ?? null,
+    pb: n(fund.pb_ratio) ?? quoteData.pb ?? fb?.pb ?? null,
+    roe: n(fund.roe ?? fund.return_on_equity) ?? quoteData.roe ?? fb?.roe ?? null,
+    debtToEquity: n(fund.debt_to_equity) ?? fb?.debtToEquity ?? null,
+    eps: n(fund.eps) ?? quoteData.eps ?? fb?.eps ?? null,
+    dividendYield: n(fund.dividend_yield) ?? quoteData.dividendYield ?? fb?.dividendYield ?? null,
+    revenueGrowth: n(fund.revenue_growth_3y ?? fund.revenue_growth) ?? fb?.revenueGrowth ?? null,
+    profitGrowth: n(fund.profit_growth_3y ?? fund.profit_growth) ?? fb?.profitGrowth ?? null,
+    interestCoverage: n(fund.interest_coverage) ?? fb?.interestCoverage ?? null,
+    source: {
+      price: yahoo ? "yahoo" : fb ? "seeded" : "none",
+      fundamentals: Object.keys(fund).length > 0 ? "indianapi" : fb ? "seeded" : yahoo ? "yahoo" : "none",
+    },
   };
 }
 
