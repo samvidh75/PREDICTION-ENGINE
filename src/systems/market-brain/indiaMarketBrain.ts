@@ -1,18 +1,13 @@
 import { normalizeEvidenceCoverage } from './evidenceNormalization';
+import type {
+  MARKET_BRAIN_ALLOWED_STATES,
+  MARKET_BRAIN_EVIDENCE_DOMAINS,
+} from './marketBrainGuardrails';
 
-export type MarketDataDomain =
-  | 'instrument_master'
-  | 'prices'
-  | 'fundamentals'
-  | 'financial_statements'
-  | 'shareholding'
-  | 'corporate_actions'
-  | 'news_events'
-  | 'technicals'
-  | 'sector_context';
+export type MarketDataDomain = typeof MARKET_BRAIN_EVIDENCE_DOMAINS[number];
 
 export type EvidenceState = 'ready' | 'partial' | 'missing';
-export type ResearchState = 'High conviction' | 'Thesis improving' | 'Watch' | 'Needs review' | 'Risk rising';
+export type ResearchState = typeof MARKET_BRAIN_ALLOWED_STATES[number];
 
 export interface IndiaEquityFundamentals {
   peRatio?: number | null;
