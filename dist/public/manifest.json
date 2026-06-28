@@ -1,0 +1,24 @@
+{
+  "name": "StockStory India — AI Stock Research",
+  "short_name": "StockStory",
+  "description": "AI-powered equity research platform for Indian stock markets. Proprietary scoring across 5 dimensions: Quality, Growth, Valuation, Momentum & Risk.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#ffffff",
+  "theme_color": "#635BFF",
+  "lang": "en-IN",
+  "scope": "/",
+  "categories": ["finance", "business", "investing"],
+  "icons": [
+    { "src": "/favicon-32.png", "sizes": "32x32", "type": "image/png" },
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/stockstory-mark.svg", "sizes": "512x512", "type": "image/svg+xml", "purpose": "any maskable" },
+    { "src": "/logo-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Stock Research", "short_name": "Research", "description": "AI-powered stock research", "url": "/scanner", "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Watchlist", "short_name": "Watchlist", "description": "Your saved companies", "url": "/watchlist", "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Compare Stocks", "short_name": "Compare", "description": "Compare companies side-by-side", "url": "/compare", "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }] }
+  ]
+}
