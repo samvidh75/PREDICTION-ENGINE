@@ -1,9 +1,14 @@
-import { assertMarketBrainCopyIsCompliant } from './marketBrainGuardrails';
+import {
+  MARKET_BRAIN_FACTOR_KEYS,
+  assertMarketBrainCopyIsCompliant,
+} from './marketBrainGuardrails';
 import type { FactorScore, IndiaMarketBrainResult, MarketDataDomain } from './indiaMarketBrain';
 import { buildMarketBrainNarrative } from './researchNarrative';
 
+export type MarketBrainFactorKey = typeof MARKET_BRAIN_FACTOR_KEYS[number];
+
 export interface MarketBrainFactorView {
-  key: 'quality' | 'growth' | 'valuation' | 'stability' | 'momentum' | 'risk' | 'ownership';
+  key: MarketBrainFactorKey;
   label: string;
   score: number;
   summary: string;
@@ -63,43 +68,43 @@ const buildEvidenceReview = (result: IndiaMarketBrainResult): MarketBrainEvidenc
 
 const buildFactorViews = (result: IndiaMarketBrainResult): MarketBrainFactorView[] => [
   {
-    key: 'quality',
+    key: MARKET_BRAIN_FACTOR_KEYS[0],
     label: 'Quality',
     score: result.quality.score,
     summary: summarizeFactor(result.quality, 'Business quality needs more evidence.'),
   },
   {
-    key: 'growth',
+    key: MARKET_BRAIN_FACTOR_KEYS[1],
     label: 'Growth',
     score: result.growth.score,
     summary: summarizeFactor(result.growth, 'Growth trend is not yet decisive.'),
   },
   {
-    key: 'valuation',
+    key: MARKET_BRAIN_FACTOR_KEYS[2],
     label: 'Valuation',
     score: result.valuation.score,
     summary: summarizeFactor(result.valuation, 'Valuation needs peer and history context.'),
   },
   {
-    key: 'stability',
+    key: MARKET_BRAIN_FACTOR_KEYS[3],
     label: 'Stability',
     score: result.stability.score,
     summary: summarizeFactor(result.stability, 'Stability needs balance sheet and volatility review.'),
   },
   {
-    key: 'momentum',
+    key: MARKET_BRAIN_FACTOR_KEYS[4],
     label: 'Momentum',
     score: result.momentum.score,
     summary: summarizeFactor(result.momentum, 'Momentum is not yet a dominant signal.'),
   },
   {
-    key: 'risk',
+    key: MARKET_BRAIN_FACTOR_KEYS[5],
     label: 'Risk',
     score: result.risk.score,
     summary: summarizeFactor(result.risk, 'Risk signals require routine review.'),
   },
   {
-    key: 'ownership',
+    key: MARKET_BRAIN_FACTOR_KEYS[6],
     label: 'Ownership',
     score: result.ownership.score,
     summary: summarizeFactor(result.ownership, 'Ownership evidence needs review.'),
