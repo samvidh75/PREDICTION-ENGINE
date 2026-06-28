@@ -141,7 +141,7 @@ interface CacheEntry {
 }
 
 export class CachedExplainProvider implements ExplainProvider {
-  readonly name = `cached(${this.inner.name})`;
+  readonly name: string;
   private cache = new Map<string, CacheEntry>();
   private readonly ttlMs: number;
 
@@ -150,6 +150,7 @@ export class CachedExplainProvider implements ExplainProvider {
     ttlSeconds: number = 300
   ) {
     this.ttlMs = ttlSeconds * 1000;
+    this.name = `cached(${inner.name})`;
   }
 
   async generateExplanation(request: ExplainRequest): Promise<ExplainResponse> {

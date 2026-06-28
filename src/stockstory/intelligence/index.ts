@@ -61,3 +61,31 @@ export type { ExplainProvider, ExplainRequest, ExplainResponse } from './llm/LLM
 
 export { StockStoryOrchestrator, orchestrator } from './orchestrator/StockStoryOrchestrator';
 export type { OrchestratorOptions } from './orchestrator/StockStoryOrchestrator';
+
+// ─── Persistence ──────────────────────────────────────────────────
+
+export { IntelligenceCache, globalIntelligenceCache } from './persistence/IntelligenceCache';
+
+// ─── Mappers ──────────────────────────────────────────────────────
+
+export {
+  mapCompanyIdentity,
+  mapFinancialSnapshot,
+  mapTechnicalSnapshot,
+  mapNewsItems,
+  mapEarningsSnapshot,
+  mapSectorContext,
+} from './mappers';
+
+export type {
+  CompanyIdentityRaw, CompanyIdentityMapped,
+  FinancialSnapshotRaw, FinancialSnapshotMapped,
+  TechnicalSnapshotRaw, TechnicalSnapshotMapped,
+  NewsItemsRaw, SentimentMapped,
+  EarningsSnapshotRaw, EarningsSnapshotMapped,
+  SectorContextRaw, SectorContextMapped,
+} from './mappers';
+
+// ─── API ──────────────────────────────────────────────────────────
+
+export { registerIntelligenceRoutes } from './api/intelligenceRoutes';
