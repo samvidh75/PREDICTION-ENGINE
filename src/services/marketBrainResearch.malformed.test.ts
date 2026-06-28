@@ -36,6 +36,20 @@ describe('fetchMarketBrainResearch malformed payload handling', () => {
     });
   });
 
+  it('rejects successful non-json responses with a typed incomplete error', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => { throw new Error('invalid json'); },
+    }));
+
+    await expect(fetchMarketBrainResearch('TCS')).rejects.toMatchObject({
+      code: 'INCOMPLETE_RESEARCH_RESPONSE',
+      message: 'Research response was incomplete.',
+      status: 200,
+    });
+  });
+
   it('uses public-safe error copy when failed responses are not JSON objects', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
       ok: false,
