@@ -6,6 +6,28 @@ export const MARKET_BRAIN_ALLOWED_STATES = [
   'Risk rising',
 ] as const;
 
+export const MARKET_BRAIN_EVIDENCE_DOMAINS = [
+  'instrument_master',
+  'prices',
+  'fundamentals',
+  'financial_statements',
+  'shareholding',
+  'corporate_actions',
+  'news_events',
+  'technicals',
+  'sector_context',
+] as const;
+
+export const MARKET_BRAIN_FACTOR_KEYS = [
+  'quality',
+  'growth',
+  'valuation',
+  'stability',
+  'momentum',
+  'risk',
+  'ownership',
+] as const;
+
 export const MARKET_BRAIN_FORBIDDEN_RECOMMENDATION_TERMS = [
   'Strong Buy',
   'Buy now',
