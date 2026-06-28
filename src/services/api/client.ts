@@ -16,10 +16,10 @@ import { authenticatedFetchJSON } from "../auth/authenticatedFetch";
 
 function resolveBaseUrl(): string {
   if (typeof window === "undefined") return "";
-  // In production, Vercel serverless functions handle /api/* directly.
+  // In production (Vercel), the frontend SPA calls Render backend via VITE_API_BASE_URL.
   // In dev, Vite proxies /api/* to VITE_API_TARGET (default localhost:4001).
-  // For Render backend access (health, WebSocket), use VITE_API_BASE_URL.
-  // Both cases use relative /api paths — no absolute URL needed for most calls.
+  const customBase = import.meta.env.VITE_API_BASE_URL as string | undefined;
+  if (customBase && customBase.length > 0) return customBase.replace(/\/+$/, "");
   return "";
 }
 
