@@ -1,20 +1,20 @@
 /**
  * verify-data-coverage.ts
  *
- * Checks actual data coverage by querying the Railway backend directly.
+ * Checks actual data coverage by querying the Render backend directly.
  * Reports symbol coverage, price/candle/fundamentals availability.
  *
  * Usage:
  *   npx tsx scripts/verify-data-coverage.ts
  *
  * Environment:
- *   RAILWAY_URL  — backend URL (default: https://prediction-engine-production-f7a8.up.railway.app)
+ *   RENDER_URL  — backend URL (default: https://stockstory-api.onrender.com)
  *   FRONTEND_URL — frontend URL (default: https://www.stockstory-india.com)
  */
 
 export {};
 
-const RAILWAY = process.env.RAILWAY_URL || "https://prediction-engine-production-f7a8.up.railway.app";
+const RENDER = process.env.RENDER_URL || "https://stockstory-api.onrender.com";
 const FRONTEND = process.env.FRONTEND_URL || "https://www.stockstory-india.com";
 
 const TARGET_SYMBOLS = [
@@ -55,11 +55,11 @@ async function checkEndpoint(url: string, timeoutMs = 10000): Promise<{ ok: bool
 
 async function main() {
   console.log("=== StockStory Data Coverage Verification ===\n");
-  console.log(`Railway backend: ${RAILWAY}`);
+  console.log(`Railway backend: ${RENDER}`);
   console.log(`Frontend: ${FRONTEND}\n`);
 
   // Check backend health
-  const health = await checkEndpoint(`${RAILWAY}/api/ops/health`);
+  const health = await checkEndpoint(`${RENDER}/api/ops/health`);
   const h = health.data?.metrics || {};
   console.log("Backend health:");
   console.log(`  status: ${health.data?.status || "unreachable"}`);
@@ -71,10 +71,10 @@ async function main() {
 
   const rows: CoverageRow[] = [];
   for (const sym of TARGET_SYMBOLS) {
-    const price = await checkEndpoint(`${RAILWAY}/api/market/stock/${sym}/price`);
-    const profile = await checkEndpoint(`${RAILWAY}/api/market/stock/${sym}/profile`);
-    const funda = await checkEndpoint(`${RAILWAY}/api/market/stock/${sym}/fundamentals`);
-    const stockstory = await checkEndpoint(`${RAILWAY}/api/stockstory/${sym}`);
+    const price = await checkEndpoint(`${RENDER}/api/market/stock/${sym}/price`);
+    const profile = await checkEndpoint(`${RENDER}/api/market/stock/${sym}/profile`);
+    const funda = await checkEndpoint(`${RENDER}/api/market/stock/${sym}/fundamentals`);
+    const stockstory = await checkEndpoint(`${RENDER}/api/stockstory/${sym}`);
 
     rows.push({
       symbol: sym,

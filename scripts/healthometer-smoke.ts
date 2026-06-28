@@ -1,7 +1,7 @@
 import { config as loadDotEnv } from "dotenv";
 loadDotEnv({ path: ".env", quiet: true });
 
-const BASE_URL = process.env.API_BASE_URL || "https://prediction-engine-production-f7a8.up.railway.app";
+const BASE_URL = process.env.API_BASE_URL || "https://stockstory-api.onrender.com";
 const SYMBOLS = (process.env.SMOKE_SYMBOLS || "RELIANCE,ITC,TCS,INFY,HDFCBANK").split(",").map((s) => s.trim().toUpperCase());
 
 interface CheckResult {
