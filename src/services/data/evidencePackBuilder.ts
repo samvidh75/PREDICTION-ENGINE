@@ -73,7 +73,15 @@ export function buildMarketEvidencePack(inputs: EvidencePackInputs): MarketEvide
   const evidenceItems: MarketEvidenceItem[] = [];
 
   for (const domain of DOMAIN_ORDER) {
-    const result = inputs[RESULT_KEYS[domain]];
+    const key = RESULT_KEYS[domain];
+    const result: AdapterResult<unknown> | AdapterResult<unknown[]> | undefined = key === "financials" ? inputs.financials
+      : key === "price" ? inputs.price
+      : key === "newsEvents" ? inputs.newsEvents
+      : key === "ownership" ? inputs.ownership
+      : key === "derivatives" ? inputs.derivatives
+      : key === "sectorMacro" ? inputs.sectorMacro
+      : key === "corporateActions" ? inputs.corporateActions
+      : undefined;
     if (hasData(result)) {
       availableDomains.push(domain);
       evidenceItems.push({ id: `${symbol}:${domain}`, domain, summary: itemSummary(domain, symbol), asOf: result?.asOf ?? asOf });
