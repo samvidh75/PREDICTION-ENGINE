@@ -1,11 +1,11 @@
 /**
- * Pill — toggleable filter pill / period tab
+ * Pill — toggleable filter pill / period tab (Raycast pill-tab)
  *
- * Supports single-select with onChange, or uncontrolled via defaultActive.
- * Use for: timeframe toggles (1D/1W/1M/1Y), filter chips, category tabs.
+ * Single-select with pill-tab / pill-tab-active styling.
  */
 
 import { colors, radius } from "../design/tokens";
+import { useState } from "react";
 
 interface PillOption {
   value: string;
@@ -14,16 +14,11 @@ interface PillOption {
 
 interface PillProps {
   options: PillOption[];
-  /** Controlled active value */
   value?: string;
-  /** Uncontrolled default */
   defaultValue?: string;
   onChange?: (value: string) => void;
   size?: "sm" | "md";
-  variant?: "outline" | "filled";
 }
-
-import { useState } from "react";
 
 export function Pill({
   options,
@@ -31,7 +26,6 @@ export function Pill({
   defaultValue,
   onChange,
   size = "sm",
-  variant = "outline",
 }: PillProps) {
   const [internalValue, setInternalValue] = useState(defaultValue ?? options[0]?.value ?? "");
   const activeValue = controlledValue ?? internalValue;
@@ -45,16 +39,8 @@ export function Pill({
     ? { height: 34, padX: 14, fontSize: 13 }
     : { height: 28, padX: 10, fontSize: 12 };
 
-  const isOutline = variant === "outline";
-
   return (
-    <div
-      style={{
-        display: "inline-flex",
-        gap: 4,
-        flexWrap: "wrap",
-      }}
-    >
+    <div style={{ display: "inline-flex", gap: 4, flexWrap: "wrap" }}>
       {options.map((opt) => {
         const isActive = opt.value === activeValue;
         return (
@@ -68,18 +54,12 @@ export function Pill({
               height: dims.height,
               padding: `0 ${dims.padX}px`,
               fontSize: dims.fontSize,
-              fontWeight: isActive ? 600 : 500,
+              fontWeight: 500,
               fontFamily: "inherit",
-              border: isOutline
-                ? `1px solid ${isActive ? colors.primary : colors.border}`
-                : "none",
+              border: `1px solid ${isActive ? "transparent" : colors.hairline}`,
               borderRadius: radius.md,
-              background: isActive
-                ? isOutline ? "transparent" : colors.primary
-                : isOutline ? "transparent" : colors.bgSecondary,
-              color: isActive
-                ? isOutline ? colors.primary : "#fff"
-                : colors.textSecondary,
+              background: isActive ? colors.surfaceElevated : "transparent",
+              color: isActive ? colors.onDark : colors.mute,
               cursor: "pointer",
               transition: "all 0.15s ease",
               whiteSpace: "nowrap",

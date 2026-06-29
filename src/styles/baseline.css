@@ -1,6 +1,9 @@
 /* ============================================================================
-   BASELINE — Reset + html defaults (Apple HIG)
+   BASELINE — Reset + Raycast dark canvas defaults
    ============================================================================ */
+
+/* INTER FONT — loaded with ss03 stylistic set */
+@import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,100..900&display=swap');
 
 /* RESET */
 *,
@@ -20,11 +23,12 @@ html {
 body {
   width: 100%;
   height: 100%;
-  font-family: var(--font-sans);
-  font-size: 15px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-feature-settings: "calt", "kern", "liga", "ss03";
+  font-size: 16px;
   line-height: 1.6;
-  color: var(--text-body);
-  background-color: var(--bg-page);
+  color: #cdcdcd;
+  background-color: #07080a;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;

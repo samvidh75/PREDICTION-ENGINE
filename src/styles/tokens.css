@@ -1,66 +1,74 @@
 :root {
-  /* ── Source of truth ────────────────────────────────────────────── */
-  --bg-page:        #FFFFFF;
-  --bg-card:        #FFFFFF;
-  --bg-card-hover:  #FAFAFA;
-  --bg-chip:        #F5F5F5;
+  /* ── Raycast Design System ──────────────────────────────────────── */
+  /* Surface ladder (ascending brightness) */
+  --bg-page:        #07080a;
+  --bg-card:        #0d0d0d;
+  --bg-card-hover:  #101111;
+  --bg-chip:        #121212;
 
-  --brand:          #007AFF;
-  --brand-light:    #E5F1FF;
-  --brand-dark:     #0062CC;
+  /* Brand / CTA */
+  --brand:          #ffffff;
+  --brand-light:    rgba(255,255,255,0.15);
+  --brand-dark:     #e8e8e8;
 
-  --green:          #13C23E;
-  --green-light:    #E8F9ED;
-  --red:            #F5222D;
-  --red-light:      #FFF1F0;
-  --amber:          #FAAD14;
-  --amber-light:    #FFFBE6;
+  /* Semantic */
+  --green:          #59d499;
+  --green-light:    rgba(89,212,153,0.15);
+  --red:            #ff6161;
+  --red-light:      rgba(255,97,97,0.15);
+  --amber:          #ffc533;
+  --amber-light:    rgba(255,197,51,0.15);
 
-  --text-primary:   #111111;
-  --text-body:      #333333;
-  --text-secondary: #666666;
-  --text-muted:     #999999;
-  --text-inverse:   #FFFFFF;
+  /* Text */
+  --text-primary:   #f4f4f6;
+  --text-body:      #cdcdcd;
+  --text-secondary: #9c9c9d;
+  --text-muted:     #6a6b6c;
+  --text-inverse:   #000000;
 
-  --border:         #E5E5E5;
-  --border-strong:  #D9D9D9;
-  --border-focus:   #007AFF;
+  /* Borders (hairline) */
+  --border:         #242728;
+  --border-strong:  rgba(255,255,255,0.16);
+  --border-focus:   #ffffff;
 
-  --font-sans:      -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --font:           -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  /* Typography */
+  --font-sans:      'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font:           'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-mono:      "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
 
-  --radius-sm:      4px;
-  --radius-md:      6px;
-  --radius-lg:      8px;
-  --radius-xl:      8px;
+  /* Radius */
+  --radius-sm:      6px;
+  --radius-md:      8px;
+  --radius-lg:      10px;
+  --radius-xl:      16px;
 
-  --shadow-card:    0 1px 3px rgba(0,0,0,0.08);
-  --shadow-raised:  0 4px 12px rgba(0,0,0,0.12);
-  --shadow-modal:   0 8px 24px rgba(0,0,0,0.14);
+  /* No drop shadows — elevation via surface ladder */
+  --shadow-card:    none;
+  --shadow-raised:  none;
+  --shadow-modal:   none;
 
-  /* ── Aliases (same values, alternate names for index.css compat) ── */
+  /* ── Aliases ── */
   --page:           var(--bg-page);
   --chip:           var(--bg-chip);
   --surface:        var(--bg-card);
   --surface-hover:  var(--bg-card-hover);
 
   --brand-hover:    var(--brand-dark);
-  --brand-tint:     rgba(0,122,255,0.15);
+  --brand-tint:     rgba(255,255,255,0.15);
 
   --text-900:       var(--text-primary);
   --text-700:       var(--text-body);
   --text-500:       var(--text-secondary);
   --text-300:       var(--text-muted);
 
-  --green-text:     #0A8C2A;
-  --red-text:       #CF1322;
-  --amber-text:     #D48806;
+  --green-text:     #59d499;
+  --red-text:       #ff6161;
+  --amber-text:     #ffc533;
 
   --sh-card:        var(--shadow-card);
   --sh-raised:      var(--shadow-raised);
   --sh-float:       var(--shadow-modal);
-  --sh-focus:       0 0 0 2px rgba(0,122,255,0.25);
+  --sh-focus:       0 0 0 2px rgba(255,255,255,0.25);
 
   --r-xs:           var(--radius-sm);
   --r-md:           var(--radius-md);

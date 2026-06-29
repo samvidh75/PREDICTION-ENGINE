@@ -1,5 +1,5 @@
 import type { InputHTMLAttributes } from "react";
-import { colors, radius, typography, components, animation } from "../design/tokens";
+import { colors, radius, typography, animation } from "../design/tokens";
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
@@ -10,26 +10,26 @@ export function Input({ label, style, ...props }: InputProps) {
     <input
       {...props}
       style={{
-        height: components.input.height,
-        padding: `0 ${components.input.paddingX}`,
+        height: "42px",
+        padding: "0 16px",
         borderRadius: radius.md,
-        border: `1px solid ${colors.border}`,
-        fontSize: typography.body.desktop.size,
+        border: `1px solid ${colors.hairline}`,
+        fontSize: typography.bodyMd.size,
         fontFamily: typography.fontFamily,
-        color: colors.textPrimary,
-        background: colors.card,
+        fontFeatureSettings: typography.fontFeature,
+        color: colors.onDark,
+        background: colors.surfaceElevated,
         outline: "none",
-        transition: `border-color ${animation.standard}, box-shadow ${animation.standard}`,
+        caretColor: colors.onDark,
+        transition: `border-color ${animation.standard}`,
         ...style,
       }}
       onFocus={(e) => {
-        e.currentTarget.style.borderColor = colors.primary;
-        e.currentTarget.style.boxShadow = `0 0 0 3px rgba(0, 122, 255, 0.15)`;
+        e.currentTarget.style.borderColor = colors.onDark;
         props.onFocus?.(e);
       }}
       onBlur={(e) => {
-        e.currentTarget.style.borderColor = colors.border;
-        e.currentTarget.style.boxShadow = "none";
+        e.currentTarget.style.borderColor = colors.hairline;
         props.onBlur?.(e);
       }}
     />

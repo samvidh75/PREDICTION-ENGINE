@@ -1,171 +1,205 @@
 // ============================================================================
-// STOCKSTORY DESIGN TOKENS — APPLE HUMAN INTERFACE GUIDELINES
+// PREDICTION-ENGINE DESIGN TOKENS — RAYCAST DESIGN SYSTEM
+// Pure near-black canvas, hairline 1px borders, Inter ss03 typography
 // ============================================================================
 
-// COLOR TOKENS — Apple System Colors
+// COLOR TOKENS — Raycast pure-dark palette
 export const colors = {
-  // System Blue
-  primary:     '#007AFF',
-  primaryDark: '#0056CC',
+  // Brand
+  primary:        '#ffffff',    // White CTA pill background
+  primaryPressed: '#e8e8e8',   // Pressed white CTA
+  onPrimary:      '#000000',   // Black text on white CTA — only black text in system
 
-  // Semantic (Apple system colors)
-  success:     '#34C759',   // Green
-  danger:      '#FF3B30',   // Red
-  warning:     '#FF9500',   // Orange
+  // Text
+  ink:            '#f4f4f6',   // Primary headlines on dark canvas
+  body:           '#cdcdcd',   // Default paragraph / inline-link color
+  charcoal:       '#d3d3d4',   // Brighter body where ink reads too soft
+  mute:           '#9c9c9d',   // Metadata, footer links, secondary captions
+  ash:            '#6a6b6c',   // Disabled text, lowest emphasis
+  stone:          '#434345',   // Least-emphasis caption / disabled icon
+  onDark:         '#ffffff',   // Interactive-state primary text (button label, focused tab)
+  onDarkMute:     'rgba(255,255,255,0.72)',  // Translucent secondary on dark
 
-  // Backgrounds (iOS grouped table style)
-  page:        '#F2F2F7',   // Grouped table background
-  card:        '#FFFFFF',   // Card on grouped background
-  fill:        '#F2F2F7',   // Secondary fill / selected state
+  // Surface ladder (no drop shadows)
+  canvas:           '#07080a', // Page background
+  surface:          '#0d0d0d', // Card / elevated panel
+  surfaceElevated:  '#101111', // Button-tertiary, text-input, store-search, pill-tab-active
+  surfaceCard:      '#121212', // App icon tiles, keycap fill, command-palette hover
+  buttonFg:         '#18191a', // Rare deep card variant (featured pricing tier)
 
-  // Text (Apple label colors)
-  textPrimary:   '#000000',
-  textSecondary: '#8E8E93',
-  textTertiary:  '#C7C7CC',
+  // Borders (hairline 1px)
+  hairline:       '#242728',
+  hairlineSoft:   'rgba(255,255,255,0.08)',
+  hairlineStrong: 'rgba(255,255,255,0.16)',
 
-  // Separators / borders
-  separator:   '#E5E5EA',
-  border:      '#E5E5EA',
+  // Semantic accents — reserved for category illustrations, never chrome
+  accentBlue:       '#57c1ff',
+  accentBlueSoft:   'rgba(87,193,255,0.15)',
+  accentRed:        '#ff6161',
+  accentRedSoft:    'rgba(255,97,97,0.15)',
+  accentGreen:      '#59d499',
+  accentGreenSoft:  'rgba(89,212,153,0.15)',
+  accentYellow:     '#ffc533',
+  accentYellowSoft: 'rgba(255,197,51,0.15)',
+
+  // Brand gradient — red diagonal-stripe hero
+  heroStripeStart: '#ff5757',
+  heroStripeEnd:   '#a1131a',
+  keyBgStart:      '#121212',
+  keyBgEnd:        '#0d0d0d',
+
+  // Legacy semantic aliases (for existing component compatibility)
+  success:         '#59d499',
+  danger:          '#ff6161',
+  warning:         '#ffc533',
+  page:            '#07080a',
+  card:            '#0d0d0d',
+  textPrimary:     '#f4f4f6',
+  textSecondary:   '#9c9c9d',
+  textTertiary:    '#6a6b6c',
+  border:          '#242728',
+  separator:       '#242728',
+  fill:            '#101111',
+  bgSecondary:     '#101111',
 } as const;
 
-// TYPOGRAPHY — DESIGN.md spec (Inter font, Apple HIG spirit)
-// Font: Inter (system-ui fallback)
-// Tabular numbers for all financial values
-// Letter-spacing: -0.02em for headings, normal for body
-// Line-height: 1.3 headings, 1.6 body, 1.4 captions
+// TYPOGRAPHY — Inter with ss03 stylistic set
 export const typography = {
   fontFamily: '\'Inter\', -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, sans-serif',
+  fontFeature: '"calt", "kern", "liga", "ss03"',
 
-  // h1: 32px/800 → mobile: 28px
-  h1: {
-    desktop: { size: '32px', weight: 800, line: '1.15', track: '-0.02em' },
-    mobile:  { size: '28px', weight: 800, line: '1.15', track: '-0.02em' },
-  },
-  // h2: 20px/700 → mobile: 18px
-  h2: {
-    desktop: { size: '20px', weight: 700, line: '1.3', track: '-0.02em' },
-    mobile:  { size: '18px', weight: 700, line: '1.3', track: '-0.02em' },
-  },
-  // h3: 16px/700 → mobile: 15px
-  h3: {
-    desktop: { size: '16px', weight: 700, line: '1.3', track: '-0.02em' },
-    mobile:  { size: '15px', weight: 700, line: '1.3', track: '-0.02em' },
-  },
-  // body: 14px/400 → mobile: 15px (readability)
-  body: {
-    desktop: { size: '14px', weight: 400, line: '1.6' },
-    mobile:  { size: '15px', weight: 400, line: '1.6' },
-  },
-  // caption: 12px/500
-  caption: {
-    desktop: { size: '12px', weight: 500, line: '1.4' },
-    mobile:  { size: '12px', weight: 500, line: '1.4' },
-  },
-  // micro: 11px/600 → uppercase, letter-spacing 0.04em
-  micro: {
-    desktop: { size: '11px', weight: 600, line: '1.3', track: '0.04em', uppercase: true },
-    mobile:  { size: '11px', weight: 600, line: '1.3', track: '0.04em', uppercase: true },
-  },
-  // Callout
-  callout: {
-    desktop: { size: '15px', weight: 400, line: '1.5' },
-    mobile:  { size: '15px', weight: 400, line: '1.5' },
-  },
-  // Label (uppercase section headers)
-  label: {
-    desktop: { size: '12px', weight: 600, line: '1.3', track: '0.04em', uppercase: true },
-    mobile:  { size: '12px', weight: 600, line: '1.3', track: '0.04em', uppercase: true },
-  },
-  // Mono (for code/financial symbols)
-  mono: {
-    desktop: { size: '13px', weight: 500, line: '1.4', fontFamily: '\'JetBrains Mono\', \'Fira Code\', Menlo, Monaco, monospace' },
-    mobile:  { size: '13px', weight: 500, line: '1.4', fontFamily: '\'JetBrains Mono\', \'Fira Code\', Menlo, Monaco, monospace' },
-  },
-} as const;// SPACING — Apple 4pt grid (8pt increments preferred at system level)
-export const space = {
-  0:  '0px',
-  1:  '4px',
-  2:  '8px',
-  3:  '12px',
-  4:  '16px',
-  5:  '20px',
-  6:  '24px',
-  7:  '28px',
-  8:  '32px',
-  9:  '36px',
-  10: '40px',
-  12: '48px',
-  16: '64px',
-  20: '80px',
+  displayXl: { size: '64px', weight: 600, line: '1.1', track: '0' },
+  displayLg: { size: '56px', weight: 500, line: '1.17', track: '0.2px' },
+  headingXl: { size: '24px', weight: 500, line: '1.6', track: '0.2px' },
+  headingLg: { size: '22px', weight: 500, line: '1.15', track: '0' },
+  headingMd: { size: '20px', weight: 500, line: '1.4', track: '0.2px' },
+  headingSm: { size: '18px', weight: 500, line: '1.4', track: '0.2px' },
+  bodyLg:    { size: '18px', weight: 400, line: '1.6', track: '0' },
+  bodyMd:    { size: '16px', weight: 400, line: '1.6', track: '0' },
+  bodyStrong:{ size: '16px', weight: 500, line: '1.4', track: '0.2px' },
+  bodySm:    { size: '14px', weight: 400, line: '1.6', track: '0' },
+  bodySmStrong: { size: '14px', weight: 500, line: '1.6', track: '0.2px' },
+  captionMd: { size: '13px', weight: 400, line: '1.4', track: '0.1px' },
+  captionSm: { size: '12px', weight: 400, line: '1.5', track: '0.4px' },
+  linkMd:    { size: '16px', weight: 500, line: '1.4', track: '0.3px' },
+  buttonMd:  { size: '14px', weight: 500, line: '1.6', track: '0.2px' },
+
+  // Backward compat aliases
+  h1: { desktop: { size: '64px', weight: 600, line: '1.1', track: '0' },
+        mobile: { size: '40px', weight: 600, line: '1.1', track: '0' } },
+  h2: { desktop: { size: '24px', weight: 500, line: '1.6', track: '0.2px' },
+        mobile: { size: '20px', weight: 500, line: '1.4', track: '0.2px' } },
+  h3: { desktop: { size: '18px', weight: 500, line: '1.4', track: '0.2px' },
+        mobile: { size: '16px', weight: 500, line: '1.4', track: '0.2px' } },
+  body: { desktop: { size: '16px', weight: 400, line: '1.6', track: '0' },
+          mobile: { size: '15px', weight: 400, line: '1.6', track: '0' } },
+  callout: { desktop: { size: '14px', weight: 400, line: '1.6', track: '0' },
+             mobile: { size: '14px', weight: 400, line: '1.6', track: '0' } },
+  caption: { desktop: { size: '12px', weight: 400, line: '1.5', track: '0.4px' },
+             mobile: { size: '12px', weight: 400, line: '1.5', track: '0.4px' } },
+  micro: { desktop: { size: '11px', weight: 600, line: '1.3', track: '0.04em', uppercase: true },
+           mobile: { size: '11px', weight: 600, line: '1.3', track: '0.04em', uppercase: true } },
 } as const;
 
-// RADIUS — Apple native corner radii (iOS continuous approximation)
+// SPACING — 8px base unit, section gap 96px
+export const space = {
+  0:   '0px',
+  1:   '4px',
+  2:   '8px',
+  3:   '12px',
+  4:   '16px',
+  5:   '20px',
+  6:   '24px',
+  7:   '28px',
+  8:   '32px',
+  9:   '36px',
+  10:  '40px',
+  12:  '48px',
+  16:  '64px',
+  20:  '80px',
+  24:  '96px',
+  xxs: '2px',
+  xs:  '4px',
+  sm:  '8px',
+  md:  '12px',
+  lg:  '16px',
+  xl:  '24px',
+  xxl: '32px',
+  section: '96px',
+} as const;
+
+// RADIUS — Raycast multi-radius system
 export const radius = {
-  none:   '0px',
-  sm:     '6px',
-  md:     '10px',   // Button / Input standard
-  lg:     '14px',   // Card corner radius
-  xl:     '16px',   // Modal sheet radius
-  full:   '9999px', // Pill / badge / tag
+  none: '0px',
+  xs:   '4px',
+  sm:   '6px',
+  md:   '8px',
+  lg:   '10px',
+  xl:   '16px',
+  full: '9999px',
 } as const;
 
 // LAYOUT
 export const layout = {
   sidebarWidth:       '256px',
-  contentMaxWidth:    '980px',    // Apple typical max content width
+  contentMaxWidth:    '1200px',
   pagePaddingMobile:  '16px',
   pagePaddingDesktop: '32px',
   sectionGapMobile:   '40px',
-  sectionGapDesktop:  '48px',
+  sectionGapDesktop:  '96px',
   borderWidth:        '1px',
 } as const;
 
-// COMPONENT DIMENSIONS (Apple HIT — iOS standard touch targets)
+// COMPONENT DIMENSIONS — Raycast spec
 export const components = {
   input: {
-    height:   '44px',
-    paddingX: '16px',
+    height:   '36px',
+    paddingX: '12px',
   },
   button: {
-    heightDesktop: '44px',
-    heightMobile:  '44px',
-    paddingX:      '20px',
+    heightDesktop: '36px',
+    heightMobile:  '36px',
+    paddingX:      '16px',
   },
   navBar: {
-    heightDesktop: '44px',
-    heightMobile:  '50px',  // Apple tab bar standard
+    heightDesktop: '56px',
+    heightMobile:  '56px',
   },
   card: {
-    paddingMobile:  '20px',
+    paddingMobile:  '16px',
     paddingDesktop: '24px',
   },
 } as const;
 
 // BREAKPOINTS
 export const breakpoints = {
-  mobile: 767,
+  mobile: 480,
   tablet: 768,
+  desktop: 1024,
+  desktopLg: 1280,
+  desktopXl: 1440,
 } as const;
 
-// SHADOWS — Apple layered shadow style (subtle, layered)
+// SHADOWS — No drop shadows in Raycast. Elevation via surface ladder.
 export const shadows = {
-  card:     '0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.06)',
-  elevated: '0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04)',
-  nav:      '0 0.5px 0 rgba(0,0,0,0.08)',  // Hairline for nav bars
+  card:     'none',
+  elevated: 'none',
+  nav:      'none',
   none:     'none',
 } as const;
 
-// ANIMATION — Apple spring timing curves + durations
+// ANIMATION — Smooth transitions
 export const animation = {
-  spring:    '0.4s cubic-bezier(0.22, 1, 0.36, 1)',
-  standard:  '0.2s cubic-bezier(0.25, 0.1, 0.25, 1)',
-  fast:      '0.15s cubic-bezier(0.25, 0.1, 0.25, 1)',
+  spring:    '0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
+  standard:  '0.2s ease',
+  fast:      '0.15s ease',
 } as const;
 
 // MEDIA QUERY HELPERS
 export const media = {
   mobile:  `(max-width: ${breakpoints.mobile}px)`,
-  desktop: `(min-width: ${breakpoints.tablet}px)`,
+  tablet:  `(max-width: ${breakpoints.tablet}px)`,
+  desktop: `(min-width: ${breakpoints.desktop}px)`,
 } as const;
 
 // Bundle export for convenience
