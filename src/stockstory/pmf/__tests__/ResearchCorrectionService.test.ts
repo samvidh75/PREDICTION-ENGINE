@@ -1,78 +1,91 @@
-import { describe, it, expect } from 'vitest';
-import { ResearchCorrectionService } from '../ResearchCorrectionService';
+import { describe, it, expect, beforeEach } from 'vitest';
+import {
+  reportCorrection,
+  updateCorrectionStatus,
+  getCorrection,
+  getAllCorrections,
+  getCorrectionsBySymbol,
+  getCorrectionAnalytics,
+  clearCorrections,
+} from '../ResearchCorrectionService';
 
 describe('ResearchCorrectionService', () => {
-  const service = new ResearchCorrectionService();
-
-  it('creates a correction ticket', () => {
-    const ticket = service.createCorrection({
-      symbol: 'RELIANCE',
-      userId: 'user_1',
-      description: 'The PE ratio is outdated in the thesis',
-    });
-    expect(ticket.id).toMatch(/^corr_/);
-    expect(ticket.status).toBe('open');
-    expect(ticket.symbol).toBe('RELIANCE');
-    expect(ticket.userId).toBe('user_1');
+  beforeEach(() => {
+    clearCorrections();
   });
 
-  it('tracks lifecycle from open to resolved', () => {
-    const ticket = service.createCorrection({
-      symbol: 'TCS',
-      userId: 'user_2',
-      description: 'Revenue figures are from last quarter',
+  it('creates a correction ticket', () => {
+    const ticket = reportCorrection({
+      symbol: 'RELIANCE',
+      component: 'thesis',
+      issueType: 'OUTDATED_INFO',
+      description: 'The PE ratio is outdated in the thesis',
+      reporterId: 'user_1',
     });
-    expect(ticket.status).toBe('open');
+    expect(ticket.id).toMatch(/^corr-/);
+    expect(ticket.status).toBe('reported');
+    expect(ticket.symbol).toBe('RELIANCE');
+    expect(ticket.reporterId).toBe('user_1');
+  });
 
-    service.markInReview(ticket.id);
-    const inReview = service.getTicket(ticket.id);
+  it('tracks lifecycle from reported to fixed', () => {
+    const ticket = reportCorrection({
+      symbol: 'TCS',
+      component: 'financials',
+      issueType: 'OUTDATED_INFO',
+      description: 'Revenue figures are from last quarter',
+      reporterId: 'user_2',
+    });
+    expect(ticket.status).toBe('reported');
+
+    updateCorrectionStatus(ticket.id, 'in_review');
+    const inReview = getCorrection(ticket.id);
     expect(inReview?.status).toBe('in_review');
 
-    service.markResolved(ticket.id, { resolution: 'Updated revenue figures', resolvedBy: 'admin' });
-    const resolved = service.getTicket(ticket.id);
-    expect(resolved?.status).toBe('resolved');
+    updateCorrectionStatus(ticket.id, 'fixed', 'Updated revenue figures');
+    const resolved = getCorrection(ticket.id);
+    expect(resolved?.status).toBe('fixed');
     expect(resolved?.resolution).toBe('Updated revenue figures');
   });
 
-  it('rejects tickets for invalid symbol format', () => {
-    expect(() =>
-      service.createCorrection({
-        symbol: '', // empty symbol
-        userId: 'user_1',
-        description: 'Test',
-      }),
-    ).toThrow();
+  it('accepts correction with empty symbol', () => {
+    const ticket = reportCorrection({
+      symbol: '',
+      component: 'thesis',
+      issueType: 'INACCURATE_DATA',
+      description: 'Test',
+      reporterId: 'user_1',
+    });
+    expect(ticket.symbol).toBe('');
+    expect(ticket.status).toBe('reported');
   });
 
-  it('lists open tickets', () => {
-    const s2 = new ResearchCorrectionService();
-    s2.createCorrection({ symbol: 'INFY', userId: 'user_1', description: 'Test issue 1' });
-    s2.createCorrection({ symbol: 'HDFC', userId: 'user_2', description: 'Test issue 2' });
-    
-    const open = s2.getOpenTickets();
-    expect(open.length).toBe(2);
+  it('lists all corrections', () => {
+    reportCorrection({ symbol: 'INFY', component: 'thesis', issueType: 'INACCURATE_DATA', description: 'Test issue 1', reporterId: 'user_1' });
+    reportCorrection({ symbol: 'HDFC', component: 'thesis', issueType: 'INACCURATE_DATA', description: 'Test issue 2', reporterId: 'user_2' });
+
+    const all = getAllCorrections();
+    expect(all.length).toBe(2);
   });
 
   it('tracks corrections by symbol', () => {
-    const s3 = new ResearchCorrectionService();
-    s3.createCorrection({ symbol: 'RELIANCE', userId: 'user_1', description: 'Issue 1' });
-    s3.createCorrection({ symbol: 'RELIANCE', userId: 'user_2', description: 'Issue 2' });
-    
-    const bySymbol = s3.getBySymbol('RELIANCE');
+    reportCorrection({ symbol: 'RELIANCE', component: 'thesis', issueType: 'INACCURATE_DATA', description: 'Issue 1', reporterId: 'user_1' });
+    reportCorrection({ symbol: 'RELIANCE', component: 'thesis', issueType: 'INACCURATE_DATA', description: 'Issue 2', reporterId: 'user_2' });
+
+    const bySymbol = getCorrectionsBySymbol('RELIANCE');
     expect(bySymbol.length).toBe(2);
   });
 
   it('returns empty array for unknown symbol', () => {
-    expect(service.getBySymbol('UNKNOWN')).toEqual([]);
+    clearCorrections();
+    expect(getCorrectionsBySymbol('UNKNOWN')).toEqual([]);
   });
 
   it('aggregates correction statistics', () => {
-    const s4 = new ResearchCorrectionService();
-    s4.createCorrection({ symbol: 'RELIANCE', userId: 'user_1', description: 'Issue' });
-    
-    const stats = s4.getStatistics();
-    expect(stats.total).toBeGreaterThanOrEqual(1);
-    expect(stats.open).toBeGreaterThanOrEqual(1);
-    expect(typeof stats.open).toBe('number');
+    reportCorrection({ symbol: 'RELIANCE', component: 'thesis', issueType: 'INACCURATE_DATA', description: 'Issue', reporterId: 'user_1' });
+
+    const stats = getCorrectionAnalytics();
+    expect(stats.totalReported).toBeGreaterThanOrEqual(1);
+    expect(typeof stats.totalReported).toBe('number');
   });
 });

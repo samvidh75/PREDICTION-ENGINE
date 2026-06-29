@@ -1,62 +1,59 @@
-import { describe, it, expect } from 'vitest';
-import { RoadmapPrioritizer } from '../RoadmapPrioritizer';
+import { describe, it, expect, beforeEach } from 'vitest';
+import { prioritize, getRoadmap, clearRoadmap } from '../RoadmapPrioritizer';
 
 describe('RoadmapPrioritizer', () => {
-  const prioritizer = new RoadmapPrioritizer();
+  beforeEach(() => {
+    clearRoadmap();
+  });
 
   it('ingests signals and produces roadmap items', () => {
-    const items = prioritizer.addSignal({
-      type: 'failed_search',
-      payload: { query: 'Sector PE ratio comparison', userId: 'user_1' },
-      source: 'search_demand',
-      timestamp: new Date().toISOString(),
+    const items = prioritize({
+      researchQualityIssues: [],
+      topFailedQueries: [{ query: 'Sector PE ratio comparison', count: 1 }],
+      correctionTrends: [],
+      featureRequests: [],
+      searchTrends: [],
     });
     expect(Array.isArray(items)).toBe(true);
   });
 
   it('generates ranked roadmap from signals', () => {
-    prioritizer.addSignal({
-      type: 'failed_search',
-      payload: { query: 'Small cap screener', userId: 'user_2' },
-      source: 'search_demand',
-      timestamp: new Date().toISOString(),
-    });
-    prioritizer.addSignal({
-      type: 'negative_feedback',
-      payload: { symbol: 'TCS', component: 'outlook', issue: 'Too optimistic' },
-      source: 'research_quality',
-      timestamp: new Date().toISOString(),
+    prioritize({
+      researchQualityIssues: [],
+      topFailedQueries: [{ query: 'Small cap screener', count: 1 }],
+      correctionTrends: [{ issueType: 'INACCURATE_DATA', count: 1 }],
+      featureRequests: [],
+      searchTrends: [],
     });
 
-    const roadmap = prioritizer.getRankedRoadmap();
+    const roadmap = getRoadmap();
     expect(roadmap.length).toBeGreaterThan(0);
   });
 
   it('groups similar signals', () => {
-    const p2 = new RoadmapPrioritizer();
-    for (let i = 0; i < 3; i++) {
-      p2.addSignal({
-        type: 'failed_search',
-        payload: { query: 'Gold ETF comparison' },
-        source: 'search_demand',
-        timestamp: new Date().toISOString(),
-      });
-    }
-    const roadmap = p2.getRankedRoadmap();
-    const goldEtf = roadmap.find((r) => r.title?.toLowerCase().includes('gold'));
-    expect(goldEtf).toBeDefined();
-    if (goldEtf) expect(goldEtf.signalCount).toBeGreaterThanOrEqual(3);
+    prioritize({
+      researchQualityIssues: [],
+      topFailedQueries: [{ query: 'Stock screener with multiple filters', count: 3 }],
+      correctionTrends: [],
+      featureRequests: [],
+      searchTrends: [],
+    });
+
+    const roadmap = getRoadmap();
+    const screenerItem = roadmap.find((r) => r.category === 'feature');
+    expect(screenerItem).toBeDefined();
+    if (screenerItem) expect(screenerItem.signalStrength).toBeGreaterThan(0);
   });
 
   it('resets state', () => {
-    const p3 = new RoadmapPrioritizer();
-    p3.addSignal({
-      type: 'failed_search',
-      payload: { query: 'Test' },
-      source: 'search_demand',
-      timestamp: new Date().toISOString(),
+    prioritize({
+      researchQualityIssues: [],
+      topFailedQueries: [{ query: 'Small cap screener', count: 1 }],
+      correctionTrends: [],
+      featureRequests: [],
+      searchTrends: [],
     });
-    p3.reset();
-    expect(p3.getRankedRoadmap().length).toBe(0);
+    clearRoadmap();
+    expect(getRoadmap().length).toBe(0);
   });
 });

@@ -17,7 +17,7 @@ export default function SectorResearch() {
       <main style={{ maxWidth: "1200px", margin: "0 auto", padding: layout.pagePaddingDesktop }}>
         <SEBIComplianceBanner />
         <h1 style={{ fontSize: typography.h2.desktop.size, color: colors.textPrimary }}>Sector Not Found</h1>
-        <p style={{ color: colors.textSecondary }}>The sector you're looking for doesn't exist in our coverage.</p>
+        <p style={{ color: colors.textSecondary }}>The sector you're looking for isn't available.</p>
         <button
           onClick={() => navigate("/sectors")}
           style={{ marginTop: "16px", padding: "8px 16px", background: colors.primary, color: colors.onPrimary, border: "none", borderRadius: "6px", cursor: "pointer" }}
