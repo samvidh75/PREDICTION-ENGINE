@@ -103,8 +103,9 @@ const asStringArray = (value: unknown): string[] => {
 
   value.forEach((item) => {
     const text = asPublicText(item);
-    if (text.length > 0 && !seen.has(text)) {
-      seen.add(text);
+    const dedupeKey = text.toLowerCase();
+    if (text.length > 0 && !seen.has(dedupeKey)) {
+      seen.add(dedupeKey);
       items.push(text);
     }
   });
