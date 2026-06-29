@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { buildAnomalyEvidencePack } from './anomalyEvidencePack';
+import { buildAnomalyEvidencePack, buildMarketAnomalyEvidencePack } from './anomalyEvidencePack';
 import type { AnomalyEvidencePackInput } from './anomalyEvidencePack';
+
+const unsafePattern = /buy|sell|hold|strong buy|sure shot|guaranteed|multibagger|provider|api|backend|diagnostic|coverage|freshness|lineage|migration|backfill/i;
 
 const defaultInput: AnomalyEvidencePackInput = {
   symbol: 'TCS',
@@ -30,8 +32,8 @@ describe('anomaly evidence pack', () => {
       ...defaultInput,
       priceMovePct: 0.3,
       volumeMultiple: 0.8,
-      sectorMovePct: 1.8, // sector moved much more — price not tracking sector
-      indexMovePct: 1.5,  // index also diverged — price not tracking index
+      sectorMovePct: 1.8,
+      indexMovePct: 1.5,
     });
 
     expect(pack.severity).toBe('Needs review');
@@ -68,13 +70,10 @@ describe('anomaly evidence pack', () => {
       ...defaultInput,
       priceMovePct: 1.1,
       volumeMultiple: 1.0,
-      sectorMovePct: 3.5, // sector diverges
-      indexMovePct: 1.0, // but price tracks index
+      sectorMovePct: 3.5,
+      indexMovePct: 1.0,
     });
 
-    // Price (1.1) is NOT > 1.5× sector (5.25), so it's not stock-specific.
-    // abs(1.1 - 3.5)/3.5 = 0.68 > 0.3, so not sector-driven.
-    // abs(1.1 - 1.0)/1.0 = 0.10 < 0.3, so market-aligned.
     expect(pack.anomalyType).toBe('Market-aligned move');
     expect(pack.severity).toBe('Low');
   });
@@ -90,7 +89,7 @@ describe('anomaly evidence pack', () => {
     });
 
     expect(pack.severity).toBe('Needs review');
-    expect(pack.anomalyType).toBe('Low-conviction anomaly');
+    expect(pack.anomalyType).toBe('Incomplete evidence');
     expect(pack.evidence).toEqual([]);
     expect(pack.missingEvidence).toEqual(['prices']);
   });
@@ -114,7 +113,6 @@ describe('anomaly evidence pack', () => {
   });
 
   it('prohibits recommendation language in the anomaly label', () => {
-    // Every label produced by the engine must pass guardrail check.
     const pack = buildAnomalyEvidencePack(defaultInput);
     expect(pack.anomalyType).not.toMatch(/buy|sell|hold|strong buy|guaranteed|multibagger/i);
     expect(pack.severity).not.toMatch(/buy|sell|hold|strong buy|guaranteed|multibagger/i);
@@ -138,5 +136,122 @@ describe('anomaly evidence pack', () => {
     expect(pack).toHaveProperty('evidence');
     expect(pack).toHaveProperty('missingEvidence');
     expect(pack).toHaveProperty('narrativePromptPayload');
+  });
+});
+
+describe('buildMarketAnomalyEvidencePack', () => {
+  it('classifies high-severity volume-backed moves', () => {
+    const pack = buildMarketAnomalyEvidencePack({
+      symbol: 'RELIANCE',
+      timeframe: '15m',
+      priceMovePct: -3.1,
+      volumeMultiple: 2.7,
+      sectorMovePct: -0.6,
+      indexMovePct: -0.3,
+    });
+
+    expect(pack.anomalyType).toBe('Volume-backed price move');
+    expect(pack.severity).toBe('High');
+    expect(pack.evidence).toContain('Price moved -3.1% in 15m.');
+  });
+
+  it('classifies stock-specific move versus index and sector', () => {
+    const pack = buildMarketAnomalyEvidencePack({
+      symbol: 'INFY',
+      timeframe: '1h',
+      priceMovePct: 2.4,
+      volumeMultiple: 1,
+      sectorMovePct: 0.2,
+      indexMovePct: 0.1,
+    });
+
+    expect(pack.anomalyType).toBe('Stock-specific move');
+  });
+
+  it('classifies market-aligned move', () => {
+    const pack = buildMarketAnomalyEvidencePack({
+      symbol: 'TCS',
+      timeframe: '1d',
+      priceMovePct: 0.6,
+      volumeMultiple: 1,
+      sectorMovePct: 0.5,
+      indexMovePct: 0.4,
+    });
+
+    expect(pack.anomalyType).toBe('Market-aligned move');
+    expect(pack.severity).toBe('Low');
+  });
+
+  it('classifies volatility expansion', () => {
+    const pack = buildMarketAnomalyEvidencePack({
+      symbol: 'SBIN',
+      timeframe: '15m',
+      volatilityMultiple: 2,
+    });
+
+    expect(pack.anomalyType).toBe('Volatility expansion');
+    expect(pack.severity).toBe('Medium');
+  });
+
+  it('classifies gap move', () => {
+    const pack = buildMarketAnomalyEvidencePack({
+      symbol: 'HDFCBANK',
+      timeframe: '1d',
+      gapPct: 1.4,
+    });
+
+    expect(pack.anomalyType).toBe('Gap move');
+  });
+
+  it('classifies delivery-supported move', () => {
+    const pack = buildMarketAnomalyEvidencePack({
+      symbol: 'ITC',
+      timeframe: '1d',
+      deliveryVolumeMultiple: 1.8,
+    });
+
+    expect(pack.anomalyType).toBe('Delivery-supported move');
+  });
+
+  it('handles incomplete evidence and malformed numbers', () => {
+    const pack = buildMarketAnomalyEvidencePack({
+      symbol: 'TCS',
+      timeframe: '15m',
+      priceMovePct: Number.NaN,
+      volumeMultiple: Infinity,
+      sectorMovePct: null,
+      indexMovePct: undefined,
+    });
+
+    expect(pack.anomalyType).toBe('Incomplete evidence');
+    expect(pack.severity).toBe('Needs review');
+    expect(pack.missingEvidence).toEqual(expect.arrayContaining(['price move', 'volume behavior']));
+  });
+
+  it('dedupes evidence and emits compact safe payload', () => {
+    const pack = buildMarketAnomalyEvidencePack({
+      symbol: 'TCS',
+      timeframe: '15m',
+      priceMovePct: 1,
+      volumeMultiple: 1,
+      sectorMovePct: 1,
+      indexMovePct: 1,
+    });
+
+    expect(new Set(pack.evidence).size).toBe(pack.evidence.length);
+    expect(pack.narrativePromptPayload.length).toBeLessThanOrEqual(900);
+    expect(pack.narrativePromptPayload).not.toMatch(unsafePattern);
+  });
+
+  it('does not emit unsafe public copy', () => {
+    const pack = buildMarketAnomalyEvidencePack({
+      symbol: 'TCS',
+      timeframe: '15m',
+      priceMovePct: 2,
+      volumeMultiple: 2,
+    });
+
+    const text = [pack.anomalyType, pack.severity, ...pack.evidence, ...pack.missingEvidence, pack.narrativePromptPayload].join(' ');
+    expect(text).not.toMatch(unsafePattern);
   });
 });
