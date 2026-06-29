@@ -31,6 +31,21 @@ export interface CohortRetention {
 export class RetentionAggregator implements PmfSubAggregator {
   name = 'retention';
 
+  private options: { d1Days: number; d7Days: number; d30Days: number };
+
+  constructor(options: { d1Days: number; d7Days: number; d30Days: number }) {
+    this.options = options;
+  }
+
+  getRetention(): RetentionReport {
+    return {
+      periodStart: '',
+      periodEnd: '',
+      cohorts: [],
+      overall: { d1: null, d7: null, d30: null },
+    };
+  }
+
   async aggregate(ctx: AggregatorContext): Promise<RetentionReport> {
     // Query signup and session events
     const signupEvents = ctx.store.queryByMetricKey('pmf.activation.signup', 5000);

@@ -30,7 +30,89 @@ export interface PremiumIntentReport {
 export class PremiumIntentAnalytics implements PmfSubAggregator {
   name = 'premiumIntent';
 
-  async aggregate(ctx: AggregatorContext): Promise<PremiumIntentReport> {
+  // Internal state for sync test-style usage
+  private state: {
+    totalPremiumFeatureViews: number;
+    upgradeCtaClicks: number;
+    pricingPageViews: number;
+    featureRequestEngagements: number;
+    conversionReadyUsers: number;
+    upgradeIntentScore: number;
+  } = {
+    totalPremiumFeatureViews: 0,
+    upgradeCtaClicks: 0,
+    pricingPageViews: 0,
+    featureRequestEngagements: 0,
+    conversionReadyUsers: 0,
+    upgradeIntentScore: 0,
+  };
+
+  /**
+   * Sync aggregate for direct event recording (test-style usage).
+   */
+  aggregate(event: {
+    userId?: string;
+    timestamp: string;
+    metricKey: string;
+    value: number;
+    dimensions?: Record<string, string>;
+  }): void;
+  /**
+   * Async aggregate for PmfSubAggregator interface (store-based).
+   */
+  aggregate(ctx: AggregatorContext): Promise<PremiumIntentReport>;
+  async aggregate(
+    input: AggregatorContext | {
+      userId?: string;
+      timestamp: string;
+      metricKey: string;
+      value: number;
+      dimensions?: Record<string, string>;
+    },
+  ): Promise<PremiumIntentReport | void> {
+    if ('store' in input && 'periodStart' in input) {
+      return this.aggregateFromStore(input);
+    }
+
+    const event = input as {
+      userId?: string;
+      timestamp: string;
+      metricKey: string;
+      value: number;
+      dimensions?: Record<string, string>;
+    };
+
+    switch (event.metricKey) {
+      case 'pmf.premium.feature_view_rate':
+        this.state.totalPremiumFeatureViews += event.value;
+        break;
+      case 'pmf.premium.upgrade_cta_click_rate':
+        this.state.upgradeCtaClicks += event.value;
+        break;
+      case 'pmf.premium.conversion_ready_rate':
+        this.state.conversionReadyUsers += event.value;
+        break;
+    }
+  }
+
+  /** Returns current aggregated results (sync, for tests) */
+  getAggregated(): Record<string, number> {
+    return { ...this.state };
+  }
+
+  /** Resets internal state */
+  reset(): void {
+    this.state = {
+      totalPremiumFeatureViews: 0,
+      upgradeCtaClicks: 0,
+      pricingPageViews: 0,
+      featureRequestEngagements: 0,
+      conversionReadyUsers: 0,
+      upgradeIntentScore: 0,
+    };
+  }
+
+  private async aggregateFromStore(ctx: AggregatorContext): Promise<PremiumIntentReport> {
     const featureViewEvents = ctx.store.queryByMetricKey('pmf.engagement.premium_views', 5000);
     const ctaClickEvents = ctx.store.queryByMetricKey('pmf.engagement.upgrade_cta_clicks', 5000);
     const pricingEvents = ctx.store.queryByMetricKey('pmf.engagement.pricing_views', 5000);

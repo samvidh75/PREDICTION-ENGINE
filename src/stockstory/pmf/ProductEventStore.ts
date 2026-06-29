@@ -74,7 +74,15 @@ export class ProductEventStore {
   }
 
   async flush(): Promise<void> {
-    if (this.buffer.length === 0 || !this.persistFn) return;
+    if (this.buffer.length === 0) return;
+
+    if (!this.persistFn) {
+      // No persist function — just trim the buffer
+      if (this.buffer.length > this.maxBuffer) {
+        this.buffer.splice(0, this.buffer.length - this.maxBuffer);
+      }
+      return;
+    }
 
     const batch = this.buffer.splice(0, this.buffer.length);
     this.flushCount++;

@@ -52,6 +52,15 @@ export class PmfMetricRegistry {
     description: 'New user registrations',
   });
 
+  static readonly ACTIVATION_SIGNUP_COMPLETED = PmfMetricRegistry.reg({
+    key: 'pmf.activation.signup_completed',
+    label: 'Sign-up Completed',
+    category: 'activation',
+    kind: 'counter',
+    unit: 'users',
+    description: 'Users who completed the sign-up flow',
+  });
+
   static readonly ACTIVATION_FIRST_SEARCH = PmfMetricRegistry.reg({
     key: 'pmf.activation.first_search',
     label: 'First Search',
