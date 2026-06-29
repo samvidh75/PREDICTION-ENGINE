@@ -3,6 +3,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import { AppShell } from "./AppShell";
 import { getBetaConfig } from "../config/beta";
 import { isFeatureEnabled } from "../config/beta";
+import { colors, typography } from "../design/tokens";
 
 const HomePage = lazy(() => import("../pages/HomePage"));
 const ScannerPage = lazy(() => import("../pages/ScannerPage"));
@@ -30,8 +31,8 @@ function RouteFallback() {
         minHeight: "40vh",
         display: "grid",
         placeItems: "center",
-        color: "var(--text-secondary)",
-        fontSize: "14px",
+        color: colors.textSecondary,
+        fontSize: typography.body.desktop.size,
       }}
     >
       Loading research…

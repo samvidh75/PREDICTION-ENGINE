@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Card, CardLabel } from '../../ui/Card';
+import { colors, typography, space, radius } from '../../design/tokens';
 
 interface AnalystBriefCardProps {
   title: string;
@@ -11,15 +12,15 @@ interface AnalystBriefCardProps {
 
 export function AnalystBriefCard({ title, summary, confidence, symbol, limitations }: AnalystBriefCardProps) {
   return (
-    <Card className="p-4">
+    <Card>
       <CardLabel>{title}</CardLabel>
-      <p className="mt-2 text-sm text-gray-700">{summary}</p>
-      {confidence && <p className="mt-1 text-xs text-gray-500">{confidence}</p>}
+      <p style={{ marginTop: space[2], fontSize: typography.body.desktop.size, color: colors.textPrimary, lineHeight: typography.body.desktop.line }}>{summary}</p>
+      {confidence && <p style={{ marginTop: space[1], fontSize: typography.caption.desktop.size, color: colors.textSecondary }}>{confidence}</p>}
       {limitations && limitations.length > 0 && (
-        <p className="mt-1 text-xs text-gray-400">{limitations.join(' ')}</p>
+        <p style={{ marginTop: space[1], fontSize: typography.caption.desktop.size, color: colors.textTertiary }}>{limitations.join(' ')}</p>
       )}
       {symbol && (
-        <Link to={`/stock/${symbol}`} className="mt-2 inline-block text-sm text-blue-600 hover:underline">
+        <Link to={`/stock/${symbol}`} style={{ marginTop: space[2], display: 'inline-block', fontSize: typography.body.desktop.size, color: colors.primary, textDecoration: 'underline', textDecorationColor: colors.primary }} onMouseEnter={(e) => { e.currentTarget.style.opacity = '0.8'; }} onMouseLeave={(e) => { e.currentTarget.style.opacity = '1'; }}>
           View company research
         </Link>
       )}
@@ -37,8 +38,8 @@ interface AnalystQABoxProps {
 
 export function AnalystQABox({ symbol, onAsk, answer, loading, limitations }: AnalystQABoxProps) {
   return (
-    <div className="space-y-3">
-      <p className="text-sm text-gray-600">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: space[3] }}>
+      <p style={{ fontSize: typography.body.desktop.size, color: colors.textSecondary }}>
         Ask StockStory about {symbol ?? 'this company'}. Research only — not investment advice.
       </p>
       <form
@@ -52,21 +53,47 @@ export function AnalystQABox({ symbol, onAsk, answer, loading, limitations }: An
         <input
           name="question"
           placeholder="What changed in the latest result?"
-          className="w-full rounded border px-3 py-2 text-sm"
+          style={{
+            width: '100%',
+            borderRadius: radius.md,
+            border: `1px solid ${colors.border}`,
+            padding: `${space[2]} ${space[3]}`,
+            fontSize: typography.body.desktop.size,
+            fontFamily: typography.fontFamily,
+            boxSizing: 'border-box',
+            outline: 'none',
+          }}
         />
         <button
           type="submit"
           disabled={loading}
-          className="mt-2 rounded bg-gray-900 px-4 py-2 text-sm text-white disabled:opacity-50"
+          style={{
+            marginTop: space[2],
+            borderRadius: radius.md,
+            background: colors.textPrimary,
+            padding: `${space[2]} ${space[4]}`,
+            fontSize: typography.body.desktop.size,
+            color: '#FFFFFF',
+            border: 'none',
+            cursor: loading ? 'default' : 'pointer',
+            opacity: loading ? 0.5 : 1,
+            fontWeight: 600,
+            fontFamily: typography.fontFamily,
+          }}
         >
           {loading ? 'Researching…' : 'Ask'}
         </button>
       </form>
       {answer && (
-        <div className="rounded bg-gray-50 p-3 text-sm">
-          <p>{answer}</p>
+        <div style={{
+          borderRadius: radius.md,
+          background: colors.fill,
+          padding: space[3],
+          fontSize: typography.body.desktop.size,
+        }}>
+          <p style={{ margin: 0 }}>{answer}</p>
           {limitations && limitations.length > 0 && (
-            <p className="mt-1 text-xs text-gray-500">{limitations.join(' ')}</p>
+            <p style={{ marginTop: space[1], fontSize: typography.caption.desktop.size, color: colors.textSecondary }}>{limitations.join(' ')}</p>
           )}
         </div>
       )}

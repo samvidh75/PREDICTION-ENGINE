@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { Card, CardLabel } from '../../ui/Card';
+import { colors, typography, space } from '../../design/tokens';
 import { AnalystQABox } from './AnalystBriefCard';
 
 interface CompanyAnalystSectionProps {
@@ -54,31 +55,31 @@ export function CompanyAnalystSection({ symbol }: CompanyAnalystSectionProps) {
 
   return (
     <>
-      <Card className="stock-panel-card">
+      <Card>
         <CardLabel>Analyst brief</CardLabel>
         {briefSummary ? (
-          <p style={{ fontSize: '14px', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+          <p style={{ fontSize: typography.body.desktop.size, color: colors.textSecondary, lineHeight: typography.body.desktop.line }}>
             {String(briefSummary)}
           </p>
         ) : (
-          <p style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>
+          <p style={{ fontSize: typography.body.desktop.size, color: colors.textSecondary }}>
             Analyst brief not yet available for this company.
           </p>
         )}
         {earningsHeadline ? (
-          <p style={{ fontSize: '13px', marginTop: '8px', color: 'var(--text-secondary)' }}>
+          <p style={{ fontSize: typography.caption.desktop.size, marginTop: space[2], color: colors.textSecondary }}>
             Results note: {String(earningsHeadline)}
           </p>
         ) : null}
         <Link
           to={`/analyst`}
-          style={{ display: 'inline-block', marginTop: '12px', fontSize: '14px' }}
+          style={{ display: 'inline-block', marginTop: space[3], fontSize: typography.body.desktop.size, color: colors.primary }}
         >
           Open company deep dive →
         </Link>
       </Card>
 
-      <Card className="stock-panel-card">
+      <Card>
         <CardLabel>Ask StockStory about this company</CardLabel>
         <AnalystQABox
           symbol={symbol}
