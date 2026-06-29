@@ -97,3 +97,109 @@ export interface FilingRecord {
   url?: string | null;
   summary?: string | null;
 }
+
+export interface OwnershipRecord {
+  symbol: string;
+  asOf: string;
+  promoters?: number | null;
+  fii?: number | null;
+  dii?: number | null;
+  mutualFunds?: number | null;
+  publicShareholding?: number | null;
+  promoterPledge?: number | null;
+}
+
+export interface CorporateActionRecord {
+  id: string;
+  symbol: string;
+  actionType: "dividend" | "bonus" | "split" | "rights" | "buyback" | "merger" | "demerger" | "other";
+  announcedAt?: string | null;
+  exDate?: string | null;
+  recordDate?: string | null;
+  details?: string | null;
+}
+
+export interface DerivativesSnapshotRecord {
+  symbol: string;
+  asOf: string;
+  expiry?: string | null;
+  futuresOpenInterest?: number | null;
+  futuresOiChange?: number | null;
+  putCallRatio?: number | null;
+  impliedVolatility?: number | null;
+  maxPain?: number | null;
+  optionVolume?: number | null;
+}
+
+export interface SectorMacroContextRecord {
+  symbol?: string;
+  sector?: string | null;
+  asOf: string;
+  sectorMovePct?: number | null;
+  indexMovePct?: number | null;
+  usdInrMovePct?: number | null;
+  crudeMovePct?: number | null;
+  bondYieldMoveBps?: number | null;
+}
+
+export interface PriceQueryOptions {
+  limit?: number;
+  start?: string;
+  end?: string;
+}
+
+export interface NewsQueryOptions {
+  limit?: number;
+  since?: string;
+}
+
+export interface FilingQueryOptions {
+  limit?: number;
+  since?: string;
+}
+
+export interface CorporateActionQueryOptions {
+  limit?: number;
+  since?: string;
+}
+
+export interface CompanyMasterAdapter {
+  getCompanyMaster(symbol: string): Promise<AdapterResult<CompanyMasterRecord>>;
+}
+
+export interface PriceAdapter {
+  getDailyCandles(symbol: string, options?: PriceQueryOptions): Promise<AdapterResult<PriceCandle[]>>;
+  getIntradayCandles(
+    symbol: string,
+    timeframe: Extract<PriceTimeframe, "1m" | "5m" | "15m" | "1h">,
+    options?: PriceQueryOptions,
+  ): Promise<AdapterResult<PriceCandle[]>>;
+}
+
+export interface FinancialsAdapter {
+  getFinancialSnapshot(symbol: string): Promise<AdapterResult<FinancialSnapshotRecord>>;
+}
+
+export interface NewsEventsAdapter {
+  getRecentNewsEvents(symbol: string, options?: NewsQueryOptions): Promise<AdapterResult<NewsEventRecord[]>>;
+}
+
+export interface FilingsAdapter {
+  getRecentFilings(symbol: string, options?: FilingQueryOptions): Promise<AdapterResult<FilingRecord[]>>;
+}
+
+export interface OwnershipAdapter {
+  getLatestOwnership(symbol: string): Promise<AdapterResult<OwnershipRecord>>;
+}
+
+export interface CorporateActionsAdapter {
+  getCorporateActions(symbol: string, options?: CorporateActionQueryOptions): Promise<AdapterResult<CorporateActionRecord[]>>;
+}
+
+export interface DerivativesAdapter {
+  getDerivativesSnapshot(symbol: string): Promise<AdapterResult<DerivativesSnapshotRecord>>;
+}
+
+export interface SectorMacroAdapter {
+  getSectorMacroContext(symbol: string): Promise<AdapterResult<SectorMacroContextRecord>>;
+}
