@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { fetchMarketBrainResearch } from './marketBrainResearch';
+import { fetchMarketBrainResearch, MarketBrainResearchError } from './marketBrainResearch';
 
 const publicResearchPayload = {
   symbol: 'TCS',
@@ -69,5 +69,27 @@ describe('fetchMarketBrainResearch public shape', () => {
     expect(result.research).not.toHaveProperty('providerTraceId');
     expect(result.research).not.toHaveProperty('rawEvidence');
     expect(result.research).not.toHaveProperty('backendDiagnostics');
+  });
+
+  it('uses a public unavailable error when upstream research payload is incomplete', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({
+        symbol: 'TCS',
+        companyName: 'TCS',
+        backendDiagnostics: {
+          adapter: 'internal-adapter',
+          reason: 'missing research object',
+        },
+      }),
+    }));
+
+    await expect(fetchMarketBrainResearch('TCS')).rejects.toMatchObject({
+      name: 'MarketBrainResearchError',
+      message: 'Research is temporarily unavailable for this company.',
+      status: 200,
+      code: 'RESEARCH_UNAVAILABLE',
+    } satisfies Partial<MarketBrainResearchError>);
   });
 });
