@@ -52,7 +52,7 @@ export default function ScannerPage() {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "8px" }}>
           <h1 style={{ color: colors.textPrimary, fontSize: typography.h1.desktop.size, fontWeight: 600, lineHeight: "1.25", margin: 0 }}>Scanner</h1>
           <span style={{ fontSize: "12px", color: colors.textSecondary }}>
-            <kbd style={{ background: "#f2f2f7", border: "1px solid #e5e5ea", borderRadius: 4, padding: "1px 6px", fontSize: 11, fontFamily: "inherit" }}>⌘K</kbd> to search
+            <kbd style={{ background: colors.surfaceCard, border: `1px solid ${colors.hairlineStrong}`, borderRadius: 4, padding: "1px 6px", fontSize: 11, fontFamily: "inherit", color: colors.textSecondary }}>⌘K</kbd> to search
           </span>
         </div>
 
@@ -73,7 +73,7 @@ export default function ScannerPage() {
         <div style={{ fontSize: "13px", color: colors.textSecondary, lineHeight: "1.45", maxWidth: "520px" }}>
           <strong style={{ color: colors.textPrimary }}>{activePreset.label}</strong> — {activePreset.description}
           {activePreset.filters && (
-            <span style={{ display: "block", marginTop: "4px", fontSize: "12px", color: "#8e8e93" }}>
+            <span style={{ display: "block", marginTop: "4px", fontSize: "12px", color: colors.textTertiary }}>
               Filters: {[
                 activePreset.filters.maxPe !== undefined && `PE ≤ ${activePreset.filters.maxPe}`,
                 activePreset.filters.maxDebtToEquity !== undefined && `D/E ≤ ${activePreset.filters.maxDebtToEquity}`,

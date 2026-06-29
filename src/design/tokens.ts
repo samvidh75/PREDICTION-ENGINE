@@ -1,66 +1,81 @@
 // ============================================================================
-// PREDICTION-ENGINE DESIGN TOKENS — RAYCAST DESIGN SYSTEM
-// Pure near-black canvas, hairline 1px borders, Inter ss03 typography
+// PREDICTION-ENGINE DESIGN TOKENS — PURE BLACK RAYCAST DESIGN SYSTEM
+// Pure #000000 canvas, #0A0A0A cards, #141414 hover, Inter ss03 typography
 // ============================================================================
 
-// COLOR TOKENS — Raycast pure-dark palette
+// COLOR TOKENS — Pure black Raycast palette
+// Reference: DESIGN LEARNING 1 — Unified Design System
+// 3 core colors: Black (#000000), White (#FFFFFF), Red (#FF6363)
+// Everything else is shades of gray for hierarchy
 export const colors = {
-  // Brand
+  // Brand — White CTA pill on black (Raycast convention)
   primary:        '#ffffff',    // White CTA pill background
   primaryPressed: '#e8e8e8',   // Pressed white CTA
   onPrimary:      '#000000',   // Black text on white CTA — only black text in system
 
-  // Text
-  ink:            '#f4f4f6',   // Primary headlines on dark canvas
-  body:           '#cdcdcd',   // Default paragraph / inline-link color
-  charcoal:       '#d3d3d4',   // Brighter body where ink reads too soft
-  mute:           '#9c9c9d',   // Metadata, footer links, secondary captions
-  ash:            '#6a6b6c',   // Disabled text, lowest emphasis
-  stone:          '#434345',   // Least-emphasis caption / disabled icon
+  // Text — Pure black spec (5-step gray hierarchy)
+  ink:            '#ffffff',   // Primary headlines on pure black canvas (contrast 21:1)
+  body:           '#a0a0a0',   // Default paragraph / inline-link color (contrast 8:1)
+  charcoal:       '#c0c0c0',   // Brighter body where ink reads too soft
+  mute:           '#707070',   // Metadata, footer links, secondary captions
+  ash:            '#585858',   // Disabled text, lowest emphasis
+  stone:          '#404040',   // Least-emphasis caption / disabled icon
   onDark:         '#ffffff',   // Interactive-state primary text (button label, focused tab)
-  onDarkMute:     'rgba(255,255,255,0.72)',  // Translucent secondary on dark
+  onDarkMute:     'rgba(255,255,255,0.65)',  // Translucent secondary on dark
 
-  // Surface ladder (no drop shadows)
-  canvas:           '#07080a', // Page background
-  surface:          '#0d0d0d', // Card / elevated panel
-  surfaceElevated:  '#101111', // Button-tertiary, text-input, store-search, pill-tab-active
-  surfaceCard:      '#121212', // App icon tiles, keycap fill, command-palette hover
-  buttonFg:         '#18191a', // Rare deep card variant (featured pricing tier)
+  // Surface ladder — 4-step elevation from pure black
+  canvas:           '#000000', // Page background — pure black (Principle 1)
+  surface:          '#0D0D0D', // Card / elevated panel — almost black
+  surfaceElevated:  '#141414', // Hover states, button-tertiary, text-input
+  surfaceCard:      '#1A1A1A', // Active/pressed, app icon tiles, keycap fill
+  buttonFg:         '#222222', // Rare deep card variant (featured pricing tier)
 
-  // Borders (hairline 1px)
-  hairline:       '#242728',
-  hairlineSoft:   'rgba(255,255,255,0.08)',
-  hairlineStrong: 'rgba(255,255,255,0.16)',
+  // Borders (hairline 1px) — sharper on pure black
+  hairline:       '#1A1A1A',
+  hairlineSoft:   'rgba(255,255,255,0.06)',
+  hairlineStrong: 'rgba(255,255,255,0.12)',
 
-  // Semantic accents — reserved for category illustrations, never chrome
+  // Brand accent — Raycast red (the ONLY action color)
+  accentRed:        '#FF6363',  // Raycast red — CTAs, emphasis, action (Principle 1)
+  accentRedSoft:    'rgba(255,99,99,0.15)',
+  accentRedStrong:  'rgba(255,99,99,0.25)',
   accentBlue:       '#57c1ff',
   accentBlueSoft:   'rgba(87,193,255,0.15)',
-  accentRed:        '#ff6161',
-  accentRedSoft:    'rgba(255,97,97,0.15)',
-  accentGreen:      '#59d499',
-  accentGreenSoft:  'rgba(89,212,153,0.15)',
   accentYellow:     '#ffc533',
   accentYellowSoft: 'rgba(255,197,51,0.15)',
 
+  // Market semantic colors — used ONLY for market signals (Principle 1.5)
+  // Distinct from brand red: brand red = action, marketRed = bearish
+  marketGreen:       '#34C759',  // Bullish, positive, up (iOS green)
+  marketGreenSoft:   'rgba(52,199,89,0.15)',
+  marketRed:         '#FF3B30',  // Bearish, negative, down (iOS red)
+  marketRedSoft:     'rgba(255,59,48,0.15)',
+  marketOrange:      '#FF9500',  // Neutral, caution, watch (iOS orange)
+  marketOrangeSoft:  'rgba(255,149,0,0.15)',
+
+  // Accent green — distinct from market green (market = signals, accent = UI)
+  accentGreen:      '#59d499',
+  accentGreenSoft:  'rgba(89,212,153,0.15)',
+
   // Brand gradient — red diagonal-stripe hero
-  heroStripeStart: '#ff5757',
-  heroStripeEnd:   '#a1131a',
-  keyBgStart:      '#121212',
-  keyBgEnd:        '#0d0d0d',
+  heroStripeStart: '#FF6363',
+  heroStripeEnd:   '#b0151e',
+  keyBgStart:      '#1A1A1A',
+  keyBgEnd:        '#0D0D0D',
 
   // Legacy semantic aliases (for existing component compatibility)
-  success:         '#59d499',
-  danger:          '#ff6161',
+  success:         '#34C759',
+  danger:          '#FF6363',
   warning:         '#ffc533',
-  page:            '#07080a',
-  card:            '#0d0d0d',
-  textPrimary:     '#f4f4f6',
-  textSecondary:   '#9c9c9d',
-  textTertiary:    '#6a6b6c',
-  border:          '#242728',
-  separator:       '#242728',
-  fill:            '#101111',
-  bgSecondary:     '#101111',
+  page:            '#000000',
+  card:            '#0D0D0D',
+  textPrimary:     '#ffffff',
+  textSecondary:   '#a0a0a0',
+  textTertiary:    '#707070',
+  border:          '#1A1A1A',
+  separator:       '#1A1A1A',
+  fill:            '#141414',
+  bgSecondary:     '#141414',
 } as const;
 
 // TYPOGRAPHY — Inter with ss03 stylistic set
@@ -101,18 +116,19 @@ export const typography = {
            mobile: { size: '11px', weight: 600, line: '1.3', track: '0.04em', uppercase: true } },
 } as const;
 
-// SPACING — 8px base unit, section gap 96px
+// SPACING — Strict 8px grid system (Principle 3)
+// Rule: every spacing value must be a multiple of 8px
+// ✅ OK: 4, 8, 12, 16, 24, 32, 40, 48, 64, 80, 96
+// ⚠️ Rare: 12px, 20px (only for specific reasons)
+// ❌ Never: 13px, 17px, 23px (random numbers)
 export const space = {
   0:   '0px',
   1:   '4px',
   2:   '8px',
   3:   '12px',
   4:   '16px',
-  5:   '20px',
   6:   '24px',
-  7:   '28px',
   8:   '32px',
-  9:   '36px',
   10:  '40px',
   12:  '48px',
   16:  '64px',
@@ -121,10 +137,10 @@ export const space = {
   xxs: '2px',
   xs:  '4px',
   sm:  '8px',
-  md:  '12px',
-  lg:  '16px',
-  xl:  '24px',
-  xxl: '32px',
+  md:  '16px',
+  lg:  '24px',
+  xl:  '32px',
+  xxl: '48px',
   section: '96px',
 } as const;
 
@@ -188,11 +204,15 @@ export const shadows = {
   none:     'none',
 } as const;
 
-// ANIMATION — Smooth transitions
+// ANIMATION — Consistent Raycast easing (Principle 7)
+// One easing curve for EVERY animation: cubic-bezier(0.34, 1.56, 0.64, 1)
+// Subtle, fast (150-300ms), consistent
+// Never use different easing curves
 export const animation = {
-  spring:    '0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
-  standard:  '0.2s ease',
-  fast:      '0.15s ease',
+  spring:    '0.2s cubic-bezier(0.34, 1.56, 0.64, 1)',  // Standard (200ms)
+  fast:      '0.15s cubic-bezier(0.34, 1.56, 0.64, 1)', // Fast (150ms)
+  slow:      '0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',  // Slow (300ms)
+  standard:  '0.2s cubic-bezier(0.34, 1.56, 0.64, 1)',  // Backward compat
 } as const;
 
 // MEDIA QUERY HELPERS

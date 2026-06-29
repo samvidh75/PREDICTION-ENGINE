@@ -192,7 +192,7 @@ export default function HomePage() {
             transform: "translateX(-50%) rotate(-2deg)",
             width: "clamp(400px, 85vw, 1100px)",
             height: 240,
-            background: "linear-gradient(90deg, #ff5757 0%, #a1131a 50%, #ff5757 100%)",
+            background: "linear-gradient(90deg, #FF6363 0%, #b0151e 50%, #FF6363 100%)",
             clipPath: "polygon(0 15%, 100% 0, 100% 85%, 0 100%)",
             opacity: 0.9,
             pointerEvents: "none",
@@ -208,7 +208,7 @@ export default function HomePage() {
             transform: "translateX(-50%) rotate(-1.5deg)",
             width: "clamp(380px, 80vw, 1050px)",
             height: 200,
-            background: "linear-gradient(90deg, #ff5757 0%, #a1131a 50%, #ff5757 100%)",
+            background: "linear-gradient(90deg, #FF6363 0%, #b0151e 50%, #FF6363 100%)",
             clipPath: "polygon(0 15%, 100% 0, 100% 85%, 0 100%)",
             opacity: 0.5,
             filter: "blur(12px)",
@@ -229,7 +229,7 @@ export default function HomePage() {
               }}
             >
               Understand the stock{" "}
-              <span style={{ background: "linear-gradient(135deg, #ff5757 0%, #a1131a 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+              <span style={{ background: "linear-gradient(135deg, #FF6363 0%, #b0151e 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
                 before you invest
               </span>
               .
@@ -328,16 +328,17 @@ export default function HomePage() {
           Quick Actions
         </h2>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(190px, 1fr))", gap: space[4] }}>
-          {QUICK_ACTIONS.map((action) => (
+          {QUICK_ACTIONS.map((action, i) => (
             <Card
               key={action.label}
               onClick={() => navigate(action.route)}
+              className={`raycast-slideUp raycast-stagger-${i + 1}`}
               style={{ cursor: "pointer" }}
             >
               <div style={{ display: "grid", gap: space[2] }}>
                 <div style={{
                   width: 32, height: 32, borderRadius: "8px",
-                  background: "rgba(0,122,255,0.1)",
+                  background: "rgba(255,255,255,0.08)",
                   display: "flex", alignItems: "center", justifyContent: "center",
                 }}>
                   <action.icon color={colors.primary} size={16} strokeWidth={1.75} />
@@ -379,7 +380,7 @@ export default function HomePage() {
                         height: "100%",
                         borderRadius: 2,
                         width: mood.label === "Bullish" ? "65%" : mood.label === "Defensive" ? "22%" : "13%",
-                        background: mood.label === "Bullish" ? colors.success : mood.label === "Defensive" ? colors.primary : "#FF9500",
+                        background: mood.label === "Bullish" ? colors.success : mood.label === "Defensive" ? colors.primary : colors.warning,
                       }} />
                     </div>
                   </div>
@@ -409,7 +410,7 @@ export default function HomePage() {
                     alignItems: "center",
                     padding: `${space[2]} ${space[3]}`,
                     borderRadius: "8px",
-                    background: item.alert.acknowledged ? "transparent" : "rgba(0,122,255,0.06)",
+                    background: item.alert.acknowledged ? "transparent" : "rgba(255,255,255,0.04)",
                   }}
                 >
                   <div style={{ display: "grid", gap: 2 }}>
@@ -437,8 +438,8 @@ export default function HomePage() {
           Scanner Leaderboard
         </h2>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: space[4] }}>
-          {leaderboard.map((preset) => (
-            <Card key={preset.id} onClick={() => navigate(`/scanner?preset=${preset.id}`)} style={{ cursor: "pointer" }}>
+          {leaderboard.map((preset, i) => (
+            <Card key={preset.id} onClick={() => navigate(`/scanner?preset=${preset.id}`)} className={`raycast-slideUp raycast-stagger-${i + 1}`} style={{ cursor: "pointer" }}>
               <div style={{ display: "grid", gap: space[3] }}>
                 <h3 style={{ fontSize: "14px", fontWeight: 600, color: colors.primary, textTransform: "uppercase", letterSpacing: "0.04em", margin: 0 }}>
                   {preset.label}

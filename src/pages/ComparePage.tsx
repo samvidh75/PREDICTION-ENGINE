@@ -359,7 +359,7 @@ export default function ComparePage() {
         <div style={{ position: "relative", zIndex: 1, display: "grid", gap: space[3] }}>
           <h1 style={{ color: colors.textPrimary, fontSize: typography.h1.desktop.size, fontWeight: typography.h1.desktop.weight, lineHeight: typography.h1.desktop.line, margin: 0 }}>
             Compare{" "}
-            <span style={{ background: "linear-gradient(135deg, #FF3B30 0%, #FF9500 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+            <span style={{ background: `linear-gradient(135deg, ${colors.danger} 0%, ${colors.warning} 100%)`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
               Stocks
             </span>
           </h1>
@@ -441,7 +441,7 @@ export default function ComparePage() {
                 gap: 6,
                 padding: "4px 8px 4px 12px",
                 borderRadius: radius.full,
-                background: "rgba(0,122,255,0.1)",
+                background: "rgba(255,255,255,0.08)",
                 color: colors.primary,
                 fontSize: 12,
                 fontWeight: 600,

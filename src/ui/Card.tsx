@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { colors, typography, radius } from "../design/tokens";
+import { colors, typography, radius, animation } from "../design/tokens";
 
 type CardVariant = "default" | "elevated" | "command" | "store";
 
@@ -33,7 +33,7 @@ export function Card({
         borderRadius: radius.md,
         padding: "24px",
         cursor: onClick ? "pointer" : undefined,
-        transition: "background-color 200ms ease",
+        transition: `background-color ${animation.standard}`,
         ...style,
       }}
       onClick={onClick}

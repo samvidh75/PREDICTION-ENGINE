@@ -195,12 +195,12 @@
 }
 
 .stat-card-error {
-  background: linear-gradient(135deg, var(--red-light) 0%, #FFF5F4 100%);
+  background: linear-gradient(135deg, var(--red-light) 0%, rgba(255,99,99,0.08) 100%);
   border-color: var(--red);
 }
 
 .stat-card-warning {
-  background: linear-gradient(135deg, var(--amber-light) 0%, #FFFBF0 100%);
+  background: linear-gradient(135deg, var(--amber-light) 0%, rgba(255,197,51,0.08) 100%);
   border-color: var(--amber);
 }
 
@@ -280,9 +280,11 @@
 
 .progress-bar {
   height: 100%;
+  width: 100%;
   background-color: var(--brand);
   border-radius: 3px;
-  transition: width var(--t-base);
+  transform-origin: left center;
+  transition: transform var(--t-base);
 }
 
 .progress-bar.success {

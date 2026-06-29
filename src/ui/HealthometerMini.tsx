@@ -22,7 +22,7 @@ function healthColor(score: number): string {
   if (score >= 80) return colors.success;
   if (score >= 65) return "#00C9A7";
   if (score >= 45) return colors.primary;
-  if (score >= 30) return "#FF9500";
+  if (score >= 30) return colors.warning;
   return colors.danger;
 }
 

@@ -290,9 +290,9 @@ export function MetricCard({
           marginTop: 4,
           color:
             trend === "up"
-              ? "#30D158"
+              ? colors.success
               : trend === "down"
-                ? "#FF3B30"
+                ? colors.danger
                 : colors.textPrimary,
         }}
       >

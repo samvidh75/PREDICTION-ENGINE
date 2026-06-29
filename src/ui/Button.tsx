@@ -10,11 +10,12 @@ const STYLE_MAP: Record<Variant, { background: string; color: string; border: st
   install:   { background: colors.surfaceCard, color: colors.onDark, border: `1px solid ${colors.hairline}` },
 };
 
-const HOVER_MAP: Record<Variant, { background: string } | { opacity: string }> = {
-  primary:   { background: "#e8e8e8" },
-  secondary: { opacity: "0.8" },
-  tertiary:  { background: "#18191a" },
-  install:   { background: "#18191a" },
+// Principle 4: Interaction states — hover → 15% lift, active → 30%
+const HOVER_BG: Record<Variant, string> = {
+  primary:   colors.surface,       // subtle darken on white CTA
+  secondary: colors.surfaceElevated,
+  tertiary:  colors.surfaceCard,
+  install:   colors.surfaceCard,
 };
 
 type Size = "sm" | "md" | "lg" | "icon";
@@ -38,7 +39,7 @@ export function Button({
   children: ReactNode;
 } & ButtonHTMLAttributes<HTMLButtonElement>) {
   const base = STYLE_MAP[variant];
-  const hover = HOVER_MAP[variant];
+  const hoverBg = HOVER_BG[variant];
   const sizeStyles = SIZE_MAP[size];
 
   return (
@@ -59,23 +60,18 @@ export function Button({
         justifyContent: "center",
         gap: "8px",
         cursor: "pointer",
-        transition: `background-color ${animation.standard}, opacity ${animation.standard}`,
+        transition: `background-color ${animation.fast}, border-color ${animation.fast}`,
         userSelect: "none",
         WebkitFontSmoothing: "antialiased",
         ...base,
         ...style,
       }}
       onMouseEnter={(e) => {
-        if ("background" in hover) {
-          e.currentTarget.style.backgroundColor = hover.background;
-        } else {
-          e.currentTarget.style.opacity = hover.opacity;
-        }
+        e.currentTarget.style.backgroundColor = hoverBg;
         props.onMouseEnter?.(e);
       }}
       onMouseLeave={(e) => {
         e.currentTarget.style.backgroundColor = base.background;
-        e.currentTarget.style.opacity = "1";
         props.onMouseLeave?.(e);
       }}
     >

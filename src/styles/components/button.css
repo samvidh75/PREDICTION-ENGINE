@@ -99,12 +99,12 @@ button:not([class*="button-"]):not([class*="ghost"]):not([class*="danger"]):not(
 }
 
 .button-secondary:hover:not(:disabled) {
-  background-color: #F0F0F0;
+  background-color: #0A0A0A;
   border-color: var(--border-strong);
 }
 
 .button-secondary:active:not(:disabled) {
-  background-color: #E8E8E8;
+  background-color: #141414;
   border-color: var(--border-strong);
 }
 
@@ -127,7 +127,7 @@ button:not([class*="button-"]):not([class*="ghost"]):not([class*="danger"]):not(
 }
 
 .button-ghost:active:not(:disabled) {
-  background-color: #F0F0F0;
+  background-color: #0A0A0A;
   color: var(--text-body);
   border-color: var(--border-strong);
 }
@@ -145,13 +145,13 @@ button:not([class*="button-"]):not([class*="ghost"]):not([class*="danger"]):not(
 }
 
 .button-danger:hover:not(:disabled) {
-  background-color: #D91E1E;
+  background-color: #B71C1C;
   box-shadow: var(--shadow-raised);
   transform: translateY(-1px);
 }
 
 .button-danger:active:not(:disabled) {
-  background-color: #D91E1E;
+  background-color: #B71C1C;
   box-shadow: var(--shadow-card);
   transform: translateY(0);
 }
