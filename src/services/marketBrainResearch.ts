@@ -70,6 +70,7 @@ const EMPTY_EVIDENCE_REVIEW: MarketBrainEvidenceReviewView = {
 };
 
 const PUBLIC_RESEARCH_UNAVAILABLE_MESSAGE = 'Research is temporarily unavailable for this company.';
+const PUBLIC_RESEARCH_UNAVAILABLE_CODE = 'RESEARCH_UNAVAILABLE';
 const INCOMPLETE_RESEARCH_RESPONSE_MESSAGE = 'Research response was incomplete.';
 
 const isRecord = (value: unknown): value is Record<string, unknown> => (
@@ -256,11 +257,10 @@ export async function fetchMarketBrainResearch(symbol: string, init?: RequestIni
   const payload = await response.json().catch(() => null) as unknown;
 
   if (!response.ok) {
-    const code = isRecord(payload) && typeof payload.code === 'string' ? payload.code : undefined;
     throw new MarketBrainResearchError(
       PUBLIC_RESEARCH_UNAVAILABLE_MESSAGE,
       response.status,
-      code,
+      PUBLIC_RESEARCH_UNAVAILABLE_CODE,
     );
   }
 
