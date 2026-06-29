@@ -67,4 +67,42 @@ describe('fetchMarketBrainResearch factor label safety', () => {
       },
     ]);
   });
+
+  it('filters factor views whose summaries contain direct recommendation language', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({
+        ...responsePayload,
+        research: {
+          ...responsePayload.research,
+          factorViews: [
+            {
+              key: 'quality',
+              label: 'Quality',
+              score: 72,
+              summary: 'Quality signal says Buy now.',
+            },
+            {
+              key: 'growth',
+              label: 'Growth',
+              score: 61,
+              summary: 'Growth evidence is available for this research view.',
+            },
+          ],
+        },
+      }),
+    }));
+
+    const result = await fetchMarketBrainResearch('TCS');
+
+    expect(result.research.factorViews).toEqual([
+      {
+        key: 'growth',
+        label: 'Growth',
+        score: 61,
+        summary: 'Growth evidence is available for this research view.',
+      },
+    ]);
+  });
 });
