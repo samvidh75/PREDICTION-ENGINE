@@ -30,6 +30,7 @@ const KNOWN_CATEGORIES = new Set([
   'engagement',
   'trust',
   'retention',
+  'research',
 ]);
 
 const KNOWN_ACTIONS = new Set([
@@ -53,6 +54,7 @@ const KNOWN_ACTIONS = new Set([
   'session_end',
   'daily_active',
   'returning_user',
+  'view',
 ]);
 
 const PII_PATTERNS = [
@@ -112,6 +114,11 @@ export class ProductEventValidator {
       errors.push({ field: 'timestamp', message: 'Missing or non-string timestamp' });
     } else if (!ISO_TIMESTAMP_RE.test(event.timestamp)) {
       errors.push({ field: 'timestamp', message: 'Timestamp not valid ISO format' });
+    }
+
+    // userId
+    if (!event.userId || typeof event.userId !== 'string' || event.userId.trim() === '') {
+      errors.push({ field: 'userId', message: 'Missing or empty userId' });
     }
 
     // PII scan on metadata

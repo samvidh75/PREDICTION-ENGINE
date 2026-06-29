@@ -16,48 +16,75 @@ export interface Cohort {
 export type CohortPeriod = 'daily' | 'weekly' | 'monthly';
 
 export interface CohortBuildResult {
-  cohorts: Cohort[];
+  cohorts: Record<string, Cohort>;
   period: CohortPeriod;
   generatedAt: string;
 }
 
 export class CohortBuilder {
+  private builtCohorts: Record<string, Record<string, Cohort>> = {};
+
   build(
     signupEvents: Array<{ userId?: string; timestamp: string }>,
-    period: CohortPeriod = 'weekly',
+    period: CohortPeriod | { start: string; end: string } = 'weekly',
   ): CohortBuildResult {
+    let effectivePeriod: CohortPeriod;
+    let startFilter: string | null = null;
+    let endFilter: string | null = null;
+
+    if (typeof period === 'object' && period !== null) {
+      effectivePeriod = 'daily';
+      startFilter = period.start;
+      endFilter = period.end;
+    } else {
+      effectivePeriod = period as CohortPeriod;
+    }
+
     const buckets = new Map<string, { start: string; end: string; userIds: Set<string> }>();
 
     for (const event of signupEvents) {
+      // Apply date filter if provided
+      if (startFilter && event.timestamp < startFilter) continue;
+      if (endFilter && event.timestamp > endFilter) continue;
+
       const userId = event.userId ?? 'anonymous';
       const date = new Date(event.timestamp);
-      const key = this.bucketKey(date, period);
+      const key = this.bucketKey(date, effectivePeriod);
 
       if (!buckets.has(key)) {
-        const { start, end } = this.bucketRange(date, period);
+        const { start, end } = this.bucketRange(date, effectivePeriod);
         buckets.set(key, { start, end, userIds: new Set() });
       }
       buckets.get(key)!.userIds.add(userId);
     }
 
     const sortedKeys = Array.from(buckets.keys()).sort();
-    const cohorts: Cohort[] = sortedKeys.map((key) => {
+    const cohortsRecord: Record<string, Cohort> = {};
+    for (const key of sortedKeys) {
       const b = buckets.get(key)!;
-      return {
+      cohortsRecord[key] = {
         id: key,
-        label: this.formatLabel(key, period),
+        label: this.formatLabel(key, effectivePeriod),
         startDate: b.start,
         endDate: b.end,
         userIds: Array.from(b.userIds),
         userCount: b.userIds.size,
       };
-    });
+    }
 
-    return {
-      cohorts,
-      period,
+    const result: CohortBuildResult = {
+      cohorts: cohortsRecord,
+      period: effectivePeriod,
       generatedAt: new Date().toISOString(),
     };
+
+    this.builtCohorts[effectivePeriod] = cohortsRecord;
+
+    return result;
+  }
+
+  getCohorts(period: CohortPeriod = 'weekly'): Record<string, Cohort> {
+    return this.builtCohorts[period] ?? {};
   }
 
   private bucketKey(date: Date, period: CohortPeriod): string {
