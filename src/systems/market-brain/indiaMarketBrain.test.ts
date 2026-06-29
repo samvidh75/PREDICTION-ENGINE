@@ -45,6 +45,8 @@ const strongPacket: IndiaEquityPacket = {
   },
 };
 
+const UNSAFE_PUBLIC_COPY = /Strong Buy|Buy now|Sell now|sure shot|guaranteed|multibagger|provider|API|backend|coverage|freshness|diagnostic|lineage|migration|backfill/i;
+
 describe('evaluateIndiaEquity', () => {
   it('returns a strong research state when factor evidence is strong and risk is contained', () => {
     const result = evaluateIndiaEquity(strongPacket);
@@ -55,6 +57,7 @@ describe('evaluateIndiaEquity', () => {
     expect(result.quality.score).toBeGreaterThanOrEqual(80);
     expect(result.risk.score).toBeLessThanOrEqual(35);
     expect(result.thesis.length).toBeGreaterThan(0);
+    expect(result.anomalyReview).toBeNull();
     expect(result.complianceNote).toContain('Research-only');
   });
 
@@ -136,5 +139,53 @@ describe('evaluateIndiaEquity', () => {
     expect(result.risk.score).toBeGreaterThanOrEqual(72);
     expect(result.risksToReview).toContain('Promoter pledge is a governance risk to review.');
     expect(result.risksToReview).toContain('Leverage risk is elevated.');
+  });
+
+  it('wires anomaly review into thesis and watch items without unsafe public copy', () => {
+    const result = evaluateIndiaEquity({
+      ...strongPacket,
+      anomaly: {
+        symbol: 'sample',
+        timeframe: '15m',
+        priceMovePct: -3.2,
+        volumeMultiple: 2.4,
+        sectorMovePct: -0.4,
+        indexMovePct: -0.2,
+      },
+    });
+
+    expect(result.anomalyReview?.anomalyType).toBe('Volume-backed price move');
+    expect(result.anomalyReview?.severity).toBe('High');
+    expect(result.thesis).toContain('The latest market event is classified as volume-backed price move.');
+    expect(result.risksToReview).toContain('Recent market behavior needs review before the thesis is strengthened.');
+    expect(result.whatToWatch).toContain('Whether the market event persists or fades after more evidence.');
+
+    const rendered = JSON.stringify(result);
+    expect(rendered).not.toMatch(UNSAFE_PUBLIC_COPY);
+  });
+
+  it('keeps incomplete anomaly review separate from core evidence domains', () => {
+    const result = evaluateIndiaEquity({
+      ...strongPacket,
+      anomaly: {
+        symbol: 'sample',
+        timeframe: '15m',
+        priceMovePct: Number.NaN,
+        volumeMultiple: Number.POSITIVE_INFINITY,
+        sectorMovePct: null,
+        indexMovePct: null,
+      },
+    });
+
+    expect(result.anomalyReview?.anomalyType).toBe('Incomplete evidence');
+    expect(result.anomalyReview?.severity).toBe('Needs review');
+    expect(result.anomalyReview?.missingEvidence).toEqual([
+      'price move',
+      'volume behavior',
+      'sector context',
+      'index context',
+    ]);
+    expect(result.missingEvidence).toEqual([]);
+    expect(JSON.stringify(result)).not.toMatch(UNSAFE_PUBLIC_COPY);
   });
 });
