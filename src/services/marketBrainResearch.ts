@@ -191,7 +191,6 @@ const normalizeResearchResponse = (
     symbol: normalizeSymbol(symbol),
     companyName,
     research: {
-      ...(research as MarketBrainResearchView),
       symbol: normalizeSymbol(symbol),
       companyName,
       state: asResearchState(research.state),
