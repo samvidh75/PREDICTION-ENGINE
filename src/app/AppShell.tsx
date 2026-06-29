@@ -1,12 +1,15 @@
 import type { ReactNode } from "react";
+import { useEffect, useState } from "react";
 import { Home, Search, Star, CreditCard, LayoutGrid, BookOpen, Shield, MessageSquareText, ArrowUpRight } from "lucide-react";
-import { NavLink, Link } from "react-router-dom";
+import { NavLink, Link, useNavigate } from "react-router-dom";
 import { colors, typography, space, radius, layout, components, shadows, animation } from "../design/tokens";
 import { NotificationBell } from "../components/NotificationBell";
 import { ResearchProfileModal } from "../components/ResearchProfileModal";
 import BetaBadge from "../components/BetaBadge";
-import FeedbackWidget from "../components/FeedbackWidget";
 import PrivacyConsentBanner from "../components/PrivacyConsentBanner";
+import { CommandPalette } from "../components/CommandPalette";
+import { useKeyboardShortcuts, KeyboardHelpOverlay } from "../hooks/useKeyboardShortcuts";
+import { SCAN_PRESETS } from "../services/scanner/presets";
 
 const NAV = [
   { to: "/", label: "Home", icon: Home },
@@ -22,6 +25,34 @@ const SECONDARY_NAV = [
 ] as const;
 
 export function AppShell({ children }: { children: ReactNode }) {
+  const navigate = useNavigate();
+  const [paletteOpen, setPaletteOpen] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
+
+  // Cmd+K / Ctrl+K to open palette
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setPaletteOpen((prev) => !prev);
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, []);
+
+  useKeyboardShortcuts({
+    handlers: {
+      'toggle-help': () => setHelpOpen((o) => !o),
+      'toggle-compare': () => navigate('/compare'),
+      'toggle-track': () => navigate('/watchlist'),
+      'escape': () => {
+        setHelpOpen(false);
+        setPaletteOpen(false);
+      },
+    },
+  });
+
   return (
     <div
       style={{
@@ -135,6 +166,21 @@ export function AppShell({ children }: { children: ReactNode }) {
           </p>
         </footer>
       </main>
+
+      {/* COMMAND PALETTE */}
+      <CommandPalette
+        presets={SCAN_PRESETS.map((p) => ({
+          id: p.id,
+          label: p.label,
+          description: p.description,
+          icon: p.icon,
+        }))}
+        open={paletteOpen}
+        onClose={() => setPaletteOpen(false)}
+      />
+
+      {/* KEYBOARD HELP */}
+      <KeyboardHelpOverlay open={helpOpen} onClose={() => setHelpOpen(false)} />
 
       {/* FEEDBACK FAB */}
       <button

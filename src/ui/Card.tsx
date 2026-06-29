@@ -2,14 +2,14 @@ import type { ReactNode } from "react";
 import { colors, typography, radius, layout, components, shadows } from "../design/tokens";
 import { useResponsiveValue } from "./responsive";
 
-export function Card({ children, style, onClick }: { children: ReactNode; style?: React.CSSProperties; onClick?: React.MouseEventHandler }) {
+export function Card({ children, style, onClick, className, variant }: { children: ReactNode; style?: React.CSSProperties; onClick?: React.MouseEventHandler; className?: string; variant?: "default" | "accent" }) {
   const padding = useResponsiveValue(components.card.paddingMobile, components.card.paddingDesktop);
 
   return (
     <section
       style={{
-        background: colors.card,
-        border: `${layout.borderWidth} solid ${colors.border}`,
+        background: variant === "accent" ? "linear-gradient(135deg, #FFF8F0 0%, #FFE8D6 100%)" : colors.card,
+        border: `${layout.borderWidth} solid ${variant === "accent" ? "#FFD4A8" : colors.border}`,
         borderRadius: radius.lg,
         boxShadow: shadows.card,
         padding,
@@ -17,6 +17,7 @@ export function Card({ children, style, onClick }: { children: ReactNode; style?
         ...style,
       }}
       onClick={onClick}
+      className={className}
     >
       {children}
     </section>
