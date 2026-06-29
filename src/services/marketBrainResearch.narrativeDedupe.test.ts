@@ -30,7 +30,7 @@ describe('fetchMarketBrainResearch narrative deduplication', () => {
     vi.unstubAllGlobals();
   });
 
-  it('deduplicates public narrative arrays after trimming and safety filtering', async () => {
+  it('deduplicates public narrative arrays after trimming, safety filtering, and case folding', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
       ok: true,
       status: 200,
@@ -40,18 +40,18 @@ describe('fetchMarketBrainResearch narrative deduplication', () => {
           ...responsePayload.research,
           thesis: [
             ' Quality metrics support the business thesis. ',
-            'Quality metrics support the business thesis.',
+            'quality metrics support the business thesis.',
             'Buy now because the setup is perfect.',
             '',
           ],
           risksToReview: [
             'Margin volatility remains a risk to review.',
-            ' Margin volatility remains a risk to review. ',
+            ' MARGIN VOLATILITY REMAINS A RISK TO REVIEW. ',
             'Guaranteed return claims should not render.',
           ],
           whatToWatch: [
             'Next result and margin trend.',
-            ' Next result and margin trend. ',
+            ' next result and margin trend. ',
             'Sell immediately if support breaks.',
           ],
         },
