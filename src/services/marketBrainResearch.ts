@@ -166,17 +166,17 @@ const asFactorViews = (value: unknown): MarketBrainFactorView[] => {
   value.forEach((item) => {
     if (!item || typeof item !== 'object') return;
     const candidate = item as Partial<MarketBrainFactorView>;
+    const keyText = asTrimmedString(candidate.key);
     const label = asPublicText(candidate.label);
     const summary = asPublicText(candidate.summary);
-    if (!(typeof candidate.key === 'string'
-      && MARKET_BRAIN_FACTOR_KEYS.has(candidate.key as MarketBrainFactorKey)
+    if (!(MARKET_BRAIN_FACTOR_KEYS.has(keyText as MarketBrainFactorKey)
       && label.length > 0
       && summary.length > 0
       && isPublicScore(candidate.score))) {
       return;
     }
 
-    const key = candidate.key as MarketBrainFactorKey;
+    const key = keyText as MarketBrainFactorKey;
     if (seen.has(key)) return;
 
     seen.add(key);
