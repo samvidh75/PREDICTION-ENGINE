@@ -71,6 +71,44 @@ describe('fetchMarketBrainResearch public shape', () => {
     expect(result.research).not.toHaveProperty('backendDiagnostics');
   });
 
+  it('normalizes trimmed public factor keys before allowlist filtering', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({
+        ...publicResearchPayload,
+        research: {
+          ...publicResearchPayload.research,
+          factorViews: [
+            {
+              key: ' quality ',
+              label: '  Quality  ',
+              score: 78,
+              summary: '  Quality evidence is available for this research view.  ',
+            },
+            {
+              key: ' quality ',
+              label: 'Duplicate quality',
+              score: 77,
+              summary: 'Duplicate quality evidence should not render twice.',
+            },
+          ],
+        },
+      }),
+    }));
+
+    const result = await fetchMarketBrainResearch('TCS');
+
+    expect(result.research.factorViews).toEqual([
+      {
+        key: 'quality',
+        label: 'Quality',
+        score: 78,
+        summary: 'Quality evidence is available for this research view.',
+      },
+    ]);
+  });
+
   it('uses a public unavailable error when upstream research payload is incomplete', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
       ok: true,
