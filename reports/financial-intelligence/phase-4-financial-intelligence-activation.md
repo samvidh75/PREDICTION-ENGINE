@@ -199,3 +199,40 @@ Checkpoint impact:
 Next smallest safe task:
 
 Phase 5 should continue with deterministic technical-indicator reliability and market anomaly evidence packs. Start with a small CPU-only evidence pack for price/volume anomaly inputs, keep it internal, test malformed inputs, and ensure Market Brain narrative output remains product-facing and free of provider/backend plumbing.
+
+---
+
+## Session Update — FinancialEngine Bonus Scoring
+
+### Changes made (2026-06-30)
+
+Added ROA, dividend yield, and market cap as bonus scoring factors in the new FinancialEngine (`src/services/intelligence/engines/FinancialEngine/`):
+
+### ROA bonus scoring (0–5 pts)
+- `scoreRoa()` method in `FinancialEngine/index.ts`
+- Thresholds: ≥25% = 5 (exceptional), ≥20% = 4, ≥15% = 3, ≥10% = 2, ≥5% = 1, <5% = 0
+- Added to `details.quality.roaScore` (was returning raw %, now returns scored value)
+- Max divisor increased from 70 to 85 to accommodate 15 bonus pts
+
+### Dividend yield bonus scoring (0–5 pts)
+- Added `dividendYield: number | null` to `FinancialMetrics` in `src/services/intelligence/types.ts`
+- `scoreDividendYield()` method: ≥5% = 5 (strong), ≥4% = 4, ≥2% = 3, ≥1% = 2, >0% = 1, 0% = 0
+- Added `details.dividend` section to `FinancialScore.details`
+
+### Market cap bonus scoring (0–5 pts)
+- `scoreMarketCap()` method: ≥500K Cr = 5 (mega), ≥100K = 4, ≥10K = 3, ≥1K = 2, ≥100 = 1, else 0
+- Added `details.marketCap` to `FinancialScore.details`
+
+### `generateReasoning()` updated
+- Now includes bonus insight text like "strong asset efficiency, modest dividend, mega cap stability"
+
+### Test fixtures updated
+- Added `roa`, `dividendYield`, `marketCap` to all 7 test cases in `FinancialEngine.test.ts`
+
+### Verification
+- Typecheck: ✅
+- Lint: ✅
+- Tests: **1687 passed, 0 failed, 7 skipped** ✅
+- Hygiene: ✅ (no secrets)
+- Frontend build: ✅
+- Backend build: ✅
