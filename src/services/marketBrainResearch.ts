@@ -23,6 +23,24 @@ export interface MarketBrainEvidenceReviewView {
   summary: string;
 }
 
+export type MarketBrainAnomalySeverityView = 'Low' | 'Medium' | 'High' | 'Needs review';
+export type MarketBrainAnomalyTypeView =
+  | 'Volume-backed price move'
+  | 'Stock-specific move'
+  | 'Market-aligned move'
+  | 'Volatility expansion'
+  | 'Gap move'
+  | 'Delivery-supported move'
+  | 'Incomplete evidence';
+
+export interface MarketBrainAnomalyReviewView {
+  anomalyType: MarketBrainAnomalyTypeView;
+  severity: MarketBrainAnomalySeverityView;
+  evidence: string[];
+  missingEvidence: string[];
+  summary: string;
+}
+
 export interface MarketBrainResearchView {
   symbol: string;
   companyName: string;
@@ -33,6 +51,7 @@ export interface MarketBrainResearchView {
   risksToReview: string[];
   whatToWatch: string[];
   evidenceReview: MarketBrainEvidenceReviewView;
+  anomalyReview: MarketBrainAnomalyReviewView | null;
   factorViews: MarketBrainFactorView[];
   methodNote: string;
   generatedAt: string;
@@ -68,6 +87,23 @@ const EMPTY_EVIDENCE_REVIEW: MarketBrainEvidenceReviewView = {
   missing: [],
   summary: 'Research evidence status is unavailable for this view.',
 };
+
+const ALLOWED_ANOMALY_TYPES = new Set<MarketBrainAnomalyTypeView>([
+  'Volume-backed price move',
+  'Stock-specific move',
+  'Market-aligned move',
+  'Volatility expansion',
+  'Gap move',
+  'Delivery-supported move',
+  'Incomplete evidence',
+]);
+
+const ALLOWED_ANOMALY_SEVERITIES = new Set<MarketBrainAnomalySeverityView>([
+  'Low',
+  'Medium',
+  'High',
+  'Needs review',
+]);
 
 const PUBLIC_RESEARCH_UNAVAILABLE_MESSAGE = 'Research is temporarily unavailable for this company.';
 const PUBLIC_RESEARCH_UNAVAILABLE_CODE = 'RESEARCH_UNAVAILABLE';
@@ -216,6 +252,35 @@ const normalizeEvidenceReview = (value: unknown): MarketBrainEvidenceReviewView 
   };
 };
 
+const normalizeAnomalyReview = (value: unknown): MarketBrainAnomalyReviewView | null => {
+  if (!isRecord(value)) return null;
+
+  const candidate = value as Partial<MarketBrainAnomalyReviewView>;
+  const anomalyTypeText = asTrimmedString(candidate.anomalyType);
+  const severityText = asTrimmedString(candidate.severity);
+  const anomalyType = ALLOWED_ANOMALY_TYPES.has(anomalyTypeText as MarketBrainAnomalyTypeView)
+    ? anomalyTypeText as MarketBrainAnomalyTypeView
+    : null;
+  const severity = ALLOWED_ANOMALY_SEVERITIES.has(severityText as MarketBrainAnomalySeverityView)
+    ? severityText as MarketBrainAnomalySeverityView
+    : null;
+
+  if (!anomalyType || !severity) return null;
+
+  const evidence = asStringArray(candidate.evidence);
+  const missingEvidence = asStringArray(candidate.missingEvidence);
+  const summary = asPublicText(candidate.summary)
+    || (evidence.length > 0 ? evidence[0] : 'Market event evidence needs review.');
+
+  return {
+    anomalyType,
+    severity,
+    evidence,
+    missingEvidence,
+    summary,
+  };
+};
+
 const normalizeResearchResponse = (
   payload: Record<string, unknown>,
   requestedSymbol: string,
@@ -237,6 +302,7 @@ const normalizeResearchResponse = (
       risksToReview: asStringArray(research.risksToReview),
       whatToWatch: asStringArray(research.whatToWatch),
       evidenceReview: normalizeEvidenceReview(research.evidenceReview),
+      anomalyReview: normalizeAnomalyReview(research.anomalyReview),
       factorViews: asFactorViews(research.factorViews),
       methodNote: asPublicText(research.methodNote),
       generatedAt: asPublicTimestamp(research.generatedAt),
