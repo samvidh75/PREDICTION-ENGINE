@@ -26,7 +26,119 @@ export interface ResearchQualityReport {
 export class ResearchQualityAggregator implements PmfSubAggregator {
   name = 'researchQuality';
 
-  async aggregate(ctx: AggregatorContext): Promise<ResearchQualityReport> {
+  // Internal state for sync test-style usage
+  private state: {
+    totalFeedback: number;
+    positiveCount: number;
+    byComponent: Record<string, { total: number; positive: number; rate: number }>;
+    bySymbol: Record<string, { total: number; positive: number }>;
+  } = {
+    totalFeedback: 0,
+    positiveCount: 0,
+    byComponent: {},
+    bySymbol: {},
+  };
+
+  /**
+   * Sync aggregate for direct event recording (test-style usage).
+   * Accepts a single normalized event object.
+   */
+  aggregate(event: {
+    userId?: string;
+    timestamp: string;
+    metricKey: string;
+    value: number;
+    dimensions?: Record<string, string>;
+  }): void;
+  /**
+   * Async aggregate for PmfSubAggregator interface.
+   * Accepts an AggregatorContext with store and period.
+   */
+  aggregate(ctx: AggregatorContext): Promise<ResearchQualityReport>;
+  async aggregate(
+    input: AggregatorContext | {
+      userId?: string;
+      timestamp: string;
+      metricKey: string;
+      value: number;
+      dimensions?: Record<string, string>;
+    },
+  ): Promise<ResearchQualityReport | void> {
+    // Check if called with AggregatorContext (PmfSubAggregator interface)
+    if ('store' in input && 'periodStart' in input) {
+      return this.aggregateFromStore(input);
+    }
+
+    // Otherwise, called with a single event (test-style)
+    const event = input as {
+      userId?: string;
+      timestamp: string;
+      metricKey: string;
+      value: number;
+      dimensions?: Record<string, string>;
+    };
+
+    if (event.metricKey === 'pmf.research.quality_positive_rate') {
+      this.state.totalFeedback += event.value;
+      if (event.value > 0) {
+        this.state.positiveCount++;
+      }
+    } else if (event.metricKey === 'pmf.research.feedback_count') {
+      // feedback_count is tracked as negative feedback, not totalFeedback
+    }
+
+    const component = event.dimensions?.component ?? 'unknown';
+    const symbol = event.dimensions?.symbol ?? 'unknown';
+
+    if (!this.state.byComponent[component]) {
+      this.state.byComponent[component] = { total: 0, positive: 0, rate: 0 };
+    }
+    this.state.byComponent[component].total++;
+    if (event.metricKey === 'pmf.research.quality_positive_rate' && event.value > 0) {
+      this.state.byComponent[component].positive++;
+    }
+
+    if (!this.state.bySymbol[symbol]) {
+      this.state.bySymbol[symbol] = { total: 0, positive: 0 };
+    }
+    this.state.bySymbol[symbol].total++;
+    if (event.metricKey === 'pmf.research.quality_positive_rate' && event.value > 0) {
+      this.state.bySymbol[symbol].positive++;
+    }
+  }
+
+  /** Returns current aggregated results (sync, for tests) */
+  getAggregated(): ResearchQualityReport {
+    const positiveRate = this.state.totalFeedback > 0
+      ? Math.round((this.state.positiveCount / this.state.totalFeedback) * 100)
+      : 0;
+
+    return {
+      periodStart: '',
+      periodEnd: '',
+      totalFeedback: this.state.totalFeedback,
+      positiveCount: this.state.positiveCount,
+      negativeCount: this.state.totalFeedback - this.state.positiveCount,
+      positiveRate,
+      byComponent: this.state.byComponent,
+      bySymbol: this.state.bySymbol,
+      weeklyTrend: [],
+      topIssues: [],
+    };
+  }
+
+  /** Resets internal state */
+  reset(): void {
+    this.state = {
+      totalFeedback: 0,
+      positiveCount: 0,
+      byComponent: {},
+      bySymbol: {},
+    };
+  }
+
+  /** Internal async aggregate from store */
+  private async aggregateFromStore(ctx: AggregatorContext): Promise<ResearchQualityReport> {
     const feedbackEvents = ctx.store.queryByMetricKey('pmf.research.feedback_count', 5000);
     const qualityEvents = ctx.store.queryByMetricKey('pmf.research.quality_positive_rate', 5000);
 

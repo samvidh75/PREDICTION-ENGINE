@@ -72,12 +72,9 @@ export function registerExperiment(def: ExperimentDefinition): void {
 
   // Validate metrics exist in PmfMetricRegistry
   const metricKeys = def.metrics ?? def.successMetrics ?? [];
-  if (metricKeys.length > 0) {
-    const { PmfMetricRegistry } = require('./PmfMetricRegistry');
-    for (const m of metricKeys) {
-      if (!PmfMetricRegistry.validateKey(m)) {
-        throw new Error(`Metric "${m}" is not registered in PmfMetricRegistry`);
-      }
+  for (const m of metricKeys) {
+    if (!PmfMetricRegistry.validateKey(m)) {
+      throw new Error(`Metric "${m}" is not registered in PmfMetricRegistry`);
     }
   }
 
@@ -111,4 +108,32 @@ export function updateExperimentStatus(key: string, status: ExperimentStatus): v
 
 export function getActiveExperiments(): ExperimentDefinition[] {
   return getExperimentsByStatus('active');
+}
+
+/** Clear all registered experiments (useful for testing) */
+export function clearExperiments(): void {
+  experiments.clear();
+}
+
+/** ExperimentRegistry class — wrapper for testing / DI */
+export class ExperimentRegistry {
+  register(def: ExperimentDefinition): void {
+    registerExperiment(def);
+  }
+
+  get(key: string): ExperimentDefinition | undefined {
+    return getExperiment(key);
+  }
+
+  getAll(): ExperimentDefinition[] {
+    return getAllExperiments();
+  }
+
+  getByStatus(status: ExperimentStatus): ExperimentDefinition[] {
+    return getExperimentsByStatus(status);
+  }
+
+  clear(): void {
+    clearExperiments();
+  }
 }

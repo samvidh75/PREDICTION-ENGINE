@@ -45,7 +45,7 @@ export class CohortBuilder {
     for (const event of signupEvents) {
       // Apply date filter if provided
       if (startFilter && event.timestamp < startFilter) continue;
-      if (endFilter && event.timestamp > endFilter) continue;
+      if (endFilter && event.timestamp.slice(0, 10) > endFilter) continue;
 
       const userId = event.userId ?? 'anonymous';
       const date = new Date(event.timestamp);

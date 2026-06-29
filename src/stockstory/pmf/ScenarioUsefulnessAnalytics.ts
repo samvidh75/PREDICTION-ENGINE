@@ -30,7 +30,89 @@ export interface ScenarioUsefulnessReport {
 export class ScenarioUsefulnessAnalytics implements PmfSubAggregator {
   name = 'scenarioUsefulness';
 
-  async aggregate(ctx: AggregatorContext): Promise<ScenarioUsefulnessReport> {
+  // Internal state for sync test-style usage
+  private state: {
+    totalViews: number;
+    totalCompletions: number;
+    totalSaves: number;
+    totalShares: number;
+    totalComparisons: number;
+  } = {
+    totalViews: 0,
+    totalCompletions: 0,
+    totalSaves: 0,
+    totalShares: 0,
+    totalComparisons: 0,
+  };
+
+  /**
+   * Sync aggregate for direct event recording (test-style usage).
+   */
+  aggregate(event: {
+    userId?: string;
+    timestamp: string;
+    metricKey: string;
+    value: number;
+    dimensions?: Record<string, string>;
+  }): void;
+  /**
+   * Async aggregate for PmfSubAggregator interface (store-based).
+   */
+  aggregate(ctx: AggregatorContext): Promise<ScenarioUsefulnessReport>;
+  async aggregate(
+    input: AggregatorContext | {
+      userId?: string;
+      timestamp: string;
+      metricKey: string;
+      value: number;
+      dimensions?: Record<string, string>;
+    },
+  ): Promise<ScenarioUsefulnessReport | void> {
+    if ('store' in input && 'periodStart' in input) {
+      return this.aggregateFromStore(input);
+    }
+
+    const event = input as {
+      userId?: string;
+      timestamp: string;
+      metricKey: string;
+      value: number;
+      dimensions?: Record<string, string>;
+    };
+
+    switch (event.metricKey) {
+      case 'pmf.scenario.view_rate':
+        this.state.totalViews += event.value;
+        break;
+      case 'pmf.scenario.completion_rate':
+        this.state.totalCompletions += event.value;
+        break;
+      case 'pmf.scenario.save_rate':
+        this.state.totalSaves += event.value;
+        break;
+      case 'pmf.scenario.share_rate':
+        this.state.totalShares += event.value;
+        break;
+    }
+  }
+
+  /** Returns current aggregated results (sync, for tests) */
+  getAggregated(): Record<string, number> {
+    return { ...this.state };
+  }
+
+  /** Resets internal state */
+  reset(): void {
+    this.state = {
+      totalViews: 0,
+      totalCompletions: 0,
+      totalSaves: 0,
+      totalShares: 0,
+      totalComparisons: 0,
+    };
+  }
+
+  private async aggregateFromStore(ctx: AggregatorContext): Promise<ScenarioUsefulnessReport> {
     const viewEvents = ctx.store.queryByMetricKey('pmf.engagement.scenario_views', 5000);
     const saveEvents = ctx.store.queryByMetricKey('pmf.engagement.scenario_saves', 5000);
     const shareEvents = ctx.store.queryByMetricKey('pmf.engagement.scenario_shares', 5000);

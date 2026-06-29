@@ -69,84 +69,49 @@ const CATEGORY_KEYWORDS: Array<{ category: IssueCategory; keywords: RegExp[]; we
 ];
 
 export class ResearchQualityIssueClassifier {
+  private issueCounts: Record<string, number> = {};
+  private componentCounts: Record<string, number> = {};
+  private totalIssues = 0;
+  private totalClassified = 0;
+
   classify(
-    feedbackEntries: Array<{
-      id: string;
-      comment?: string;
-      symbol?: string;
-      component?: string;
-      feedback_type?: string;
-    }>,
-  ): ClassificationResult {
-    const issues: ClassifiedIssue[] = [];
-    const byCategory: Record<IssueCategory, number> = {
-      INACCURATE_DATA: 0,
-      OUTDATED_INFO: 0,
-      MISSING_CONTEXT: 0,
-      UNCLEAR_EXPLANATION: 0,
-      BIASED_LANGUAGE: 0,
-      COMPLIANCE_RISK: 0,
-      OTHER: 0,
-    };
+    event: {
+      userId?: string;
+      metricKey: string;
+      value: number;
+      timestamp: string;
+      dimensions?: Record<string, string>;
+    },
+  ): { issueTypes: string[] } {
+    this.totalClassified++;
+    const issueTypes: string[] = [];
+    const component = event.dimensions?.component ?? 'unknown';
 
-    for (const entry of feedbackEntries) {
-      const comment = entry.comment ?? '';
-      if (!comment.trim()) {
-        // If no comment but feedback_type indicates issue, classify as OTHER
-        if (entry.feedback_type === 'incorrect' || entry.feedback_type === 'confusing') {
-          issues.push({
-            feedbackId: entry.id,
-            category: 'OTHER',
-            confidence: 0.5,
-            detail: `Feedback type: ${entry.feedback_type}`,
-            symbol: entry.symbol,
-            component: entry.component,
-          });
-          byCategory.OTHER++;
-        }
-        continue;
+    // Only feedback_count with low rating indicates an issue
+    if (event.metricKey === 'pmf.research.feedback_count' && event.value > 0) {
+      const rating = event.dimensions?.rating ? parseInt(event.dimensions.rating, 10) : 0;
+      if (rating <= 2) {
+        issueTypes.push('INACCURATE_DATA');
+        this.totalIssues++;
+        this.issueCounts['INACCURATE_DATA'] = (this.issueCounts['INACCURATE_DATA'] ?? 0) + 1;
+        this.componentCounts[component] = (this.componentCounts[component] ?? 0) + 1;
       }
-
-      let bestCategory: IssueCategory = 'OTHER';
-      let bestConfidence = 0;
-
-      for (const rule of CATEGORY_KEYWORDS) {
-        for (const re of rule.keywords) {
-          if (re.test(comment)) {
-            if (rule.weight > bestConfidence) {
-              bestConfidence = rule.weight;
-              bestCategory = rule.category;
-            }
-            break;
-          }
-        }
-      }
-
-      // Boost for specific feedback type + comment combo
-      if (entry.feedback_type === 'incorrect') {
-        const incorrectConfidence = Math.max(bestConfidence, 0.7);
-        if (incorrectConfidence > bestConfidence) {
-          bestCategory = 'INACCURATE_DATA';
-          bestConfidence = incorrectConfidence;
-        }
-      }
-
-      issues.push({
-        feedbackId: entry.id,
-        category: bestCategory,
-        confidence: bestConfidence,
-        detail: comment.slice(0, 200),
-        symbol: entry.symbol,
-        component: entry.component,
-      });
-
-      byCategory[bestCategory]++;
     }
 
+    return { issueTypes };
+  }
+
+  getStatistics(): { totalIssues: number; perComponent: Record<string, number> } {
     return {
-      issues,
-      byCategory,
-      uncategorizedCount: byCategory.OTHER,
+      totalIssues: this.totalIssues,
+      perComponent: { ...this.componentCounts },
     };
+  }
+
+  reset(): void {
+    this.totalIssues = 0;
+    this.totalClassified = 0;
+    this.issueCounts = {};
+    this.componentCounts = {};
   }
 }

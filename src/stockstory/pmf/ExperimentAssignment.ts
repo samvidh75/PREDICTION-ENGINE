@@ -45,6 +45,29 @@ function selectVariant(userId: string, experiment: ExperimentDefinition): Varian
   return experiment.variants[experiment.variants.length - 1];
 }
 
+/** Class-based API for test compatibility */
+export class ExperimentAssignment {
+  assign(
+    userId: string,
+    experimentKey: string,
+    variants: Array<{ id: string; trafficPercent: number }>,
+  ): string {
+    const hash = hashUserId(userId, experimentKey);
+    const totalPercent = variants.reduce((sum, v) => sum + v.trafficPercent, 0);
+    const normalized = totalPercent > 0 ? (hash % 1000) / 1000 : 0;
+
+    let cumulative = 0;
+    for (const variant of variants) {
+      cumulative += variant.trafficPercent / totalPercent;
+      if (normalized < cumulative) {
+        return variant.id;
+      }
+    }
+
+    return variants[variants.length - 1].id;
+  }
+}
+
 export function assignUser(userId: string, experimentKey?: string): AssignmentRecord[] {
   const experiments = experimentKey
     ? [getExperiment(experimentKey)].filter(Boolean) as ExperimentDefinition[]

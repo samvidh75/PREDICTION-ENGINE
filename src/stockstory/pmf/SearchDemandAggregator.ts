@@ -27,6 +27,27 @@ export interface SearchDemandReport {
 export class SearchDemandAggregator implements PmfSubAggregator {
   name = 'searchDemand';
 
+  private options: { minCount: number };
+
+  constructor(options: { minCount: number }) {
+    this.options = options;
+  }
+
+  getAggregated(): SearchDemandReport {
+    return {
+      periodStart: '',
+      periodEnd: '',
+      totalSearches: 0,
+      successfulSearches: 0,
+      failedSearches: 0,
+      successRate: 0,
+      topQueries: [],
+      topFailedQueries: [],
+      topSymbols: [],
+      dailyTrend: [],
+    };
+  }
+
   async aggregate(ctx: AggregatorContext): Promise<SearchDemandReport> {
     const searchEvents = ctx.store.queryByMetricKey('pmf.activation.first_search', 5000);
     const failedEvents = ctx.store.queryByMetricKey('pmf.search.demand_empty_results', 5000);

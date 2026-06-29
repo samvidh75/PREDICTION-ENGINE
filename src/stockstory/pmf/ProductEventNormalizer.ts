@@ -21,6 +21,8 @@ export interface NormalizationResult {
   skipped: number;
   errors: string[];
   eventType?: string;
+  length: number;
+  forEach(cb: (event: NormalizedMetricEvent, index: number, array: NormalizedMetricEvent[]) => void): void;
   [Symbol.iterator](): Iterator<NormalizedMetricEvent>;
 }
 
@@ -66,6 +68,12 @@ export class ProductEventNormalizer {
       skipped: this.skipped,
       errors: this.errors,
       eventType: this._eventType,
+      get length() {
+        return events.length;
+      },
+      forEach(cb: (event: NormalizedMetricEvent, index: number, array: NormalizedMetricEvent[]) => void) {
+        events.forEach(cb);
+      },
       [Symbol.iterator](): Iterator<NormalizedMetricEvent> {
         let i = 0;
         const evts = events;
@@ -86,7 +94,7 @@ export class ProductEventNormalizer {
   private normalizeOne(
     raw: Record<string, unknown>,
   ): NormalizedMetricEvent | null {
-    const category = String(raw.category ?? '');
+    const category = String(raw.category ?? raw.eventType ?? '');
     const action = String(raw.action ?? '');
     const label = String(raw.label ?? '');
     const timestamp = String(raw.timestamp ?? new Date().toISOString());
@@ -118,13 +126,20 @@ export class ProductEventNormalizer {
     const map: Record<string, Record<string, string>> = {
       discovery: {
         search_performed: 'pmf.activation.first_search',
+        search: 'pmf.activation.first_search',
         stock_viewed: 'pmf.activation.first_stock_view',
         compare_performed: 'pmf.activation.first_compare',
+        page_view: 'pmf.activation.signup',
       },
       engagement: {
         superpage_view: 'pmf.engagement.stock_pages_per_session',
         watchlist_add: 'pmf.activation.first_watchlist_add',
         watchlist_remove: 'pmf.engagement.sessions_per_user',
+        page_view: 'pmf.engagement.stock_pages_per_session',
+      },
+      feedback: {
+        rating: 'pmf.research.quality_positive_rate',
+        feedback: 'pmf.research.feedback_count',
       },
       retention: {
         session_start: 'pmf.engagement.sessions_per_user',

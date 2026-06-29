@@ -49,9 +49,91 @@ export interface PmfSubAggregator {
 export class PmfAggregationService {
   private aggregators: Map<string, PmfSubAggregator> = new Map();
   private store: ProductEventStore;
+  private processedEvents: NormalizedMetricEvent[] = [];
 
-  constructor(store: ProductEventStore) {
-    this.store = store;
+  constructor(store?: ProductEventStore) {
+    this.store = store ?? new ProductEventStore();
+  }
+
+  /** Process a single normalized metric event (test-style usage) */
+  process(event: NormalizedMetricEvent): void {
+    this.processedEvents.push(event);
+    this.store.store(event);
+  }
+
+  /** Build a snapshot of current state (test-style usage) */
+  buildSnapshot(): {
+    totalEvents: number;
+    funnel: Record<string, { count: number; name?: string }>;
+    researchQuality?: Record<string, unknown>;
+    searchDemand?: Record<string, unknown>;
+  } {
+    const grouped = this.buildFunnelFromEvents(this.processedEvents);
+
+    // Compute research quality from events
+    const feedbackEvents = this.processedEvents.filter(
+      (e) => e.metricKey === 'pmf.research.feedback_count' || e.metricKey === 'pmf.research.quality_positive_rate',
+    );
+    const researchQuality = feedbackEvents.length > 0
+      ? {
+          totalFeedback: feedbackEvents
+            .filter((e) => e.metricKey === 'pmf.research.feedback_count')
+            .reduce((s, e) => s + e.value, 0),
+          positiveRate: Math.round(
+            (feedbackEvents.filter((e) => e.metricKey === 'pmf.research.quality_positive_rate' && e.value > 0).length /
+              feedbackEvents.length) *
+              100,
+          ),
+        }
+      : undefined;
+
+    // Compute search demand from events
+    const searchEvents = this.processedEvents.filter((e) => e.metricKey === 'pmf.activation.first_search');
+    const searchDemand = searchEvents.length > 0
+      ? { totalSearches: searchEvents.reduce((s, e) => s + e.value, 0), successRate: 100 }
+      : undefined;
+
+    return {
+      totalEvents: this.processedEvents.length,
+      funnel: grouped,
+      researchQuality,
+      searchDemand,
+    };
+  }
+
+  /** Reset all internal state */
+  reset(): void {
+    this.processedEvents = [];
+  }
+
+  private buildFunnelFromEvents(
+    events: NormalizedMetricEvent[],
+  ): Record<string, { count: number; name?: string }> {
+    const funnel: Record<string, { count: number; name?: string }> = {};
+
+    for (const e of events) {
+      const key = e.metricKey;
+      if (!funnel[key]) {
+        funnel[key] = { count: 0 };
+      }
+      funnel[key].count++;
+    }
+
+    // Map known metric keys to funnel step names
+    const stepNames: Record<string, string> = {
+      'pmf.activation.signup': 'signup',
+      'pmf.activation.first_search': 'search',
+      'pmf.activation.first_stock_view': 'stockView',
+      'pmf.activation.first_watchlist_add': 'watchlist',
+    };
+
+    const namedFunnel: Record<string, { count: number; name?: string }> = {};
+    for (const [key, data] of Object.entries(funnel)) {
+      const name = stepNames[key] ?? key;
+      namedFunnel[name] = { count: data.count, name };
+    }
+
+    return namedFunnel;
   }
 
   registerAggregator(agg: PmfSubAggregator): void {

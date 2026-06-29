@@ -26,6 +26,98 @@ export interface ContentOpportunity {
 
 export class GrowthContentOpportunityEngine {
   private nextId = 1;
+  private failedSearches: Array<{ query: string; userId: string; timestamp: string }> = [];
+  private qualityFeedbacks: Array<{ symbol: string; component: string; issue: string; userId: string; timestamp: string }> = [];
+
+  /** Record a failed search and return current opportunities */
+  addFailedSearch(input: {
+    query: string;
+    userId: string;
+    timestamp: string;
+  }): ContentOpportunity[] {
+    this.failedSearches.push(input);
+    return this.getRankedOpportunities();
+  }
+
+  /** Record quality feedback and return current opportunities */
+  addQualityFeedback(input: {
+    symbol: string;
+    component: string;
+    issue: string;
+    userId: string;
+    timestamp: string;
+  }): ContentOpportunity[] {
+    this.qualityFeedbacks.push(input);
+    return this.getRankedOpportunities();
+  }
+
+  /** Get ranked opportunities based on accumulated signals */
+  getRankedOpportunities(): (ContentOpportunity & { frequency: number; category: string })[] {
+    const opportunities: (ContentOpportunity & { frequency: number; category: string })[] = [];
+
+    // Failed searches → content gaps
+    const queryCounts = new Map<string, number>();
+    for (const fs of this.failedSearches) {
+      queryCounts.set(fs.query, (queryCounts.get(fs.query) ?? 0) + 1);
+    }
+    for (const [query, count] of queryCounts) {
+      if (count < 2) continue;
+      const cat = 'content_gap';
+      opportunities.push({
+        ...this.makeOpportunity({
+          title: `Content gap: "${query}"`,
+          description: `Users searched for "${query}" ${count} times with no results`,
+          source: 'failed_search',
+          signalCount: count,
+          priority: Math.min(count * 10, 100),
+          suggestedFormat: this.inferFormat(query),
+          suggestedSymbols: [],
+          rationale: `${count} failed searches indicate unmet demand for this topic`,
+        }),
+        frequency: count,
+        category: cat,
+      });
+    }
+
+    // Quality feedback → content improvement opportunities
+    const componentCounts = new Map<string, { count: number; symbols: string[] }>();
+    for (const qf of this.qualityFeedbacks) {
+      const entry = componentCounts.get(qf.component) ?? { count: 0, symbols: [] };
+      entry.count++;
+      if (qf.symbol && !entry.symbols.includes(qf.symbol)) entry.symbols.push(qf.symbol);
+      componentCounts.set(qf.component, entry);
+    }
+    for (const [component, data] of componentCounts) {
+      if (data.count < 2) continue;
+      const cat: string = 'content_gap';
+      opportunities.push({
+        ...this.makeOpportunity({
+          title: `Improve "${component}" section quality`,
+          description: `Users reported ${data.count} quality issues with "${component}" content`,
+          source: 'user_feedback',
+          signalCount: data.count,
+          priority: Math.min(data.count * 15, 100),
+          suggestedFormat: 'guide',
+          suggestedSymbols: data.symbols,
+          rationale: `${data.count} quality feedback items on "${component}" content`,
+        }),
+        frequency: data.count,
+        category: cat,
+      });
+    }
+
+    // Sort by priority descending
+    opportunities.sort((a, b) => b.priority - a.priority);
+
+    return opportunities.slice(0, 20);
+  }
+
+  /** Reset internal state */
+  reset(): void {
+    this.failedSearches = [];
+    this.qualityFeedbacks = [];
+    this.nextId = 1;
+  }
 
   generate(
     searchDemand?: SearchDemandReport,
