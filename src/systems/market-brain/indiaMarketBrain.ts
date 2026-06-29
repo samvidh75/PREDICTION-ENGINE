@@ -1,3 +1,4 @@
+import { buildMarketAnomalyEvidencePack, type MarketAnomalyEvidencePack, type MarketAnomalyInput } from './anomalyEvidencePack';
 import { normalizeEvidenceCoverage } from './evidenceNormalization';
 import type {
   MARKET_BRAIN_ALLOWED_STATES,
@@ -52,6 +53,7 @@ export interface IndiaEquityPacket {
   technicals?: IndiaEquityTechnicals;
   ownership?: IndiaEquityOwnership;
   evidence?: Partial<Record<MarketDataDomain, EvidenceState>>;
+  anomaly?: MarketAnomalyInput | null;
 }
 
 export interface FactorScore {
@@ -75,6 +77,7 @@ export interface IndiaMarketBrainResult {
   thesis: string[];
   risksToReview: string[];
   whatToWatch: string[];
+  anomalyReview: MarketAnomalyEvidencePack | null;
   missingEvidence: MarketDataDomain[];
   partialEvidence: MarketDataDomain[];
   complianceNote: string;
@@ -102,6 +105,27 @@ const average = (items: Array<{ score: number; weight: number }>): number => {
 };
 
 const unique = (items: string[][]): string[] => Array.from(new Set(items.flat())).slice(0, 8);
+
+function anomalyThesis(review: MarketAnomalyEvidencePack | null): string[] {
+  if (!review || review.evidence.length === 0) return [];
+  return [`The latest market event is classified as ${review.anomalyType.toLowerCase()}.`];
+}
+
+function anomalyRisks(review: MarketAnomalyEvidencePack | null): string[] {
+  if (!review) return [];
+  if (review.severity === 'High') return ['Recent market behavior needs review before the thesis is strengthened.'];
+  if (review.severity === 'Needs review') return ['Market-event evidence is incomplete and needs review.'];
+  return [];
+}
+
+function anomalyWatchItems(review: MarketAnomalyEvidencePack | null): string[] {
+  if (!review) return [];
+  const items = ['Whether the market event persists or fades after more evidence.'];
+  if (review.missingEvidence.length > 0) {
+    items.push('Whether missing market context becomes available before drawing stronger conclusions.');
+  }
+  return items;
+}
 
 function scoreQuality(fin?: IndiaEquityFundamentals): FactorScore {
   const score = average([
@@ -227,6 +251,7 @@ export function evaluateIndiaEquity(packet: IndiaEquityPacket): IndiaMarketBrain
   const evidenceCoverage = normalizeEvidenceCoverage(packet.evidence);
   const missing = evidenceCoverage.missing;
   const partial = evidenceCoverage.partial;
+  const anomalyReview = packet.anomaly ? buildMarketAnomalyEvidencePack(packet.anomaly) : null;
 
   const convictionScore = average([
     { score: quality.score, weight: 2 },
@@ -238,8 +263,8 @@ export function evaluateIndiaEquity(packet: IndiaEquityPacket): IndiaMarketBrain
     { score: 100 - risk.score, weight: 2 },
   ]);
 
-  const thesis = unique([quality.drivers, growth.drivers, valuation.drivers, stability.drivers, momentum.drivers, ownership.drivers]);
-  const risksToReview = unique([quality.risks, growth.risks, valuation.risks, stability.risks, momentum.risks, risk.risks, ownership.risks]);
+  const thesis = unique([quality.drivers, growth.drivers, valuation.drivers, stability.drivers, momentum.drivers, ownership.drivers, anomalyThesis(anomalyReview)]);
+  const risksToReview = unique([quality.risks, growth.risks, valuation.risks, stability.risks, momentum.risks, risk.risks, ownership.risks, anomalyRisks(anomalyReview)]);
 
   return {
     symbol: normalizeSymbol(packet.symbol),
@@ -260,7 +285,9 @@ export function evaluateIndiaEquity(packet: IndiaEquityPacket): IndiaMarketBrain
       'Valuation versus sector peers.',
       'Risk changes from leverage, volatility, pledge, or adverse events.',
       'Whether the original thesis improves or weakens after new evidence.',
+      ...anomalyWatchItems(anomalyReview),
     ],
+    anomalyReview,
     missingEvidence: missing,
     partialEvidence: partial,
     complianceNote: 'Research-only output.',
