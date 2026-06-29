@@ -1,75 +1,116 @@
 import { describe, it, expect } from 'vitest';
 import { WeeklyProductReviewBuilder } from '../WeeklyProductReviewBuilder';
+import type { ResearchQualityReport } from '../ResearchQualityAggregator';
+import type { SearchDemandReport } from '../SearchDemandAggregator';
+import type { AlertUsefulnessReport } from '../AlertUsefulnessAnalytics';
+
+function makeResearchQuality(overrides?: Partial<ResearchQualityReport>): ResearchQualityReport {
+  return {
+    periodStart: '2024-01-15',
+    periodEnd: '2024-01-21',
+    totalFeedback: 10,
+    positiveCount: 7,
+    negativeCount: 3,
+    positiveRate: 70,
+    byComponent: { thesis: { total: 5, positive: 4, rate: 80 } },
+    bySymbol: { RELIANCE: { total: 3, positive: 2 } },
+    weeklyTrend: [],
+    topIssues: [],
+    ...overrides,
+  };
+}
+
+function makeSearchDemand(overrides?: Partial<SearchDemandReport>): SearchDemandReport {
+  return {
+    periodStart: '2024-01-15',
+    periodEnd: '2024-01-21',
+    totalSearches: 50,
+    successfulSearches: 43,
+    failedSearches: 0,
+    successRate: 86,
+    topQueries: [],
+    topFailedQueries: [],
+    topSymbols: [],
+    dailyTrend: [],
+    ...overrides,
+  };
+}
+
+function makeAlertUsefulness(overrides?: Partial<AlertUsefulnessReport>): AlertUsefulnessReport {
+  return {
+    periodStart: '2024-01-15',
+    periodEnd: '2024-01-21',
+    totalAlerts: 200,
+    alertsRead: 80,
+    alertsDismissed: 10,
+    alertsActioned: 15,
+    alertsSnoozed: 5,
+    readRate: 40,
+    actionRate: 7.5,
+    byCategory: {},
+    topTriggers: [],
+    dailyTrend: [],
+    ...overrides,
+  };
+}
 
 describe('WeeklyProductReviewBuilder', () => {
   const reviewBuilder = new WeeklyProductReviewBuilder();
 
-  it('generates a weekly review from PMF snapshot', () => {
+  it('generates a weekly review from PMF data', () => {
     const review = reviewBuilder.build({
-      period: { start: '2024-01-15', end: '2024-01-21' },
-      totalEvents: 100,
-      uniqueUsers: 25,
-      funnel: { signup: 25, search: 18, stockView: 12, thesisRead: 8, actionTaken: 3 },
-      researchQuality: { totalFeedback: 10, positiveRate: 0.7 },
-      searchDemand: { totalSearches: 50, successRate: 0.85, uniqueQueries: 30 },
-      retention: { d1: 0.4, d7: 0.25, d30: 0.1 },
-      alertUsefulness: { totalDelivered: 200, totalRead: 80, totalActions: 15, actionRate: 0.075 },
+      researchQuality: makeResearchQuality(),
+      searchDemand: makeSearchDemand(),
+      alertUsefulness: makeAlertUsefulness(),
     });
 
-    expect(review.period).toBe('2024-01-15 to 2024-01-21');
-    expect(review.keyMetrics).toBeDefined();
-    expect(review.keyMetrics.activeUsers).toBe(25);
-    expect(review.keyMetrics.retentionD1).toBe('40%');
-    expect(review.keyMetrics.retentionD7).toBe('25%');
-    expect(review.keyMetrics.retentionD30).toBe('10%');
-    expect(review.summary).toBeTruthy();
+    expect(review.weekStart).toBeTruthy();
+    expect(review.weekEnd).toBeTruthy();
+    expect(review.metricHighlights).toBeDefined();
+    expect(review.summary).toContain('Research quality');
+    expect(review.summary).toContain('Search success');
   });
 
-  it('generates highlights and lowlights', () => {
+  it('generates top issues and wins', () => {
     const review = reviewBuilder.build({
-      period: { start: '2024-01-15', end: '2024-01-21' },
-      totalEvents: 100,
-      uniqueUsers: 25,
-      funnel: { signup: 25, search: 18, stockView: 12, thesisRead: 8, actionTaken: 3 },
-      researchQuality: { totalFeedback: 10, positiveRate: 0.7 },
-      searchDemand: { totalSearches: 50, successRate: 0.85, uniqueQueries: 30 },
-      retention: { d1: 0.4, d7: 0.25, d30: 0.1 },
-      alertUsefulness: { totalDelivered: 200, totalRead: 80, totalActions: 15, actionRate: 0.075 },
+      researchQuality: makeResearchQuality({
+        positiveRate: 45,
+        topIssues: ['Low quality for component thesis'],
+      }),
+      searchDemand: makeSearchDemand({
+        failedSearches: 5,
+        topFailedQueries: [{ query: 'Sector comparison', count: 3 }],
+      }),
     });
 
-    expect(review.highlights).toBeDefined();
-    expect(review.highlights.length).toBeGreaterThan(0);
-    expect(review.lowlights).toBeDefined();
-    expect(review.lowlights.length).toBeGreaterThan(0);
+    expect(review.topIssues).toBeDefined();
+    expect(review.topIssues.length).toBeGreaterThan(0);
+    expect(review.wins).toBeDefined();
+    expect(review.wins.length).toBeGreaterThan(0);
   });
 
-  it('generates recommendations', () => {
+  it('generates action items', () => {
     const review = reviewBuilder.build({
-      period: { start: '2024-01-15', end: '2024-01-21' },
-      totalEvents: 100,
-      uniqueUsers: 25,
-      funnel: { signup: 10, search: 3, stockView: 1, thesisRead: 0, actionTaken: 0 },
-      researchQuality: { totalFeedback: 5, positiveRate: 0.3 },
-      searchDemand: { totalSearches: 20, successRate: 0.5, uniqueQueries: 15 },
-      retention: { d1: 0.1, d7: 0.05, d30: 0 },
-      alertUsefulness: { totalDelivered: 50, totalRead: 5, totalActions: 0, actionRate: 0 },
+      researchQuality: makeResearchQuality({
+        positiveRate: 30,
+        topIssues: ['Issue 1', 'Issue 2', 'Issue 3'],
+      }),
+      searchDemand: makeSearchDemand({
+        failedSearches: 10,
+        totalSearches: 20,
+        successRate: 50,
+      }),
     });
 
-    expect(review.recommendations).toBeDefined();
-    expect(review.recommendations.length).toBeGreaterThan(0);
+    expect(review.actionItems).toBeDefined();
+    expect(review.actionItems.length).toBeGreaterThan(0);
   });
 
   it('works with empty data', () => {
-    const review = reviewBuilder.build({
-      period: { start: '2024-01-01', end: '2024-01-07' },
-      totalEvents: 0,
-      uniqueUsers: 0,
-      funnel: { signup: 0, search: 0, stockView: 0, thesisRead: 0, actionTaken: 0 },
-      researchQuality: { totalFeedback: 0, positiveRate: 0 },
-      searchDemand: { totalSearches: 0, successRate: 0, uniqueQueries: 0 },
-      retention: { d1: 0, d7: 0, d30: 0 },
-      alertUsefulness: { totalDelivered: 0, totalRead: 0, totalActions: 0, actionRate: 0 },
-    });
-    expect(review.summary).toBeTruthy();
+    const review = reviewBuilder.build({});
+    expect(typeof review.summary).toBe('string');
+    expect(review.metricHighlights).toEqual([]);
+    expect(review.topIssues).toEqual([]);
+    expect(review.actionItems).toEqual([]);
   });
 });

@@ -22,7 +22,7 @@ const SECTIONS = [
   {
     id: "data-sources",
     title: "Data Sources & Accuracy",
-    content: "We aggregate data from exchange filings, regulatory databases, and market data providers. All data is timestamped and attributed. Where data is unavailable or stale, scores reflect lower confidence indicators. We do not guarantee data accuracy — users should verify critical data points independently."
+    content: "We aggregate data from exchange filings, regulatory databases, and market data sources. All data is timestamped and attributed. Where data is unavailable or stale, scores reflect lower confidence indicators. We do not guarantee data accuracy — users should verify critical data points independently."
   },
   {
     id: "limitations",

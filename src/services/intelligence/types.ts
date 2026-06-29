@@ -25,6 +25,9 @@ export interface FinancialMetrics {
   assetTurnover?: number;    // Revenue / Average Assets
   equityTurnover?: number;   // Revenue / Average Equity
 
+  // Distributions
+  dividendYield?: number | null;  // Dividend Yield (0.03 = 3%)
+
   // Metadata
   lastUpdated: Date;
   fiscalYear: number;
@@ -43,7 +46,7 @@ export interface FinancialScore {
   details: {
     quality: {
       roeScore: number;
-      roaScore: number;
+      roaScore: number;       // 0-5 scored value
       marginScore: number;
       points: number;
     };
@@ -56,6 +59,21 @@ export interface FinancialScore {
       leverageScore: number;
       coverageScore: number;
       points: number;
+    };
+    roa?: {
+      score: number;
+      value?: number;
+      level: string;
+    };
+    dividend?: {
+      score: number;
+      yield?: number;
+      level: string;
+    };
+    marketCap?: {
+      score: number;
+      cap?: number;
+      level: string;
     };
   };
 

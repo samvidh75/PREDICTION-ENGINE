@@ -14,6 +14,9 @@ describe('Financial Engine', () => {
         epsGrowth: 8.1,
         debtToEquity: 0.15,
         interestCoverage: 45,
+        roa: 25,
+        dividendYield: 0.012,
+        marketCap: 1500000,
         lastUpdated: new Date(),
         fiscalYear: 2026,
       };
@@ -43,6 +46,9 @@ describe('Financial Engine', () => {
         epsGrowth: 9.5,
         debtToEquity: 0.30,
         interestCoverage: 35,
+        roa: 18,
+        dividendYield: 0.015,
+        marketCap: 800000,
         lastUpdated: new Date(),
         fiscalYear: 2026,
       };
@@ -109,11 +115,11 @@ describe('Financial Engine', () => {
   describe('Major Indian Stocks', () => {
     it('should score 5 major stocks correctly', async () => {
       const testStocks = [
-        { name: 'TCS', roe: 48, om: 24, nm: 22, rg: 6.3, eg: 8.1, de: 0.15, ic: 45 },
-        { name: 'INFY', roe: 32, om: 18, nm: 15, rg: 8.2, eg: 9.5, de: 0.30, ic: 35 },
-        { name: 'WIPRO', roe: 24, om: 16, nm: 12, rg: 4.1, eg: 5.2, de: 0.05, ic: 40 },
-        { name: 'HCLTECH', roe: 35, om: 20, nm: 16, rg: 7.5, eg: 8.8, de: 0.20, ic: 38 },
-        { name: 'RELIANCE', roe: 25, om: 15, nm: 10, rg: 5, eg: 6, de: 1.2, ic: 8 },
+        { name: 'TCS', roe: 48, om: 24, nm: 22, rg: 6.3, eg: 8.1, de: 0.15, ic: 45, roa: 25, dy: 0.012, mc: 1500000 },
+        { name: 'INFY', roe: 32, om: 18, nm: 15, rg: 8.2, eg: 9.5, de: 0.30, ic: 35, roa: 18, dy: 0.015, mc: 800000 },
+        { name: 'WIPRO', roe: 24, om: 16, nm: 12, rg: 4.1, eg: 5.2, de: 0.05, ic: 40, roa: 12, dy: 0.022, mc: 300000 },
+        { name: 'HCLTECH', roe: 35, om: 20, nm: 16, rg: 7.5, eg: 8.8, de: 0.20, ic: 38, roa: 20, dy: 0.018, mc: 500000 },
+        { name: 'RELIANCE', roe: 25, om: 15, nm: 10, rg: 5, eg: 6, de: 1.2, ic: 8, roa: 8, dy: 0.004, mc: 2000000 },
       ];
 
       const results = await Promise.all(
@@ -126,6 +132,9 @@ describe('Financial Engine', () => {
             epsGrowth: stock.eg,
             debtToEquity: stock.de,
             interestCoverage: stock.ic,
+            roa: stock.roa,
+            dividendYield: stock.dy,
+            marketCap: stock.mc,
             lastUpdated: new Date(),
             fiscalYear: 2026,
           })

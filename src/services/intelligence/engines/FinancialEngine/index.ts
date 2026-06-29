@@ -22,9 +22,10 @@ export class FinancialEngine {
    * 1. Score quality (0-35 pts)
    * 2. Score growth (0-25 pts)
    * 3. Score debt (0-10 pts)
-   * 4. Aggregate: (quality + growth + debt) / 70 * 100 = 0-100
-   * 5. Calculate confidence based on data completeness
-   * 6. Generate reasoning
+   * 4. Score bonus: ROA (0-5), dividend yield (0-5), market cap (0-5)
+   * 5. Aggregate: (quality + growth + debt + bonuses) / 85 * 100 = 0-100
+   * 6. Calculate confidence based on data completeness
+   * 7. Generate reasoning
    */
   async analyze(metrics: FinancialMetrics): Promise<FinancialScore> {
     logger.info(`=== Financial Engine Analyzing ===`);
@@ -46,15 +47,26 @@ export class FinancialEngine {
       interestCoverage: metrics.interestCoverage,
     });
 
+    const roaResult = this.scoreRoa(metrics.roa);
+    const dividendResult = this.scoreDividendYield(metrics.dividendYield);
+    const marketCapResult = this.scoreMarketCap(metrics.marketCap);
+
+    const MAX_BASE = 70;    // quality(35) + growth(25) + debt(10)
+    const MAX_BONUS = 15;   // roa(5) + dividend(5) + marketCap(5)
+    const MAX_TOTAL = MAX_BASE + MAX_BONUS;
+
     const totalRawScore =
       qualityResult.score +
       growthResult.score +
-      debtResult.score;
+      debtResult.score +
+      roaResult.score +
+      dividendResult.score +
+      marketCapResult.score;
 
-    const normalizedScore = (totalRawScore / 70) * 100;
+    const normalizedScore = (totalRawScore / MAX_TOTAL) * 100;
 
     logger.info(
-      `Raw Score: ${totalRawScore}/70 → Normalized: ${normalizedScore.toFixed(1)}/100`
+      `Raw Score: ${totalRawScore}/${MAX_TOTAL} → Normalized: ${normalizedScore.toFixed(1)}/100`
     );
 
     const criticalFields = [
@@ -90,7 +102,10 @@ export class FinancialEngine {
       qualityResult,
       growthResult,
       debtResult,
-      normalizedScore
+      normalizedScore,
+      roaResult,
+      dividendResult,
+      marketCapResult
     );
 
     const result: FinancialScore = {
@@ -102,7 +117,7 @@ export class FinancialEngine {
       details: {
         quality: {
           roeScore: qualityResult.roeScore,
-          roaScore: metrics.roa ?? 0,
+          roaScore: roaResult.score,
           marginScore: qualityResult.operatingMarginScore + qualityResult.netMarginScore,
           points: qualityResult.score,
         },
@@ -116,6 +131,9 @@ export class FinancialEngine {
           coverageScore: metrics.interestCoverage ?? 0,
           points: debtResult.score,
         },
+        roa: roaResult.score > 0 ? roaResult : undefined,
+        dividend: dividendResult.score > 0 ? dividendResult : undefined,
+        marketCap: marketCapResult.score > 0 ? marketCapResult : undefined,
       },
 
       dataCompleteness,
@@ -129,6 +147,99 @@ export class FinancialEngine {
     logger.info(`Confidence: ${(result.confidence * 100).toFixed(0)}%`);
 
     return result;
+  }
+
+  /**
+   * Score Return on Assets (0-5 pts)
+   * High ROA = efficient asset utilization, strong management
+   */
+  private scoreRoa(roa?: number): { score: number; value?: number; level: string } {
+    if (roa === undefined || roa === null) {
+      return { score: 0, level: 'unavailable' };
+    }
+
+    let score: number;
+    let level: string;
+
+    if (roa >= 25) {
+      score = 5; level = 'exceptional';
+    } else if (roa >= 20) {
+      score = 4; level = 'excellent';
+    } else if (roa >= 15) {
+      score = 3; level = 'good';
+    } else if (roa >= 10) {
+      score = 2; level = 'fair';
+    } else if (roa >= 5) {
+      score = 1; level = 'weak';
+    } else {
+      score = 0; level = 'poor';
+    }
+
+    logger.info(`ROA Score: ${score}/5 (${level})`);
+
+    return { score, value: roa, level };
+  }
+
+  /**
+   * Score Dividend Yield (0-5 pts)
+   * Rewards sustainable dividends (2-5%), penalizes yield traps
+   */
+  private scoreDividendYield(divYield?: number | null): { score: number; yield?: number; level: string } {
+    if (divYield === undefined || divYield === null) {
+      return { score: 0, level: 'unavailable' };
+    }
+
+    let score: number;
+    let level: string;
+
+    if (divYield >= 0.05) {
+      score = 5; level = 'strong';
+    } else if (divYield >= 0.04) {
+      score = 4; level = 'solid';
+    } else if (divYield >= 0.02) {
+      score = 3; level = 'decent';
+    } else if (divYield >= 0.01) {
+      score = 2; level = 'modest';
+    } else if (divYield > 0) {
+      score = 1; level = 'minimal';
+    } else {
+      score = 0; level = 'none';
+    }
+
+    logger.info(`Dividend Yield Score: ${score}/5 (${level})`);
+
+    return { score, yield: divYield, level };
+  }
+
+  /**
+   * Score Market Cap (0-5 pts)
+   * Larger market caps = more stability, lower risk premium
+   */
+  private scoreMarketCap(marketCap?: number): { score: number; cap?: number; level: string } {
+    if (marketCap === undefined || marketCap === null) {
+      return { score: 0, level: 'unavailable' };
+    }
+
+    let score: number;
+    let level: string;
+
+    if (marketCap >= 500000) {
+      score = 5; level = 'mega_cap';
+    } else if (marketCap >= 100000) {
+      score = 4; level = 'large_cap';
+    } else if (marketCap >= 10000) {
+      score = 3; level = 'mid_cap';
+    } else if (marketCap >= 1000) {
+      score = 2; level = 'small_cap';
+    } else if (marketCap >= 100) {
+      score = 1; level = 'micro_cap';
+    } else {
+      score = 0; level = 'nano_cap';
+    }
+
+    logger.info(`Market Cap Score: ${score}/5 (${level})`);
+
+    return { score, cap: marketCap, level };
   }
 
   /**
@@ -158,7 +269,10 @@ export class FinancialEngine {
     quality: ReturnType<QualityScoring['analyze']>,
     growth: ReturnType<GrowthScoring['analyze']>,
     debt: ReturnType<DebtScoring['analyze']>,
-    score: number
+    score: number,
+    roa?: { score: number; level: string },
+    dividend?: { score: number; level: string },
+    marketCap?: { score: number; level: string }
   ): string {
     const parts: string[] = [];
 
@@ -194,6 +308,22 @@ export class FinancialEngine {
       parts.push('moderate leverage');
     } else {
       parts.push('high financial risk');
+    }
+
+    if (roa && roa.score > 0) {
+      if (roa.score >= 4) {
+        parts.push('strong asset efficiency');
+      } else if (roa.score >= 2) {
+        parts.push('adequate asset efficiency');
+      }
+    }
+
+    if (dividend && dividend.score > 0) {
+      parts.push(`${dividend.level} dividend`);
+    }
+
+    if (marketCap && marketCap.score > 0) {
+      parts.push(`${marketCap.level.replace('_', ' ')} stability`);
     }
 
     let overall = '';
