@@ -24,6 +24,7 @@ describe('marketBrainGuardrails', () => {
       'Watch',
       'Needs review',
       'Risk rising',
+      'Avoid for now',
     ]);
     expect(MARKET_BRAIN_ALLOWED_STATES.some(containsForbiddenRecommendationLanguage)).toBe(false);
   });
@@ -39,6 +40,8 @@ describe('marketBrainGuardrails', () => {
       'news_events',
       'technicals',
       'sector_context',
+      'ownership',
+      'derivatives',
     ]);
     expect(new Set(MARKET_BRAIN_EVIDENCE_DOMAINS).size).toBe(MARKET_BRAIN_EVIDENCE_DOMAINS.length);
   });
