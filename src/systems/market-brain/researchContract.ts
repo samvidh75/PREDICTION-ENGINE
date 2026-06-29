@@ -129,6 +129,7 @@ export function toMarketBrainResearchView(result: IndiaMarketBrainResult): Marke
   };
 
   assertMarketBrainCopyIsCompliant([
+    view.companyName,
     view.headline,
     ...view.thesis,
     ...view.risksToReview,
