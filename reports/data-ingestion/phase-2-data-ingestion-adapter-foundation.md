@@ -3,12 +3,23 @@
 **Date:** 2025-01-15
 **Status:** ✅ COMPLETE
 
-## Deliverables
+## Origin Files (from other session)
+
+| File | Status |
+|------|--------|
+| `src/services/data/dataAdapterTypes.ts` | ✅ In origin (canonical contracts) |
+| `src/services/data/normalizeDataRecord.ts` | ✅ In origin (normalization helpers) |
+| `src/services/data/nullAdapters.ts` | ✅ In origin (unavailable adapters) |
+| `src/services/data/dataAdapterRegistry.ts` | ✅ In origin (adapter registry) |
+| `src/services/data/normalizeDataRecord.test.ts` | ✅ In origin |
+| `src/services/data/nullAdapters.test.ts` | ✅ In origin |
+
+## This Session's Deliverables
 
 | File | Status | Description |
 |------|--------|-------------|
 | `src/services/data/adapterResult.ts` | ✅ Created | Result constructors, combinators, null adapter factory, safe error messages, warning sanitizer |
-| `src/services/data/evidencePackBuilder.test.ts` | ✅ Created | 8 unit tests for buildMarketEvidencePack |
+| `src/services/data/evidencePackBuilder.test.ts` | ✅ Created | 10 unit tests for buildMarketEvidencePack (combined suites) |
 | `src/systems/market-brain/evidencePackContract.ts` | ✅ Created | Market Brain integration mapper with public UX safeguards |
 | `src/systems/market-brain/evidencePackContract.test.ts` | ✅ Created | 12 unit tests for contract layer |
 | `src/systems/market-brain/index.ts` | ✅ Updated | Added evidencePackContract export |
@@ -31,12 +42,28 @@
 3. **evidencePackBuilder.test.ts** — Tests `buildMarketEvidencePack()` with real adapter results from `adapterOk()`/`adapterErr()`. Verifies all 7 domains, symbol normalization, and empty-array-as-missing behavior.
 4. **evidencePackContract.test.ts** — Verifies domain humanization, coverage mapping, public view generation, and forbidden language detection. Confirms "Strong Buy", "API", "backend", "diagnostics" etc. are caught by `assertCleanPublicView()`.
 
-## Origin Divergence
+## Evidence Pack Domains
 
-Origin already had 5 Phase 2 files from another session (commits ec58e08f–77e1a7aa). This session adds 4 unique files not in origin:
-- `adapterResult.ts` (origin's dataAdapterTypes.ts has the type but no constructors/combinators)
-- `evidencePackBuilder.test.ts`
-- `evidencePackContract.ts`
-- `evidencePackContract.test.ts`
+- `financial_statements`
+- `price_volume`
+- `news_events`
+- `ownership`
+- `derivatives`
+- `sector_context`
+- `corporate_actions`
 
-Additionally, a pre-existing TypeScript error in `evidencePackBuilder.ts:77` was fixed (indexed access returned `string` type from `symbol` field).
+## Safety Confirmations
+
+- No fake data added.
+- No fake rankings added.
+- No fake predictions added.
+- No broker execution added.
+- No secrets touched.
+- No environment variables added.
+- No public recommendation language added.
+- No frontend UX changes made.
+- Adapter errors remain internal-only.
+
+## Next Remaining Task
+
+Phase 3 should wire the first real existing data source into these contracts, starting with company master and daily price candles. Keep all other domains on null adapters until each has a verified implementation.

@@ -1,7 +1,9 @@
 // src/services/data/evidencePackBuilder.test.ts
 // Phase 2 – Tests for market evidence pack builder.
+// Combined test suite: adapter-result-based tests + raw-AdapterResult tests.
 
 import { describe, it, expect } from 'vitest';
+import type { AdapterResult, PriceCandle } from './dataAdapterTypes';
 import { buildMarketEvidencePack, EvidencePackInputs } from './evidencePackBuilder';
 import { adapterOk, adapterErr } from './adapterResult';
 
@@ -19,7 +21,9 @@ function emptyInputs(overrides: Partial<EvidencePackInputs> = {}): EvidencePackI
   };
 }
 
-describe('buildMarketEvidencePack', () => {
+// --- Tests using adapterOk/adapterErr helpers ---
+
+describe('buildMarketEvidencePack (with adapter helpers)', () => {
   it('marks domains with data as available', () => {
     const inputs = emptyInputs({
       price: adapterOk([{ close: 100 }]),
@@ -80,5 +84,34 @@ describe('buildMarketEvidencePack', () => {
     });
     const pack = buildMarketEvidencePack(inputs);
     expect(pack.missingDomains).toContain('price_volume');
+  });
+});
+
+// --- Tests using raw AdapterResult objects ---
+
+const price: AdapterResult<PriceCandle[]> = {
+  ok: true,
+  asOf: "2026-06-29T00:00:00.000Z",
+  warnings: [],
+  data: [{ symbol: "RELIANCE", timeframe: "1d", timestamp: "2026-06-29T00:00:00.000Z", open: 1, high: 2, low: 1, close: 1.5, volume: 10 }],
+};
+
+describe("market evidence pack builder (raw types)", () => {
+  it("marks available price evidence and missing unwired domains", () => {
+    const pack = buildMarketEvidencePack({ symbol: "reliance", price });
+    expect(pack.symbol).toBe("RELIANCE");
+    expect(pack.availableDomains).toEqual(["price_volume"]);
+    expect(pack.missingDomains).toContain("financial_statements");
+    expect(pack.evidenceItems).toHaveLength(1);
+    expect(pack.evidenceItems[0]?.summary).toBe("Price and volume evidence is available for RELIANCE.");
+  });
+
+  it("returns fresh arrays without raw error details", () => {
+    const packA = buildMarketEvidencePack({ symbol: "TCS" });
+    const packB = buildMarketEvidencePack({ symbol: "TCS" });
+    expect(packA.availableDomains).not.toBe(packB.availableDomains);
+    expect(packA.missingDomains).not.toBe(packB.missingDomains);
+    expect(packA.evidenceItems).toEqual([]);
+    expect(packA.missingDomains).toContain("price_volume");
   });
 });
