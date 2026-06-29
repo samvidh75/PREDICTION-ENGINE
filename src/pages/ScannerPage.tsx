@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { scanByType, type ScanType } from "../services/scanner/scoringEngine";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { scanByPreset, SCAN_PRESETS, type EnhancedScanType, type EnhancedScannedStock, type ScanPresetDefinition } from "../services/scanner/presets";
 import { Button } from "../ui/Button";
 import { Card } from "../ui/Card";
 import { useResponsiveValue } from "../ui/responsive";
@@ -8,32 +8,39 @@ import { colors, typography, radius } from "../design/tokens";
 import { SEBIComplianceBanner } from "../components/SEBICompliance";
 import { ScannerPresets } from "../components/ScannerPresets";
 
-const SCANS: ScanType[] = ["quality", "value", "momentum", "stable"];
+const FALLBACK_PRESET: EnhancedScanType = "quality-compounders";
 
-const COLUMNS = [
-  { key: "rank", label: "#", width: "32px" },
-  { key: "company", label: "Company", width: "1fr" },
+const FACTOR_COLUMNS = [
   { key: "quality", label: "Quality", width: "64px" },
-  { key: "valuation", label: "Val", width: "56px" },
   { key: "growth", label: "Growth", width: "64px" },
+  { key: "momentum", label: "Mom", width: "56px" },
+  { key: "valuation", label: "Val", width: "56px" },
   { key: "risk", label: "Risk", width: "56px" },
-  { key: "technical", label: "Tech", width: "56px" },
-  { key: "overall", label: "%", width: "48px" },
+  { key: "stability", label: "Stability", width: "72px" },
+  { key: "dividend", label: "Div", width: "56px" },
 ] as const;
 
 export default function ScannerPage() {
   const navigate = useNavigate();
-  const [scanType, setScanType] = useState<ScanType>("quality");
+  const [searchParams] = useSearchParams();
+  const presetFromUrl = searchParams.get("preset") as EnhancedScanType | null;
+
+  const [activePresetId, setActivePresetId] = useState<EnhancedScanType>(
+    presetFromUrl && SCAN_PRESETS.find((p) => p.id === presetFromUrl) ? presetFromUrl : FALLBACK_PRESET,
+  );
   const [query, setQuery] = useState("");
   const label = useResponsiveValue("13px", "14px");
+
+  const activePreset = SCAN_PRESETS.find((p) => p.id === activePresetId)!;
+
   const results = useMemo(
     () =>
-      scanByType(scanType).filter(
+      scanByPreset(activePresetId).filter(
         (item) =>
           item.symbol.toLowerCase().includes(query.toLowerCase()) ||
           item.name.toLowerCase().includes(query.toLowerCase()),
       ),
-    [query, scanType],
+    [query, activePresetId],
   );
 
   const displayResults = results.slice(0, 50);
@@ -42,14 +49,45 @@ export default function ScannerPage() {
     <div style={{ display: "grid", gap: "24px" }}>
       <SEBIComplianceBanner />
       <div style={{ display: "grid", gap: "16px" }}>
-        <h1 style={{ color: colors.textPrimary, fontSize: typography.h1.desktop.size, fontWeight: 600, lineHeight: "1.25" }}>Scanner</h1>
-        <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
-          {SCANS.map((scan) => (
-            <Button key={scan} variant={scan === scanType ? "primary" : "secondary"} onClick={() => setScanType(scan)}>
-              {scan}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "8px" }}>
+          <h1 style={{ color: colors.textPrimary, fontSize: typography.h1.desktop.size, fontWeight: 600, lineHeight: "1.25", margin: 0 }}>Scanner</h1>
+          <span style={{ fontSize: "12px", color: colors.textSecondary }}>
+            <kbd style={{ background: "#f2f2f7", border: "1px solid #e5e5ea", borderRadius: 4, padding: "1px 6px", fontSize: 11, fontFamily: "inherit" }}>⌘K</kbd> to search
+          </span>
+        </div>
+
+        <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+          {SCAN_PRESETS.map((preset) => (
+            <Button
+              key={preset.id}
+              variant={preset.id === activePresetId ? "primary" : "secondary"}
+              size="sm"
+              onClick={() => setActivePresetId(preset.id)}
+              title={preset.description}
+            >
+              {preset.icon} {preset.shortLabel}
             </Button>
           ))}
         </div>
+
+        <div style={{ fontSize: "13px", color: colors.textSecondary, lineHeight: "1.45", maxWidth: "520px" }}>
+          <strong style={{ color: colors.textPrimary }}>{activePreset.label}</strong> — {activePreset.description}
+          {activePreset.filters && (
+            <span style={{ display: "block", marginTop: "4px", fontSize: "12px", color: "#8e8e93" }}>
+              Filters: {[
+                activePreset.filters.maxPe !== undefined && `PE ≤ ${activePreset.filters.maxPe}`,
+                activePreset.filters.maxDebtToEquity !== undefined && `D/E ≤ ${activePreset.filters.maxDebtToEquity}`,
+                activePreset.filters.minRevenueGrowth !== undefined && `Rev growth ≥ ${activePreset.filters.minRevenueGrowth}%`,
+                activePreset.filters.minDividendYield !== undefined && `Yield ≥ ${activePreset.filters.minDividendYield}%`,
+                activePreset.filters.minRoe !== undefined && `ROE ≥ ${activePreset.filters.minRoe}%`,
+              ].filter(Boolean).join(" · ")}
+              {activePreset.thresholds && Object.keys(activePreset.thresholds).length > 0 && (
+                <> · Thresholds: {Object.entries(activePreset.thresholds).map(([k, v]) => `${k} ≥ ${v}`).join(" · ")}</>
+              )}
+            </span>
+          )}
+        </div>
+
         <input
           value={query}
           onChange={(event) => setQuery(event.target.value)}
@@ -62,14 +100,12 @@ export default function ScannerPage() {
             padding: "0 16px",
           }}
         />
+
         <ScannerPresets
-          scanType={scanType}
+          scanType={activePresetId}
           query={query}
           onApply={(preset) => {
             setQuery((preset.filters.query as string) || "");
-            if (preset.filters.scanType && SCANS.includes(preset.filters.scanType as ScanType)) {
-              setScanType(preset.filters.scanType as ScanType);
-            }
           }}
         />
       </div>
@@ -79,13 +115,19 @@ export default function ScannerPage() {
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: COLUMNS.map((c) => c.width).join(" "),
-              gap: "12px",
-              minWidth: "600px",
+              gridTemplateColumns: `32px 1fr repeat(${FACTOR_COLUMNS.length}, auto) 64px`,
+              gap: "8px",
+              minWidth: "680px",
               padding: "4px",
             }}
           >
-            {COLUMNS.map((col) => (
+            {/* Header */}
+            {[
+              { key: "rank", label: "#", width: "32px" },
+              { key: "company", label: "Company", width: "1fr" },
+              ...FACTOR_COLUMNS,
+              { key: "composite", label: "%", width: "64px" },
+            ].map((col) => (
               <div
                 key={col.key}
                 style={{
@@ -95,7 +137,7 @@ export default function ScannerPage() {
                   lineHeight: "1.4",
                   textTransform: "uppercase",
                   letterSpacing: "0.04em",
-                  padding: `0 8px 8px`,
+                  padding: `0 6px 8px`,
                   borderBottom: `1px solid ${colors.border}`,
                   textAlign: col.key === "company" ? "left" : "right",
                 }}
@@ -103,7 +145,9 @@ export default function ScannerPage() {
                 {col.label}
               </div>
             ))}
-            {displayResults.map((stock, index) => (
+
+            {/* Rows */}
+            {displayResults.map((stock) => (
               <button
                 key={stock.symbol}
                 onClick={() => navigate(`/stock/${stock.symbol}`)}
@@ -114,38 +158,50 @@ export default function ScannerPage() {
                 }}
               >
                 {[
-                  { value: String(index + 1), color: colors.textSecondary },
-                  { value: stock.name || stock.symbol, color: colors.textPrimary, bold: true },
-                  { value: String(stock.quality ?? "-"), color: colors.textPrimary },
-                  { value: String(stock.valuation ?? "-"), color: colors.textPrimary },
-                  { value: String(stock.growth ?? "-"), color: colors.textPrimary },
-                  { value: String(stock.risk ?? "-"), color: colors.textPrimary },
-                  { value: String(stock.technical ?? "-"), color: colors.textPrimary },
-                  { value: `${stock.overall ?? "-"}%`, color: colors.textPrimary },
-                ].map((cell, ci) => (
-                  <div
-                    key={ci}
-                    style={{
-                      color: cell.color,
-                      fontSize: label,
-                      fontWeight: cell.bold ? 600 : 400,
-                      lineHeight: "1.4",
-                      padding: "8px 8px",
-                      textAlign: ci === 1 ? "left" : "right",
-                      borderBottom: `1px solid ${colors.border}`,
-                      background: index % 2 === 0 ? "transparent" : colors.fill,
-                      transition: "background 120ms ease",
-                      borderRadius: ci === 0 ? "6px 0 0 6px" : ci === 7 ? "0 6px 6px 0" : "0",
-                    }}
-                  >
-                    {cell.value}
-                  </div>
-                ))}
+                  { value: String(stock.rank), color: colors.textSecondary, bold: false },
+                  { value: stock.name ? `${stock.name} (${stock.symbol})` : stock.symbol, color: colors.textPrimary, bold: true },
+                  ...FACTOR_COLUMNS.map((fc) => ({
+                    value: String(Math.round((stock as any)[fc.key] ?? 0)),
+                    color: colors.textPrimary,
+                    bold: false,
+                  })),
+                  { value: `${Math.round(stock.composite)}%`, color: colors.primary, bold: true },
+                ].map((cell, ci) => {
+                  const isLast = ci === FACTOR_COLUMNS.length + 2;
+                  return (
+                    <div
+                      key={ci}
+                      style={{
+                        color: cell.color,
+                        fontSize: label,
+                        fontWeight: cell.bold ? 600 : 400,
+                        lineHeight: "1.4",
+                        padding: "8px 6px",
+                        textAlign: ci === 1 ? "left" : "right",
+                        borderBottom: `1px solid ${colors.border}`,
+                        background: (stock.rank - 1) % 2 === 0 ? "transparent" : colors.fill,
+                        transition: "background 120ms ease",
+                        borderRadius: ci === 0 ? "6px 0 0 6px" : isLast ? "0 6px 6px 0" : "0",
+                        whiteSpace: "nowrap" as const,
+                      }}
+                    >
+                      {cell.value}
+                    </div>
+                  );
+                })}
+                {/* hidden match reason tooltip via title */}
+                <div style={{ display: "none" }} data-match={stock.matchReason} />
               </button>
             ))}
           </div>
         </div>
       </Card>
+
+      {/* Results summary */}
+      <div style={{ fontSize: "12px", color: colors.textSecondary, textAlign: "center" }}>
+        Showing {displayResults.length} of {results.length} results for <strong>{activePreset.label}</strong>
+        &nbsp;· Hover a row for match reason
+      </div>
     </div>
   );
 }
