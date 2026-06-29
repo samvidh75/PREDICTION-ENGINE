@@ -133,6 +133,14 @@ const isPublicScore = (value: unknown): value is number => (
 
 const asPublicScore = (value: unknown): number => (isPublicScore(value) ? value : 0);
 
+const asPublicTimestamp = (value: unknown): string => {
+  const timestamp = asTrimmedString(value);
+  if (!timestamp) return '';
+
+  const parsed = Date.parse(timestamp);
+  return Number.isFinite(parsed) && new Date(parsed).toISOString() === timestamp ? timestamp : '';
+};
+
 const asFactorViews = (value: unknown): MarketBrainFactorView[] => {
   if (!Array.isArray(value)) return [];
 
@@ -215,7 +223,7 @@ const normalizeResearchResponse = (
       evidenceReview: normalizeEvidenceReview(research.evidenceReview),
       factorViews: asFactorViews(research.factorViews),
       methodNote: asPublicText(research.methodNote),
-      generatedAt: asTrimmedString(research.generatedAt),
+      generatedAt: asPublicTimestamp(research.generatedAt),
     },
   };
 };
