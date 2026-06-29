@@ -1,10 +1,18 @@
-import { describe, it, expect } from 'vitest';
-import { ExperimentRegistry } from '../ExperimentRegistry';
+import { describe, it, expect, beforeEach } from 'vitest';
+import {
+  registerExperiment,
+  getExperiment,
+  getAllExperiments,
+  clearExperiments,
+} from '../ExperimentRegistry';
 
 describe('ExperimentRegistry', () => {
+  beforeEach(() => {
+    clearExperiments();
+  });
+
   it('registers experiments', () => {
-    const registry = new ExperimentRegistry();
-    registry.register({
+    registerExperiment({
       id: 'test_exp_1',
       name: 'Test Experiment',
       description: 'A test experiment',
@@ -16,12 +24,13 @@ describe('ExperimentRegistry', () => {
       metrics: ['pmf.activation.signup_completed'],
       startDate: '2024-01-01',
     });
-    expect(registry.get('test_exp_1')).toBeDefined();
+    const exp = getExperiment('test_exp_1');
+    expect(exp).toBeDefined();
+    expect(exp!.name).toBe('Test Experiment');
   });
 
   it('prevents duplicate experiment registration', () => {
-    const registry = new ExperimentRegistry();
-    registry.register({
+    registerExperiment({
       id: 'dup_exp',
       name: 'First',
       description: 'First',
@@ -31,7 +40,7 @@ describe('ExperimentRegistry', () => {
       startDate: '2024-01-01',
     });
     expect(() =>
-      registry.register({
+      registerExperiment({
         id: 'dup_exp',
         name: 'Second',
         description: 'Second',
@@ -40,13 +49,12 @@ describe('ExperimentRegistry', () => {
         metrics: ['pmf.activation.signup_completed'],
         startDate: '2024-01-01',
       }),
-    ).toThrow();
+    ).toThrow('already registered');
   });
 
   it('validates variant traffic adds to 100', () => {
-    const registry = new ExperimentRegistry();
     expect(() =>
-      registry.register({
+      registerExperiment({
         id: 'bad_variant',
         name: 'Bad Variant',
         description: 'Should fail',
@@ -62,8 +70,7 @@ describe('ExperimentRegistry', () => {
   });
 
   it('lists all experiments', () => {
-    const registry = new ExperimentRegistry();
-    registry.register({
+    registerExperiment({
       id: 'exp_a',
       name: 'Exp A',
       description: 'A',
@@ -72,7 +79,7 @@ describe('ExperimentRegistry', () => {
       metrics: ['pmf.activation.signup_completed'],
       startDate: '2024-01-01',
     });
-    registry.register({
+    registerExperiment({
       id: 'exp_b',
       name: 'Exp B',
       description: 'B',
@@ -81,14 +88,13 @@ describe('ExperimentRegistry', () => {
       metrics: ['pmf.activation.first_search'],
       startDate: '2024-01-01',
     });
-    const all = registry.list();
+    const all = getAllExperiments();
     expect(all.length).toBe(2);
   });
 
   it('validates metrics exist in PmfMetricRegistry', () => {
-    const registry = new ExperimentRegistry();
     expect(() =>
-      registry.register({
+      registerExperiment({
         id: 'bad_metric',
         name: 'Bad Metric',
         description: 'Should fail',

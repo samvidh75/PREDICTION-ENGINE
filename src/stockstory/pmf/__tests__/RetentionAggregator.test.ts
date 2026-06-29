@@ -1,80 +1,82 @@
 import { describe, it, expect } from 'vitest';
 import { RetentionAggregator } from '../RetentionAggregator';
+import { ProductEventStore } from '../ProductEventStore';
+import type { NormalizedMetricEvent } from '../ProductEventNormalizer';
+
+function signupEvent(userId: string, daysAgo: number): NormalizedMetricEvent {
+  const d = new Date();
+  d.setDate(d.getDate() - daysAgo);
+  return {
+    metricKey: 'pmf.activation.signup',
+    value: 1,
+    userId,
+    timestamp: d.toISOString(),
+    dimensions: {},
+  };
+}
+
+function sessionEvent(userId: string, daysAgo: number): NormalizedMetricEvent {
+  const d = new Date();
+  d.setDate(d.getDate() - daysAgo);
+  return {
+    metricKey: 'pmf.retention.wau',
+    value: 1,
+    userId,
+    timestamp: d.toISOString(),
+    dimensions: {},
+  };
+}
 
 describe('RetentionAggregator', () => {
-  const aggregator = new RetentionAggregator({ d1Days: 1, d7Days: 7, d30Days: 30 });
-
-  function addEvent(dayOffset: number) {
-    const d = new Date();
-    d.setDate(d.getDate() + dayOffset);
-    aggregator.aggregate({
-      userId: 'user_1',
-      timestamp: d.toISOString(),
-      metricKey: 'pmf.engagement.daily_active_user',
-      value: 1,
-      dimensions: {},
-    });
-  }
-
-  it('returns empty retention when no data', () => {
-    const retention = aggregator.getRetention();
-    expect(retention).toBeDefined();
-    expect(typeof retention.d1).toBe('number');
-    expect(typeof retention.d7).toBe('number');
-    expect(typeof retention.d30).toBe('number');
+  it('returns null retention values from empty store', async () => {
+    const store = new ProductEventStore();
+    const aggregator = new RetentionAggregator();
+    const result = await aggregator.aggregate({ store, periodStart: '2025-01-01', periodEnd: '2025-12-31' });
+    expect(result.overall).toBeDefined();
+    expect(result.overall.d1).toBeNull();
+    expect(result.overall.d7).toBeNull();
+    expect(result.overall.d30).toBeNull();
+    expect(result.cohorts).toHaveLength(0);
   });
 
-  it('calculates D1 retention', () => {
-    // Day 0 - signup
-    aggregator.aggregate({
-      userId: 'user_1', timestamp: new Date().toISOString(),
-      metricKey: 'pmf.activation.signup_completed', value: 1, dimensions: {},
-    });
-    
-    // Day 1 - return (should count as D1)
-    const d1 = new Date();
-    d1.setDate(d1.getDate() + 1);
-    aggregator.aggregate({
-      userId: 'user_1', timestamp: d1.toISOString(),
-      metricKey: 'pmf.engagement.daily_active_user', value: 1, dimensions: {},
-    });
+  it('calculates D1 retention for a returning user', async () => {
+    const store = new ProductEventStore();
+    // User signs up 1 day ago
+    store.store(signupEvent('user_1', 1));
+    // User returns today (D1)
+    store.store(sessionEvent('user_1', 0));
 
-    const retention = aggregator.getRetention();
-    expect(retention.d1).toBeTypeOf('number');
+    const aggregator = new RetentionAggregator();
+    const result = await aggregator.aggregate({ store, periodStart: '2025-01-01', periodEnd: '2025-12-31' });
+    expect(result.cohorts.length).toBeGreaterThanOrEqual(1);
+    expect(result.overall.d1).toBeGreaterThan(0);
   });
 
-  it('handles multiple users', () => {
-    const a2 = new RetentionAggregator({ d1Days: 1, d7Days: 7, d30Days: 30 });
-    
-    // Add users without return events to avoid NaN
-    a2.aggregate({
-      userId: 'user_1', timestamp: new Date().toISOString(),
-      metricKey: 'pmf.activation.signup_completed', value: 1, dimensions: {},
-    });
+  it('handles multiple users with different return patterns', async () => {
+    const store = new ProductEventStore();
+    // user_1 signs up and returns D1
+    store.store(signupEvent('user_1', 1));
+    store.store(sessionEvent('user_1', 0));
+    // user_2 signs up but doesn't return
+    store.store(signupEvent('user_2', 1));
+    // user_3 signs up and returns D1
+    store.store(signupEvent('user_3', 1));
+    store.store(sessionEvent('user_3', 0));
 
-    // User returns D1
-    const d1 = new Date();
-    d1.setDate(d1.getDate() + 1);
-    a2.aggregate({
-      userId: 'user_1', timestamp: d1.toISOString(),
-      metricKey: 'pmf.engagement.daily_active_user', value: 1, dimensions: {},
-    });
-
-    const retention = a2.getRetention();
-    expect(retention.d1).toBeGreaterThanOrEqual(0);
-    expect(retention.d1).toBeLessThanOrEqual(1);
+    const aggregator = new RetentionAggregator();
+    const result = await aggregator.aggregate({ store, periodStart: '2025-01-01', periodEnd: '2025-12-31' });
+    expect(result.cohorts.length).toBeGreaterThanOrEqual(1);
+    // 2 out of 3 returned = 67%
+    expect(result.overall.d1).toBe(67);
   });
 
-  it('resets state', () => {
-    const a3 = new RetentionAggregator({ d1Days: 1, d7Days: 7, d30Days: 30 });
-    a3.aggregate({
-      userId: 'user_1', timestamp: new Date().toISOString(),
-      metricKey: 'pmf.activation.signup_completed', value: 1, dimensions: {},
-    });
-    a3.reset();
-    const retention = a3.getRetention();
-    expect(retention.d1).toBe(0);
-    expect(retention.d7).toBe(0);
-    expect(retention.d30).toBe(0);
+  it('reports 0% retention when no users return', async () => {
+    const store = new ProductEventStore();
+    store.store(signupEvent('user_1', 1));
+    store.store(signupEvent('user_2', 1));
+
+    const aggregator = new RetentionAggregator();
+    const result = await aggregator.aggregate({ store, periodStart: '2025-01-01', periodEnd: '2025-12-31' });
+    expect(result.overall.d1).toBe(0);
   });
 });

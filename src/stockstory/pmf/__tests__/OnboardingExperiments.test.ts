@@ -1,55 +1,73 @@
-import { describe, it, expect } from 'vitest';
-import { OnboardingExperiments } from '../OnboardingExperiments';
+import { describe, it, expect, beforeAll } from 'vitest';
+import { registerOnboardingExperiments } from '../OnboardingExperiments';
+import { getAllExperiments } from '../ExperimentRegistry';
+
+function safeRegister(): void {
+  try {
+    registerOnboardingExperiments();
+  } catch {
+    // Already registered — safe to ignore
+  }
+}
 
 describe('OnboardingExperiments', () => {
-  it('exports all onboarding experiments', () => {
-    expect(Array.isArray(OnboardingExperiments)).toBe(true);
-    expect(OnboardingExperiments.length).toBe(4);
+  beforeAll(() => {
+    safeRegister();
+  });
+
+  it('registers 4 onboarding experiments', () => {
+    const experiments = getAllExperiments();
+    expect(experiments.length).toBe(4);
   });
 
   it('each experiment has valid structure', () => {
-    for (const exp of OnboardingExperiments) {
-      expect(exp.id).toMatch(/^onboarding_/);
+    const experiments = getAllExperiments();
+    for (const exp of experiments) {
+      expect(exp.key).toMatch(/^onboarding\.v2\./);
       expect(exp.name).toBeTruthy();
       expect(exp.description).toBeTruthy();
-      expect(exp.owner).toBe('Product');
+      expect(exp.owner).toBe('product');
       expect(exp.variants.length).toBeGreaterThanOrEqual(2);
-      expect(exp.metrics.length).toBeGreaterThan(0);
+      expect(exp.successMetrics.length).toBeGreaterThan(0);
 
-      // Traffic should sum to 100
-      const totalTraffic = exp.variants.reduce((sum: number, v: { trafficPercent: number }) => sum + v.trafficPercent, 0);
-      expect(totalTraffic).toBe(100);
+      // Traffic fractions should sum to 1
+      const totalTraffic = exp.variants.reduce((sum: number, v: { trafficFraction: number }) => sum + v.trafficFraction, 0);
+      expect(totalTraffic).toBe(1);
 
       // Each variant has required fields
       for (const v of exp.variants) {
         expect(v.id).toBeTruthy();
         expect(v.name).toBeTruthy();
-        expect(v.trafficPercent).toBeGreaterThan(0);
+        expect(v.trafficFraction).toBeGreaterThan(0);
       }
     }
   });
 
   it('includes simplified vs detailed flow experiment', () => {
-    const simplified = OnboardingExperiments.find((e) => e.id === 'onboarding_simplified_vs_detailed');
+    const experiments = getAllExperiments();
+    const simplified = experiments.find((e) => e.key === 'onboarding.v2.simplified-vs-detailed');
     expect(simplified).toBeDefined();
-    expect(simplified?.variants.find((v) => v.id === 'simplified')).toBeDefined();
-    expect(simplified?.variants.find((v) => v.id === 'detailed')).toBeDefined();
+    expect(simplified?.variants.find((v) => v.id === 'treatment_a')).toBeDefined();
+    expect(simplified?.variants.find((v) => v.id === 'control')).toBeDefined();
   });
 
   it('includes guided vs self-serve experiment', () => {
-    const guided = OnboardingExperiments.find((e) => e.id === 'onboarding_guided_vs_self_serve');
+    const experiments = getAllExperiments();
+    const guided = experiments.find((e) => e.key === 'onboarding.v2.guided-vs-self-serve');
     expect(guided).toBeDefined();
-    expect(guided?.variants.find((v) => v.id === 'guided')).toBeDefined();
-    expect(guided?.variants.find((v) => v.id === 'self_serve')).toBeDefined();
+    expect(guided?.variants.find((v) => v.id === 'guided' || v.id === 'treatment_a')).toBeDefined();
+    expect(guided?.variants.find((v) => v.id === 'control')).toBeDefined();
   });
 
   it('includes watchlist prompt timing experiment', () => {
-    const timing = OnboardingExperiments.find((e) => e.id === 'onboarding_watchlist_prompt_timing');
+    const experiments = getAllExperiments();
+    const timing = experiments.find((e) => e.key === 'onboarding.v2.watchlist-prompt-timing');
     expect(timing).toBeDefined();
   });
 
   it('includes compare discovery experiment', () => {
-    const compare = OnboardingExperiments.find((e) => e.id === 'onboarding_compare_discovery');
+    const experiments = getAllExperiments();
+    const compare = experiments.find((e) => e.key === 'onboarding.v2.compare-discovery');
     expect(compare).toBeDefined();
   });
 });

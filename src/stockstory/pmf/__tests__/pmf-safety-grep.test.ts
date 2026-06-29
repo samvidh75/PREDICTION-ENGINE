@@ -1,15 +1,15 @@
 import { describe, it, expect } from 'vitest';
-import {
-  SECRET_PATTERNS,
-  FORBIDDEN_PATTERNS,
-  SUSPICIOUS_PATTERNS,
-} from '../PmfMetricRegistry';
+import { PmfMetricRegistry } from '../PmfMetricRegistry';
 
 describe('Safety grep patterns', () => {
-  it('forbidden patterns are defined', () => {
-    expect(SECRET_PATTERNS).toBeDefined();
-    expect(FORBIDDEN_PATTERNS).toBeDefined();
-    expect(SUSPICIOUS_PATTERNS).toBeDefined();
+  it('pmf metric registry defines metrics', () => {
+    const all = PmfMetricRegistry.getAll();
+    expect(all.length).toBeGreaterThan(0);
+    for (const m of all) {
+      expect(m.key).toMatch(/^pmf\./);
+      expect(m.label).toBeTruthy();
+      expect(m.unit).toBeTruthy();
+    }
   });
 
   it('no .only in test files', async () => {

@@ -30,13 +30,13 @@ describe('fetchMarketBrainResearch malformed payload handling', () => {
     }));
 
     await expect(fetchMarketBrainResearch('TCS')).rejects.toMatchObject({
-      code: 'INCOMPLETE_RESEARCH_RESPONSE',
-      message: 'Research response was incomplete.',
+      code: 'RESEARCH_UNAVAILABLE',
+      message: 'Research is temporarily unavailable for this company.',
       status: 200,
     });
   });
 
-  it('rejects successful non-json responses with a typed incomplete error', async () => {
+  it('rejects successful non-json responses with a typed unavailable error', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
       ok: true,
       status: 200,
@@ -44,8 +44,8 @@ describe('fetchMarketBrainResearch malformed payload handling', () => {
     }));
 
     await expect(fetchMarketBrainResearch('TCS')).rejects.toMatchObject({
-      code: 'INCOMPLETE_RESEARCH_RESPONSE',
-      message: 'Research response was incomplete.',
+      code: 'RESEARCH_UNAVAILABLE',
+      message: 'Research is temporarily unavailable for this company.',
       status: 200,
     });
   });
@@ -58,7 +58,7 @@ describe('fetchMarketBrainResearch malformed payload handling', () => {
     }));
 
     await expect(fetchMarketBrainResearch('TCS')).rejects.toMatchObject({
-      code: undefined,
+      code: 'RESEARCH_UNAVAILABLE',
       message: 'Research is temporarily unavailable for this company.',
       status: 502,
     });

@@ -4,11 +4,11 @@ import type { NormalizedMetricEvent } from '../ProductEventNormalizer';
 
 function makeValidEvent(overrides: Record<string, unknown> = {}): Record<string, unknown> {
   return {
-    category: 'research',
-    action: 'view',
+    category: 'discovery',
+    action: 'search_performed',
     userId: 'user_123',
     timestamp: '2024-01-15T10:30:00.000Z',
-    metadata: { label: 'Research View' },
+    metadata: { label: 'Search result click' },
     ...overrides,
   };
 }
@@ -27,13 +27,13 @@ describe('ProductEventNormalizer', () => {
     expect(event.timestamp).toBeDefined();
   });
 
-  it('skips events with missing required fields', () => {
+  it('skips events with unknown category/action', () => {
     const result = normalizer.normalize([
-      makeValidEvent({ category: '', userId: 'user_1' }),
+      makeValidEvent({ category: 'unknown_category', userId: 'user_1' }),
     ]);
     expect(result.skipped).toBe(1);
     expect(result.events.length).toBe(0);
-    expect(result.errors.length).toBeGreaterThan(0);
+    expect(result.errors).toEqual([]);
   });
 
   it('normalizes multiple events in batch', () => {
@@ -48,47 +48,36 @@ describe('ProductEventNormalizer', () => {
   it('skips invalid events in batch while processing valid ones', () => {
     const result = normalizer.normalize([
       makeValidEvent({ userId: 'user_1' }),
-      makeValidEvent({ category: '' }),
+      makeValidEvent({ category: 'invalid' }),
       makeValidEvent({ userId: 'user_3' }),
     ]);
     expect(result.events.length).toBe(2);
     expect(result.skipped).toBe(1);
   });
 
-  it('emits research view event with correct metricKey', () => {
+  it('emits event with correct metricKey', () => {
     const result = normalizer.normalize([makeValidEvent()]);
     expect(result.events.length).toBeGreaterThan(0);
-    expect(result.events.some((e: NormalizedMetricEvent) => e.metricKey.includes('research'))).toBe(true);
+    expect(result.events.some((e: NormalizedMetricEvent) => e.metricKey.includes('pmf'))).toBe(true);
   });
 
-  it('preserves metadata in normalized events', () => {
+  it('preserves dimensions in normalized events', () => {
     const result = normalizer.normalize([makeValidEvent({
-      metadata: { label: 'Research View', symbol: 'RELIANCE' },
+      metadata: { label: 'Search result click', symbol: 'RELIANCE' },
     })]);
     const event = result.events[0];
-    expect(event.metadata).toBeDefined();
-    expect(event.metadata?.symbol).toBe('RELIANCE');
-  });
-});
-    expect(() =>
-      normalizer.normalize({
-        eventType: 'discovery',
-        action: 'page_view',
-        userId: '', // empty userId
-        timestamp: '2024-01-15T10:00:00.000Z',
-        metadata: { label: 'Test' },
-      }),
-    ).toThrow();
+    expect(event.dimensions).toBeDefined();
+    expect(event.dimensions?.symbol).toBe('RELIANCE');
   });
 
-  it('extracts metric label from metadata', () => {
-    const result = normalizer.normalize({
-      eventType: 'engagement',
-      action: 'alert_view',
+  it('normalizes engagement events with correct metricKey', () => {
+    const result = normalizer.normalize([{
+      category: 'engagement',
+      action: 'superpage_view',
       userId: 'user_1',
       timestamp: '2024-01-15T10:00:00.000Z',
-      metadata: { label: 'Alert: Price Target', category: 'price_target' },
-    });
-    expect(result.some((r) => r.metricKey === 'pmf.engagement.alerts_viewed')).toBe(true);
+      metadata: { label: 'Stock Page View', symbol: 'TCS' },
+    }]);
+    expect(result.events[0].metricKey).toContain('pmf.engagement');
   });
 });

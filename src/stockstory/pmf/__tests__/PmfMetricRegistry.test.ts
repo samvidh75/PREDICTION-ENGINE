@@ -8,7 +8,7 @@ describe('PmfMetricRegistry', () => {
   });
 
   it('returns metric by valid key', () => {
-    const metric = PmfMetricRegistry.get('pmf.activation.signup_completed');
+    const metric = PmfMetricRegistry.get('pmf.activation.signup');
     expect(metric).toBeDefined();
     expect(metric?.category).toBe('activation');
   });
@@ -25,7 +25,7 @@ describe('PmfMetricRegistry', () => {
   });
 
   it('validates metric keys correctly', () => {
-    expect(PmfMetricRegistry.validateKey('pmf.activation.signup_completed')).toBe(true);
+    expect(PmfMetricRegistry.validateKey('pmf.activation.signup')).toBe(true);
     expect(PmfMetricRegistry.validateKey('invalid.key')).toBe(false);
     expect(PmfMetricRegistry.validateKey('')).toBe(false);
   });
@@ -34,9 +34,9 @@ describe('PmfMetricRegistry', () => {
     const all = PmfMetricRegistry.getAll();
     for (const m of all) {
       expect(m.key).toMatch(/^pmf\./);
-      expect(m.name).toBeTruthy();
+      expect(m.label).toBeTruthy();
       expect(m.category).toMatch(/^(activation|retention|engagement|research|search|scanner|alert|scenario|premium|experiment)$/);
-      expect(['ratio', 'count', 'histogram', 'duration', 'boolean']).toContain(m.type);
+      expect(['counter', 'gauge', 'histogram', 'ratio']).toContain(m.kind);
     }
   });
 
