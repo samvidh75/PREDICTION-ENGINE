@@ -62,7 +62,7 @@ export function ScannerPresets({ scanType, query, onApply }: ScannerPresetsProps
             {preset.name}
           </Button>
         ))}
-        <Button variant="ghost" size="sm" onClick={() => setShowSave(!showSave)}>
+        <Button variant="tertiary" size="sm" onClick={() => setShowSave(!showSave)}>
           <Save size={14} style={{ marginRight: "4px" }} />
           {showSave ? "Cancel" : "Save current"}
         </Button>
@@ -93,7 +93,7 @@ export function ScannerPresets({ scanType, query, onApply }: ScannerPresetsProps
               <Check size={14} style={{ marginRight: "4px" }} />
               Save
             </Button>
-            <Button variant="ghost" size="sm" onClick={() => setShowSave(false)}>
+            <Button variant="tertiary" size="sm" onClick={() => setShowSave(false)}>
               <X size={14} />
             </Button>
           </div>
@@ -109,7 +109,7 @@ export function ScannerPresets({ scanType, query, onApply }: ScannerPresetsProps
               }}
             >
               <span style={{ fontSize: "13px" }}>{preset.name}</span>
-              <Button variant="ghost" size="icon" onClick={() => handleDelete(preset.id!)}>
+              <Button variant="tertiary" size="icon" onClick={() => handleDelete(preset.id!)}>
                 <Trash2 size={14} />
               </Button>
             </div>
