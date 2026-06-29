@@ -60,6 +60,7 @@ const normalizeSymbol = (symbol: string): string => symbol.trim().toUpperCase();
 const MARKET_BRAIN_RESEARCH_STATES = new Set<MarketBrainResearchState>(MARKET_BRAIN_ALLOWED_STATES);
 const MARKET_BRAIN_EVIDENCE_DOMAINS = new Set<MarketBrainEvidenceDomain>(MARKET_BRAIN_PUBLIC_EVIDENCE_DOMAINS);
 const MARKET_BRAIN_FACTOR_KEYS = new Set<MarketBrainFactorKey>(MARKET_BRAIN_PUBLIC_FACTOR_KEYS);
+const PUBLIC_SYMBOL_PATTERN = /^[A-Z0-9][A-Z0-9&.-]*$/;
 
 const EMPTY_EVIDENCE_REVIEW: MarketBrainEvidenceReviewView = {
   needsReview: false,
@@ -76,6 +77,11 @@ const isRecord = (value: unknown): value is Record<string, unknown> => (
 );
 
 const asTrimmedString = (value: unknown): string => (typeof value === 'string' ? value.trim() : '');
+
+const asPublicSymbol = (value: unknown): string => {
+  const symbol = normalizeSymbol(asTrimmedString(value));
+  return PUBLIC_SYMBOL_PATTERN.test(symbol) ? symbol : '';
+};
 
 const asPublicText = (value: unknown): string => {
   const text = asTrimmedString(value);
@@ -205,14 +211,14 @@ const normalizeResearchResponse = (
   requestedSymbol: string,
 ): MarketBrainResearchResponse => {
   const research = payload.research as Partial<MarketBrainResearchView>;
-  const symbol = asTrimmedString(payload.symbol) || asTrimmedString(research.symbol) || requestedSymbol;
+  const symbol = asPublicSymbol(payload.symbol) || asPublicSymbol(research.symbol) || requestedSymbol;
   const companyName = asPublicText(payload.companyName) || asPublicText(research.companyName);
 
   return {
-    symbol: normalizeSymbol(symbol),
+    symbol,
     companyName,
     research: {
-      symbol: normalizeSymbol(symbol),
+      symbol,
       companyName,
       state: asResearchState(research.state),
       convictionScore: asPublicScore(research.convictionScore),
