@@ -135,6 +135,14 @@ const asEvidenceDomains = (value: unknown): MarketBrainEvidenceDomain[] => {
   return domains;
 };
 
+const removeEvidenceOverlap = (
+  primary: MarketBrainEvidenceDomain[],
+  secondary: MarketBrainEvidenceDomain[],
+): MarketBrainEvidenceDomain[] => {
+  const primaryDomains = new Set(primary);
+  return secondary.filter((domain) => !primaryDomains.has(domain));
+};
+
 const isPublicScore = (value: unknown): value is number => (
   typeof value === 'number' && Number.isFinite(value) && value >= 0 && value <= 100
 );
@@ -193,7 +201,7 @@ const normalizeEvidenceReview = (value: unknown): MarketBrainEvidenceReviewView 
   if (!isRecord(value)) return copyEmptyEvidenceReview();
   const candidate = value as Partial<MarketBrainEvidenceReviewView>;
   const partial = asEvidenceDomains(candidate.partial);
-  const missing = asEvidenceDomains(candidate.missing);
+  const missing = removeEvidenceOverlap(partial, asEvidenceDomains(candidate.missing));
   const summary = asPublicText(candidate.summary) || EMPTY_EVIDENCE_REVIEW.summary;
   const hasEvidenceGaps = partial.length > 0 || missing.length > 0;
   const needsReview = hasEvidenceGaps || (typeof candidate.needsReview === 'boolean'
@@ -246,7 +254,7 @@ export async function fetchMarketBrainResearch(symbol: string, init?: RequestIni
     throw new MarketBrainResearchError('A valid symbol is required to load research.', 400, 'SYMBOL_INVALID');
   }
 
-  const response = await fetch(`/api/stockstory/${encodeURIComponent(normalized)}/research`, {
+  const response = await fetch('/api/stockstory/' + encodeURIComponent(normalized) + '/research', {
     ...init,
     headers: {
       Accept: 'application/json',
