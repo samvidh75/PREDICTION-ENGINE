@@ -586,7 +586,7 @@ export default function ComparePage() {
           <h2 style={{ display: "flex", alignItems: "center", gap: space[2], color: colors.textPrimary, fontSize: typography.h3.desktop.size, fontWeight: typography.h3.desktop.weight, margin: 0 }}>
             <Sparkles size={16} color={colors.warning} /> AI Comparison Insight
           </h2>
-          <Card variant="accent">
+          <Card variant="elevated">
             {(() => {
               const sorted = [...stocks].sort((a, b) => b.score - a.score);
               const top = sorted[0];

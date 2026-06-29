@@ -237,7 +237,7 @@ function StockView({ stock }: { stock: StockResearchDetail }) {
           </div>
           <div style={{ display: "flex", gap: "4px", width: "100%" }}>
             {TIMEFRAMES.map((value) => (
-              <Button key={value} variant={value === timeframe ? "primary" : "ghost"} onClick={() => setTimeframe(value)}>
+              <Button key={value} variant={value === timeframe ? "primary" : "tertiary"} onClick={() => setTimeframe(value)}>
                 {value}
               </Button>
             ))}
@@ -410,7 +410,7 @@ function StockView({ stock }: { stock: StockResearchDetail }) {
           <CardLabel>Shareholdings</CardLabel>
           <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
             {shareholdingSeries.map((value) => (
-              <Button key={value.period} variant={value.period === period ? "secondary" : "ghost"} onClick={() => setPeriod(value.period)}>
+              <Button key={value.period} variant={value.period === period ? "secondary" : "tertiary"} onClick={() => setPeriod(value.period)}>
                 {value.period}
               </Button>
             ))}
