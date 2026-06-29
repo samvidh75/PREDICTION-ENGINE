@@ -352,11 +352,11 @@ export function CommandPalette({ presets = [], open, onClose }: CommandPalettePr
       <div
         onClick={(e) => e.stopPropagation()}
         style={{
-          background: '#0D0D0D',
+          background: colors.surface,
           borderRadius: isMobile ? '12px 12px 0 0' : '12px',
           width: isMobile ? 'calc(100vw - 16px)' : 'min(90vw, 600px)',
           maxWidth: 600,
-          border: '1px solid #2A2A2A',
+          border: `1px solid ${colors.hairline}`,
           boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
           overflow: 'hidden',
           display: 'flex', flexDirection: 'column',
@@ -371,10 +371,10 @@ export function CommandPalette({ presets = [], open, onClose }: CommandPalettePr
         <div style={{
           height: 48, display: 'flex', alignItems: 'center',
           padding: '0 16px', gap: 12,
-          borderBottom: '1px solid #2A2A2A',
-          background: '#000000',
+          borderBottom: `1px solid ${colors.hairline}`,
+          background: colors.page,
         }}>
-          <span style={{ fontSize: 16, color: '#B0B0B0', flexShrink: 0 }}>🔍</span>
+          <span style={{ fontSize: 16, color: colors.body, flexShrink: 0 }}>🔍</span>
           <input
             ref={inputRef}
             placeholder="Search stocks, commands, insights…"
@@ -384,20 +384,20 @@ export function CommandPalette({ presets = [], open, onClose }: CommandPalettePr
             style={{
               flex: 1, border: 'none', outline: 'none',
               fontSize: isMobile ? 16 : 15, fontWeight: 400,
-              background: 'transparent', color: '#FFFFFF',
+              background: 'transparent', color: colors.textPrimary,
               fontFamily: typography.fontFamily,
               minWidth: 0,
             }}
           />
           {aiItem && (
             <span style={{
-              fontSize: 13, fontWeight: 400, color: '#808080',
+              fontSize: 13, fontWeight: 400, color: colors.body,
               whiteSpace: 'nowrap', flexShrink: 0,
             }}>
               Ask AI <kbd style={{
-                background: '#1A1A1A', border: '1px solid #333',
+                background: colors.surfaceCard, border: `1px solid ${colors.hairline}`,
                 borderRadius: 4, padding: '1px 5px', fontSize: 11,
-                fontFamily: 'inherit', color: '#808080',
+                fontFamily: 'inherit', color: colors.body,
               }}>Tab</kbd>
             </span>
           )}
@@ -409,9 +409,9 @@ export function CommandPalette({ presets = [], open, onClose }: CommandPalettePr
           {aiResponse && (
             <div style={{
               margin: '0 12px 8px', padding: 12,
-              background: '#141414', borderRadius: 8,
-              fontSize: 13, lineHeight: '1.6', color: '#C0C0C0',
-              border: '1px solid #1A1A1A',
+              background: colors.surfaceElevated, borderRadius: 8,
+              fontSize: 13, lineHeight: '1.6', color: colors.charcoal,
+              border: `1px solid ${colors.hairline}`,
               whiteSpace: 'pre-wrap',
             }}>
               {aiResponse}
@@ -438,7 +438,7 @@ export function CommandPalette({ presets = [], open, onClose }: CommandPalettePr
           {/* Empty state */}
           {groupedSections.length === 0 && !aiLoading && !aiResponse && (
             <div style={{ padding: '24px 16px', textAlign: 'center' }}>
-              <p style={{ fontSize: 14, color: '#707070', margin: '0 0 16px' }}>
+              <p style={{ fontSize: 14, color: colors.textTertiary, margin: '0 0 16px' }}>
                 {query.trim() ? `No matching results for "${query}"` : 'Type to search or ask a question'}
               </p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -602,8 +602,8 @@ export function CommandPalette({ presets = [], open, onClose }: CommandPalettePr
         {!isMobile && (
           <div style={{
             display: 'flex', gap: 8, padding: '12px 16px',
-            borderTop: '1px solid #2A2A2A',
-            background: '#000000',
+            borderTop: `1px solid ${colors.hairline}`,
+            background: colors.page,
           }}>
             {[
               { label: 'Open', hint: '↵', action: () => { resultsWithAI[selectedIdx]?.action(); triggerClose(); } },
@@ -616,19 +616,19 @@ export function CommandPalette({ presets = [], open, onClose }: CommandPalettePr
                 style={{
                   flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
                   gap: 8, height: 36,
-                  background: '#FFFFFF', border: 'none',
+                  background: colors.primary, border: 'none',
                   borderRadius: 6, padding: '8px 16px',
                   fontSize: 14, fontWeight: 500, fontFamily: typography.fontFamily,
-                  color: '#000000', cursor: 'pointer',
+                  color: colors.page, cursor: 'pointer',
                   transition: `background 0.15s ease, transform 0.1s ease`,
                 }}
-                onMouseEnter={(e) => (e.currentTarget.style.background = '#F5F5F5')}
-                onMouseLeave={(e) => (e.currentTarget.style.background = '#FFFFFF')}
+                onMouseEnter={(e) => (e.currentTarget.style.background = colors.primaryPressed)}
+                onMouseLeave={(e) => (e.currentTarget.style.background = colors.primary)}
                 onMouseDown={(e) => (e.currentTarget.style.transform = 'scale(0.98)')}
                 onMouseUp={(e) => (e.currentTarget.style.transform = 'scale(1)')}
               >
                 {btn.label}
-                <span style={{ fontSize: 11, color: '#707070', fontWeight: 400 }}>{btn.hint}</span>
+                <span style={{ fontSize: 11, color: colors.textTertiary, fontWeight: 400 }}>{btn.hint}</span>
               </button>
             ))}
           </div>
@@ -639,17 +639,17 @@ export function CommandPalette({ presets = [], open, onClose }: CommandPalettePr
           <div style={{
             display: 'flex', flexDirection: 'column', gap: 8,
             padding: '12px 16px',
-            borderTop: '1px solid #2A2A2A',
-            background: '#000000',
+            borderTop: `1px solid ${colors.hairline}`,
+            background: colors.page,
           }}>
             <button
               onClick={() => { resultsWithAI[selectedIdx]?.action(); triggerClose(); }}
               style={{
                 width: '100%', height: 48,
-                background: '#FFFFFF', border: 'none',
+                background: colors.primary, border: 'none',
                 borderRadius: 8, fontSize: 16, fontWeight: 500,
                 fontFamily: typography.fontFamily,
-                color: '#000000', cursor: 'pointer',
+                color: colors.page, cursor: 'pointer',
               }}
             >
               Open

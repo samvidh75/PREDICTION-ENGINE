@@ -112,8 +112,13 @@ function HeroSection({ stock, isUp, trendColor }: { stock: StockResearchDetail; 
         <Badge value={60} label={stock.exchange} />
         <span style={{ color: colors.textSecondary, fontSize: "14px", fontWeight: 500 }}>{stock.companyName}</span>
       </div>
-      <div style={{ fontSize: useResponsiveValue("40px", "64px"), fontWeight: 700, color: colors.textPrimary, lineHeight: "1.1", letterSpacing: "-0.02em" }}>
+      <div style={{ fontSize: useResponsiveValue("40px", "64px"), fontWeight: 700, color: colors.textPrimary, lineHeight: "1.1", letterSpacing: "-0.02em", display: "flex", alignItems: "center", justifyContent: "center", gap: "12px" }}>
         ₹{stock.price.current.toLocaleString("en-IN")}
+        <span className="live-indicator" style={{
+          width: "10px", height: "10px", borderRadius: "50%", background: "#22C55E",
+          display: "inline-block", flexShrink: 0, marginTop: "8px",
+        }} title="Live data" />
+        <span style={{ fontSize: "11px", color: "#22C55E", fontWeight: 600, letterSpacing: "0.06em", marginTop: "8px" }}>LIVE</span>
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: "12px", marginTop: "12px", flexWrap: "wrap", justifyContent: "center" }}>
         <div style={{ color: trendColor, fontSize: "18px", fontWeight: 600, display: "inline-flex", alignItems: "center", gap: "6px" }}>
@@ -135,8 +140,9 @@ function HeroSection({ stock, isUp, trendColor }: { stock: StockResearchDetail; 
     </section>
   );
 }// ── Healthometer (120px ring, color-coded, driver expansion) ─────
-function Healthometer({ score, confidence, stance, timeline }: {
+function Healthometer({ score, confidence, stance, timeline, factorScores }: {
   score: number; confidence: number; stance: string; timeline: Array<{ day: string; health: number }>;
+  factorScores: { quality: number; valuation: number; growth: number; momentum: number; risk: number };
 }) {
   const [expanded, setExpanded] = useState(false);
   const circumference = 2 * Math.PI * 54;
@@ -148,11 +154,11 @@ function Healthometer({ score, confidence, stance, timeline }: {
   const trendColor = trend === "improving" ? colors.success : trend === "declining" ? colors.danger : colors.textSecondary;
 
   const drivers = [
-    { label: "Quality", value: 0, max: 100 },
-    { label: "Valuation", value: 0, max: 100 },
-    { label: "Growth", value: 0, max: 100 },
-    { label: "Momentum", value: 0, max: 100 },
-    { label: "Risk Mgmt", value: 0, max: 100 },
+    { label: "Quality", value: factorScores.quality ?? 0, max: 100 },
+    { label: "Valuation", value: factorScores.valuation ?? 0, max: 100 },
+    { label: "Growth", value: factorScores.growth ?? 0, max: 100 },
+    { label: "Momentum", value: factorScores.momentum ?? 0, max: 100 },
+    { label: "Risk Mgmt", value: factorScores.risk ?? 0, max: 100 },
   ];
 
   return (
@@ -260,7 +266,7 @@ function StockSkeleton() {
 
 function StockError({ symbol }: { symbol: string }) {
   return <div style={{ color: colors.textPrimary, padding: "40px", textAlign: "center" }}>We could not load research for {symbol}.</div>;
-}function StockView({ stock, financialChartData: financialChartDataProp, shareholding: shareholdingProp, shareholdingSeries: shareholdingSeriesProp, period: periodProp }: {
+}function StockView({ stock, financialChartData, shareholding, shareholdingSeries, period: initialPeriod }: {
   stock: StockResearchDetail;
   financialChartData: { period: string; value: number }[];
   shareholding?: { period: string; promoter: number; fii: number; dii: number; retail: number; deltas: { promoter: number; fii: number; dii: number; retail: number } };
@@ -285,19 +291,29 @@ function StockError({ symbol }: { symbol: string }) {
   const [showFooter, setShowFooter] = useState(true);
   const [isCompareOpen, setIsCompareOpen] = useState(false);
   const [isExportOpen, setIsExportOpen] = useState(false);
+  const [sectorExpanded, setSectorExpanded] = useState(false);
 
-  const [period, setPeriod] = useState(periodProp);
+  const [period, setPeriod] = useState(initialPeriod);
   const availableBrokers = listAvailableBrokers();
   const selectedBroker = availableBrokers[0]?.name ?? null;
   const sectionGap = useResponsiveValue("48px", "80px");
   const isUp = stock.price.changeAbs >= 0;
   const trendColor = isUp ? colors.success : colors.danger;
-  const shareholding = shareholdingProp ?? shareholdingSeriesProp.find((item) => item.period === period) ?? shareholdingSeriesProp[0];
+  const effectiveShareholding = shareholding ?? shareholdingSeries.find((item) => item.period === period) ?? shareholdingSeries[0];
   const selectedFinancialSeries = stock.financials[financialPeriod][financialMetric];
-  const financialChartData = financialChartDataProp.length > 0 ? financialChartDataProp : selectedFinancialSeries.map((item) => ({ period: item.period, value: Math.round(item.value) }));
+  const effectiveChartData = financialChartData.length > 0 ? financialChartData : selectedFinancialSeries.map((item) => ({ period: item.period, value: Math.round(item.value) }));
   const newsItems = stock.news.slice(0, 7);
   const filteredNews = newsFilter === "all" ? newsItems : newsItems.filter((n: any) => n.sentiment === newsFilter);
   const disclaimer = "This is not investment advice. All data is for educational purposes. Past performance does not guarantee future results.";
+
+  // Sector relative lookup for metric subtitles
+  const sectorRelMap = useMemo(() => {
+    const map: Record<string, string> = {};
+    for (const item of stock.sectorRelative ?? []) {
+      map[item.label.toLowerCase()] = item.sectorMedian;
+    }
+    return map;
+  }, [stock.sectorRelative]);
 
   // AI analysis
   useEffect(() => {
@@ -313,18 +329,25 @@ function StockError({ symbol }: { symbol: string }) {
     return () => { cancelled = true; };
   }, [stock.symbol]);
 
-  // Sticky header scroll observer
+  // Sticky header scroll direction observer
   useEffect(() => {
-    const el = heroRef.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => setStickyVisible(!entry.isIntersecting),
-      { threshold: 0, rootMargin: "-48px 0px 0px 0px" }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
+    let lastScrollY = window.scrollY;
+    let ticking = false;
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      const scrollDirection = currentScrollY > lastScrollY ? "down" : "up";
+      lastScrollY = currentScrollY;
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          setStickyVisible(currentScrollY > 300 && scrollDirection === "up");
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
   // Native ads
   const nativeAdSlots = [
     { type: "ad" as const, id: "ad1", data: { icon: "📈", title: "Track your portfolio like a pro", subtitle: "Get real-time alerts and expert analysis", cta: "Try StockStory Pro →" } },
@@ -351,7 +374,9 @@ function StockError({ symbol }: { symbol: string }) {
       <StickyHeader symbol={stock.symbol} price={stock.price.current} changeAbs={stock.price.changeAbs}
         changePercent={stock.price.changePercent} trendColor={trendColor} />
       <style>{`
-        .stock-sticky-header { opacity: ${stickyVisible ? "1" : "0"} !important; pointer-events: ${stickyVisible ? "auto" : "none"}; }
+        .stock-sticky-header { transition: opacity 0.25s ease, transform 0.25s ease; opacity: ${stickyVisible ? "1" : "0"} !important; pointer-events: ${stickyVisible ? "auto" : "none"}; transform: translateY(${stickyVisible ? "0" : "-8px"}); }
+        @keyframes livePulse { 0%,100% { box-shadow: 0 0 0 0 rgba(34,197,94,0.4); } 50% { box-shadow: 0 0 0 6px rgba(34,197,94,0); } }
+        .live-indicator { animation: livePulse 2s ease-in-out infinite; }
       `}</style>
 
       {/* ── Hero Section ── */}
@@ -423,7 +448,19 @@ function StockError({ symbol }: { symbol: string }) {
         )}
       </Card>      {/* ── Healthometer + Score Overview ── */}
       <section className="stock-score-grid raycast-slideUp" style={{ animationDelay: "0.1s", animationFillMode: "both", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "16px" }}>
-        <Healthometer score={stock.scores.health ?? 0} confidence={stock.confidenceMeter} stance={stock.thesis.stance} timeline={stock.timeline} />
+        <Healthometer
+          score={stock.scores.health ?? 0}
+          confidence={stock.confidenceMeter}
+          stance={stock.thesis.stance}
+          timeline={stock.timeline}
+          factorScores={{
+            quality: stock.scores.quality ?? 0,
+            valuation: stock.scores.valuation ?? 0,
+            growth: stock.scores.growth ?? 0,
+            momentum: stock.scores.momentum ?? 0,
+            risk: stock.scores.risk ?? 0,
+          }}
+        />
         <Card className="stock-panel-card">
           <CardLabel>Factor breakdown</CardLabel>
           <div style={{ display: "flex", justifyContent: "space-around", gap: "16px", flexWrap: "wrap", marginBottom: "12px" }}>
@@ -448,16 +485,19 @@ function StockError({ symbol }: { symbol: string }) {
           <MetricCard label="Market Cap" value={`₹${Math.round(stock.price.marketCap).toLocaleString("en-IN")} Cr`} />
           <MetricCard label="PE (TTM)" value={stock.fundamentals.pe?.toFixed(1) ?? "—"}
             trend={stock.fundamentals.pe != null && stock.fundamentals.pe < 20 ? "up" : stock.fundamentals.pe != null && stock.fundamentals.pe > 30 ? "down" : "neutral"}
-            subtitle={stock.fundamentals.industryPe != null ? `Sector: ${stock.fundamentals.industryPe.toFixed(1)}` : undefined} />
-          <MetricCard label="PB Ratio" value={stock.fundamentals.pb?.toFixed(1) ?? "—"} />
+            subtitle={stock.fundamentals.industryPe != null ? `Sector: ${stock.fundamentals.industryPe.toFixed(1)}` : sectorRelMap["pe"] ? `Sector: ${sectorRelMap["pe"]}` : undefined} />
+          <MetricCard label="PB Ratio" value={stock.fundamentals.pb?.toFixed(1) ?? "—"}
+            trend={stock.fundamentals.pb != null && stock.fundamentals.pb < 3 ? "up" : stock.fundamentals.pb != null && stock.fundamentals.pb > 5 ? "down" : "neutral"} />
           <MetricCard label="ROE" value={stock.roe != null ? `${stock.roe.toFixed(1)}%` : "—"}
-            trend={stock.roe != null && stock.roe > 15 ? "up" : stock.roe != null ? "down" : "neutral"} />
+            trend={stock.roe != null && stock.roe > 15 ? "up" : stock.roe != null ? "down" : "neutral"}
+            subtitle={sectorRelMap["roe"] ? `Sector: ${sectorRelMap["roe"]}` : undefined} />
           <MetricCard label="Debt/Equity" value={stock.debtToEquity != null ? stock.debtToEquity.toFixed(2) : "—"}
             trend={stock.debtToEquity != null && stock.debtToEquity < 0.5 ? "up" : stock.debtToEquity != null && stock.debtToEquity > 1 ? "down" : "neutral"} />
           <MetricCard label="Dividend Yield" value={stock.fundamentals.dividendYield != null ? `${stock.fundamentals.dividendYield.toFixed(2)}%` : "—"}
             trend={stock.fundamentals.dividendYield != null && stock.fundamentals.dividendYield > 1 ? "up" : "neutral"} />
           <MetricCard label="Revenue Growth" value={stock.revenueGrowth != null ? `${stock.revenueGrowth.toFixed(1)}%` : "—"}
-            trend={stock.revenueGrowth != null && stock.revenueGrowth > 10 ? "up" : stock.revenueGrowth != null ? "down" : "neutral"} />
+            trend={stock.revenueGrowth != null && stock.revenueGrowth > 10 ? "up" : stock.revenueGrowth != null ? "down" : "neutral"}
+            subtitle={sectorRelMap["revenue growth"] ? `Sector: ${sectorRelMap["revenue growth"]}` : undefined} />
           <MetricCard label="Profit Growth" value={stock.profitGrowth != null ? `${stock.profitGrowth.toFixed(1)}%` : "—"}
             trend={stock.profitGrowth != null && stock.profitGrowth > 10 ? "up" : stock.profitGrowth != null ? "down" : "neutral"} />
           <MetricCard label="EPS (TTM)" value={stock.fundamentals.eps != null ? `₹${stock.fundamentals.eps.toFixed(1)}` : "—"} />
@@ -527,8 +567,8 @@ function StockError({ symbol }: { symbol: string }) {
                 </tr>
               </thead>
               <tbody>
-                {financialChartData.map((entry, idx) => {
-                  const prev = financialChartData[idx + 1];
+                {effectiveChartData.map((entry, idx) => {
+                  const prev = effectiveChartData[idx + 1];
                   const growth = prev ? ((entry.value - prev.value) / prev.value * 100).toFixed(1) : null;
                   return (
                     <tr key={entry.period} style={{ borderBottom: `1px solid ${colors.border}` }}>
@@ -544,12 +584,12 @@ function StockError({ symbol }: { symbol: string }) {
         ) : (
           <div style={{ width: "100%", height: "280px" }}>
             <ResponsiveContainer>
-              <BarChart data={financialChartData}>
+              <BarChart data={effectiveChartData}>
                 <CartesianGrid vertical={false} stroke={colors.border} />
                 <XAxis dataKey="period" stroke={colors.textSecondary} tick={{ fontSize: 11 }} />
                 <YAxis stroke={colors.textSecondary} tick={{ fontSize: 11 }} />
                 <Bar dataKey="value" radius={[6, 6, 0, 0]}>
-                  {financialChartData.map((entry) => (<Cell key={entry.period} fill={colors.primary} />))}
+                  {effectiveChartData.map((entry) => (<Cell key={entry.period} fill={colors.primary} />))}
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
@@ -570,10 +610,10 @@ function StockError({ symbol }: { symbol: string }) {
         </div>
         <div style={{ display: "grid", gap: "16px" }}>
           {[
-            { label: "Promoter", value: shareholding?.promoter ?? 0, delta: shareholding?.deltas.promoter ?? 0 },
-            { label: "FII", value: shareholding?.fii ?? 0, delta: shareholding?.deltas.fii ?? 0 },
-            { label: "DII", value: shareholding?.dii ?? 0, delta: shareholding?.deltas.dii ?? 0 },
-            { label: "Retail", value: shareholding?.retail ?? 0, delta: shareholding?.deltas.retail ?? 0 },
+            { label: "Promoter", value: effectiveShareholding?.promoter ?? 0, delta: effectiveShareholding?.deltas.promoter ?? 0 },
+            { label: "FII", value: effectiveShareholding?.fii ?? 0, delta: effectiveShareholding?.deltas.fii ?? 0 },
+            { label: "DII", value: effectiveShareholding?.dii ?? 0, delta: effectiveShareholding?.deltas.dii ?? 0 },
+            { label: "Retail", value: effectiveShareholding?.retail ?? 0, delta: effectiveShareholding?.deltas.retail ?? 0 },
           ].map((item) => {
             const positive = item.delta >= 0;
             return (
@@ -713,7 +753,10 @@ function StockError({ symbol }: { symbol: string }) {
         </div>
       </Card>
       {/* ── Sector Relative View ── */}
-      <ExpandingPanel label="Sector Relative View">
+      <div style={{ cursor: "pointer" }} onClick={() => setSectorExpanded(!sectorExpanded)}>
+        <CardLabel>Sector Relative View {sectorExpanded ? "▲" : "▼"}</CardLabel>
+      </div>
+      <ExpandingPanel isOpen={sectorExpanded}>
         <div style={{ display: "grid", gap: "16px" }}>
           {stock.sectorComparison.map((cmp, i) => (
             <div key={i} style={{ display: "grid", gap: "6px" }}>
@@ -764,18 +807,31 @@ function StockError({ symbol }: { symbol: string }) {
         opacity: showFooter ? 1 : 0,
         pointerEvents: showFooter ? "auto" : "none",
       }}>
-        <InteractiveButton onClick={() => setTracked(!tracked)} label={tracked ? "Untrack" : "Track"} icon={<Star size={15} fill={tracked ? colors.warning : "none"} color={tracked ? colors.warning : "currentColor"} />} style={{ minWidth: "100px", justifyContent: "center" }} />
-        <InteractiveButton onClick={() => setIsCompareOpen(true)} label="Compare" icon={<ArrowLeftRight size={15} />} style={{ minWidth: "100px", justifyContent: "center" }} />
-        <InteractiveButton onClick={() => setIsExportOpen(true)} label="Export" icon={<Download size={15} />} style={{ minWidth: "100px", justifyContent: "center" }} />
-        <InteractiveButton onClick={() => setIsBrokerOpen(true)} label={`Trade via ${selectedBroker ?? "Broker"}`} primary icon={<TrendingUp size={15} />} style={{ minWidth: "150px", justifyContent: "center" }} />
+        <InteractiveButton onClick={() => setTracked(!tracked)} variant={tracked ? "primary" : "secondary"} style={{ minWidth: "100px", justifyContent: "center" }}>
+          <Star size={15} fill={tracked ? colors.warning : "none"} color={tracked ? colors.warning : "currentColor"} /> {tracked ? "Untrack" : "Track"}
+        </InteractiveButton>
+        <InteractiveButton onClick={() => setIsCompareOpen(true)} style={{ minWidth: "100px", justifyContent: "center" }}>
+          <ArrowLeftRight size={15} /> Compare
+        </InteractiveButton>
+        <InteractiveButton onClick={() => setIsExportOpen(true)} style={{ minWidth: "100px", justifyContent: "center" }}>
+          <Download size={15} /> Export
+        </InteractiveButton>
+        <InteractiveButton onClick={() => setIsBrokerOpen(true)} variant="primary" style={{ minWidth: "150px", justifyContent: "center" }}>
+          <TrendingUp size={15} /> Trade via {selectedBroker ?? "Broker"}
+        </InteractiveButton>
       </div>
 
       {/* ── Broker Handoff Modal ── */}
-      <BrokerHandoffModal
-        open={isBrokerOpen}
-        symbol={stock.symbol}
-        onClose={() => setIsBrokerOpen(false)}
-      />
+      {isBrokerOpen && (
+        <BrokerHandoffModal
+          broker={availableBrokers[0]}
+          stockSymbol={stock.symbol}
+          direction="long"
+          rationale={ai?.bullCase ?? "Based on AI analysis"}
+          confidence={stock.scores.quality ?? 70}
+          onClose={() => setIsBrokerOpen(false)}
+        />
+      )}
 
       {/* ── Keyboard Hint ── */}
       <p style={{ textAlign: "center", color: colors.textTertiary, fontSize: "12px", padding: "16px 0 100px", opacity: 0.7 }}>
@@ -783,23 +839,47 @@ function StockError({ symbol }: { symbol: string }) {
         <ArrowDown size={12} style={{ marginRight: "4px" }} />
         Navigate · <kbd className="raycast-hint">t</kbd> Track · <kbd className="raycast-hint">c</kbd> Compare · <kbd className="raycast-hint">r</kbd> Refresh · <kbd className="raycast-hint">⌘K</kbd> Commands
       </p>
-    </>
+    </div>
   );
 }
 
 // ── Export ──
-export function StockPage() {
+export default function StockPage() {
   const { symbol } = useParams<{ symbol: string }>();
-  const { data, isLoading, error } = useAirtableData(symbol!);
-  const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.05 });
+  const seoMeta = useMemo(() => symbol ? buildCompanySeo(symbol, undefined, undefined) : null, [symbol]);
+  useSeo(seoMeta);
+  const [inView, setInView] = useState(false);
+  const ref = useCallback((node: HTMLDivElement | null) => {
+    if (!node) return;
+    const obs = new IntersectionObserver(([entry]) => { if (entry.isIntersecting) { setInView(true); obs.disconnect(); } }, { threshold: 0.05 });
+    obs.observe(node);
+    return () => obs.disconnect();
+  }, []);
+
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["stock", symbol],
+    queryFn: async () => {
+      // In production this would call the API; for now return a minimal shape
+      const res = await fetch(`/api/stock/${symbol}`);
+      if (!res.ok) throw new Error("Failed to load stock data");
+      return res.json() as Promise<{ stock: StockResearchDetail; financialChartData: { period: string; value: number }[]; shareholding?: any; shareholdingSeries?: any[]; period?: string }>;
+    },
+    enabled: !!symbol,
+    staleTime: 30_000,
+  });
 
   if (isLoading) return <StockSkeleton />;
-  if (error || !data) return <StockError error={error} />;
+  if (error || !data) return <StockError symbol={symbol ?? "unknown"} />;
 
   return (
     <div ref={ref} style={{ opacity: inView ? 1 : 0, transition: "opacity 0.4s ease" }}>
-      <SEO title={`${data.stock.companyName} (${data.stock.symbol}) — StockStory`} description={data.stock.description || `AI-powered analysis of ${data.stock.companyName}`} />
-      <StockView stock={data.stock} financialChartData={data.financialChartData ?? []} shareholding={data.shareholding} shareholdingSeries={data.shareholdingSeries ?? []} period={data.period ?? "Sep 2025"} />
+      <StockView
+        stock={data.stock}
+        financialChartData={data.financialChartData ?? []}
+        shareholding={data.shareholding}
+        shareholdingSeries={data.shareholdingSeries ?? []}
+        period={data.period ?? "Sep 2025"}
+      />
     </div>
   );
 }
