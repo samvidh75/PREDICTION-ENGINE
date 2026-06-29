@@ -1,85 +1,107 @@
 import { describe, it, expect } from 'vitest';
 import { FunnelAggregator } from '../FunnelAggregator';
-import { ProductEventNormalizer } from '../ProductEventNormalizer';
+import { ProductEventStore } from '../ProductEventStore';
+import { PmfMetricRegistry } from '../PmfMetricRegistry';
+import type { NormalizedMetricEvent } from '../ProductEventNormalizer';
+
+function signupEvent(userId: string): NormalizedMetricEvent {
+  return {
+    metricKey: PmfMetricRegistry.ACTIVATION_SIGNUP.key,
+    value: 1,
+    userId,
+    timestamp: new Date().toISOString(),
+    dimensions: {},
+  };
+}
+
+function searchEvent(userId: string): NormalizedMetricEvent {
+  return {
+    metricKey: PmfMetricRegistry.ACTIVATION_FIRST_SEARCH.key,
+    value: 1,
+    userId,
+    timestamp: new Date().toISOString(),
+    dimensions: {},
+  };
+}
+
+function stockViewEvent(userId: string): NormalizedMetricEvent {
+  return {
+    metricKey: PmfMetricRegistry.ACTIVATION_FIRST_STOCK_VIEW.key,
+    value: 1,
+    userId,
+    timestamp: new Date().toISOString(),
+    dimensions: {},
+  };
+}
+
+function watchlistEvent(userId: string): NormalizedMetricEvent {
+  return {
+    metricKey: PmfMetricRegistry.ACTIVATION_FIRST_WATCHLIST.key,
+    value: 1,
+    userId,
+    timestamp: new Date().toISOString(),
+    dimensions: {},
+  };
+}
 
 describe('FunnelAggregator', () => {
-  const normalizer = new ProductEventNormalizer();
-  const aggregator = new FunnelAggregator();
-
-  function makeEvent(userId: string, action: string, eventType = 'discovery') {
-    const raw = {
-      eventType,
-      action,
-      userId,
-      timestamp: new Date().toISOString(),
-      metadata: { label: `Funnel: ${action}` },
-    };
-    return normalizer.normalize(raw);
-  }
-
-  it('initializes with zeroed funnel', () => {
-    const funnel = aggregator.getCurrentConversion();
-    expect(funnel).toBeDefined();
-    expect(funnel.signup).toBe(0);
-    expect(funnel.search).toBe(0);
-    expect(funnel.stockView).toBe(0);
-    expect(funnel.thesisRead).toBe(0);
-    expect(funnel.actionTaken).toBe(0);
+  it('returns zeroed funnel from empty store', async () => {
+    const store = new ProductEventStore();
+    const aggregator = new FunnelAggregator();
+    const result = await aggregator.aggregate({ store, periodStart: '2025-01-01', periodEnd: '2025-12-31' });
+    expect(result.steps).toHaveLength(5);
+    for (const step of result.steps) {
+      expect(step.uniqueUsers).toBe(0);
+    }
+    expect(result.overallConversion).toBeNull();
   });
 
-  it('tracks activation funnel correctly', () => {
-    const events = [
-      ...makeEvent('user_1', 'page_view'),
-      ...makeEvent('user_1', 'search'),
-      ...makeEvent('user_1', 'stock_view'),
-      ...makeEvent('user_1', 'thesis_read'),
-      ...makeEvent('user_1', 'rating', 'feedback'),
-    ];
-    events.forEach((e) => aggregator.aggregate(e));
+  it('tracks activation funnel correctly for one user', async () => {
+    const store = new ProductEventStore();
+    store.store(signupEvent('user_1'));
+    store.store(searchEvent('user_1'));
+    store.store(stockViewEvent('user_1'));
+    store.store(watchlistEvent('user_1'));
 
-    const funnel = aggregator.getCurrentConversion();
-    expect(funnel.signup).toBe(1);
-    expect(funnel.search).toBe(1);
-    expect(funnel.stockView).toBe(1);
-    expect(funnel.thesisRead).toBe(1);
-    expect(funnel.actionTaken).toBe(0);
+    const aggregator = new FunnelAggregator();
+    const result = await aggregator.aggregate({ store, periodStart: '2025-01-01', periodEnd: '2025-12-31' });
+    expect(result.steps[0].uniqueUsers).toBe(1); // sign-up
+    expect(result.steps[1].uniqueUsers).toBe(1); // first search
+    expect(result.steps[2].uniqueUsers).toBe(1); // stock view
+    expect(result.steps[3].uniqueUsers).toBe(1); // watchlist
   });
 
-  it('calculates conversion rates between steps', () => {
-    const events = [
-      ...makeEvent('user_1', 'page_view'),
-      ...makeEvent('user_1', 'search'),
-      ...makeEvent('user_1', 'stock_view'),
-    ];
-    events.forEach((e) => aggregator.aggregate(e));
+  it('calculates conversion rates between steps', async () => {
+    const store = new ProductEventStore();
+    store.store(signupEvent('user_1'));
+    store.store(searchEvent('user_1'));
+    store.store(stockViewEvent('user_1'));
+    store.store(signupEvent('user_2'));
+    store.store(searchEvent('user_2'));
+    store.store(signupEvent('user_3'));
 
-    const rates = aggregator.getConversionRates();
-    expect(rates.signupToSearch).toBeDefined();
-    expect(rates.searchToStockView).toBeDefined();
-    expect(typeof rates.signupToSearch).toBe('number');
-    expect(typeof rates.searchToStockView).toBe('number');
+    const aggregator = new FunnelAggregator();
+    const result = await aggregator.aggregate({ store, periodStart: '2025-01-01', periodEnd: '2025-12-31' });
+    expect(result.steps[0].uniqueUsers).toBe(3); // 3 signed up
+    expect(result.steps[1].uniqueUsers).toBe(2); // 2 searched
+    expect(result.steps[1].conversionFromPrevious).toBe(67); // 2/3 ≈ 67%
+    expect(result.steps[2].uniqueUsers).toBe(1); // 1 viewed stock
+    expect(result.steps[2].conversionFromPrevious).toBe(50); // 1/2 = 50%
   });
 
-  it('handles multiple users', () => {
-    const allEvents = [
-      ...makeEvent('user_1', 'page_view'),
-      ...makeEvent('user_1', 'search'),
-      ...makeEvent('user_1', 'stock_view'),
-      ...makeEvent('user_2', 'page_view'),
-      ...makeEvent('user_3', 'page_view'),
-      ...makeEvent('user_3', 'search'),
-    ];
-    allEvents.forEach((e) => aggregator.aggregate(e));
+  it('handles multiple users with partial progress', async () => {
+    const store = new ProductEventStore();
+    store.store(signupEvent('user_1'));
+    store.store(searchEvent('user_1'));
+    store.store(stockViewEvent('user_1'));
+    store.store(signupEvent('user_2'));
+    store.store(signupEvent('user_3'));
+    store.store(searchEvent('user_3'));
 
-    const funnel = aggregator.getCurrentConversion();
-    expect(funnel.signup).toBe(3);
-    expect(funnel.search).toBe(2);
-    expect(funnel.stockView).toBe(1);
-  });
-
-  it('resets correctly', () => {
-    aggregator.reset();
-    const funnel = aggregator.getCurrentConversion();
-    expect(funnel.signup).toBe(0);
+    const aggregator = new FunnelAggregator();
+    const result = await aggregator.aggregate({ store, periodStart: '2025-01-01', periodEnd: '2025-12-31' });
+    expect(result.steps[0].uniqueUsers).toBe(3);
+    expect(result.steps[1].uniqueUsers).toBe(2);
+    expect(result.steps[2].uniqueUsers).toBe(1);
   });
 });

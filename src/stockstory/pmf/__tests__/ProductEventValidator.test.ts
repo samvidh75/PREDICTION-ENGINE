@@ -121,7 +121,6 @@ describe('ProductEventValidator', () => {
     expect(result.valid).toBe(false);
     expect(result.errors.some((e) => e.field === 'timestamp')).toBe(true);
   });
-});
 
   it('detects phone numbers in metadata', () => {
     const result = validator.validate({

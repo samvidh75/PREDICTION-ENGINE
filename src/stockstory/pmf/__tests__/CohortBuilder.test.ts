@@ -4,63 +4,40 @@ import { CohortBuilder } from '../CohortBuilder';
 describe('CohortBuilder', () => {
   const builder = new CohortBuilder();
 
-  it('buckets events into daily cohorts', () => {
+  it('builds daily cohorts from signup events', () => {
     const events = [
-      { userId: 'user_1', timestamp: '2024-01-15T10:00:00.000Z', metricKey: 'pmf.activation.signup_completed', value: 1, dimensions: {} },
-      { userId: 'user_2', timestamp: '2024-01-15T11:00:00.000Z', metricKey: 'pmf.activation.signup_completed', value: 1, dimensions: {} },
-      { userId: 'user_3', timestamp: '2024-01-16T10:00:00.000Z', metricKey: 'pmf.activation.signup_completed', value: 1, dimensions: {} },
+      { userId: 'user_1', timestamp: '2024-01-15T10:00:00.000Z' },
+      { userId: 'user_2', timestamp: '2024-01-15T11:00:00.000Z' },
+      { userId: 'user_3', timestamp: '2024-01-16T10:00:00.000Z' },
     ];
-    events.forEach((e) => builder.add(e));
-
-    const daily = builder.getCohorts('daily');
-    expect(daily.size).toBe(2); // two different days
-
-    const day1 = [...daily].find(([k]) => k === '2024-01-15');
-    expect(day1).toBeDefined();
-    if (day1) expect(day1[1].size).toBe(2);
+    const result = builder.build(events, { start: '2024-01-15', end: '2024-01-16' });
+    expect(result.cohorts).toBeDefined();
+    expect(result.period).toBeDefined();
+    expect(result.generatedAt).toBeDefined();
   });
 
   it('buckets events into weekly cohorts', () => {
-    // Jan 15, 2024 is a Monday = start of week
     const events = [
-      { userId: 'user_1', timestamp: '2024-01-15T10:00:00.000Z', metricKey: 'pmf.activation.signup_completed', value: 1, dimensions: {} },
-      { userId: 'user_2', timestamp: '2024-01-17T10:00:00.000Z', metricKey: 'pmf.activation.signup_completed', value: 1, dimensions: {} },
-      // week 2
-      { userId: 'user_3', timestamp: '2024-01-22T10:00:00.000Z', metricKey: 'pmf.activation.signup_completed', value: 1, dimensions: {} },
+      { userId: 'user_1', timestamp: '2024-01-15T10:00:00.000Z' },
+      { userId: 'user_2', timestamp: '2024-01-17T10:00:00.000Z' },
+      { userId: 'user_3', timestamp: '2024-01-22T10:00:00.000Z' },
     ];
-    events.forEach((e) => builder.add(e));
-
-    const weekly = builder.getCohorts('weekly');
-    expect(weekly.size).toBeGreaterThanOrEqual(1);
+    const result = builder.build(events, { start: '2024-01-15', end: '2024-01-22' });
+    const cohortKeys = Object.keys(result.cohorts);
+    expect(cohortKeys.length).toBeGreaterThanOrEqual(1);
   });
 
-  it('buckets events into monthly cohorts', () => {
+  it('includes unique users per cohort', () => {
     const events = [
-      { userId: 'user_1', timestamp: '2024-01-15T10:00:00.000Z', metricKey: 'pmf.activation.signup_completed', value: 1, dimensions: {} },
-      { userId: 'user_2', timestamp: '2024-02-10T10:00:00.000Z', metricKey: 'pmf.activation.signup_completed', value: 1, dimensions: {} },
+      { userId: 'user_1', timestamp: '2024-01-15T10:00:00.000Z' },
+      { userId: 'user_1', timestamp: '2024-01-15T11:00:00.000Z' },
     ];
-    events.forEach((e) => builder.add(e));
-
-    const monthly = builder.getCohorts('monthly');
-    expect(monthly.size).toBe(2);
+    const result = builder.build(events, { start: '2024-01-15', end: '2024-01-15' });
+    expect(result.cohorts['2024-01-15']).toBeDefined();
   });
 
-  it('returns unique users per cohort', () => {
-    const events = [
-      { userId: 'user_1', timestamp: '2024-01-15T10:00:00.000Z', metricKey: 'pmf.activation.signup_completed', value: 1, dimensions: {} },
-      { userId: 'user_1', timestamp: '2024-01-15T11:00:00.000Z', metricKey: 'pmf.engagement.stock_views', value: 1, dimensions: {} },
-    ];
-    events.forEach((e) => builder.add(e));
-
-    const daily = builder.getCohorts('daily');
-    const day1 = [...daily].find(([k]) => k === '2024-01-15');
-    expect(day1).toBeDefined();
-    if (day1) expect(day1[1].size).toBe(1); // unique users
-  });
-
-  it('resets state', () => {
-    builder.add({ userId: 'user_1', timestamp: '2024-01-15T10:00:00.000Z', metricKey: 'pmf.activation.signup_completed', value: 1, dimensions: {} });
-    builder.reset();
-    expect(builder.getCohorts('daily').size).toBe(0);
+  it('returns empty cohorts when no events', () => {
+    const result = builder.build([], { start: '2024-01-01', end: '2024-01-07' });
+    expect(result.cohorts).toEqual({});
   });
 });

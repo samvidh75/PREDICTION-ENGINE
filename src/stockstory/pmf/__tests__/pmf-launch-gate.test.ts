@@ -82,7 +82,7 @@ describe('Launch Gate Evaluation', () => {
       errorRate: 0.02,
     });
     expect(passes).toBe(false);
-    expect(failures.some((f) => f.includes('data freshness'))).toBe(true);
+    expect(failures.some((f) => f.includes('Data freshness'))).toBe(true);
   });
 
   it('reports all failures when multiple metrics fail', () => {
