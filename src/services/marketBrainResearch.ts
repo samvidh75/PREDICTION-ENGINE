@@ -89,9 +89,22 @@ const asResearchState = (value: unknown): MarketBrainResearchState => {
     : 'Needs review';
 };
 
-const asStringArray = (value: unknown): string[] => (Array.isArray(value)
-  ? value.map(asPublicText).filter((item) => item.length > 0)
-  : []);
+const asStringArray = (value: unknown): string[] => {
+  if (!Array.isArray(value)) return [];
+
+  const items: string[] = [];
+  const seen = new Set<string>();
+
+  value.forEach((item) => {
+    const text = asPublicText(item);
+    if (text.length > 0 && !seen.has(text)) {
+      seen.add(text);
+      items.push(text);
+    }
+  });
+
+  return items;
+};
 
 const asEvidenceDomains = (value: unknown): MarketBrainEvidenceDomain[] => {
   if (!Array.isArray(value)) return [];
