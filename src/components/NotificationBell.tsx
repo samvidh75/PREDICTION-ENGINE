@@ -26,7 +26,7 @@ export function NotificationBell() {
           top: "-6px",
           right: "-8px",
           background: colors.danger,
-          color: "#fff",
+          color: colors.onPrimary,
           fontSize: "10px",
           fontWeight: 700,
           minWidth: "16px",

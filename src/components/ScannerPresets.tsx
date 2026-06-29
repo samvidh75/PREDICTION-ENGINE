@@ -118,7 +118,7 @@ export function ScannerPresets({ scanType, query, onApply }: ScannerPresetsProps
       )}
 
       {message && (
-        <span style={{ fontSize: "12px", color: "#30D158" }}>{message}</span>
+        <span style={{ fontSize: "12px", color: colors.marketGreen }}>{message}</span>
       )}
     </div>
   );

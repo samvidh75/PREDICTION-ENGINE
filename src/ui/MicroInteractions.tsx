@@ -42,7 +42,7 @@ export function InteractiveButton({
   const filled: React.CSSProperties = {
     ...base,
     background: colors.primary,
-    color: "#fff",
+    color: colors.onPrimary,
   };
 
   const outline: React.CSSProperties = {

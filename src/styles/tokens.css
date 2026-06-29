@@ -22,8 +22,8 @@
   /* UI semantic accents */
   --green:          #59d499;
   --green-light:    rgba(89,212,153,0.15);
-  --red:            #FF6363;
-  --red-light:      rgba(255,99,99,0.15);
+  --red:            #FF6B6B;
+  --red-light:      rgba(255,107,107,0.15);
   --amber:          #ffc533;
   --amber-light:    rgba(255,197,51,0.15);
 
@@ -76,7 +76,7 @@
   --text-300:       var(--text-muted);
 
   --green-text:     #59d499;
-  --red-text:       #FF6363;
+  --red-text:       #FF6B6B;
   --amber-text:     #ffc533;
 
   --sh-card:        var(--shadow-card);

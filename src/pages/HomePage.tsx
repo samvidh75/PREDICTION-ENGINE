@@ -192,7 +192,7 @@ export default function HomePage() {
             transform: "translateX(-50%) rotate(-2deg)",
             width: "clamp(400px, 85vw, 1100px)",
             height: 240,
-            background: "linear-gradient(90deg, #FF6363 0%, #b0151e 50%, #FF6363 100%)",
+            background: "linear-gradient(90deg, #FF6B6B 0%, #b0151e 50%, #FF6B6B 100%)",
             clipPath: "polygon(0 15%, 100% 0, 100% 85%, 0 100%)",
             opacity: 0.9,
             pointerEvents: "none",
@@ -208,7 +208,7 @@ export default function HomePage() {
             transform: "translateX(-50%) rotate(-1.5deg)",
             width: "clamp(380px, 80vw, 1050px)",
             height: 200,
-            background: "linear-gradient(90deg, #FF6363 0%, #b0151e 50%, #FF6363 100%)",
+            background: "linear-gradient(90deg, #FF6B6B 0%, #b0151e 50%, #FF6B6B 100%)",
             clipPath: "polygon(0 15%, 100% 0, 100% 85%, 0 100%)",
             opacity: 0.5,
             filter: "blur(12px)",
@@ -229,7 +229,7 @@ export default function HomePage() {
               }}
             >
               Understand the stock{" "}
-              <span style={{ background: "linear-gradient(135deg, #FF6363 0%, #b0151e 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+              <span style={{ background: "linear-gradient(135deg, #FF6B6B 0%, #b0151e 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
                 before you invest
               </span>
               .
@@ -338,7 +338,7 @@ export default function HomePage() {
               <div style={{ display: "grid", gap: space[2] }}>
                 <div style={{
                   width: 32, height: 32, borderRadius: "8px",
-                  background: "rgba(255,255,255,0.08)",
+                  background: colors.hairlineStrong,
                   display: "flex", alignItems: "center", justifyContent: "center",
                 }}>
                   <action.icon color={colors.primary} size={16} strokeWidth={1.75} />
@@ -410,7 +410,7 @@ export default function HomePage() {
                     alignItems: "center",
                     padding: `${space[2]} ${space[3]}`,
                     borderRadius: "8px",
-                    background: item.alert.acknowledged ? "transparent" : "rgba(255,255,255,0.04)",
+                    background: item.alert.acknowledged ? "transparent" : colors.hairlineSoft,
                   }}
                 >
                   <div style={{ display: "grid", gap: 2 }}>

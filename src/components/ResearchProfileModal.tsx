@@ -4,7 +4,7 @@ import type { UserResearchProfile, ResearchExperienceLevel, ResearchTimeHorizon,
 import { getProfile, saveProfile, updateExperienceLevel, updateTimeHorizon, updateMaxRiskLevel, updateResearchTopics, updateDisplayName } from "../services/personalization/researchProfileStore";
 import { Button } from "../ui/Button";
 import { Card } from "../ui/Card";
-import { colors, typography, space } from "../design/tokens";
+import { colors, typography, space, shadows } from "../design/tokens";
 
 const EXPERIENCE_OPTIONS: ResearchExperienceLevel[] = ["beginner", "intermediate", "advanced"];
 const HORIZON_OPTIONS: ResearchTimeHorizon[] = ["short_term", "medium_term", "long_term"];
@@ -62,7 +62,7 @@ export function ResearchProfileModal() {
         style={{
           position: "fixed",
           inset: 0,
-          background: "rgba(0,0,0,0.4)",
+          background: colors.backdropModal,
           zIndex: 100,
         }}
       />
@@ -81,7 +81,7 @@ export function ResearchProfileModal() {
           overflowY: "auto",
           background: colors.page,
           borderRadius: "16px",
-          boxShadow: "0 20px 60px rgba(0,0,0,0.3)",
+          boxShadow: shadows.elevated,
         }}
       >
         <Card>

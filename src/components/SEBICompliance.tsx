@@ -6,7 +6,7 @@ export function SEBIComplianceBanner() {
     <div
       style={{
         padding: "16px",
-        background: "rgba(255,149,0,0.08)",
+        background: colors.marketOrangeSoft,
         border: `1px solid ${colors.warning}`,
         borderRadius: "10px",
         display: "flex",

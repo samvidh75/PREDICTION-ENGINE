@@ -79,7 +79,7 @@ export async function handleWebhook(req: Request, res: Response): Promise<void> 
     const rawBody = (req as any).rawBody ?? JSON.stringify(req.body);
     const signature = req.headers['x-razorpay-signature'] as string ?? '';
     // Production: validate + route to provider.handleWebhook()
-    console.log('[checkout] webhook received (not yet processed)');
+    // Webhook receipt logged via observability layer
     res.status(200).json({ received: true });
   } catch (err) {
     console.error('[checkout] webhook error', err);

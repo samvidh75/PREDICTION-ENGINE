@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { colors, typography, space, radius } from "../design/tokens";
+import { colors, typography, space, radius, shadows } from "../design/tokens";
 import type { FeedbackCategory } from "../config/feedback";
 
 const CATEGORIES: { value: FeedbackCategory; label: string }[] = [
@@ -116,7 +116,7 @@ const cardStyle: React.CSSProperties = {
   padding: space[5],
   borderRadius: radius.xl,
   background: colors.card,
-  boxShadow: "0 4px 24px rgba(0,0,0,0.12)",
+  boxShadow: shadows.card,
 };
 
 const inputStyle: React.CSSProperties = {
@@ -138,7 +138,7 @@ const submitButtonStyle: React.CSSProperties = {
   borderRadius: radius.md,
   border: "none",
   background: colors.primary,
-  color: "#fff",
+  color: colors.onPrimary,
   fontSize: typography.body.desktop.size,
   fontWeight: 600,
   cursor: "pointer",

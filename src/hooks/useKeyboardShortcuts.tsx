@@ -13,6 +13,7 @@
  */
 
 import { useEffect, useCallback, useRef, useState } from 'react';
+import { colors } from '../design/tokens';
 import { useNavigate } from 'react-router-dom';
 
 export interface ShortcutMap {
@@ -193,7 +194,7 @@ export function KeyboardHelpOverlay({ open, onClose }: KeyboardHelpOverlayProps)
     <div
       style={{
         position: 'fixed', inset: 0, zIndex: 9999,
-        background: 'rgba(0,0,0,0.4)',
+        background: colors.backdropModal,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         backdropFilter: 'blur(4px)',
       }}

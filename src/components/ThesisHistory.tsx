@@ -16,11 +16,11 @@ interface ThesisHistoryProps {
 
 const STATUS_STYLES: Record<string, { bg: string; color: string }> = {
   Strengthening: { bg: colors.accentGreenSoft, color: colors.accentGreen },
-  Stable: { bg: "rgba(87, 193, 255, 0.12)", color: colors.accentBlue },
+  Stable: { bg: colors.accentBlueSoft, color: colors.accentBlue },
   "Needs review": { bg: colors.accentYellowSoft, color: colors.warning },
   Weakening: { bg: colors.accentRedSoft, color: colors.danger },
-  "Research signals pending": { bg: "rgba(112, 112, 112, 0.12)", color: colors.textTertiary },
-  "Tracking begins now": { bg: "rgba(112, 112, 112, 0.12)", color: colors.textTertiary },
+  "Research signals pending": { bg: colors.backdropMuted, color: colors.textTertiary },
+  "Tracking begins now": { bg: colors.backdropMuted, color: colors.textTertiary },
 };
 
 export function ThesisHistory({ symbol, currentThesis }: ThesisHistoryProps) {

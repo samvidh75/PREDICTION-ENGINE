@@ -25,7 +25,7 @@ const badgeStyle: React.CSSProperties = {
   padding: "2px 8px",
   borderRadius: "4px",
   background: colors.warning,
-  color: "#fff",
+  color: colors.onPrimary,
   marginLeft: space[2],
   verticalAlign: "middle",
 };

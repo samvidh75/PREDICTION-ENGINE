@@ -5,7 +5,7 @@
 
 // COLOR TOKENS — Pure black Raycast palette
 // Reference: DESIGN LEARNING 1 — Unified Design System
-// 3 core colors: Black (#000000), White (#FFFFFF), Red (#FF6363)
+// 3 core colors: Black (#000000), White (#FFFFFF), Red (#FF6B6B)
 // Everything else is shades of gray for hierarchy
 export const colors = {
   // Brand — White CTA pill on black (Raycast convention)
@@ -30,15 +30,23 @@ export const colors = {
   surfaceCard:      '#1A1A1A', // Active/pressed, app icon tiles, keycap fill
   buttonFg:         '#222222', // Rare deep card variant (featured pricing tier)
 
+  // Backdrop / overlay tokens — structural glassmorphism
+  backdropClear:       'rgba(0,0,0,0)',      // Transparent (animation transitions)
+  backdropModal:       'rgba(0,0,0,0.4)',    // Modal sheet backdrop
+  backdropHeavy:       'rgba(0,0,0,0.5)',    // Heavy modal / drawer backdrop
+  backdropGlassmorphic:'rgba(0,0,0,0.85)',   // Sticky nav / header with blur
+  backdropFooter:      'rgba(20,20,20,0.85)', // Floating footer bar
+  backdropMuted:       'rgba(112,112,112,0.12)', // Neutral badge / chip bg
+
   // Borders (hairline 1px) — sharper on pure black
   hairline:       '#1A1A1A',
   hairlineSoft:   'rgba(255,255,255,0.06)',
   hairlineStrong: 'rgba(255,255,255,0.12)',
 
   // Brand accent — Raycast red (the ONLY action color)
-  accentRed:        '#FF6363',  // Raycast red — CTAs, emphasis, action (Principle 1)
-  accentRedSoft:    'rgba(255,99,99,0.15)',
-  accentRedStrong:  'rgba(255,99,99,0.25)',
+  accentRed:        '#FF6B6B',  // Raycast red — CTAs, emphasis, action (Principle 1)
+  accentRedSoft:    'rgba(255,107,107,0.15)',
+  accentRedStrong:  'rgba(255,107,107,0.25)',
   accentBlue:       '#57c1ff',
   accentBlueSoft:   'rgba(87,193,255,0.15)',
   accentYellow:     '#ffc533',
@@ -58,14 +66,14 @@ export const colors = {
   accentGreenSoft:  'rgba(89,212,153,0.15)',
 
   // Brand gradient — red diagonal-stripe hero
-  heroStripeStart: '#FF6363',
+  heroStripeStart: '#FF6B6B',
   heroStripeEnd:   '#b0151e',
   keyBgStart:      '#1A1A1A',
   keyBgEnd:        '#0D0D0D',
 
   // Legacy semantic aliases (for existing component compatibility)
   success:         '#34C759',
-  danger:          '#FF6363',
+  danger:          '#FF6B6B',
   warning:         '#ffc533',
   page:            '#000000',
   card:            '#0D0D0D',
