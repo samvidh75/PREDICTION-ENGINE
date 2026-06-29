@@ -54,4 +54,29 @@ describe('fetchMarketBrainResearch evidence domain safety', () => {
     expect(result.research.evidenceReview.partial).toEqual(['fundamentals']);
     expect(result.research.evidenceReview.missing).toEqual(['sector_context', 'technicals']);
   });
+
+  it('keeps overlapping evidence domains in the weaker public status only once', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({
+        ...responsePayload,
+        research: {
+          ...responsePayload.research,
+          evidenceReview: {
+            needsReview: false,
+            partial: ['fundamentals', 'news_events'],
+            missing: ['fundamentals', 'sector_context', 'news_events'],
+            summary: 'Some research evidence needs review.',
+          },
+        },
+      }),
+    }));
+
+    const result = await fetchMarketBrainResearch('TCS');
+
+    expect(result.research.evidenceReview.needsReview).toBe(true);
+    expect(result.research.evidenceReview.partial).toEqual(['fundamentals', 'news_events']);
+    expect(result.research.evidenceReview.missing).toEqual(['sector_context']);
+  });
 });
