@@ -4,7 +4,7 @@
  * TRACK-P1: Per-metric percentile readiness.
  */
 
-import { EngineInputs, ValuationEngineOutput, clampScore, weightedAverage } from '../types';
+import { EngineInputs, ValuationEngineOutput, clampScore, isFiniteNumber, weightedAverage } from '../types';
 import { getSectorProfile } from '../SectorAdapter';
 import { SectorPercentileEngine } from '../scoring/SectorPercentileEngine';
 
@@ -85,7 +85,7 @@ export class ValuationEngine {
 
     // ── Sub-score 5: Dividend Yield Score (TRACK-12B: yield-trap) ──
     let dividendYieldScore = 50;
-    const divYield = financials.dividendYield;
+    const divYield = isFiniteNumber(financials.dividendYield);
     if (divYield !== null) {
       if (divYield >= 0.20) dividendYieldScore = 10;   // Extreme distress (likely unsustainable)
       else if (divYield >= 0.12) dividendYieldScore = 25; // Probable distress / value trap
@@ -107,7 +107,7 @@ export class ValuationEngine {
       { score: pbScore, weight: pbWeight },
       { score: evEbitdaScore, weight: evWeight },
       { score: fcfYieldScore, weight: 3 },
-      { score: dividendYieldScore, weight: financials.dividendYield !== null ? 1.5 : 0 },
+      { score: dividendYieldScore, weight: divYield !== null ? 1.5 : 0 },
     ]);
 
     const factorAdjust = (factors.valueFactor - 50) * 0.2;
