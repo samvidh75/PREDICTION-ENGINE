@@ -183,16 +183,35 @@ export default function HomePage() {
           paddingBottom: layout.pagePaddingDesktop,
         }}
       >
-        {/* Raycast-style red stripe */}
+        {/* Raycast-style red diagonal stripe */}
         <div
           style={{
             position: "absolute",
-            top: -100,
+            top: -80,
             left: "50%",
-            transform: "translateX(-50%)",
-            width: "clamp(400px, 90%, 1000px)",
-            height: 350,
-            background: "radial-gradient(ellipse 60% 60% at 50% 30%, rgba(255,69,58,0.25) 0%, rgba(255,105,97,0.12) 30%, rgba(255,159,10,0.06) 55%, transparent 75%)",
+            transform: "translateX(-50%) rotate(-2deg)",
+            width: "clamp(400px, 85vw, 1100px)",
+            height: 240,
+            background: "linear-gradient(90deg, #ff5757 0%, #a1131a 50%, #ff5757 100%)",
+            clipPath: "polygon(0 15%, 100% 0, 100% 85%, 0 100%)",
+            opacity: 0.9,
+            pointerEvents: "none",
+            zIndex: 0,
+          }}
+        />
+        {/* Second stripe offset for depth */}
+        <div
+          style={{
+            position: "absolute",
+            top: -60,
+            left: "50%",
+            transform: "translateX(-50%) rotate(-1.5deg)",
+            width: "clamp(380px, 80vw, 1050px)",
+            height: 200,
+            background: "linear-gradient(90deg, #ff5757 0%, #a1131a 50%, #ff5757 100%)",
+            clipPath: "polygon(0 15%, 100% 0, 100% 85%, 0 100%)",
+            opacity: 0.5,
+            filter: "blur(12px)",
             pointerEvents: "none",
             zIndex: 0,
           }}
@@ -202,25 +221,25 @@ export default function HomePage() {
           <div style={{ display: "grid", gap: space[4] }}>
             <h1
               style={{
-                color: colors.textPrimary,
-                fontSize: typography.h1.desktop.size,
-                fontWeight: typography.h1.desktop.weight,
-                lineHeight: typography.h1.desktop.line,
-                letterSpacing: typography.h1.desktop.track,
+                color: colors.ink,
+                fontSize: "clamp(32px, 5vw, 56px)",
+                fontWeight: 600,
+                lineHeight: 1.1,
+                letterSpacing: "0.2px",
               }}
             >
               Understand the stock{" "}
-              <span style={{ background: "linear-gradient(135deg, #FF3B30 0%, #FF9500 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+              <span style={{ background: "linear-gradient(135deg, #ff5757 0%, #a1131a 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
                 before you invest
               </span>
               .
             </h1>
             <p
               style={{
-                color: colors.textSecondary,
-                fontSize: typography.body.desktop.size,
+                color: colors.body,
+                fontSize: "18px",
                 fontWeight: 400,
-                lineHeight: typography.body.desktop.line,
+                lineHeight: 1.6,
               }}
             >
               Build conviction with calmer research flows, cleaner comparisons, and the key numbers that changed.
@@ -244,11 +263,11 @@ export default function HomePage() {
                   height: "44px",
                   width: "100%",
                   borderRadius: "10px",
-                  border: `1px solid ${colors.border}`,
+                  border: `1px solid ${colors.hairline}`,
                   padding: "0 60px 0 38px",
-                  fontSize: typography.body.desktop.size,
-                  color: colors.textPrimary,
-                  background: `${colors.card} url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238E8E93' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E") 12px center no-repeat`,
+                  fontSize: "18px",
+                  color: colors.ink,
+                  background: `${colors.surface} url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238E8E93' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E") 12px center no-repeat`,
                   outline: "none",
                   boxSizing: "border-box",
                 }}
@@ -264,11 +283,11 @@ export default function HomePage() {
                   gap: 3,
                   padding: "2px 6px",
                   borderRadius: "4px",
-                  background: colors.fill,
-                  border: `1px solid ${colors.border}`,
+                  background: colors.surfaceElevated,
+                  border: `1px solid ${colors.hairline}`,
                   fontSize: 10,
                   fontWeight: 600,
-                  color: colors.textSecondary,
+                  color: colors.body,
                   pointerEvents: "none",
                 }}
               >
@@ -284,9 +303,9 @@ export default function HomePage() {
                   key={r.symbol}
                   onClick={() => navigate(`/stock/${r.symbol}`)}
                   style={{
-                    border: `1px solid ${colors.border}`,
+                    border: `1px solid ${colors.hairline}`,
                     borderRadius: "10px",
-                    background: colors.card,
+                    background: colors.surface,
                     padding: `${space[3]} ${space[4]}`,
                     display: "flex",
                     justifyContent: "space-between",
@@ -295,7 +314,7 @@ export default function HomePage() {
                   }}
                 >
                   <span style={{ fontWeight: 600 }}>{r.symbol}</span>
-                  <span style={{ color: colors.textSecondary }}>{r.name}</span>
+                  <span style={{ color: colors.body }}>{r.name}</span>
                 </button>
               ))}
             </div>
@@ -305,7 +324,7 @@ export default function HomePage() {
 
       {/* ════════════════ QUICK ACTIONS ════════════════ */}
       <section style={{ display: "grid", gap: space[5] }}>
-        <h2 style={{ color: colors.textPrimary, fontSize: typography.h3.desktop.size, fontWeight: typography.h3.desktop.weight }}>
+        <h2 style={{ color: colors.ink, fontSize: "20px", fontWeight: 500 }}>
           Quick Actions
         </h2>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(190px, 1fr))", gap: space[4] }}>
@@ -323,10 +342,10 @@ export default function HomePage() {
                 }}>
                   <action.icon color={colors.primary} size={16} strokeWidth={1.75} />
                 </div>
-                <h3 style={{ fontSize: typography.caption.desktop.size, fontWeight: 600, color: colors.textPrimary, margin: 0 }}>
+                <h3 style={{ fontSize: "14px", fontWeight: 600, color: colors.ink, margin: 0 }}>
                   {action.label}
                 </h3>
-                <p style={{ fontSize: 12, color: colors.textSecondary, lineHeight: 1.4, margin: 0 }}>
+                <p style={{ fontSize: 12, color: colors.body, lineHeight: 1.4, margin: 0 }}>
                   {action.desc}
                 </p>
               </div>
@@ -339,11 +358,11 @@ export default function HomePage() {
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: sectionGap, alignItems: "start" }}>
         {/* Market pulse */}
         <section style={{ display: "grid", gap: space[5] }}>
-          <h2 style={{ color: colors.textPrimary, fontSize: typography.h3.desktop.size, fontWeight: typography.h3.desktop.weight }}>
+          <h2 style={{ color: colors.ink, fontSize: "20px", fontWeight: 500 }}>
             Market Pulse
           </h2>
-          <Card variant="accent" style={{ display: "grid", gap: space[4] }}>
-            <p style={{ fontSize: 13, color: colors.textSecondary, margin: 0, lineHeight: 1.5 }}>
+          <Card style={{ display: "grid", gap: space[4], background: colors.surface }}>
+            <p style={{ fontSize: 13, color: colors.body, margin: 0, lineHeight: 1.5 }}>
               Based on fundamental health scores across <strong>{leaderboard.reduce((s, p) => s + p.stocks.length, 0)}</strong> tracked stocks
             </p>
             <div style={{ display: "grid", gap: space[3] }}>
@@ -351,11 +370,11 @@ export default function HomePage() {
                 <div key={mood.label} style={{ display: "flex", alignItems: "center", gap: space[3] }}>
                   <span style={{ fontSize: 20 }}>{mood.emoji}</span>
                   <div style={{ flex: 1 }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, fontWeight: 600, color: colors.textPrimary }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, fontWeight: 600, color: colors.ink }}>
                       <span>{mood.label}</span>
                       <span>{mood.stocks}</span>
                     </div>
-                    <div style={{ height: 4, background: colors.border, borderRadius: 2, marginTop: 4 }}>
+                    <div style={{ height: 4, background: colors.hairline, borderRadius: 2, marginTop: 4 }}>
                       <div style={{
                         height: "100%",
                         borderRadius: 2,
@@ -372,12 +391,12 @@ export default function HomePage() {
 
         {/* Recent alerts */}
         <section style={{ display: "grid", gap: space[5] }}>
-          <h2 style={{ display: "flex", alignItems: "center", gap: space[2], color: colors.textPrimary, fontSize: typography.h3.desktop.size, fontWeight: typography.h3.desktop.weight }}>
+          <h2 style={{ display: "flex", alignItems: "center", gap: space[2], color: colors.ink, fontSize: "20px", fontWeight: 500 }}>
             <Bell size={16} /> Recent Alerts
           </h2>
           <Card style={{ display: "grid", gap: space[2] }}>
             {recentAlerts.length === 0 ? (
-              <p style={{ fontSize: 13, color: colors.textSecondary, margin: 0, padding: space[3], textAlign: "center" }}>
+              <p style={{ fontSize: 13, color: colors.body, margin: 0, padding: space[3], textAlign: "center" }}>
                 No recent alerts. Start researching to get notified of changes.
               </p>
             ) : (
@@ -394,10 +413,10 @@ export default function HomePage() {
                   }}
                 >
                   <div style={{ display: "grid", gap: 2 }}>
-                    <span style={{ fontSize: 13, fontWeight: 500, color: colors.textPrimary }}>
+                    <span style={{ fontSize: 13, fontWeight: 500, color: colors.ink }}>
                       {item.alert.symbol ?? "System"}
                     </span>
-                    <span style={{ fontSize: 12, color: colors.textSecondary }}>
+                    <span style={{ fontSize: 12, color: colors.body }}>
                       {item.alert.title?.slice(0, 80) ?? item.alert.body?.slice(0, 80)}
                     </span>
                   </div>
@@ -414,32 +433,32 @@ export default function HomePage() {
 
       {/* ════════════════ SCANNER LEADERBOARD ════════════════ */}
       <section style={{ display: "grid", gap: space[5] }}>
-        <h2 style={{ color: colors.textPrimary, fontSize: typography.h3.desktop.size, fontWeight: typography.h3.desktop.weight }}>
+        <h2 style={{ color: colors.ink, fontSize: "20px", fontWeight: 500 }}>
           Scanner Leaderboard
         </h2>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: space[4] }}>
           {leaderboard.map((preset) => (
             <Card key={preset.id} onClick={() => navigate(`/scanner?preset=${preset.id}`)} style={{ cursor: "pointer" }}>
               <div style={{ display: "grid", gap: space[3] }}>
-                <h3 style={{ fontSize: typography.caption.desktop.size, fontWeight: 600, color: colors.primary, textTransform: "uppercase", letterSpacing: "0.04em", margin: 0 }}>
+                <h3 style={{ fontSize: "14px", fontWeight: 600, color: colors.primary, textTransform: "uppercase", letterSpacing: "0.04em", margin: 0 }}>
                   {preset.label}
                 </h3>
                 {preset.stocks.length === 0 ? (
-                  <p style={{ fontSize: 12, color: colors.textSecondary, margin: 0 }}>No data available</p>
+                  <p style={{ fontSize: 12, color: colors.body, margin: 0 }}>No data available</p>
                 ) : (
                   preset.stocks.map((stock, i) => (
                     <div key={stock.symbol} style={{ display: "flex", alignItems: "center", gap: space[3] }}>
-                      <span style={{ fontSize: 12, fontWeight: 600, color: colors.textSecondary, minWidth: 16 }}>
+                      <span style={{ fontSize: 12, fontWeight: 600, color: colors.body, minWidth: 16 }}>
                         {i + 1}
                       </span>
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                          <span style={{ fontSize: 13, fontWeight: 600, color: colors.textPrimary }}>
+                          <span style={{ fontSize: 13, fontWeight: 600, color: colors.ink }}>
                             {stock.symbol}
                           </span>
                           <HealthometerMini score={Math.round(stock.composite)} size="sm" />
                         </div>
-                        <p style={{ fontSize: 11, color: colors.textSecondary, margin: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                        <p style={{ fontSize: 11, color: colors.body, margin: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                           {stock.matchReason}
                         </p>
                       </div>
@@ -454,7 +473,7 @@ export default function HomePage() {
 
       {/* ════════════════ RECENTLY RESEARCHED ════════════════ */}
       <section style={{ display: "grid", gap: space[5] }}>
-        <h2 style={{ color: colors.textPrimary, fontSize: typography.h3.desktop.size, fontWeight: typography.h3.desktop.weight }}>
+        <h2 style={{ color: colors.ink, fontSize: "20px", fontWeight: 500 }}>
           <Star size={16} style={{ verticalAlign: "middle", marginRight: space[2] }} />
           Recently Researched
         </h2>
@@ -471,7 +490,7 @@ export default function HomePage() {
       <section style={{ display: "grid", gap: space[5] }}>
         <div style={{ display: "flex", alignItems: "center", gap: space[2] }}>
           <Lightbulb size={16} color={colors.warning} />
-          <h2 style={{ color: colors.textPrimary, fontSize: typography.h3.desktop.size, fontWeight: typography.h3.desktop.weight, margin: 0 }}>
+          <h2 style={{ color: colors.ink, fontSize: "20px", fontWeight: 500, margin: 0 }}>
             Did You Know?
           </h2>
         </div>
@@ -483,10 +502,10 @@ export default function HomePage() {
           {EDUCATIONAL_FACTS.map((fact) => (
             <Card key={fact.title} style={{ display: "grid", gap: space[2] }}>
               <fact.icon size={18} color={colors.primary} strokeWidth={1.75} />
-              <h3 style={{ fontSize: typography.caption.desktop.size, fontWeight: 600, color: colors.textPrimary, margin: 0 }}>
+              <h3 style={{ fontSize: "14px", fontWeight: 600, color: colors.ink, margin: 0 }}>
                 {fact.title}
               </h3>
-              <p style={{ fontSize: 12, color: colors.textSecondary, lineHeight: 1.5, margin: 0 }}>
+              <p style={{ fontSize: 12, color: colors.body, lineHeight: 1.5, margin: 0 }}>
                 {fact.body}
               </p>
             </Card>
@@ -497,8 +516,8 @@ export default function HomePage() {
       {/* ════════════════ KEYBOARD SHORTCUTS HINT ════════════════ */}
       <section style={{
         padding: space[6],
-        background: colors.card,
-        border: `1px solid ${colors.border}`,
+        background: colors.surface,
+        border: `1px solid ${colors.hairline}`,
         borderRadius: radius.lg,
         display: "flex",
         flexWrap: "wrap",
@@ -506,17 +525,17 @@ export default function HomePage() {
         alignItems: "center",
         justifyContent: "center",
       }}>
-        <span style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: colors.textSecondary }}>
-          <Keyboard size={14} /> <kbd style={{ padding: "1px 5px", borderRadius: 3, background: colors.fill, border: `1px solid ${colors.border}`, fontSize: 11 }}>⌘K</kbd> Search stocks
+        <span style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: colors.body }}>
+          <Keyboard size={14} /> <kbd style={{ padding: "1px 5px", borderRadius: 3, background: colors.surfaceElevated, border: `1px solid ${colors.hairline}`, fontSize: 11 }}>⌘K</kbd> Search stocks
         </span>
-        <span style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: colors.textSecondary }}>
-          <Keyboard size={14} /> <kbd style={{ padding: "1px 5px", borderRadius: 3, background: colors.fill, border: `1px solid ${colors.border}`, fontSize: 11 }}>G</kbd> <kbd style={{ padding: "1px 5px", borderRadius: 3, background: colors.fill, border: `1px solid ${colors.border}`, fontSize: 11 }}>N</kbd> Go to news
+        <span style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: colors.body }}>
+          <Keyboard size={14} /> <kbd style={{ padding: "1px 5px", borderRadius: 3, background: colors.surfaceElevated, border: `1px solid ${colors.hairline}`, fontSize: 11 }}>G</kbd> <kbd style={{ padding: "1px 5px", borderRadius: 3, background: colors.surfaceElevated, border: `1px solid ${colors.hairline}`, fontSize: 11 }}>N</kbd> Go to news
         </span>
-        <span style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: colors.textSecondary }}>
-          <Keyboard size={14} /> <kbd style={{ padding: "1px 5px", borderRadius: 3, background: colors.fill, border: `1px solid ${colors.border}`, fontSize: 11 }}>R</kbd> Refresh data
+        <span style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: colors.body }}>
+          <Keyboard size={14} /> <kbd style={{ padding: "1px 5px", borderRadius: 3, background: colors.surfaceElevated, border: `1px solid ${colors.hairline}`, fontSize: 11 }}>R</kbd> Refresh data
         </span>
-        <span style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: colors.textSecondary }}>
-          <Keyboard size={14} /> <kbd style={{ padding: "1px 5px", borderRadius: 3, background: colors.fill, border: `1px solid ${colors.border}`, fontSize: 11 }}>?</kbd> Show shortcuts
+        <span style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: colors.body }}>
+          <Keyboard size={14} /> <kbd style={{ padding: "1px 5px", borderRadius: 3, background: colors.surfaceElevated, border: `1px solid ${colors.hairline}`, fontSize: 11 }}>?</kbd> Show shortcuts
         </span>
       </section>
 
@@ -524,7 +543,7 @@ export default function HomePage() {
       <footer style={{
         marginTop: space[8],
         paddingTop: space[8],
-        borderTop: `1px solid ${colors.separator}`,
+        borderTop: `1px solid ${colors.hairline}`,
         display: "grid",
         gap: space[8],
       }}>
@@ -535,7 +554,7 @@ export default function HomePage() {
         }}>
           {FOOTER_COLUMNS.map((col) => (
             <div key={col.title} style={{ display: "grid", gap: space[3] }}>
-              <h4 style={{ fontSize: typography.label.desktop.size, fontWeight: 600, color: colors.textSecondary, textTransform: "uppercase", letterSpacing: "0.04em", margin: 0 }}>
+              <h4 style={{ fontSize: "12px", fontWeight: 600, color: colors.body, textTransform: "uppercase", letterSpacing: "0.04em", margin: 0 }}>
                 {col.title}
               </h4>
               <nav style={{ display: "grid", gap: space[2] }}>
@@ -551,7 +570,7 @@ export default function HomePage() {
                     }}
                     style={{
                       fontSize: 13,
-                      color: colors.textPrimary,
+                      color: colors.ink,
                       textDecoration: "none",
                       display: "flex",
                       alignItems: "center",
@@ -575,25 +594,25 @@ export default function HomePage() {
           flexWrap: "wrap",
           gap: space[4],
           paddingTop: space[6],
-          borderTop: `1px solid ${colors.separator}`,
+          borderTop: `1px solid ${colors.hairline}`,
         }}>
           <div style={{ display: "flex", alignItems: "center", gap: space[3] }}>
-            <span style={{ fontSize: 13, fontWeight: 700, color: colors.textPrimary }}>StockStory</span>
-            <span style={{ fontSize: 12, color: colors.textSecondary }}>
+            <span style={{ fontSize: 13, fontWeight: 700, color: colors.ink }}>StockStory</span>
+            <span style={{ fontSize: 12, color: colors.body }}>
               © {new Date().getFullYear()} StockStory. For educational purposes only.
             </span>
           </div>
           <div style={{ display: "flex", gap: space[3] }}>
-            <a href="https://x.com" target="_blank" rel="noopener noreferrer" style={{ color: colors.textSecondary }}>
+            <a href="https://x.com" target="_blank" rel="noopener noreferrer" style={{ color: colors.body }}>
               <Twitter size={16} />
             </a>
-            <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" style={{ color: colors.textSecondary }}>
+            <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" style={{ color: colors.body }}>
               <Linkedin size={16} />
             </a>
-            <a href="https://github.com" target="_blank" rel="noopener noreferrer" style={{ color: colors.textSecondary }}>
+            <a href="https://github.com" target="_blank" rel="noopener noreferrer" style={{ color: colors.body }}>
               <Github size={16} />
             </a>
-            <a href="mailto:hello@stockstory.org" style={{ color: colors.textSecondary }}>
+            <a href="mailto:hello@stockstory.org" style={{ color: colors.body }}>
               <Mail size={16} />
             </a>
           </div>

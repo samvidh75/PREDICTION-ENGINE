@@ -1,13 +1,13 @@
 import type { ReactNode } from "react";
-import { colors, radius, layout, typography } from "../design/tokens";
+import { colors, radius, typography, space } from "../design/tokens";
 
 function Panel({ children }: { children: ReactNode }) {
   return (
     <div
       style={{
-        background: colors.card,
-        borderRadius: radius.lg,
-        border: `1px solid ${colors.border}`,
+        background: colors.surface,
+        borderRadius: radius.md,
+        border: `1px solid ${colors.hairline}`,
         overflow: "hidden",
       }}
     >
@@ -23,8 +23,8 @@ function Filters({ children }: { children: ReactNode }) {
         display: "flex",
         flexWrap: "wrap",
         gap: "12px",
-        padding: layout.padding,
-        borderBottom: `1px solid ${colors.border}`,
+        padding: space[6],
+        borderBottom: `1px solid ${colors.hairline}`,
       }}
     >
       {children}
@@ -33,18 +33,18 @@ function Filters({ children }: { children: ReactNode }) {
 }
 
 function Content({ children }: { children: ReactNode }) {
-  return <div style={{ padding: layout.padding }}>{children}</div>;
+  return <div style={{ padding: space[6] }}>{children}</div>;
 }
 
 function Footer({ children }: { children: ReactNode }) {
   return (
     <div
       style={{
-        padding: layout.padding,
-        borderTop: `1px solid ${colors.border}`,
+        padding: space[6],
+        borderTop: `1px solid ${colors.hairline}`,
         fontFamily: typography.fontFamily,
-        fontSize: typography.caption.desktop.size,
-        color: colors.textSecondary,
+        fontSize: typography.captionMd.size,
+        color: colors.mute,
       }}
     >
       {children}

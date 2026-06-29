@@ -1,33 +1,26 @@
-import { colors, radius } from "../design/tokens";
+import { colors, radius, typography } from "../design/tokens";
 
-type BadgeVariant = "neutral" | "success" | "warning" | "danger" | "info";
+type BadgeVariant = "pro" | "info" | "success" | "danger" | "warning" | "neutral";
 
-const VARIANT_MAP: Record<BadgeVariant, { background: string; text: string; border: string }> = {
-  neutral: { background: colors.fill, text: colors.textPrimary, border: colors.border },
-  success: { background: "#E8F5E2", text: colors.success, border: colors.success },
-  warning: { background: "#FFF3CD", text: "#856404", border: "#FFC107" },
-  danger:  { background: "#FEE2E3", text: colors.danger, border: colors.danger },
-  info:    { background: "#D1ECF1", text: "#0C5460", border: "#17A2B8" },
+const VARIANT_MAP: Record<BadgeVariant, { background: string; color: string }> = {
+  pro:     { background: colors.surfaceElevated, color: colors.mute },
+  info:    { background: colors.accentBlueSoft, color: colors.accentBlue },
+  success: { background: colors.accentGreenSoft, color: colors.accentGreen },
+  danger:  { background: colors.accentRedSoft, color: colors.accentRed },
+  warning: { background: colors.accentYellowSoft, color: colors.accentYellow },
+  neutral: { background: colors.surfaceCard, color: colors.body },
 };
 
 export function Badge({
   value,
   label,
-  variant,
+  variant = "pro",
 }: {
   value: number | string;
   label?: string;
   variant?: BadgeVariant;
 }) {
-  const tone = variant
-    ? VARIANT_MAP[variant]
-    : typeof value === "number"
-      ? value >= 75
-        ? VARIANT_MAP.success
-        : value >= 50
-          ? VARIANT_MAP.neutral
-          : VARIANT_MAP.danger
-      : VARIANT_MAP.neutral;
+  const tone = VARIANT_MAP[variant];
 
   return (
     <span
@@ -38,12 +31,12 @@ export function Badge({
         minHeight: "24px",
         padding: "0 10px",
         borderRadius: radius.full,
-        border: `1px solid ${tone.border}`,
         background: tone.background,
-        color: tone.text,
-        fontSize: "12px",
-        fontWeight: 600,
-        lineHeight: "1.4",
+        color: tone.color,
+        fontSize: typography.captionSm.size,
+        fontWeight: 500,
+        lineHeight: typography.captionSm.line,
+        letterSpacing: typography.captionSm.track,
       }}
     >
       {label ? `${label} ` : ""}
