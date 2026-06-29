@@ -15,11 +15,16 @@ import { listAvailableBrokers } from "../commercial/BrokerHandoffService";
 import type { BrokerEntry } from "../commercial/BrokerRegistry";
 import { fallbackAnalysis, generateStockAnalysis } from "../services/llm/AIAnalysisService";
 import type { AIAnalysis } from "../services/llm/AIAnalysisService";
-import { colors, typography, radius, animation } from "../design/tokens";
+import { colors, typography, radius, animation, shadows } from "../design/tokens";
 import { InteractiveButton, MetricCard, ExpandingPanel, HoverCard } from "../ui/MicroInteractions";
 import { useSeo } from "../frontend/seo/useSeo";
 import { buildCompanySeo } from "../frontend/seo/companySeo";
 import { CompanyAnalystSection } from "../components/analyst/CompanyAnalystSection";
+import { SimilarStocks } from "../components/SimilarStocks";
+import { OptionsFlow } from "../components/OptionsFlow";
+import { InsiderActivity } from "../components/InsiderActivity";
+import { PriceTargets } from "../components/PriceTargets";
+import { NativeAd } from "../components/NativeAd";
 
 type StockResearchDetail = {
   symbol: string;
@@ -75,8 +80,8 @@ function StickyHeader({ symbol, price, changeAbs, changePercent, trendColor }: {
   return (
     <div className="stock-sticky-header" style={{
       position: "fixed", top: 0, left: 0, right: 0, height: "48px",
-      background: "rgba(0, 0, 0, 0.85)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)",
-      borderBottom: "1px solid rgba(255, 255, 255, 0.06)", zIndex: 50,
+      background: colors.backdropGlassmorphic, backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)",
+      borderBottom: `1px solid ${colors.hairlineSoft}`, zIndex: 50,
       display: "flex", alignItems: "center", justifyContent: "space-between",
       padding: "0 24px", opacity: 0, pointerEvents: "none",
       transition: "opacity 0.2s ease",
@@ -105,7 +110,7 @@ function StickyHeader({ symbol, price, changeAbs, changePercent, trendColor }: {
 function HeroSection({ stock, isUp, trendColor }: { stock: StockResearchDetail; isUp: boolean; trendColor: string }) {
   const convictionEmoji = stock.confidenceMeter >= 75 ? "🔥" : stock.confidenceMeter >= 60 ? "📈" : stock.confidenceMeter >= 40 ? "👀" : "⚠️";
   const convictionLabel = stock.confidenceMeter >= 75 ? "HIGH CONVICTION" : stock.confidenceMeter >= 60 ? "WATCH" : stock.confidenceMeter >= 40 ? "NEEDS REVIEW" : "RISK RISING";
-  const convictionColor = stock.confidenceMeter >= 75 ? colors.success : stock.confidenceMeter >= 60 ? colors.warning : stock.confidenceMeter >= 40 ? "#FF9500" : colors.danger;
+  const convictionColor = stock.confidenceMeter >= 75 ? colors.success : stock.confidenceMeter >= 60 ? colors.warning : stock.confidenceMeter >= 40 ? colors.marketOrange : colors.danger;
   return (
     <section className="stock-hero raycast-slideUp" style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "48px 0 40px", textAlign: "center", position: "relative" }}>
       <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "16px" }}>
@@ -115,10 +120,10 @@ function HeroSection({ stock, isUp, trendColor }: { stock: StockResearchDetail; 
       <div style={{ fontSize: useResponsiveValue("40px", "64px"), fontWeight: 700, color: colors.textPrimary, lineHeight: "1.1", letterSpacing: "-0.02em", display: "flex", alignItems: "center", justifyContent: "center", gap: "12px" }}>
         ₹{stock.price.current.toLocaleString("en-IN")}
         <span className="live-indicator" style={{
-          width: "10px", height: "10px", borderRadius: "50%", background: "#22C55E",
+          width: "10px", height: "10px", borderRadius: "50%", background: colors.marketGreen,
           display: "inline-block", flexShrink: 0, marginTop: "8px",
         }} title="Live data" />
-        <span style={{ fontSize: "11px", color: "#22C55E", fontWeight: 600, letterSpacing: "0.06em", marginTop: "8px" }}>LIVE</span>
+        <span style={{ fontSize: "11px", color: colors.marketGreen, fontWeight: 600, letterSpacing: "0.06em", marginTop: "8px" }}>LIVE</span>
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: "12px", marginTop: "12px", flexWrap: "wrap", justifyContent: "center" }}>
         <div style={{ color: trendColor, fontSize: "18px", fontWeight: 600, display: "inline-flex", alignItems: "center", gap: "6px" }}>
@@ -375,7 +380,6 @@ function StockError({ symbol }: { symbol: string }) {
         changePercent={stock.price.changePercent} trendColor={trendColor} />
       <style>{`
         .stock-sticky-header { transition: opacity 0.25s ease, transform 0.25s ease; opacity: ${stickyVisible ? "1" : "0"} !important; pointer-events: ${stickyVisible ? "auto" : "none"}; transform: translateY(${stickyVisible ? "0" : "-8px"}); }
-        @keyframes livePulse { 0%,100% { box-shadow: 0 0 0 0 rgba(34,197,94,0.4); } 50% { box-shadow: 0 0 0 6px rgba(34,197,94,0); } }
         .live-indicator { animation: livePulse 2s ease-in-out infinite; }
       `}</style>
 
@@ -396,8 +400,8 @@ function StockError({ symbol }: { symbol: string }) {
       <Card className="stock-chart-card raycast-slideUp" style={{ animationDelay: "0.05s", animationFillMode: "both" }}>
         <div className="stock-chart-toolbar" style={{ display: "flex", gap: "8px", marginBottom: "16px", flexWrap: "wrap", alignItems: "center" }}>
           <div style={{ display: "flex", gap: "4px", background: colors.fill, borderRadius: radius.full, padding: "2px" }}>
-            <button onClick={() => setChartType("line")} style={{ padding: "6px 14px", borderRadius: radius.full, border: "none", cursor: "pointer", fontSize: "12px", fontWeight: 500, background: chartType === "line" ? colors.primary : "transparent", color: chartType === "line" ? "#fff" : colors.textSecondary }}>Line</button>
-            <button onClick={() => setChartType("candle")} style={{ padding: "6px 14px", borderRadius: radius.full, border: "none", cursor: "pointer", fontSize: "12px", fontWeight: 500, background: chartType === "candle" ? colors.primary : "transparent", color: chartType === "candle" ? "#fff" : colors.textSecondary }}>Candle</button>
+            <button onClick={() => setChartType("line")} style={{ padding: "6px 14px", borderRadius: radius.full, border: "none", cursor: "pointer", fontSize: "12px", fontWeight: 500, background: chartType === "line" ? colors.primary : "transparent", color: chartType === "line" ? colors.onPrimary : colors.textSecondary }}>Line</button>
+            <button onClick={() => setChartType("candle")} style={{ padding: "6px 14px", borderRadius: radius.full, border: "none", cursor: "pointer", fontSize: "12px", fontWeight: 500, background: chartType === "candle" ? colors.primary : "transparent", color: chartType === "candle" ? colors.onPrimary : colors.textSecondary }}>Candle</button>
           </div>
           <div style={{ display: "flex", gap: "4px", marginLeft: "auto" }}>
             {(["none", "sma", "rsi", "macd"] as const).map((ind) => (
@@ -551,7 +555,7 @@ function StockError({ symbol }: { symbol: string }) {
             <Button variant={financialMetric === "ebitda" ? "primary" : "secondary"} onClick={() => setFinancialMetric("ebitda")}>EBITDA</Button>
             <Button variant={financialPeriod === "annual" ? "primary" : "secondary"} onClick={() => setFinancialPeriod("annual")}>Annual</Button>
             <Button variant={financialPeriod === "quarterly" ? "primary" : "secondary"} onClick={() => setFinancialPeriod("quarterly")}>Quarterly</Button>
-            <button onClick={() => setShowFinancialTable(!showFinancialTable)} style={{ padding: "6px 12px", borderRadius: radius.md, border: `1px solid ${colors.border}`, cursor: "pointer", fontSize: "12px", background: showFinancialTable ? colors.primary : "transparent", color: showFinancialTable ? "#fff" : colors.textSecondary }}>
+            <button onClick={() => setShowFinancialTable(!showFinancialTable)} style={{ padding: "6px 12px", borderRadius: radius.md, border: `1px solid ${colors.border}`, cursor: "pointer", fontSize: "12px", background: showFinancialTable ? colors.primary : "transparent", color: showFinancialTable ? colors.onPrimary : colors.textSecondary }}>
               {showFinancialTable ? "Chart" : "Table"}
             </button>
           </div>
@@ -637,7 +641,7 @@ function StockError({ symbol }: { symbol: string }) {
           <CardLabel>Latest news</CardLabel>
           <div className="stock-news-filters" style={{ display: "flex", gap: "4px", padding: "2px", background: colors.fill, borderRadius: radius.full }}>
             {(["all", "positive", "negative"] as const).map((f) => (
-              <button key={f} onClick={() => setNewsFilter(f)} style={{ padding: "4px 14px", borderRadius: radius.full, border: "none", cursor: "pointer", fontSize: "12px", fontWeight: 500, background: newsFilter === f ? colors.primary : "transparent", color: newsFilter === f ? "#fff" : colors.textSecondary, textTransform: "capitalize" }}>
+              <button key={f} onClick={() => setNewsFilter(f)} style={{ padding: "4px 14px", borderRadius: radius.full, border: "none", cursor: "pointer", fontSize: "12px", fontWeight: 500, background: newsFilter === f ? colors.primary : "transparent", color: newsFilter === f ? colors.onPrimary : colors.textSecondary, textTransform: "capitalize" }}>
                 {f === "all" ? "All" : f === "positive" ? "Positive" : "Negative"}
               </button>
             ))}
@@ -784,6 +788,24 @@ function StockError({ symbol }: { symbol: string }) {
       {/* ── Company Analyst Section ── */}
       <CompanyAnalystSection symbol={stock.symbol} />
 
+      {/* ── Native Ad (Position 3) ── */}
+      <NativeAd position={3} />
+
+      {/* ── Price Targets ── */}
+      <PriceTargets currentPrice={stock.price.current} />
+
+      {/* ── Options Flow ── */}
+      <OptionsFlow />
+
+      {/* ── Insider Activity ── */}
+      <InsiderActivity />
+
+      {/* ── Similar Stocks ── */}
+      <SimilarStocks />
+
+      {/* ── Native Ad (Position 7) ── */}
+      <NativeAd position={7} />
+
       {/* ── Disclaimer ── */}
       <p style={{
         color: colors.textTertiary, fontSize: "11px", textAlign: "center", padding: "0 16px", lineHeight: "1.6",
@@ -797,11 +819,11 @@ function StockError({ symbol }: { symbol: string }) {
       <div className="stock-fixed-footer" style={{
         position: "fixed", bottom: "16px", left: "50%", transform: "translateX(-50%)",
         display: "flex", gap: "8px", padding: "8px 16px",
-        borderRadius: radius.full, background: "rgba(19, 19, 19, 0.85)",
+        borderRadius: radius.full, background: colors.backdropFooter,
         backdropFilter: "blur(24px) saturate(180%)",
         WebkitBackdropFilter: "blur(24px) saturate(180%)",
         border: `1px solid ${colors.border}`,
-        boxShadow: "0 4px 24px rgba(0,0,0,0.5)",
+        boxShadow: shadows.card,
         zIndex: 50,
         transition: "opacity 0.25s ease",
         opacity: showFooter ? 1 : 0,

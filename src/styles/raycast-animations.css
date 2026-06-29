@@ -48,6 +48,12 @@
   50% { box-shadow: 0 0 0 8px rgba(52, 199, 89, 0); }
 }
 
+/* LIVE INDICATOR PULSE (subtler, lower alpha than badgePulse) */
+@keyframes livePulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(52, 199, 89, 0.4); }
+  50% { box-shadow: 0 0 0 6px rgba(52, 199, 89, 0); }
+}
+
 /* SCANNER ROW HOVER - slide arrow in */
 @keyframes rowHoverSlideIn {
   from { transform: translateX(-8px); opacity: 0; }
@@ -108,6 +114,10 @@
   animation: badgePulse 2s infinite;
 }
 
+.raycast-liveIndicator {
+  animation: livePulse 2s ease-in-out infinite;
+}
+
 .raycast-spinner {
   animation: spin 0.8s linear infinite;
 }
@@ -139,3 +149,221 @@
 .raycast-stagger-10 { animation-delay: 0.50s; }
 .raycast-stagger-11 { animation-delay: 0.55s; }
 .raycast-stagger-12 { animation-delay: 0.60s; }
+
+/* ============================================================
+   3.2 SPRING TRANSITIONS — Raycast-style spring physics
+   ============================================================ */
+
+/* Spring scale — for button presses, card hovers */
+.raycast-spring {
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+              opacity 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.raycast-spring:hover {
+  transform: scale(1.02);
+}
+
+.raycast-spring:active {
+  transform: scale(0.97);
+}
+
+/* Subtle hover lift — for cards */
+.raycast-hover-lift {
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+              box-shadow 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.raycast-hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+/* Spring expand — for detail panels, accordion */
+.raycast-spring-expand {
+  transition: max-height 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+              opacity 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ============================================================
+   3.3 SCROLL REVEAL — Intersection Observer driven
+   ============================================================ */
+
+.raycast-reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
+              transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.raycast-reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Staggered reveal delays */
+.raycast-reveal-stagger-1  { transition-delay: 0.00s; }
+.raycast-reveal-stagger-2  { transition-delay: 0.06s; }
+.raycast-reveal-stagger-3  { transition-delay: 0.12s; }
+.raycast-reveal-stagger-4  { transition-delay: 0.18s; }
+.raycast-reveal-stagger-5  { transition-delay: 0.24s; }
+.raycast-reveal-stagger-6  { transition-delay: 0.30s; }
+.raycast-reveal-stagger-7  { transition-delay: 0.36s; }
+.raycast-reveal-stagger-8  { transition-delay: 0.42s; }
+
+/* ============================================================
+   3.4 PAGE TRANSITIONS — 60fps route changes
+   ============================================================ */
+
+@keyframes pageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes pageExit {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-12px) scale(0.98);
+  }
+}
+
+.raycast-page-enter {
+  animation: pageEnter 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.raycast-page-exit {
+  animation: pageExit 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* ============================================================
+   3.5 MICRO-INTERACTIONS
+   ============================================================ */
+
+/* Ripple effect on click */
+@keyframes ripple {
+  to {
+    transform: scale(6);
+    opacity: 0;
+  }
+}
+
+.raycast-ripple {
+  position: relative;
+  overflow: hidden;
+}
+
+.raycast-ripple::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  width: 100px;
+  height: 100px;
+  margin-top: -50px;
+  margin-left: -50px;
+  top: 50%;
+  left: 50%;
+  transform: scale(0);
+  opacity: 1;
+  pointer-events: none;
+}
+
+.raycast-ripple:active::after {
+  animation: ripple 0.6s ease-out;
+}
+
+/* Number ticker — smooth counting */
+@keyframes numberTick {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.raycast-number-tick {
+  animation: numberTick 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Glow border on focus */
+.raycast-glow-focus {
+  transition: box-shadow 0.2s ease;
+}
+
+.raycast-glow-focus:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(255, 99, 99, 0.6),
+              0 0 16px rgba(255, 99, 99, 0.2);
+}
+
+/* Tab underline slide */
+.raycast-tab-underline {
+  position: relative;
+}
+
+.raycast-tab-underline::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  background: #FF6B6B;
+  transition: width 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+              left 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Toast slide-in */
+@keyframes toastSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-16px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes toastSlideOut {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-16px) scale(0.95);
+  }
+}
+
+.raycast-toast-enter {
+  animation: toastSlideIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.raycast-toast-exit {
+  animation: toastSlideOut 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Skeleton pulse for loading states */
+@keyframes skeletonPulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.6; }
+}
+
+.raycast-skeleton {
+  animation: skeletonPulse 1.8s ease-in-out infinite;
+  background: #1A1A1A;
+  border-radius: 6px;
+}
+
+/* 60fps GPU-accelerated transforms */
+.raycast-gpu {
+  transform: translateZ(0);
+  will-change: transform, opacity;
+}

@@ -145,6 +145,8 @@ const PLANS: Plan[] = [
       'peer_comparison',
       'csv_export',
       'portfolio_tracking',
+      'api_access',
+      'priority_support',
     ],
     highlights: [
       'Everything in Research Plus',
@@ -153,6 +155,8 @@ const PLANS: Plan[] = [
       'CSV export for all data',
       'Portfolio tracking & analysis',
       'Advanced search with filters',
+      'Ad-free experience',
+      'Priority email support',
     ],
     limits: {
       maxWatchlists: Infinity,

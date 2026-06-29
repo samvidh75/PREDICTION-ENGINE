@@ -11,8 +11,9 @@
  */
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
-import { Download, Printer, TrendingUp, TrendingDown, Minus, Search, X, BarChart3, Radar, Sparkles } from "lucide-react";
+import { Download, Printer, TrendingUp, TrendingDown, Minus, Search, X, BarChart3, Radar, Sparkles, AlertTriangle, Award } from "lucide-react";
 import { Card } from "../ui/Card";
 import { Button } from "../ui/Button";
 import { HealthometerMini } from "../ui/HealthometerMini";
@@ -37,13 +38,14 @@ interface ComparableStock {
   score: number;
 }
 
-type TabId = "overview" | "fundamentals" | "growth" | "health";
+type TabId = "valuation" | "quality" | "growth" | "dividend" | "risk";
 
-const TABS: { id: TabId; label: string }[] = [
-  { id: "overview", label: "Overview" },
-  { id: "fundamentals", label: "Fundamentals" },
-  { id: "growth", label: "Growth" },
-  { id: "health", label: "Health" },
+const TABS: { id: TabId; label: string; icon: ReactNode }[] = [
+  { id: "valuation", label: "Valuation", icon: <BarChart3 size={14} /> },
+  { id: "quality", label: "Quality", icon: <Award size={14} /> },
+  { id: "growth", label: "Growth", icon: <TrendingUp size={14} /> },
+  { id: "dividend", label: "Dividend", icon: <TrendingUp size={14} /> },
+  { id: "risk", label: "Risk", icon: <AlertTriangle size={14} /> },
 ];
 
 // ─── Mock data helpers ─────────────────────────────────────────────
@@ -73,20 +75,35 @@ function generateMockStock(symbol: string): ComparableStock | null {
     sector: meta.sector,
     score: rand(40, 92),
     metrics: {
+      // Valuation
       pe: rand(12, 45),
-      roe: rand(8, 36),
-      epsGrowth3y: rand(5, 35),
-      debtEquity: rand(0.05, 2.5),
+      pb: rand(1, 8),
+      evToEbitda: rand(8, 30),
       peg: rand(0.5, 3.5),
-      revenueGrowth: rand(3, 30),
-      profitMargin: rand(5, 28),
-      currentRatio: rand(0.8, 3.0),
-      promoterHolding: rand(40, 85),
-      dividendYield: rand(0, 5),
+      earningsYield: rand(2, 12),
+      fcfYield: rand(1, 10),
+      // Quality
+      roe: rand(8, 36),
       roce: rand(10, 40),
+      profitMargin: rand(5, 28),
+      netMargin: rand(3, 22),
+      promoterHolding: rand(40, 85),
+      interestCoverage: rand(2, 15),
+      // Growth
+      epsGrowth3y: rand(5, 35),
+      revenueGrowth: rand(3, 30),
       salesGrowth5y: rand(5, 25),
       profitGrowth5y: rand(3, 30),
+      bookValueGrowth: rand(2, 25),
+      // Dividend
+      dividendYield: rand(0, 5),
+      dividendPayoutRatio: rand(10, 60),
+      dividendGrowth5y: rand(0, 20),
+      // Risk
+      debtEquity: rand(0.05, 2.5),
+      currentRatio: rand(0.8, 3.0),
       assetTurnover: rand(0.5, 2.5),
+      beta: rand(0.5, 2.2),
     },
   };
 }
@@ -141,7 +158,7 @@ function MetricRow({ label, values, unit, higherIsBetter }: {
             fontWeight: 600,
             fontVariantNumeric: "tabular-nums",
             color: isBest ? colors.success : isWorst ? colors.danger : colors.textPrimary,
-            background: isBest ? "rgba(52,199,89,0.06)" : isWorst ? "rgba(255,59,48,0.06)" : "transparent",
+            background: isBest ? colors.marketGreenSoft : isWorst ? colors.marketRedSoft : "transparent",
             borderBottom: `1px solid ${colors.border}`,
             textAlign: "right",
           }}>
@@ -249,7 +266,7 @@ export default function ComparePage() {
   const [query, setQuery] = useState("");
   const [selectedSymbols, setSelectedSymbols] = useState<string[]>(["RELIANCE", "TCS"]);
   const [searchResults, setSearchResults] = useState<typeof SAMPLE_STOCKS>([]);
-  const [activeTab, setActiveTab] = useState<TabId>("overview");
+  const [activeTab, setActiveTab] = useState<TabId>("valuation");
   const [chartMode, setChartMode] = useState<"bar" | "radar">("bar");
 
   // Search
@@ -278,43 +295,56 @@ export default function ComparePage() {
     return selectedSymbols.map((s) => generateMockStock(s)).filter(Boolean) as ComparableStock[];
   }, [selectedSymbols]);
 
-  const metricRows = useMemo((): { id: TabId; rows: { label: string; key: string; higherIsBetter: boolean; unit?: string }[] }[] => [
+  const metricRows = useMemo((): { id: TabId; rows: { label: string; key: string; higherIsBetter: boolean; unit?: string; highlight?: boolean }[] }[] => [
     {
-      id: "overview",
+      id: "valuation",
       rows: [
-        { label: "Health Score", key: "score", higherIsBetter: true },
-        { label: "P/E Ratio", key: "pe", higherIsBetter: false },
-        { label: "ROE", key: "roe", higherIsBetter: true, unit: "%" },
-        { label: "Profit Margin", key: "profitMargin", higherIsBetter: true, unit: "%" },
-        { label: "Dividend Yield", key: "dividendYield", higherIsBetter: true, unit: "%" },
+        { label: "P/E Ratio", key: "pe", higherIsBetter: false, highlight: true },
+        { label: "P/B Ratio", key: "pb", higherIsBetter: false },
+        { label: "PEG Ratio", key: "peg", higherIsBetter: false },
+        { label: "EV / EBITDA", key: "evToEbitda", higherIsBetter: false },
+        { label: "Earnings Yield", key: "earningsYield", higherIsBetter: true, unit: "%" },
+        { label: "FCF Yield", key: "fcfYield", higherIsBetter: true, unit: "%" },
       ],
     },
     {
-      id: "fundamentals",
+      id: "quality",
       rows: [
-        { label: "P/E Ratio", key: "pe", higherIsBetter: false },
-        { label: "PEG Ratio", key: "peg", higherIsBetter: false },
+        { label: "ROE", key: "roe", higherIsBetter: true, unit: "%", highlight: true },
         { label: "ROCE", key: "roce", higherIsBetter: true, unit: "%" },
-        { label: "Asset Turnover", key: "assetTurnover", higherIsBetter: true },
+        { label: "Net Margin", key: "netMargin", higherIsBetter: true, unit: "%" },
+        { label: "Profit Margin", key: "profitMargin", higherIsBetter: true, unit: "%" },
+        { label: "Interest Coverage", key: "interestCoverage", higherIsBetter: true },
         { label: "Promoter Holding", key: "promoterHolding", higherIsBetter: true, unit: "%" },
       ],
     },
     {
       id: "growth",
       rows: [
-        { label: "EPS Growth (3Y)", key: "epsGrowth3y", higherIsBetter: true, unit: "%" },
+        { label: "EPS Growth (3Y)", key: "epsGrowth3y", higherIsBetter: true, unit: "%", highlight: true },
         { label: "Revenue Growth", key: "revenueGrowth", higherIsBetter: true, unit: "%" },
         { label: "Sales Growth (5Y)", key: "salesGrowth5y", higherIsBetter: true, unit: "%" },
         { label: "Profit Growth (5Y)", key: "profitGrowth5y", higherIsBetter: true, unit: "%" },
+        { label: "Book Value Growth", key: "bookValueGrowth", higherIsBetter: true, unit: "%" },
       ],
     },
     {
-      id: "health",
+      id: "dividend",
       rows: [
-        { label: "Debt / Equity", key: "debtEquity", higherIsBetter: false },
+        { label: "Dividend Yield", key: "dividendYield", higherIsBetter: true, unit: "%", highlight: true },
+        { label: "Payout Ratio", key: "dividendPayoutRatio", higherIsBetter: false, unit: "%" },
+        { label: "Dividend Growth (5Y)", key: "dividendGrowth5y", higherIsBetter: true, unit: "%" },
+        { label: "FCF Yield", key: "fcfYield", higherIsBetter: true, unit: "%" },
+      ],
+    },
+    {
+      id: "risk",
+      rows: [
+        { label: "Debt / Equity", key: "debtEquity", higherIsBetter: false, highlight: true },
         { label: "Current Ratio", key: "currentRatio", higherIsBetter: true },
-        { label: "Profit Margin", key: "profitMargin", higherIsBetter: true, unit: "%" },
-        { label: "ROE", key: "roe", higherIsBetter: true, unit: "%" },
+        { label: "Asset Turnover", key: "assetTurnover", higherIsBetter: true },
+        { label: "Beta", key: "beta", higherIsBetter: false },
+        { label: "Interest Coverage", key: "interestCoverage", higherIsBetter: true },
       ],
     },
   ], []);
@@ -325,6 +355,8 @@ export default function ComparePage() {
     { label: "Health Score", key: "score", higherIsBetter: true },
     { label: "ROE", key: "roe", higherIsBetter: true },
     { label: "EPS Growth", key: "epsGrowth3y", higherIsBetter: true },
+    { label: "FCF Yield", key: "fcfYield", higherIsBetter: true },
+    { label: "Debt / Equity", key: "debtEquity", higherIsBetter: false },
   ], []);
 
   const exportCSV = useCallback(() => {
@@ -353,7 +385,7 @@ export default function ComparePage() {
           position: "absolute",
           top: -80, left: "50%", transform: "translateX(-50%)",
           width: "clamp(300px, 70%, 600px)", height: 280,
-          background: "radial-gradient(ellipse 70% 70% at 50% 40%, rgba(255,69,58,0.18) 0%, rgba(255,159,10,0.06) 50%, transparent 70%)",
+          background: `radial-gradient(ellipse 70% 70% at 50% 40%, ${colors.marketRedSoft} 0%, ${colors.marketOrangeSoft} 50%, transparent 70%)`,
           pointerEvents: "none", zIndex: 0,
         }} />
         <div style={{ position: "relative", zIndex: 1, display: "grid", gap: space[3] }}>
@@ -441,7 +473,7 @@ export default function ComparePage() {
                 gap: 6,
                 padding: "4px 8px 4px 12px",
                 borderRadius: radius.full,
-                background: "rgba(255,255,255,0.08)",
+                background: colors.hairlineStrong,
                 color: colors.primary,
                 fontSize: 12,
                 fontWeight: 600,
@@ -475,7 +507,7 @@ export default function ComparePage() {
               <button onClick={() => setChartMode("bar")} style={{
                 padding: "6px 10px", borderRadius: radius.sm, border: `1px solid ${colors.border}`,
                 background: chartMode === "bar" ? colors.primary : "transparent",
-                color: chartMode === "bar" ? "#fff" : colors.textSecondary,
+                color: chartMode === "bar" ? colors.onPrimary : colors.textSecondary,
                 cursor: "pointer", fontSize: 11, fontWeight: 600, display: "flex", alignItems: "center", gap: 4,
               }}>
                 <BarChart3 size={14} /> Bars
@@ -483,7 +515,7 @@ export default function ComparePage() {
               <button onClick={() => setChartMode("radar")} style={{
                 padding: "6px 10px", borderRadius: radius.sm, border: `1px solid ${colors.border}`,
                 background: chartMode === "radar" ? colors.primary : "transparent",
-                color: chartMode === "radar" ? "#fff" : colors.textSecondary,
+                color: chartMode === "radar" ? colors.onPrimary : colors.textSecondary,
                 cursor: "pointer", fontSize: 11, fontWeight: 600, display: "flex", alignItems: "center", gap: 4,
               }}>
                 <Radar size={14} /> Radar
@@ -522,24 +554,33 @@ export default function ComparePage() {
         <section style={{ display: "grid", gap: space[4] }}>
           {/* Tab bar */}
           <div style={{ display: "flex", gap: 4, borderBottom: `1px solid ${colors.border}`, paddingBottom: 0 }}>
-            {TABS.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                style={{
-                  padding: "8px 16px",
-                  border: "none",
-                  borderBottom: activeTab === tab.id ? `2px solid ${colors.primary}` : "2px solid transparent",
-                  background: "transparent",
-                  color: activeTab === tab.id ? colors.primary : colors.textSecondary,
-                  fontWeight: activeTab === tab.id ? 600 : 400,
-                  fontSize: 13,
-                  cursor: "pointer",
-                }}
-              >
-                {tab.label}
-              </button>
-            ))}
+            {TABS.map((tab) => {
+              const isActive = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  style={{
+                    padding: "10px 16px",
+                    border: "none",
+                    borderBottom: isActive ? `2px solid ${colors.primary}` : "2px solid transparent",
+                    background: isActive ? colors.fill : "transparent",
+                    color: isActive ? colors.primary : colors.textSecondary,
+                    fontWeight: isActive ? 600 : 400,
+                    fontSize: 13,
+                    cursor: "pointer",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 6,
+                    borderRadius: "4px 4px 0 0",
+                    transition: "all 0.15s ease",
+                  }}
+                >
+                  {React.cloneElement(tab.icon as React.ReactElement, { color: isActive ? colors.primary : colors.textTertiary })}
+                  {tab.label}
+                </button>
+              );
+            })}
           </div>
 
           {/* Metric table */}
@@ -586,35 +627,122 @@ export default function ComparePage() {
           <h2 style={{ display: "flex", alignItems: "center", gap: space[2], color: colors.textPrimary, fontSize: typography.h3.desktop.size, fontWeight: typography.h3.desktop.weight, margin: 0 }}>
             <Sparkles size={16} color={colors.warning} /> AI Comparison Insight
           </h2>
-          <Card variant="elevated">
-            {(() => {
-              const sorted = [...stocks].sort((a, b) => b.score - a.score);
-              const top = sorted[0];
-              return (
-                <div style={{ display: "grid", gap: space[3] }}>
-                  <p style={{ fontSize: 14, color: colors.textPrimary, margin: 0, lineHeight: 1.6 }}>
-                    Based on fundamental metrics, <strong>{top.symbol}</strong> leads with a health score of <strong>{top.score}/100</strong>, driven by strong{" "}
-                    {Number(top.metrics.roe) > 20 ? "ROE and profitability" : "growth and reasonable valuation"}.
-                    {sorted.length > 1 && sorted[1].score >= top.score - 8
-                      ? ` ${sorted[1].symbol} is close behind — consider evaluating both in detail.`
-                      : ""}
-                  </p>
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: space[3] }}>
-                    {sorted.map((s, i) => (
-                      <div key={s.symbol} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: colors.textPrimary }}>
-                        <span style={{ fontWeight: 600, color: i === 0 ? colors.success : colors.textSecondary }}>
-                          {i + 1}.
-                        </span>
-                        <HealthometerMini score={Math.round(s.score)} size="sm" />
-                        <span style={{ fontWeight: 500 }}>{s.symbol}</span>
-                        <span style={{ color: colors.textSecondary }}>({Math.round(s.score)})</span>
-                      </div>
-                    ))}
+          <div style={{ display: "grid", gap: space[4], gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))" }}>
+            {/* Allocation recommendation */}
+            <Card variant="elevated">
+              {(() => {
+                const sorted = [...stocks].sort((a, b) => b.score - a.score);
+                const top = sorted[0];
+                const worst = sorted[sorted.length - 1];
+                return (
+                  <div style={{ display: "grid", gap: space[3] }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      <Award size={16} color={colors.success} />
+                      <span style={{ fontSize: 13, fontWeight: 600, color: colors.textPrimary }}>AI Allocation</span>
+                    </div>
+                    <p style={{ fontSize: 14, color: colors.textPrimary, margin: 0, lineHeight: 1.6 }}>
+                      <strong>{top.symbol}</strong> leads with a score of <strong>{top.score}/100</strong>, driven by strong{" "}
+                      {Number(top.metrics.roe) > 20 ? "ROE and profitability" : "growth and reasonable valuation"}.
+                    </p>
+                    {/* Per-stock conviction allocation */}
+                    <div style={{ display: "grid", gap: 8 }}>
+                      {sorted.map((s, i) => {
+                        const pct = sorted.length > 1 ? Math.round((s.score / sorted.reduce((sum, st) => sum + st.score, 0)) * 100) : 100;
+                        return (
+                          <div key={s.symbol} style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                            <span style={{ fontSize: 12, fontWeight: 600, color: i === 0 ? colors.success : colors.textSecondary, minWidth: 18 }}>
+                              {i + 1}.
+                            </span>
+                            <span style={{ fontSize: 13, fontWeight: 500, color: colors.textPrimary, minWidth: 80 }}>{s.symbol}</span>
+                            <div style={{ flex: 1, height: 6, background: colors.border, borderRadius: 3, overflow: "hidden" }}>
+                              <div style={{
+                                width: `${pct}%`,
+                                height: "100%",
+                                borderRadius: 3,
+                                background: i === 0 ? colors.success : i === 1 ? colors.primary : colors.textTertiary,
+                                transition: "width 0.5s ease",
+                              }} />
+                            </div>
+                            <span style={{ fontSize: 11, fontWeight: 600, color: colors.textSecondary, minWidth: 36, textAlign: "right" }}>{pct}%</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                    <p style={{ fontSize: 12, color: colors.textTertiary, margin: 0, lineHeight: 1.5 }}>
+                      {sorted.length > 1 && sorted[1].score >= top.score - 8
+                        ? `${sorted[1].symbol} is close behind — diversify across both for balanced exposure.`
+                        : `Concentrate on ${top.symbol} for best risk-adjusted returns.`}
+                      {worst.score < 50 && ` Consider removing ${worst.symbol} (low overall health).`}
+                    </p>
                   </div>
-                </div>
-              );
-            })()}
-          </Card>
+                );
+              })()}
+            </Card>
+
+            {/* Sector concentration warning */}
+            <Card variant="elevated">
+              {(() => {
+                const sectorCounts: Record<string, number> = {};
+                stocks.forEach((s) => { sectorCounts[s.sector] = (sectorCounts[s.sector] || 0) + 1; });
+                const maxSector = Object.entries(sectorCounts).sort((a, b) => b[1] - a[1])[0];
+                const hasConcentration = maxSector && maxSector[1] >= 2 && stocks.length >= 3;
+                return (
+                  <div style={{ display: "grid", gap: space[3] }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      <AlertTriangle size={16} color={hasConcentration ? colors.warning : colors.success} />
+                      <span style={{ fontSize: 13, fontWeight: 600, color: colors.textPrimary }}>Sector Analysis</span>
+                    </div>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                      {Object.entries(sectorCounts).sort((a, b) => b[1] - a[1]).map(([sector, count]) => (
+                        <span key={sector} style={{
+                          padding: "3px 10px",
+                          borderRadius: radius.full,
+                          fontSize: 11,
+                          fontWeight: 600,
+                          background: count >= 2 ? colors.marketOrangeSoft : colors.fill,
+                          color: count >= 2 ? colors.warning : colors.textSecondary,
+                          border: `1px solid ${count >= 2 ? colors.warning : colors.border}`,
+                        }}>
+                          {sector} ({count})
+                        </span>
+                      ))}
+                    </div>
+                    {hasConcentration ? (
+                      <p style={{ fontSize: 12, color: colors.textSecondary, margin: 0, lineHeight: 1.5 }}>
+                        <strong style={{ color: colors.warning }}>⚠️ Sector concentration detected:</strong>{" "}
+                        {maxSector[1]} of {stocks.length} stocks are in {maxSector[0]}. Consider diversifying across different sectors to reduce systematic risk.
+                      </p>
+                    ) : (
+                      <p style={{ fontSize: 12, color: colors.textSecondary, margin: 0, lineHeight: 1.5 }}>
+                        <span style={{ color: colors.success }}>✓</span> Well-diversified across sectors. No single sector dominates your comparison set.
+                      </p>
+                    )}
+                    {/* Summary stats */}
+                    <div style={{ display: "flex", gap: 16, paddingTop: 8, borderTop: `1px solid ${colors.border}` }}>
+                      <div>
+                        <div style={{ fontSize: 11, color: colors.textTertiary }}>Avg Score</div>
+                        <div style={{ fontSize: 14, fontWeight: 600, color: colors.textPrimary, fontVariantNumeric: "tabular-nums" }}>
+                          {Math.round(stocks.reduce((s, st) => s + st.score, 0) / stocks.length)}
+                        </div>
+                      </div>
+                      <div>
+                        <div style={{ fontSize: 11, color: colors.textTertiary }}>Avg ROE</div>
+                        <div style={{ fontSize: 14, fontWeight: 600, color: colors.textPrimary, fontVariantNumeric: "tabular-nums" }}>
+                          {Math.round(stocks.reduce((s, st) => s + (st.metrics.roe as number), 0) / stocks.length)}%
+                        </div>
+                      </div>
+                      <div>
+                        <div style={{ fontSize: 11, color: colors.textTertiary }}>Sectors</div>
+                        <div style={{ fontSize: 14, fontWeight: 600, color: colors.textPrimary, fontVariantNumeric: "tabular-nums" }}>
+                          {Object.keys(sectorCounts).length}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+            </Card>
+          </div>
         </section>
       )}
 

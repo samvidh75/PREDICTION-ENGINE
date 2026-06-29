@@ -14,7 +14,7 @@ import { useState } from "react";
 import { AlertCircle, ArrowRight, Check, ExternalLink, Shield } from "lucide-react";
 import { Button } from "../ui/Button";
 import { Card, CardLabel } from "../ui/Card";
-import { colors, typography } from "../design/tokens";
+import { colors, typography, shadows } from "../design/tokens";
 import { prepareHandoff, getDisclaimer } from "../commercial/BrokerHandoffService";
 import type { BrokerEntry } from "../commercial/BrokerRegistry";
 
@@ -93,7 +93,7 @@ export function BrokerHandoffModal({
         <div
           style={{
             padding: "12px",
-            background: "rgba(255,149,0,0.08)",
+            background: colors.marketOrangeSoft,
             border: `1px solid ${colors.warning}`,
             borderRadius: "10px",
             display: "flex",
@@ -167,7 +167,7 @@ export function BrokerHandoffModal({
 const overlayStyle: React.CSSProperties = {
   position: "fixed",
   inset: 0,
-  background: "rgba(0,0,0,0.5)",
+  background: colors.backdropHeavy,
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
@@ -181,7 +181,7 @@ const modalStyle: React.CSSProperties = {
   padding: "24px",
   maxWidth: "520px",
   width: "100%",
-  boxShadow: "0 8px 32px rgba(0,0,0,0.18)",
+  boxShadow: shadows.elevated,
   maxHeight: "90vh",
   overflowY: "auto",
 };

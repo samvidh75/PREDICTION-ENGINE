@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { colors, typography, space, radius, components } from "../design/tokens";
+import { colors, typography, space, radius, components, shadows } from "../design/tokens";
 
 export default function WaitlistPage() {
   const [email, setEmail] = useState("");
@@ -85,7 +85,7 @@ const cardStyle: React.CSSProperties = {
   padding: space[8],
   borderRadius: radius.xl,
   background: colors.card,
-  boxShadow: "0 2px 16px rgba(0,0,0,0.06)",
+  boxShadow: shadows.card,
 };
 
 const headingStyle: React.CSSProperties = {
@@ -121,7 +121,7 @@ const buttonStyle: React.CSSProperties = {
   borderRadius: radius.md,
   border: "none",
   background: colors.primary,
-  color: "#fff",
+  color: colors.onPrimary,
   fontSize: typography.body.desktop.size,
   fontWeight: 600,
   cursor: "pointer",

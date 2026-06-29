@@ -14,16 +14,16 @@ export function getAIProvider(): AIProvider {
   if (localAiEnabled && hasLocalUrl) {
     const { LocalOllamaProvider } = require('./LocalOllamaProvider');
     _instance = new CachedAIProvider(new LocalOllamaProvider());
-    console.log('[AI] Using LocalOllamaProvider (LOCAL_AI_ENABLED=true)');
+    // Using LocalOllamaProvider (LOCAL_AI_ENABLED=true)
   } else {
     const external = new ExternalLLMProvider();
     const hasKey = !!(process.env.GROQ_API_KEY || process.env.VITE_GROQ_API_KEY || process.env.GEMINI_API_KEY || process.env.OPENAI_API_KEY);
     if (hasKey) {
       _instance = new CachedAIProvider(external);
-      console.log('[AI] Using ExternalLLMProvider with caching');
+      // Using ExternalLLMProvider with caching
     } else {
       _instance = new CachedAIProvider(new DeterministicResearchProvider());
-      console.log('[AI] Using DeterministicResearchProvider (no LLM configured)');
+      // Using DeterministicResearchProvider (no LLM configured)
     }
   }
 

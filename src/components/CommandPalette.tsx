@@ -12,7 +12,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { ScanPresetDefinition } from '../services/scanner/presets';
-import { colors, typography, radius, animation } from '../design/tokens';
+import { colors, typography, radius, animation, shadows } from '../design/tokens';
 
 /* ─── Types ─────────────────────────────────────────────────────────── */
 
@@ -338,7 +338,7 @@ export function CommandPalette({ presets = [], open, onClose }: CommandPalettePr
     <div
       style={{
         position: 'fixed', inset: 0, zIndex: 9998,
-        background: closing ? 'rgba(0,0,0,0)' : 'rgba(0,0,0,0.4)',
+        background: closing ? colors.backdropClear : colors.backdropModal,
         backdropFilter: closing ? 'blur(0px)' : 'blur(10px)',
         WebkitBackdropFilter: closing ? 'blur(0px)' : 'blur(10px)',
         display: 'flex', alignItems: isMobile ? 'flex-end' : 'flex-start',
@@ -357,7 +357,7 @@ export function CommandPalette({ presets = [], open, onClose }: CommandPalettePr
           width: isMobile ? 'calc(100vw - 16px)' : 'min(90vw, 600px)',
           maxWidth: 600,
           border: `1px solid ${colors.hairline}`,
-          boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
+          boxShadow: shadows.elevated,
           overflow: 'hidden',
           display: 'flex', flexDirection: 'column',
           maxHeight: isMobile ? '80vh' : 'min(70vh, 640px)',
@@ -422,13 +422,13 @@ export function CommandPalette({ presets = [], open, onClose }: CommandPalettePr
           {aiLoading && (
             <div style={{
               margin: '0 12px 8px', padding: 12,
-              background: '#141414', borderRadius: 8,
+              background: colors.surfaceElevated, borderRadius: 8,
               display: 'flex', alignItems: 'center', gap: 10,
-              fontSize: 13, color: '#A0A0A0',
+              fontSize: 13, color: colors.textSecondary,
             }}>
               <span className="raycast-spinner" style={{
                 display: 'inline-block', width: 14, height: 14,
-                border: '2px solid #333', borderTopColor: '#FF6363',
+                border: `2px solid ${colors.hairline}`, borderTopColor: colors.accentRed,
                 borderRadius: '50%',
               }} />
               Analyzing your question…
@@ -454,15 +454,15 @@ export function CommandPalette({ presets = [], open, onClose }: CommandPalettePr
                       inputRef.current?.focus();
                     }}
                     style={{
-                      background: '#141414', border: '1px solid #1A1A1A',
+                      background: colors.surfaceElevated, border: `1px solid ${colors.hairline}`,
                       borderRadius: 8, padding: '8px 12px',
-                      color: '#A0A0A0', fontSize: 13,
+                      color: colors.textSecondary, fontSize: 13,
                       cursor: 'pointer', textAlign: 'left',
                       fontFamily: typography.fontFamily,
                       transition: `background 0.15s ease`,
                     }}
-                    onMouseEnter={(e) => (e.currentTarget.style.background = '#1A1A1A')}
-                    onMouseLeave={(e) => (e.currentTarget.style.background = '#141414')}
+                    onMouseEnter={(e) => (e.currentTarget.style.background = colors.surfaceCard)}
+                    onMouseLeave={(e) => (e.currentTarget.style.background = colors.surfaceElevated)}
                   >
                     {suggestion.label}
                   </button>
@@ -474,9 +474,9 @@ export function CommandPalette({ presets = [], open, onClose }: CommandPalettePr
                       inputRef.current?.focus();
                     }}
                     style={{
-                      background: 'transparent', border: '1px dashed #333',
+                      background: 'transparent', border: `1px dashed ${colors.hairline}`,
                       borderRadius: 8, padding: '8px 12px',
-                      color: '#FF6363', fontSize: 13,
+                      color: colors.accentRed, fontSize: 13,
                       cursor: 'pointer', textAlign: 'left',
                       fontFamily: typography.fontFamily,
                     }}
@@ -493,7 +493,7 @@ export function CommandPalette({ presets = [], open, onClose }: CommandPalettePr
             <div key={section.cat}>
               {/* Section header */}
               <p style={{
-                fontSize: 11, fontWeight: 600, color: '#606060',
+                fontSize: 11, fontWeight: 600, color: colors.textTertiary,
                 textTransform: 'uppercase', letterSpacing: '0.05em',
                 padding: '12px 16px 4px', margin: 0,
               }}>
@@ -515,12 +515,12 @@ export function CommandPalette({ presets = [], open, onClose }: CommandPalettePr
                       width: '100%', padding: isMobile ? '10px 16px' : '8px 16px',
                       minHeight: isMobile ? 56 : 48,
                       border: 'none',
-                      background: isSelected ? '#1A1A1A' : 'transparent',
+                      background: isSelected ? colors.surfaceCard : 'transparent',
                       cursor: 'pointer', textAlign: 'left',
                       color: colors.textPrimary,
                       fontFamily: typography.fontFamily,
                       transition: `background 0.1s ease`,
-                      outline: isSelected ? '2px solid #FF6363' : 'none',
+                      outline: isSelected ? `2px solid ${colors.accentRed}` : 'none',
                       outlineOffset: '-2px',
                       animation: visible && !closing ? `fadeIn 0.3s var(--ease-raycast) forwards` : 'none',
                       animationDelay: `${sectionIdx * 0.03 + itemIdx * 0.02}s`,
@@ -531,11 +531,11 @@ export function CommandPalette({ presets = [], open, onClose }: CommandPalettePr
                     <span style={{
                       fontSize: 16, width: 24, textAlign: 'center',
                       flexShrink: 0, marginTop: 2,
-                      color: item.category === 'command' ? '#0A84FF'
-                           : item.category === 'market' ? '#34C759'
-                           : item.category === 'ai' ? '#FF6363'
-                           : item.category === 'recent' ? '#808080'
-                           : '#A0A0A0',
+                      color: item.category === 'command' ? colors.accentBlue
+                           : item.category === 'market' ? colors.marketGreen
+                           : item.category === 'ai' ? colors.accentRed
+                           : item.category === 'recent' ? colors.body
+                           : colors.textSecondary,
                     }}>
                       {item.icon}
                     </span>
@@ -544,13 +544,13 @@ export function CommandPalette({ presets = [], open, onClose }: CommandPalettePr
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <span style={{
                         fontWeight: 400, fontSize: 15, display: 'block',
-                        color: '#FFFFFF', lineHeight: '1.4',
+                        color: colors.textPrimary, lineHeight: '1.4',
                       }}>
                         {item.label}
                       </span>
                       {(item.description || item.subtitle) && (
                         <span style={{
-                          fontSize: 13, color: '#808080',
+                          fontSize: 13, color: colors.body,
                           display: 'block', whiteSpace: 'nowrap',
                           overflow: 'hidden', textOverflow: 'ellipsis',
                           lineHeight: '1.3',
@@ -568,23 +568,22 @@ export function CommandPalette({ presets = [], open, onClose }: CommandPalettePr
                       {item.metadata && (
                         <span style={{
                           fontSize: 12, color:
-                            item.metadata === 'live' ? '#34C759'
-                            : item.metadata === 'Ask AI' ? '#FF6363'
-                            : '#808080',
+                            item.metadata === 'live' ? colors.marketGreen
+                            : item.metadata === 'Ask AI' ? colors.accentRed
+                            : colors.body,
                           display: 'flex', alignItems: 'center', gap: 4,
                         }}>
                           {item.metadata === 'live' && (
-                            <span style={{
+                            <span className="raycast-badgeImproving" style={{
                               display: 'inline-block', width: 5, height: 5,
-                              borderRadius: '50%', background: '#34C759',
-                              animation: 'badgePulse 2s infinite',
+                              borderRadius: '50%', background: colors.marketGreen,
                             }} />
                           )}
                           {item.metadata}
                         </span>
                       )}
                       <span style={{
-                        fontSize: 14, color: isSelected ? '#FFFFFF' : '#808080',
+                        fontSize: 14, color: isSelected ? colors.textPrimary : colors.body,
                         opacity: isSelected ? 1 : 0,
                         transition: 'opacity 0.15s ease',
                       }}>

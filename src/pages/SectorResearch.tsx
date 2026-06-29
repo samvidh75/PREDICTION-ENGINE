@@ -20,7 +20,7 @@ export default function SectorResearch() {
         <p style={{ color: colors.textSecondary }}>The sector you're looking for doesn't exist in our coverage.</p>
         <button
           onClick={() => navigate("/sectors")}
-          style={{ marginTop: "16px", padding: "8px 16px", background: colors.primary, color: "#fff", border: "none", borderRadius: "6px", cursor: "pointer" }}
+          style={{ marginTop: "16px", padding: "8px 16px", background: colors.primary, color: colors.onPrimary, border: "none", borderRadius: "6px", cursor: "pointer" }}
         >
           Browse all sectors
         </button>

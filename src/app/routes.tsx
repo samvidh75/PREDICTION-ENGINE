@@ -23,6 +23,9 @@ const CompanyResearchReportPage = lazy(() => import("../pages/CompanyResearchRep
 const AnalystWorkspace = lazy(() => import("../pages/AnalystWorkspace"));
 const ComparePage = lazy(() => import("../pages/ComparePage"));
 const AboutPage = lazy(() => import("../pages/AboutPage"));
+const TrackPage = lazy(() => import("../pages/TrackPage"));
+const AIChatPage = lazy(() => import("../pages/AIChatPage"));
+const RelativeStrengthPage = lazy(() => import("../pages/RelativeStrength"));
 
 function RouteFallback() {
   return (
@@ -53,6 +56,7 @@ export function AppRoutes() {
           <Route path="/scanner/:preset" element={<ScannerLanding />} />
           <Route path="/watchlist" element={<WatchlistPage />} />
           <Route path="/compare" element={<ComparePage />} />
+          <Route path="/track" element={<TrackPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/pricing" element={<PricingPage />} />
           <Route path="/stock/:symbol/*" element={<StockPage />} />
@@ -64,6 +68,8 @@ export function AppRoutes() {
           <Route path="/share/research/:shareId" element={<SharedResearchSnapshot />} />
           <Route path="/research/:symbol" element={<CompanyResearchReportPage />} />
           <Route path="/analyst" element={<AnalystWorkspace />} />
+          <Route path="/chat" element={<AIChatPage />} />
+          <Route path="/relative-strength" element={<RelativeStrengthPage />} />
           {enableWaitlistPage && (
             <Route path="/waitlist" element={<WaitlistPage />} />
           )}

@@ -137,7 +137,7 @@ export default function AboutPage() {
             transform: "translateX(-50%) rotate(-2deg)",
             width: "clamp(400px, 85vw, 1100px)",
             height: 240,
-            background: "linear-gradient(90deg, #FF6363 0%, #b0151e 50%, #FF6363 100%)",
+            background: `linear-gradient(90deg, ${colors.heroStripeStart} 0%, ${colors.heroStripeEnd} 50%, ${colors.heroStripeStart} 100%)`,
             clipPath: "polygon(0 15%, 100% 0, 100% 85%, 0 100%)",
             opacity: 0.9,
             pointerEvents: "none",
@@ -153,7 +153,7 @@ export default function AboutPage() {
             transform: "translateX(-50%) rotate(-1.5deg)",
             width: "clamp(380px, 80vw, 1050px)",
             height: 200,
-            background: "linear-gradient(90deg, #FF6363 0%, #b0151e 50%, #FF6363 100%)",
+            background: `linear-gradient(90deg, ${colors.heroStripeStart} 0%, ${colors.heroStripeEnd} 50%, ${colors.heroStripeStart} 100%)`,
             clipPath: "polygon(0 15%, 100% 0, 100% 85%, 0 100%)",
             opacity: 0.5,
             filter: "blur(12px)",
@@ -192,7 +192,7 @@ export default function AboutPage() {
             Research the Indian market{" "}
             <span
               style={{
-                background: "linear-gradient(135deg, #FF6363 0%, #b0151e 100%)",
+                background: `linear-gradient(135deg, ${colors.heroStripeStart} 0%, ${colors.heroStripeEnd} 100%)`,
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
               }}
@@ -215,6 +215,119 @@ export default function AboutPage() {
           <div style={{ display: "flex", gap: space[3], flexWrap: "wrap", justifyContent: "center" }}>
             <Button onClick={() => navigate("/scanner?preset=quality-compounders")}>Start Researching</Button>
             <Button variant="secondary" onClick={() => navigate("/learn/health-score")}>How It Works</Button>
+          </div>
+
+          {/* ── Command Palette Mockup (Raycast-style) ── */}
+          <div
+            className="raycast-fadeIn raycast-stagger-4"
+            style={{
+              marginTop: space[6],
+              width: "100%",
+              maxWidth: 560,
+              position: "relative",
+            }}
+          >
+            <div
+              style={{
+                background: colors.surface,
+                border: `1px solid ${colors.hairline}`,
+                borderRadius: radius.lg,
+                padding: "16px 20px",
+                display: "grid",
+                gap: space[3],
+                boxShadow: `0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px ${colors.hairline}`,
+              }}
+            >
+              {/* Search bar */}
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: space[3],
+                  padding: "10px 14px",
+                  borderRadius: radius.md,
+                  background: colors.surfaceElevated,
+                  border: `1px solid ${colors.hairline}`,
+                }}
+              >
+                <Sparkles size={16} color={colors.accentRed} />
+                <span style={{ fontSize: "14px", color: colors.mute, flex: 1 }}>
+                  Search stocks, compare, or run a preset…
+                </span>
+                <span style={{ display: "flex", gap: 4 }}>
+                  <kbd
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      minWidth: 22,
+                      height: 22,
+                      borderRadius: radius.sm,
+                      background: colors.surfaceCard,
+                      border: `1px solid ${colors.hairline}`,
+                      fontSize: "11px",
+                      fontWeight: 500,
+                      color: colors.body,
+                      padding: "0 5px",
+                    }}
+                  >
+                    ⌘
+                  </kbd>
+                  <kbd
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      minWidth: 22,
+                      height: 22,
+                      borderRadius: radius.sm,
+                      background: colors.surfaceCard,
+                      border: `1px solid ${colors.hairline}`,
+                      fontSize: "11px",
+                      fontWeight: 500,
+                      color: colors.body,
+                      padding: "0 5px",
+                    }}
+                  >
+                    K
+                  </kbd>
+                </span>
+              </div>
+              {/* Suggestion items */}
+              {[{ label: "Quality Compounders", type: "Preset" }, { label: "Reliance Industries", type: "Stock" }, { label: "Compare: TCS vs Infosys", type: "Compare" }].map(
+                (item, i) => (
+                  <div
+                    key={item.label}
+                    className={`raycast-slideUp raycast-stagger-${i + 5}`}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      padding: "8px 12px",
+                      borderRadius: radius.sm,
+                      background: i === 0 ? colors.surfaceElevated : "transparent",
+                      transition: "background 0.15s ease",
+                      cursor: "default",
+                    }}
+                  >
+                    <span style={{ fontSize: "13px", color: colors.ink }}>
+                      {item.label}
+                    </span>
+                    <span
+                      style={{
+                        fontSize: "10px",
+                        fontWeight: 600,
+                        color: colors.mute,
+                        textTransform: "uppercase",
+                        letterSpacing: "0.5px",
+                      }}
+                    >
+                      {item.type}
+                    </span>
+                  </div>
+                )
+              )}
+            </div>
           </div>
         </div>
       </section>

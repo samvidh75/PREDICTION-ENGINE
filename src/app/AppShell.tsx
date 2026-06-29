@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
-import { Home, Search, Star, CreditCard, LayoutGrid, BookOpen, Shield, MessageSquareText, ArrowUpRight } from "lucide-react";
+import { Home, Search, Star, CreditCard, LayoutGrid, BookOpen, Shield, MessageSquareText, ArrowUpRight, MessageCircle, TrendingUp } from "lucide-react";
 import { NavLink, Link, useNavigate } from "react-router-dom";
 import { colors, typography, space, radius, layout, components, shadows, animation } from "../design/tokens";
 import { NotificationBell } from "../components/NotificationBell";
@@ -20,6 +20,8 @@ const NAV = [
 ] as const;
 
 const SECONDARY_NAV = [
+  { to: "/relative-strength", label: "R. Strength", icon: TrendingUp },
+  { to: "/chat", label: "AI Chat", icon: MessageCircle },
   { to: "/methodology", label: "Methodology", icon: BookOpen },
   { to: "/trust", label: "Trust & Safety", icon: Shield },
 ] as const;
@@ -211,7 +213,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               </select>
               <input id="fb-title" type="text" required placeholder="Brief title" style="padding:8px 12px;border-radius:10px;border:1px solid #1A1A1A;font-size:14px;background:#000000;color:#ffffff;" />
               <textarea id="fb-body" required rows="4" placeholder="Describe your feedback..." style="padding:8px 12px;border-radius:10px;border:1px solid #1A1A1A;font-size:14px;resize:vertical;font-family:inherit;background:#000000;color:#ffffff;"></textarea>
-              <div id="fb-error" style="color:#FF6363;font-size:14px;display:none;"></div>
+              <div id="fb-error" style="color:#FF6B6B;font-size:14px;display:none;"></div>
               <button type="submit" style="padding:8px 20px;border-radius:10px;border:none;background:#ffffff;color:#000000;font-size:14px;font-weight:600;cursor:pointer;">Submit Feedback</button>
             </form>
           </div>`;
@@ -248,12 +250,12 @@ export function AppShell({ children }: { children: ReactNode }) {
           borderRadius: "50%",
           border: "none",
           background: colors.primary,
-          color: "#fff",
+          color: colors.onPrimary,
           cursor: "pointer",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          boxShadow: "0 2px 8px rgba(0,0,0,0.3)",
+          boxShadow: shadows.card,
         }}
         aria-label="Send feedback"
       >
@@ -287,7 +289,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         }
         .rail .nav-link.is-active {
           color:${colors.primary};
-          background:rgba(255,255,255,0.08);
+          background:${colors.hairlineStrong};
         }
         .rail .nav-link:hover {
           color:${colors.textPrimary};
@@ -300,7 +302,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           height:${components.navBar.heightDesktop};
           padding:0 ${layout.pagePaddingMobile};
           border-bottom:${layout.borderWidth} solid ${colors.border};
-          background:rgba(0,0,0,0.85);
+          background:${colors.backdropGlassmorphic};
           backdrop-filter:blur(20px);
           -webkit-backdrop-filter:blur(20px);
         }
@@ -314,7 +316,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           height:${components.navBar.heightMobile};
           display:flex;
           border-top:${layout.borderWidth} solid ${colors.border};
-          background:rgba(0,0,0,0.85);
+          background:${colors.backdropGlassmorphic};
           backdrop-filter:blur(20px);
           -webkit-backdrop-filter:blur(20px);
           z-index:10;
@@ -350,7 +352,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             bottom:0;
             border-right:${layout.borderWidth} solid ${colors.border};
             padding:${space[6]};
-            background:rgba(0,0,0,0.85);
+            background:${colors.backdropGlassmorphic};
             backdrop-filter:blur(24px);
             -webkit-backdrop-filter:blur(24px);
             overflow-y:auto;

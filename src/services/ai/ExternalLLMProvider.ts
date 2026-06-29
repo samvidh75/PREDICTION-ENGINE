@@ -27,9 +27,9 @@ export class ExternalLLMProvider implements AIProvider {
     const preferred = process.env.AI_PROVIDER || '';
     this.activeProvider = pick(preferred, this.groqKey, this.geminiKey, this.openaiKey);
     if (this.activeProvider) {
-      console.log(`[AI] ExternalLLMProvider active: ${this.activeProvider}`);
+      // External LLM configured — provider active
     } else {
-      console.log('[AI] No external LLM API key configured, using deterministic fallback');
+      // No external LLM API key — using deterministic fallback
     }
   }
 

@@ -33,7 +33,7 @@ export default function CalmSkeletonSurface({
         className="absolute inset-0"
         style={{
           background:
-            "linear-gradient(90deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.06) 50%, rgba(255,255,255,0.03) 100%)",
+            `linear-gradient(90deg, ${colors.hairlineSoft} 0%, ${colors.hairlineStrong} 50%, ${colors.hairlineSoft} 100%)`,
           transform: "translateX(-100%)",
           animation: "ss_skeleton_shimmer 1.25s ease-in-out infinite",
         }}
