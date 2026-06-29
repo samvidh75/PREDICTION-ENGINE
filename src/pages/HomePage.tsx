@@ -1,6 +1,7 @@
 import {
-  BarChart3, Bell, Compass, Gauge, Search, Shield,
-  Sparkles, Star, TrendingUp, Zap,
+  BarChart3, Bell, BookOpen, Compass, Gauge, Shield,
+  Sparkles, Star, TrendingUp, Zap, Lightbulb, Command,
+  Keyboard, Github, Twitter, Linkedin, Mail, ChevronRight,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -9,7 +10,7 @@ import { Card } from "../ui/Card";
 import { HealthometerMini } from "../ui/HealthometerMini";
 import { ConvictionBadge } from "../ui/ConvictionBadge";
 import { useResponsiveValue } from "../ui/responsive";
-import { colors, typography, space, layout, media } from "../design/tokens";
+import { colors, typography, space, layout, media, radius } from "../design/tokens";
 import { SEBIComplianceBanner } from "../components/SEBICompliance";
 import { scanByPreset } from "../services/scanner/presets";
 import { getAlerts } from "../services/personalization/AlertStore";
@@ -37,6 +38,95 @@ const MARKET_MOODS = [
   { label: "Bullish", emoji: "🐂", stocks: "65% of scanned stocks" },
   { label: "Defensive", emoji: "🛡️", stocks: "22% of scanned stocks" },
   { label: "Caution", emoji: "⚠️", stocks: "13% of scanned stocks" },
+];
+
+// ─── Educational facts ──────────────────────────────────────────────
+
+const EDUCATIONAL_FACTS = [
+  {
+    icon: Lightbulb,
+    title: "P/E Ratio is not enough",
+    body: "A low P/E can mean a value trap. Always pair it with ROE, debt levels, and earnings growth for the full picture.",
+  },
+  {
+    icon: BookOpen,
+    title: "The 3‑statement check",
+    body: "Always read the P&L, Balance Sheet, and Cash Flow together. A company can show profit but burn cash.",
+  },
+  {
+    icon: TrendingUp,
+    title: "Compounding needs time",
+    body: "The best Indian wealth creators over 20 years delivered 18‑22% CAGR — consistency beats heroics.",
+  },
+  {
+    icon: Star,
+    title: "Promoter holding matters",
+    body: "Indian companies with >50% promoter holding tend to be more aligned with minority shareholders.",
+  },
+  {
+    icon: Shield,
+    title: "Debt is a double‑edged sword",
+    body: "Low debt + high ROE = quality compounder. High debt + low ROE = high risk during downturns.",
+  },
+  {
+    icon: BarChart3,
+    title: "Compare, don't isolate",
+    body: "A stock's P/E of 30 means nothing in isolation. Compare it with peers and its own 5‑year history.",
+  },
+];
+
+// ─── Footer links ──────────────────────────────────────────────────
+
+const FOOTER_COLUMNS = [
+  {
+    title: "Research",
+    links: [
+      { label: "Scanner", href: "/scanner" },
+      { label: "Compare", href: "/compare" },
+      { label: "Sectors", href: "/sectors" },
+      { label: "Watchlist", href: "/watchlist" },
+    ],
+  },
+  {
+    title: "Learn",
+    links: [
+      { label: "Methodology", href: "/methodology" },
+      { label: "StockStory Trust", href: "/trust" },
+      { label: "Education Center", href: "/methodology" },
+    ],
+  },
+  {
+    title: "Company",
+    links: [
+      { label: "About", href: "/about" },
+      { label: "Changelog", href: "/changelog" },
+      { label: "Pricing", href: "/pricing" },
+    ],
+  },
+  {
+    title: "Legal",
+    links: [
+      { label: "Disclaimer", href: "/trust" },
+      { label: "Privacy", href: "/trust" },
+      { label: "Terms of Use", href: "/trust" },
+    ],
+  },
+  {
+    title: "Community",
+    links: [
+      { label: "Twitter / X", href: "https://x.com" },
+      { label: "LinkedIn", href: "https://linkedin.com" },
+      { label: "GitHub", href: "https://github.com" },
+    ],
+  },
+  {
+    title: "Support",
+    links: [
+      { label: "Contact", href: "mailto:hello@stockstory.org" },
+      { label: "FAQ", href: "/methodology" },
+      { label: "Report an issue", href: "https://github.com" },
+    ],
+  },
 ];
 
 // ─── Page component ──────────────────────────────────────────────────
@@ -93,23 +183,22 @@ export default function HomePage() {
           paddingBottom: layout.pagePaddingDesktop,
         }}
       >
-        {/* Gradient accent stripe */}
+        {/* Raycast-style red stripe */}
         <div
           style={{
             position: "absolute",
-            top: -60,
+            top: -100,
             left: "50%",
             transform: "translateX(-50%)",
-            width: "clamp(300px, 80%, 800px)",
-            height: 300,
-            background:
-              "radial-gradient(ellipse 80% 80% at 50% 40%, rgba(255,69,58,0.15) 0%, rgba(255,159,10,0.08) 50%, transparent 70%)",
+            width: "clamp(400px, 90%, 1000px)",
+            height: 350,
+            background: "radial-gradient(ellipse 60% 60% at 50% 30%, rgba(255,69,58,0.25) 0%, rgba(255,105,97,0.12) 30%, rgba(255,159,10,0.06) 55%, transparent 75%)",
             pointerEvents: "none",
             zIndex: 0,
           }}
         />
 
-        <div style={{ maxWidth: "640px", display: "grid", gap: space[6], position: "relative", zIndex: 1 }}>
+        <div style={{ maxWidth: "680px", display: "grid", gap: space[6], position: "relative", zIndex: 1 }}>
           <div style={{ display: "grid", gap: space[4] }}>
             <h1
               style={{
@@ -120,7 +209,7 @@ export default function HomePage() {
                 letterSpacing: typography.h1.desktop.track,
               }}
             >
-              Research Indian stocks{" "}
+              Understand the stock{" "}
               <span style={{ background: "linear-gradient(135deg, #FF3B30 0%, #FF9500 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
                 before you invest
               </span>
@@ -138,31 +227,54 @@ export default function HomePage() {
             </p>
           </div>
 
-          {/* Search */}
+          {/* Search with keyboard hint */}
           <div style={{ display: "flex", gap: space[3], flexWrap: "wrap", justifyContent: "center" }}>
-            <input
-              aria-label="Search stocks"
-              placeholder="Search HDFCBANK, TCS, Infosys…"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && searchResults[0]) {
-                  navigate(`/stock/${searchResults[0].symbol}`);
-                }
-              }}
-              style={{
-                height: "44px",
-                minWidth: "240px",
-                flex: "1 1 280px",
-                borderRadius: "10px",
-                border: `1px solid ${colors.border}`,
-                padding: "0 16px 0 38px",
-                fontSize: typography.body.desktop.size,
-                color: colors.textPrimary,
-                background: `${colors.card} url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238E8E93' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E") 12px center no-repeat`,
-                outline: "none",
-              }}
-            />
+            <div style={{ position: "relative", flex: "1 1 300px", minWidth: "240px" }}>
+              <input
+                aria-label="Search stocks"
+                placeholder="Search HDFCBANK, TCS, Infosys…"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && searchResults[0]) {
+                    navigate(`/stock/${searchResults[0].symbol}`);
+                  }
+                }}
+                style={{
+                  height: "44px",
+                  width: "100%",
+                  borderRadius: "10px",
+                  border: `1px solid ${colors.border}`,
+                  padding: "0 60px 0 38px",
+                  fontSize: typography.body.desktop.size,
+                  color: colors.textPrimary,
+                  background: `${colors.card} url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238E8E93' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E") 12px center no-repeat`,
+                  outline: "none",
+                  boxSizing: "border-box",
+                }}
+              />
+              <kbd
+                style={{
+                  position: "absolute",
+                  right: 10,
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 3,
+                  padding: "2px 6px",
+                  borderRadius: "4px",
+                  background: colors.fill,
+                  border: `1px solid ${colors.border}`,
+                  fontSize: 10,
+                  fontWeight: 600,
+                  color: colors.textSecondary,
+                  pointerEvents: "none",
+                }}
+              >
+                <Command size={10} />K
+              </kbd>
+            </div>
             <Button onClick={() => navigate(`/stock/${searchResults[0]?.symbol ?? "HDFCBANK"}`)}>Research</Button>
           </div>
           {searchResults.length > 0 && (
@@ -354,6 +466,139 @@ export default function HomePage() {
           ))}
         </div>
       </section>
+
+      {/* ════════════════ DID YOU KNOW ════════════════ */}
+      <section style={{ display: "grid", gap: space[5] }}>
+        <div style={{ display: "flex", alignItems: "center", gap: space[2] }}>
+          <Lightbulb size={16} color={colors.warning} />
+          <h2 style={{ color: colors.textPrimary, fontSize: typography.h3.desktop.size, fontWeight: typography.h3.desktop.weight, margin: 0 }}>
+            Did You Know?
+          </h2>
+        </div>
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
+          gap: space[4],
+        }}>
+          {EDUCATIONAL_FACTS.map((fact) => (
+            <Card key={fact.title} style={{ display: "grid", gap: space[2] }}>
+              <fact.icon size={18} color={colors.primary} strokeWidth={1.75} />
+              <h3 style={{ fontSize: typography.caption.desktop.size, fontWeight: 600, color: colors.textPrimary, margin: 0 }}>
+                {fact.title}
+              </h3>
+              <p style={{ fontSize: 12, color: colors.textSecondary, lineHeight: 1.5, margin: 0 }}>
+                {fact.body}
+              </p>
+            </Card>
+          ))}
+        </div>
+      </section>
+
+      {/* ════════════════ KEYBOARD SHORTCUTS HINT ════════════════ */}
+      <section style={{
+        padding: space[6],
+        background: colors.card,
+        border: `1px solid ${colors.border}`,
+        borderRadius: radius.lg,
+        display: "flex",
+        flexWrap: "wrap",
+        gap: space[6],
+        alignItems: "center",
+        justifyContent: "center",
+      }}>
+        <span style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: colors.textSecondary }}>
+          <Keyboard size={14} /> <kbd style={{ padding: "1px 5px", borderRadius: 3, background: colors.fill, border: `1px solid ${colors.border}`, fontSize: 11 }}>⌘K</kbd> Search stocks
+        </span>
+        <span style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: colors.textSecondary }}>
+          <Keyboard size={14} /> <kbd style={{ padding: "1px 5px", borderRadius: 3, background: colors.fill, border: `1px solid ${colors.border}`, fontSize: 11 }}>G</kbd> <kbd style={{ padding: "1px 5px", borderRadius: 3, background: colors.fill, border: `1px solid ${colors.border}`, fontSize: 11 }}>N</kbd> Go to news
+        </span>
+        <span style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: colors.textSecondary }}>
+          <Keyboard size={14} /> <kbd style={{ padding: "1px 5px", borderRadius: 3, background: colors.fill, border: `1px solid ${colors.border}`, fontSize: 11 }}>R</kbd> Refresh data
+        </span>
+        <span style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: colors.textSecondary }}>
+          <Keyboard size={14} /> <kbd style={{ padding: "1px 5px", borderRadius: 3, background: colors.fill, border: `1px solid ${colors.border}`, fontSize: 11 }}>?</kbd> Show shortcuts
+        </span>
+      </section>
+
+      {/* ════════════════ FOOTER ════════════════ */}
+      <footer style={{
+        marginTop: space[8],
+        paddingTop: space[8],
+        borderTop: `1px solid ${colors.separator}`,
+        display: "grid",
+        gap: space[8],
+      }}>
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))",
+          gap: space[6],
+        }}>
+          {FOOTER_COLUMNS.map((col) => (
+            <div key={col.title} style={{ display: "grid", gap: space[3] }}>
+              <h4 style={{ fontSize: typography.label.desktop.size, fontWeight: 600, color: colors.textSecondary, textTransform: "uppercase", letterSpacing: "0.04em", margin: 0 }}>
+                {col.title}
+              </h4>
+              <nav style={{ display: "grid", gap: space[2] }}>
+                {col.links.map((link) => (
+                  <a
+                    key={link.label}
+                    href={link.href}
+                    onClick={(e) => {
+                      if (link.href.startsWith("/")) {
+                        e.preventDefault();
+                        navigate(link.href);
+                      }
+                    }}
+                    style={{
+                      fontSize: 13,
+                      color: colors.textPrimary,
+                      textDecoration: "none",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 4,
+                    }}
+                    target={link.href.startsWith("http") ? "_blank" : undefined}
+                    rel={link.href.startsWith("http") ? "noopener noreferrer" : undefined}
+                  >
+                    {link.label} {link.href.startsWith("http") && <ChevronRight size={10} />}
+                  </a>
+                ))}
+              </nav>
+            </div>
+          ))}
+        </div>
+
+        <div style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          flexWrap: "wrap",
+          gap: space[4],
+          paddingTop: space[6],
+          borderTop: `1px solid ${colors.separator}`,
+        }}>
+          <div style={{ display: "flex", alignItems: "center", gap: space[3] }}>
+            <span style={{ fontSize: 13, fontWeight: 700, color: colors.textPrimary }}>StockStory</span>
+            <span style={{ fontSize: 12, color: colors.textSecondary }}>
+              © {new Date().getFullYear()} StockStory. For educational purposes only.
+            </span>
+          </div>
+          <div style={{ display: "flex", gap: space[3] }}>
+            <a href="https://x.com" target="_blank" rel="noopener noreferrer" style={{ color: colors.textSecondary }}>
+              <Twitter size={16} />
+            </a>
+            <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" style={{ color: colors.textSecondary }}>
+              <Linkedin size={16} />
+            </a>
+            <a href="https://github.com" target="_blank" rel="noopener noreferrer" style={{ color: colors.textSecondary }}>
+              <Github size={16} />
+            </a>
+            <a href="mailto:hello@stockstory.org" style={{ color: colors.textSecondary }}>
+              <Mail size={16} />
+            </a>
+          </div>
+        </div>
+      </footer>
 
       {/* Responsive */}
       <style>{`

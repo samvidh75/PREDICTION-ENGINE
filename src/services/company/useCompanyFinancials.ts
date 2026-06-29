@@ -53,9 +53,7 @@ export function useCompanyFinancials(ticker: string): UseCompanyFinancialsResult
     setState({ kind: "loading" });
 
     try {
-      const baseUrl = typeof window !== "undefined"
-        ? window.location.origin
-        : "http://localhost:3001";
+      const baseUrl = window.location.origin;
 
       const response = await fetch(
         `${baseUrl}/api/company/${encodeURIComponent(ticker.trim())}/financials`,
