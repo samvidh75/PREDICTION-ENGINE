@@ -212,7 +212,7 @@ const normalizeResearchResponse = (
 ): MarketBrainResearchResponse => {
   const research = payload.research as Partial<MarketBrainResearchView>;
   const symbol = asPublicSymbol(payload.symbol) || asPublicSymbol(research.symbol) || requestedSymbol;
-  const companyName = asPublicText(payload.companyName) || asPublicText(research.companyName);
+  const companyName = asPublicText(payload.companyName) || asPublicText(research.companyName) || symbol;
 
   return {
     symbol,
