@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { evaluateIndiaEquity } from './indiaMarketBrain';
-import { MARKET_BRAIN_FACTOR_KEYS } from './marketBrainGuardrails';
+import {
+  MARKET_BRAIN_FACTOR_KEYS,
+  MARKET_BRAIN_FORBIDDEN_RECOMMENDATION_TERMS,
+} from './marketBrainGuardrails';
 import { toMarketBrainResearchView } from './researchContract';
 
 const basePacket = {
@@ -96,12 +99,22 @@ describe('toMarketBrainResearchView', () => {
       ...basePacket,
       evidence: completeEvidence,
     });
-    const unsafeCopy = ['Strong', 'Buy'].join(' ');
+    const unsafeCopy = MARKET_BRAIN_FORBIDDEN_RECOMMENDATION_TERMS[0];
 
     expect(() => toMarketBrainResearchView({
       ...result,
       quality: { score: 72, drivers: [unsafeCopy], risks: [] },
     })).toThrow('Market brain copy contains recommendation language that requires compliance review.');
+  });
+
+  it('rejects direct recommendation language before returning public company names', () => {
+    const result = evaluateIndiaEquity({
+      ...basePacket,
+      companyName: MARKET_BRAIN_FORBIDDEN_RECOMMENDATION_TERMS[0],
+      evidence: completeEvidence,
+    });
+
+    expect(() => toMarketBrainResearchView(result)).toThrow('Market brain copy contains recommendation language that requires compliance review.');
   });
 
   it('surfaces partial evidence as review metadata without marking it missing', () => {
