@@ -317,7 +317,7 @@ describe('fetchMarketBrainResearch', () => {
           ...responsePayload.research,
           evidenceReview: {
             needsReview: true,
-            partial: ['fundamentals', 'fundamentals', 'news', 'news'],
+            partial: ['fundamentals', 'fundamentals', 'news_events', 'news_events'],
             missing: ['sector_context', 'sector_context', 'technicals'],
             summary: 'Some research evidence needs review.',
           },
@@ -327,7 +327,7 @@ describe('fetchMarketBrainResearch', () => {
 
     const result = await fetchMarketBrainResearch('TCS');
 
-    expect(result.research.evidenceReview.partial).toEqual(['fundamentals', 'news']);
+    expect(result.research.evidenceReview.partial).toEqual(['fundamentals', 'news_events']);
     expect(result.research.evidenceReview.missing).toEqual(['sector_context', 'technicals']);
   });
 
@@ -424,7 +424,7 @@ describe('fetchMarketBrainResearch', () => {
     expect(result.research.factorViews.map((factorView) => factorView.score)).toEqual([0, 100]);
   });
 
-  it('throws a typed incomplete error for malformed successful research payloads', async () => {
+  it('throws a public-safe unavailable error for malformed successful research payloads', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
       ok: true,
       status: 200,
@@ -435,8 +435,7 @@ describe('fetchMarketBrainResearch', () => {
     }));
 
     await expect(fetchMarketBrainResearch('TCS')).rejects.toMatchObject({
-      code: 'INCOMPLETE_RESEARCH_RESPONSE',
-      message: 'Research response was incomplete.',
+      code: 'RESEARCH_UNAVAILABLE',
       status: 200,
     });
   });
