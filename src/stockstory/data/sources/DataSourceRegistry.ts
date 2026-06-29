@@ -193,6 +193,28 @@ export class DataSourceRegistry {
         coverageScope: 'india',
         lastVerified: null,
       },
+      {
+        id: 'stock-universe-bundle',
+        name: 'Stock Universe Bundle',
+        kind: 'manual_upload',
+        status: 'active',
+        domains: ['universe', 'identity', 'sector'],
+        description: 'Curated stock universe snapshot (stock-universe.json) — symbols, sectors, market caps',
+        requiresAuth: false,
+        coverageScope: 'india',
+        lastVerified: null,
+      },
+      {
+        id: 'daily-prices',
+        name: 'Daily Prices (SQLite)',
+        kind: 'provider_db',
+        status: 'active',
+        domains: ['price'],
+        description: 'Daily OHLCV price data from the local stockstory.db daily_prices table — populated during ingestion',
+        requiresAuth: false,
+        coverageScope: 'india',
+        lastVerified: null,
+      },
     ];
 
     for (const source of builtIn) {

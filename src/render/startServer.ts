@@ -15,6 +15,8 @@ import { existsSync, readFile } from "fs";
 import { dbAdapter } from "../db/DatabaseAdapter";
 import { MigrationRunner } from "../db/MigrationRunner";
 import registerApiRoutes from "./apiRouter.js";
+import { StockUniverseAdapter } from "../services/data/providers/StockUniverseAdapter.js";
+import { defaultDataAdapterRegistry } from "../services/data/dataAdapterRegistry.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -198,6 +200,38 @@ async function bootstrap() {
       distFiles,
     };
   });
+
+  // ── Data adapter initialization ────────────────────────────────────
+  const adaptedRegistry = defaultDataAdapterRegistry;
+
+  try {
+    const companyMasterAdapter = StockUniverseAdapter.getInstance();
+    server.log.info(`StockUniverseAdapter loaded: ${companyMasterAdapter.size} equities (generated ${companyMasterAdapter.dataGeneratedAt})`);
+    // Inject into the default registry so all services get a real adapter
+    Object.defineProperty(adaptedRegistry, 'companyMaster', {
+      value: companyMasterAdapter,
+      writable: false,
+      configurable: false,
+    });
+    server.log.info("DefaultDataAdapterRegistry wired with StockUniverseAdapter");
+  } catch (err) {
+    server.log.warn(`CompanyMasterAdapter init error: ${err}`);
+  }
+
+  // ── Price adapter initialization ───────────────────────────────────
+  try {
+    const { PriceRealAdapter } = await import("../services/data/providers/PriceRealAdapter.js");
+    const priceAdapter = new PriceRealAdapter();
+    server.log.info(`PriceRealAdapter initialized — reading from daily_prices table (${priceAdapter.kind})`);
+    Object.defineProperty(adaptedRegistry, 'price', {
+      value: priceAdapter,
+      writable: false,
+      configurable: false,
+    });
+    server.log.info("DefaultDataAdapterRegistry wired with PriceRealAdapter");
+  } catch (err) {
+    server.log.warn(`PriceRealAdapter init error: ${err}`);
+  }
 
   // ── API routes: /api/stock, /api/search ────────────────────────────
   await registerApiRoutes(server);

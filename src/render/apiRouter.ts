@@ -5,6 +5,7 @@
  * Uses real Yahoo Finance data with deterministic fallbacks.
  */
 import type { FastifyInstance } from "fastify";
+import { StockUniverseAdapter } from "../services/data/providers/StockUniverseAdapter.js";
 import { getPersistedStockResearch } from "../lib/stockResearchSnapshot.js";
 import { financialEngine } from "../services/intelligence/engines/FinancialEngine/index.js";
 import { technicalEngine } from "../services/intelligence/engines/TechnicalEngine/index.js";
@@ -564,6 +565,45 @@ export default async function registerApiRoutes(server: FastifyInstance) {
     stockCache.set(symbol, { data: payload, expiresAt: Date.now() + CACHE_TTL });
     reply.header("Cache-Control", "public, s-maxage=300");
     return payload;
+  });
+
+  // GET /api/company-master?symbol=RELIANCE
+  server.get("/api/company-master", async (req, reply) => {
+    const symbol = String((req.query as any)?.symbol ?? "").toUpperCase().trim();
+    if (!symbol) return reply.status(400).send({ error: "symbol required" });
+
+    const adapter = StockUniverseAdapter.getInstance();
+    const ready = adapter.ready;
+    const result = adapter.getCompanyMaster();
+
+    if (!result.ok) {
+      return reply.status(503).send({ error: "Company master unavailable", detail: result.error });
+    }
+
+    // Normalize and find the exact entry
+    const normalizedKey = symbol.startsWith("NSE") || symbol.startsWith("BSE")
+      ? symbol.slice(3)
+      : symbol;
+    const entry = result.data[normalizedKey];
+
+    if (!entry) {
+      return reply.status(404).send({ error: "Symbol not found in universe", symbol });
+    }
+
+    return {
+      ok: true,
+      symbol: entry.symbol,
+      name: entry.name,
+      sector: entry.sector,
+      industry: entry.industry,
+      marketCap: entry.marketCap,
+      marketCapCategory: entry.marketCapCategory || null,
+      isin: entry.isin || null,
+      active: entry.active ?? true,
+      source: "stock-universe-bundle",
+      ready,
+      universeSize: adapter.size,
+    };
   });
 
   // GET /api/search?q=reliance&limit=10
