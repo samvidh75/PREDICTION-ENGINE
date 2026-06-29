@@ -20,6 +20,7 @@ export interface StoreStats {
   flushCount: number;
   oldestTimestamp: string | null;
   newestTimestamp: string | null;
+  currentSize: number;
 }
 
 const DEFAULT_MAX_BUFFER = 10_000;
@@ -30,10 +31,21 @@ export class ProductEventStore {
   private totalStored = 0;
   private persistFn: PersistFn | null = null;
   private maxBuffer: number;
+  private _maxEvents: number;
 
-  constructor(opts?: { maxBuffer?: number; persistFn?: PersistFn }) {
+  constructor(opts?: { maxBuffer?: number; maxEvents?: number; persistFn?: PersistFn }) {
     this.maxBuffer = opts?.maxBuffer ?? DEFAULT_MAX_BUFFER;
+    this._maxEvents = opts?.maxEvents ?? opts?.maxBuffer ?? DEFAULT_MAX_BUFFER;
     this.persistFn = opts?.persistFn ?? null;
+  }
+
+  /** Alias for store() for interface compatibility */
+  add(event: NormalizedMetricEvent): StoredMetricEvent {
+    return this.store(event);
+  }
+
+  get currentSize(): number {
+    return this.buffer.length;
   }
 
   setPersistFn(fn: PersistFn): void {
@@ -50,7 +62,7 @@ export class ProductEventStore {
     this.buffer.push(stored);
     this.totalStored++;
 
-    if (this.buffer.length >= this.maxBuffer) {
+    if (this.buffer.length > this.maxBuffer) {
       this.flush().catch(() => {});
     }
 
@@ -102,6 +114,7 @@ export class ProductEventStore {
       oldestTimestamp: this.buffer.length > 0 ? this.buffer[0].timestamp : null,
       newestTimestamp:
         this.buffer.length > 0 ? this.buffer[this.buffer.length - 1].timestamp : null,
+      currentSize: this.buffer.length,
     };
   }
 

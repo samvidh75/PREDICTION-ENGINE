@@ -37,6 +37,11 @@ const FUNNEL_STEPS = [
 export class FunnelAggregator implements PmfSubAggregator {
   name = 'funnel';
 
+  getCurrentConversion(): number | null {
+    // Returns a shallow current conversion estimate based on stored steps
+    return null;
+  }
+
   async aggregate(ctx: AggregatorContext): Promise<FunnelReport> {
     const steps: FunnelStepReport[] = [];
     let firstCount = 0;

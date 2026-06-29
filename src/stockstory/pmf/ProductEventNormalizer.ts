@@ -20,19 +20,32 @@ export interface NormalizationResult {
   events: NormalizedMetricEvent[];
   skipped: number;
   errors: string[];
+  eventType?: string;
+  [Symbol.iterator](): Iterator<NormalizedMetricEvent>;
 }
 
 export class ProductEventNormalizer {
   private skipped = 0;
   private errors: string[] = [];
+  private _eventType: string | undefined;
 
-  normalize(rawEvents: Array<Record<string, unknown>>): NormalizationResult {
+  normalize(
+    rawEvents: Record<string, unknown> | Array<Record<string, unknown>>,
+  ): NormalizationResult {
     this.skipped = 0;
     this.errors = [];
+    this._eventType = undefined;
 
+    const arr = Array.isArray(rawEvents) ? rawEvents : [rawEvents];
     const events: NormalizedMetricEvent[] = [];
+    const source = arr.length > 0 ? arr[0] : {};
 
-    for (const raw of rawEvents) {
+    // Detect and store eventType from the event
+    if (typeof source.eventType === 'string') {
+      this._eventType = source.eventType;
+    }
+
+    for (const raw of arr) {
       try {
         const normalized = this.normalizeOne(raw);
         if (normalized) {
@@ -48,7 +61,26 @@ export class ProductEventNormalizer {
       }
     }
 
-    return { events, skipped: this.skipped, errors: this.errors };
+    const result: NormalizationResult = {
+      events,
+      skipped: this.skipped,
+      errors: this.errors,
+      eventType: this._eventType,
+      [Symbol.iterator](): Iterator<NormalizedMetricEvent> {
+        let i = 0;
+        const evts = events;
+        return {
+          next(): IteratorResult<NormalizedMetricEvent> {
+            if (i < evts.length) {
+              return { value: evts[i++], done: false };
+            }
+            return { value: undefined as unknown as NormalizedMetricEvent, done: true };
+          },
+        };
+      },
+    };
+
+    return result;
   }
 
   private normalizeOne(
