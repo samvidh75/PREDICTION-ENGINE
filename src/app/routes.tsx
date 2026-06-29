@@ -20,6 +20,8 @@ const Invite = lazy(() => import("../pages/Invite"));
 const SharedResearchSnapshot = lazy(() => import("../pages/SharedResearchSnapshot"));
 const CompanyResearchReportPage = lazy(() => import("../pages/CompanyResearchReport"));
 const AnalystWorkspace = lazy(() => import("../pages/AnalystWorkspace"));
+const ComparePage = lazy(() => import("../pages/ComparePage"));
+const AboutPage = lazy(() => import("../pages/AboutPage"));
 
 function RouteFallback() {
   return (
@@ -49,7 +51,8 @@ export function AppRoutes() {
           <Route path="/scanner" element={<ScannerPage />} />
           <Route path="/scanner/:preset" element={<ScannerLanding />} />
           <Route path="/watchlist" element={<WatchlistPage />} />
-          <Route path="/compare" element={<Navigate to="/" replace />} />
+          <Route path="/compare" element={<ComparePage />} />
+          <Route path="/about" element={<AboutPage />} />
           <Route path="/pricing" element={<PricingPage />} />
           <Route path="/stock/:symbol/*" element={<StockPage />} />
           <Route path="/sectors" element={<Sectors />} />

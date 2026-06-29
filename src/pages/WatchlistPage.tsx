@@ -1,10 +1,11 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Bell, Clock, Eye, Star, TrendingDown, TrendingUp } from "lucide-react";
+import { Bell, Clock, Crosshair, Eye, Plus, Search, Star, TrendingDown, TrendingUp, X } from "lucide-react";
 import { Card } from "../ui/Card";
 import { Button } from "../ui/Button";
 import { Badge } from "../ui/Badge";
-import { colors, typography, space, radius } from "../design/tokens";
+import { ConvictionBadge } from "../ui/ConvictionBadge";
+import { colors, typography, space, radius, media } from "../design/tokens";
 import { SEBIComplianceBanner } from "../components/SEBICompliance";
 import { AnalystBriefCard } from "../components/analyst/AnalystBriefCard";
 import { watchlistReviewBriefGenerator } from "../stockstory/analyst/watchlist/WatchlistReviewBriefGenerator";
@@ -49,6 +50,9 @@ export default function WatchlistPage() {
   const [intel, setIntel] = useState<WatchlistIntelligence | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [addQuery, setAddQuery] = useState("");
+  const addInputRef = useRef<HTMLInputElement>(null);
 
   const fetchIntelligence = async () => {
     setLoading(true);
@@ -86,13 +90,123 @@ export default function WatchlistPage() {
 
       {/* Header row */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: space[4] }}>
-        <h1 style={{ color: colors.textPrimary, fontSize: typography.h1.desktop.size, fontWeight: 600, lineHeight: "1.25" }}>
-          Watchlist
-        </h1>
-        <Button onClick={fetchIntelligence} disabled={loading}>
-          {loading ? "Loading..." : "Refresh Intelligence"}
-        </Button>
+        <div>
+          <h1 style={{ color: colors.textPrimary, fontSize: typography.h1.desktop.size, fontWeight: 700, lineHeight: "1.2", margin: 0 }}>
+            Track
+          </h1>
+          <p style={{ color: colors.textSecondary, fontSize: 13, margin: `${space[1]} 0 0` }}>
+            Monitor your thesis and stay ahead of changes.
+          </p>
+        </div>
+        <div style={{ display: "flex", gap: space[3] }}>
+          <Button variant="secondary" onClick={() => setShowAddModal(true)}>
+            <Plus size={14} style={{ marginRight: "4px" }} />
+            Add Stock
+          </Button>
+          <Button onClick={fetchIntelligence} disabled={loading}>
+            {loading ? "Loading..." : "Refresh Intelligence"}
+          </Button>
+        </div>
       </div>
+
+      {/* Add Stock Modal */}
+      {showAddModal && (
+        <div style={{
+          position: "fixed",
+          inset: 0,
+          zIndex: 999,
+          background: "rgba(0,0,0,0.4)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: 16,
+        }}
+          onClick={() => setShowAddModal(false)}
+          onKeyDown={(e) => e.key === "Escape" && setShowAddModal(false)}
+          role="presentation"
+        >
+          <Card style={{
+            width: "100%",
+            maxWidth: 420,
+            display: "grid",
+            gap: space[4],
+            position: "relative",
+          }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setShowAddModal(false)}
+              style={{
+                position: "absolute",
+                top: 16,
+                right: 16,
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                color: colors.textSecondary,
+                padding: 4,
+              }}
+              aria-label="Close"
+            >
+              <X size={16} />
+            </button>
+            <h2 style={{ fontSize: 16, fontWeight: 600, color: colors.textPrimary, margin: 0 }}>
+              Add Stock to Track
+            </h2>
+            <div style={{ position: "relative" }}>
+              <input
+                ref={addInputRef}
+                autoFocus
+                placeholder="Search by symbol or company name…"
+                value={addQuery}
+                onChange={(e) => setAddQuery(e.target.value)}
+                style={{
+                  width: "100%",
+                  height: 40,
+                  borderRadius: 8,
+                  border: `1px solid ${colors.border}`,
+                  padding: "0 12px 0 36px",
+                  fontSize: 14,
+                  color: colors.textPrimary,
+                  background: `${colors.card} url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%238E8E93' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E") 12px center no-repeat`,
+                  outline: "none",
+                  boxSizing: "border-box",
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && addQuery.trim()) {
+                    navigate(`/stock/${addQuery.trim().toUpperCase()}`);
+                    setShowAddModal(false);
+                    setAddQuery("");
+                  }
+                }}
+              />
+            </div>
+            <div style={{ display: "flex", gap: space[2], flexWrap: "wrap" }}>
+              {WATCHLIST_TICKERS.filter((t) => t.includes(addQuery.toUpperCase())).slice(0, 6).map((t) => (
+                <button
+                  key={t}
+                  onClick={() => { navigate(`/stock/${t}`); setShowAddModal(false); setAddQuery(""); }}
+                  style={{
+                    padding: "4px 10px",
+                    borderRadius: 6,
+                    border: `1px solid ${colors.border}`,
+                    background: colors.fill,
+                    fontSize: 12,
+                    fontWeight: 600,
+                    color: colors.textPrimary,
+                    cursor: "pointer",
+                  }}
+                >
+                  {t}
+                </button>
+              ))}
+            </div>
+            <p style={{ fontSize: 11, color: colors.textSecondary, margin: 0 }}>
+              Press <kbd style={{ padding: "1px 5px", borderRadius: 3, background: colors.fill, border: `1px solid ${colors.border}`, fontSize: 10 }}>Enter</kbd> to research a new symbol.
+            </p>
+          </Card>
+        </div>
+      )}
 
       {/* Summary chips */}
       {intel && (
@@ -121,16 +235,52 @@ export default function WatchlistPage() {
 
       {/* Empty / initial state */}
       {!intel && !loading && !error && (
-        <Card>
-          <div style={{ display: "grid", gap: space[4], justifyItems: "center", textAlign: "center", padding: `${space[8]} 0` }}>
-            <Star size={40} strokeWidth={1.5} color={colors.textSecondary} />
-            <div>
-              <h3 style={{ color: colors.textPrimary, margin: 0, fontSize: typography.h3.desktop.size }}>Your research watchlist</h3>
-              <p style={{ color: colors.textSecondary, margin: `${space[2]} 0 0`, fontSize: typography.body.desktop.size }}>
-                Click <strong>Refresh Intelligence</strong> to analyze your tracked companies with the latest research signals.
+        <Card style={{ padding: space[8] }}>
+          <div style={{ display: "grid", gap: space[5], justifyItems: "center", textAlign: "center", maxWidth: 440, margin: "0 auto" }}>
+            <div style={{
+              width: 64,
+              height: 64,
+              borderRadius: "50%",
+              background: `radial-gradient(circle, rgba(0,122,255,0.12) 0%, transparent 70%)`,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}>
+              <Crosshair size={28} strokeWidth={1.5} color={colors.primary} />
+            </div>
+            <div style={{ display: "grid", gap: space[2] }}>
+              <h2 style={{ color: colors.textPrimary, margin: 0, fontSize: 18, fontWeight: 700 }}>
+                Start tracking your thesis
+              </h2>
+              <p style={{ color: colors.textSecondary, margin: 0, fontSize: 13, lineHeight: 1.6 }}>
+                Add stocks to your track list and we'll monitor their fundamentals, surface conviction changes, 
+                and tell you when it's time to review your thesis.
               </p>
             </div>
-            <Button onClick={fetchIntelligence}>Refresh Intelligence</Button>
+            <div style={{ display: "flex", gap: space[3], flexWrap: "wrap", justifyContent: "center" }}>
+              <Button onClick={fetchIntelligence}>
+                <Star size={14} style={{ marginRight: "4px" }} />
+                Load Tracked Stocks
+              </Button>
+              <Button variant="secondary" onClick={() => setShowAddModal(true)}>
+                <Plus size={14} style={{ marginRight: "4px" }} />
+                Add First Stock
+              </Button>
+            </div>
+            <div style={{
+              display: "flex",
+              gap: space[4],
+              fontSize: 11,
+              color: colors.textSecondary,
+              borderTop: `1px solid ${colors.separator}`,
+              paddingTop: space[4],
+              width: "100%",
+              justifyContent: "center",
+            }}>
+              <span>🔍 Health scores update daily</span>
+              <span>📊 Compare side by side</span>
+              <span>🔔 Alerts when things change</span>
+            </div>
           </div>
         </Card>
       )}
@@ -139,75 +289,82 @@ export default function WatchlistPage() {
       {sorted.length > 0 && (
         <div style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
+          gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))",
           gap: space[4],
         }}>
           {sorted.map((item) => (
             <Card key={item.symbol}>
               <div style={{ display: "grid", gap: space[3] }}>
-                {/* Top row: symbol + status */}
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-                  <div>
-                    <div
-                      style={{
-                        fontSize: typography.h3.desktop.size,
-                        fontWeight: 600,
-                        color: colors.textPrimary,
-                        cursor: "pointer",
-                      }}
-                      onClick={() => handleResearch(item.symbol)}
-                      onKeyDown={(e) => e.key === "Enter" && handleResearch(item.symbol)}
-                      role="link"
-                      tabIndex={0}
-                    >
+                {/* Top row: symbol + conviction badge */}
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <div
+                    onClick={() => handleResearch(item.symbol)}
+                    onKeyDown={(e) => e.key === "Enter" && handleResearch(item.symbol)}
+                    role="link"
+                    tabIndex={0}
+                    style={{ cursor: "pointer" }}
+                  >
+                    <div style={{ fontSize: typography.h3.desktop.size, fontWeight: 600, color: colors.textPrimary }}>
                       {item.symbol}
                     </div>
-                    <div style={{ fontSize: "13px", color: colors.textSecondary }}>
+                    <div style={{ fontSize: "12px", color: colors.textSecondary }}>
                       {item.companyName}
                     </div>
                   </div>
-                  <span style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    minHeight: "24px",
-                    padding: "0 10px",
-                    borderRadius: "999px",
-                    fontSize: "12px",
-                    fontWeight: 600,
-                    background: STATUS_COLORS[item.currentStatus] || "#8E8E93",
-                    color: "#fff",
-                  }}>
-                    {item.currentStatus}
-                  </span>
+                  <ConvictionBadge
+                    level={
+                      item.currentStatus === "Strengthening" ? "healthy" :
+                      item.currentStatus === "Stable" ? "stable" :
+                      item.currentStatus === "Needs review" ? "caution" :
+                      item.currentStatus === "Weakening" ? "caution" :
+                      "watch-list"
+                    }
+                    size="md"
+                  />
                 </div>
 
-                {/* Score */}
+                {/* Score bar */}
                 {item.score !== null && (
-                  <div style={{ display: "flex", alignItems: "baseline", gap: space[2] }}>
-                    <span style={{ fontSize: "24px", fontWeight: 700, color: colors.textPrimary }}>
-                      {item.score}
-                    </span>
-                    <span style={{ fontSize: "13px", color: colors.textSecondary }}>/ 100</span>
+                  <div>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 4 }}>
+                      <span style={{ fontSize: "22px", fontWeight: 700, color: colors.textPrimary }}>
+                        {item.score}
+                        <span style={{ fontSize: "13px", fontWeight: 400, color: colors.textSecondary }}>/100</span>
+                      </span>
+                      <span style={{ display: "flex", alignItems: "center", gap: 3, fontSize: 12, color: colors.textSecondary }}>
+                        {item.scoreDirection === "improving" ? (
+                          <><TrendingUp size={12} color="#30D158" /> Improving</>
+                        ) : item.scoreDirection === "declining" ? (
+                          <><TrendingDown size={12} color="#FF3B30" /> Declining</>
+                        ) : (
+                          "Stable"
+                        )}
+                      </span>
+                    </div>
+                    <div style={{ height: 4, background: colors.border, borderRadius: 2, overflow: "hidden" }}>
+                      <div style={{
+                        height: "100%",
+                        width: `${item.score}%`,
+                        borderRadius: 2,
+                        background: `linear-gradient(90deg, ${colors.success} 0%, #FF9500 50%, ${colors.danger} 100%)`,
+                      }} />
+                    </div>
                   </div>
                 )}
 
-                {/* Conviction + trend */}
-                <div style={{ display: "flex", gap: space[4], fontSize: "13px" }}>
-                  <div>
-                    <span style={{ color: colors.textSecondary }}>Conviction: </span>
-                    <span style={{ fontWeight: 500 }}>{item.conviction}</span>
-                  </div>
-                  <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-                    <span style={{ color: colors.textSecondary }}>Trend: </span>
-                    {item.scoreDirection === "improving" ? (
-                      <TrendingUp size={14} color="#30D158" />
-                    ) : item.scoreDirection === "declining" ? (
-                      <TrendingDown size={14} color="#FF3B30" />
-                    ) : (
-                      <span style={{ color: colors.textSecondary }}>—</span>
-                    )}
-                    <span style={{ fontWeight: 500 }}>{item.scoreDirection ?? "stable"}</span>
-                  </div>
+                {/* Thesis status + last reviewed */}
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 12, color: colors.textSecondary }}>
+                  <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                    <Clock size={12} />
+                    {item.lastUpdated
+                      ? `Last reviewed ${new Date(item.lastUpdated).toLocaleDateString()}`
+                      : "Not yet reviewed"}
+                  </span>
+                  {item.lastThesis && (
+                    <span style={{ fontStyle: "italic" }}>
+                      "{item.lastThesis.slice(0, 60)}{item.lastThesis.length > 60 ? "…" : ""}"
+                    </span>
+                  )}
                 </div>
 
                 {/* Action buttons */}
@@ -224,19 +381,7 @@ export default function WatchlistPage() {
                   </Button>
                 </div>
 
-                {/* Thesis note */}
-                {item.lastThesis && (
-                  <div style={{
-                    fontSize: "12px",
-                    color: colors.textSecondary,
-                    fontStyle: "italic",
-                    borderTop: `1px solid ${colors.border}`,
-                    paddingTop: space[2],
-                  }}>
-                    "{item.lastThesis.slice(0, 120)}{item.lastThesis.length > 120 ? "..." : ""}"
-                  </div>
-                )}
-
+                {/* Review brief */}
                 {(() => {
                   const brief = watchlistReviewBriefGenerator.generate({
                     symbol: item.symbol,
