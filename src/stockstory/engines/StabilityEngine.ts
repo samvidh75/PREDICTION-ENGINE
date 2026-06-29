@@ -13,7 +13,7 @@
  *   - null marketCap → neutral 50, no distortion
  */
 
-import { EngineInputs, StabilityEngineOutput, clampScore, weightedAverage } from '../types';
+import { EngineInputs, StabilityEngineOutput, clampScore, isFiniteNumber, weightedAverage } from '../types';
 import { getSectorProfile } from '../SectorAdapter';
 import { SectorPercentileEngine } from '../scoring/SectorPercentileEngine';
 
@@ -124,12 +124,13 @@ export class StabilityEngine {
 
     // ── Sub-score 6: Market Cap Size Score (TRACK-12B: log10) ──────
     let marketCapSizeScore = 50;
-    if (financials.marketCap !== null && financials.marketCap > 0) {
-      const mcapCr = financials.marketCap; // in crores (INR)
+    const marketCap = isFiniteNumber(financials.marketCap);
+    if (marketCap !== null && marketCap > 0) {
+      const mcapCr = marketCap; // in crores (INR)
       const logMcap = Math.log10(mcapCr);
       // Continuous log10 scaling: ~10 Cr (log10≈1) → 5, 1L Cr (log10=5) → 81, ~1M Cr (log10=6) → 100
       marketCapSizeScore = clampScore((logMcap - 1) / 5 * 95 + 5);
-    } else if (financials.marketCap !== null) {
+    } else if (marketCap !== null) {
       marketCapSizeScore = 10; // Negative or zero → score floor
     }
 
@@ -140,7 +141,7 @@ export class StabilityEngine {
       { score: volatilityScore, weight: STABILITY_WEIGHTS.volatility },
       { score: coverageScore, weight: STABILITY_WEIGHTS.coverage },
       { score: interestCoverageScore, weight: STABILITY_WEIGHTS.interestCoverage },
-      { score: marketCapSizeScore, weight: financials.marketCap !== null ? STABILITY_WEIGHTS.marketCapSize : 0 },
+      { score: marketCapSizeScore, weight: marketCap !== null ? STABILITY_WEIGHTS.marketCapSize : 0 },
     ]);
 
     const factorAdjust = (factors.riskFactor - 50) * 0.2;
