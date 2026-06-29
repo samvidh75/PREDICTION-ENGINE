@@ -51,7 +51,7 @@
 }
 
 .tag:hover {
-  background-color: #F0F0F0;
+  background-color: #0A0A0A;
   border-color: var(--border-strong);
 }
 
@@ -92,7 +92,7 @@
 }
 
 .tag-warning:hover {
-  background-color: #FFF5E1;
+  background-color: rgba(255,197,51,0.08);
 }
 
 .tag-closeable {

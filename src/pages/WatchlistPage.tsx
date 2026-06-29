@@ -14,12 +14,12 @@ import type { WatchlistIntelligence } from "../services/personalization/Watchlis
 import { recordAction } from "../services/personalization/UserActionMemory";
 
 const STATUS_COLORS: Record<string, string> = {
-  Strengthening: "#30D158",
-  Stable: "#007AFF",
-  "Needs review": "#FF9500",
-  Weakening: "#FF3B30",
-  "Research signals pending": "#8E8E93",
-  "Tracking begins now": "#8E8E93",
+  Strengthening: colors.accentGreen,
+  Stable: colors.accentBlue,
+  "Needs review": colors.warning,
+  Weakening: colors.danger,
+  "Research signals pending": colors.textTertiary,
+  "Tracking begins now": colors.textTertiary,
 };
 
 const STATUS_PRIORITY: Record<string, number> = {
@@ -226,7 +226,7 @@ export default function WatchlistPage() {
       {/* Error state */}
       {error && (
         <Card>
-          <p style={{ color: "#FF3B30", margin: 0 }}>{error}</p>
+          <p style={{ color: colors.danger, margin: 0 }}>{error}</p>
           <Button variant="secondary" onClick={fetchIntelligence} style={{ marginTop: space[3] }}>
             Retry
           </Button>
@@ -241,7 +241,7 @@ export default function WatchlistPage() {
               width: 64,
               height: 64,
               borderRadius: "50%",
-              background: `radial-gradient(circle, rgba(0,122,255,0.12) 0%, transparent 70%)`,
+              background: `radial-gradient(circle, rgba(255,255,255,0.06) 0%, transparent 70%)`,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -333,9 +333,9 @@ export default function WatchlistPage() {
                       </span>
                       <span style={{ display: "flex", alignItems: "center", gap: 3, fontSize: 12, color: colors.textSecondary }}>
                         {item.scoreDirection === "improving" ? (
-                          <><TrendingUp size={12} color="#30D158" /> Improving</>
+                          <><TrendingUp size={12} color={colors.marketGreen} /> Improving</>
                         ) : item.scoreDirection === "declining" ? (
-                          <><TrendingDown size={12} color="#FF3B30" /> Declining</>
+                          <><TrendingDown size={12} color={colors.danger} /> Declining</>
                         ) : (
                           "Stable"
                         )}
@@ -346,7 +346,7 @@ export default function WatchlistPage() {
                         height: "100%",
                         width: `${item.score}%`,
                         borderRadius: 2,
-                        background: `linear-gradient(90deg, ${colors.success} 0%, #FF9500 50%, ${colors.danger} 100%)`,
+                        background: `linear-gradient(90deg, ${colors.success} 0%, ${colors.warning} 50%, ${colors.danger} 100%)`,
                       }} />
                     </div>
                   </div>

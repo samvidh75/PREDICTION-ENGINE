@@ -1,8 +1,8 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, BarChart3, CandlestickChart, Building2, TrendingUp, Activity, Sigma } from "lucide-react";
+import { ArrowDown, ArrowLeft, ArrowLeftRight, ArrowRight, ArrowUp, BarChart3, Building2, TrendingUp, Activity, Search, ChevronDown, ChevronUp, Download, ExternalLink, Star, Zap } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, Line, LineChart, ResponsiveContainer, XAxis, YAxis } from "recharts";
+import { Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, Line, LineChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts";
 import { Badge } from "../ui/Badge";
 import { Button } from "../ui/Button";
 import { Card, CardLabel } from "../ui/Card";
@@ -15,7 +15,7 @@ import { listAvailableBrokers } from "../commercial/BrokerHandoffService";
 import type { BrokerEntry } from "../commercial/BrokerRegistry";
 import { fallbackAnalysis, generateStockAnalysis } from "../services/llm/AIAnalysisService";
 import type { AIAnalysis } from "../services/llm/AIAnalysisService";
-import { colors, typography, radius } from "../design/tokens";
+import { colors, typography, radius, animation } from "../design/tokens";
 import { InteractiveButton, MetricCard, ExpandingPanel, HoverCard } from "../ui/MicroInteractions";
 import { useSeo } from "../frontend/seo/useSeo";
 import { buildCompanySeo } from "../frontend/seo/companySeo";
@@ -29,24 +29,17 @@ type StockResearchDetail = {
   industry: string;
   price: { current: number; changeAbs: number; changePercent: number; marketCap: number };
   fundamentals: {
-    pe: number | null;
-    industryPe: number | null;
-    pb: number | null;
-    dividendYield: number | null;
-    eps: number | null;
-    high52w?: number | null;
-    low52w?: number | null;
+    pe: number | null; industryPe: number | null; pb: number | null; dividendYield: number | null;
+    eps: number | null; high52w?: number | null; low52w?: number | null;
   };
-  roe: number | null;
-  debtToEquity: number | null;
-  revenueGrowth: number | null;
-  profitGrowth: number | null;
+  roe: number | null; debtToEquity: number | null; revenueGrowth: number | null; profitGrowth: number | null;
   rsi: number | null;
   scores: { quality: number | null; valuation: number | null; growth: number | null; momentum: number | null; risk: number | null; health: number | null; riskAdjusted: number | null };
   confidenceMeter: number;
   timeline: Array<{ day: string; health: number }>;
   whatChanged: string[];
   sectorRelative: Array<{ label: string; company: string; sectorMedian: string }>;
+  sectorComparison: Array<{ company: string; value: string; percentile: number; metric: string }>;
   description: string;
   companyProfile: { founded: string; ceo: string; hq: string; employees: string; website: string; isin: string; businessSegments: string[] };
   financials: {
@@ -63,7 +56,6 @@ type StockResearchDetail = {
 const TIMEFRAMES = ["1W", "1M", "3M", "1Y", "5Y"] as const;
 const FINANCIAL_METRICS = ["revenue", "profit", "ebitda"] as const;
 const FINANCIAL_PERIODS = ["annual", "quarterly"] as const;
-
 type FinancialMetric = (typeof FINANCIAL_METRICS)[number];
 type FinancialPeriod = (typeof FINANCIAL_PERIODS)[number];
 
@@ -75,33 +67,183 @@ function formatNewsTime(value?: string): string {
   if (minutesAgo < 60) return `${Math.max(minutesAgo, 1)}m ago`;
   if (minutesAgo < 1440) return `${Math.round(minutesAgo / 60)}h ago`;
   return `${Math.round(minutesAgo / 1440)}d ago`;
+}// ── Sticky Header (48px, shows on scroll past hero) ─────────────
+function StickyHeader({ symbol, price, changeAbs, changePercent, trendColor }: {
+  symbol: string; price: number; changeAbs: number; changePercent: number; trendColor: string;
+}) {
+  const isUp = changeAbs >= 0;
+  return (
+    <div className="stock-sticky-header" style={{
+      position: "fixed", top: 0, left: 0, right: 0, height: "48px",
+      background: "rgba(0, 0, 0, 0.85)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)",
+      borderBottom: "1px solid rgba(255, 255, 255, 0.06)", zIndex: 50,
+      display: "flex", alignItems: "center", justifyContent: "space-between",
+      padding: "0 24px", opacity: 0, pointerEvents: "none",
+      transition: "opacity 0.2s ease",
+    }}>
+      <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+        <span style={{ color: colors.textPrimary, fontSize: "16px", fontWeight: 700, letterSpacing: "-0.01em" }}>
+          {symbol}
+        </span>
+        <span style={{ color: colors.textPrimary, fontSize: "16px", fontWeight: 600 }}>
+          ₹{price.toLocaleString("en-IN")}
+        </span>
+        <span style={{ color: trendColor, fontSize: "13px", fontWeight: 500, display: "inline-flex", alignItems: "center", gap: "4px" }}>
+          {isUp ? <ArrowUp size={12} /> : <ArrowDown size={12} />}
+          {isUp ? "+" : ""}{changeAbs.toFixed(2)} ({changePercent.toFixed(2)}%)
+        </span>
+      </div>
+      <div style={{ display: "flex", alignItems: "center", gap: "4px", color: colors.textTertiary, fontSize: "12px" }}>
+        <span>⌘</span><span>K</span>
+        <span style={{ marginLeft: "4px", color: colors.textSecondary }}>Commands</span>
+      </div>
+    </div>
+  );
 }
 
-function Ring({ label, value }: { label: string; value: number }) {
-  const circumference = 2 * Math.PI * 40;
+// ── Hero Section (centred, massive price) ────────────────────────
+function HeroSection({ stock, isUp, trendColor }: { stock: StockResearchDetail; isUp: boolean; trendColor: string }) {
+  const convictionEmoji = stock.confidenceMeter >= 75 ? "🔥" : stock.confidenceMeter >= 60 ? "📈" : stock.confidenceMeter >= 40 ? "👀" : "⚠️";
+  const convictionLabel = stock.confidenceMeter >= 75 ? "HIGH CONVICTION" : stock.confidenceMeter >= 60 ? "WATCH" : stock.confidenceMeter >= 40 ? "NEEDS REVIEW" : "RISK RISING";
+  const convictionColor = stock.confidenceMeter >= 75 ? colors.success : stock.confidenceMeter >= 60 ? colors.warning : stock.confidenceMeter >= 40 ? "#FF9500" : colors.danger;
+  return (
+    <section className="stock-hero raycast-slideUp" style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "48px 0 40px", textAlign: "center", position: "relative" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "16px" }}>
+        <Badge value={60} label={stock.exchange} />
+        <span style={{ color: colors.textSecondary, fontSize: "14px", fontWeight: 500 }}>{stock.companyName}</span>
+      </div>
+      <div style={{ fontSize: useResponsiveValue("40px", "64px"), fontWeight: 700, color: colors.textPrimary, lineHeight: "1.1", letterSpacing: "-0.02em" }}>
+        ₹{stock.price.current.toLocaleString("en-IN")}
+      </div>
+      <div style={{ display: "flex", alignItems: "center", gap: "12px", marginTop: "12px", flexWrap: "wrap", justifyContent: "center" }}>
+        <div style={{ color: trendColor, fontSize: "18px", fontWeight: 600, display: "inline-flex", alignItems: "center", gap: "6px" }}>
+          {isUp ? <ArrowUp size={20} /> : <ArrowDown size={20} />}
+          {isUp ? "+" : ""}{stock.price.changeAbs.toFixed(2)} ({stock.price.changePercent.toFixed(2)}%)
+        </div>
+        <div className="raycast-badgePulse" style={{
+          display: "inline-flex", alignItems: "center", gap: "6px", padding: "6px 14px",
+          borderRadius: radius.full, border: `1px solid ${convictionColor}40`,
+          background: `${convictionColor}14`, fontSize: "13px", fontWeight: 600,
+          color: convictionColor,
+        }}>
+          <span>{convictionEmoji}</span><span>{convictionLabel}</span>
+        </div>
+      </div>
+      <div style={{ fontSize: "13px", color: colors.textSecondary, marginTop: "10px" }}>
+        Conf: {stock.confidenceMeter}% · Market Cap: ₹{Math.round(stock.price.marketCap).toLocaleString("en-IN")} Cr
+      </div>
+    </section>
+  );
+}// ── Healthometer (120px ring, color-coded, driver expansion) ─────
+function Healthometer({ score, confidence, stance, timeline }: {
+  score: number; confidence: number; stance: string; timeline: Array<{ day: string; health: number }>;
+}) {
+  const [expanded, setExpanded] = useState(false);
+  const circumference = 2 * Math.PI * 54;
+  const strokeDashoffset = circumference - (score / 100) * circumference;
+  const ringColor = score >= 75 ? colors.success : score >= 50 ? colors.warning : colors.danger;
+  const previousScore = timeline[timeline.length - 2]?.health ?? score;
+  const trend = score > previousScore ? "improving" : score < previousScore ? "declining" : "stable";
+  const trendLabel = trend === "improving" ? "IMPROVING" : trend === "declining" ? "DECLINING" : "STABLE";
+  const trendColor = trend === "improving" ? colors.success : trend === "declining" ? colors.danger : colors.textSecondary;
+
+  const drivers = [
+    { label: "Quality", value: 0, max: 100 },
+    { label: "Valuation", value: 0, max: 100 },
+    { label: "Growth", value: 0, max: 100 },
+    { label: "Momentum", value: 0, max: 100 },
+    { label: "Risk Mgmt", value: 0, max: 100 },
+  ];
+
+  return (
+    <Card className="stock-healthometer-card">
+      <CardLabel>Healthometer Score</CardLabel>
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "20px" }}>
+        <div style={{ position: "relative", width: "120px", height: "120px" }}>
+          <svg width="120" height="120" viewBox="0 0 120 120" style={{ transform: "rotate(-90deg)" }}>
+            <circle cx="60" cy="60" r="54" fill="none" stroke={colors.border} strokeWidth="8" />
+            <circle cx="60" cy="60" r="54" fill="none" stroke={ringColor} strokeWidth="8"
+              strokeDasharray={circumference} strokeDashoffset={strokeDashoffset}
+              strokeLinecap="round"
+              style={{ transition: "stroke-dashoffset 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)" }}
+            />
+          </svg>
+          <div style={{
+            position: "absolute", top: 0, left: 0, right: 0, bottom: 0,
+            display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+          }}>
+            <span style={{ fontSize: "32px", fontWeight: 700, color: colors.textPrimary, lineHeight: "1" }}>{Math.round(score)}</span>
+            <span style={{ fontSize: "11px", color: colors.textSecondary, marginTop: "2px" }}>/100</span>
+          </div>
+        </div>
+        <div className="raycast-badgePulse" style={{
+          display: "inline-flex", alignItems: "center", gap: "6px", padding: "4px 12px",
+          borderRadius: radius.full, border: `1px solid ${trendColor}30`, background: `${trendColor}12`,
+          fontSize: "11px", fontWeight: 600, color: trendColor, letterSpacing: "0.04em",
+        }}>
+          <span>{trend === "improving" ? "▲" : trend === "declining" ? "▼" : "●"}</span>
+          <span>{trendLabel}</span>
+          <span style={{ color: colors.textTertiary, fontWeight: 400 }}>
+            Was {previousScore} → {Math.round(score)} {trend === "improving" ? "↗" : trend === "declining" ? "↘" : "→"}
+          </span>
+        </div>
+        <div className="stock-confidence-row" style={{ display: "flex", gap: "8px", flexWrap: "wrap", justifyContent: "center" }}>
+          <span style={{ fontSize: "12px", color: colors.textSecondary }}>Stance:</span>
+          <span style={{
+            fontSize: "12px", fontWeight: 600,
+            color: stance === "High conviction" ? colors.success : stance === "Risk rising" ? colors.danger : colors.warning,
+          }}>
+            {stance}
+          </span>
+          <span style={{ fontSize: "12px", color: colors.textSecondary }}>· Confidence: {confidence}%</span>
+        </div>
+        <button
+          onClick={() => setExpanded(!expanded)}
+          style={{
+            border: "none", background: "transparent", cursor: "pointer",
+            display: "inline-flex", alignItems: "center", gap: "4px",
+            color: colors.textSecondary, fontSize: "12px", padding: 0,
+          }}
+        >
+          {expanded ? "Hide" : "Show"} score drivers
+          {expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+        </button>
+      </div>
+      {expanded && (
+        <div className="stock-drivers" style={{ marginTop: "20px", display: "grid", gap: "10px" }}>
+          {drivers.map((driver) => (
+            <div key={driver.label} className="raycast-slideUp" style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+              <span style={{ width: "80px", fontSize: "12px", fontWeight: 500, color: colors.textSecondary }}>{driver.label}</span>
+              <div style={{ flex: 1, height: "6px", background: colors.border, borderRadius: radius.full, overflow: "hidden" }}>
+                <div style={{ width: `${driver.value}%`, height: "100%", background: ringColor, borderRadius: radius.full,
+                  transition: "width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)" }} />
+              </div>
+              <span style={{ width: "36px", fontSize: "11px", fontWeight: 500, color: colors.textPrimary, textAlign: "right" }}>{driver.value}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </Card>
+  );
+}// ── Ring (smaller, for score overview) ───────────────────────────
+function Ring({ label, value, size = 80 }: { label: string; value: number; size?: number }) {
+  const r = size * 0.4;
+  const circumference = 2 * Math.PI * r;
   const strokeDashoffset = circumference - (value / 100) * circumference;
-  const color = value >= 75 ? colors.success : value >= 50 ? colors.primary : colors.danger;
+  const ringColor = value >= 75 ? colors.success : value >= 50 ? colors.warning : colors.danger;
   return (
     <div style={{ display: "grid", justifyItems: "center", gap: "8px" }}>
-      <svg width="96" height="96" viewBox="0 0 96 96">
-        <circle cx="48" cy="48" r="40" fill="none" stroke={colors.border} strokeWidth="8" />
-        <circle
-          cx="48"
-          cy="48"
-          r="40"
-          fill="none"
-          stroke={color}
-          strokeWidth="8"
-          strokeDasharray={circumference}
-          strokeDashoffset={strokeDashoffset}
-          strokeLinecap="round"
-          transform="rotate(-90 48 48)"
-        />
-        <text x="48" y="52" textAnchor="middle" fontSize="20" fontWeight="600" fill={colors.textPrimary}>
-          {value}
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={colors.border} strokeWidth="7" />
+        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={ringColor} strokeWidth="7"
+          strokeDasharray={circumference} strokeDashoffset={strokeDashoffset}
+          strokeLinecap="round" transform={`rotate(-90 ${size / 2} ${size / 2})`}
+          style={{ transition: "stroke-dashoffset 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)" }} />
+        <text x={size / 2} y={size / 2 + 4} textAnchor="middle" fontSize={size * 0.2} fontWeight="600" fill={colors.textPrimary}>
+          {Math.round(value)}
         </text>
       </svg>
-      <span style={{ color: colors.textSecondary, fontSize: "12px", letterSpacing: "0.04em", textTransform: "uppercase" }}>{label}</span>
+      <span style={{ color: colors.textSecondary, fontSize: "11px", letterSpacing: "0.04em", textTransform: "uppercase" }}>{label}</span>
     </div>
   );
 }
@@ -117,34 +259,18 @@ function StockSkeleton() {
 }
 
 function StockError({ symbol }: { symbol: string }) {
-  return <div>We could not load research for {symbol}.</div>;
-}
-
-function StockView({ stock }: { stock: StockResearchDetail }) {
+  return <div style={{ color: colors.textPrimary, padding: "40px", textAlign: "center" }}>We could not load research for {symbol}.</div>;
+}function StockView({ stock, financialChartData: financialChartDataProp, shareholding: shareholdingProp, shareholdingSeries: shareholdingSeriesProp, period: periodProp }: {
+  stock: StockResearchDetail;
+  financialChartData: { period: string; value: number }[];
+  shareholding?: { period: string; promoter: number; fii: number; dii: number; retail: number; deltas: { promoter: number; fii: number; dii: number; retail: number } };
+  shareholdingSeries: { period: string; promoter: number; fii: number; dii: number; retail: number; deltas: { promoter: number; fii: number; dii: number; retail: number } }[];
+  period: string;
+}) {
+  const navigate = useNavigate();
+  const heroRef = useRef<HTMLDivElement>(null);
   const [ai, setAi] = useState<AIAnalysis | null>(null);
   const [aiLoading, setAiLoading] = useState(false);
-
-  useEffect(() => {
-    let cancelled = false;
-    const scores = {
-      quality: stock.scores.quality ?? 50,
-      valuation: stock.scores.valuation ?? 50,
-      growth: stock.scores.growth ?? 50,
-      risk: stock.scores.risk ?? 50,
-      technical: stock.scores.momentum ?? 50,
-    };
-    setAiLoading(true);
-    generateStockAnalysis(stock.symbol, stock.companyName, stock.price.current, scores, stock.thesis?.thesis)
-      .then((result) => {
-        if (!cancelled) { setAi(result); setAiLoading(false); }
-      })
-      .catch(() => {
-        if (!cancelled) { setAi(fallbackAnalysis(scores)); setAiLoading(false); }
-      });
-    return () => { cancelled = true; };
-  }, [stock.symbol]);
-
-  const navigate = useNavigate();
   const [timeframe, setTimeframe] = useState<(typeof TIMEFRAMES)[number]>("1Y");
   const [chartType, setChartType] = useState<"line" | "candle">("line");
   const [techIndicator, setTechIndicator] = useState<"none" | "sma" | "rsi" | "macd">("none");
@@ -152,22 +278,54 @@ function StockView({ stock }: { stock: StockResearchDetail }) {
   const [showFinancialTable, setShowFinancialTable] = useState(false);
   const [financialMetric, setFinancialMetric] = useState<FinancialMetric>("revenue");
   const [financialPeriod, setFinancialPeriod] = useState<FinancialPeriod>("annual");
-  const shareholdingSeries = stock.shareholdings ?? stock.shareholding ?? [];
-  const [period, setPeriod] = useState(shareholdingSeries[0]?.period ?? "Mar'26");
   const [brokerModalOpen, setBrokerModalOpen] = useState(false);
+  const [isBrokerOpen, setIsBrokerOpen] = useState(false);
+  const [stickyVisible, setStickyVisible] = useState(false);
+  const [tracked, setTracked] = useState(false);
+  const [showFooter, setShowFooter] = useState(true);
+  const [isCompareOpen, setIsCompareOpen] = useState(false);
+  const [isExportOpen, setIsExportOpen] = useState(false);
+
+  const [period, setPeriod] = useState(periodProp);
   const availableBrokers = listAvailableBrokers();
-  const primaryBroker = availableBrokers[0] ?? null;
+  const selectedBroker = availableBrokers[0]?.name ?? null;
   const sectionGap = useResponsiveValue("48px", "80px");
   const isUp = stock.price.changeAbs >= 0;
   const trendColor = isUp ? colors.success : colors.danger;
-  const shareholding = shareholdingSeries.find((item) => item.period === period) ?? shareholdingSeries[0];
+  const shareholding = shareholdingProp ?? shareholdingSeriesProp.find((item) => item.period === period) ?? shareholdingSeriesProp[0];
   const selectedFinancialSeries = stock.financials[financialPeriod][financialMetric];
-  const financialChartData = selectedFinancialSeries.map((item) => ({
-    period: item.period,
-    value: Math.round(item.value),
-  }));
-  const newsItems = stock.news.slice(0, 5);
-  const filteredNews = newsFilter === "all" ? newsItems : newsItems.filter((n) => (n as any).sentiment === newsFilter);
+  const financialChartData = financialChartDataProp.length > 0 ? financialChartDataProp : selectedFinancialSeries.map((item) => ({ period: item.period, value: Math.round(item.value) }));
+  const newsItems = stock.news.slice(0, 7);
+  const filteredNews = newsFilter === "all" ? newsItems : newsItems.filter((n: any) => n.sentiment === newsFilter);
+  const disclaimer = "This is not investment advice. All data is for educational purposes. Past performance does not guarantee future results.";
+
+  // AI analysis
+  useEffect(() => {
+    let cancelled = false;
+    const scores = {
+      quality: stock.scores.quality ?? 50, valuation: stock.scores.valuation ?? 50,
+      growth: stock.scores.growth ?? 50, risk: stock.scores.risk ?? 50, technical: stock.scores.momentum ?? 50,
+    };
+    setAiLoading(true);
+    generateStockAnalysis(stock.symbol, stock.companyName, stock.price.current, scores, stock.thesis?.thesis)
+      .then((result) => { if (!cancelled) { setAi(result); setAiLoading(false); } })
+      .catch(() => { if (!cancelled) { setAi(fallbackAnalysis(scores)); setAiLoading(false); } });
+    return () => { cancelled = true; };
+  }, [stock.symbol]);
+
+  // Sticky header scroll observer
+  useEffect(() => {
+    const el = heroRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setStickyVisible(!entry.isIntersecting),
+      { threshold: 0, rootMargin: "-48px 0px 0px 0px" }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  // Native ads
   const nativeAdSlots = [
     { type: "ad" as const, id: "ad1", data: { icon: "📈", title: "Track your portfolio like a pro", subtitle: "Get real-time alerts and expert analysis", cta: "Try StockStory Pro →" } },
     { type: "ad" as const, id: "ad2", data: { icon: "🎯", title: "AI-powered stock screening", subtitle: "Find the next multi-bagger before the crowd", cta: "Start free trial →" } },
@@ -178,53 +336,41 @@ function StockView({ stock }: { stock: StockResearchDetail }) {
     if (idx === 6) acc.push(nativeAdSlots[1]);
     return acc;
   }, []);
+
   const factorBadges = [
     { label: "Quality", value: stock.scores.quality ?? 0 },
     { label: "Valuation", value: stock.scores.valuation ?? 0 },
     { label: "Growth", value: stock.scores.growth ?? 0 },
     { label: "Momentum", value: stock.scores.momentum ?? 0 },
     { label: "Risk", value: stock.scores.risk ?? 0 },
-  ];
-
-  return (
+  ];  return (
     <div className="stock-page" style={{ display: "grid", gap: sectionGap }}>
       <SEBIComplianceBanner />
-      <section className="stock-header" style={{ display: "flex", justifyContent: "space-between", gap: "16px", flexWrap: "wrap" }}>
-        <div className="stock-header-copy" style={{ display: "grid", gap: "12px" }}>
-          <button
-            onClick={() => navigate(-1)}
-            style={{ border: "none", background: "transparent", padding: 0, display: "inline-flex", alignItems: "center", gap: "8px", color: colors.textSecondary, cursor: "pointer" }}
-          >
-            <ArrowLeft size={16} />
-            <span>Back</span>
+
+      {/* ── Sticky Header ── */}
+      <StickyHeader symbol={stock.symbol} price={stock.price.current} changeAbs={stock.price.changeAbs}
+        changePercent={stock.price.changePercent} trendColor={trendColor} />
+      <style>{`
+        .stock-sticky-header { opacity: ${stickyVisible ? "1" : "0"} !important; pointer-events: ${stickyVisible ? "auto" : "none"}; }
+      `}</style>
+
+      {/* ── Hero Section ── */}
+      <div ref={heroRef}>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "12px" }}>
+          <button onClick={() => navigate(-1)} style={{
+            border: "none", background: "transparent", padding: 0, display: "inline-flex", alignItems: "center",
+            gap: "6px", color: colors.textSecondary, cursor: "pointer", fontSize: "13px",
+          }}>
+            <ArrowLeft size={16} /><span>Back</span>
           </button>
-          <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
-            <Badge value={60} label={stock.exchange} />
-            <h1 style={{ color: colors.textPrimary, fontSize: typography.h1.desktop.size, fontWeight: 600, lineHeight: "1.25" }}>{stock.symbol}</h1>
-          </div>
-          <p style={{ color: colors.textSecondary, fontSize: typography.body.desktop.size, fontWeight: 400, lineHeight: "1.6" }}>{stock.companyName}</p>
         </div>
-        <div className="stock-header-actions" style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
-          <Button variant="secondary">Track</Button>
-          <Button variant="secondary">Compare</Button>
-          <Button onClick={() => setBrokerModalOpen(true)} disabled={!primaryBroker}>
-            <span>Continue with broker</span>
-            <ArrowRight size={16} />
-          </Button>
-        </div>
-      </section>
+        <HeroSection stock={stock} isUp={isUp} trendColor={trendColor} />
+      </div>
 
-      <section className="stock-price-block" style={{ display: "grid", gap: "12px" }}>
-        <div className="stock-price-value" style={{ color: colors.textPrimary, fontSize: typography.h1.desktop.size, fontWeight: 700, lineHeight: "1.15" }}>₹{stock.price.current.toLocaleString("en-IN")}</div>
-        <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", color: trendColor }}>
-          {isUp ? <ArrowUp size={16} /> : <ArrowDown size={16} />}
-          <span>{`${isUp ? "+" : ""}${stock.price.changeAbs.toFixed(2)} (${stock.price.changePercent.toFixed(2)}%)`}</span>
-        </div>
-      </section>
-
-      <Card className="stock-chart-card">
+      {/* ── Price Chart ── */}
+      <Card className="stock-chart-card raycast-slideUp" style={{ animationDelay: "0.05s", animationFillMode: "both" }}>
         <div className="stock-chart-toolbar" style={{ display: "flex", gap: "8px", marginBottom: "16px", flexWrap: "wrap", alignItems: "center" }}>
-          <div style={{ display: "flex", gap: "4px", background: colors.border, borderRadius: radius.full, padding: "2px" }}>
+          <div style={{ display: "flex", gap: "4px", background: colors.fill, borderRadius: radius.full, padding: "2px" }}>
             <button onClick={() => setChartType("line")} style={{ padding: "6px 14px", borderRadius: radius.full, border: "none", cursor: "pointer", fontSize: "12px", fontWeight: 500, background: chartType === "line" ? colors.primary : "transparent", color: chartType === "line" ? "#fff" : colors.textSecondary }}>Line</button>
             <button onClick={() => setChartType("candle")} style={{ padding: "6px 14px", borderRadius: radius.full, border: "none", cursor: "pointer", fontSize: "12px", fontWeight: 500, background: chartType === "candle" ? colors.primary : "transparent", color: chartType === "candle" ? "#fff" : colors.textSecondary }}>Candle</button>
           </div>
@@ -237,13 +383,11 @@ function StockView({ stock }: { stock: StockResearchDetail }) {
           </div>
           <div style={{ display: "flex", gap: "4px", width: "100%" }}>
             {TIMEFRAMES.map((value) => (
-              <Button key={value} variant={value === timeframe ? "primary" : "tertiary"} onClick={() => setTimeframe(value)}>
-                {value}
-              </Button>
+              <Button key={value} variant={value === timeframe ? "primary" : "tertiary"} onClick={() => setTimeframe(value)}>{value}</Button>
             ))}
           </div>
         </div>
-        <div style={{ width: "100%", height: "280px" }}>
+        <div style={{ width: "100%", height: "300px" }}>
           <ResponsiveContainer>
             {chartType === "line" ? (
               <AreaChart data={stock.priceHistory[timeframe]}>
@@ -253,10 +397,11 @@ function StockView({ stock }: { stock: StockResearchDetail }) {
                     <stop offset="100%" stopColor={trendColor} stopOpacity="0" />
                   </linearGradient>
                 </defs>
-                <CartesianGrid vertical={false} stroke={colors.border} />
-                <XAxis dataKey="label" stroke={colors.textSecondary} />
-                <YAxis stroke={colors.textSecondary} domain={["dataMin", "dataMax"]} />
-                <Area dataKey="price" stroke={trendColor} fill="url(#trendFill)" strokeWidth={2} />
+                <CartesianGrid vertical={false} stroke={colors.border} strokeDasharray="4 4" />
+                <XAxis dataKey="label" stroke={colors.textSecondary} tick={{ fontSize: 11 }} />
+                <YAxis stroke={colors.textSecondary} domain={["auto", "auto"]} tick={{ fontSize: 11 }} />
+                <Tooltip contentStyle={{ background: colors.card, border: `1px solid ${colors.border}`, borderRadius: "8px", color: colors.textPrimary }} />
+                <Area dataKey="price" stroke={trendColor} fill="url(#trendFill)" strokeWidth={2} dot={false} />
                 {techIndicator === "sma" && (
                   <Line dataKey="price" stroke={colors.warning} strokeWidth={1.5} strokeDasharray="6 3" dot={false} name="SMA 20" />
                 )}
@@ -264,8 +409,8 @@ function StockView({ stock }: { stock: StockResearchDetail }) {
             ) : (
               <BarChart data={stock.priceHistory[timeframe].map((d) => ({ ...d, high: d.price * 1.02, low: d.price * 0.98, open: d.price * 0.99, close: d.price * 1.01 }))}>
                 <CartesianGrid vertical={false} stroke={colors.border} />
-                <XAxis dataKey="label" stroke={colors.textSecondary} />
-                <YAxis stroke={colors.textSecondary} domain={["dataMin", "dataMax"]} />
+                <XAxis dataKey="label" stroke={colors.textSecondary} tick={{ fontSize: 11 }} />
+                <YAxis stroke={colors.textSecondary} domain={["auto", "auto"]} tick={{ fontSize: 11 }} />
                 <Bar dataKey="close" fill={trendColor} radius={[2, 2, 0, 0]} />
               </BarChart>
             )}
@@ -276,55 +421,58 @@ function StockView({ stock }: { stock: StockResearchDetail }) {
             {techIndicator === "sma" ? "SMA 20 (dashed) overlaid on price" : techIndicator === "rsi" ? "RSI shown on separate scale tab (coming soon)" : "MACD histogram overlay (coming soon)"}
           </p>
         )}
-      </Card>
-
-      <section className="stock-score-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "16px" }}>
+      </Card>      {/* ── Healthometer + Score Overview ── */}
+      <section className="stock-score-grid raycast-slideUp" style={{ animationDelay: "0.1s", animationFillMode: "both", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "16px" }}>
+        <Healthometer score={stock.scores.health ?? 0} confidence={stock.confidenceMeter} stance={stock.thesis.stance} timeline={stock.timeline} />
         <Card className="stock-panel-card">
-          <CardLabel>Score overview</CardLabel>
-          <div style={{ display: "flex", justifyContent: "space-around", gap: "16px", flexWrap: "wrap", marginBottom: "16px" }}>
+          <CardLabel>Factor breakdown</CardLabel>
+          <div style={{ display: "flex", justifyContent: "space-around", gap: "16px", flexWrap: "wrap", marginBottom: "12px" }}>
             <Ring label="Health" value={stock.scores.health ?? 0} />
-            <Ring label="Risk" value={stock.scores.risk ?? 0} />
+            <Ring label="Risk Adj" value={stock.scores.riskAdjusted ?? stock.scores.health ?? 0} />
           </div>
           <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
             {factorBadges.map((factor) => (
               <Badge key={factor.label} value={factor.value} label={factor.label} />
             ))}
           </div>
-        </Card>
-        <Card className="stock-panel-card">
-          <CardLabel>Thesis confidence</CardLabel>
-          <div style={{ display: "grid", gap: "12px" }}>
-            <Ring label="Confidence" value={stock.confidenceMeter} />
-            <Badge value={stock.scores.riskAdjusted ?? stock.scores.health ?? 0} label="Risk-adjusted" />
-            <p style={{ color: colors.textSecondary, fontSize: typography.body.desktop.size, lineHeight: "1.6" }}>
-              Timeline drift: {stock.timeline.map((item) => item.health).join(" • ")}
-            </p>
-          </div>
+          <p style={{ color: colors.textTertiary, fontSize: "11px", marginTop: "12px", lineHeight: "1.5" }}>
+            Timeline drift: {stock.timeline.map((item) => item.health).join(" → ")}
+          </p>
         </Card>
       </section>
 
-      <Card className="stock-panel-card">
+      {/* ── Key Metrics Grid ── */}
+      <Card className="stock-metrics-card raycast-slideUp" style={{ animationDelay: "0.15s", animationFillMode: "both" }}>
         <CardLabel>Key metrics</CardLabel>
         <div className="stock-metric-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "16px" }}>
           <MetricCard label="Market Cap" value={`₹${Math.round(stock.price.marketCap).toLocaleString("en-IN")} Cr`} />
-          <MetricCard label="PE (TTM)" value={stock.fundamentals.pe?.toFixed(1) ?? "—"} trend={stock.fundamentals.pe != null && stock.fundamentals.pe < 20 ? "up" : stock.fundamentals.pe != null && stock.fundamentals.pe > 30 ? "down" : "neutral"} />
+          <MetricCard label="PE (TTM)" value={stock.fundamentals.pe?.toFixed(1) ?? "—"}
+            trend={stock.fundamentals.pe != null && stock.fundamentals.pe < 20 ? "up" : stock.fundamentals.pe != null && stock.fundamentals.pe > 30 ? "down" : "neutral"}
+            subtitle={stock.fundamentals.industryPe != null ? `Sector: ${stock.fundamentals.industryPe.toFixed(1)}` : undefined} />
           <MetricCard label="PB Ratio" value={stock.fundamentals.pb?.toFixed(1) ?? "—"} />
-          <MetricCard label="ROE" value={stock.roe != null ? `${stock.roe.toFixed(1)}%` : "—"} trend={stock.roe != null && stock.roe > 15 ? "up" : stock.roe != null ? "down" : "neutral"} />
-          <MetricCard label="Debt/Equity" value={stock.debtToEquity != null ? stock.debtToEquity.toFixed(2) : "—"} trend={stock.debtToEquity != null && stock.debtToEquity < 0.5 ? "up" : stock.debtToEquity != null && stock.debtToEquity > 1 ? "down" : "neutral"} />
-          <MetricCard label="Dividend Yield" value={stock.fundamentals.dividendYield != null ? `${stock.fundamentals.dividendYield.toFixed(2)}%` : "—"} trend={stock.fundamentals.dividendYield != null && stock.fundamentals.dividendYield > 1 ? "up" : "neutral"} />
-          <MetricCard label="Revenue Growth" value={stock.revenueGrowth != null ? `${stock.revenueGrowth.toFixed(1)}%` : "—"} trend={stock.revenueGrowth != null && stock.revenueGrowth > 10 ? "up" : stock.revenueGrowth != null ? "down" : "neutral"} />
-          <MetricCard label="Profit Growth" value={stock.profitGrowth != null ? `${stock.profitGrowth.toFixed(1)}%` : "—"} trend={stock.profitGrowth != null && stock.profitGrowth > 10 ? "up" : stock.profitGrowth != null ? "down" : "neutral"} />
-          <MetricCard label="EPS" value={stock.fundamentals.eps != null ? `₹${stock.fundamentals.eps.toFixed(1)}` : "—"} />
-          <MetricCard label="RSI" value={stock.rsi != null ? String(stock.rsi) : "—"} trend={stock.rsi != null && stock.rsi >= 30 && stock.rsi <= 70 ? "neutral" : "down"} />
+          <MetricCard label="ROE" value={stock.roe != null ? `${stock.roe.toFixed(1)}%` : "—"}
+            trend={stock.roe != null && stock.roe > 15 ? "up" : stock.roe != null ? "down" : "neutral"} />
+          <MetricCard label="Debt/Equity" value={stock.debtToEquity != null ? stock.debtToEquity.toFixed(2) : "—"}
+            trend={stock.debtToEquity != null && stock.debtToEquity < 0.5 ? "up" : stock.debtToEquity != null && stock.debtToEquity > 1 ? "down" : "neutral"} />
+          <MetricCard label="Dividend Yield" value={stock.fundamentals.dividendYield != null ? `${stock.fundamentals.dividendYield.toFixed(2)}%` : "—"}
+            trend={stock.fundamentals.dividendYield != null && stock.fundamentals.dividendYield > 1 ? "up" : "neutral"} />
+          <MetricCard label="Revenue Growth" value={stock.revenueGrowth != null ? `${stock.revenueGrowth.toFixed(1)}%` : "—"}
+            trend={stock.revenueGrowth != null && stock.revenueGrowth > 10 ? "up" : stock.revenueGrowth != null ? "down" : "neutral"} />
+          <MetricCard label="Profit Growth" value={stock.profitGrowth != null ? `${stock.profitGrowth.toFixed(1)}%` : "—"}
+            trend={stock.profitGrowth != null && stock.profitGrowth > 10 ? "up" : stock.profitGrowth != null ? "down" : "neutral"} />
+          <MetricCard label="EPS (TTM)" value={stock.fundamentals.eps != null ? `₹${stock.fundamentals.eps.toFixed(1)}` : "—"} />
+          <MetricCard label="RSI (14)" value={stock.rsi != null ? String(stock.rsi) : "—"}
+            trend={stock.rsi != null && stock.rsi >= 30 && stock.rsi <= 70 ? "neutral" : "down"} />
+          <MetricCard label="52W High" value={stock.fundamentals.high52w != null ? `₹${stock.fundamentals.high52w.toLocaleString("en-IN")}` : "—"} />
+          <MetricCard label="52W Low" value={stock.fundamentals.low52w != null ? `₹${stock.fundamentals.low52w.toLocaleString("en-IN")}` : "—"} />
         </div>
-      </Card>
-
-      <Card className="stock-panel-card">
-        <CardLabel>About company</CardLabel>
-        <p style={{ color: colors.textPrimary, fontSize: typography.body.desktop.size, fontWeight: 400, lineHeight: "1.6", marginBottom: "16px" }}>
+      </Card>      {/* ── Company Identity ── */}
+      <Card className="stock-company-card raycast-slideUp" style={{ animationDelay: "0.2s", animationFillMode: "both" }}>
+        <CardLabel>About {stock.companyName}</CardLabel>
+        <p style={{ color: colors.textPrimary, fontSize: typography.body.desktop.size, fontWeight: 400, lineHeight: "1.6", marginBottom: "20px" }}>
           {stock.description}
         </p>
-        <div className="stock-about-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "16px", marginBottom: "16px" }}>
+        <div className="stock-about-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "16px", marginBottom: "20px" }}>
           <Stat label="Founded" value={stock.companyProfile.founded} />
           <Stat label="CEO" value={stock.companyProfile.ceo} />
           <Stat label="HQ" value={stock.companyProfile.hq} />
@@ -333,21 +481,28 @@ function StockView({ stock }: { stock: StockResearchDetail }) {
           <Stat label="ISIN" value={stock.companyProfile.isin} />
           <Stat label="Sector" value={stock.sector} />
           <Stat label="Industry" value={stock.industry} />
-          <Stat label="Listed on" value={`BSE, NSE`} />
+          <Stat label="Listed on" value="BSE, NSE" />
         </div>
-        <div style={{ display: "flex", gap: "12px", marginTop: "6px", fontSize: "13px" }}>
-          <a href="#" style={{ color: colors.primary, textDecoration: "none" }}>Annual Report →</a>
-          <a href="#" style={{ color: colors.primary, textDecoration: "none" }}>Investor Relations →</a>
-          <a href="#" style={{ color: colors.primary, textDecoration: "none" }}>Press Releases →</a>
+        <div style={{ display: "flex", gap: "16px", fontSize: "13px", flexWrap: "wrap" }}>
+          <a href="#" style={{ color: colors.primary, textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "4px" }}>
+            Annual Report <ExternalLink size={12} />
+          </a>
+          <a href="#" style={{ color: colors.primary, textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "4px" }}>
+            Investor Relations <ExternalLink size={12} />
+          </a>
+          <a href="#" style={{ color: colors.primary, textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "4px" }}>
+            Press Releases <ExternalLink size={12} />
+          </a>
         </div>
-        <div className="stock-chip-row" style={{ display: "flex", gap: "8px", flexWrap: "wrap", marginTop: "12px" }}>
+        <div className="stock-chip-row" style={{ display: "flex", gap: "8px", flexWrap: "wrap", marginTop: "16px" }}>
           {stock.companyProfile.businessSegments.map((segment) => (
             <Badge key={segment} value={60} label={segment} />
           ))}
         </div>
       </Card>
 
-      <Card className="stock-panel-card">
+      {/* ── Financials ── */}
+      <Card className="stock-financials-card raycast-slideUp" style={{ animationDelay: "0.25s", animationFillMode: "both" }}>
         <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", flexWrap: "wrap", marginBottom: "16px" }}>
           <CardLabel>Financials</CardLabel>
           <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", alignItems: "center" }}>
@@ -391,12 +546,10 @@ function StockView({ stock }: { stock: StockResearchDetail }) {
             <ResponsiveContainer>
               <BarChart data={financialChartData}>
                 <CartesianGrid vertical={false} stroke={colors.border} />
-                <XAxis dataKey="period" stroke={colors.textSecondary} />
-                <YAxis stroke={colors.textSecondary} />
+                <XAxis dataKey="period" stroke={colors.textSecondary} tick={{ fontSize: 11 }} />
+                <YAxis stroke={colors.textSecondary} tick={{ fontSize: 11 }} />
                 <Bar dataKey="value" radius={[6, 6, 0, 0]}>
-                  {financialChartData.map((entry) => (
-                    <Cell key={entry.period} fill={colors.primary} />
-                  ))}
+                  {financialChartData.map((entry) => (<Cell key={entry.period} fill={colors.primary} />))}
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
@@ -405,14 +558,13 @@ function StockView({ stock }: { stock: StockResearchDetail }) {
         <p style={{ color: colors.textSecondary, fontSize: "12px", marginTop: "12px" }}>All values in ₹ Cr</p>
       </Card>
 
-      <Card className="stock-panel-card">
+      {/* ── Shareholdings ── */}
+      <Card className="stock-shareholdings-card raycast-slideUp" style={{ animationDelay: "0.3s", animationFillMode: "both" }}>
         <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", flexWrap: "wrap", marginBottom: "16px" }}>
           <CardLabel>Shareholdings</CardLabel>
           <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
             {shareholdingSeries.map((value) => (
-              <Button key={value.period} variant={value.period === period ? "secondary" : "tertiary"} onClick={() => setPeriod(value.period)}>
-                {value.period}
-              </Button>
+              <Button key={value.period} variant={value.period === period ? "secondary" : "tertiary"} onClick={() => setPeriod(value.period)}>{value.period}</Button>
             ))}
           </div>
         </div>
@@ -425,27 +577,25 @@ function StockView({ stock }: { stock: StockResearchDetail }) {
           ].map((item) => {
             const positive = item.delta >= 0;
             return (
-              <div key={item.label} className="stock-shareholding-list" style={{ display: "grid", gap: "8px" }}>
+              <div key={item.label} style={{ display: "grid", gap: "8px" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", gap: "12px" }}>
-                  <span>{item.label}</span>
-                  <span style={{ display: "inline-flex", alignItems: "center", gap: "4px", color: positive ? colors.success : colors.danger }}>
-                    {positive ? <ArrowUp size={14} /> : <ArrowDown size={14} />}
-                    {item.value.toFixed(1)}%
+                  <span style={{ fontSize: "13px", color: colors.textPrimary }}>{item.label}</span>
+                  <span style={{ display: "inline-flex", alignItems: "center", gap: "4px", color: positive ? colors.success : colors.danger, fontSize: "13px" }}>
+                    {positive ? <ArrowUp size={14} /> : <ArrowDown size={14} />}{item.value.toFixed(1)}%
                   </span>
                 </div>
-                <div className="stock-shareholding-bar" style={{ height: "8px", background: colors.border, borderRadius: radius.lg, overflow: "hidden" }}>
-                  <div className="stock-shareholding-fill" style={{ width: `${item.value}%`, height: "100%", background: colors.primary }} />
+                <div style={{ height: "8px", background: colors.border, borderRadius: radius.lg, overflow: "hidden" }}>
+                  <div style={{ width: `${item.value}%`, height: "100%", background: colors.primary, borderRadius: radius.lg }} />
                 </div>
               </div>
             );
           })}
         </div>
-      </Card>
-
-      <Card className="stock-panel-card">
+      </Card>      {/* ── News Feed with Native Ads ── */}
+      <Card className="stock-news-card raycast-slideUp" style={{ animationDelay: "0.3s", animationFillMode: "both" }}>
         <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", flexWrap: "wrap", marginBottom: "16px" }}>
           <CardLabel>Latest news</CardLabel>
-          <div className="stock-news-filters" style={{ display: "flex", gap: "4px", padding: "2px", background: colors.border, borderRadius: radius.full }}>
+          <div className="stock-news-filters" style={{ display: "flex", gap: "4px", padding: "2px", background: colors.fill, borderRadius: radius.full }}>
             {(["all", "positive", "negative"] as const).map((f) => (
               <button key={f} onClick={() => setNewsFilter(f)} style={{ padding: "4px 14px", borderRadius: radius.full, border: "none", cursor: "pointer", fontSize: "12px", fontWeight: 500, background: newsFilter === f ? colors.primary : "transparent", color: newsFilter === f ? "#fff" : colors.textSecondary, textTransform: "capitalize" }}>
                 {f === "all" ? "All" : f === "positive" ? "Positive" : "Negative"}
@@ -453,17 +603,28 @@ function StockView({ stock }: { stock: StockResearchDetail }) {
             ))}
           </div>
         </div>
-        <div className="stock-news-list" style={{ display: "grid", gap: "16px" }}>
-          {newsFeedWithAds.map((entry) => {
+        <div className="stock-news-list" style={{ display: "grid", gap: "12px" }}>
+          {newsFeedWithAds.map((entry, entryIdx) => {
             if (entry.type === "ad") {
               return (
-                <div key={entry.id} style={{ display: "flex", gap: "12px", border: `1px dashed ${colors.primary}40`, borderRadius: radius.lg, padding: "12px", background: `${colors.primary}08`, cursor: "pointer" }}>
-                  <span style={{ fontSize: "20px" }}>{entry.data.icon}</span>
-                  <div style={{ display: "grid", gap: "4px", flex: 1 }}>
-                    <div style={{ color: colors.primary, fontWeight: 600, fontSize: "14px" }}>{entry.data.title}</div>
+                <div key={entry.id} className="stock-native-ad raycast-slideUp" style={{
+                  animationDelay: `${0.05 * entryIdx}s`, animationFillMode: "both",
+                  display: "flex", gap: "12px", alignItems: "center",
+                  border: `1px solid ${colors.border}`, borderRadius: radius.lg, padding: "14px 16px",
+                  background: colors.card, cursor: "pointer",
+                  transition: "border-color 0.15s ease",
+                }}>
+                  <span style={{ fontSize: "24px", flexShrink: 0 }}>{entry.data.icon}</span>
+                  <div style={{ display: "grid", gap: "3px", flex: 1 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                      <span style={{ fontSize: "10px", fontWeight: 600, color: colors.textTertiary, textTransform: "uppercase", letterSpacing: "0.06em" }}>SPONSORED</span>
+                    </div>
+                    <div style={{ color: colors.textPrimary, fontWeight: 600, fontSize: "14px" }}>{entry.data.title}</div>
                     <div style={{ color: colors.textSecondary, fontSize: "12px" }}>{entry.data.subtitle}</div>
-                    <span style={{ color: colors.primary, fontSize: "12px", fontWeight: 500, marginTop: "4px" }}>{entry.data.cta}</span>
                   </div>
+                  <span style={{ color: colors.primary, fontSize: "12px", fontWeight: 600, whiteSpace: "nowrap", display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                    {entry.data.cta} <ArrowRight size={14} />
+                  </span>
                 </div>
               );
             }
@@ -471,24 +632,23 @@ function StockView({ stock }: { stock: StockResearchDetail }) {
             const secondary = formatNewsTime(item.publishedAt) || item.time;
             return (
               <a
-                className="stock-news-item"
+                className={`stock-news-item raycast-slideUp`}
                 key={entry.id}
                 href={item.link || "#"}
                 target={item.link ? "_blank" : undefined}
                 rel={item.link ? "noopener noreferrer" : undefined}
                 style={{
-                  display: "flex",
-                  gap: "12px",
-                  textDecoration: "none",
-                  border: `1px solid ${colors.border}`,
-                  borderRadius: radius.lg,
-                  padding: "12px",
-                  color: "inherit",
+                  animationDelay: `${0.05 * entryIdx}s`, animationFillMode: "both",
+                  display: "flex", gap: "12px", alignItems: "flex-start", textDecoration: "none",
+                  border: `1px solid transparent`, borderRadius: radius.lg, padding: "12px",
+                  color: "inherit", transition: "border-color 0.15s ease",
                 }}
+                onMouseEnter={(e) => { e.currentTarget.style.borderColor = colors.border; }}
+                onMouseLeave={(e) => { e.currentTarget.style.borderColor = "transparent"; }}
               >
-                <Building2 color={colors.primary} size={18} />
+                <Building2 color={colors.primary} size={18} style={{ marginTop: "2px", flexShrink: 0 }} />
                 <div style={{ display: "grid", gap: "4px" }}>
-                  <div style={{ color: colors.textPrimary }}>{item.headline}</div>
+                  <div style={{ color: colors.textPrimary, fontSize: "14px", lineHeight: "1.5" }}>{item.headline}</div>
                   <div style={{ color: colors.textSecondary, fontSize: "12px" }}>{`${item.source}${secondary ? ` · ${secondary}` : ""}`}</div>
                 </div>
               </a>
@@ -497,119 +657,149 @@ function StockView({ stock }: { stock: StockResearchDetail }) {
         </div>
       </Card>
 
-      <Card>
+      {/* ── Research Thesis ── */}
+      <Card className="raycast-slideUp" style={{ animationDelay: "0.35s", animationFillMode: "both" }}>
         <CardLabel>Research thesis</CardLabel>
-        <div className="stock-copy-list" style={{ display: "grid", gap: "12px" }}>
+        <div style={{ display: "grid", gap: "12px" }}>
           <Badge value={stock.scores.health ?? 0} label={stock.thesis.stance} />
           <p style={{ color: colors.textSecondary, fontSize: typography.body.desktop.size, lineHeight: "1.6" }}>{stock.thesis.thesis}</p>
-          <p style={{ color: colors.textPrimary, fontSize: typography.body.desktop.size, lineHeight: "1.6" }}>{`Bull case: ${stock.thesis.bullCase}`}</p>
-          <p style={{ color: colors.textPrimary, fontSize: typography.body.desktop.size, lineHeight: "1.6" }}>{`Bear case: ${stock.thesis.bearCase}`}</p>
-          <p style={{ color: colors.textSecondary, fontSize: typography.body.desktop.size, lineHeight: "1.6" }}>{`What to watch: ${stock.thesis.whatToWatch}`}</p>
+          <p style={{ color: colors.textPrimary, fontSize: typography.body.desktop.size, lineHeight: "1.6" }}><strong>Bull case:</strong> {stock.thesis.bullCase}</p>
+          <p style={{ color: colors.textPrimary, fontSize: typography.body.desktop.size, lineHeight: "1.6" }}><strong>Bear case:</strong> {stock.thesis.bearCase}</p>
+          <p style={{ color: colors.textSecondary, fontSize: typography.body.desktop.size, lineHeight: "1.6" }}><strong>What to watch:</strong> {stock.thesis.whatToWatch}</p>
         </div>
       </Card>
 
+      {/* ── Thesis History ── */}
       <ThesisHistory symbol={stock.symbol} />
 
-      {ai && (
-        <Card className="stock-panel-card">
+      {/* ── AI Analysis ── */}
+      {aiLoading && (
+        <Card className="stock-panel-card raycast-slideUp">
           <CardLabel>AI Analysis</CardLabel>
-          <div className="stock-copy-list" style={{ display: "grid", gap: "12px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px", padding: "16px 0" }}>
+            <div className="raycast-spinner" style={{ width: "16px", height: "16px", border: `2px solid ${colors.border}`, borderTopColor: colors.primary, borderRadius: "50%" }} />
+            <span style={{ color: colors.textSecondary, fontSize: "14px" }}>Generating AI analysis…</span>
+          </div>
+        </Card>
+      )}
+      {ai && !aiLoading && (
+        <Card className="stock-ai-card raycast-slideUp">
+          <CardLabel>AI Analysis</CardLabel>
+          <div style={{ display: "grid", gap: "12px" }}>
             <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
               <div style={{
                 width: "8px", height: "8px", borderRadius: "50%",
                 background: ai.state === "High Conviction" ? colors.success : ai.state === "Risk Rising" ? colors.danger : colors.warning,
+                boxShadow: `0 0 6px ${ai.state === "High Conviction" ? colors.success : ai.state === "Risk Rising" ? colors.danger : colors.warning}`,
               }} />
               <span style={{ fontSize: "14px", fontWeight: 600, color: colors.textPrimary }}>{ai.state}</span>
-              <span style={{ fontSize: "12px", color: colors.textSecondary, marginLeft: "8px" }}>
-                Confidence: {ai.confidence}%
-              </span>
+              <span style={{ fontSize: "12px", color: colors.textSecondary, marginLeft: "8px" }}>Confidence: {ai.confidence}%</span>
             </div>
             <p style={{ color: colors.textSecondary, fontSize: typography.body.desktop.size, lineHeight: "1.6" }}>{ai.thesis}</p>
-            <p style={{ color: colors.textPrimary, fontSize: typography.body.desktop.size, lineHeight: "1.6" }}>Bull case: {ai.bullCase}</p>
-            <p style={{ color: colors.textPrimary, fontSize: typography.body.desktop.size, lineHeight: "1.6" }}>Bear case: {ai.bearCase}</p>
-            <p style={{ color: colors.textSecondary, fontSize: typography.body.desktop.size, lineHeight: "1.6" }}>What to watch: {ai.whatToWatch}</p>
+            <p style={{ color: colors.textPrimary, fontSize: typography.body.desktop.size, lineHeight: "1.6" }}><strong>Bull case:</strong> {ai.bullCase}</p>
+            <p style={{ color: colors.textPrimary, fontSize: typography.body.desktop.size, lineHeight: "1.6" }}><strong>Bear case:</strong> {ai.bearCase}</p>
+            <p style={{ color: colors.textSecondary, fontSize: typography.body.desktop.size, lineHeight: "1.6" }}><strong>What to watch:</strong> {ai.whatToWatch}</p>
           </div>
         </Card>
       )}
 
-      <Card className="stock-panel-card">
+      {/* ── What Changed ── */}
+      <Card className="stock-whatchanged-card raycast-slideUp" style={{ animationDelay: "0.4s", animationFillMode: "both" }}>
         <CardLabel>What changed</CardLabel>
-        <div className="stock-copy-list" style={{ display: "grid", gap: "12px" }}>
-          {stock.whatChanged.map((item) => (
-            <p key={item} style={{ color: colors.textSecondary, fontSize: typography.body.desktop.size, lineHeight: "1.6" }}>
-              {item}
-            </p>
+        <div style={{ display: "grid", gap: "12px" }}>
+          {stock.whatChanged.map((item, i) => (
+            <p key={item} className={`raycast-slideUp raycast-stagger-${i + 1}`} style={{ color: colors.textSecondary, fontSize: typography.body.desktop.size, lineHeight: "1.6" }}>{item}</p>
           ))}
         </div>
       </Card>
-
-      <Card className="stock-panel-card">
-        <CardLabel>What to watch next</CardLabel>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "16px" }}>
-          <Stat label="Next earnings" value="Q4 FY25 (estimated)" />
-          <Stat label="Key resistance" value={stock.price.current > 0 ? `₹${(stock.price.current * 1.05).toFixed(0)}` : "—"} />
-          <Stat label="Support level" value={stock.price.current > 0 ? `₹${(stock.price.current * 0.95).toFixed(0)}` : "—"} />
-          <Stat label="52W High" value={stock.fundamentals.high52w != null ? `₹${stock.fundamentals.high52w.toLocaleString("en-IN")}` : "—"} />
-          <Stat label="52W Low" value={stock.fundamentals.low52w != null ? `₹${stock.fundamentals.low52w.toLocaleString("en-IN")}` : "—"} />
-          <Stat label="AI Risk Alert" value={stock.thesis.whatToWatch || "Watch valuation multiple"} />
-        </div>
-      </Card>
-
-      <Card className="stock-panel-card">
-        <CardLabel>Sector-relative view</CardLabel>
-        <div className="stock-sector-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "16px" }}>
-          {stock.sectorRelative.map((item) => (
-            <Stat key={item.label} label={`${item.label} vs sector`} value={`${item.company} / ${item.sectorMedian}`} />
+      {/* ── Sector Relative View ── */}
+      <ExpandingPanel label="Sector Relative View">
+        <div style={{ display: "grid", gap: "16px" }}>
+          {stock.sectorComparison.map((cmp, i) => (
+            <div key={i} style={{ display: "grid", gap: "6px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", gap: "12px" }}>
+                <span style={{ fontSize: "13px", color: colors.textPrimary }}>
+                  {cmp.company}
+                  {cmp.company === stock.companyName && (<span style={{ color: colors.primary, marginLeft: "4px" }}>•</span>)}
+                </span>
+                <span style={{ fontSize: "13px", fontWeight: 600, color: colors.textPrimary }}>{cmp.value}</span>
+              </div>
+              <div style={{ height: "6px", background: colors.fill, borderRadius: radius.full, overflow: "hidden" }}>
+                <div style={{
+                  width: `${cmp.percentile}%`,
+                  height: "100%",
+                  borderRadius: radius.full,
+                  background: cmp.percentile >= 80 ? colors.success : cmp.percentile >= 50 ? colors.warning : colors.danger,
+                }} />
+              </div>
+              <span style={{ fontSize: "11px", color: colors.textTertiary }}>{cmp.metric}</span>
+            </div>
           ))}
         </div>
-      </Card>
+      </ExpandingPanel>
 
+      {/* ── Company Analyst Section ── */}
       <CompanyAnalystSection symbol={stock.symbol} />
 
-      <div style={{ position: "sticky", bottom: 0, display: "flex", gap: "8px", padding: "16px", background: `${colors.page}E6`, backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)", borderTop: `1px solid ${colors.border}`, marginTop: "24px", zIndex: 10, borderRadius: radius.full, justifyContent: "center" }}>
-        <InteractiveButton onClick={() => {}} style={{ flex: 1, maxWidth: 200 }}>Track</InteractiveButton>
-        <InteractiveButton onClick={() => {}} style={{ flex: 1, maxWidth: 200 }} variant="secondary">Compare</InteractiveButton>
-        <InteractiveButton onClick={() => setBrokerModalOpen(true)} disabled={!primaryBroker} style={{ flex: 1, maxWidth: 200 }}>
-          Buy / Trade
-        </InteractiveButton>
+      {/* ── Disclaimer ── */}
+      <p style={{
+        color: colors.textTertiary, fontSize: "11px", textAlign: "center", padding: "0 16px", lineHeight: "1.6",
+      }}>
+        {disclaimer}
+      </p>
+
+      <SEBIComplianceBanner />
+
+      {/* ── Fixed Action Buttons (Raycast White Pill Footer) ── */}
+      <div className="stock-fixed-footer" style={{
+        position: "fixed", bottom: "16px", left: "50%", transform: "translateX(-50%)",
+        display: "flex", gap: "8px", padding: "8px 16px",
+        borderRadius: radius.full, background: "rgba(19, 19, 19, 0.85)",
+        backdropFilter: "blur(24px) saturate(180%)",
+        WebkitBackdropFilter: "blur(24px) saturate(180%)",
+        border: `1px solid ${colors.border}`,
+        boxShadow: "0 4px 24px rgba(0,0,0,0.5)",
+        zIndex: 50,
+        transition: "opacity 0.25s ease",
+        opacity: showFooter ? 1 : 0,
+        pointerEvents: showFooter ? "auto" : "none",
+      }}>
+        <InteractiveButton onClick={() => setTracked(!tracked)} label={tracked ? "Untrack" : "Track"} icon={<Star size={15} fill={tracked ? colors.warning : "none"} color={tracked ? colors.warning : "currentColor"} />} style={{ minWidth: "100px", justifyContent: "center" }} />
+        <InteractiveButton onClick={() => setIsCompareOpen(true)} label="Compare" icon={<ArrowLeftRight size={15} />} style={{ minWidth: "100px", justifyContent: "center" }} />
+        <InteractiveButton onClick={() => setIsExportOpen(true)} label="Export" icon={<Download size={15} />} style={{ minWidth: "100px", justifyContent: "center" }} />
+        <InteractiveButton onClick={() => setIsBrokerOpen(true)} label={`Trade via ${selectedBroker ?? "Broker"}`} primary icon={<TrendingUp size={15} />} style={{ minWidth: "150px", justifyContent: "center" }} />
       </div>
 
-      <div style={{ fontSize: "12px", color: colors.textSecondary, textAlign: "center", paddingTop: "8px" }}>
-        All data for informational purposes only. Not investment advice.
-      </div>
+      {/* ── Broker Handoff Modal ── */}
+      <BrokerHandoffModal
+        open={isBrokerOpen}
+        symbol={stock.symbol}
+        onClose={() => setIsBrokerOpen(false)}
+      />
 
-      {brokerModalOpen && primaryBroker && (
-        <BrokerHandoffModal
-          broker={primaryBroker}
-          stockSymbol={stock.symbol}
-          direction={stock.price.changeAbs >= 0 ? "long" : "short"}
-          rationale={stock.thesis?.thesis ?? "Fundamental analysis"}
-          confidence={stock.confidenceMeter}
-          onClose={() => setBrokerModalOpen(false)}
-        />
-      )}
-    </div>
+      {/* ── Keyboard Hint ── */}
+      <p style={{ textAlign: "center", color: colors.textTertiary, fontSize: "12px", padding: "16px 0 100px", opacity: 0.7 }}>
+        <ArrowUp size={12} style={{ marginRight: "4px" }} />
+        <ArrowDown size={12} style={{ marginRight: "4px" }} />
+        Navigate · <kbd className="raycast-hint">t</kbd> Track · <kbd className="raycast-hint">c</kbd> Compare · <kbd className="raycast-hint">r</kbd> Refresh · <kbd className="raycast-hint">⌘K</kbd> Commands
+      </p>
+    </>
   );
 }
 
-export default function StockPage() {
-  const { symbol = "HDFCBANK" } = useParams();
-  const { data, status } = useQuery({
-    queryKey: ["stock", symbol],
-    staleTime: 5 * 60 * 1000,
-    queryFn: async () => {
-      const response = await fetch(`/api/stock?symbol=${encodeURIComponent(symbol)}`);
-      if (!response.ok) return null;
-      return response.json() as Promise<StockResearchDetail>;
-    },
-  });
+// ── Export ──
+export function StockPage() {
+  const { symbol } = useParams<{ symbol: string }>();
+  const { data, isLoading, error } = useAirtableData(symbol!);
+  const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.05 });
 
-  const companyName = data?.companyName;
-  const sector = data?.sector;
-  const meta = buildCompanySeo(symbol.toUpperCase(), companyName, sector);
-  useSeo(meta);
+  if (isLoading) return <StockSkeleton />;
+  if (error || !data) return <StockError error={error} />;
 
-  if (status === "pending") return <StockSkeleton />;
-  if (!data) return <StockError symbol={symbol} />;
-  return <StockView stock={data} />;
+  return (
+    <div ref={ref} style={{ opacity: inView ? 1 : 0, transition: "opacity 0.4s ease" }}>
+      <SEO title={`${data.stock.companyName} (${data.stock.symbol}) — StockStory`} description={data.stock.description || `AI-powered analysis of ${data.stock.companyName}`} />
+      <StockView stock={data.stock} financialChartData={data.financialChartData ?? []} shareholding={data.shareholding} shareholdingSeries={data.shareholdingSeries ?? []} period={data.period ?? "Sep 2025"} />
+    </div>
+  );
 }

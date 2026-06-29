@@ -137,7 +137,7 @@ export default function AboutPage() {
             transform: "translateX(-50%) rotate(-2deg)",
             width: "clamp(400px, 85vw, 1100px)",
             height: 240,
-            background: "linear-gradient(90deg, #ff5757 0%, #a1131a 50%, #ff5757 100%)",
+            background: "linear-gradient(90deg, #FF6363 0%, #b0151e 50%, #FF6363 100%)",
             clipPath: "polygon(0 15%, 100% 0, 100% 85%, 0 100%)",
             opacity: 0.9,
             pointerEvents: "none",
@@ -153,7 +153,7 @@ export default function AboutPage() {
             transform: "translateX(-50%) rotate(-1.5deg)",
             width: "clamp(380px, 80vw, 1050px)",
             height: 200,
-            background: "linear-gradient(90deg, #ff5757 0%, #a1131a 50%, #ff5757 100%)",
+            background: "linear-gradient(90deg, #FF6363 0%, #b0151e 50%, #FF6363 100%)",
             clipPath: "polygon(0 15%, 100% 0, 100% 85%, 0 100%)",
             opacity: 0.5,
             filter: "blur(12px)",
@@ -192,7 +192,7 @@ export default function AboutPage() {
             Research the Indian market{" "}
             <span
               style={{
-                background: "linear-gradient(135deg, #ff5757 0%, #a1131a 100%)",
+                background: "linear-gradient(135deg, #FF6363 0%, #b0151e 100%)",
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
               }}
@@ -293,10 +293,11 @@ export default function AboutPage() {
             textAlign: "left",
           }}
         >
-          {VALUES.map((v) => (
+          {VALUES.map((v, i) => (
             <Card
               key={v.title}
               variant="elevated"
+              className={`raycast-slideUp raycast-stagger-${i + 1}`}
               style={{ display: "grid", gap: space[3], justifyContent: "start" }}
             >
               <div
@@ -346,9 +347,10 @@ export default function AboutPage() {
             width: "100%",
           }}
         >
-          {TEAM.map((member) => (
+          {TEAM.map((member, i) => (
             <div
               key={member.name}
+              className={`raycast-slideUp raycast-stagger-${i + 1}`}
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -436,6 +438,7 @@ export default function AboutPage() {
           {MILESTONES.map((m, i) => (
             <div
               key={m.year}
+              className={`raycast-slideUp raycast-stagger-${i + 1}`}
               style={{
                 position: "relative",
                 display: "grid",
@@ -524,9 +527,10 @@ export default function AboutPage() {
               { keys: ["G", "N"], label: "Go to news" },
               { keys: ["R"], label: "Refresh data" },
               { keys: ["?"], label: "Show all shortcuts" },
-            ].map((sc) => (
+            ].map((sc, i) => (
               <div
                 key={sc.label}
+                className={`raycast-slideUp raycast-stagger-${i + 1}`}
                 style={{
                   display: "flex",
                   justifyContent: "space-between",

@@ -202,16 +202,16 @@ export function KeyboardHelpOverlay({ open, onClose }: KeyboardHelpOverlayProps)
       <div
         onClick={(e) => e.stopPropagation()}
         style={{
-          background: '#fff', borderRadius: 16,
+          background: '#0A0A0A', borderRadius: 16,
           padding: '28px 32px', maxWidth: 480, width: '90%',
-          boxShadow: '0 16px 48px rgba(0,0,0,0.15)',
+          border: '1px solid #1A1A1A',
         }}
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-          <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700 }}>Keyboard Shortcuts</h2>
+          <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: '#ffffff' }}>Keyboard Shortcuts</h2>
           <button
             onClick={onClose}
-            style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', padding: 4, color: '#8e8e93' }}
+            style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', padding: 4, color: '#707070' }}
           >
             ✕
           </button>
@@ -219,19 +219,19 @@ export function KeyboardHelpOverlay({ open, onClose }: KeyboardHelpOverlayProps)
 
         {categories.map((cat) => (
           <div key={cat} style={{ marginBottom: 16 }}>
-            <p style={{ fontSize: 11, fontWeight: 600, color: '#8e8e93', textTransform: 'uppercase', letterSpacing: '0.05em', margin: '0 0 8px' }}>
+            <p style={{ fontSize: 11, fontWeight: 600, color: '#707070', textTransform: 'uppercase', letterSpacing: '0.05em', margin: '0 0 8px' }}>
               {labels[cat]}
             </p>
             <div style={{ display: 'grid', gap: 6 }}>
               {SHORTCUT_CATALOG.filter((s) => s.category === cat).map((s) => (
                 <div key={s.key} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: 14, color: '#3c3c43' }}>{s.description}</span>
+                  <span style={{ fontSize: 14, color: '#A0A0A0' }}>{s.description}</span>
                   <kbd
                     style={{
-                      background: '#f2f2f7', border: '1px solid #e5e5ea',
+                      background: '#1A1A1A', border: '1px solid #333',
                       borderRadius: 6, padding: '2px 8px',
                       fontSize: 12, fontWeight: 600, fontFamily: 'inherit',
-                      color: '#3c3c43',
+                      color: '#A0A0A0',
                     }}
                   >
                     {s.key}
@@ -242,8 +242,8 @@ export function KeyboardHelpOverlay({ open, onClose }: KeyboardHelpOverlayProps)
           </div>
         ))}
 
-        <p style={{ fontSize: 12, color: '#8e8e93', margin: '12px 0 0', textAlign: 'center' }}>
-          Press <kbd style={{ background: '#f2f2f7', border: '1px solid #e5e5ea', borderRadius: 4, padding: '1px 6px', fontSize: 11, fontWeight: 600, fontFamily: 'inherit' }}>?</kbd> anytime to reopen
+        <p style={{ fontSize: 12, color: '#707070', margin: '12px 0 0', textAlign: 'center' }}>
+          Press <kbd style={{ background: '#1A1A1A', border: '1px solid #333', borderRadius: 4, padding: '1px 6px', fontSize: 11, fontWeight: 600, fontFamily: 'inherit', color: '#A0A0A0' }}>?</kbd> anytime to reopen
         </p>
       </div>
     </div>

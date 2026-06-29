@@ -158,7 +158,7 @@
   background: linear-gradient(
     90deg,
     var(--bg-chip) 0%,
-    #F5F5F5 50%,
+    #1A1A1A 50%,
     var(--bg-chip) 100%
   );
   background-size: 200% 100%;
@@ -213,7 +213,7 @@
   background: linear-gradient(
     90deg,
     var(--bg-chip) 0%,
-    #F5F5F5 50%,
+    #1A1A1A 50%,
     var(--bg-chip) 100%
   );
   background-size: 200% 100%;

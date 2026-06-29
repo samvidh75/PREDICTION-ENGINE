@@ -4,7 +4,7 @@
  * Single-select with pill-tab / pill-tab-active styling.
  */
 
-import { colors, radius } from "../design/tokens";
+import { colors, radius, animation } from "../design/tokens";
 import { useState } from "react";
 
 interface PillOption {
@@ -61,7 +61,7 @@ export function Pill({
               background: isActive ? colors.surfaceElevated : "transparent",
               color: isActive ? colors.onDark : colors.mute,
               cursor: "pointer",
-              transition: "all 0.15s ease",
+              transition: `all ${animation.fast}`,
               whiteSpace: "nowrap",
               lineHeight: 1,
             }}

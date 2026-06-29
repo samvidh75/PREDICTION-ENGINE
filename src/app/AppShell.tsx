@@ -195,13 +195,13 @@ export function AppShell({ children }: { children: ReactNode }) {
           root.id = "feedback-widget-root";
           document.body.appendChild(root);
           // Simple mount via DOM — React would need a portal, this is a lightweight toggle
-          root.innerHTML = `<div style="position:fixed;bottom:80px;right:24px;z-index:100;background:#fff;border-radius:16px;padding:20px;box-shadow:0 4px 24px rgba(0,0,0,0.12);width:360px;">
+          root.innerHTML = `<div style="position:fixed;bottom:80px;right:24px;z-index:100;background:#0A0A0A;border:1px solid #1A1A1A;border-radius:16px;padding:20px;width:360px;">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-              <h3 style="margin:0;font-size:16px;font-weight:700;">Send Feedback</h3>
-              <button id="feedback-close" style="background:none;border:none;cursor:pointer;font-size:18px;">×</button>
+              <h3 style="margin:0;font-size:16px;font-weight:700;color:#ffffff;">Send Feedback</h3>
+              <button id="feedback-close" style="background:none;border:none;cursor:pointer;font-size:18px;color:#A0A0A0;">×</button>
             </div>
             <form id="feedback-form" style="display:flex;flex-direction:column;gap:12px;font-size:14px;">
-              <select id="fb-category" style="padding:8px 12px;border-radius:10px;border:1px solid #e5e5ea;font-size:14px;">
+              <select id="fb-category" style="padding:8px 12px;border-radius:10px;border:1px solid #1A1A1A;font-size:14px;background:#000000;color:#ffffff;">
                 <option value="bug">Bug Report</option>
                 <option value="feature-request">Feature Request</option>
                 <option value="accuracy">Accuracy Concern</option>
@@ -209,10 +209,10 @@ export function AppShell({ children }: { children: ReactNode }) {
                 <option value="data-quality">Data Quality</option>
                 <option value="other">Other</option>
               </select>
-              <input id="fb-title" type="text" required placeholder="Brief title" style="padding:8px 12px;border-radius:10px;border:1px solid #e5e5ea;font-size:14px;" />
-              <textarea id="fb-body" required rows="4" placeholder="Describe your feedback..." style="padding:8px 12px;border-radius:10px;border:1px solid #e5e5ea;font-size:14px;resize:vertical;font-family:inherit;"></textarea>
-              <div id="fb-error" style="color:#ff3b30;font-size:14px;display:none;"></div>
-              <button type="submit" style="padding:8px 20px;border-radius:10px;border:none;background:#007aff;color:#fff;font-size:14px;font-weight:600;cursor:pointer;">Submit Feedback</button>
+              <input id="fb-title" type="text" required placeholder="Brief title" style="padding:8px 12px;border-radius:10px;border:1px solid #1A1A1A;font-size:14px;background:#000000;color:#ffffff;" />
+              <textarea id="fb-body" required rows="4" placeholder="Describe your feedback..." style="padding:8px 12px;border-radius:10px;border:1px solid #1A1A1A;font-size:14px;resize:vertical;font-family:inherit;background:#000000;color:#ffffff;"></textarea>
+              <div id="fb-error" style="color:#FF6363;font-size:14px;display:none;"></div>
+              <button type="submit" style="padding:8px 20px;border-radius:10px;border:none;background:#ffffff;color:#000000;font-size:14px;font-weight:600;cursor:pointer;">Submit Feedback</button>
             </form>
           </div>`;
 
@@ -230,7 +230,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 body: JSON.stringify({ category: cat, title, body, pageUrl: window.location.href }),
               });
               if (!res.ok) throw new Error();
-              root.innerHTML = '<div style="padding:20px;text-align:center;"><h3 style="margin:0 0 12px;">Thank you!</h3><p style="color:#8e8e93;font-size:14px;">Your feedback helps us improve.</p></div>';
+              root.innerHTML = '<div style="padding:20px;text-align:center;"><h3 style="margin:0 0 12px;color:#ffffff;">Thank you!</h3><p style="color:#A0A0A0;font-size:14px;">Your feedback helps us improve.</p></div>';
               setTimeout(() => root.remove(), 3000);
             } catch {
               errEl.style.display = "block";
@@ -253,7 +253,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          boxShadow: "0 4px 12px rgba(0,122,255,0.3)",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.3)",
         }}
         aria-label="Send feedback"
       >
@@ -287,7 +287,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         }
         .rail .nav-link.is-active {
           color:${colors.primary};
-          background:rgba(0,122,255,0.08);
+          background:rgba(255,255,255,0.08);
         }
         .rail .nav-link:hover {
           color:${colors.textPrimary};
@@ -300,7 +300,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           height:${components.navBar.heightDesktop};
           padding:0 ${layout.pagePaddingMobile};
           border-bottom:${layout.borderWidth} solid ${colors.border};
-          background:rgba(242,242,247,0.82);
+          background:rgba(0,0,0,0.85);
           backdrop-filter:blur(20px);
           -webkit-backdrop-filter:blur(20px);
         }
@@ -314,7 +314,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           height:${components.navBar.heightMobile};
           display:flex;
           border-top:${layout.borderWidth} solid ${colors.border};
-          background:rgba(242,242,247,0.82);
+          background:rgba(0,0,0,0.85);
           backdrop-filter:blur(20px);
           -webkit-backdrop-filter:blur(20px);
           z-index:10;
@@ -350,7 +350,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             bottom:0;
             border-right:${layout.borderWidth} solid ${colors.border};
             padding:${space[6]};
-            background:rgba(242,242,247,0.78);
+            background:rgba(0,0,0,0.85);
             backdrop-filter:blur(24px);
             -webkit-backdrop-filter:blur(24px);
             overflow-y:auto;

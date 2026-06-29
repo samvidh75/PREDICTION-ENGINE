@@ -55,7 +55,7 @@ tbody tr {
 }
 
 tbody tr:hover {
-  background-color: #FAFAFA;
+  background-color: #0A0A0A;
 }
 
 tbody tr:last-child {
@@ -101,11 +101,11 @@ td:last-child {
 
 /* STRIPED TABLE */
 .table-striped tbody tr:nth-child(odd) {
-  background-color: #FAFAFA;
+  background-color: #0A0A0A;
 }
 
 .table-striped tbody tr:nth-child(odd):hover {
-  background-color: #F5F5F5;
+  background-color: #141414;
 }
 
 /* HOVERABLE TABLE */
@@ -151,7 +151,7 @@ td:last-child {
 }
 
 .table-borderless tbody tr:hover {
-  background-color: #F0F0F0;
+  background-color: #0A0A0A;
 }
 
 /* SORTABLE COLUMNS */
@@ -162,7 +162,7 @@ th.sortable {
 }
 
 th.sortable:hover {
-  background-color: #F0F0F0;
+  background-color: #0A0A0A;
 }
 
 th.sortable::after {
@@ -232,7 +232,7 @@ th.sortable.sort-desc::after {
 
 .table-expandable tbody tr.expanded + tr.expanded-content {
   display: table-row;
-  background-color: #FAFAFA;
+  background-color: #0A0A0A;
 }
 
 .table-expandable .expanded-content td {

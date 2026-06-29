@@ -15,12 +15,12 @@ interface ThesisHistoryProps {
 }
 
 const STATUS_STYLES: Record<string, { bg: string; color: string }> = {
-  Strengthening: { bg: "rgba(48, 209, 88, 0.12)", color: "#30D158" },
-  Stable: { bg: "rgba(0, 122, 255, 0.12)", color: "#007AFF" },
-  "Needs review": { bg: "rgba(255, 149, 0, 0.12)", color: "#FF9500" },
-  Weakening: { bg: "rgba(255, 59, 48, 0.12)", color: "#FF3B30" },
-  "Research signals pending": { bg: "rgba(142, 142, 147, 0.12)", color: "#8E8E93" },
-  "Tracking begins now": { bg: "rgba(142, 142, 147, 0.12)", color: "#8E8E93" },
+  Strengthening: { bg: colors.accentGreenSoft, color: colors.accentGreen },
+  Stable: { bg: "rgba(87, 193, 255, 0.12)", color: colors.accentBlue },
+  "Needs review": { bg: colors.accentYellowSoft, color: colors.warning },
+  Weakening: { bg: colors.accentRedSoft, color: colors.danger },
+  "Research signals pending": { bg: "rgba(112, 112, 112, 0.12)", color: colors.textTertiary },
+  "Tracking begins now": { bg: "rgba(112, 112, 112, 0.12)", color: colors.textTertiary },
 };
 
 export function ThesisHistory({ symbol, currentThesis }: ThesisHistoryProps) {

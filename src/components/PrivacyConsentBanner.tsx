@@ -17,7 +17,7 @@ export default function PrivacyConsentBanner() {
 
   return (
     <div style={bannerStyle}>
-      <p style={{ margin: 0, fontSize: typography.body.desktop.size, lineHeight: typography.body.desktop.line, flex: 1, color: "#f5f5f7" }}>
+      <p style={{ margin: 0, fontSize: typography.body.desktop.size, lineHeight: typography.body.desktop.line, flex: 1, color: colors.textSecondary }}>
         We use privacy-first analytics to improve the app. No personal data is collected.
         <a
           href="/privacy"
@@ -50,7 +50,7 @@ const bannerStyle: React.CSSProperties = {
   alignItems: "center",
   gap: space[4],
   padding: `${space[3]} ${space[6]}`,
-  background: "#1c1c1e",
+  background: colors.surface,
   fontSize: typography.body.desktop.size,
   flexWrap: "wrap",
   fontFamily: typography.fontFamily,
