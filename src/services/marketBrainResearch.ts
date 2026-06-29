@@ -240,6 +240,10 @@ export async function fetchMarketBrainResearch(symbol: string, init?: RequestIni
     throw new MarketBrainResearchError('A symbol is required to load research.', 400, 'SYMBOL_REQUIRED');
   }
 
+  if (!PUBLIC_SYMBOL_PATTERN.test(normalized)) {
+    throw new MarketBrainResearchError('A valid symbol is required to load research.', 400, 'SYMBOL_INVALID');
+  }
+
   const response = await fetch(`/api/stockstory/${encodeURIComponent(normalized)}/research`, {
     ...init,
     headers: {
