@@ -66,4 +66,46 @@ describe('fetchMarketBrainResearch public symbol normalization', () => {
     expect(result.symbol).toBe('BAJAJ-AUTO');
     expect(result.research.symbol).toBe('BAJAJ-AUTO');
   });
+
+  it('falls back to the requested symbol when upstream top-level and nested symbols are malformed', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({
+        symbol: '../../backend-provider',
+        companyName: 'Test Company',
+        research: {
+          ...baseResearch,
+          symbol: 'NSE:TEST<script>',
+          companyName: 'Test Company',
+        },
+      }),
+    }));
+
+    const result = await fetchMarketBrainResearch('test-1');
+
+    expect(result.symbol).toBe('TEST-1');
+    expect(result.research.symbol).toBe('TEST-1');
+  });
+
+  it('uses a safe nested symbol when the top-level upstream symbol is malformed', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({
+        symbol: 'bad symbol with spaces',
+        companyName: 'M&M',
+        research: {
+          ...baseResearch,
+          symbol: ' m&m ',
+          companyName: 'M&M',
+        },
+      }),
+    }));
+
+    const result = await fetchMarketBrainResearch('fallback');
+
+    expect(result.symbol).toBe('M&M');
+    expect(result.research.symbol).toBe('M&M');
+  });
 });
