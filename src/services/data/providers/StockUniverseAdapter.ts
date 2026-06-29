@@ -93,6 +93,11 @@ function resolveUniversePath(): string | null {
 // ─── Adapter ─────────────────────────────────────────────────────────────────
 
 export class StockUniverseAdapter implements CompanyMasterAdapter {
+  /** Singleton accessor — delegates to the module-level getStockUniverseAdapter(). */
+  static getInstance(): StockUniverseAdapter {
+    return getStockUniverseAdapter();
+  }
+
   private loaded = false;
   private loadError: string | null = null;
   private bySymbol: Map<string, StockUniverseEntry> = new Map();
@@ -218,8 +223,3 @@ export function getStockUniverseAdapter(): StockUniverseAdapter {
   }
   return _instance;
 }
-
-/** Static alias for getStockUniverseAdapter — used by startServer.ts wiring. */
-StockUniverseAdapter.getInstance = function (): StockUniverseAdapter {
-  return getStockUniverseAdapter();
-};

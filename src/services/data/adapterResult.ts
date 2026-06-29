@@ -59,7 +59,7 @@ export function unwrapOr<T>(result: AdapterResult<T>, fallback: T): T {
 
 export function mapResult<T, U>(result: AdapterResult<T>, fn: (data: T) => U): AdapterResult<U> {
   if (!result.ok) {
-    return { ...result, data: null as unknown as U };
+    return { ok: false, data: null, warnings: result.warnings, errorCode: result.errorCode, asOf: result.asOf };
   }
   return {
     ok: true,
@@ -74,7 +74,7 @@ export function flatMapResult<T, U>(
   fn: (data: T) => AdapterResult<U>,
 ): AdapterResult<U> {
   if (!result.ok) {
-    return { ...result, data: null as unknown as U };
+    return { ok: false, data: null, warnings: result.warnings, errorCode: result.errorCode, asOf: result.asOf };
   }
   const next = fn(result.data);
   next.warnings = [...result.warnings, ...next.warnings]; // accumulate warnings

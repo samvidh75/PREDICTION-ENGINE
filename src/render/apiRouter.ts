@@ -573,18 +573,13 @@ export default async function registerApiRoutes(server: FastifyInstance) {
     if (!symbol) return reply.status(400).send({ error: "symbol required" });
 
     const adapter = StockUniverseAdapter.getInstance();
-    const ready = adapter.ready;
-    const result = adapter.getCompanyMaster();
+    const result = await adapter.getCompanyMaster(symbol);
 
     if (!result.ok) {
-      return reply.status(503).send({ error: "Company master unavailable", detail: result.error });
+      return reply.status(503).send({ error: "Company master unavailable", detail: result.errorCode });
     }
 
-    // Normalize and find the exact entry
-    const normalizedKey = symbol.startsWith("NSE") || symbol.startsWith("BSE")
-      ? symbol.slice(3)
-      : symbol;
-    const entry = result.data[normalizedKey];
+    const entry = result.data;
 
     if (!entry) {
       return reply.status(404).send({ error: "Symbol not found in universe", symbol });
@@ -593,16 +588,13 @@ export default async function registerApiRoutes(server: FastifyInstance) {
     return {
       ok: true,
       symbol: entry.symbol,
-      name: entry.name,
+      companyName: entry.companyName,
       sector: entry.sector,
       industry: entry.industry,
-      marketCap: entry.marketCap,
+      exchange: entry.exchange || null,
       marketCapCategory: entry.marketCapCategory || null,
       isin: entry.isin || null,
-      active: entry.active ?? true,
       source: "stock-universe-bundle",
-      ready,
-      universeSize: adapter.size,
     };
   });
 
