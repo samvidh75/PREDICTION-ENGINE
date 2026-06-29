@@ -121,11 +121,12 @@ const asEvidenceDomains = (value: unknown): MarketBrainEvidenceDomain[] => {
   const seen = new Set<MarketBrainEvidenceDomain>();
 
   value.forEach((item) => {
-    if (!(typeof item === 'string' && MARKET_BRAIN_EVIDENCE_DOMAINS.has(item as MarketBrainEvidenceDomain))) {
+    const trimmedDomain = asTrimmedString(item);
+    if (!MARKET_BRAIN_EVIDENCE_DOMAINS.has(trimmedDomain as MarketBrainEvidenceDomain)) {
       return;
     }
 
-    const domain = item as MarketBrainEvidenceDomain;
+    const domain = trimmedDomain as MarketBrainEvidenceDomain;
     if (!seen.has(domain)) {
       seen.add(domain);
       domains.push(domain);
