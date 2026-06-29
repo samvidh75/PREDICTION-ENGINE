@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { getConsent, setConsent } from "../lib/consent";
+import { colors, typography, space, radius } from "../design/tokens";
+import { Button } from "../ui/Button";
 
 export default function PrivacyConsentBanner() {
   const [visible, setVisible] = useState(false);
@@ -15,24 +17,24 @@ export default function PrivacyConsentBanner() {
 
   return (
     <div style={bannerStyle}>
-      <p style={{ margin: 0, fontSize: "14px", lineHeight: "1.5", flex: 1 }}>
+      <p style={{ margin: 0, fontSize: typography.body.desktop.size, lineHeight: typography.body.desktop.line, flex: 1, color: "#f5f5f7" }}>
         We use privacy-first analytics to improve the app. No personal data is collected.
         <a
           href="/privacy"
-          style={{ color: "inherit", marginLeft: "4px" }}
+          style={{ color: colors.primary, marginLeft: space[1] }}
           target="_blank"
           rel="noopener noreferrer"
         >
           Learn more
         </a>.
       </p>
-      <div style={{ display: "flex", gap: "8px", flexShrink: 0 }}>
-        <button onClick={() => { setConsent("declined"); setVisible(false); }} style={secondaryBtnStyle}>
+      <div style={{ display: "flex", gap: space[2], flexShrink: 0 }}>
+        <Button variant="secondary" size="sm" onClick={() => { setConsent("declined"); setVisible(false); }}>
           Decline
-        </button>
-        <button onClick={() => { setConsent("accepted"); setVisible(false); }} style={primaryBtnStyle}>
+        </Button>
+        <Button variant="primary" size="sm" onClick={() => { setConsent("accepted"); setVisible(false); }}>
           Accept
-        </button>
+        </Button>
       </div>
     </div>
   );
@@ -46,31 +48,10 @@ const bannerStyle: React.CSSProperties = {
   zIndex: 999,
   display: "flex",
   alignItems: "center",
-  gap: "16px",
-  padding: "12px 24px",
+  gap: space[4],
+  padding: `${space[3]} ${space[6]}`,
   background: "#1c1c1e",
-  color: "#f5f5f7",
-  fontSize: "14px",
+  fontSize: typography.body.desktop.size,
   flexWrap: "wrap",
-};
-
-const primaryBtnStyle: React.CSSProperties = {
-  padding: "8px 16px",
-  borderRadius: "8px",
-  border: "none",
-  background: "#007aff",
-  color: "#fff",
-  fontWeight: 600,
-  cursor: "pointer",
-  fontSize: "13px",
-};
-
-const secondaryBtnStyle: React.CSSProperties = {
-  padding: "8px 16px",
-  borderRadius: "8px",
-  border: "1px solid rgba(255,255,255,0.3)",
-  background: "transparent",
-  color: "#f5f5f7",
-  cursor: "pointer",
-  fontSize: "13px",
+  fontFamily: typography.fontFamily,
 };

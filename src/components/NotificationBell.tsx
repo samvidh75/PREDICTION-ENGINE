@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Bell } from "lucide-react";
 import { getUnacknowledgedCount } from "../services/personalization/AlertStore";
+import { colors } from "../design/tokens";
 
 export function NotificationBell() {
   const [count, setCount] = useState(0);
@@ -24,7 +25,7 @@ export function NotificationBell() {
           position: "absolute",
           top: "-6px",
           right: "-8px",
-          background: "#FF3B30",
+          background: colors.danger,
           color: "#fff",
           fontSize: "10px",
           fontWeight: 700,

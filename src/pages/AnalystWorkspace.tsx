@@ -4,6 +4,7 @@ import { Card, CardLabel } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
 import { SEBIComplianceBanner } from '../components/SEBICompliance';
+import { colors, typography, layout, space, radius } from '../design/tokens';
 
 const API_BASE = import.meta.env.VITE_API_URL ?? '';
 
@@ -12,6 +13,19 @@ async function fetchAnalyst<T>(path: string, init?: RequestInit): Promise<T> {
   if (!res.ok) throw new Error('Research unavailable');
   return res.json() as Promise<T>;
 }
+
+const inputStyle: React.CSSProperties = {
+  minHeight: "44px",
+  border: `1px solid ${colors.border}`,
+  borderRadius: radius.md,
+  padding: "0 16px",
+  fontSize: typography.body.desktop.size,
+  color: colors.textPrimary,
+  background: colors.card,
+  outline: "none",
+  fontFamily: "inherit",
+  flex: 1,
+};
 
 export default function AnalystWorkspace() {
   const [question, setQuestion] = useState('');
@@ -38,74 +52,87 @@ export default function AnalystWorkspace() {
   const answer = qaMutation.data?.data;
 
   return (
-    <div className="mx-auto max-w-5xl space-y-6 p-6">
-      <header>
-        <h1 className="text-2xl font-semibold text-gray-900">Analyst Workspace</h1>
-        <p className="mt-1 text-sm text-gray-600">
-          Research briefs, deep dives, and evidence-bound Q&amp;A. Not investment advice.
-        </p>
-      </header>
-
+    <main style={{ maxWidth: "1200px", margin: "0 auto", padding: layout.pagePaddingDesktop, color: colors.textPrimary }}>
       <SEBIComplianceBanner />
 
-      <Card>
-        <CardLabel>Ask a research question</CardLabel>
-        <div className="mt-3 flex flex-col gap-3 sm:flex-row">
-          <input
-            type="text"
-            placeholder="Symbol (optional)"
-            value={symbol}
-            onChange={(e) => setSymbol(e.target.value.toUpperCase())}
-            className="rounded border px-3 py-2 text-sm"
-          />
-          <input
-            type="text"
-            placeholder="e.g. Why is risk elevated?"
-            value={question}
-            onChange={(e) => setQuestion(e.target.value)}
-            className="flex-1 rounded border px-3 py-2 text-sm"
-          />
-          <Button
-            onClick={() => question.trim() && qaMutation.mutate(question.trim())}
-            disabled={!question.trim() || qaMutation.isPending}
-          >
-            Ask
-          </Button>
-        </div>
-        {answer && (
-          <div className="mt-4 rounded bg-gray-50 p-4 text-sm">
-            <p>{answer.answer}</p>
-            {answer.confidence && (
-              <Badge value={answer.confidence} />
-            )}
-            {answer.limitations && answer.limitations.length > 0 && (
-              <p className="mt-2 text-gray-500">{answer.limitations.join(' ')}</p>
-            )}
-            <p className="mt-2 text-xs text-gray-400">Research only. Not investment advice.</p>
-          </div>
-        )}
-      </Card>
-
-      <Card>
-        <CardLabel>Company deep dive</CardLabel>
-        {deepDives?.data ? (
-          <div className="mt-3 space-y-2 text-sm">
-            <p>{String(deepDives.data.thesisSummary ?? deepDives.data.summary ?? 'Research available')}</p>
-            {Array.isArray(deepDives.data.limitations) && deepDives.data.limitations.length > 0 && (
-              <p className="text-gray-500">{deepDives.data.limitations.join(' ')}</p>
-            )}
-          </div>
-        ) : (
-          <p className="mt-3 text-sm text-gray-500">No deep dive available yet. Enter a symbol to load research.</p>
-        )}
-      </Card>
-
-      <Card>
-        <CardLabel>Latest analyst briefs</CardLabel>
-        <p className="mt-3 text-sm text-gray-500">
-          Earnings notes, filing briefs, and sector briefs appear here when generated for your research universe.
+      <section style={{ marginBottom: "48px" }}>
+        <h1 style={{ fontSize: typography.h2.desktop.size, fontWeight: 700, marginBottom: "8px" }}>
+          Analyst Workspace
+        </h1>
+        <p style={{ fontSize: typography.body.desktop.size, color: colors.textSecondary, maxWidth: "600px", lineHeight: 1.6 }}>
+          Research briefs, deep dives, and evidence-bound Q&amp;A. Not investment advice.
         </p>
-      </Card>
-    </div>
+      </section>
+
+      <div style={{ display: "grid", gap: "24px" }}>
+        <Card>
+          <CardLabel>Ask a research question</CardLabel>
+          <div style={{ display: "flex", flexDirection: "row", gap: "12px", marginTop: "16px", flexWrap: "wrap" }}>
+            <input
+              type="text"
+              placeholder="Symbol (optional)"
+              value={symbol}
+              onChange={(e) => setSymbol(e.target.value.toUpperCase())}
+              style={{ ...inputStyle, maxWidth: "160px" }}
+            />
+            <input
+              type="text"
+              placeholder="e.g. Why is risk elevated?"
+              value={question}
+              onChange={(e) => setQuestion(e.target.value)}
+              style={inputStyle}
+              onKeyDown={(e) => e.key === 'Enter' && question.trim() && qaMutation.mutate(question.trim())}
+            />
+            <Button
+              onClick={() => question.trim() && qaMutation.mutate(question.trim())}
+              disabled={!question.trim() || qaMutation.isPending}
+            >
+              Ask
+            </Button>
+          </div>
+          {answer && (
+            <div style={{ marginTop: "16px", padding: "16px", background: colors.page, borderRadius: radius.md, fontSize: typography.body.desktop.size, lineHeight: 1.6 }}>
+              <p style={{ margin: 0 }}>{answer.answer}</p>
+              <div style={{ display: "flex", gap: "8px", alignItems: "center", marginTop: "12px" }}>
+                {answer.confidence && (
+                  <Badge value={answer.confidence} />
+                )}
+                {answer.limitations && answer.limitations.length > 0 && (
+                  <span style={{ fontSize: "13px", color: colors.textSecondary }}>{answer.limitations.join(' ')}</span>
+                )}
+              </div>
+              <p style={{ marginTop: "12px", fontSize: "12px", color: colors.textSecondary }}>Research only. Not investment advice.</p>
+            </div>
+          )}
+        </Card>
+
+        <Card>
+          <CardLabel>Company deep dive</CardLabel>
+          {deepDives?.data ? (
+            <div style={{ marginTop: "12px", display: "grid", gap: "8px", fontSize: typography.body.desktop.size, lineHeight: 1.6 }}>
+              <p style={{ margin: 0, color: colors.textPrimary }}>
+                {String(deepDives.data.thesisSummary ?? deepDives.data.summary ?? 'Research available')}
+              </p>
+              {Array.isArray(deepDives.data.limitations) && deepDives.data.limitations.length > 0 && (
+                <p style={{ margin: 0, color: colors.textSecondary, fontSize: "14px" }}>
+                  {deepDives.data.limitations.join(' ')}
+                </p>
+              )}
+            </div>
+          ) : (
+            <p style={{ marginTop: "12px", color: colors.textSecondary, fontSize: "14px" }}>
+              No deep dive available yet. Enter a symbol to load research.
+            </p>
+          )}
+        </Card>
+
+        <Card>
+          <CardLabel>Latest analyst briefs</CardLabel>
+          <p style={{ marginTop: "12px", color: colors.textSecondary, fontSize: "14px" }}>
+            Earnings notes, filing briefs, and sector briefs appear here when generated for your research universe.
+          </p>
+        </Card>
+      </div>
+    </main>
   );
 }

@@ -7,6 +7,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { ScanPresetDefinition } from '../services/scanner/presets';
+import { colors, typography, radius } from '../design/tokens';
 
 /* ─── Types ─────────────────────────────────────────────────────────── */
 
@@ -146,16 +147,17 @@ export function CommandPalette({ presets = [], open, onClose }: CommandPalettePr
       <div
         onClick={(e) => e.stopPropagation()}
         style={{
-          background: '#fff', borderRadius: 16,
+          background: colors.card, borderRadius: radius.xl,
           width: '90%', maxWidth: 520,
           boxShadow: '0 20px 60px rgba(0,0,0,0.18)',
           overflow: 'hidden',
           display: 'flex', flexDirection: 'column',
           maxHeight: '60vh',
+          fontFamily: typography.fontFamily,
         }}
       >
         {/* ── Input ── */}
-        <div style={{ padding: '12px 16px', borderBottom: '1px solid #e5e5ea' }}>
+        <div style={{ padding: '12px 16px', borderBottom: `1px solid ${colors.separator}` }}>
           <input
             ref={inputRef}
             autoFocus
@@ -166,7 +168,7 @@ export function CommandPalette({ presets = [], open, onClose }: CommandPalettePr
             style={{
               width: '100%', border: 'none', outline: 'none',
               fontSize: 16, background: 'transparent',
-              color: '#1c1c1e', fontFamily: 'inherit',
+              color: colors.textPrimary, fontFamily: typography.fontFamily,
             }}
           />
         </div>
@@ -174,7 +176,7 @@ export function CommandPalette({ presets = [], open, onClose }: CommandPalettePr
         {/* ── Results ── */}
         <div ref={listRef} style={{ overflowY: 'auto', padding: '6px 0', flex: 1 }}>
           {results.length === 0 && (
-            <p style={{ padding: '20px 16px', color: '#8e8e93', fontSize: 14, textAlign: 'center' }}>
+            <p style={{ padding: '20px 16px', color: colors.textSecondary, fontSize: 14, textAlign: 'center' }}>
               No results for "{query}"
             </p>
           )}
@@ -187,14 +189,14 @@ export function CommandPalette({ presets = [], open, onClose }: CommandPalettePr
               <div key={cat}>
                 <p
                   style={{
-                    fontSize: 11, fontWeight: 600, color: '#8e8e93',
-                    textTransform: 'uppercase', letterSpacing: '0.05em',
+                    fontSize: typography.micro.desktop.size, fontWeight: typography.micro.desktop.weight, color: colors.textSecondary,
+                    textTransform: 'uppercase', letterSpacing: typography.micro.desktop.track,
                     padding: '8px 16px 4px', margin: 0,
                   }}
                 >
                   {cat === 'page' ? 'Pages' : cat === 'preset' ? 'Scanner Presets' : 'Viewport'}
                 </p>
-                {items.map((item, i) => {
+                {items.map((item) => {
                   const globalIdx = results.indexOf(item);
                   return (
                     <button
@@ -204,9 +206,9 @@ export function CommandPalette({ presets = [], open, onClose }: CommandPalettePr
                       style={{
                         display: 'flex', alignItems: 'center', gap: 10,
                         width: '100%', padding: '8px 16px',
-                        border: 'none', background: selectedIdx === globalIdx ? '#f2f2f7' : 'transparent',
+                        border: 'none', background: selectedIdx === globalIdx ? colors.fill : 'transparent',
                         cursor: 'pointer', textAlign: 'left', fontSize: 14,
-                        color: '#1c1c1e', fontFamily: 'inherit',
+                        color: colors.textPrimary, fontFamily: typography.fontFamily,
                         transition: 'background 0.1s',
                       }}
                     >
@@ -214,7 +216,7 @@ export function CommandPalette({ presets = [], open, onClose }: CommandPalettePr
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <span style={{ fontWeight: 500, display: 'block' }}>{item.label}</span>
                         {item.description && (
-                          <span style={{ fontSize: 12, color: '#8e8e93', display: 'block', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          <span style={{ fontSize: typography.caption.desktop.size, color: colors.textSecondary, display: 'block', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                             {item.description}
                           </span>
                         )}
@@ -230,8 +232,8 @@ export function CommandPalette({ presets = [], open, onClose }: CommandPalettePr
         {/* ── Footer ── */}
         <div
           style={{
-            padding: '8px 16px', borderTop: '1px solid #e5e5ea',
-            display: 'flex', gap: 16, fontSize: 12, color: '#8e8e93',
+            padding: '8px 16px', borderTop: `1px solid ${colors.separator}`,
+            display: 'flex', gap: 16, fontSize: typography.caption.desktop.size, color: colors.textSecondary,
           }}
         >
           <span>↑↓ Navigate</span>
