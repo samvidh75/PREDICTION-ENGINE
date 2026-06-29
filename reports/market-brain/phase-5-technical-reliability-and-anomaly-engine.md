@@ -38,6 +38,7 @@ Build deterministic technical-intelligence foundations for Market Brain research
 - validate already-computed technical feature values before use;
 - classify structured market events without LLM calls;
 - extend anomaly evidence packs with compact, safe narrative payloads;
+- wire anomaly review into Market Brain output only as optional research context;
 - preserve product-safe copy and avoid direct recommendation language.
 
 ## Files changed
@@ -49,6 +50,8 @@ Build deterministic technical-intelligence foundations for Market Brain research
 - `src/systems/market-brain/eventClassifier.ts`
 - `src/systems/market-brain/eventClassifier.test.ts`
 - `src/systems/market-brain/index.ts`
+- `src/systems/market-brain/indiaMarketBrain.ts`
+- `src/systems/market-brain/indiaMarketBrain.test.ts`
 - `reports/market-brain/phase-5-technical-reliability-and-anomaly-engine.md`
 
 ## Technical reliability result
@@ -104,7 +107,13 @@ This classifier is deterministic and emits compact factual reasons only.
 
 The new utilities are exported from `src/systems/market-brain/index.ts`.
 
-No deeper Market Brain narrative wiring was added in this run because the safe next step was to establish deterministic foundations first and avoid accidental public output changes.
+Additional follow-up wiring was completed after the first Phase 5 checkpoint:
+
+- `IndiaEquityPacket` now accepts an optional `anomaly` input.
+- `evaluateIndiaEquity` now builds an optional `anomalyReview` using `buildMarketAnomalyEvidencePack`.
+- Anomaly context can add safe thesis, risk-review, and watch-next lines.
+- Incomplete anomaly evidence stays inside `anomalyReview` and does not pollute core `missingEvidence` domains.
+- No provider integration, LLM call, prediction, or trading-signal language was added.
 
 ## Frontend-safe normalization result
 
@@ -117,7 +126,8 @@ The new outputs are designed to be frontend-safe if later exposed through Market
 - no direct recommendation language;
 - no provider/backend wording;
 - compact and deduped evidence arrays;
-- research-only wording.
+- research-only wording;
+- optional anomaly context instead of mandatory public diagnostics.
 
 ## Tests added or updated
 
@@ -145,6 +155,8 @@ Added and updated unit tests for:
 - market-aligned move;
 - gap move;
 - incomplete and malformed inputs;
+- optional Market Brain anomaly review wiring;
+- incomplete anomaly review isolation from core evidence domains;
 - absence of unsafe copy.
 
 ## Verification results
@@ -203,9 +215,12 @@ Some internal tests intentionally contain forbidden words only inside negative a
 - `31a2ba59ccd484c5082b2493f7e735e3b27a7eac` — Add market event classifier
 - `6ae85f7c3b3debf5f70c20a64dcaef88d1ae0282` — Add market event classifier tests
 - `c879f72229799900ab61e8d40148a9a778e10217` — Export market brain helpers
+- `30c4c21e0c2f6f1a5e11b4d9c90b16df94735976` — Document phase 5 technical anomaly engine
+- `40da8881c3ef498cf804cac33f68d1cf542404d1` — Wire anomaly review into market brain
+- `12ff89e4e20b25b84fdbbae0d5e4fa41eea83934` — Test market brain anomaly review wiring
 
 ## Next remaining task
 
-Run CI/local verification, then wire the anomaly/event outputs into Market Brain narrative normalization only if the public DTO can remain product-facing and free of backend/provider wording.
+Run CI/local verification, then wire normalized Market Brain anomaly output into `marketBrainResearch` only if the public DTO can remain product-facing and free of provider/backend wording.
 
 The next engine phase should be historical-similarity foundations for similar past setups, with sample-size safeguards and research-context language only. It must not become a prediction or trading-signal feature.
