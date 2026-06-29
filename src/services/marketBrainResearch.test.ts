@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { fetchMarketBrainResearch, MarketBrainResearchError } from './marketBrainResearch';
+import { fetchMarketBrainResearch } from './marketBrainResearch';
 
 const responsePayload = {
   symbol: 'TCS',
@@ -452,13 +452,13 @@ describe('fetchMarketBrainResearch', () => {
     }));
 
     await expect(fetchMarketBrainResearch('TCS')).rejects.toMatchObject({
-      code: 'PROVIDER_UPSTREAM_FAILURE',
+      code: 'RESEARCH_UNAVAILABLE',
       message: 'Research is temporarily unavailable for this company.',
       status: 503,
     });
   });
 
-  it('throws public-safe error copy when unavailable research returns a non-object payload', async () => {
+  it('throws public-safe unavailable code and copy when unavailable research returns a non-object payload', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
       ok: false,
       status: 502,
@@ -466,7 +466,7 @@ describe('fetchMarketBrainResearch', () => {
     }));
 
     await expect(fetchMarketBrainResearch('TCS')).rejects.toMatchObject({
-      code: undefined,
+      code: 'RESEARCH_UNAVAILABLE',
       message: 'Research is temporarily unavailable for this company.',
       status: 502,
     });
