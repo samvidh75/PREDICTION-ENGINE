@@ -46,8 +46,8 @@ describe('fetchMarketBrainResearch company name safety', () => {
 
     const result = await fetchMarketBrainResearch('TCS');
 
-    expect(result.companyName).toBe('');
-    expect(result.research.companyName).toBe('');
+    expect(result.companyName).toBe('TCS');
+    expect(result.research.companyName).toBe('TCS');
   });
 
   it('falls back to a nested safe company name when the top-level copy is unsafe', async () => {
@@ -68,5 +68,27 @@ describe('fetchMarketBrainResearch company name safety', () => {
 
     expect(result.companyName).toBe('Tata Consultancy Services');
     expect(result.research.companyName).toBe('Tata Consultancy Services');
+  });
+
+  it('falls back to the public symbol when company names are blank', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({
+        ...responsePayload,
+        symbol: ' infy ',
+        companyName: '   ',
+        research: {
+          ...responsePayload.research,
+          symbol: ' infy ',
+          companyName: '',
+        },
+      }),
+    }));
+
+    const result = await fetchMarketBrainResearch('INFY');
+
+    expect(result.companyName).toBe('INFY');
+    expect(result.research.companyName).toBe('INFY');
   });
 });
