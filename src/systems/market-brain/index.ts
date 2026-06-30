@@ -13,3 +13,6 @@ export * from './narrativeModelProvider';
 export * from './disabledNarrativeModelProvider';
 export * from './ollamaNarrativeModelProvider';
 export * from './narrativeOutputGuardrails';
+export * from './eventEvidencePack';
+export * from './evidenceRetrievalAdapters';
+export * from './evidenceRetrievalOrchestrator';
