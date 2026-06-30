@@ -7,6 +7,8 @@ import { useResponsiveValue } from "../ui/responsive";
 import { colors, typography, radius } from "../design/tokens";
 import { ScannerPresets } from "../components/ScannerPresets";
 import { Sparkles, TrendingUp, TrendingDown, Minus, BarChart3 } from "lucide-react";
+import { ResearchAiExplanationPanel } from "../components/ai-orchestrator/ResearchAiExplanationPanel";
+import { buildScannerContext } from "../components/ai-orchestrator/researchAiContext";
 
 const FALLBACK_PRESET: EnhancedScanType = "quality-compounders";
 
@@ -369,6 +371,24 @@ export default function ScannerPage() {
           </div>
         </div>
       )}
+
+      {/* AI Explanation Panel — appears below hovered stock detail */}
+      {hoveredStock && (() => {
+        const scannerCtx = buildScannerContext(
+          hoveredStock.symbol,
+          hoveredStock.name || hoveredStock.symbol,
+          {
+            rank: hoveredStock.rank,
+            keyReason: hoveredStock.matchReason || `${hoveredStock.symbol} scores ${Math.round(hoveredStock.composite)}% on ${activePreset.label}`,
+            riskMarker: FACTOR_COLUMNS.reduce((lowest, fc) => ((hoveredStock as any)[fc.key] ?? 0) < ((hoveredStock as any)[lowest.key] ?? 0) ? fc : lowest, FACTOR_COLUMNS[0]).label,
+            conviction: hoveredStock.composite >= 70 ? "High conviction" : hoveredStock.composite >= 50 ? "Moderate conviction" : "Speculative",
+            oneLineThesis: `${hoveredStock.symbol} ranks #${hoveredStock.rank} in ${activePreset.label} with ${Math.round(hoveredStock.composite)}% composite score.`,
+            companyName: hoveredStock.name || hoveredStock.symbol,
+            symbol: hoveredStock.symbol,
+          }
+        );
+        return <ResearchAiExplanationPanel context={scannerCtx} />;
+      })()}
 
       {/* Results summary */}
       <div className="raycast-stagger-7" style={{ fontSize: "12px", color: colors.textSecondary, textAlign: "center" }}>

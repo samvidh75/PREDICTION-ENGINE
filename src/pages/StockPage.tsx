@@ -35,6 +35,8 @@ import {
   buildNewsEventPack,
 } from "../components/ai-orchestrator/eventEvidenceAiContext";
 import { buildEvidenceRetrievalContext } from "../systems/market-brain/evidenceRetrievalOrchestrator";
+import type { EvidenceRetrievalAggregate } from "../research/contracts/evidenceRetrievalContracts";
+import { EvidenceSummaryPanel } from "../ui/EvidenceSummaryPanel";
 import { getStockResearch, type StockResearchDetail as LocalStockResearchDetail } from "../lib/stockResearch";
 
 type StockResearchDetail = {
@@ -412,11 +414,20 @@ function StockError({ symbol }: { symbol: string }) {
 
   // Async enrich with full evidence retrieval (filings, corp actions, alerts, results)
   const [retrievalContext, setRetrievalContext] = useState<string | null>(null);
+  const [evidenceAggregate, setEvidenceAggregate] = useState<EvidenceRetrievalAggregate | null>(null);
   useEffect(() => {
     let cancelled = false;
-    buildEvidenceRetrievalContext(stock.symbol).then((ctx) => {
-      if (!cancelled && ctx) setRetrievalContext(ctx);
-    }).catch(() => { /* graceful degradation */ });
+    (async () => {
+      try {
+        const { buildEvidenceRetrievalAggregate } = await import("../systems/market-brain/evidenceRetrievalOrchestrator");
+        const result = await buildEvidenceRetrievalAggregate(stock.symbol, { symbol: stock.symbol, maxPerSource: 8, lookbackDays: 90 });
+        if (!cancelled) {
+          const { compressEventEvidencePack } = await import("../systems/market-brain/eventEvidencePack");
+          setEvidenceAggregate(result.aggregate);
+          setRetrievalContext(compressEventEvidencePack(result.pack));
+        }
+      } catch { /* graceful degradation */ }
+    })();
     return () => { cancelled = true; };
   }, [stock.symbol]);
 
@@ -545,6 +556,13 @@ function StockError({ symbol }: { symbol: string }) {
         <ResearchAiExplanationPanel context={finalHealthometerContext} />
         <ResearchAiExplanationPanel context={finalResearchContext} />
       </section>
+
+      {/* ── Evidence Summary Panel ── */}
+      {evidenceAggregate && evidenceAggregate.totalItems > 0 ? (
+        <section className="raycast-slideUp" style={{ animationDelay: "0.15s", animationFillMode: "both" }}>
+          <EvidenceSummaryPanel aggregate={evidenceAggregate} title="Deterministic Evidence" />
+        </section>
+      ) : null}
 
       {/* ── Key Metrics Grid ── */}
       <Card className="stock-metrics-card raycast-slideUp" style={{ animationDelay: "0.15s", animationFillMode: "both" }}>
