@@ -19,6 +19,8 @@ import { Button } from "../ui/Button";
 import { HealthometerMini } from "../ui/HealthometerMini";
 import { PriceFlash } from "../ui/PriceFlash";
 import { colors, typography, space, radius, layout, media } from "../design/tokens";
+import { ResearchAiExplanationPanel } from "../components/ai-orchestrator/ResearchAiExplanationPanel";
+import type { ResearchAiContext } from "../components/ai-orchestrator/researchAiTypes";
 import type { ReactNode } from "react";
 
 // ─── Types ─────────────────────────────────────────────────────────
@@ -295,6 +297,40 @@ export default function ComparePage() {
   const stocks = useMemo(() => {
     return selectedSymbols.map((s) => generateMockStock(s)).filter(Boolean) as ComparableStock[];
   }, [selectedSymbols]);
+
+  // Build AI context from comparison for ResearchAiExplanationPanel
+  const comparisonContext = useMemo((): ResearchAiContext | null => {
+    if (stocks.length < 2) return null;
+    const sorted = [...stocks].sort((a, b) => b.score - a.score);
+    const top = sorted[0];
+    const worst = sorted[sorted.length - 1];
+    const sectorCounts: Record<string, { count: number; symbols: string[] }> = {};
+    stocks.forEach((s) => {
+      if (!sectorCounts[s.sector]) sectorCounts[s.sector] = { count: 0, symbols: [] };
+      sectorCounts[s.sector].count++;
+      sectorCounts[s.sector].symbols.push(s.symbol);
+    });
+    const concentratedSector = Object.entries(sectorCounts).find(([, v]) => v.count >= 2);
+
+    return {
+      surface: "compare",
+      symbol: `${top.symbol} vs ${worst.symbol}`,
+      companyName: `${stocks.length} stocks compared`,
+      headline: `Comparing ${stocks.length} stocks — leader: ${top.symbol}`,
+      narrative: [
+        `${top.symbol} leads with score ${top.score.toFixed(0)}/100 vs ${worst.symbol} at ${worst.score.toFixed(0)}/100.`,
+        concentratedSector
+          ? `${concentratedSector[0]} is over-represented (${concentratedSector[1].symbols.join(", ")}).`
+          : "Sector allocation looks well diversified.",
+      ],
+      comparisonContext: stocks.map((s) =>
+        `${s.symbol} (${s.sector}): score=${s.score.toFixed(0)}, PE=${s.metrics.pe}, ROE=${s.metrics.roe}%, margin=${s.metrics.profitMargin}%`
+      ),
+      whatToWatch: sorted.slice(0, 2).map((s) =>
+        `Monitor ${s.symbol} — ${s.score > 70 ? "strong fundamentals warrant attention" : "keep tracking for improvement"}`
+      ),
+    };
+  }, [stocks]);
 
   const metricRows = useMemo((): { id: TabId; rows: { label: string; key: string; higherIsBetter: boolean; unit?: string; highlight?: boolean }[] }[] => [
     {
@@ -744,6 +780,8 @@ export default function ComparePage() {
               })()}
             </Card>
           </div>
+
+          <ResearchAiExplanationPanel context={comparisonContext} />
         </section>
       )}
 

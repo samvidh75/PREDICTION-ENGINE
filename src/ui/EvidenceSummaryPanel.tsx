@@ -8,8 +8,8 @@
 
 import { useState } from "react";
 import { ChevronDown, ChevronRight, Newspaper, FileText, ArrowRightLeft, LineChart, Bell } from "lucide-react";
-import { colors, space, typography, radius } from "../design/tokens";
-import { Card, CardLabel } from "./Card";
+import { colors, space, typography } from "../design/tokens";
+import { Panel } from "./Panel";
 import type { EventEvidencePack, EventEvidenceKind } from "../research/contracts/eventEvidenceContracts";
 import type { EvidenceRetrievalAggregate } from "../research/contracts/evidenceRetrievalContracts";
 
@@ -139,22 +139,23 @@ export function EvidenceSummaryPanel({ pack, aggregate, title }: EvidenceSummary
   // If aggregate provided, render it directly (richer data)
   if (aggregate && aggregate.totalItems > 0) {
     return (
-      <Card className="luxury-panel" style={{ display: "grid", gap: space[2], overflow: "hidden" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-          <CardLabel>{title ?? "Evidence Summary"}</CardLabel>
-          <button
-            onClick={() => setAllOpen(!allOpen)}
-            style={{
-              all: "unset",
-              cursor: "pointer",
-              fontSize: "11px",
-              color: colors.primary,
-              marginLeft: "auto",
-            }}
-          >
-            {allOpen ? "Collapse all" : "Expand all"}
-          </button>
-        </div>
+      <Panel variant="elevated" style={{ display: "grid", gap: space[2] }}>
+        <Panel.Header
+          title={title ?? "Evidence Summary"}
+          action={
+            <button
+              onClick={() => setAllOpen(!allOpen)}
+              style={{
+                all: "unset",
+                cursor: "pointer",
+                fontSize: "11px",
+                color: colors.primary,
+              }}
+            >
+              {allOpen ? "Collapse all" : "Expand all"}
+            </button>
+          }
+        />
 
         <div style={{ color: colors.textSecondary, fontSize: "12px", lineHeight: "1.5" }}>
           Retrieved {aggregate.totalItems} evidence items from deterministic sources.
@@ -205,7 +206,7 @@ export function EvidenceSummaryPanel({ pack, aggregate, title }: EvidenceSummary
         <div style={{ fontSize: "11px", color: colors.textTertiary }}>
           Data retrieved at {new Date(aggregate.retrievedAt).toLocaleTimeString("en-IN")}
         </div>
-      </Card>
+      </Panel>
     );
   }
 
@@ -218,22 +219,23 @@ export function EvidenceSummaryPanel({ pack, aggregate, title }: EvidenceSummary
   if (kindsWithItems.length === 0) return null;
 
   return (
-    <Card className="luxury-panel" style={{ display: "grid", gap: space[2], overflow: "hidden" }}>
-      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-        <CardLabel>{title ?? "Evidence Summary"}</CardLabel>
-        <button
-          onClick={() => setAllOpen(!allOpen)}
-          style={{
-            all: "unset",
-            cursor: "pointer",
-            fontSize: "11px",
-            color: colors.primary,
-            marginLeft: "auto",
-          }}
-        >
-          {allOpen ? "Collapse all" : "Expand all"}
-        </button>
-      </div>
+    <Panel variant="elevated" style={{ display: "grid", gap: space[2] }}>
+      <Panel.Header
+        title={title ?? "Evidence Summary"}
+        action={
+          <button
+            onClick={() => setAllOpen(!allOpen)}
+            style={{
+              all: "unset",
+              cursor: "pointer",
+              fontSize: "11px",
+              color: colors.primary,
+            }}
+          >
+            {allOpen ? "Collapse all" : "Expand all"}
+          </button>
+        }
+      />
 
       <div style={{ color: colors.textSecondary, fontSize: "12px", lineHeight: "1.5" }}>
         {pack.totalCount} evidence items across {kindsWithItems.length} source type{kindsWithItems.length > 1 ? "s" : ""}.
@@ -253,6 +255,6 @@ export function EvidenceSummaryPanel({ pack, aggregate, title }: EvidenceSummary
       <div style={{ fontSize: "11px", color: colors.textTertiary }}>
         Retrieved at {new Date(pack.retrievedAt).toLocaleTimeString("en-IN")}
       </div>
-    </Card>
+    </Panel>
   );
 }
