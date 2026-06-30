@@ -6,6 +6,7 @@ import type { ResearchAiContext, ResearchAiSurface } from './researchAiTypes';
 
 const MAX_STRING_LENGTH = 280;
 const MAX_ARRAY_LENGTH = 5;
+const UNSAFE_COPY_PATTERN = /\b(?:Strong Buy|Buy now|Sell now|Hold|sure shot|guaranteed|multibagger|target|provider|API|backend|diagnostic|coverage|freshness|lineage|migration|backfill|source pending|source verified|quote unavailable|history unavailable|RAG|vector|embedding|chunk|narrativePromptPayload|adapter|ADAPTER_UNAVAILABLE|EMPTY_RESPONSE|MALFORMED_RESPONSE)\b/i;
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {
   return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
@@ -14,7 +15,7 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
 function safeString(value: unknown): string {
   if (typeof value !== 'string') return '';
   const trimmed = value.trim().replace(/\s+/g, ' ');
-  if (!trimmed) return '';
+  if (!trimmed || UNSAFE_COPY_PATTERN.test(trimmed)) return '';
   return trimmed.length > MAX_STRING_LENGTH
     ? trimmed.slice(0, MAX_STRING_LENGTH) + '…'
     : trimmed;
