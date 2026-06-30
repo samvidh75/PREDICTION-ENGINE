@@ -43,11 +43,13 @@ export interface MarketBrainAnomalyReviewView {
 
 export interface MarketBrainHistoricalSimilarityReviewView {
   usable: boolean;
+  needsReview: boolean;
   sampleSize: number;
   minSampleSize: number;
   observations: string[];
   limitations: string[];
-  summary: string;
+  summary: string[];
+  headline: string;
 }
 
 export interface MarketBrainResearchView {
@@ -310,18 +312,38 @@ const normalizeHistoricalSimilarityReview = (value: unknown): MarketBrainHistori
   const usable = typeof candidate.usable === 'boolean'
     ? candidate.usable && sampleSize >= minSampleSize
     : sampleSize >= minSampleSize;
-  const summary = asPublicText(candidate.summary)
+  const needsReview = typeof (candidate as Record<string, unknown>).needsReview === 'boolean'
+    ? (candidate as Record<string, unknown>).needsReview as boolean
+    : !usable && sampleSize > 0;
+
+  const rawSummary = (candidate as Record<string, unknown>).summary;
+  const summary: string[] = Array.isArray(rawSummary)
+    ? rawSummary.filter((s): s is string => typeof s === 'string').map((s) => asPublicText(s) || '').filter(Boolean)
+    : typeof rawSummary === 'string'
+      ? [asPublicText(rawSummary) || ''].filter(Boolean)
+      : [];
+  if (summary.length === 0) {
+    summary.push(
+      usable
+        ? 'Similar historical cases are available as research context.'
+        : 'Not enough similar historical cases for this view yet.',
+    );
+  }
+
+  const headline = asPublicText((candidate as Record<string, unknown>).headline as string)
     || (usable
-      ? 'Similar historical cases are available as research context.'
-      : 'Not enough similar historical cases for this view yet.');
+      ? 'Historical similarity data available for research context.'
+      : 'Insufficient historical similarity data.');
 
   return {
     usable,
+    needsReview,
     sampleSize,
     minSampleSize,
     observations,
     limitations,
     summary,
+    headline,
   };
 };
 
