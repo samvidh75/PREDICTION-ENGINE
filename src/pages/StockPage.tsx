@@ -26,6 +26,7 @@ import { InsiderActivity } from "../components/InsiderActivity";
 import { PriceTargets } from "../components/PriceTargets";
 import { NativeAd } from "../components/NativeAd";
 import { MarketBrainPanel } from "../components/market-brain/MarketBrainPanel";
+import { EdgeAiChatSection } from "../components/edge-ai/EdgeAiChatSection";
 
 type StockResearchDetail = {
   symbol: string;
@@ -750,6 +751,11 @@ function StockError({ symbol }: { symbol: string }) {
 
       {/* ── Market Brain Panel ── */}
       <MarketBrainPanel symbol={stock.symbol} companyName={stock.companyName} />
+
+      {/* ── Edge AI Research Chat ── */}
+      <div style={{ height: '400px', borderTop: '1px solid #2A2A2A', marginTop: '8px', paddingTop: '8px' }}>
+        <EdgeAiChatSection symbol={stock.symbol} companyName={stock.companyName} />
+      </div>
 
       {/* ── What Changed ── */}
       <Card className="stock-whatchanged-card raycast-slideUp" style={{ animationDelay: "0.4s", animationFillMode: "both" }}>
