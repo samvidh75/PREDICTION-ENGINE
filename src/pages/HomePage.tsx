@@ -839,14 +839,15 @@ export default function HomePage() {
           </div>
           <div style={{ display: "flex", gap: space[2] }}>
             {[
-              { icon: Twitter, href: "https://x.com" },
-              { icon: Linkedin, href: "https://linkedin.com" },
-              { icon: Github, href: "https://github.com" },
-              { icon: Mail, href: "mailto:hello@stockstory.org" },
-            ].map(({ icon: Icon, href }) => (
+              { icon: Twitter, href: "https://x.com", label: "X / Twitter" },
+              { icon: Linkedin, href: "https://linkedin.com", label: "LinkedIn" },
+              { icon: Github, href: "https://github.com", label: "GitHub" },
+              { icon: Mail, href: "mailto:hello@stockstory.org", label: "Contact us" },
+            ].map(({ icon: Icon, href, label }) => (
               <a
                 key={href}
                 href={href}
+                aria-label={label}
                 target={href.startsWith("mailto") ? undefined : "_blank"}
                 rel={href.startsWith("mailto") ? undefined : "noopener noreferrer"}
                 style={{
