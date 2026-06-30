@@ -6,3 +6,4 @@ export * from './evidencePackContract';
 export * from './technicalReliability';
 export * from './anomalyEvidencePack';
 export * from './eventClassifier';
+export * from './historicalSimilarity';
