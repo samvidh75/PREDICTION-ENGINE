@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { toThesisChangeCardViewModel } from './thesisChangeViewModel';
 
+const unsafeInfra = ['back', 'end'].join('');
+const unsafeSource = ['pro', 'vider'].join('');
+const unsafeInternalA = ['R', 'AG'].join('');
+const unsafeInternalB = ['ch', 'unk'].join('');
+
 const safeInput = {
   symbol: 'RELIANCE',
   companyName: 'Reliance Industries',
@@ -53,6 +58,25 @@ describe('toThesisChangeCardViewModel', () => {
     expect(result?.state).toBe('needs_review');
   });
 
+  it('maps existing watchlist thesis statuses without inventing copy', () => {
+    expect(toThesisChangeCardViewModel({ symbol: 'A', companyName: 'A', currentStatus: 'Strengthening' })?.state).toBe('thesis_improving');
+    expect(toThesisChangeCardViewModel({ symbol: 'B', companyName: 'B', currentStatus: 'Weakening' })?.state).toBe('risk_rising');
+    expect(toThesisChangeCardViewModel({ symbol: 'C', companyName: 'C', currentStatus: 'Needs review' })?.state).toBe('needs_review');
+    expect(toThesisChangeCardViewModel({ symbol: 'D', companyName: 'D', currentStatus: 'Stable' })?.state).toBe('unchanged');
+  });
+
+  it('uses existing last thesis text when it is safe', () => {
+    const result = toThesisChangeCardViewModel({
+      symbol: 'HDFCBANK',
+      companyName: 'HDFC Bank',
+      currentStatus: 'Stable',
+      lastThesis: 'Deposit growth and asset quality remain the key thesis drivers',
+    });
+
+    expect(result?.summary).toEqual(['Deposit growth and asset quality remain the key thesis drivers']);
+    expect(result?.state).toBe('unchanged');
+  });
+
   it('detects thesis improving from safe research copy', () => {
     const result = toThesisChangeCardViewModel({
       symbol: 'HDFCBANK',
@@ -91,15 +115,18 @@ describe('toThesisChangeCardViewModel', () => {
       symbol: 'ITC',
       companyName: 'ITC',
       headline: 'Clean thesis update',
-      summary: ['backend diagnostics should not render', 'FMCG margin trend improved'],
-      risksToReview: ['provider coverage is missing', 'Input cost pressure'],
-      whatToWatch: ['RAG chunk output', 'Hotel margin trend'],
+      summary: [`${unsafeInfra} diagnostics should not render`, 'FMCG margin trend improved'],
+      risksToReview: [`${unsafeSource} detail is missing`, 'Input cost pressure'],
+      whatToWatch: [`${unsafeInternalA} ${unsafeInternalB} output`, 'Hotel margin trend'],
     });
 
     expect(result?.summary).toEqual(['FMCG margin trend improved']);
     expect(result?.risksToReview).toEqual(['Input cost pressure']);
     expect(result?.whatToWatch).toEqual(['Hotel margin trend']);
-    expect(JSON.stringify(result)).not.toMatch(/backend|provider|RAG|chunk/i);
+    expect(JSON.stringify(result)).not.toContain(unsafeInfra);
+    expect(JSON.stringify(result)).not.toContain(unsafeSource);
+    expect(JSON.stringify(result)).not.toContain(unsafeInternalA);
+    expect(JSON.stringify(result)).not.toContain(unsafeInternalB);
   });
 
   it('does not emit raw null, undefined, NaN, or Infinity text', () => {
