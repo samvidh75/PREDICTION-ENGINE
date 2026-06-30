@@ -45,12 +45,16 @@ describe('historical similarity research foundation', () => {
     const summary = buildHistoricalSimilaritySummary(defaultInput);
 
     expect(summary.usable).toBe(true);
+    expect(summary.needsReview).toBe(false);
     expect(summary.sampleSize).toBe(40);
     expect(summary.minSampleSize).toBe(30);
     expect(summary.medianMovePct).not.toBeNull();
     expect(summary.medianMaxDrawdownPct).toBe(-0.7);
     expect(summary.positiveCaseShare).toBeCloseTo(0.5);
     expect(summary.observations.join(' ')).toContain('research context');
+    expect(summary.matchedCases.length).toBeGreaterThan(0);
+    expect(summary.matchedCases[0]).toHaveProperty('similarityScore');
+    expect(summary.matchedCases[0]).toHaveProperty('distance');
   });
 
   it('requires a minimum sample before exposing outcome statistics', () => {
@@ -61,6 +65,7 @@ describe('historical similarity research foundation', () => {
     });
 
     expect(summary.usable).toBe(false);
+    expect(summary.needsReview).toBe(true);
     expect(summary.sampleSize).toBe(12);
     expect(summary.medianMovePct).toBeNull();
     expect(summary.positiveCaseShare).toBeNull();
@@ -121,16 +126,19 @@ describe('historical similarity research foundation', () => {
   it('returns fresh arrays', () => {
     const summary = buildHistoricalSimilaritySummary(defaultInput);
     const originalObservationCount = summary.observations.length;
+    const originalMatchedCasesCount = summary.matchedCases.length;
 
     summary.observations.push('mutated');
     summary.limitations.push('mutated');
     summary.matchedCaseIds.push('mutated');
+    summary.matchedCases.push({ id: 'mutated', symbol: 'X', timeframe: '15m', similarityScore: 0, distance: 0 });
 
     const nextSummary = buildHistoricalSimilaritySummary(defaultInput);
     expect(nextSummary.observations).toHaveLength(originalObservationCount);
     expect(nextSummary.observations).not.toContain('mutated');
     expect(nextSummary.limitations).not.toContain('mutated');
     expect(nextSummary.matchedCaseIds).not.toContain('mutated');
+    expect(nextSummary.matchedCases).toHaveLength(originalMatchedCasesCount);
   });
 
   it('does not emit unsafe public copy', () => {
@@ -144,5 +152,97 @@ describe('historical similarity research foundation', () => {
     ].join(' ');
 
     expect(text).not.toMatch(unsafePattern);
+  });
+
+  it('sorts matchedCases by distance ascending and includes similarity scores', () => {
+    const summary = buildHistoricalSimilaritySummary(defaultInput);
+
+    for (let i = 1; i < summary.matchedCases.length; i++) {
+      expect(summary.matchedCases[i].distance).toBeGreaterThanOrEqual(summary.matchedCases[i - 1].distance);
+    }
+    expect(summary.matchedCases[0].similarityScore).toBeGreaterThanOrEqual(0);
+    expect(summary.matchedCases[0].similarityScore).toBeLessThanOrEqual(100);
+  });
+
+  it('produces matchedCases with correct shape', () => {
+    const summary = buildHistoricalSimilaritySummary(defaultInput);
+
+    expect(summary.matchedCases.length).toBeGreaterThan(0);
+    for (const match of summary.matchedCases) {
+      expect(match).toHaveProperty('id');
+      expect(match).toHaveProperty('symbol');
+      expect(match).toHaveProperty('timeframe');
+      expect(match).toHaveProperty('similarityScore');
+      expect(match).toHaveProperty('distance');
+      expect(match.symbol).toMatch(/^[A-Z0-9._-]{1,24}$/);
+      expect(match.similarityScore).toBeGreaterThanOrEqual(0);
+      expect(match.similarityScore).toBeLessThanOrEqual(100);
+      expect(match.distance).toBeGreaterThanOrEqual(0);
+    }
+  });
+
+  it('sets needsReview when not usable but has some matched cases', () => {
+    const summary = buildHistoricalSimilaritySummary({
+      ...defaultInput,
+      cases: makeCases(15),
+      minSampleSize: 30,
+    });
+
+    expect(summary.usable).toBe(false);
+    expect(summary.needsReview).toBe(true);
+    expect(summary.sampleSize).toBe(15);
+  });
+
+  it('sets needsReview false when usable', () => {
+    const summary = buildHistoricalSimilaritySummary(defaultInput);
+
+    expect(summary.usable).toBe(true);
+    expect(summary.needsReview).toBe(false);
+  });
+
+  it('handles null outcome gracefully', () => {
+    const casesWithNullOutcomes = makeCases(35).map((c) => ({ ...c, outcome: null }));
+    const summary = buildHistoricalSimilaritySummary({
+      ...defaultInput,
+      cases: casesWithNullOutcomes,
+    });
+
+    expect(summary.usable).toBe(true);
+    expect(summary.medianMovePct).toBeNull();
+    expect(summary.positiveCaseShare).toBeNull();
+    expect(summary.limitations).toContain('Some similar cases do not include outcome observations.');
+  });
+
+  it('handles re-entrant malformed current with no valid features', () => {
+    const summary = buildHistoricalSimilaritySummary({
+      ...defaultInput,
+      current: {
+        priceMovePct: Number.NaN,
+        volumeMultiple: Number.POSITIVE_INFINITY,
+        volatilityMultiple: null,
+        sectorMovePct: undefined,
+        indexMovePct: Number.NEGATIVE_INFINITY,
+      },
+      cases: makeCases(50),
+    });
+
+    expect(summary.usable).toBe(false);
+    expect(summary.sampleSize).toBe(0);
+    expect(summary.limitations).toContain('Not enough similar historical cases for this view yet.');
+  });
+
+  it('removes unmatched timeframe cases from matchedCases', () => {
+    const mixedCases = [
+      ...makeCases(30),
+      ...makeCases(20).map((c) => ({ ...c, id: `1d-${c.id}`, timeframe: '1d' as const })),
+    ];
+    const summary = buildHistoricalSimilaritySummary({
+      ...defaultInput,
+      cases: mixedCases,
+      maxCases: 100,
+    });
+
+    expect(summary.matchedCases.every((m) => m.timeframe === '15m')).toBe(true);
+    expect(summary.matchedCaseIds.every((id) => id.startsWith('case-'))).toBe(true);
   });
 });

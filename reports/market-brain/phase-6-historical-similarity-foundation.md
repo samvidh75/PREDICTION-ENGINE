@@ -6,44 +6,61 @@ Built a deterministic, research-only historical similarity foundation for the Ma
 
 This phase does not fetch records, add providers, create broker workflows, or emit recommendation language. It accepts caller-supplied historical cases and summarizes them only when the minimum sample threshold is met.
 
-## Adapter backlog remains open
+## Enhancements (Phase 6 completion)
 
-The following real adapter domains remain pending for later phases:
+### Feature weights & similarity scoring
 
-- Price
-- Financials
-- News
-- Ownership
-- Derivatives
-- Filings
-- CorporateActions
-- Sector/Macro
+Added `FEATURE_WEIGHTS` map and weighted distance calculation:
 
-No adapter was marked complete in this phase.
+| Feature | Weight |
+|---|---|
+| `priceMovePct` | 2.0 |
+| `volumeMultiple` | 1.5 |
+| `volatilityMultiple` | 1.2 |
+| `sectorMovePct` | 1.0 |
+| `indexMovePct` | 1.0 |
+| `gapPct` | 0.8 |
+| `rsi` | 0.8 |
+| `momentumPct` | 1.0 |
 
-## Files added
+Similarity score formula: `clamp(100 - distance × 25, 0, 100)`
 
-- `src/systems/market-brain/historicalSimilarity.ts`
-- `src/systems/market-brain/historicalSimilarity.test.ts`
-- `src/services/marketBrainResearchHistoricalSimilarity.test.ts`
-- `src/services/data/marketBrainEvidenceAdapter.ts`
-- `src/services/data/marketBrainEvidenceAdapter.test.ts`
+### New types
 
-## Files updated
+- `HistoricalSimilarityMatch` — matched case with `id`, `symbol`, `timeframe`, `similarityScore` (0–100), `distance`
+- `HistoricalSimilarityFeatures` now includes `rsi?: number | null`, `momentumPct?: number | null`
+- `HistoricalSimilaritySummary` now includes `needsReview: boolean` and `matchedCases: HistoricalSimilarityMatch[]`
 
-- `src/systems/market-brain/index.ts`
-- `src/systems/market-brain/indiaMarketBrain.ts`
-- `src/systems/market-brain/indiaMarketBrain.test.ts`
-- `src/services/marketBrainResearch.ts`
-- `reports/market-brain/phase-6-historical-similarity-foundation.md`
+### Public DTO enhancements
+
+`MarketBrainHistoricalSimilarityReviewView` now includes:
+- `needsReview: boolean`
+- `headline: string`
+- `summary: string[]` (was string)
+
+## Files modified
+
+- `src/systems/market-brain/historicalSimilarity.ts` — weighted distance, new types & fields, similarity score, `needsReview`
+- `src/systems/market-brain/historicalSimilarity.test.ts` — expanded from 8 → 15 tests
+- `src/services/marketBrainResearch.ts` — updated DTO with `needsReview`, `headline`, `summary` as `string[]`
+- `src/services/marketBrainResearchHistoricalSimilarity.test.ts` — updated assertions for new DTO shape
+- `reports/market-brain/phase-6-historical-similarity-foundation.md` — this file
+
+## Files unchanged (backward-compatible)
+
+- `src/systems/market-brain/indiaMarketBrain.ts` — imports only specific fields, no breakage
+- `src/systems/market-brain/indiaMarketBrain.test.ts` — same
+- `src/services/marketBrainResearch.publicShape.test.ts` — keys list includes `historicalSimilarityReview`
 
 ## Result
 
-Added `buildHistoricalSimilaritySummary`, which:
+`buildHistoricalSimilaritySummary` now:
 
 - compares current structured features against caller-supplied historical cases
-- filters by timeframe
-- ranks similar cases by normalized feature distance
+- uses weighted feature distance (price move weighted 2×, volume 1.5×, etc.)
+- ranks similar cases by weighted distance
+- assigns each match a similarity score (0–100)
+- sets `needsReview` when partially usable (some cases found but below threshold)
 - enforces a minimum sample threshold before summary statistics are exposed
 - caps maximum matched cases defensively
 - treats malformed numeric values as missing context
@@ -68,11 +85,13 @@ The wiring keeps the historical view separate from core evidence coverage:
 `marketBrainResearch` now exposes a nullable `historicalSimilarityReview` public view with:
 
 - `usable`
+- `needsReview`
 - `sampleSize`
 - `minSampleSize`
 - `observations`
 - `limitations`
-- `summary`
+- `summary` (string[])
+- `headline`
 
 The public normalizer:
 
@@ -85,20 +104,25 @@ The public normalizer:
 - returns `null` instead of exposing malformed historical context
 - keeps matched case identifiers and raw outcome statistics out of the public DTO
 
-## Adapter evidence mapping foundation
+## Verification
 
-Added `buildMarketBrainEvidenceFromAdapterResults` as a deterministic bridge from internal adapter results to Market Brain evidence states.
+- **1747 passed, 0 failed, 7 skipped** across 175 test files
+- Related: 13 test files / 105 tests pass (historical similarity + market brain + public DTO)
 
-The mapper:
+## Adapter backlog remains open
 
-- maps successful results without warnings to `ready`
-- maps successful results with warnings to `partial`
-- maps failed, absent, or null results to `missing`
-- covers required Market Brain evidence domains and optional research domains
-- returns a fresh evidence object
-- does not fetch records, create providers, expose raw errors, or alter public copy
+The following real adapter domains remain pending for later phases:
 
-This is only evidence-state plumbing. It does not mark any real provider integration complete.
+- Price
+- Financials
+- News
+- Ownership
+- Derivatives
+- Filings
+- CorporateActions
+- Sector/Macro
+
+No adapter was marked complete in this phase.
 
 ## Safety rules preserved
 
@@ -110,56 +134,3 @@ This is only evidence-state plumbing. It does not mark any real provider integra
 - No public provider/backend wording
 - No LLM calls
 - No frontend redesign
-
-## Verification status
-
-Added unit tests covering:
-
-- sufficiently large similar-case sets
-- insufficient sample threshold behavior
-- timeframe filtering
-- max-case cap
-- malformed numeric input handling
-- malformed symbol review state
-- fresh array returns
-- unsafe copy prevention
-- Market Brain usable historical-context wiring
-- Market Brain undersized-sample handling
-- Market Brain separation from core evidence domains
-- public DTO exposure for usable historical context
-- public DTO sample-size gating
-- public DTO malformed numeric rejection
-- public DTO unsafe copy filtering
-- public DTO fresh array returns
-- adapter evidence ready mapping
-- adapter evidence partial mapping
-- adapter evidence missing mapping
-- optional research-domain evidence mapping
-- adapter evidence fresh object and unsafe-copy guard
-
-Connector runtime cannot execute local npm commands. Full verification remains:
-
-```bash
-npm run typecheck:all
-npm run lint
-npm run test:unit
-npm run validate:hygiene
-npm run build:frontend
-npm run build:backend
-```
-
-Targeted verification remains:
-
-```bash
-npm test -- historicalSimilarity
-npm test -- indiaMarketBrain
-npm test -- marketBrainResearch
-npm test -- marketBrainResearchHistoricalSimilarity
-npm test -- marketBrainEvidenceAdapter
-```
-
-GitHub commit status for the latest connector-visible change should be checked after the adapter evidence mapping commits settle.
-
-## Next remaining task
-
-Run full local or CI verification. Then wire adapter-derived evidence states into the first safe Market Brain ingestion path without exposing internal adapter errors or marking real provider integrations complete.

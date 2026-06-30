@@ -58,6 +58,7 @@ describe('fetchMarketBrainResearch historical similarity normalization', () => {
 
     expect(result.research.historicalSimilarityReview).toEqual({
       usable: true,
+      needsReview: false,
       sampleSize: 42,
       minSampleSize: 30,
       observations: [
@@ -65,7 +66,8 @@ describe('fetchMarketBrainResearch historical similarity normalization', () => {
         'Use this as historical context, not an instruction.',
       ],
       limitations: ['Some similar cases do not include outcome observations.'],
-      summary: 'Similar historical cases are available as research context.',
+      summary: ['Similar historical cases are available as research context.'],
+      headline: 'Historical similarity data available for research context.',
     });
   });
 
@@ -94,7 +96,7 @@ describe('fetchMarketBrainResearch historical similarity normalization', () => {
       usable: false,
       sampleSize: 12,
       minSampleSize: 30,
-      summary: 'Not enough similar historical cases for this view yet.',
+      summary: ['Not enough similar historical cases for this view yet.'],
     });
   });
 
@@ -150,11 +152,13 @@ describe('fetchMarketBrainResearch historical similarity normalization', () => {
 
     expect(result.research.historicalSimilarityReview).toEqual({
       usable: true,
+      needsReview: false,
       sampleSize: 35,
       minSampleSize: 30,
       observations: ['Found 35 similar historical cases for research context.'],
       limitations: [],
-      summary: 'Similar historical cases are available as research context.',
+      summary: ['Similar historical cases are available as research context.'],
+      headline: 'Historical similarity data available for research context.',
     });
   });
 
