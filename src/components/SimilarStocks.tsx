@@ -1,7 +1,7 @@
 /**
  * SimilarStocks — factor-based peer discovery via Euclidean distance.
  * 
- * Leverages PeerComparisonEngine for backend computation.
+ * Uses PeerComparisonEngine for similarity computation.
  * Shows: top 5 similar stocks with factor overlap %, key differentiator,
  * and quick compare CTA.
  * 

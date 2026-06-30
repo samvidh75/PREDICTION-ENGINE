@@ -32,7 +32,7 @@ const SECTIONS = [
   {
     id: "conflicts",
     title: "Conflicts of Interest",
-    content: "StockStory India does not accept compensation from listed companies for research coverage. We do not engage in paid promotions of stocks. We do not hold trading positions in securities we cover. Our revenue comes from user subscriptions for premium research features — not from companies or market intermediaries."
+    content: "StockStory India does not accept compensation from listed companies for research. We do not engage in paid promotions of stocks. We do not hold trading positions in securities we analyze. Our revenue comes from user subscriptions for premium research — not from companies or market intermediaries."
   },
   {
     id: "user-responsibility",

@@ -214,7 +214,7 @@ export function OptionsFlow() {
       {/* Disclaimer */}
       <div style={{ marginTop: "12px", fontSize: "11px", color: colors.textTertiary, lineHeight: "1.5", fontStyle: "italic" }}>
         Options data is for informational purposes only. Derivatives involve substantial risk.
-        Max Pain theory is not a guaranteed predictor of price movement.
+        Max Pain theory is not a reliable predictor of price movement.
       </div>
     </div>
   );

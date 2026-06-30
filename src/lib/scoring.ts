@@ -146,6 +146,6 @@ export function computeFactorScores(inputs: ScoreInputs): FactorScoreSet {
 
 export function confidenceFromCoverage(values: Array<unknown>, agreement: number): number {
   const present = values.filter((value) => value != null).length;
-  const coverage = values.length === 0 ? 0 : (present / values.length) * 100;
-  return round(coverage * 0.7 + clamp(agreement, 0, 100) * 0.3);
+  const completeness = values.length === 0 ? 0 : (present / values.length) * 100;
+  return round(completeness * 0.7 + clamp(agreement, 0, 100) * 0.3);
 }

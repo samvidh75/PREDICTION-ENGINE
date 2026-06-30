@@ -7,6 +7,7 @@ import { computeGrowthFeatures } from "../features/growthFeatures";
 import { computeRiskFeatures } from "../features/riskFeatures";
 import { computeMomentumFeatures } from "../features/momentumFeatures";
 import { computeStabilityFeatures } from "../features/stabilityFeatures";
+import { computeFinancialIntelligence } from "../features/financialIntelligence";
 import type { NormalizedFundamentals } from "../normalization/types";
 import type { NormalizedCandle } from "../normalization/types";
 
@@ -72,6 +73,10 @@ export function buildCompanyResearch(input: CompanyResearchInput): CompanyResear
   let riskScore: number | null = null;
   let momentumScore: number | null = null;
   let stabilityScore: number | null = null;
+  let roaScore: number | null = null;
+  let dividendYieldScore: number | null = null;
+  let marketCapScore: number | null = null;
+  let financialIntelligenceScore: number | null = null;
 
   if (fn) {
     const qf = computeQualityFeatures(fn);
@@ -88,6 +93,12 @@ export function buildCompanyResearch(input: CompanyResearchInput): CompanyResear
 
     const sf = computeStabilityFeatures(fn, qualityScore, growthScore);
     stabilityScore = sf.overallStability;
+
+    const fi = computeFinancialIntelligence(fn, input.quote?.marketCap ?? null);
+    roaScore = fi.roaScore;
+    dividendYieldScore = fi.dividendYieldScore;
+    marketCapScore = fi.marketCapScore;
+    financialIntelligenceScore = fi.overallFinancialScore;
   }
 
   const mf = computeMomentumFeatures(input.candles, input.relativeStrength);
@@ -108,6 +119,11 @@ export function buildCompanyResearch(input: CompanyResearchInput): CompanyResear
     riskExplanation: riskScore !== null ? `Risk score of ${Math.round(riskScore)}` : null,
     momentumExplanation: momentumScore !== null ? `Momentum score of ${Math.round(momentumScore)}` : null,
     stabilityExplanation: stabilityScore !== null ? `Stability score of ${Math.round(stabilityScore)}` : null,
+    roaScore, dividendYieldScore, marketCapScore,
+    financialIntelligenceScore,
+    financialIntelligenceExplanation: financialIntelligenceScore !== null
+      ? `Financial intelligence score of ${Math.round(financialIntelligenceScore)} (ROA: ${roaScore !== null ? Math.round(roaScore) : "N/A"}, Dividend: ${dividendYieldScore !== null ? Math.round(dividendYieldScore) : "N/A"}, Market Cap: ${marketCapScore !== null ? Math.round(marketCapScore) : "N/A"})`
+      : null,
   };
 
   const thesis: CompanyThesisView = buildThesis(symbol, conviction, input.priorThesisStatus);

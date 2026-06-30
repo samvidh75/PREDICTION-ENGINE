@@ -70,6 +70,12 @@ export interface CompanyFactorScoresView {
   riskExplanation: string | null;
   momentumExplanation: string | null;
   stabilityExplanation: string | null;
+  // ── Financial Intelligence (Phase 4) ──────────────────────
+  roaScore: number | null;
+  dividendYieldScore: number | null;
+  marketCapScore: number | null;
+  financialIntelligenceScore: number | null;
+  financialIntelligenceExplanation: string | null;
 }
 
 export type ThesisStatus = "Strengthening" | "Stable" | "Weakening" | "Needs review" | "Tracking begins now" | "Research signals pending";
