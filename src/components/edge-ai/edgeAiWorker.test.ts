@@ -42,7 +42,7 @@ describe('edgeAiWorker logic', () => {
     const result = simulateGenerateReply(input);
     expect(result).toContain('Client concentration');
     expect(result).toContain('Rupee appreciation');
-    expect(result).toContain('TCS');
+    expect(result).toContain('Tata Consultancy Services');
   });
 
   it('responds to watch queries with watch items', () => {
@@ -62,7 +62,7 @@ describe('edgeAiWorker logic', () => {
   it('responds to price queries with price context', () => {
     const input: EdgeAiWorkerInput = { ...sampleInput, query: 'How is the price doing?' };
     const result = simulateGenerateReply(input);
-    expect(result).toContain('₹3,890');
+    expect(result).toContain('₹3890.50');
     expect(result).toContain('1.18%');
   });
 

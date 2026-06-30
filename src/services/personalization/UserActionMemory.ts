@@ -24,7 +24,10 @@ export type ActionType =
   | "alert_view"
   | "digest_view"
   | "profile_update"
-  | "scenario_run";
+  | "scenario_run"
+  | "compare_open"
+  | "watchlist_review"
+  | "invest_review";
 
 export interface ActionRecord {
   id: string;
