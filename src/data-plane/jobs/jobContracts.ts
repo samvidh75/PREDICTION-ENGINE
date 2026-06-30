@@ -38,10 +38,16 @@ export interface DataPlaneJobRun {
 
 export function formatErrorSummary(err: unknown): string {
   const msg =
-    err instanceof Error ? err.message : typeof err === "string" ? err : "Unknown error";
+    err instanceof Error
+      ? err.message
+      : typeof err === "string"
+        ? err
+        : err === null || err === undefined
+          ? "Unknown error"
+          : String(err);
   // Strip stack traces and anything that looks like a secret/key
   const withoutStack = msg.split("\n")[0] ?? msg;
-  return withoutStack.replace(/(?:key|secret|token|password|credential)=[^\s&]+/gi, "$1=***");
+  return withoutStack.replace(/(key|secret|token|password|credential)=[^\s&]+/gi, "$1=***");
 }
 
 export function isValidStatusTransition(
