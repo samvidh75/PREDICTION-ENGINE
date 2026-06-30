@@ -29,6 +29,7 @@ let engine: MlceEngine | null = null;
 let engineFactory:
   | ((modelId: string, options?: { initProgressCallback?: (report: { progress: number; text: string }) => void }) => Promise<MlceEngine>)
   | null = null;
+const cancelledRequestIds = new Set<string>();
 
 function postMessageToMain(payload: BrowserLocalWorkerResponse): void {
   self.postMessage(payload);
@@ -42,17 +43,29 @@ function postStatus(
   postMessageToMain({ type: "status", requestId, status, message });
 }
 
+function postProgress(
+  phase: "checking" | "loading" | "ready",
+  requestId?: string,
+  percent?: number,
+): void {
+  postMessageToMain({ type: "progress", requestId, phase, percent });
+}
+
 function postFailure(reason: ResearchAiResponse["reason"], requestId?: string): void {
   postMessageToMain({ type: "safe-failure", requestId, reason });
 }
 
 async function ensureEngine(requestId?: string): Promise<boolean> {
   if (engine) {
-    postStatus("ready", requestId, "Enhanced explanation is ready.");
+    postProgress("ready", requestId, 100);
     return true;
   }
 
-  postStatus("loading", requestId, "Preparing enhanced explanation.");
+  if (requestId && cancelledRequestIds.has(requestId)) {
+    return false;
+  }
+
+  postProgress("loading", requestId, 0);
 
   try {
     const specifier = "@mlc-ai/web-llm";
@@ -73,14 +86,17 @@ async function ensureEngine(requestId?: string): Promise<boolean> {
     return false;
   }
 
+  if (requestId && cancelledRequestIds.has(requestId)) {
+    return false;
+  }
+
   try {
     engine = await engineFactory(MODEL_ID, {
       initProgressCallback: (report) => {
-        const normalized = report.progress >= 1 ? "ready" : "loading";
-        postStatus(normalized, requestId, report.progress >= 1 ? "Enhanced explanation is ready." : "Preparing enhanced explanation.");
+        postProgress(report.progress >= 1 ? "ready" : "loading", requestId, Math.round(report.progress * 100));
       },
     });
-    postStatus("ready", requestId, "Enhanced explanation is ready.");
+    postProgress("ready", requestId, 100);
     return true;
   } catch {
     postStatus("failed", requestId, "Enhanced explanation could not start.");
@@ -113,9 +129,19 @@ async function answerQuestion(requestId: string, compressedContext: string, ques
     return;
   }
 
+  if (cancelledRequestIds.has(requestId)) {
+    return;
+  }
+
   const ready = await ensureEngine(requestId);
   if (!ready || !engine) {
-    postFailure("not_ready", requestId);
+    if (requestId && !cancelledRequestIds.has(requestId)) {
+      postFailure("not_ready", requestId);
+    }
+    return;
+  }
+
+  if (cancelledRequestIds.has(requestId)) {
     return;
   }
 
@@ -140,10 +166,18 @@ async function answerQuestion(requestId: string, compressedContext: string, ques
       }),
     ]);
 
+    if (cancelledRequestIds.has(requestId)) {
+      return;
+    }
+
     const rawText = result.choices?.[0]?.message?.content ?? "";
     const sanitizedText = sanitizeResearchAiOutput(rawText);
     if (!sanitizedText) {
       postFailure("unsafe_output", requestId);
+      return;
+    }
+
+    if (cancelledRequestIds.has(requestId)) {
       return;
     }
 
@@ -153,7 +187,9 @@ async function answerQuestion(requestId: string, compressedContext: string, ques
       text: sanitizedText,
     });
   } catch (error) {
-    postFailure(error instanceof Error && error.message === "timeout" ? "timeout" : "failed", requestId);
+    if (requestId && !cancelledRequestIds.has(requestId)) {
+      postFailure(error instanceof Error && error.message === "timeout" ? "timeout" : "failed", requestId);
+    }
   }
 }
 
@@ -178,7 +214,11 @@ self.onmessage = async (event: MessageEvent<BrowserLocalWorkerRequest>) => {
     case "ask":
       await answerQuestion(request.requestId, request.compressedContext, request.question);
       break;
+    case "cancel":
+      cancelledRequestIds.add(request.requestId);
+      break;
     case "reset":
+      cancelledRequestIds.clear();
       await resetEngine(request.requestId);
       break;
   }

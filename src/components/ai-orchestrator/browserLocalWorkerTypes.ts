@@ -8,14 +8,22 @@ export type BrowserLocalWorkerStatus =
   | "failed"
   | "unsupported";
 
+export interface BrowserLocalWorkerModelConfig {
+  modelId: string;
+  maxOutputTokens: number;
+  temperature: number;
+  timeoutMs: number;
+}
+
 export type BrowserLocalWorkerRequest =
-  | { type: "init"; requestId: string }
+  | { type: "init"; requestId: string; config?: BrowserLocalWorkerModelConfig }
   | {
       type: "ask";
       requestId: string;
       compressedContext: string;
       question: string;
     }
+  | { type: "cancel"; requestId: string }
   | { type: "reset"; requestId: string };
 
 export type BrowserLocalWorkerResponse =
@@ -24,6 +32,12 @@ export type BrowserLocalWorkerResponse =
       requestId?: string;
       status: BrowserLocalWorkerStatus;
       message?: string;
+    }
+  | {
+      type: "progress";
+      requestId?: string;
+      phase: "checking" | "loading" | "ready";
+      percent?: number;
     }
   | {
       type: "answer";
