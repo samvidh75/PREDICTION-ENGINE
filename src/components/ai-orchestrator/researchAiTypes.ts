@@ -28,6 +28,7 @@ export type ResearchAiSurface =
   | "why_move"
   | "scanner"
   | "compare"
+  | "rankings"
   | "watchlist"
   | "alerts"
   | "portfolio";
