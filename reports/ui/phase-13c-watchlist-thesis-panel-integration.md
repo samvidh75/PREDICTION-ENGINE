@@ -10,11 +10,14 @@ Wire the existing safe thesis-change research panel into the Watchlist page usin
 ## Files inspected
 - `src/pages/WatchlistPage.tsx`
 - `src/components/watchlist/ThesisChangeResearchPanel.tsx`
+- `src/components/watchlist/thesisChangeViewModel.ts`
+- `src/components/watchlist/ThesisChangeResearchPanel.test.tsx`
 - `src/services/personalization/WatchlistIntelligenceEngine.ts`
 - `src/app/routes.tsx`
 
 ## Files changed
 - `src/pages/WatchlistPage.tsx`
+- `src/pages/WatchlistPage.test.tsx`
 - `reports/ui/phase-13c-watchlist-thesis-panel-integration.md`
 
 ## Implementation result
@@ -28,21 +31,29 @@ Wire the existing safe thesis-change research panel into the Watchlist page usin
   - `Invest` remains a review handoff to the stock research page and does not place orders.
 - Replaced the prior raw status-based load error with a product-safe message.
 
+## Integration test result
+- Added `src/pages/WatchlistPage.test.tsx`.
+- Covered loading watchlist intelligence through the page CTA and rendering the thesis-change panel.
+- Covered merged `needsReview` and `changedItems` inputs without adding fake runtime data.
+- Covered safe action handoff for the Compare action.
+- Covered product-safe load failure copy with no raw transport wording.
+- Included negative assertions against public provider/backend/model/recommendation leakage in rendered page text.
+
 ## Safety confirmations
 - Frontend-only change.
 - Backend untouched.
 - No provider integrations touched.
 - No database schema or migrations touched.
 - No secrets touched.
-- No fake data added.
+- No fake data added outside test fixtures.
 - No broker execution added.
 - No direct recommendation language added.
 - No public provider/backend plumbing intentionally exposed by the new panel wiring.
 
 ## Verification
-- GitHub connector write succeeded on `main`.
-- Manual code inspection completed for the modified page import, helper, handlers, and panel render path.
+- GitHub connector writes succeeded on `main`.
+- Manual code inspection completed for the modified page import, helper, handlers, panel render path, and new integration test.
 - Full local `npm run typecheck:all`, `npm run lint`, `npm run test:unit`, `npm run validate:hygiene`, `npm run build:frontend`, and `npm run build:backend` could not be executed from this connector-only environment.
 
 ## Next remaining task
-Add a focused `WatchlistPage` integration test around the thesis-change panel render path, then run full verification in an environment with npm execution.
+Run full verification in an environment with npm execution, then wire the previously added research alerts view model into a compact Alerts/Watchlist research panel if verification stays clean.
