@@ -16,6 +16,9 @@
  */
 
 import { dbAdapter } from '../../db/DatabaseAdapter';
+import { EodDataCacheService } from '../marketData/EodDataCacheService';
+import { runScanner, SCANNER_PRESETS, type ScannerPreset } from '../../research/scanner/scannerEngine';
+import { trackThesis } from '../../research/watchlist/watchlistEngine';
 
 // ---------------------------------------------------------------------------
 // Snapshot persistence helpers
@@ -66,87 +69,193 @@ export class PrecomputeScheduler {
   }
 
   // -----------------------------------------------------------------------
-  // Healthometer snapshots
+  // Healthometer snapshots — store cached quote/financials per symbol
   // -----------------------------------------------------------------------
 
   static async runHealthometer(): Promise<boolean> {
     const symbols = await PrecomputeScheduler.getActiveUniverse();
-    const ok = true;
+    let ok = true;
 
     for (const symbol of symbols) {
-      await writeSnapshot('healthometer', symbol, {
-        symbol,
-        computedAt: new Date().toISOString(),
-        engine: 'deterministic',
-      });
+      try {
+        const quote = await EodDataCacheService.get<Record<string, unknown>>('quote', symbol);
+        const profile = await EodDataCacheService.get<Record<string, unknown>>('profile', symbol);
+        const financials = await EodDataCacheService.get<Record<string, unknown>>('financials', symbol);
+
+        await writeSnapshot('healthometer', symbol, {
+          symbol,
+          computedAt: new Date().toISOString(),
+          engine: 'deterministic',
+          cached: { quote, profile, financials },
+        });
+      } catch {
+        ok = false;
+      }
     }
 
     return ok;
   }
 
   // -----------------------------------------------------------------------
-  // Scanner snapshots (all presets)
+  // Scanner snapshots (all presets) — runs actual scanner engine per preset
   // -----------------------------------------------------------------------
 
   static async runScanner(): Promise<boolean> {
-    const presets = [
-      'Quality compounders',
-      'Undervalued quality',
-      'Improving momentum',
-      'Low debt leaders',
-      'Earnings acceleration',
-      'Dividend stability',
-      'Risk rising',
-      'Turnaround watch',
-      'Good businesses out of favour',
-      'High quality, expensive',
-    ] as const;
+    const presets = Object.keys(SCANNER_PRESETS) as ScannerPreset[];
+    const symbols = await PrecomputeScheduler.getActiveUniverse();
 
-    const ok = true;
+    // Build ScannerCompanyInput array from cached data
+    const companies: Array<{
+      symbol: string;
+      scores: Record<string, number>;
+      narrativeKey: number;
+    }> = [];
+
+    const BASE_TIME = Date.now();
+
+    for (const symbol of symbols) {
+      try {
+        const financials =
+          await EodDataCacheService.get<Record<string, unknown>>('financials', symbol);
+        if (!financials) continue;
+
+        const narrativeKey = (BASE_TIME + companies.length) % 1000;
+        companies.push({
+          symbol,
+          scores: financials as unknown as Record<string, number>,
+          narrativeKey,
+        });
+      } catch {
+        // Skip symbol on cache miss
+      }
+    }
+
+    let ok = true;
     for (const preset of presets) {
-      await writeSnapshot('scanner', preset, {
-        preset,
-        computedAt: new Date().toISOString(),
-        engine: 'deterministic',
-      });
+      try {
+        const results = runScanner(preset, companies);
+        await writeSnapshot('scanner', preset, {
+          preset,
+          computedAt: new Date().toISOString(),
+          engine: 'deterministic',
+          results: results.slice(0, 50),
+          totalCandidates: companies.length,
+        });
+      } catch {
+        ok = false;
+      }
     }
     return ok;
   }
 
   // -----------------------------------------------------------------------
-  // Rankings
+  // Rankings — rank symbols by cached quote price
   // -----------------------------------------------------------------------
 
   static async runRankings(): Promise<boolean> {
-    await writeSnapshot('rankings', 'all', {
-      computedAt: new Date().toISOString(),
-      engine: 'deterministic',
-    });
-    return true;
+    try {
+      const symbols = await PrecomputeScheduler.getActiveUniverse();
+      const entries: Array<{ symbol: string; score: number | null }> = [];
+
+      for (const symbol of symbols) {
+        try {
+          const quote =
+            await EodDataCacheService.get<Record<string, unknown>>('quote', symbol);
+          entries.push({
+            symbol,
+            score: (quote?.price as number) ?? null,
+          });
+        } catch {
+          entries.push({ symbol, score: null });
+        }
+      }
+
+      entries.sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
+
+      await writeSnapshot('rankings', 'all', {
+        computedAt: new Date().toISOString(),
+        engine: 'deterministic',
+        entries: entries.slice(0, 200),
+      });
+      return true;
+    } catch {
+      return false;
+    }
   }
 
   // -----------------------------------------------------------------------
-  // Event evidence
+  // Event evidence — count cached news per symbol
   // -----------------------------------------------------------------------
 
   static async runEventEvidence(): Promise<boolean> {
-    await writeSnapshot('event_evidence', 'latest', {
-      computedAt: new Date().toISOString(),
-      engine: 'deterministic',
-    });
-    return true;
+    try {
+      const symbols = await PrecomputeScheduler.getActiveUniverse();
+      const evidence: Array<{ symbol: string; newsCount: number }> = [];
+
+      for (const symbol of symbols) {
+        try {
+          const news = await EodDataCacheService.get<unknown[]>('news', symbol);
+          evidence.push({
+            symbol,
+            newsCount: Array.isArray(news) ? news.length : 0,
+          });
+        } catch {
+          evidence.push({ symbol, newsCount: 0 });
+        }
+      }
+
+      await writeSnapshot('event_evidence', 'latest', {
+        computedAt: new Date().toISOString(),
+        engine: 'deterministic',
+        symbolsWithEvidence: evidence.filter((e) => e.newsCount > 0).length,
+        totalSymbols: symbols.length,
+      });
+      return true;
+    } catch {
+      return false;
+    }
   }
 
   // -----------------------------------------------------------------------
-  // Watchlist thesis refresh
+  // Watchlist thesis refresh — runs trackThesis with cached data
   // -----------------------------------------------------------------------
 
   static async runWatchlistTheses(): Promise<boolean> {
-    await writeSnapshot('watchlist_thesis', 'all', {
-      computedAt: new Date().toISOString(),
-      engine: 'deterministic',
-    });
-    return true;
+    try {
+      const symbols = await PrecomputeScheduler.getActiveUniverse();
+      const theses: Array<ReturnType<typeof trackThesis>> = [];
+
+      for (const symbol of symbols) {
+        try {
+          const profile =
+            await EodDataCacheService.get<{ name?: string }>('profile', symbol);
+          const quote =
+            await EodDataCacheService.get<{ price?: number }>('quote', symbol);
+
+          const thesis = trackThesis({
+            symbol,
+            companyName: profile?.name ?? symbol,
+            currentScore: quote?.price ?? null,
+            previousScore: null,
+            factorChanges: [],
+            riskChanges: [],
+            lastUpdated: new Date().toISOString(),
+          });
+          theses.push(thesis);
+        } catch {
+          // Skip symbols with insufficient cached data
+        }
+      }
+
+      await writeSnapshot('watchlist_thesis', 'all', {
+        computedAt: new Date().toISOString(),
+        engine: 'deterministic',
+        theses,
+      });
+      return true;
+    } catch {
+      return false;
+    }
   }
 
   // -----------------------------------------------------------------------
@@ -155,14 +264,22 @@ export class PrecomputeScheduler {
 
   private static async getActiveUniverse(): Promise<string[]> {
     try {
+      // Keys are eod:NAMESPACE:SYMBOL — fetch them all and extract unique symbols in JS
+      // for cross-DB compatibility (PG SPLIT_PART vs SQLite).
       const res = await dbAdapter.query(
-        `SELECT DISTINCT SUBSTR(key, 5) AS symbol
-         FROM cache
+        `SELECT DISTINCT key FROM cache
          WHERE key LIKE 'eod:%'
            AND expires_at > CURRENT_TIMESTAMP
-         LIMIT 500`,
+         LIMIT 2500`,
       );
-      return res.rows.map((r: { symbol: string }) => r.symbol).filter(Boolean);
+      const symbols = [
+        ...new Set(
+          res.rows
+            .map((r: { key: string }) => r.key.split(':')[2])
+            .filter(Boolean),
+        ),
+      ];
+      return symbols;
     } catch {
       return [];
     }
