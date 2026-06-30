@@ -69,4 +69,4 @@ EXPOSE 4001
 
 # ── Start ─────────────────────────────────────────────────────────────────────
 # Use tsx to resolve @/ path aliases correctly
-CMD ["npx", "tsx", "src/backend/startServer.ts"]
+CMD ["npx", "tsx", "src/render/startServer.ts"]
