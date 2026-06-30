@@ -22,6 +22,7 @@ import {
 import { Card } from "../ui/Card";
 import { Button } from "../ui/Button";
 import { Badge } from "../ui/Badge";
+import { PriceFlash } from "../ui/PriceFlash";
 import { colors, typography, space, radius, media } from "../design/tokens";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -261,10 +262,10 @@ export default function TrackPage() {
   ] as const;
 
   return (
-    <div style={{ display: "grid", gap: "24px" }}>
+    <div className="raycast-slideUp" style={{ display: "grid", gap: "24px" }}>
 
       {/* ── Header ── */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "16px" }}>
+      <div className="raycast-stagger-1" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "16px" }}>
         <div>
           <h1 style={{ fontSize: "24px", fontWeight: 700, color: colors.textPrimary, margin: 0 }}>
             Track Pro
@@ -296,7 +297,7 @@ export default function TrackPage() {
       </div>
 
       {/* ── Conviction Score Card ── */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "16px" }}>
+      <div className="raycast-stagger-2" style={{ animationDelay: "0.1s", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "16px" }}>
         <Card style={{ display: "flex", alignItems: "center", gap: "20px", padding: "20px 24px" }}>
           <ConvictionGauge score={convictionScore} />
           <div>
@@ -351,7 +352,7 @@ export default function TrackPage() {
       </div>
 
       {/* ── Sector Concentration ── */}
-      <Card style={{ padding: "16px 20px" }}>
+      <Card className="raycast-stagger-3" style={{ animationDelay: "0.2s", padding: "16px 20px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "12px" }}>
           <PieChart size={14} color={colors.textSecondary} />
           <span style={{ fontSize: "12px", fontWeight: 600, color: colors.textSecondary, textTransform: "uppercase", letterSpacing: "0.04em" }}>
@@ -388,7 +389,7 @@ export default function TrackPage() {
       </Card>
 
       {/* ── Tab Bar ── */}
-      <div style={{ display: "flex", gap: "4px", padding: "4px", background: colors.fill, borderRadius: radius.lg }}>
+      <div className="raycast-stagger-4" style={{ animationDelay: "0.3s", display: "flex", gap: "4px", padding: "4px", background: colors.fill, borderRadius: radius.lg }}>
         {TAB_LABELS.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
@@ -468,9 +469,11 @@ export default function TrackPage() {
                   {h.healthScore}%
                 </span>
                 <div style={{ textAlign: "right" }}>
-                  <span style={{ fontSize: "13px", fontWeight: 600, color: h.pnlPct >= 0 ? colors.success : colors.marketRed }}>
-                    {formatPercent(h.pnlPct)}
-                  </span>
+                  <PriceFlash value={h.pnlPct}>
+                    <span style={{ fontSize: "13px", fontWeight: 600, color: h.pnlPct >= 0 ? colors.success : colors.marketRed }}>
+                      {formatPercent(h.pnlPct)}
+                    </span>
+                  </PriceFlash>
                   {h.alerts > 0 && (
                     <Badge value={h.alerts} variant="warning" />
                   )}
@@ -486,10 +489,12 @@ export default function TrackPage() {
                   <div>
                     <span style={{ fontSize: "10px", fontWeight: 600, color: colors.textTertiary, textTransform: "uppercase", letterSpacing: "0.04em" }}>Price</span>
                     <p style={{ fontSize: "13px", color: colors.textPrimary, margin: "4px 0 0 0" }}>
-                      {formatCurrency(h.lastPrice)}{" "}
-                      <span style={{ color: h.dayChange >= 0 ? colors.success : colors.marketRed, fontSize: "12px" }}>
-                        {formatPercent(h.dayChange)}
-                      </span>
+                      <PriceFlash value={h.lastPrice}>{formatCurrency(h.lastPrice)}</PriceFlash>{" "}
+                      <PriceFlash value={h.dayChange}>
+                        <span style={{ color: h.dayChange >= 0 ? colors.success : colors.marketRed, fontSize: "12px" }}>
+                          {formatPercent(h.dayChange)}
+                        </span>
+                      </PriceFlash>
                     </p>
                   </div>
                   <div>

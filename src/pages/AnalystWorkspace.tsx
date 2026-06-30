@@ -51,9 +51,9 @@ export default function AnalystWorkspace() {
   const answer = qaMutation.data?.data;
 
   return (
-    <main style={{ maxWidth: "1200px", margin: "0 auto", padding: layout.pagePaddingDesktop, color: colors.textPrimary }}>
+    <main className="raycast-slideUp" style={{ maxWidth: "1200px", margin: "0 auto", padding: layout.pagePaddingDesktop, color: colors.textPrimary }}>
 
-      <section style={{ marginBottom: "48px" }}>
+      <section className="raycast-stagger-1" style={{ marginBottom: "48px" }}>
         <h1 style={{ fontSize: typography.h2.desktop.size, fontWeight: 700, marginBottom: "8px" }}>
           Analyst Workspace
         </h1>
@@ -62,7 +62,7 @@ export default function AnalystWorkspace() {
         </p>
       </section>
 
-      <div style={{ display: "grid", gap: "24px" }}>
+      <div className="raycast-stagger-2" style={{ animationDelay: "0.1s", display: "grid", gap: "24px" }}>
         <Card>
           <CardLabel>Ask a research question</CardLabel>
           <div style={{ display: "flex", flexDirection: "row", gap: "12px", marginTop: "16px", flexWrap: "wrap" }}>

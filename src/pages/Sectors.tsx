@@ -14,9 +14,9 @@ export default function Sectors() {
   const gap = useResponsiveValue("12px", "20px");
 
   return (
-    <main style={{ maxWidth: "1200px", margin: "0 auto", padding: layout.pagePaddingDesktop, color: colors.textPrimary }}>
+    <main className="raycast-slideUp" style={{ maxWidth: "1200px", margin: "0 auto", padding: layout.pagePaddingDesktop, color: colors.textPrimary }}>
 
-      <section style={{ marginBottom: "48px" }}>
+      <section className="raycast-stagger-1" style={{ marginBottom: "48px" }}>
         <h1 style={{ fontSize: typography.h2.desktop.size, fontWeight: 700, marginBottom: "8px", color: colors.textPrimary }}>
           Sector Research
         </h1>
@@ -25,7 +25,7 @@ export default function Sectors() {
         </p>
       </section>
 
-      <section>
+      <section className="raycast-stagger-2" style={{ animationDelay: "0.1s" }}>
         <div style={{ display: "grid", gridTemplateColumns: `repeat(auto-fill, minmax(${cardWidth}, 1fr))`, gap }}>
           {SECTORS.map((sector) => {
             const slug = nameToSlug(sector.name);
@@ -50,7 +50,7 @@ export default function Sectors() {
         </div>
       </section>
 
-      <footer style={{ marginTop: "64px", paddingTop: "24px", borderTop: `1px solid ${colors.border}`, fontSize: "13px", color: colors.textSecondary }}>
+      <footer className="raycast-stagger-3" style={{ animationDelay: "0.2s", marginTop: "64px", paddingTop: "24px", borderTop: `1px solid ${colors.border}`, fontSize: "13px", color: colors.textSecondary }}>
         <p>StockStory India provides research analysis only. Not investment advice. Consult a SEBI-registered investment advisor.</p>
       </footer>
     </main>

@@ -27,9 +27,9 @@ export default function SectorResearch() {
   }
 
   return (
-    <main style={{ maxWidth: contentWidth, margin: "0 auto", padding: layout.pagePaddingDesktop, color: colors.textPrimary }}>
+    <main className="raycast-slideUp" style={{ maxWidth: contentWidth, margin: "0 auto", padding: layout.pagePaddingDesktop, color: colors.textPrimary }}>
 
-      <nav style={{ marginBottom: "24px", fontSize: "14px", color: colors.textSecondary }}>
+      <nav className="raycast-stagger-1" style={{ marginBottom: "24px", fontSize: "14px", color: colors.textSecondary }}>
         <span style={{ cursor: "pointer", color: colors.primary }} onClick={() => navigate("/sectors")}>
           Sectors
         </span>
@@ -37,7 +37,7 @@ export default function SectorResearch() {
         <span>{sector.name}</span>
       </nav>
 
-      <section style={{ marginBottom: "48px" }}>
+      <section className="raycast-stagger-2" style={{ animationDelay: "0.1s", marginBottom: "48px" }}>
         <h1 style={{ fontSize: typography.h2.desktop.size, fontWeight: 700, marginBottom: "16px" }}>
           {sector.name} Sector — Research Analysis
         </h1>
@@ -47,7 +47,7 @@ export default function SectorResearch() {
       </section>
 
       {sectorContent.keyMetrics.length > 0 && (
-        <section style={{ marginBottom: "36px" }}>
+        <section className="raycast-stagger-3" style={{ animationDelay: "0.2s", marginBottom: "36px" }}>
           <h2 style={{ fontSize: typography.h3.desktop.size, fontWeight: 600, marginBottom: "12px" }}>Key Metrics</h2>
           <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
             {sectorContent.keyMetrics.map((metric) => (
@@ -59,7 +59,7 @@ export default function SectorResearch() {
         </section>
       )}
 
-      <section style={{ marginBottom: "36px" }}>
+      <section className="raycast-stagger-4" style={{ animationDelay: "0.3s", marginBottom: "36px" }}>
         <h2 style={{ fontSize: typography.h3.desktop.size, fontWeight: 600, marginBottom: "12px" }}>Risks</h2>
         <ul style={{ lineHeight: 1.8, color: colors.textSecondary }}>
           {sectorContent.risks.map((risk) => (
@@ -68,7 +68,7 @@ export default function SectorResearch() {
         </ul>
       </section>
 
-      <section style={{ marginBottom: "36px" }}>
+      <section className="raycast-stagger-5" style={{ animationDelay: "0.4s", marginBottom: "36px" }}>
         <h2 style={{ fontSize: typography.h3.desktop.size, fontWeight: 600, marginBottom: "12px" }}>Opportunities</h2>
         <ul style={{ lineHeight: 1.8, color: colors.textSecondary }}>
           {sectorContent.opportunities.map((opp) => (
@@ -77,7 +77,7 @@ export default function SectorResearch() {
         </ul>
       </section>
 
-      <footer style={{ marginTop: "48px", paddingTop: "24px", borderTop: `1px solid ${colors.border}`, fontSize: "13px", color: colors.textSecondary }}>
+      <footer className="raycast-stagger-6" style={{ animationDelay: "0.5s", marginTop: "48px", paddingTop: "24px", borderTop: `1px solid ${colors.border}`, fontSize: "13px", color: colors.textSecondary }}>
         <p>Research analysis only. Not investment advice. Consult a SEBI-registered investment advisor.</p>
       </footer>
     </main>

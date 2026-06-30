@@ -49,9 +49,9 @@ export default function Trust() {
   const contentWidth = useResponsiveValue("100%", "740px");
 
   return (
-    <main style={{ maxWidth: contentWidth, margin: "0 auto", padding: layout.pagePaddingDesktop, color: colors.textPrimary }}>
+    <main className="raycast-slideUp" style={{ maxWidth: contentWidth, margin: "0 auto", padding: layout.pagePaddingDesktop, color: colors.textPrimary }}>
 
-      <section style={{ marginBottom: "48px" }}>
+      <section className="raycast-stagger-1" style={{ marginBottom: "48px" }}>
         <h1 style={{ fontSize: typography.h2.desktop.size, fontWeight: 700, marginBottom: "12px" }}>
           Trust and Disclosures
         </h1>
@@ -60,8 +60,12 @@ export default function Trust() {
         </p>
       </section>
 
+      <div className="raycast-stagger-2" style={{ animationDelay: "0.1s" }}>
       <ResearchOnlyDisclosure />
 
+      </div>
+
+      <div className="raycast-stagger-3" style={{ animationDelay: "0.2s" }}>
       {SECTIONS.map((section) => (
         <article
           key={section.id}
@@ -76,8 +80,9 @@ export default function Trust() {
           </p>
         </article>
       ))}
+      </div>
 
-      <footer style={{ marginTop: "48px", paddingTop: "24px", borderTop: `1px solid ${colors.border}`, fontSize: "13px", color: colors.textSecondary }}>
+      <footer className="raycast-stagger-4" style={{ animationDelay: "0.3s", marginTop: "48px", paddingTop: "24px", borderTop: `1px solid ${colors.border}`, fontSize: "13px", color: colors.textSecondary }}>
         <p>Research analysis only. Not investment advice. Consult a SEBI-registered investment advisor before making investment decisions.</p>
       </footer>
     </main>

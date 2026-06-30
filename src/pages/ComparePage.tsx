@@ -17,6 +17,7 @@ import { Download, Printer, TrendingUp, TrendingDown, Minus, Search, X, BarChart
 import { Card } from "../ui/Card";
 import { Button } from "../ui/Button";
 import { HealthometerMini } from "../ui/HealthometerMini";
+import { PriceFlash } from "../ui/PriceFlash";
 import { colors, typography, space, radius, layout, media } from "../design/tokens";
 import type { ReactNode } from "react";
 
@@ -377,9 +378,9 @@ export default function ComparePage() {
   }, [stocks, metricRows]);
 
   return (
-    <div style={{ display: "grid", gap: space[6] }}>
+    <div className="raycast-slideUp" style={{ display: "grid", gap: space[6] }}>
       {/* ════════════ HEADER ════════════ */}
-      <section style={{ position: "relative", overflow: "hidden", paddingBottom: space[4] }}>
+      <section className="raycast-slideUp" style={{ position: "relative", overflow: "hidden", paddingBottom: space[4] }}>
         {/* Red stripe */}
         <div style={{
           position: "absolute",
@@ -402,7 +403,7 @@ export default function ComparePage() {
       </section>
 
       {/* ════════════ SEARCH + SELECTED ════════════ */}
-      <section style={{ display: "grid", gap: space[4] }}>
+      <section className="raycast-slideUp" style={{ animationDelay: "0.1s", animationFillMode: "both", display: "grid", gap: space[4] }}>
         <div style={{ position: "relative" }}>
           <input
             aria-label="Add stock to compare"
@@ -498,7 +499,7 @@ export default function ComparePage() {
 
       {/* ════════════ CHARTS ROW ════════════ */}
       {stocks.length >= 2 && (
-        <section style={{ display: "grid", gap: space[4] }}>
+        <section className="raycast-slideUp" style={{ animationDelay: "0.2s", animationFillMode: "both", display: "grid", gap: space[4] }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <h2 style={{ color: colors.textPrimary, fontSize: typography.h3.desktop.size, fontWeight: typography.h3.desktop.weight, margin: 0 }}>
               Visual Comparison
@@ -551,7 +552,7 @@ export default function ComparePage() {
 
       {/* ════════════ TABS + METRIC TABLE ════════════ */}
       {stocks.length >= 2 && (
-        <section style={{ display: "grid", gap: space[4] }}>
+        <section className="raycast-slideUp" style={{ animationDelay: "0.3s", animationFillMode: "both", display: "grid", gap: space[4] }}>
           {/* Tab bar */}
           <div style={{ display: "flex", gap: 4, borderBottom: `1px solid ${colors.border}`, paddingBottom: 0 }}>
             {TABS.map((tab) => {
@@ -623,7 +624,7 @@ export default function ComparePage() {
 
       {/* ════════════ AI RECOMMENDATION ════════════ */}
       {stocks.length >= 2 && (
-        <section style={{ display: "grid", gap: space[4] }}>
+        <section className="raycast-slideUp" style={{ animationDelay: "0.4s", animationFillMode: "both", display: "grid", gap: space[4] }}>
           <h2 style={{ display: "flex", alignItems: "center", gap: space[2], color: colors.textPrimary, fontSize: typography.h3.desktop.size, fontWeight: typography.h3.desktop.weight, margin: 0 }}>
             <Sparkles size={16} color={colors.warning} /> AI Comparison Insight
           </h2>
@@ -641,7 +642,7 @@ export default function ComparePage() {
                       <span style={{ fontSize: 13, fontWeight: 600, color: colors.textPrimary }}>AI Allocation</span>
                     </div>
                     <p style={{ fontSize: 14, color: colors.textPrimary, margin: 0, lineHeight: 1.6 }}>
-                      <strong>{top.symbol}</strong> leads with a score of <strong>{top.score}/100</strong>, driven by strong{" "}
+                      <strong>{top.symbol}</strong> leads with a score of <PriceFlash value={top.score}><strong>{top.score}/100</strong></PriceFlash>, driven by strong{" "}
                       {Number(top.metrics.roe) > 20 ? "ROE and profitability" : "growth and reasonable valuation"}.
                     </p>
                     {/* Per-stock conviction allocation */}

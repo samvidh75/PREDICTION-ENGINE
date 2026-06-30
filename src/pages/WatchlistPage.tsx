@@ -182,10 +182,10 @@ export default function WatchlistPage() {
   };
 
   return (
-    <div style={{ display: "grid", gap: "24px" }}>
+    <div className="raycast-slideUp" style={{ display: "grid", gap: "24px" }}>
 
       {/* Header row */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: space[4] }}>
+      <div className="raycast-stagger-1" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: space[4] }}>
         <div>
           <h1 style={{ color: colors.textPrimary, fontSize: typography.h1.desktop.size, fontWeight: 700, lineHeight: "1.2", margin: 0 }}>
             Track
@@ -306,7 +306,7 @@ export default function WatchlistPage() {
 
       {/* Summary chips */}
       {intel && (
-        <div style={{ display: "flex", gap: space[3], flexWrap: "wrap" }}>
+        <div className="raycast-slideUp raycast-stagger-2" style={{ display: "flex", gap: space[3], flexWrap: "wrap" }}>
           {needsReviewCount > 0 && (
             <Badge variant="warning" value={`${needsReviewCount} need${needsReviewCount === 1 ? "s" : ""} review`} />
           )}
@@ -323,26 +323,32 @@ export default function WatchlistPage() {
       )}
 
       {intel && (
-        <ThesisChangeResearchPanel
-          items={thesisChangeItems}
-          onResearch={handleResearch}
-          onCompare={handleCompare}
-          onTrack={handleTrack}
-          onInvest={handleInvestReview}
-        />
+        <div className="raycast-slideUp" style={{ animationDelay: "0.3s", animationFillMode: "both" }}>
+          <ThesisChangeResearchPanel
+            items={thesisChangeItems}
+            onResearch={handleResearch}
+            onCompare={handleCompare}
+            onTrack={handleTrack}
+            onInvest={handleInvestReview}
+          />
+        </div>
       )}
 
       {intel && (
-        <ResearchAlertsPanel
-          alerts={intel.alerts}
-          onResearch={handleResearch}
-          onCompare={handleCompare}
-          onTrack={handleTrack}
-          onInvest={handleInvestReview}
-        />
+        <div className="raycast-slideUp" style={{ animationDelay: "0.4s", animationFillMode: "both" }}>
+          <ResearchAlertsPanel
+            alerts={intel.alerts}
+            onResearch={handleResearch}
+            onCompare={handleCompare}
+            onTrack={handleTrack}
+            onInvest={handleInvestReview}
+          />
+        </div>
       )}
 
-      {watchlistAiContext && <ResearchAiExplanationPanel context={watchlistAiContext} />}
+      <div className="raycast-slideUp" style={{ animationDelay: "0.5s", animationFillMode: "both" }}>
+        {watchlistAiContext && <ResearchAiExplanationPanel context={watchlistAiContext} />}
+      </div>
 
       {/* Error state */}
       {error && (
@@ -356,7 +362,7 @@ export default function WatchlistPage() {
 
       {/* Empty / initial state */}
       {!intel && !loading && !error && (
-        <Card style={{ padding: space[8] }}>
+        <Card className="raycast-slideUp" style={{ animationDelay: "0.2s", animationFillMode: "both", padding: space[8] }}>
           <div style={{ display: "grid", gap: space[5], justifyItems: "center", textAlign: "center", maxWidth: 440, margin: "0 auto" }}>
             <div style={{
               width: 64,

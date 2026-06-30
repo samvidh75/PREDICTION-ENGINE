@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "../ui/Button";
 import { Card } from "../ui/Card";
 import { StaggerContainer } from "../ui/MicroInteractions";
+import { PriceFlash } from "../ui/PriceFlash";
 import { useResponsiveValue } from "../ui/responsive";
 import { colors, typography, layout, media, radius } from "../design/tokens";
 import { TrendingUp, TrendingDown, Minus, PieChart, Activity, Target, Shield, Zap, BarChart3 } from "lucide-react";
@@ -97,9 +98,14 @@ export default function PortfolioPage() {
                 <span style={{ fontSize: "12px", color: colors.body, fontWeight: 500 }}>{m.label}</span>
               </div>
               <div style={{ fontSize: typography.h3.desktop.size, fontWeight: 700, color: m.color }}>
-                {m.value}
+                {m.label === "P&L" || m.label === "Day Change" ? (
+                  <PriceFlash value={m.label === "P&L" ? metrics.pnl : metrics.dayChange}>{m.value}</PriceFlash>
+                ) : m.value}
               </div>
-              {m.sub && (
+              {m.sub && m.label === "P&L" && (
+                <div style={{ fontSize: "12px", color: m.color, marginTop: 4 }}><PriceFlash value={metrics.pnl}>{m.sub}</PriceFlash></div>
+              )}
+              {m.sub && m.label !== "P&L" && (
                 <div style={{ fontSize: "12px", color: m.color, marginTop: 4 }}>{m.sub}</div>
               )}
             </Card>
@@ -189,15 +195,15 @@ export default function PortfolioPage() {
                       </td>
                       <td style={{ padding: "12px 16px", color: colors.ink }}>{h.shares}</td>
                       <td style={{ padding: "12px 16px", color: colors.ink }}>{formatCurrency(h.avgCost)}</td>
-                      <td style={{ padding: "12px 16px", color: colors.ink }}>{formatCurrency(h.ltp)}</td>
+                      <td style={{ padding: "12px 16px", color: colors.ink }}><PriceFlash value={h.ltp}>{formatCurrency(h.ltp)}</PriceFlash></td>
                       <td style={{ padding: "12px 16px", color: getReturnColor(h.dayChange) }}>
                         <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
                           {h.dayChange > 0 ? <TrendingUp size={14} /> : h.dayChange < 0 ? <TrendingDown size={14} /> : <Minus size={14} />}
-                          {h.dayChangePercent > 0 ? "+" : ""}{h.dayChangePercent.toFixed(2)}%
+                          <PriceFlash value={h.dayChange}>{h.dayChangePercent > 0 ? "+" : ""}{h.dayChangePercent.toFixed(2)}%</PriceFlash>
                         </div>
                       </td>
                       <td style={{ padding: "12px 16px", color: getReturnColor(h.totalReturn) }}>
-                        <div style={{ fontWeight: 600 }}>{h.totalReturn > 0 ? "+" : ""}{h.totalReturnPercent.toFixed(2)}%</div>
+                        <div style={{ fontWeight: 600 }}><PriceFlash value={h.totalReturn}>{h.totalReturn > 0 ? "+" : ""}{h.totalReturnPercent.toFixed(2)}%</PriceFlash></div>
                         <div style={{ fontSize: "12px" }}>{formatCurrency(h.totalReturn)}</div>
                       </td>
                       <td style={{ padding: "12px 16px" }}>

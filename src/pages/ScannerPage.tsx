@@ -183,7 +183,7 @@ export default function ScannerPage() {
         </div>
       </div>
 
-      <div className="raycast-stagger-5">
+      <div className="raycast-stagger-5" style={{ maxWidth: "100%" }}>
         <Card variant="elevated">
           <div style={{ overflowX: "auto" }}>
             <div

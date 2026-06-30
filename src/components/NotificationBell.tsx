@@ -14,7 +14,7 @@ export function NotificationBell() {
   }, []);
 
   if (count === 0) {
-    return <Bell size={20} strokeWidth={1.75} />;
+    return <Bell size={20} strokeWidth={1.75} aria-label="Notifications" />;
   }
 
   return (
