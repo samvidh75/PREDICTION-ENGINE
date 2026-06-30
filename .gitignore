@@ -1,9 +1,8 @@
 # Dependencies
 node_modules/
 
-# Build outputs
-dist/*
-!dist/public/
+# Build outputs (Vite builds from source during deploy)
+dist/
 build/
 .next/
 coverage/

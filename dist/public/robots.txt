@@ -1,9 +1,0 @@
-User-agent: *
-Allow: /
-Disallow: /api/
-Disallow: /invite
-Disallow: /share/
-Disallow: /waitlist
-
-# Sitemaps
-Sitemap: https://stockstory-india.com/sitemap.xml
