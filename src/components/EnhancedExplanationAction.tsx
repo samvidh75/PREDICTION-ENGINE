@@ -1,100 +1,71 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// Phase 4 — ResearchAiSurfaceTrigger
+// Phase 19C-8 — EnhancedExplanationAction
 //
-// Compact floating trigger (badge / inline) that opens a small popover with
-// the AI context summary for any supported surface.  Designed as a lightweight
-// alternative to the full ResearchAiExplanationPanel — ideal for inline use
-// in page headers or next to search bars on scanner / compare / watchlist pages.
+// Shared UI affordance that surfaces event-grounded LLM context for any page
+// that has event evidence.  Shows a small "Why this moved" or "What changed"
+// button that opens the ResearchAiSurfaceTrigger popover with enriched context.
+//
+// Wires into: StockPage, WatchlistPage, ScannerPage, ComparePage, etc.
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { useState, useRef, useEffect } from "react";
-import { Info, X } from "lucide-react";
+import { Sparkles, X } from "lucide-react";
 import { colors, space } from "../design/tokens";
-import type { ResearchAiContext } from "../components/ai-orchestrator/researchAiTypes";
+import type { ResearchAiContext } from "./ai-orchestrator/researchAiTypes";
+import { surfaceLabel, getSurfaceItems } from "./ResearchAiSurfaceTrigger";
 
-// ─── Constants ───────────────────────────────────────────────────────────────
+// ─── Styles ──────────────────────────────────────────────────────────────────
 
-const TRIGGER_CLOSED: import("react").CSSProperties = {
+const BUTTON_STYLE: import("react").CSSProperties = {
   display: "inline-flex",
   alignItems: "center",
-  gap: "5px",
-  padding: "4px 11px",
-  borderRadius: "20px",
+  gap: "6px",
+  padding: "6px 14px",
+  borderRadius: "8px",
   border: `1px solid ${colors.hairline}`,
-  background: "transparent",
+  background: colors.surface,
   color: colors.textSecondary,
-  fontSize: "12px",
+  fontSize: "13px",
   fontWeight: 500,
   cursor: "pointer",
   fontFamily: "inherit",
-  transition: "background 0.15s, border-color 0.15s",
+  transition: "background 0.15s, border-color 0.15s, color 0.15s",
   whiteSpace: "nowrap",
 };
 
-const TRIGGER_OPEN: import("react").CSSProperties = {
-  ...TRIGGER_CLOSED,
+const BUTTON_HOVER: import("react").CSSProperties = {
+  ...BUTTON_STYLE,
   background: colors.surfaceElevated,
   borderColor: colors.hairlineStrong,
+  color: colors.textPrimary,
 };
-
-// ─── Helpers ─────────────────────────────────────────────────────────────────
-
-export function surfaceLabel(surface: string): string {
-  switch (surface) {
-    case "scanner":
-      return "Scanner research context";
-    case "compare":
-      return "Compare research context";
-    case "watchlist":
-      return "Watchlist research context";
-    case "alerts":
-      return "Alert research context";
-    case "stock":
-      return "Stock research context";
-    default:
-      return "Research context";
-  }
-}
-
-export function getSurfaceItems(ctx: ResearchAiContext): string[] {
-  switch (ctx.surface) {
-    case "scanner":
-      return ctx.scannerContext ?? [];
-    case "compare":
-      return ctx.comparisonContext ?? [];
-    case "watchlist":
-      return [
-        ...(ctx.watchlistContext ?? []),
-        ...(ctx.whatToWatch ?? []),
-      ];
-    case "alerts":
-      return ctx.alertContext ?? [];
-    default:
-      return ctx.narrative ?? ctx.researchNarrative ?? [];
-  }
-}
 
 // ─── Props ───────────────────────────────────────────────────────────────────
 
-export interface ResearchAiSurfaceTriggerProps {
-  /** The research context to display inside the popover (static, not AI-powered) */
+export interface EnhancedExplanationActionProps {
+  /** The enriched research context with event evidence */
   context: ResearchAiContext | null;
-  /** Short badge label (default "Context") */
+  /** Optional label (default "What changed") */
   label?: string;
-  /** Visual style (default "badge") */
-  variant?: "badge" | "inline";
+  /** Optional size variant */
+  size?: "sm" | "md";
 }
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
-export function ResearchAiSurfaceTrigger({
+export function EnhancedExplanationAction({
   context,
-  label = "Context",
-  variant = "badge",
-}: ResearchAiSurfaceTriggerProps) {
+  label = "What changed",
+  size = "md",
+}: EnhancedExplanationActionProps) {
   const [open, setOpen] = useState(false);
+  const [hovered, setHovered] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
-  const items = context ? getSurfaceItems(context) : [];
+
+  const sizeStyle: import("react").CSSProperties =
+    size === "sm"
+      ? { padding: "4px 10px", fontSize: "12px" }
+      : {};
 
   /* Close on click outside */
   useEffect(() => {
@@ -120,38 +91,38 @@ export function ResearchAiSurfaceTrigger({
 
   if (!context) return null;
 
-  const headTitle =
-    context.companyName ?? context.symbol ?? surfaceLabel(context.surface);
+  const currentStyle = hovered ? { ...BUTTON_HOVER, ...sizeStyle } : { ...BUTTON_STYLE, ...sizeStyle };
+  const items = getSurfaceItems(context);
+  const title = context.companyName ?? context.symbol ?? surfaceLabel(context.surface);
 
   return (
     <div
       ref={ref}
-      style={{
-        position: "relative",
-        display: variant === "inline" ? "inline-flex" : "inline-block",
-      }}
+      style={{ position: "relative", display: "inline-block" }}
     >
-      {/* ── Trigger button ──────────────────────────────────────────────── */}
+      {/* ── Action button ──────────────────────────────────────── */}
       <button
         type="button"
         onClick={() => setOpen((prev) => !prev)}
-        aria-label={surfaceLabel(context.surface)}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+        aria-label={label}
         aria-expanded={open}
-        style={open ? TRIGGER_OPEN : TRIGGER_CLOSED}
+        style={currentStyle}
       >
-        <Info size={13} color={colors.accentRed} />
+        <Sparkles size={14} color={colors.accentRed} />
         {label}
       </button>
 
-      {/* ── Popover ─────────────────────────────────────────────────────── */}
+      {/* ── Popover ─────────────────────────────────────────────── */}
       {open && (
         <div
           style={{
             position: "absolute",
             top: "calc(100% + 8px)",
             right: 0,
-            minWidth: "240px",
-            maxWidth: "340px",
+            minWidth: "260px",
+            maxWidth: "360px",
             background: colors.surface,
             border: `1px solid ${colors.hairlineStrong}`,
             borderRadius: "12px",
@@ -162,7 +133,7 @@ export function ResearchAiSurfaceTrigger({
             boxShadow: "0 8px 24px rgba(0,0,0,0.45)",
           }}
         >
-          {/* ── Header row ────────────────────────────────────────────── */}
+          {/* ── Header ──────────────────────────────────────────── */}
           <div
             style={{
               display: "flex",
@@ -179,7 +150,7 @@ export function ResearchAiSurfaceTrigger({
                   lineHeight: 1.3,
                 }}
               >
-                {headTitle}
+                {title}
               </span>
               <span
                 style={{
@@ -214,22 +185,8 @@ export function ResearchAiSurfaceTrigger({
             </button>
           </div>
 
-          {/* ── Title ───────────────────────────────────────────────── */}
-          {context.title ? (
-            <p
-              style={{
-                margin: 0,
-                color: colors.body,
-                fontSize: "13px",
-                lineHeight: 1.45,
-              }}
-            >
-              {context.title}
-            </p>
-          ) : null}
-
-          {/* ── Items list ──────────────────────────────────────────── */}
-          {items.length > 0 ? (
+          {/* ── Context items ────────────────────────────────────── */}
+          {items.length > 0 && (
             <ul
               style={{
                 margin: 0,
@@ -265,10 +222,10 @@ export function ResearchAiSurfaceTrigger({
                 </li>
               ))}
             </ul>
-          ) : null}
+          )}
 
-          {/* ── Sector / metadata footer ────────────────────────────── */}
-          {context.sector ? (
+          {/* ── Event evidence footer ──────────────────────────── */}
+          {(context.whatChanged?.length ?? 0) > 0 && (
             <div
               style={{
                 color: colors.ash,
@@ -278,9 +235,10 @@ export function ResearchAiSurfaceTrigger({
                 marginTop: space[1],
               }}
             >
-              Sector: {context.sector}
+              <strong>What changed:</strong>{" "}
+              {context.whatChanged!.slice(0, 2).join(" · ")}
             </div>
-          ) : null}
+          )}
         </div>
       )}
     </div>

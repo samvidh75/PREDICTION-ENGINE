@@ -30,6 +30,10 @@ import { EdgeAiChatSection } from "../components/edge-ai/EdgeAiChatSection";
 import { ResearchAiExplanationPanel } from "../components/ai-orchestrator/ResearchAiExplanationPanel";
 import { toHealthometerAiContext } from "../components/ai-orchestrator/healthometerAiContext";
 import { toResearchAiContext } from "../components/ai-orchestrator/researchAiContext";
+import {
+  enrichResearchContextWithEvents,
+  buildNewsEventPack,
+} from "../components/ai-orchestrator/eventEvidenceAiContext";
 import { getStockResearch, type StockResearchDetail as LocalStockResearchDetail } from "../lib/stockResearch";
 
 type StockResearchDetail = {
@@ -396,6 +400,15 @@ function StockError({ symbol }: { symbol: string }) {
     methodNote: "Research context only. Not a recommendation.",
   }, "stock");
 
+  // Enrich both contexts with real news event evidence for LLM grounding
+  const newsEventPack = buildNewsEventPack(stock.symbol, stock.news);
+  const enrichedResearchContext = researchContext
+    ? (enrichResearchContextWithEvents(researchContext, newsEventPack) ?? researchContext)
+    : null;
+  const enrichedHealthometerContext = healthometerContext
+    ? (enrichResearchContextWithEvents(healthometerContext, newsEventPack, "healthometer") ?? healthometerContext)
+    : null;
+
   return (
     <div className="stock-page" style={{ display: "grid", gap: sectionGap }}>
 
@@ -510,8 +523,8 @@ function StockError({ symbol }: { symbol: string }) {
         className="stock-ai-explainer-grid"
         style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "24px" }}
       >
-        <ResearchAiExplanationPanel context={healthometerContext} />
-        <ResearchAiExplanationPanel context={researchContext} />
+        <ResearchAiExplanationPanel context={enrichedHealthometerContext} />
+        <ResearchAiExplanationPanel context={enrichedResearchContext} />
       </section>
 
       {/* ── Key Metrics Grid ── */}
