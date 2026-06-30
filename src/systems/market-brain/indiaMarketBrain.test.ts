@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { evaluateIndiaEquity, type IndiaEquityPacket } from './indiaMarketBrain';
+import type { HistoricalSimilarityCase } from './historicalSimilarity';
 
 const readyEvidence: IndiaEquityPacket['evidence'] = {
   instrument_master: 'ready',
@@ -47,6 +48,27 @@ const strongPacket: IndiaEquityPacket = {
 
 const UNSAFE_PUBLIC_COPY = /Strong Buy|Buy now|Sell now|sure shot|guaranteed|multibagger|provider|API|backend|coverage|freshness|diagnostic|lineage|migration|backfill/i;
 
+function makeHistoricalCases(count: number): HistoricalSimilarityCase[] {
+  return Array.from({ length: count }, (_, index) => ({
+    id: `case-${index + 1}`,
+    symbol: 'sample',
+    timeframe: '1d',
+    features: {
+      priceMovePct: 2 + index * 0.01,
+      volumeMultiple: 1.8,
+      volatilityMultiple: 1.2,
+      sectorMovePct: 0.4,
+      indexMovePct: 0.2,
+      gapPct: 0.1,
+    },
+    outcome: {
+      label: 'next-session',
+      movePct: index % 2 === 0 ? 1.2 : -0.7,
+      maxDrawdownPct: -1.1,
+    },
+  }));
+}
+
 describe('evaluateIndiaEquity', () => {
   it('returns a strong research state when factor evidence is strong and risk is contained', () => {
     const result = evaluateIndiaEquity(strongPacket);
@@ -58,6 +80,7 @@ describe('evaluateIndiaEquity', () => {
     expect(result.risk.score).toBeLessThanOrEqual(35);
     expect(result.thesis.length).toBeGreaterThan(0);
     expect(result.anomalyReview).toBeNull();
+    expect(result.historicalSimilarityReview).toBeNull();
     expect(result.complianceNote).toContain('Research-only');
   });
 
@@ -185,6 +208,54 @@ describe('evaluateIndiaEquity', () => {
       'sector context',
       'index context',
     ]);
+    expect(result.missingEvidence).toEqual([]);
+    expect(JSON.stringify(result)).not.toMatch(UNSAFE_PUBLIC_COPY);
+  });
+
+  it('wires usable historical similarity as research context without unsafe public copy', () => {
+    const result = evaluateIndiaEquity({
+      ...strongPacket,
+      historicalSimilarity: {
+        symbol: 'sample',
+        timeframe: '1d',
+        current: {
+          priceMovePct: 2.1,
+          volumeMultiple: 1.8,
+          volatilityMultiple: 1.2,
+          sectorMovePct: 0.4,
+          indexMovePct: 0.2,
+          gapPct: 0.1,
+        },
+        cases: makeHistoricalCases(30),
+        minSampleSize: 30,
+      },
+    });
+
+    expect(result.historicalSimilarityReview?.usable).toBe(true);
+    expect(result.historicalSimilarityReview?.sampleSize).toBe(30);
+    expect(result.thesis).toContain('Similar historical cases are available as research context.');
+    expect(result.whatToWatch).toContain('Whether the historical context remains relevant as fresh evidence changes.');
+    expect(JSON.stringify(result)).not.toMatch(UNSAFE_PUBLIC_COPY);
+  });
+
+  it('keeps undersized historical similarity separate from core evidence domains', () => {
+    const result = evaluateIndiaEquity({
+      ...strongPacket,
+      historicalSimilarity: {
+        symbol: 'sample',
+        timeframe: '1d',
+        current: {
+          priceMovePct: 2.1,
+          volumeMultiple: 1.8,
+        },
+        cases: makeHistoricalCases(8),
+        minSampleSize: 10,
+      },
+    });
+
+    expect(result.historicalSimilarityReview?.usable).toBe(false);
+    expect(result.historicalSimilarityReview?.medianMovePct).toBeNull();
+    expect(result.risksToReview).toContain('Not enough similar historical cases for this view yet.');
     expect(result.missingEvidence).toEqual([]);
     expect(JSON.stringify(result)).not.toMatch(UNSAFE_PUBLIC_COPY);
   });
