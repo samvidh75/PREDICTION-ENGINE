@@ -1,6 +1,8 @@
 import type { AlertChangeView, WatchlistThesisView } from "../../research/contracts/productContracts";
 import type { ResearchAiContext } from "./researchAiTypes";
 import { buildAlertContext, buildWatchlistContext } from "./researchAiContext";
+import { enrichResearchContextWithEvents } from "./eventEvidenceAiContext";
+import type { EventEvidencePack, EventEvidenceItem, EventEvidenceKind } from "../../research/contracts/eventEvidenceContracts";
 
 function uniqueCompact(values: Array<string | null | undefined>, max = 5): string[] {
   const seen = new Set<string>();
@@ -81,7 +83,9 @@ export function buildWatchlistAiExplanationContext({
   ]);
   const narrative = uniqueCompact([...watchlistContext, ...alertContext]);
 
-  return {
+  // Build event evidence pack from alerts for LLM grounding
+  const alertEventPack = buildAlertEventPack(alerts);
+  const base: ResearchAiContext = {
     ...primary,
     surface: "watchlist",
     title: "Watchlist research explanation",
@@ -92,4 +96,51 @@ export function buildWatchlistAiExplanationContext({
     risksToReview,
     whatToWatch,
   };
+
+  return enrichResearchContextWithEvents(base, alertEventPack, "watchlist") ?? base;
+}
+
+/* ── Helpers ─────────────────────────────────────────────── */
+
+function buildAlertEventPack(alerts?: AlertChangeView[] | null): EventEvidencePack | null {
+  if (!alerts || alerts.length === 0) return null;
+  const items: EventEvidenceItem[] = alerts.map((alert, i) => ({
+    id: `alert-ev-${i}`,
+    kind: 'alert_event' as EventEvidenceKind,
+    label: alert.title.slice(0, 120),
+    detail: alert.body.slice(0, 500),
+    impact: classifyAlertImpact(alert.type),
+    date: alert.timestamp,
+    source: `Alert: ${alert.type}`,
+    confidence: 'high' as const,
+  }));
+
+  return {
+    symbol: 'WATCHLIST',
+    items,
+    totalCount: items.length,
+    retrievedAt: Date.now(),
+    byKind: {
+      news_headline: [],
+      alert_event: items,
+      corporate_action: [],
+      result_event: [],
+      filing_event: [],
+      analyst_event: [],
+    },
+    highlighted: items.slice(0, 3),
+  };
+}
+
+function classifyAlertImpact(type: string): 'positive' | 'negative' | 'neutral' | 'mixed' {
+  switch (type) {
+    case 'thesis_change':
+    case 'risk_change':
+      return 'negative';
+    case 'valuation_change':
+    case 'peer_change':
+      return 'mixed';
+    default:
+      return 'neutral';
+  }
 }

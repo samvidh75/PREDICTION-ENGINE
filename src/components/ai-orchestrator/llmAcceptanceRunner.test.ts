@@ -9,8 +9,8 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { describe, expect, it } from "vitest";
+import { evaluateAnswerQuality } from "./researchAiQualityGate";
 import {
-  evaluateAnswerQuality,
   runLlmAcceptanceCase,
   runLlmAcceptanceSuite,
   runSurfaceAcceptance,

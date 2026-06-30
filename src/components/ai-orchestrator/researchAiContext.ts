@@ -5,6 +5,8 @@ import type {
   WatchlistThesisView,
 } from "../../research/contracts/productContracts";
 import type { ResearchAiContext, ResearchAiSurface } from "./researchAiTypes";
+import type { EventEvidencePack } from "../../research/contracts/eventEvidenceContracts";
+import { enrichResearchContextWithEvents } from "./eventEvidenceAiContext";
 
 const DEFAULT_MAX_CHARS = 3000;
 const MAX_ITEMS = 5;
@@ -243,6 +245,7 @@ export function buildStockResearchContext(
   symbol: string,
   companyName: string,
   data: unknown,
+  eventEvidence?: EventEvidencePack | null,
 ): ResearchAiContext | null {
   if (!symbol.trim()) return null;
   const baseContext =
@@ -254,7 +257,7 @@ export function buildStockResearchContext(
     });
   if (!baseContext) return null;
   const context = baseContext as ResearchAiContext;
-  return {
+  const normalized: ResearchAiContext = {
     ...context,
     symbol: (context.symbol ?? symbol).trim().toUpperCase(),
     companyName: context.companyName ?? symbol.trim().toUpperCase(),
@@ -264,6 +267,7 @@ export function buildStockResearchContext(
     changeAbs: context.changeAbs ?? 0,
     changePercent: context.changePercent ?? 0,
   };
+  return enrichResearchContextWithEvents(normalized, eventEvidence, surface) ?? normalized;
 }
 
 export function buildScannerContext(

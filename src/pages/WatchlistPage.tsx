@@ -8,7 +8,7 @@ import { ConvictionBadge } from "../ui/ConvictionBadge";
 import { colors, typography, space, radius, media } from "../design/tokens";
 import { AnalystBriefCard } from "../components/analyst/AnalystBriefCard";
 import { ResearchAlertsPanel } from "../components/alerts/ResearchAlertsPanel";
-import { ResearchAiExplanationPanel, buildAlertContext, buildWatchlistContext } from "../components/ai-orchestrator";
+import { ResearchAiExplanationPanel, buildAlertContext, buildWatchlistContext, buildWatchlistAiExplanationContext } from "../components/ai-orchestrator";
 import type { ResearchAiContext } from "../components/ai-orchestrator";
 import { ResearchAiSurfaceTrigger } from "../components/ResearchAiSurfaceTrigger";
 import { ThesisChangeResearchPanel } from "../components/watchlist/ThesisChangeResearchPanel";
@@ -72,44 +72,15 @@ function uniqueCompact(values: Array<string | null | undefined>, max = 5): strin
   return result;
 }
 
-function buildWatchlistAiExplanationContext(
+function buildWatchlistAiExplanationContextLocal(
   intel: WatchlistIntelligence | null,
   thesisChangeItems: WatchlistThesisView[],
 ): ResearchAiContext | null {
   if (!intel) return null;
-
-  const thesisContexts = thesisChangeItems
-    .map((item) => buildWatchlistContext(item.symbol, item.companyName, item))
-    .filter((context): context is ResearchAiContext => Boolean(context));
-  const alertContexts = (intel.alerts ?? [])
-    .map((alert: AlertChangeView) => buildAlertContext(alert.symbol, alert.symbol, alert))
-    .filter((context): context is ResearchAiContext => Boolean(context));
-  const primary = thesisContexts[0] ?? alertContexts[0] ?? null;
-  if (!primary) return null;
-
-  const watchlistContext = uniqueCompact(thesisContexts.flatMap((context) => context.watchlistContext ?? context.narrative ?? []));
-  const alertContext = uniqueCompact(alertContexts.flatMap((context) => context.alertContext ?? context.narrative ?? []));
-  const whatChanged = uniqueCompact(
-    thesisChangeItems.map((item) => `${item.symbol}: ${item.currentStatus}`),
-  );
-
-  return {
-    ...primary,
-    surface: "watchlist",
-    title: "Watchlist research explanation",
-    narrative: uniqueCompact([...watchlistContext, ...alertContext]),
-    watchlistContext,
-    alertContext,
-    whatChanged,
-    risksToReview: uniqueCompact([
-      ...thesisContexts.flatMap((context) => context.risksToReview ?? []),
-      ...alertContexts.flatMap((context) => context.risksToReview ?? []),
-    ]),
-    whatToWatch: uniqueCompact([
-      ...thesisContexts.flatMap((context) => context.whatToWatch ?? []),
-      ...alertContexts.flatMap((context) => context.whatToWatch ?? []),
-    ]),
-  };
+  return buildWatchlistAiExplanationContext({
+    thesisItems: thesisChangeItems,
+    alerts: intel.alerts ?? null,
+  });
 }
 
 const WATCHLIST_TICKERS = [
@@ -154,7 +125,7 @@ export default function WatchlistPage() {
   );
 
   const watchlistAiContext = useMemo(
-    () => buildWatchlistAiExplanationContext(intel, thesisChangeItems),
+    () => buildWatchlistAiExplanationContextLocal(intel, thesisChangeItems),
     [intel, thesisChangeItems],
   );
 

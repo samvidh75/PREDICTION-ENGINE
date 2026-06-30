@@ -10,6 +10,7 @@ import { applyGuardrails } from './researchAiGuardrails';
 import { compressResearchAiContext } from './researchAiContext';
 import { isRuntimeAvailable } from './researchAiRuntimeRegistry';
 import { ensureWorker, requestExplanation } from './browserLocalRuntime';
+import { evaluateAnswerQuality } from './researchAiQualityGate';
 
 let _initAttempted = false;
 
@@ -49,6 +50,11 @@ export async function queryBrowserLocalRuntime(
     if (result.ok && result.text) {
       const { sanitized } = applyGuardrails(result.text, request.context);
       if (!sanitized) {
+        return { ok: true, text: null, needsReview: true, runtime: 'browser_local' };
+      }
+      // Phase 19C-3: Runtime quality gate — reject low-quality model answers
+      const quality = evaluateAnswerQuality(sanitized, compressedContext);
+      if (!quality.accepted) {
         return { ok: true, text: null, needsReview: true, runtime: 'browser_local' };
       }
       return {

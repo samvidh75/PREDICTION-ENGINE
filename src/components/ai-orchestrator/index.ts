@@ -90,3 +90,13 @@ export {
 export {
   ResearchAiExplanationPanel,
 } from './ResearchAiExplanationPanel';
+
+export {
+  enrichResearchContextWithEvents,
+  buildEventContext,
+  buildNewsEventPack,
+} from './eventEvidenceAiContext';
+
+export type {
+  NewsHeadlineInput,
+} from './eventEvidenceAiContext';
