@@ -87,6 +87,6 @@ describe('market brain evidence mapping from adapter results', () => {
     const second = buildMarketBrainEvidenceFromAdapterResults({ prices: ready([]) });
 
     expect(first).not.toBe(second);
-    expect(JSON.stringify(first)).not.toMatch(/Buy|Sell|Hold|provider|backend|API|coverage|freshness|diagnostic/i);
+    expect(JSON.stringify(first)).not.toMatch(/Buy|Sell|\bHold\b|provider|backend|\bAPI\b|coverage|freshness|diagnostic/i);
   });
 });

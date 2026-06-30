@@ -52,12 +52,14 @@ describe('fetchMarketBrainResearch public shape', () => {
     const result = await fetchMarketBrainResearch('TCS');
 
     expect(Object.keys(result.research).sort()).toEqual([
+      'anomalyReview',
       'companyName',
       'convictionScore',
       'evidenceReview',
       'factorViews',
       'generatedAt',
       'headline',
+      'historicalSimilarityReview',
       'methodNote',
       'risksToReview',
       'state',
