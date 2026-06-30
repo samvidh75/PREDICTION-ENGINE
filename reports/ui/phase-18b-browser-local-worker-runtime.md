@@ -1,8 +1,7 @@
 # Phase 18B — Browser-Local Web Worker AI Runtime
 
 ## Status
-- **Phase:** 7 (Complete) — React hook built
-- **Next:** 8 — Explanation panel UI
+- **Phase:** 14 (Complete) — Finalized on `main`
 - **Branch:** main
 
 ## Motivation
@@ -54,13 +53,13 @@ Runtime types: browserLocalWorkerTypes.ts (shared contract)
 | 5 | ✅ Complete | Build runtime adapter |
 | 6 | ✅ Complete | Integrate orchestrator |
 | 7 | ✅ Complete | Build React hook (useBrowserLocalResearchRuntime.ts) |
-| 8 | ⏳ Pending | Build explanation panel UI |
-| 9 | ⏳ Pending | Wire into StockDetail page |
-| 10 | ⏳ Pending | Tests |
-| 11 | ⏳ Pending | Safety/naming audit |
-| 12 | ⏳ Pending | Final baseline verification |
-| 13 | ⏳ Pending | Update report |
-| 14 | ⏳ Pending | Commit and push |
+| 8 | ✅ Complete | Build explanation panel UI |
+| 9 | ✅ Complete | Wire into StockDetail page |
+| 10 | ✅ Complete | Tests |
+| 11 | ✅ Complete | Safety/naming audit |
+| 12 | ✅ Complete | Final baseline verification |
+| 13 | ✅ Complete | Update report |
+| 14 | ✅ Complete | Commit and push |
 
 ## Baseline (Phase 0)
 - Typecheck: ✅
@@ -70,3 +69,41 @@ Runtime types: browserLocalWorkerTypes.ts (shared contract)
 - StockDetail tests: 1 passed
 - Full unit tests: 2044 passed, 7 skipped
 - Hygiene: ✅
+
+## Final implementation notes
+- Browser-local runtime now uses a tighter worker contract:
+  - `init`
+  - `ask`
+  - `reset`
+  - `status`
+  - `answer`
+  - `safe-failure`
+- `@mlc-ai/web-llm` is dynamically imported inside the worker only after explicit user start.
+- No model loads on page render.
+- Stock Detail keeps deterministic explanation as the default visible answer.
+- Enhanced explanation starts only after explicit user action on Stock Detail surfaces.
+- Non-Stock Detail surfaces keep the simpler deterministic-first panel behavior and were not widened further in this pass.
+- Worker requests use compressed safe context plus sanitized question only.
+- Worker output is sanitized before it reaches the UI.
+- Public UI copy avoids backend/provider/model/runtime naming.
+
+## Final verification
+- `npm run typecheck:all`: passed
+- `npm run lint`: passed
+- `npm run validate:hygiene`: passed with one pre-existing warning in `src/stockstory/intelligence/__tests__/DeepIntegration.test.ts`
+- `npm run build:frontend`: passed
+- `npm run build:backend`: passed
+- `npm test -- ai-orchestrator -- --runInBand`: passed (`12` files, `73` tests)
+- `npm test -- StockDetail -- --runInBand`: passed
+- `npm run test:unit`: passed (`210` files, `2053` tests passed, `7` skipped)
+
+## Confirmations
+- Backend untouched: yes
+- Provider changes: none
+- Official scores remain deterministic: yes
+- Local AI is explanation-only: yes
+- No fake data outside tests: yes
+- No secrets committed: yes
+- No broker execution changes: yes
+- No recommendation language in public-facing AI explanation copy: yes
+- No public backend/provider/model/runtime leakage: yes
