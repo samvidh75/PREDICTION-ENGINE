@@ -52,6 +52,21 @@ export interface MarketBrainHistoricalSimilarityReviewView {
   headline: string;
 }
 
+export type MarketBrainMoveDirection = 'up' | 'down' | 'sideways' | 'mixed';
+export type MarketBrainMoveConfidence = 'strong' | 'moderate' | 'weak' | 'insufficient';
+
+export interface MarketBrainWhyDidThisMoveView {
+  direction: MarketBrainMoveDirection;
+  confidence: MarketBrainMoveConfidence;
+  magnitudePct: number | null;
+  primaryDriver: string;
+  contributingFactors: string[];
+  risksToThesis: string[];
+  summary: string;
+  keyLevels: string[];
+  neededContext: string[];
+}
+
 export interface MarketBrainResearchView {
   symbol: string;
   companyName: string;
@@ -64,6 +79,7 @@ export interface MarketBrainResearchView {
   evidenceReview: MarketBrainEvidenceReviewView;
   anomalyReview: MarketBrainAnomalyReviewView | null;
   historicalSimilarityReview: MarketBrainHistoricalSimilarityReviewView | null;
+  whyDidThisMove: MarketBrainWhyDidThisMoveView | null;
   evidenceSummary: string[];
   factorViews: MarketBrainFactorView[];
   methodNote: string;
@@ -299,6 +315,43 @@ const normalizeAnomalyReview = (value: unknown): MarketBrainAnomalyReviewView | 
   };
 };
 
+const ALLOWED_DIRECTIONS = new Set<MarketBrainMoveDirection>(['up', 'down', 'sideways', 'mixed']);
+const ALLOWED_CONFIDENCES = new Set<MarketBrainMoveConfidence>(['strong', 'moderate', 'weak', 'insufficient']);
+
+const asDirection = (value: unknown): MarketBrainMoveDirection => {
+  const text = asTrimmedString(value) as MarketBrainMoveDirection;
+  return ALLOWED_DIRECTIONS.has(text) ? text : 'mixed';
+};
+
+const asConfidence = (value: unknown): MarketBrainMoveConfidence => {
+  const text = asTrimmedString(value) as MarketBrainMoveConfidence;
+  return ALLOWED_CONFIDENCES.has(text) ? text : 'insufficient';
+};
+
+const asNullableNumber = (value: unknown): number | null => {
+  if (typeof value !== 'number' || !Number.isFinite(value)) return null;
+  return value;
+};
+
+const normalizeWhyDidThisMoveView = (value: unknown): MarketBrainWhyDidThisMoveView | null => {
+  if (!isRecord(value)) return null;
+
+  const candidate = value as Partial<MarketBrainWhyDidThisMoveView>;
+  const direction = asDirection(candidate.direction);
+
+  return {
+    direction,
+    confidence: asConfidence(candidate.confidence),
+    magnitudePct: asNullableNumber(candidate.magnitudePct),
+    primaryDriver: asPublicText(candidate.primaryDriver) || 'Insufficient evidence to identify a driver for the move.',
+    contributingFactors: asStringArray(candidate.contributingFactors),
+    risksToThesis: asStringArray(candidate.risksToThesis),
+    summary: asPublicText(candidate.summary) || 'Move explanation is not yet available.',
+    keyLevels: asStringArray(candidate.keyLevels),
+    neededContext: asStringArray(candidate.neededContext),
+  };
+};
+
 const normalizeHistoricalSimilarityReview = (value: unknown): MarketBrainHistoricalSimilarityReviewView | null => {
   if (!isRecord(value)) return null;
 
@@ -371,6 +424,7 @@ const normalizeResearchResponse = (
       evidenceReview: normalizeEvidenceReview(research.evidenceReview),
       anomalyReview: normalizeAnomalyReview(research.anomalyReview),
       historicalSimilarityReview: normalizeHistoricalSimilarityReview(research.historicalSimilarityReview),
+      whyDidThisMove: normalizeWhyDidThisMoveView(research.whyDidThisMove),
       evidenceSummary: asStringArray(research.evidenceSummary),
       factorViews: asFactorViews(research.factorViews),
       methodNote: asPublicText(research.methodNote),

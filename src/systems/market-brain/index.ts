@@ -7,3 +7,4 @@ export * from './technicalReliability';
 export * from './anomalyEvidencePack';
 export * from './eventClassifier';
 export * from './historicalSimilarity';
+export * from './whyDidThisMove';

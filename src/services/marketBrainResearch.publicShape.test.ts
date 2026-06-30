@@ -67,6 +67,7 @@ describe('fetchMarketBrainResearch public shape', () => {
       'symbol',
       'thesis',
       'whatToWatch',
+      'whyDidThisMove',
     ].sort());
     expect(result.research).not.toHaveProperty('provider');
     expect(result.research).not.toHaveProperty('providerTraceId');

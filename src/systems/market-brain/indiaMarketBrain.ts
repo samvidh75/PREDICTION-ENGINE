@@ -8,6 +8,8 @@ import {
 } from './historicalSimilarity';
 import type { EvidencePack } from './evidencePackContract';
 import { humanizeDomain } from './evidencePackContract';
+import { buildWhyDidThisMoveResult } from './whyDidThisMove';
+import type { WhyDidThisMoveInput, WhyDidThisMoveResult } from './whyDidThisMove';
 import type {
   MARKET_BRAIN_ALLOWED_STATES,
   MARKET_BRAIN_EVIDENCE_DOMAINS,
@@ -65,6 +67,7 @@ export interface IndiaEquityPacket {
   anomaly?: MarketAnomalyInput | null;
   historicalSimilarity?: HistoricalSimilarityInput | null;
   evidencePack?: EvidencePack | null;
+  whyDidThisMove?: WhyDidThisMoveInput | null;
 }
 
 export interface FactorScore {
@@ -90,6 +93,7 @@ export interface IndiaMarketBrainResult {
   whatToWatch: string[];
   anomalyReview: MarketAnomalyEvidencePack | null;
   historicalSimilarityReview: HistoricalSimilaritySummary | null;
+  whyDidThisMove: WhyDidThisMoveResult | null;
   missingEvidence: MarketDataDomain[];
   partialEvidence: MarketDataDomain[];
   evidenceSummary: string[];
@@ -289,6 +293,9 @@ export function evaluateIndiaEquity(packet: IndiaEquityPacket): IndiaMarketBrain
   const historicalSimilarityReview = packet.historicalSimilarity
     ? buildHistoricalSimilaritySummary(packet.historicalSimilarity)
     : null;
+  const whyDidThisMoveResult = packet.whyDidThisMove
+    ? buildWhyDidThisMoveResult(packet.whyDidThisMove)
+    : null;
   const evidenceSummary = packet.evidencePack
     ? packet.evidencePack.availableDomains.map(humanizeDomain)
     : [];
@@ -349,6 +356,7 @@ export function evaluateIndiaEquity(packet: IndiaEquityPacket): IndiaMarketBrain
     ],
     anomalyReview,
     historicalSimilarityReview,
+    whyDidThisMove: whyDidThisMoveResult,
     missingEvidence: missing,
     partialEvidence: partial,
     evidenceSummary,
