@@ -1,7 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useResponsiveValue } from "../ui/responsive";
 import { colors, typography, layout } from "../design/tokens";
-import { SEBIComplianceBanner } from "../components/SEBICompliance";
 import { METHODOLOGY_SECTIONS } from "../stockstory/content/methodology/MethodologyContent";
 
 export default function Methodology() {
@@ -10,7 +9,6 @@ export default function Methodology() {
 
   return (
     <main style={{ maxWidth: contentWidth, margin: "0 auto", padding: layout.pagePaddingDesktop, color: colors.textPrimary }}>
-      <SEBIComplianceBanner />
 
       <section style={{ marginBottom: "48px" }}>
         <h1 style={{ fontSize: typography.h2.desktop.size, fontWeight: 700, marginBottom: "12px" }}>

@@ -3,7 +3,6 @@ import { Card } from "../ui/Card";
 import { Button } from "../ui/Button";
 import { useResponsiveValue } from "../ui/responsive";
 import { colors, typography, layout } from "../design/tokens";
-import { SEBIComplianceBanner } from "../components/SEBICompliance";
 import { SCANNER_PRESETS, getScannerPreset } from "../frontend/scanner/scannerLandingConfig";
 
 export default function ScannerLanding() {
@@ -16,7 +15,6 @@ export default function ScannerLanding() {
   if (preset && !presetConfig) {
     return (
       <main style={{ maxWidth: "1200px", margin: "0 auto", padding: layout.pagePaddingDesktop }}>
-        <SEBIComplianceBanner />
         <h1 style={{ fontSize: typography.h2.desktop.size, color: colors.textPrimary }}>Scanner Preset Not Found</h1>
         <p style={{ color: colors.textSecondary }}>This scanner preset doesn't exist. Try one of our standard presets.</p>
         <Button onClick={() => navigate("/scanner")} style={{ marginTop: "16px" }}>
@@ -29,7 +27,6 @@ export default function ScannerLanding() {
   if (presetConfig) {
     return (
       <main style={{ maxWidth: contentWidth, margin: "0 auto", padding: layout.pagePaddingDesktop, color: colors.textPrimary }}>
-        <SEBIComplianceBanner />
 
         <nav style={{ marginBottom: "24px", fontSize: "14px", color: colors.textSecondary }}>
           <span style={{ cursor: "pointer", color: colors.primary }} onClick={() => navigate("/scanner")}>
@@ -60,7 +57,6 @@ export default function ScannerLanding() {
 
   return (
     <main style={{ maxWidth: "1200px", margin: "0 auto", padding: layout.pagePaddingDesktop, color: colors.textPrimary }}>
-      <SEBIComplianceBanner />
 
       <section style={{ marginBottom: "48px" }}>
         <h1 style={{ fontSize: typography.h2.desktop.size, fontWeight: 700, marginBottom: "8px" }}>Research Scanner Presets</h1>

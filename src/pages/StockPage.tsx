@@ -8,7 +8,6 @@ import { Button } from "../ui/Button";
 import { Card, CardLabel } from "../ui/Card";
 import { Stat } from "../ui/Stat";
 import { useResponsiveValue } from "../ui/responsive";
-import { SEBIComplianceBanner } from "../components/SEBICompliance";
 import { BrokerHandoffModal } from "../components/BrokerHandoffModal";
 import { ThesisHistory } from "../components/ThesisHistory";
 import { listAvailableBrokers } from "../commercial/BrokerHandoffService";
@@ -375,7 +374,6 @@ function StockError({ symbol }: { symbol: string }) {
     { label: "Risk", value: stock.scores.risk ?? 0 },
   ];  return (
     <div className="stock-page" style={{ display: "grid", gap: sectionGap }}>
-      <SEBIComplianceBanner />
 
       {/* ── Sticky Header ── */}
       <StickyHeader symbol={stock.symbol} price={stock.price.current} changeAbs={stock.price.changeAbs}
@@ -822,8 +820,6 @@ function StockError({ symbol }: { symbol: string }) {
       }}>
         {disclaimer}
       </p>
-
-      <SEBIComplianceBanner />
 
       {/* ── Fixed Action Buttons (Raycast White Pill Footer) ── */}
       <div className="stock-fixed-footer" style={{

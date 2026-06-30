@@ -4,7 +4,6 @@ import { Card } from "../ui/Card";
 import { Button } from "../ui/Button";
 import { useResponsiveValue } from "../ui/responsive";
 import { colors, typography, layout } from "../design/tokens";
-import { SEBIComplianceBanner } from "../components/SEBICompliance";
 import { generateReferralCode, buildReferralUrl } from "../stockstory/growth/referral/ReferralService";
 
 export default function Invite() {
@@ -28,7 +27,6 @@ export default function Invite() {
 
   return (
     <main style={{ maxWidth: contentWidth, margin: "0 auto", padding: layout.pagePaddingDesktop, color: colors.textPrimary }}>
-      <SEBIComplianceBanner />
 
       <section style={{ marginBottom: "36px" }}>
         <h1 style={{ fontSize: typography.h2.desktop.size, fontWeight: 700, marginBottom: "12px" }}>

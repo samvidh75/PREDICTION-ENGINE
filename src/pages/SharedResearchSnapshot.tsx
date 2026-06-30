@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useResponsiveValue } from "../ui/responsive";
 import { colors, typography, layout, radius, space, shadows } from "../design/tokens";
-import { SEBIComplianceBanner } from "../components/SEBICompliance";
 import { getShareSnapshot } from "../stockstory/share/ResearchShareService";
 import type { SharedSnapshot } from "../stockstory/share/ResearchShareTypes";
 
@@ -32,7 +31,6 @@ export default function SharedResearchSnapshot() {
   if (loading) {
     return (
       <main style={{ maxWidth: contentWidth, margin: "0 auto", padding: layout.pagePaddingDesktop, color: colors.textPrimary }}>
-        <SEBIComplianceBanner />
         <p style={{ fontSize: typography.body.desktop.size, color: colors.textSecondary }}>Loading shared research...</p>
       </main>
     );
@@ -41,7 +39,6 @@ export default function SharedResearchSnapshot() {
   if (error || !snapshot) {
     return (
       <main style={{ maxWidth: contentWidth, margin: "0 auto", padding: layout.pagePaddingDesktop, color: colors.textPrimary }}>
-        <SEBIComplianceBanner />
         <h1 style={{ fontSize: typography.h2.desktop.size, fontWeight: 700, marginBottom: "12px" }}>Snapshot Not Found</h1>
         <p style={{ fontSize: typography.body.desktop.size, color: colors.textSecondary }}>
           This research snapshot may have expired or is no longer available.
@@ -52,7 +49,6 @@ export default function SharedResearchSnapshot() {
 
   return (
     <main style={{ maxWidth: contentWidth, margin: "0 auto", padding: layout.pagePaddingDesktop, color: colors.textPrimary }}>
-      <SEBIComplianceBanner />
 
       <section style={{ marginBottom: "36px" }}>
         <p style={{ fontSize: typography.caption.desktop.size, color: colors.textSecondary, marginBottom: "4px" }}>

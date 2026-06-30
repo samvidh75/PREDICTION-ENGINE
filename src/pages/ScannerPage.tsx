@@ -5,7 +5,6 @@ import { Button } from "../ui/Button";
 import { Card } from "../ui/Card";
 import { useResponsiveValue } from "../ui/responsive";
 import { colors, typography, radius } from "../design/tokens";
-import { SEBIComplianceBanner } from "../components/SEBICompliance";
 import { ScannerPresets } from "../components/ScannerPresets";
 import { Sparkles, TrendingUp, TrendingDown, Minus, BarChart3 } from "lucide-react";
 
@@ -110,7 +109,6 @@ export default function ScannerPage() {
 
   return (
     <div style={{ display: "grid", gap: "24px" }}>
-      <SEBIComplianceBanner />
       <div style={{ display: "grid", gap: "16px" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "8px" }}>
           <h1 style={{ color: colors.textPrimary, fontSize: typography.h1.desktop.size, fontWeight: 600, lineHeight: "1.25", margin: 0 }}>Scanner</h1>

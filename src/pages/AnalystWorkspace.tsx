@@ -3,7 +3,6 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { Card, CardLabel } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
-import { SEBIComplianceBanner } from '../components/SEBICompliance';
 import { colors, typography, layout, space, radius } from '../design/tokens';
 
 const API_BASE = import.meta.env.VITE_API_URL ?? '';
@@ -53,7 +52,6 @@ export default function AnalystWorkspace() {
 
   return (
     <main style={{ maxWidth: "1200px", margin: "0 auto", padding: layout.pagePaddingDesktop, color: colors.textPrimary }}>
-      <SEBIComplianceBanner />
 
       <section style={{ marginBottom: "48px" }}>
         <h1 style={{ fontSize: typography.h2.desktop.size, fontWeight: 700, marginBottom: "8px" }}>

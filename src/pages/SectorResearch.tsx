@@ -1,7 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useResponsiveValue } from "../ui/responsive";
 import { colors, typography, layout } from "../design/tokens";
-import { SEBIComplianceBanner } from "../components/SEBICompliance";
 import { getAllSectors, getSectorContent, getSectorInfo } from "../stockstory/content/sector/SectorContentService";
 
 export default function SectorResearch() {
@@ -15,7 +14,6 @@ export default function SectorResearch() {
   if (!sector || !sectorContent) {
     return (
       <main style={{ maxWidth: "1200px", margin: "0 auto", padding: layout.pagePaddingDesktop }}>
-        <SEBIComplianceBanner />
         <h1 style={{ fontSize: typography.h2.desktop.size, color: colors.textPrimary }}>Sector Not Found</h1>
         <p style={{ color: colors.textSecondary }}>The sector you're looking for isn't available.</p>
         <button
@@ -30,7 +28,6 @@ export default function SectorResearch() {
 
   return (
     <main style={{ maxWidth: contentWidth, margin: "0 auto", padding: layout.pagePaddingDesktop, color: colors.textPrimary }}>
-      <SEBIComplianceBanner />
 
       <nav style={{ marginBottom: "24px", fontSize: "14px", color: colors.textSecondary }}>
         <span style={{ cursor: "pointer", color: colors.primary }} onClick={() => navigate("/sectors")}>
