@@ -50,7 +50,7 @@ const strongPacket: IndiaEquityPacket = {
   },
 };
 
-const UNSAFE_PUBLIC_COPY = /provider|API|backend|diagnostics|coverage|freshness|lineage|migration|backfill|source pending|source verified|quote unavailable|history unavailable|null adapter|ADAPTER_UNAVAILABLE|EMPTY_RESPONSE|MALFORMED_RESPONSE|\bBuy\b|\bSell\b|\bHold\b|Strong Buy|guaranteed|sure shot|multibagger/i;
+const UNSAFE_PUBLIC_COPY = /provider|\bAPI\b|backend|diagnostics|coverage|freshness|lineage|migration|backfill|source pending|source verified|quote unavailable|history unavailable|null adapter|ADAPTER_UNAVAILABLE|EMPTY_RESPONSE|MALFORMED_RESPONSE|\bBuy\b|\bSell\b|\bHold\b|Strong Buy|guaranteed|sure shot|multibagger/i;
 
 describe('adapter evidence state normalization', () => {
   it('keeps all available domains out of review state', () => {

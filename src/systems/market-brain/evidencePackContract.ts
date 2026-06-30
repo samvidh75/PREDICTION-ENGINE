@@ -1,19 +1,68 @@
 // src/systems/market-brain/evidencePackContract.ts
-// Phase 2 – Safe Market Brain ↔ Data Adapter integration contract.
+// Phase 2 + Phase 8 – Safe Market Brain ↔ Data Adapter integration contract.
 //
 // Maps adapter MarketEvidencePack into Market Brain's evidence coverage model
 // without leaking internal plumbing terminology to the public UX.
+//
+// Phase 8 additions: canonical EvidenceDomain, EvidenceStrength, EvidenceItem,
+// and EvidencePack types for the RAG retrieval pipeline.
 //
 // Key invariants:
 //  1. Internal error codes NEVER reach public copy.
 //  2. "missing" domains are reported as "Unavailable" — never "API down".
 //  3. Adapter warnings are filtered to only public-safe categories.
 //  4. Domain names are humanized before rendering.
+//  5. All domains are allowlisted — malformed domains are dropped.
+//  6. Evidence text is trimmed; empty titles/summaries are dropped.
+//  7. Output arrays are deduped and fresh copies.
 
 import type { MarketEvidencePack, MarketEvidenceItem } from '../../services/data/evidencePackBuilder';
 import type { MarketDataDomain } from '../../services/data/dataAdapterTypes';
 
-// ─── Public-Facing Evidence Domain View ─────────────────────────────────────
+// ════════════════════════════════════════════════════════════════════════════
+// Phase 8 — Canonical Evidence Pack Types (for RAG pipeline)
+// ════════════════════════════════════════════════════════════════════════════
+
+export type EvidenceDomain =
+  | 'price_volume'
+  | 'financial_statements'
+  | 'news_events'
+  | 'ownership'
+  | 'derivatives'
+  | 'filings'
+  | 'corporate_actions'
+  | 'sector_context';
+
+export type EvidenceStrength =
+  | 'strong'
+  | 'moderate'
+  | 'weak'
+  | 'missing';
+
+export interface EvidenceItem {
+  id: string;
+  domain: EvidenceDomain;
+  title: string;
+  summary: string;
+  strength: EvidenceStrength;
+  occurredAt?: string | null;
+  url?: string | null;
+  metadata?: Record<string, unknown>;
+}
+
+export interface EvidencePack {
+  symbol: string;
+  generatedAt: string;
+  items: EvidenceItem[];
+  missingDomains: EvidenceDomain[];
+  partialDomains: EvidenceDomain[];
+  availableDomains: EvidenceDomain[];
+  needsReview: boolean;
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// Existing Phase 2 — Public-Facing Evidence Domain View
+// ════════════════════════════════════════════════════════════════════════════
 
 export interface EvidenceDomainView {
   domain: string; // humanized label

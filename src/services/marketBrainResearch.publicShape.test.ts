@@ -56,6 +56,7 @@ describe('fetchMarketBrainResearch public shape', () => {
       'companyName',
       'convictionScore',
       'evidenceReview',
+      'evidenceSummary',
       'factorViews',
       'generatedAt',
       'headline',

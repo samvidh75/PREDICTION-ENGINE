@@ -6,6 +6,8 @@ import {
   type HistoricalSimilarityInput,
   type HistoricalSimilaritySummary,
 } from './historicalSimilarity';
+import type { EvidencePack } from './evidencePackContract';
+import { humanizeDomain } from './evidencePackContract';
 import type {
   MARKET_BRAIN_ALLOWED_STATES,
   MARKET_BRAIN_EVIDENCE_DOMAINS,
@@ -62,6 +64,7 @@ export interface IndiaEquityPacket {
   adapterEvidenceState?: MarketBrainAdapterEvidenceState | null;
   anomaly?: MarketAnomalyInput | null;
   historicalSimilarity?: HistoricalSimilarityInput | null;
+  evidencePack?: EvidencePack | null;
 }
 
 export interface FactorScore {
@@ -89,6 +92,7 @@ export interface IndiaMarketBrainResult {
   historicalSimilarityReview: HistoricalSimilaritySummary | null;
   missingEvidence: MarketDataDomain[];
   partialEvidence: MarketDataDomain[];
+  evidenceSummary: string[];
   complianceNote: string;
   generatedAt: string;
 }
@@ -285,6 +289,9 @@ export function evaluateIndiaEquity(packet: IndiaEquityPacket): IndiaMarketBrain
   const historicalSimilarityReview = packet.historicalSimilarity
     ? buildHistoricalSimilaritySummary(packet.historicalSimilarity)
     : null;
+  const evidenceSummary = packet.evidencePack
+    ? packet.evidencePack.availableDomains.map(humanizeDomain)
+    : [];
 
   const convictionScore = average([
     { score: quality.score, weight: 2 },
@@ -344,6 +351,7 @@ export function evaluateIndiaEquity(packet: IndiaEquityPacket): IndiaMarketBrain
     historicalSimilarityReview,
     missingEvidence: missing,
     partialEvidence: partial,
+    evidenceSummary,
     complianceNote: 'Research-only output.',
     generatedAt: new Date().toISOString(),
   };

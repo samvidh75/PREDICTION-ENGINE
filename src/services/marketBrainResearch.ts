@@ -64,6 +64,7 @@ export interface MarketBrainResearchView {
   evidenceReview: MarketBrainEvidenceReviewView;
   anomalyReview: MarketBrainAnomalyReviewView | null;
   historicalSimilarityReview: MarketBrainHistoricalSimilarityReviewView | null;
+  evidenceSummary: string[];
   factorViews: MarketBrainFactorView[];
   methodNote: string;
   generatedAt: string;
@@ -370,6 +371,7 @@ const normalizeResearchResponse = (
       evidenceReview: normalizeEvidenceReview(research.evidenceReview),
       anomalyReview: normalizeAnomalyReview(research.anomalyReview),
       historicalSimilarityReview: normalizeHistoricalSimilarityReview(research.historicalSimilarityReview),
+      evidenceSummary: asStringArray(research.evidenceSummary),
       factorViews: asFactorViews(research.factorViews),
       methodNote: asPublicText(research.methodNote),
       generatedAt: asPublicTimestamp(research.generatedAt),
