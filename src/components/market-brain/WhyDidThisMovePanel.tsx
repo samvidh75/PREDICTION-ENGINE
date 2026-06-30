@@ -10,7 +10,7 @@ import { useState, useCallback } from "react";
 import { Brain, TrendingUp, AlertTriangle, Eye, X, Shield, Loader2 } from "lucide-react";
 import type { MarketAnomalyEvidencePack } from "../../systems/market-brain/anomalyEvidencePack";
 import { toAnomalyResearchAiContext } from "../ai-orchestrator/anomalyAiContext";
-import { Card, CardLabel } from "../../ui/Card";
+import { Panel } from "../../ui/Panel";
 import { Badge } from "../../ui/Badge";
 import { colors, typography } from "../../design/tokens";
 
@@ -108,40 +108,29 @@ export function WhyDidThisMovePanel({
   const watchItems = ctx!.whatToWatch;
 
   return (
-    <Card className="why-did-this-move-panel" variant="elevated">
-      {/* ── Header ───────────────────────────────────────────────────── */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: "8px",
-          marginBottom: "12px",
-        }}
-      >
-        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-          <TrendingUp size={16} color={colors.primary} />
-          <CardLabel>Why Did This Move</CardLabel>
-        </div>
-        <SeverityPill severity={pack.severity} />
-      </div>
+    <Panel variant="elevated" className="why-did-this-move-panel">
+      <Panel.Header
+        icon={<TrendingUp size={16} color={colors.primary} />}
+        title="Why Did This Move"
+        action={<SeverityPill severity={pack.severity} />}
+      />
 
-      {/* ── Anomaly type ─────────────────────────────────────────────── */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "8px",
-          marginBottom: "12px",
-        }}
-      >
-        <span style={{ fontSize: "14px", fontWeight: 600, color: colors.textPrimary }}>
-          {pack.anomalyType}
-        </span>
-        <span style={{ fontSize: "12px", color: colors.textSecondary }}>
-          {pack.timeframe} · {pack.symbol}
-        </span>
-      </div>
+      <Panel.Content style={{ display: 'grid', gap: '12px' }}>
+        {/* ── Anomaly type ─────────────────────────────────────────────── */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+          }}
+        >
+          <span style={{ fontSize: "14px", fontWeight: 600, color: colors.textPrimary }}>
+            {pack.anomalyType}
+          </span>
+          <span style={{ fontSize: "12px", color: colors.textSecondary }}>
+            {pack.timeframe} · {pack.symbol}
+          </span>
+        </div>
 
       {/* ── Headline ─────────────────────────────────────────────────── */}
       {ctx!.headline && (
@@ -339,6 +328,7 @@ export function WhyDidThisMovePanel({
           {pack.anomalyType} flagged at {pack.severity} severity.
         </p>
       </div>
-    </Card>
+    </Panel.Content>
+    </Panel>
   );
 }
