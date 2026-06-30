@@ -85,7 +85,7 @@ const FOOTER_COLUMNS = [
       { label: "Compare", href: "/compare" },
       { label: "Sectors", href: "/sectors" },
       { label: "Watchlist", href: "/watchlist" },
-      { label: "Methodology", href: "/methodology" },
+      { label: "Portfolio", href: "/portfolio" },
     ],
   },
   {
@@ -94,7 +94,6 @@ const FOOTER_COLUMNS = [
       { label: "About", href: "/about" },
       { label: "Changelog", href: "/changelog" },
       { label: "Pricing", href: "/pricing" },
-      { label: "Education Center", href: "/methodology" },
     ],
   },
   {
@@ -104,7 +103,6 @@ const FOOTER_COLUMNS = [
       { label: "Disclaimer", href: "/trust" },
       { label: "Privacy", href: "/trust" },
       { label: "Terms of Use", href: "/trust" },
-      { label: "FAQ", href: "/methodology" },
     ],
   },
   {

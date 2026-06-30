@@ -2,7 +2,7 @@
 // Phase 18 — Main orchestrator hook that coordinates the AI inference
 // fallback chain across all runtimes.
 //
-// Fallback order: browser-edge → user-local → server-local → deterministic
+// Fallback order: browser-edge → browser_local → user-local → server-local → deterministic
 // =========================================================================
 
 import { useState, useRef, useCallback, useEffect } from 'react';
@@ -27,6 +27,7 @@ import {
   initRuntimeRegistry,
 } from './researchAiRuntimeRegistry';
 import { queryBrowserEdgeWorker } from './browserEdgeRuntime';
+import { queryBrowserLocalRuntime } from './queryBrowserLocalRuntime';
 import { queryUserLocalRuntime } from './userLocalRuntime';
 import { queryServerLocalRuntime } from './serverLocalRuntime';
 
@@ -64,6 +65,7 @@ const RUNTIME_QUERIES: Partial<Record<
   (req: ResearchAiRequest) => Promise<ResearchAiResponse | null>
 >> = {
   'browser-edge': queryBrowserEdgeWorker,
+  'browser_local': queryBrowserLocalRuntime,
   'user-local': queryUserLocalRuntime,
   'server-local': queryServerLocalRuntime,
   // deterministic is handled inline

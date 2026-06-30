@@ -41,14 +41,6 @@ export const EXPERIMENTS: ExperimentConfig[] = [
     trafficFraction: 0,
   },
   {
-    id: "exp-methodology-access",
-    name: "Methodology Page Access Patterns",
-    description: "Test different ways of surfacing methodology content from stock pages.",
-    enabled: false,
-    variants: ["footer-link", "inline-banner", "side-panel"],
-    trafficFraction: 0,
-  },
-  {
     id: "exp-trust-signals",
     name: "Trust Signals Placement",
     description: "Test placement and styling of trust and disclosure elements on key pages.",

@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
-import { Home, Search, Star, CreditCard, LayoutGrid, BookOpen, Shield, MessageSquareText, ArrowUpRight, MessageCircle, TrendingUp } from "lucide-react";
+import { Home, Search, Star, CreditCard, LayoutGrid, Shield, MessageSquareText, ArrowUpRight, MessageCircle, TrendingUp } from "lucide-react";
 import { NavLink, Link, useNavigate } from "react-router-dom";
 import { colors, typography, space, radius, layout, components, shadows, animation } from "../design/tokens";
 import { NotificationBell } from "../components/NotificationBell";
@@ -23,7 +23,7 @@ const NAV = [
 const SECONDARY_NAV = [
   { to: "/relative-strength", label: "R. Strength", icon: TrendingUp },
   { to: "/chat", label: "AI Chat", icon: MessageCircle },
-  { to: "/methodology", label: "Methodology", icon: BookOpen },
+
   { to: "/trust", label: "Trust & Safety", icon: Shield },
 ] as const;
 

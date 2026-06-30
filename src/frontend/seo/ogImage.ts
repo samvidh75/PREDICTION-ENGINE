@@ -7,7 +7,7 @@
 const DEFAULT_OG = "/og-image.png";
 
 export function resolveOgImage(
-  page: "home" | "company" | "sector" | "scanner" | "methodology" | "trust",
+  page: "home" | "company" | "sector" | "scanner" | "trust",
   identifier?: string,
 ): string {
   if (page === "company" && identifier) {

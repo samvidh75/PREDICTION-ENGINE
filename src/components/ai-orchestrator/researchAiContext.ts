@@ -124,7 +124,6 @@ function fromMarketBrainRecord(input: UnknownRecord, surface: ResearchAiSurface)
           ...(Array.isArray(evidenceReview.missing) ? evidenceReview.missing : []),
         ])
       : undefined,
-    methodologyNote: sanitizeText(research.methodNote),
     sector: sanitizeText(research.sector ?? research.industry),
     currentPrice: sanitizeNumber(input.currentPrice ?? research.currentPrice),
     changeAbs: sanitizeNumber(input.changeAbs ?? research.changeAbs),
@@ -235,7 +234,6 @@ export function compressResearchAiContext(context: ResearchAiContext, maxChars =
   pushList("Watchlist context", context.watchlistContext);
   pushList("Alert context", context.alertContext);
   pushList("History", context.historicalContext);
-  if (context.methodologyNote) blocks.push(`Methodology: ${context.methodologyNote}`);
 
   return blocks.join("\n").slice(0, maxChars).trim();
 }

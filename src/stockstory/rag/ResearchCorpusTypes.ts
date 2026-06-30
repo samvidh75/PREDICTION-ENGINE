@@ -15,8 +15,7 @@ export type CorpusEntityKind =
   | 'transcript_note'
   | 'news_event_summary'
   | 'company_profile_fact'
-  | 'sector_fact'
-  | 'methodology_knowledge';
+  | 'sector_fact';
 
 export interface CorpusDocument {
   id: string;

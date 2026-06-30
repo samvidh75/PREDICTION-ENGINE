@@ -48,7 +48,6 @@ const KNOWN_ACTIONS = new Set([
   'watchlist_remove',
   'trust_centre_visit',
   'prediction_journal_visit',
-  'methodology_click',
   'limitations_click',
   'session_start',
   'session_end',

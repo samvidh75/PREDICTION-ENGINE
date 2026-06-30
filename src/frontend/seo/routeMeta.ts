@@ -73,17 +73,6 @@ export function resolveRouteMeta(
     };
   }
 
-  // Methodology
-  if (p === "/methodology") {
-    return {
-      title: "Research Methodology — How StockStory Works",
-      description:
-        "Understand the research methodology behind StockStory scorecards, theses, risk radar, and scenario analysis.",
-      canonical: "/methodology",
-      ogImage: "/og-image.png",
-    };
-  }
-
   // Trust & Disclosures
   if (p === "/trust" || p === "/disclosures") {
     return {

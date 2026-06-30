@@ -71,7 +71,7 @@ export interface WatchlistEvent extends AnalyticsEvent {
 
 export interface TrustEvent extends AnalyticsEvent {
   category: 'trust';
-  action: 'trust_centre_visit' | 'prediction_journal_visit' | 'methodology_click' | 'limitations_click';
+  action: 'trust_centre_visit' | 'prediction_journal_visit' | 'limitations_click';
   metadata?: {
     time_on_page_ms?: number;
     section?: string;
@@ -180,14 +180,6 @@ export class EventAnalyticsEngine {
     } as TrustEvent);
   }
 
-  trackMethodologyClick(section: string): void {
-    this.record({
-      category: 'trust',
-      action: 'methodology_click',
-      timestamp: new Date().toISOString(),
-      metadata: { section },
-    } as TrustEvent);
-  }
 
   trackSessionStart(): void {
     this.sessionStart = new Date().toISOString();
