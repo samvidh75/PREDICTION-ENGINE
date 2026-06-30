@@ -79,7 +79,7 @@ function getSurfaceItems(ctx: ResearchAiContext): string[] {
 export interface ResearchAiSurfaceTriggerProps {
   /** The research context to display inside the popover (static, not AI-powered) */
   context: ResearchAiContext | null;
-  /** Short badge label (default "Insight") */
+  /** Short badge label (default "Context") */
   label?: string;
   /** Visual style (default "badge") */
   variant?: "badge" | "inline";
@@ -89,7 +89,7 @@ export interface ResearchAiSurfaceTriggerProps {
 
 export function ResearchAiSurfaceTrigger({
   context,
-  label = "Insight",
+  label = "Context",
   variant = "badge",
 }: ResearchAiSurfaceTriggerProps) {
   const [open, setOpen] = useState(false);
