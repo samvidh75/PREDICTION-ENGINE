@@ -54,7 +54,7 @@ describe('buildStockResearchContext', () => {
   });
 
   it('trims and uppercases the symbol', () => {
-    const ctx = buildStockResearchContext('stock-detail', '  tech  ', 'X', stockData());
+    const ctx = buildStockResearchContext('  tech  ', 'X', stockData());
     expect(ctx!.symbol).toBe('TECH');
   });
 
@@ -199,6 +199,24 @@ describe('buildAlertContext', () => {
 
   it('returns null for empty symbol', () => {
     expect(buildAlertContext('', 'X', {})).toBeNull();
+  });
+
+  it('filters unsafe public copy before alert context reaches AI narrative wiring', () => {
+    const ctx = buildAlertContext('SAFE', 'provider backend', {
+      change: 'API provider diagnostics should not reach users',
+      summary: ['Revenue growth needs review'],
+      risks: ['backend adapter failed', 'Margin pressure'],
+      nextSteps: ['RAG vector chunk', 'Deal conversion'],
+      changeType: 'source verified',
+    });
+
+    expect(ctx).not.toBeNull();
+    expect(ctx!.companyName).toBe('SAFE');
+    expect(ctx!.narrative).toEqual(['Revenue growth needs review']);
+    expect(ctx!.risksToReview).toEqual(['Margin pressure']);
+    expect(ctx!.whatToWatch).toEqual(['Deal conversion']);
+    expect(ctx!.extraContext).toBeUndefined();
+    expect(JSON.stringify(ctx)).not.toMatch(/API|provider|backend|adapter|RAG|vector|chunk|source verified/i);
   });
 });
 
