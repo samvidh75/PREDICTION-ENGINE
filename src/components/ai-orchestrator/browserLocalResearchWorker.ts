@@ -21,15 +21,17 @@ type MlceEngine = {
   resetChat: () => Promise<void>;
 };
 
-const MODEL_ID = "Qwen2.5-1.5B-Instruct-q4f16_1-MLC";
-const ANSWER_TIMEOUT_MS = 30_000;
-const MAX_OUTPUT_TOKENS = 180;
-
 let engine: MlceEngine | null = null;
 let engineFactory:
   | ((modelId: string, options?: { initProgressCallback?: (report: { progress: number; text: string }) => void }) => Promise<MlceEngine>)
   | null = null;
 const cancelledRequestIds = new Set<string>();
+
+// Configuration received from the main-thread manifest via init message.
+let activeModelId = "Qwen2.5-1.5B-Instruct-q4f16_1-MLC";
+let answerTimeoutMs = 30_000;
+let maxOutputTokens = 180;
+let temperature = 0.2;
 
 function postMessageToMain(payload: BrowserLocalWorkerResponse): void {
   self.postMessage(payload);
@@ -91,7 +93,7 @@ async function ensureEngine(requestId?: string): Promise<boolean> {
   }
 
   try {
-    engine = await engineFactory(MODEL_ID, {
+    engine = await engineFactory(activeModelId, {
       initProgressCallback: (report) => {
         postProgress(report.progress >= 1 ? "ready" : "loading", requestId, Math.round(report.progress * 100));
       },
@@ -158,11 +160,11 @@ async function answerQuestion(requestId: string, compressedContext: string, ques
           },
           { role: "user", content: prompt },
         ],
-        max_tokens: MAX_OUTPUT_TOKENS,
-        temperature: 0.2,
+        max_tokens: maxOutputTokens,
+        temperature,
       }),
       new Promise<never>((_, reject) => {
-        setTimeout(() => reject(new Error("timeout")), ANSWER_TIMEOUT_MS);
+        setTimeout(() => reject(new Error("timeout")), answerTimeoutMs);
       }),
     ]);
 
@@ -209,6 +211,12 @@ self.onmessage = async (event: MessageEvent<BrowserLocalWorkerRequest>) => {
 
   switch (request.type) {
     case "init":
+      if (request.config) {
+        activeModelId = request.config.modelId;
+        maxOutputTokens = request.config.maxOutputTokens;
+        temperature = request.config.temperature;
+        answerTimeoutMs = request.config.timeoutMs;
+      }
       await ensureEngine(request.requestId);
       break;
     case "ask":
