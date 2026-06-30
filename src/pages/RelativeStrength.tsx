@@ -1,8 +1,10 @@
 import { useMemo, useState } from "react";
-import { TrendingUp, Trophy, Medal, Shield, Zap, BarChart3, ArrowUp, ArrowDown, Minus, Info } from "lucide-react";
+import { TrendingUp, Trophy, Medal, Shield, Zap, BarChart3, ArrowUp, ArrowDown, Minus, Info, Sparkles } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { colors, typography, space, radius } from "../design/tokens";
 import type { FC } from "react";
+import { ResearchAiExplanationPanel } from "../components/ai-orchestrator/ResearchAiExplanationPanel";
+import type { ResearchAiContext } from "../components/ai-orchestrator/researchAiTypes";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 type RankingMetric = "quality" | "growth" | "value" | "momentum" | "stability";
@@ -119,6 +121,28 @@ export default function RelativeStrengthPage() {
     : rankings;
 
   const topStocks = rankings.slice(0, 3);
+
+  // Build AI context from current rankings for ResearchAiExplanationPanel
+  const rankingContext = useMemo((): ResearchAiContext | null => {
+    if (!rankings.length) return null;
+    const sectorDistribution = [...new Set(rankings.map((r) => r.sector))];
+    const top3 = rankings.slice(0, 3);
+
+    return {
+      surface: "rankings",
+      headline: `Relative strength rankings by ${active.label.toLowerCase()}`,
+      narrative: [
+        `Top-ranked: ${top3[0].symbol} (score ${top3[0].scores[activeMetric]}) followed by ${top3[1].symbol} (${top3[1].scores[activeMetric]}) and ${top3[2].symbol} (${top3[2].scores[activeMetric]}).`,
+        `Spanning ${sectorDistribution.length} sectors: ${sectorDistribution.slice(0, 5).join(", ")}${sectorDistribution.length > 5 ? " and more" : ""}.`,
+      ],
+      comparisonContext: rankings.slice(0, 10).map(
+        (r) => `${r.symbol} (${r.sector}): rank #${r.rank}, ${active.label.toLowerCase()}=${r.scores[activeMetric]}`
+      ),
+      whatToWatch: top3.map(
+        (r) => `${r.symbol} leads in ${active.label.toLowerCase()} with score ${r.scores[activeMetric]} — monitor for sustained strength.`
+      ),
+    };
+  }, [rankings, activeMetric, active.label]);
 
   return (
     <div className="raycast-slideUp" style={{ padding: `${space[6]} ${space[8]}`, maxWidth: 1100, margin: "0 auto", color: colors.textPrimary, fontFamily: typography.fontFamily }}>
@@ -355,6 +379,9 @@ export default function RelativeStrengthPage() {
           </div>
         </div>
       )}
+
+      {/* AI explanation panel */}
+      {rankings.length > 0 && <ResearchAiExplanationPanel context={rankingContext} />}
 
       {/* Methodology note */}
       <div
