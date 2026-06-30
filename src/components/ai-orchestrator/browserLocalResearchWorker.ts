@@ -1,134 +1,185 @@
-/**
- * Phase 18B — Browser-local Web Worker for AI explanation generation.
- *
- * Runs @mlc-ai/web-llm inside a dedicated Web Worker so the main thread
- * stays responsive.  The worker is loaded **on-demand** — never at page
- * render — and communicates via `BrowserLocalWorkerRequest/Response`.
- *
- * @mlc-ai/web-llm version 0.2.84
- */
-
-import { CreateMLCEngine, type MLCEngine } from "@mlc-ai/web-llm";
-
+import { sanitizeResearchAiOutput, sanitizeResearchAiQuestion } from "./researchAiGuardrails";
+import type { ResearchAiResponse } from "./researchAiTypes";
 import type {
   BrowserLocalWorkerRequest,
   BrowserLocalWorkerResponse,
-  WorkerEnvelope,
+  BrowserLocalWorkerStatus,
 } from "./browserLocalWorkerTypes";
 
-let engine: MLCEngine | null = null;
-let loadedModelId: string | null = null;
-
-/** A small model that works well on consumer GPUs. */
-const DEFAULT_MODEL = "Qwen2.5-1.5B-Instruct-q4f16_1-MLC";
-
-function post(payload: BrowserLocalWorkerResponse, correlationId?: string): void {
-  const msg: WorkerEnvelope<BrowserLocalWorkerResponse> = {
-    correlationId: correlationId ?? "",
-    payload,
+type MlceEngine = {
+  chat: {
+    completions: {
+      create: (input: {
+        messages: Array<{ role: "system" | "user"; content: string }>;
+        max_tokens: number;
+        temperature: number;
+      }) => Promise<{
+        choices?: Array<{ message?: { content?: string | null } }>;
+      }>;
+    };
   };
-  self.postMessage(msg);
-}
-
-function progress(stage: "loading" | "compiling" | "ready" | "generating", percent?: number, message?: string): void {
-  post({ tag: "progress", stage, percent, message });
-}
-
-self.onmessage = async (event: MessageEvent<WorkerEnvelope<BrowserLocalWorkerRequest>>) => {
-  const { correlationId, payload } = event.data;
-
-  try {
-    switch (payload.tag) {
-      case "init":
-        await handleInit(payload.model, correlationId);
-        break;
-      case "explain":
-        await handleExplain(payload.prompt, payload.maxTokens, correlationId);
-        break;
-      case "checkCapability":
-        handleCheckCapability(correlationId);
-        break;
-      case "reset":
-        await handleReset(correlationId);
-        break;
-      case "unload":
-        await handleUnload(correlationId);
-        break;
-    }
-  } catch (err) {
-    const message = err instanceof Error ? err.message : String(err);
-    post({ tag: "error", message, recoverable: true }, correlationId);
-  }
+  resetChat: () => Promise<void>;
 };
 
-async function handleInit(modelId?: string, correlationId?: string): Promise<void> {
-  const id = modelId ?? DEFAULT_MODEL;
-  progress("loading", 0, `Loading model…`);
+const MODEL_ID = "Qwen2.5-1.5B-Instruct-q4f16_1-MLC";
+const ANSWER_TIMEOUT_MS = 30_000;
+const MAX_OUTPUT_TOKENS = 180;
 
-  engine = await CreateMLCEngine(id, {
-    initProgressCallback: (report) => {
-      progress(
-        report.text.includes("compiling") || report.text.includes("Fetching") ? "compiling" : "loading",
-        Math.round(report.progress * 100),
-        report.text,
-      );
-    },
-  });
+let engine: MlceEngine | null = null;
+let engineFactory:
+  | ((modelId: string, options?: { initProgressCallback?: (report: { progress: number; text: string }) => void }) => Promise<MlceEngine>)
+  | null = null;
 
-  loadedModelId = id;
-  progress("ready", 100, "Model ready");
-  post({ tag: "initResult", ok: true, message: `Model "${id}" loaded` }, correlationId);
+function postMessageToMain(payload: BrowserLocalWorkerResponse): void {
+  self.postMessage(payload);
 }
 
-async function handleExplain(prompt: string, maxTokens?: number, correlationId?: string): Promise<void> {
-  if (!engine) {
-    post({ tag: "error", message: "Engine not initialized. Call init first.", recoverable: true }, correlationId);
+function postStatus(
+  status: BrowserLocalWorkerStatus,
+  requestId?: string,
+  message?: string,
+): void {
+  postMessageToMain({ type: "status", requestId, status, message });
+}
+
+function postFailure(reason: ResearchAiResponse["reason"], requestId?: string): void {
+  postMessageToMain({ type: "safe-failure", requestId, reason });
+}
+
+async function ensureEngine(requestId?: string): Promise<boolean> {
+  if (engine) {
+    postStatus("ready", requestId, "Enhanced explanation is ready.");
+    return true;
+  }
+
+  postStatus("loading", requestId, "Preparing enhanced explanation.");
+
+  try {
+    const specifier = "@mlc-ai/web-llm";
+    const module = (await import(specifier)) as {
+      CreateMLCEngine: (
+        modelId: string,
+        options?: { initProgressCallback?: (report: { progress: number; text: string }) => void },
+      ) => Promise<MlceEngine>;
+    };
+    engineFactory = module.CreateMLCEngine;
+  } catch {
+    postStatus("unsupported", requestId, "Enhanced explanation is unavailable on this device.");
+    return false;
+  }
+
+  if (!engineFactory) {
+    postStatus("failed", requestId, "Enhanced explanation could not start.");
+    return false;
+  }
+
+  try {
+    engine = await engineFactory(MODEL_ID, {
+      initProgressCallback: (report) => {
+        const normalized = report.progress >= 1 ? "ready" : "loading";
+        postStatus(normalized, requestId, report.progress >= 1 ? "Enhanced explanation is ready." : "Preparing enhanced explanation.");
+      },
+    });
+    postStatus("ready", requestId, "Enhanced explanation is ready.");
+    return true;
+  } catch {
+    postStatus("failed", requestId, "Enhanced explanation could not start.");
+    engine = null;
+    return false;
+  }
+}
+
+function buildPrompt(compressedContext: string, question: string): string {
+  return [
+    "Use only the research context below.",
+    "Give a short explanation in at most three sentences.",
+    "Stay educational and factual.",
+    "Do not give recommendations or targets.",
+    "",
+    `Research context: ${compressedContext}`,
+    `Question: ${question}`,
+  ].join("\n");
+}
+
+async function answerQuestion(requestId: string, compressedContext: string, question: string): Promise<void> {
+  if (!compressedContext.trim()) {
+    postFailure("no_context", requestId);
     return;
   }
 
-  progress("generating", undefined, "Generating explanation…");
-  const start = performance.now();
-
-  const reply = await engine.chat.completions.create({
-    messages: [
-      {
-        role: "system",
-        content:
-          "You are a helpful Indian stock research assistant. Keep answers concise (2-4 sentences), factual, and grounded in the provided context. Do not make investment recommendations.",
-      },
-      { role: "user", content: prompt },
-    ],
-    max_tokens: maxTokens ?? 512,
-    temperature: 0.3,
-  });
-
-  const text = reply.choices?.[0]?.message?.content ?? null;
-  const runtimeMs = Math.round(performance.now() - start);
-
-  post({ tag: "explainResult", ok: true, text, runtimeMs }, correlationId);
-}
-
-function handleCheckCapability(correlationId?: string): void {
-  const hasWebGpu = typeof navigator !== "undefined" && "gpu" in navigator;
-  post(
-    {
-      tag: "capabilityResult",
-      canUseWebLLM: hasWebGpu,
-      message: hasWebGpu ? "WebGPU supported" : "WebGPU not available",
-    },
-    correlationId,
-  );
-}
-
-async function handleReset(correlationId?: string): Promise<void> {
-  if (engine) {
-    await engine.resetChat();
+  const sanitizedQuestion = sanitizeResearchAiQuestion(question);
+  if (!sanitizedQuestion) {
+    postFailure("unsupported", requestId);
+    return;
   }
-  post({ tag: "resetResult", ok: true }, correlationId);
+
+  const ready = await ensureEngine(requestId);
+  if (!ready || !engine) {
+    postFailure("not_ready", requestId);
+    return;
+  }
+
+  const prompt = buildPrompt(compressedContext, sanitizedQuestion);
+
+  try {
+    const result = await Promise.race([
+      engine.chat.completions.create({
+        messages: [
+          {
+            role: "system",
+            content:
+              "You explain already-computed stock research context. Keep answers under three sentences. Do not make recommendations.",
+          },
+          { role: "user", content: prompt },
+        ],
+        max_tokens: MAX_OUTPUT_TOKENS,
+        temperature: 0.2,
+      }),
+      new Promise<never>((_, reject) => {
+        setTimeout(() => reject(new Error("timeout")), ANSWER_TIMEOUT_MS);
+      }),
+    ]);
+
+    const rawText = result.choices?.[0]?.message?.content ?? "";
+    const sanitizedText = sanitizeResearchAiOutput(rawText);
+    if (!sanitizedText) {
+      postFailure("unsafe_output", requestId);
+      return;
+    }
+
+    postMessageToMain({
+      type: "answer",
+      requestId,
+      text: sanitizedText,
+    });
+  } catch (error) {
+    postFailure(error instanceof Error && error.message === "timeout" ? "timeout" : "failed", requestId);
+  }
 }
 
-async function handleUnload(correlationId?: string): Promise<void> {
-  engine = null;
-  loadedModelId = null;
-  post({ tag: "unloadResult", ok: true }, correlationId);
+async function resetEngine(requestId: string): Promise<void> {
+  if (engine) {
+    try {
+      await engine.resetChat();
+    } catch {
+      // keep reset silent; deterministic fallback remains available
+    }
+  }
+  postStatus("idle", requestId, "Enhanced explanation is idle.");
 }
+
+self.onmessage = async (event: MessageEvent<BrowserLocalWorkerRequest>) => {
+  const request = event.data;
+
+  switch (request.type) {
+    case "init":
+      await ensureEngine(request.requestId);
+      break;
+    case "ask":
+      await answerQuestion(request.requestId, request.compressedContext, request.question);
+      break;
+    case "reset":
+      await resetEngine(request.requestId);
+      break;
+  }
+};

@@ -74,3 +74,7 @@ export type {
 export {
   ResearchAiChatPanel,
 } from './ResearchAiChatPanel';
+
+export {
+  ResearchAiExplanationPanel,
+} from './ResearchAiExplanationPanel';

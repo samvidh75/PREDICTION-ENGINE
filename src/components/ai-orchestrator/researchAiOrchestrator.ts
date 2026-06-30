@@ -8,39 +8,6 @@ import {
 } from "./researchAiGuardrails";
 import type { ResearchAiRequest, ResearchAiResponse } from "./researchAiTypes";
 
-/**
- * Build a concise prompt for the browser-local model from compressed context.
- * Returns null if there's insufficient context to ask a meaningful question.
- */
-function buildBrowserLocalPrompt(
-  _compressed: string,
-  context: ResearchAiRequest["context"],
-): string | null {
-  const symbol = context.symbol;
-  const companyName = context.companyName;
-  const name = companyName ?? symbol;
-  if (!name) return null;
-
-  const lines: string[] = [`Provide a brief research analysis of ${name}.`];
-
-  if (context.sector) {
-    lines.push(`Sector: ${context.sector}.`);
-  }
-  if (context.narrative?.length) {
-    const snippet = context.narrative.slice(0, 3).join(" ");
-    lines.push(`Context: ${snippet}`);
-  }
-  if (context.researchNarrative?.length) {
-    lines.push(context.researchNarrative.join(" "));
-  }
-  if (context.healthometer?.explanation?.length) {
-    lines.push(context.healthometer.explanation.join(" "));
-  }
-
-  lines.push("Keep the answer concise (2-4 sentences), factual, and educational.");
-  return lines.join("\n");
-}
-
 function buildUnavailableResponse(reason: ResearchAiResponse["reason"]): ResearchAiResponse {
   return {
     ok: false,
@@ -80,13 +47,7 @@ export async function answerResearchQuestion(
     return deterministic;
   }
 
-  // Build a concise prompt from the compressed context
-  const prompt = buildBrowserLocalPrompt(compressed, request.context);
-  if (!prompt) {
-    return deterministic;
-  }
-
-  const result = await requestExplanation(prompt, 512);
+  const result = await requestExplanation(compressed, question);
   if (!result.ok || !result.text) {
     return deterministic;
   }

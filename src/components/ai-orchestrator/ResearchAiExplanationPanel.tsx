@@ -3,21 +3,37 @@ import { Sparkles } from "lucide-react";
 import { colors, space, typography } from "../../design/tokens";
 import { Button } from "../../ui/Button";
 import { Card, CardLabel } from "../../ui/Card";
-import { detectDeviceAiCapability } from "./deviceAiCapability";
-import { answerResearchQuestion } from "./researchAiOrchestrator";
-import type { ResearchAiContext, ResearchAiResponse } from "./researchAiTypes";
+import { compressResearchAiContext } from "./researchAiContext";
+import { buildDeterministicFallbackAnswer } from "./researchAiGuardrails";
+import type { ResearchAiContext } from "./researchAiTypes";
+import { useBrowserLocalResearchRuntime } from "./useBrowserLocalResearchRuntime";
 
 export function ResearchAiExplanationPanel({ context }: { context: ResearchAiContext | null }) {
   const [question, setQuestion] = useState("");
-  const [response, setResponse] = useState<ResearchAiResponse | null>(null);
-  const [loading, setLoading] = useState(false);
-  const capability = useMemo(() => detectDeviceAiCapability(), []);
+  const runtime = useBrowserLocalResearchRuntime();
+
+  const deterministicText = useMemo(
+    () => (context ? buildDeterministicFallbackAnswer(context).text : null),
+    [context],
+  );
+
+  const compressedContext = useMemo(
+    () => (context ? compressResearchAiContext(context) : ""),
+    [context],
+  );
 
   if (!context) return null;
 
-  const fallbackCopy = capability.canUseBrowserLocalAi
-    ? "Standard explanation is available for this view."
-    : "Standard explanation is available for this view.";
+  const supportsEnhancedStart =
+    context.surface === "stock" || context.surface === "healthometer";
+  const canStart = runtime.status.status === "unloaded" || runtime.status.status === "idle";
+  const showQuestionBox = !supportsEnhancedStart || runtime.status.status === "ready";
+  const helperCopy =
+    runtime.status.status === "unsupported"
+      ? "Enhanced explanation is unavailable on this device."
+      : runtime.status.status === "failed"
+        ? "Standard explanation is available for this view."
+        : "Standard explanation is available for this view.";
 
   return (
     <Card
@@ -41,60 +57,95 @@ export function ResearchAiExplanationPanel({ context }: { context: ResearchAiCon
         </p>
       </div>
 
-      <label style={{ display: "grid", gap: "8px" }}>
-        <span style={{ color: colors.textSecondary, fontSize: "13px" }}>
-          Ask what changed, what risks matter, or what to watch.
-        </span>
-        <input
-          aria-label="AI research question"
-          value={question}
-          onChange={(event) => setQuestion(event.target.value)}
-          placeholder="Ask what changed, what risks matter, or what to watch."
+      <div style={{ display: "grid", gap: "10px" }}>
+        <div
           style={{
-            minHeight: "44px",
-            width: "100%",
-            border: `1px solid ${colors.border}`,
-            borderRadius: "18px",
-            padding: "0 14px",
             color: colors.textPrimary,
-            background: colors.card,
-            boxSizing: "border-box",
-          }}
-        />
-      </label>
-
-      <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", alignItems: "center" }}>
-        <Button
-          variant="primary"
-          disabled={loading}
-          onClick={async () => {
-            setLoading(true);
-            const next = await answerResearchQuestion({
-              surface: context.surface,
-              context,
-              question: question || "Explain this view",
-              preferredRuntime: "browser_local",
-            });
-            setResponse(next);
-            setLoading(false);
+            fontSize: typography.body.desktop.size,
+            lineHeight: "1.6",
+            borderTop: `1px solid ${colors.border}`,
+            paddingTop: space[3],
+            overflowWrap: "anywhere",
           }}
         >
-          Explain this view
-        </Button>
-        <span style={{ color: colors.textSecondary, fontSize: "13px" }}>{fallbackCopy}</span>
+          {runtime.explanation ?? deterministicText ?? "Standard explanation is available for this view."}
+        </div>
+
+        {runtime.progress?.message ? (
+          <div style={{ color: colors.textSecondary, fontSize: "13px" }}>
+            {runtime.progress.message}
+          </div>
+        ) : (
+          <div style={{ color: colors.textSecondary, fontSize: "13px" }}>{helperCopy}</div>
+        )}
       </div>
 
-      <div
-        style={{
-          color: colors.textPrimary,
-          fontSize: typography.body.desktop.size,
-          lineHeight: "1.6",
-          borderTop: `1px solid ${colors.border}`,
-          paddingTop: space[3],
-          overflowWrap: "anywhere",
-        }}
-      >
-        {loading ? "Preparing explanation..." : response?.text ?? fallbackCopy}
+      {showQuestionBox ? (
+        <label style={{ display: "grid", gap: "8px" }}>
+          <span style={{ color: colors.textSecondary, fontSize: "13px" }}>
+            Ask what changed, what risks matter, or what to watch.
+          </span>
+          <input
+            aria-label="AI research question"
+            value={question}
+            onChange={(event) => setQuestion(event.target.value)}
+            placeholder="Ask what changed, what risks matter, or what to watch."
+            style={{
+              minHeight: "44px",
+              width: "100%",
+              border: `1px solid ${colors.border}`,
+              borderRadius: "18px",
+              padding: "0 14px",
+              color: colors.textPrimary,
+              background: colors.card,
+              boxSizing: "border-box",
+            }}
+          />
+        </label>
+      ) : null}
+
+      <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", alignItems: "center" }}>
+        {supportsEnhancedStart && canStart ? (
+          <Button
+            variant="primary"
+            disabled={runtime.busy}
+            onClick={async () => {
+              const canUse = await runtime.canUse();
+              if (canUse) {
+                await runtime.start();
+              }
+            }}
+          >
+            Start enhanced explanation
+          </Button>
+        ) : null}
+
+        {showQuestionBox ? (
+          <Button
+            variant="primary"
+            disabled={runtime.busy}
+            onClick={async () => {
+              if (supportsEnhancedStart) {
+                await runtime.explain(compressedContext, question || "Explain this view");
+              }
+            }}
+          >
+            Explain this view
+          </Button>
+        ) : null}
+
+        {supportsEnhancedStart && showQuestionBox ? (
+          <Button
+            variant="secondary"
+            disabled={runtime.busy}
+            onClick={async () => {
+              setQuestion("");
+              await runtime.reset();
+            }}
+          >
+            Reset
+          </Button>
+        ) : null}
       </div>
     </Card>
   );

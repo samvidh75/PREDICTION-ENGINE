@@ -23,7 +23,7 @@ export interface ProgressInfo {
 }
 
 export interface UseBrowserLocalRuntimeReturn {
-  /** Current status (unloaded | loading | ready | error | unsupported) */
+  /** Current status (unloaded | checking | loading | ready | failed | unsupported) */
   status: BrowserLocalRuntimeState;
   /** Whether an explanation request is in flight */
   busy: boolean;
@@ -33,8 +33,8 @@ export interface UseBrowserLocalRuntimeReturn {
   explanation: string | null;
   /** Start the worker and load the model */
   start: () => Promise<void>;
-  /** Generate an explanation for the given prompt */
-  explain: (prompt: string, maxTokens?: number) => Promise<string | null>;
+  /** Generate an explanation for the given compressed context and question */
+  explain: (compressedContext: string, question: string) => Promise<string | null>;
   /** Reset the worker's chat session */
   reset: () => Promise<void>;
   /** Unload the model and terminate the worker */
@@ -60,49 +60,47 @@ export function useBrowserLocalResearchRuntime(): UseBrowserLocalRuntimeReturn {
 
   const start = useCallback(async () => {
     if (mountedRef.current) setBusy(true);
-    if (mountedRef.current) setProgress({ stage: "loading", percent: 0, message: "Initializing…" });
+    if (mountedRef.current) setProgress({ stage: "checking", percent: 0, message: "Checking enhanced explanation." });
 
     try {
-      const s = await ensureWorker({
-        onProgress: (stage, percent, message) => {
-          if (mountedRef.current) setProgress({ stage, percent, message });
-        },
-        onError: (_msg) => {
-          /* status updated by ensureWorker */
-        },
+      const s = await ensureWorker((nextState) => {
+        if (mountedRef.current) {
+          setStatus(nextState);
+          setProgress({ stage: nextState.status, message: nextState.statusMessage });
+        }
       });
       if (mountedRef.current) setStatus(s);
       if (s.status !== "ready") {
-        if (mountedRef.current) setProgress({ stage: "error", message: s.statusMessage });
+        if (mountedRef.current) setProgress({ stage: s.status, message: s.statusMessage });
       } else {
-        if (mountedRef.current) setProgress({ stage: "ready", percent: 100, message: "Model ready" });
+        if (mountedRef.current) setProgress({ stage: "ready", percent: 100, message: "Enhanced explanation is ready." });
       }
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Unknown error";
-      if (mountedRef.current) setStatus({ status: "error", statusMessage: msg });
-      if (mountedRef.current) setProgress({ stage: "error", message: msg });
+      if (mountedRef.current) setStatus({ status: "failed", statusMessage: msg });
+      if (mountedRef.current) setProgress({ stage: "failed", message: msg });
     } finally {
       if (mountedRef.current) setBusy(false);
     }
   }, []);
 
   const explain = useCallback(
-    async (prompt: string, maxTokens?: number): Promise<string | null> => {
+    async (compressedContext: string, question: string): Promise<string | null> => {
       if (mountedRef.current) setBusy(true);
-      if (mountedRef.current) setProgress({ stage: "generating", message: "Generating explanation…" });
+      if (mountedRef.current) setProgress({ stage: "loading", message: "Preparing enhanced explanation." });
 
       try {
-        const result = await requestExplanation(prompt, maxTokens);
+        const result = await requestExplanation(compressedContext, question);
         if (result.ok && result.text) {
           if (mountedRef.current) setExplanation(result.text);
           if (mountedRef.current) setProgress(null);
           return result.text;
         }
-        if (mountedRef.current) setProgress({ stage: "error", message: result.text ?? "No output" });
+        if (mountedRef.current) setProgress({ stage: result.reason ?? "failed", message: "Standard explanation remains available for this view." });
         return null;
       } catch (err) {
         const msg = err instanceof Error ? err.message : "Generation failed";
-        if (mountedRef.current) setProgress({ stage: "error", message: msg });
+        if (mountedRef.current) setProgress({ stage: "failed", message: msg });
         return null;
       } finally {
         if (mountedRef.current) setBusy(false);
@@ -127,6 +125,9 @@ export function useBrowserLocalResearchRuntime(): UseBrowserLocalRuntimeReturn {
 
   const canUse = useCallback(async () => {
     const cap = await checkCapability();
+    if (mountedRef.current && !cap.canUse) {
+      setStatus({ status: "unsupported", statusMessage: cap.message });
+    }
     return cap.canUse;
   }, []);
 

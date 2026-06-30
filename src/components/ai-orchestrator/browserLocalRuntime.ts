@@ -1,238 +1,182 @@
-/**
- * Phase 18B — Browser-local runtime adapter.
- *
- * Manages the Web Worker lifecycle and provides a clean API for the
- * orchestrator to request AI explanations.  The worker is only created
- * when `ensureWorker()` is called — never at module import or page render.
- */
-
 import type {
   BrowserLocalWorkerRequest,
   BrowserLocalWorkerResponse,
-  WorkerEnvelope,
+  BrowserLocalWorkerStatus,
 } from "./browserLocalWorkerTypes";
 
-export type BrowserLocalRuntimeStatus =
-  | "unloaded"
-  | "loading"
-  | "ready"
-  | "error"
-  | "unsupported";
+export type BrowserLocalRuntimeStatus = "unloaded" | BrowserLocalWorkerStatus;
 
 export interface BrowserLocalRuntimeState {
   status: BrowserLocalRuntimeStatus;
   statusMessage: string;
 }
 
-export type RuntimeProgressCallback = (stage: string, percent?: number, message?: string) => void;
-
-export type RuntimeErrorCallback = (message: string, recoverable: boolean) => void;
-
 let worker: Worker | null = null;
-const pendingResolve: Map<
+let requestCounter = 0;
+let runtimeState: BrowserLocalRuntimeState = { status: "unloaded", statusMessage: "" };
+const pending = new Map<
   string,
   {
-    resolve: (value: BrowserLocalWorkerResponse) => void;
-    reject: (err: Error) => void;
+    resolve: (response: BrowserLocalWorkerResponse) => void;
+    reject: (error: Error) => void;
   }
-> = new Map();
-let correlationCounter = 0;
-let _progressCallback: RuntimeProgressCallback | null = null;
-let _errorCallback: RuntimeErrorCallback | null = null;
-let _status: BrowserLocalRuntimeState = { status: "unloaded", statusMessage: "" };
+>();
+let progressListener: ((state: BrowserLocalRuntimeState) => void) | null = null;
 
-function nextCorrelationId(): string {
-  correlationCounter += 1;
-  return `blwr-${correlationCounter}-${Date.now()}`;
+function nextRequestId(): string {
+  requestCounter += 1;
+  return `browser-local-${requestCounter}-${Date.now()}`;
 }
 
-function buildWorker(): Worker {
-  const wrk = new Worker(
-    new URL("./browserLocalResearchWorker.ts", import.meta.url),
-    { type: "module" },
-  );
+function updateRuntimeState(status: BrowserLocalRuntimeStatus, statusMessage = ""): void {
+  runtimeState = { status, statusMessage };
+  progressListener?.(getStatus());
+}
 
-  wrk.onmessage = (event: MessageEvent<WorkerEnvelope<BrowserLocalWorkerResponse>>) => {
-    const { correlationId, payload } = event.data;
+function attachWorkerListeners(nextWorker: Worker): void {
+  nextWorker.onmessage = (event: MessageEvent<BrowserLocalWorkerResponse>) => {
+    const payload = event.data;
 
-    if (payload.tag === "progress") {
-      _progressCallback?.(payload.stage, payload.percent, payload.message);
-      return;
+    if (payload.type === "status") {
+      updateRuntimeState(payload.status, payload.message ?? "");
     }
 
-    if (payload.tag === "error") {
-      _errorCallback?.(payload.message, payload.recoverable);
-    }
-
-    const pending = pendingResolve.get(correlationId);
-    if (pending) {
-      pendingResolve.delete(correlationId);
-      pending.resolve(payload);
+    if ("requestId" in payload && payload.requestId) {
+      const current = pending.get(payload.requestId);
+      if (!current) return;
+      pending.delete(payload.requestId);
+      current.resolve(payload);
     }
   };
 
-  wrk.onerror = (err) => {
-    const msg = err.message || "Unknown worker error";
-    _status = { status: "error", statusMessage: msg };
-    _errorCallback?.(msg, true);
+  nextWorker.onerror = () => {
+    updateRuntimeState("failed", "Enhanced explanation could not start.");
   };
-
-  return wrk;
 }
 
-function sendRequest(request: BrowserLocalWorkerRequest): Promise<BrowserLocalWorkerResponse> {
-  if (!worker) {
-    return Promise.reject(new Error("Worker not initialized. Call ensureWorker() first."));
+function ensureWorkerInstance(): Worker | null {
+  if (worker) return worker;
+  if (typeof Worker === "undefined") {
+    updateRuntimeState("unsupported", "Enhanced explanation is unavailable on this device.");
+    return null;
   }
 
-  const correlationId = nextCorrelationId();
+  try {
+    worker = new Worker(new URL("./browserLocalResearchWorker.ts", import.meta.url), { type: "module" });
+    attachWorkerListeners(worker);
+    return worker;
+  } catch {
+    updateRuntimeState("unsupported", "Enhanced explanation is unavailable on this device.");
+    return null;
+  }
+}
+
+function postRequest(request: BrowserLocalWorkerRequest, timeoutMs = 35_000): Promise<BrowserLocalWorkerResponse> {
+  const activeWorker = ensureWorkerInstance();
+  if (!activeWorker) {
+    return Promise.resolve({ type: "safe-failure", requestId: request.requestId, reason: "unsupported" });
+  }
 
   return new Promise<BrowserLocalWorkerResponse>((resolve, reject) => {
     const timeout = setTimeout(() => {
-      pendingResolve.delete(correlationId);
-      reject(new Error("Worker request timed out"));
-    }, 120_000);
+      pending.delete(request.requestId);
+      reject(new Error("timeout"));
+    }, timeoutMs);
 
-    pendingResolve.set(correlationId, {
-      resolve: (value) => {
+    pending.set(request.requestId, {
+      resolve: (response) => {
         clearTimeout(timeout);
-        resolve(value);
+        resolve(response);
       },
-      reject: (err) => {
+      reject: (error) => {
         clearTimeout(timeout);
-        reject(err);
+        reject(error);
       },
     });
 
-    const envelope: WorkerEnvelope<BrowserLocalWorkerRequest> = {
-      correlationId,
-      payload: request,
-    };
-
-    worker!.postMessage(envelope);
+    activeWorker.postMessage(request);
   });
 }
 
-/**
- * Ensure the Web Worker is created and ready.
- * Safe to call multiple times — only creates one worker.
- */
-export async function ensureWorker(
-  callbacks?: {
-    onProgress?: RuntimeProgressCallback;
-    onError?: RuntimeErrorCallback;
-  },
-): Promise<BrowserLocalRuntimeState> {
-  if (callbacks?.onProgress) _progressCallback = callbacks.onProgress;
-  if (callbacks?.onError) _errorCallback = callbacks.onError;
+export async function ensureWorker(callback?: (state: BrowserLocalRuntimeState) => void): Promise<BrowserLocalRuntimeState> {
+  if (callback) progressListener = callback;
+  if (runtimeState.status === "ready") return getStatus();
 
-  if (worker) {
-    return _status;
+  const requestId = nextRequestId();
+  updateRuntimeState("checking", "Checking enhanced explanation.");
+  const response = await postRequest({ type: "init", requestId });
+
+  if (response.type === "safe-failure") {
+    updateRuntimeState(response.reason === "unsupported" ? "unsupported" : "failed", "Enhanced explanation is unavailable on this device.");
   }
 
-  try {
-    worker = buildWorker();
-  } catch {
-    _status = { status: "unsupported", statusMessage: "Web Workers not supported in this browser" };
-    return _status;
-  }
-
-  _status = { status: "loading", statusMessage: "Starting worker…" };
-
-  try {
-    const result = await sendRequest({ tag: "init" });
-    if (result.tag === "initResult" && result.ok) {
-      _status = { status: "ready", statusMessage: result.message };
-    } else if (result.tag === "error") {
-      _status = { status: "error", statusMessage: result.message };
-    } else {
-      _status = { status: "error", statusMessage: "Unknown init result" };
-    }
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : "Failed to initialize worker";
-    _status = { status: "error", statusMessage: msg };
-  }
-
-  return _status;
+  return getStatus();
 }
 
-/**
- * Generate an AI explanation for the given prompt using the browser-local model.
- * The worker must be initialized first via `ensureWorker()`.
- */
 export async function requestExplanation(
-  prompt: string,
-  maxTokens?: number,
-): Promise<{ ok: boolean; text: string | null; runtimeMs: number }> {
-  if (!worker || _status.status !== "ready") {
-    return { ok: false, text: "Model not ready. Please initialize first.", runtimeMs: 0 };
-  }
+  compressedContext: string,
+  question: string,
+): Promise<{ ok: boolean; text: string | null; reason?: "unsupported" | "disabled" | "not_ready" | "unsafe_output" | "timeout" | "failed" | "no_context" }> {
+  const requestId = nextRequestId();
+  updateRuntimeState("loading", "Preparing enhanced explanation.");
 
-  const result = await sendRequest({ tag: "explain", prompt, maxTokens: maxTokens ?? 512 });
+  try {
+    const response = await postRequest(
+      {
+        type: "ask",
+        requestId,
+        compressedContext,
+        question,
+      },
+      35_000,
+    );
 
-  if (result.tag === "explainResult") {
-    return { ok: result.ok, text: result.text, runtimeMs: result.runtimeMs };
-  }
+    if (response.type === "answer") {
+      updateRuntimeState("ready", "Enhanced explanation is ready.");
+      return { ok: true, text: response.text };
+    }
 
-  if (result.tag === "error") {
-    return { ok: false, text: result.message, runtimeMs: 0 };
-  }
+    if (response.type === "safe-failure") {
+      updateRuntimeState(response.reason === "unsupported" ? "unsupported" : "failed", "Enhanced explanation is unavailable on this device.");
+      return { ok: false, text: null, reason: response.reason };
+    }
 
-  return { ok: false, text: "Unexpected response from worker", runtimeMs: 0 };
-}
-
-/**
- * Check whether the browser supports WebLLM (needs WebGPU).
- */
-export async function checkCapability(): Promise<{ canUse: boolean; message: string }> {
-  if (!worker) {
-    // Quick synchronous check without starting the worker
-    const hasWebGpu = typeof navigator !== "undefined" && "gpu" in navigator;
-    const hasWorker = typeof Worker !== "undefined";
-    const canUse = hasWebGpu && hasWorker;
+    updateRuntimeState("failed", "Enhanced explanation is unavailable on this device.");
+    return { ok: false, text: null, reason: "failed" };
+  } catch (error) {
+    updateRuntimeState("failed", "Enhanced explanation took too long.");
     return {
-      canUse,
-      message: canUse ? "WebGPU + Worker supported" : "WebGPU or Worker not available",
+      ok: false,
+      text: null,
+      reason: error instanceof Error && error.message === "timeout" ? "timeout" : "failed",
     };
   }
-
-  try {
-    const result = await sendRequest({ tag: "checkCapability" });
-    if (result.tag === "capabilityResult") {
-      return { canUse: result.canUseWebLLM, message: result.message };
-    }
-  } catch {
-    // fall through
-  }
-  return { canUse: false, message: "Unable to check capability" };
 }
 
-/**
- * Reset the chat session in the worker.
- */
-export async function resetWorkerChat(): Promise<boolean> {
-  if (!worker) return false;
-  const result = await sendRequest({ tag: "reset" });
-  return result.tag === "resetResult" && result.ok;
+export async function resetWorkerChat(): Promise<void> {
+  if (!worker) return;
+  const requestId = nextRequestId();
+  await postRequest({ type: "reset", requestId }, 10_000);
+  updateRuntimeState("idle", "Enhanced explanation is idle.");
 }
 
-/**
- * Unload the model and terminate the worker to free resources.
- */
+export async function checkCapability(): Promise<{ canUse: boolean; message: string }> {
+  const canUse = typeof Worker !== "undefined" && typeof navigator !== "undefined" && "gpu" in navigator;
+  return {
+    canUse,
+    message: canUse ? "Enhanced explanation is available." : "Enhanced explanation is unavailable on this device.",
+  };
+}
+
 export async function unloadWorker(): Promise<void> {
   if (worker) {
-    try {
-      await sendRequest({ tag: "unload" });
-    } catch {
-      // ignore errors during teardown
-    }
     worker.terminate();
     worker = null;
   }
-  pendingResolve.clear();
-  _status = { status: "unloaded", statusMessage: "" };
+  pending.clear();
+  updateRuntimeState("unloaded", "");
 }
 
 export function getStatus(): BrowserLocalRuntimeState {
-  return { ..._status };
+  return { ...runtimeState };
 }
