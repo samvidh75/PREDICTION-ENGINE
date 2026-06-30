@@ -11,6 +11,23 @@ describe("browserLocalWorkerTypes", () => {
     expect(request.type).toBe("init");
   });
 
+  it("accepts init with model config from manifest", () => {
+    const request: BrowserLocalWorkerRequest = {
+      type: "init",
+      requestId: "req-config",
+      config: { modelId: "Qwen2.5-1.5B", maxOutputTokens: 180, temperature: 0.2, timeoutMs: 30_000 },
+    };
+    expect(request.type).toBe("init");
+    expect(request.config?.modelId).toBe("Qwen2.5-1.5B");
+    expect(request.config?.maxOutputTokens).toBe(180);
+    expect(request.config?.timeoutMs).toBe(30_000);
+  });
+
+  it("accepts init without optional config", () => {
+    const request: BrowserLocalWorkerRequest = { type: "init", requestId: "req-no-config" };
+    expect(request.config).toBeUndefined();
+  });
+
   it("accepts the ask request shape with compressed safe context", () => {
     const request: BrowserLocalWorkerRequest = {
       type: "ask",
