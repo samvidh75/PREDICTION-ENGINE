@@ -28,6 +28,23 @@ describe("browserLocalWorkerTypes", () => {
     expect(request.type).toBe("reset");
   });
 
+  it("accepts a cancel request shape", () => {
+    const request: BrowserLocalWorkerRequest = { type: "cancel", requestId: "req-cancel-1" };
+    expect(request.type).toBe("cancel");
+  });
+
+  it("accepts a progress response", () => {
+    const response: BrowserLocalWorkerResponse = {
+      type: "progress",
+      phase: "loading",
+      percent: 42,
+    };
+
+    expect(response.type).toBe("progress");
+    expect(response.phase).toBe("loading");
+    expect(response.percent).toBe(42);
+  });
+
   it("accepts a status response", () => {
     const response: BrowserLocalWorkerResponse = {
       type: "status",

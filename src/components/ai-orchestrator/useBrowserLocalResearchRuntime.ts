@@ -14,6 +14,8 @@ import {
   resetWorkerChat,
   unloadWorker,
   getStatus,
+  cancelRequest,
+  getLastRequestId,
 } from "./browserLocalRuntime";
 
 export interface ProgressInfo {
@@ -27,6 +29,10 @@ export interface UseBrowserLocalRuntimeReturn {
   status: BrowserLocalRuntimeState;
   /** Whether an explanation request is in flight */
   busy: boolean;
+  /** True while the model is being loaded/started */
+  isStarting: boolean;
+  /** True while an explanation is being generated */
+  isGenerating: boolean;
   /** Latest progress info from model loading / generation */
   progress: ProgressInfo | null;
   /** Generated explanation text (null until a request completes) */
@@ -35,6 +41,8 @@ export interface UseBrowserLocalRuntimeReturn {
   start: () => Promise<void>;
   /** Generate an explanation for the given compressed context and question */
   explain: (compressedContext: string, question: string) => Promise<string | null>;
+  /** Cancel the current explanation request */
+  cancel: () => Promise<void>;
   /** Reset the worker's chat session */
   reset: () => Promise<void>;
   /** Unload the model and terminate the worker */
@@ -48,6 +56,8 @@ export interface UseBrowserLocalRuntimeReturn {
 export function useBrowserLocalResearchRuntime(): UseBrowserLocalRuntimeReturn {
   const [status, setStatus] = useState<BrowserLocalRuntimeState>(getStatus());
   const [busy, setBusy] = useState(false);
+  const [isStarting, setIsStarting] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
   const [progress, setProgress] = useState<ProgressInfo | null>(null);
   const [explanation, setExplanation] = useState<string | null>(null);
   const mountedRef = useRef(true);
@@ -59,7 +69,7 @@ export function useBrowserLocalResearchRuntime(): UseBrowserLocalRuntimeReturn {
   }, []);
 
   const start = useCallback(async () => {
-    if (mountedRef.current) setBusy(true);
+    if (mountedRef.current) { setBusy(true); setIsStarting(true); }
     if (mountedRef.current) setProgress({ stage: "checking", percent: 0, message: "Checking enhanced explanation." });
 
     try {
@@ -80,13 +90,13 @@ export function useBrowserLocalResearchRuntime(): UseBrowserLocalRuntimeReturn {
       if (mountedRef.current) setStatus({ status: "failed", statusMessage: msg });
       if (mountedRef.current) setProgress({ stage: "failed", message: msg });
     } finally {
-      if (mountedRef.current) setBusy(false);
+      if (mountedRef.current) { setBusy(false); setIsStarting(false); }
     }
   }, []);
 
   const explain = useCallback(
     async (compressedContext: string, question: string): Promise<string | null> => {
-      if (mountedRef.current) setBusy(true);
+      if (mountedRef.current) { setBusy(true); setIsGenerating(true); }
       if (mountedRef.current) setProgress({ stage: "loading", message: "Preparing enhanced explanation." });
 
       try {
@@ -103,7 +113,7 @@ export function useBrowserLocalResearchRuntime(): UseBrowserLocalRuntimeReturn {
         if (mountedRef.current) setProgress({ stage: "failed", message: msg });
         return null;
       } finally {
-        if (mountedRef.current) setBusy(false);
+        if (mountedRef.current) { setBusy(false); setIsGenerating(false); }
       }
     },
     [],
@@ -131,6 +141,11 @@ export function useBrowserLocalResearchRuntime(): UseBrowserLocalRuntimeReturn {
     return cap.canUse;
   }, []);
 
+  const cancel = useCallback(async () => {
+    await cancelRequest();
+    if (mountedRef.current) { setBusy(false); setIsGenerating(false); setProgress(null); }
+  }, []);
+
   const clearExplanation = useCallback(() => {
     if (mountedRef.current) setExplanation(null);
   }, []);
@@ -138,10 +153,13 @@ export function useBrowserLocalResearchRuntime(): UseBrowserLocalRuntimeReturn {
   return {
     status,
     busy,
+    isStarting,
+    isGenerating,
     progress,
     explanation,
     start,
     explain,
+    cancel,
     reset,
     stop,
     canUse,

@@ -71,7 +71,21 @@ export function ResearchAiExplanationPanel({ context }: { context: ResearchAiCon
           {runtime.explanation ?? deterministicText ?? "Standard explanation is available for this view."}
         </div>
 
-        {runtime.progress?.message ? (
+        {runtime.isStarting || runtime.isGenerating ? (
+          <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+            <div style={{ color: colors.textSecondary, fontSize: "13px" }}>
+              {runtime.progress?.message ?? "Preparing enhanced explanation\u2026"}
+              {runtime.progress?.percent != null ? ` (${runtime.progress.percent}%)` : ""}
+            </div>
+            <Button
+              variant="secondary"
+              onClick={() => runtime.cancel()}
+              style={{ fontSize: "12px", padding: "4px 12px", minHeight: "auto" }}
+            >
+              Cancel
+            </Button>
+          </div>
+        ) : runtime.progress?.message ? (
           <div style={{ color: colors.textSecondary, fontSize: "13px" }}>
             {runtime.progress.message}
           </div>

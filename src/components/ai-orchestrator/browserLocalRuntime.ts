@@ -1,3 +1,4 @@
+import { getBrowserLocalModelConfig } from "./browserLocalModelManifest";
 import type {
   BrowserLocalWorkerRequest,
   BrowserLocalWorkerResponse,
@@ -9,6 +10,8 @@ export type BrowserLocalRuntimeStatus = "unloaded" | BrowserLocalWorkerStatus;
 export interface BrowserLocalRuntimeState {
   status: BrowserLocalRuntimeStatus;
   statusMessage: string;
+  progressPercent?: number;
+  progressPhase?: "checking" | "loading" | "ready";
 }
 
 let worker: Worker | null = null;
@@ -22,6 +25,7 @@ const pending = new Map<
   }
 >();
 let progressListener: ((state: BrowserLocalRuntimeState) => void) | null = null;
+let lastRequestId: string | null = null;
 
 function nextRequestId(): string {
   requestCounter += 1;
@@ -41,7 +45,17 @@ function attachWorkerListeners(nextWorker: Worker): void {
       updateRuntimeState(payload.status, payload.message ?? "");
     }
 
-    if ("requestId" in payload && payload.requestId) {
+    if (payload.type === "progress") {
+      updateRuntimeState(
+        payload.phase === "ready" ? "ready" : payload.phase === "loading" ? "loading" : "checking",
+        payload.phase === "ready" ? "Enhanced explanation is ready." : "Preparing enhanced explanation\u2026",
+      );
+      runtimeState.progressPercent = payload.percent;
+      runtimeState.progressPhase = payload.phase;
+      progressListener?.(getStatus());
+    }
+
+    if ("requestId" in payload && payload.requestId && payload.type !== "progress") {
       const current = pending.get(payload.requestId);
       if (!current) return;
       pending.delete(payload.requestId);
@@ -103,8 +117,9 @@ export async function ensureWorker(callback?: (state: BrowserLocalRuntimeState) 
   if (runtimeState.status === "ready") return getStatus();
 
   const requestId = nextRequestId();
+  const manifest = getBrowserLocalModelConfig();
   updateRuntimeState("checking", "Checking enhanced explanation.");
-  const response = await postRequest({ type: "init", requestId });
+  const response = await postRequest({ type: "init", requestId, config: manifest.profile === "disabled" ? undefined : { modelId: manifest.modelId, maxOutputTokens: manifest.maxOutputTokens, temperature: manifest.temperature, timeoutMs: manifest.timeoutMs } });
 
   if (response.type === "safe-failure") {
     updateRuntimeState(response.reason === "unsupported" ? "unsupported" : "failed", "Enhanced explanation is unavailable on this device.");
@@ -113,11 +128,17 @@ export async function ensureWorker(callback?: (state: BrowserLocalRuntimeState) 
   return getStatus();
 }
 
+/** Returns the requestId of the current explanation, or null if none. */
+export function getLastRequestId(): string | null {
+  return lastRequestId;
+}
+
 export async function requestExplanation(
   compressedContext: string,
   question: string,
 ): Promise<{ ok: boolean; text: string | null; reason?: "unsupported" | "disabled" | "not_ready" | "unsafe_output" | "timeout" | "failed" | "no_context" }> {
   const requestId = nextRequestId();
+  lastRequestId = requestId;
   updateRuntimeState("loading", "Preparing enhanced explanation.");
 
   try {
@@ -151,6 +172,15 @@ export async function requestExplanation(
       reason: error instanceof Error && error.message === "timeout" ? "timeout" : "failed",
     };
   }
+}
+
+export async function cancelRequest(requestId?: string): Promise<void> {
+  const id = requestId ?? lastRequestId;
+  if (!worker || !id) return;
+  worker.postMessage({ type: "cancel", requestId: id } satisfies BrowserLocalWorkerRequest);
+  pending.delete(id);
+  lastRequestId = null;
+  updateRuntimeState(runtimeState.status, "Enhanced explanation cancelled.");
 }
 
 export async function resetWorkerChat(): Promise<void> {
