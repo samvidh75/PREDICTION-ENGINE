@@ -19,6 +19,7 @@
  */
 
 import { dbAdapter } from '../../db/DatabaseAdapter';
+import { ProviderQuotaMonitor } from '../scheduler/ProviderQuotaMonitor';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -66,7 +67,10 @@ export class EodDataCacheService {
         [key],
       );
 
-      if (res.rows.length === 0) return null;
+      if (res.rows.length === 0) {
+        ProviderQuotaMonitor.recordCacheMiss().catch(() => {});
+        return null;
+      }
 
       const row = res.rows[0];
 
@@ -76,12 +80,15 @@ export class EodDataCacheService {
       if (expiresAt <= new Date()) {
         // Expired — delete and return null (lazy cleanup)
         await dbAdapter.query('DELETE FROM cache WHERE key = $1', [key]);
+        ProviderQuotaMonitor.recordCacheMiss().catch(() => {});
         return null;
       }
 
+      ProviderQuotaMonitor.recordCacheHit().catch(() => {});
       return JSON.parse(row.value as string) as T;
     } catch {
       // Cache miss / DB error — fall through to upstream
+      ProviderQuotaMonitor.recordCacheMiss().catch(() => {});
       return null;
     }
   }
