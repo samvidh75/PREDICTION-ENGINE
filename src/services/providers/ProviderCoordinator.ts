@@ -16,6 +16,7 @@ import { ProviderHealthMonitor } from './ProviderHealthMonitor';
 import { DataFlowTracer } from '../audit/DataFlowTracer';
 import ProviderCircuitBreaker from './ProviderCircuitBreaker';
 import { loadAuthorizedProviderConfig } from './authorization/ProviderAuthorization';
+import { ProviderQuotaMonitor } from '../scheduler/ProviderQuotaMonitor';
 
 const REQUIRED_SCORING_FIELDS = new Set([
   'peRatio',
@@ -140,9 +141,10 @@ export class ProviderCoordinator {
 
     const errors: string[] = [];
     for (const provider of providers) {
+      const providerName = provider.constructor.name;
       const status = this.healthMonitor.getStatus(provider);
       if (status === 'Unavailable' || status === 'RateLimited') {
-        errors.push(`${provider.constructor.name}: skipped (${status})`);
+        errors.push(`${providerName}: skipped (${status})`);
         continue;
       }
 
@@ -150,12 +152,14 @@ export class ProviderCoordinator {
       try {
         const result = breaker ? await breaker.execute(() => fn(provider)) : await fn(provider);
         this.healthMonitor.recordSuccess(provider);
-        this.tracer.recordUsage(symbol, category, provider.constructor.name, false);
+        this.tracer.recordUsage(symbol, category, providerName, false);
+        ProviderQuotaMonitor.recordCall(providerName, category, true).catch(() => {});
         return result;
       } catch (err: any) {
-        errors.push(`${provider.constructor.name}: ${this.sanitizeProviderError(err)}`);
+        errors.push(`${providerName}: ${this.sanitizeProviderError(err)}`);
         this.healthMonitor.recordFailure(provider);
-        this.tracer.recordUsage(symbol, category, provider.constructor.name, true);
+        this.tracer.recordUsage(symbol, category, providerName, true);
+        ProviderQuotaMonitor.recordCall(providerName, category, false).catch(() => {});
       }
     }
 
