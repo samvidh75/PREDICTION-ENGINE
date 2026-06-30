@@ -103,6 +103,7 @@ jobs:
             -e ALLOW_SQLITE_IN_PRODUCTION=false \
             -e DATABASE_URL=postgresql://stockstory:stockstory@host.docker.internal:5432/stockstory_test \
             -e COOKIE_SECRET=ci-test-secret-not-for-production \
+            -e PORT=4001 \
             stockstory-api:test
 
       - name: Wait for /healthz
