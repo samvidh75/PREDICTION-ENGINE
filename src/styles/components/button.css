@@ -1,5 +1,5 @@
 /* ============================================================================
-   BUTTONS — All variants with Stripe minimalism + Apple polish
+   BUTTONS — Raycast design: pure black, white CTA pill, no shadows
    ============================================================================ */
 
 /* BASE BUTTON */
@@ -10,79 +10,65 @@ button,
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 12px 24px;
+  padding: 0 16px;
+  height: 36px;
   font-size: 14px;
-  font-weight: 600;
-  line-height: 1.4;
+  font-weight: 500;
+  line-height: 1;
   border: none;
   border-radius: var(--radius-md);
   cursor: pointer;
-  transition:
-    background-color var(--t-base),
-    color var(--t-base),
-    box-shadow var(--t-base),
-    border-color var(--t-base),
-    transform var(--t-fast);
+  transition: background-color var(--t-fast), color var(--t-fast), border-color var(--t-fast);
   text-decoration: none;
   white-space: nowrap;
   user-select: none;
   outline: none;
   position: relative;
+  font-family: inherit;
 }
 
 button:disabled,
 .button:disabled,
 [role="button"]:disabled {
-  opacity: 0.5;
+  opacity: 0.4;
   cursor: not-allowed;
   pointer-events: none;
 }
 
 /* SIZE VARIANTS */
 .button-lg {
-  padding: 16px 32px;
-  font-size: 16px;
-  height: 48px;
+  padding: 0 24px;
+  height: 44px;
+  font-size: 15px;
 }
 
 .button-md {
-  padding: 12px 24px;
+  padding: 0 16px;
+  height: 36px;
   font-size: 14px;
-  height: 40px;
 }
 
 .button-sm {
-  padding: 8px 16px;
-  font-size: 13px;
-  height: 32px;
-}
-
-.button-xs {
-  padding: 6px 12px;
-  font-size: 12px;
+  padding: 0 12px;
   height: 28px;
+  font-size: 13px;
 }
 
-/* PRIMARY BUTTON */
+/* PRIMARY — White CTA pill (Raycast convention) */
 .button-primary,
 button:not([class*="button-"]):not([class*="ghost"]):not([class*="danger"]):not([class*="secondary"]) {
   background-color: var(--brand);
-  color: #FFFFFF;
-  box-shadow: var(--shadow-card);
+  color: var(--text-inverse);
 }
 
 .button-primary:hover:not(:disabled),
 button:not([class*="button-"]):not([class*="ghost"]):not([class*="danger"]):not([class*="secondary"]):hover:not(:disabled) {
   background-color: var(--brand-dark);
-  box-shadow: var(--shadow-raised);
-  transform: translateY(-1px);
 }
 
 .button-primary:active:not(:disabled),
 button:not([class*="button-"]):not([class*="ghost"]):not([class*="danger"]):not([class*="secondary"]):active:not(:disabled) {
-  background-color: var(--brand-dark);
-  box-shadow: var(--shadow-card);
-  transform: translateY(0);
+  background-color: #d0d0d0;
 }
 
 .button-primary:focus-visible,
@@ -91,77 +77,45 @@ button:not([class*="button-"]):not([class*="ghost"]):not([class*="danger"]):not(
   outline-offset: 2px;
 }
 
-/* SECONDARY BUTTON */
+/* SECONDARY — Hairline border on surface */
 .button-secondary {
-  background-color: var(--bg-chip);
+  background-color: transparent;
   color: var(--text-body);
   border: 1px solid var(--border);
 }
 
 .button-secondary:hover:not(:disabled) {
-  background-color: #0A0A0A;
+  background-color: var(--bg-chip);
+  color: var(--text-primary);
   border-color: var(--border-strong);
 }
 
 .button-secondary:active:not(:disabled) {
-  background-color: #141414;
-  border-color: var(--border-strong);
+  background-color: var(--bg-card-hover);
 }
 
-.button-secondary:focus-visible {
-  outline: 2px solid var(--brand);
-  outline-offset: 2px;
+/* TERTIARY — Fill on surface-elevated */
+.button-tertiary {
+  background-color: var(--bg-card-hover);
+  color: var(--text-body);
 }
 
-/* GHOST BUTTON */
-.button-ghost {
-  background-color: transparent;
-  color: var(--text-secondary);
-  border: 1px solid var(--border);
-}
-
-.button-ghost:hover:not(:disabled) {
+.button-tertiary:hover:not(:disabled) {
   background-color: var(--bg-chip);
-  color: var(--text-body);
-  border-color: var(--border-strong);
+  color: var(--text-primary);
 }
 
-.button-ghost:active:not(:disabled) {
-  background-color: #0A0A0A;
-  color: var(--text-body);
-  border-color: var(--border-strong);
-}
-
-.button-ghost:focus-visible {
-  outline: 2px solid var(--brand);
-  outline-offset: 2px;
-}
-
-/* DANGER BUTTON */
+/* DANGER */
 .button-danger {
-  background-color: var(--red);
-  color: #FFFFFF;
-  box-shadow: var(--shadow-card);
+  background-color: var(--red-light);
+  color: var(--red);
 }
 
 .button-danger:hover:not(:disabled) {
-  background-color: #B71C1C;
-  box-shadow: var(--shadow-raised);
-  transform: translateY(-1px);
+  background-color: rgba(255,107,107,0.25);
 }
 
-.button-danger:active:not(:disabled) {
-  background-color: #B71C1C;
-  box-shadow: var(--shadow-card);
-  transform: translateY(0);
-}
-
-.button-danger:focus-visible {
-  outline: 2px solid var(--red);
-  outline-offset: 2px;
-}
-
-/* LINK BUTTON */
+/* LINK — Inline text with accent */
 .button-link {
   background-color: transparent;
   color: var(--brand);
@@ -175,20 +129,10 @@ button:not([class*="button-"]):not([class*="ghost"]):not([class*="danger"]):not(
   text-decoration: underline;
 }
 
-.button-link:active:not(:disabled) {
-  color: var(--brand-dark);
-}
-
-.button-link:focus-visible {
-  outline: 2px solid var(--brand);
-  outline-offset: 2px;
-  border-radius: var(--radius-sm);
-}
-
 /* ICON BUTTON */
 .button-icon {
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   padding: 0;
   border-radius: var(--radius-md);
   display: inline-flex;
@@ -197,61 +141,27 @@ button:not([class*="button-"]):not([class*="ghost"]):not([class*="danger"]):not(
 }
 
 .button-icon.button-lg {
-  width: 48px;
-  height: 48px;
+  width: 44px;
+  height: 44px;
 }
 
 .button-icon.button-sm {
-  width: 32px;
-  height: 32px;
-}
-
-.button-icon.button-xs {
   width: 28px;
   height: 28px;
-}
-
-/* STATES */
-.button:focus {
-  outline: none;
-}
-
-.button:disabled,
-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
 }
 
 /* ICON SPACING */
 .button svg,
 .button i {
-  width: 1em;
-  height: 1em;
+  width: 16px;
+  height: 16px;
   display: inline-block;
 }
 
 .button-icon svg,
 .button-icon i {
-  width: 24px;
-  height: 24px;
-}
-
-.button-icon.button-lg svg,
-.button-icon.button-lg i {
-  width: 28px;
-  height: 28px;
-}
-
-.button-icon.button-sm svg,
-.button-icon.button-sm i {
-  width: 20px;
-  height: 20px;
-}
-
-.button-icon.button-xs svg,
-.button-icon.button-xs i {
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
 }
 
 /* LOADING STATE */
@@ -285,23 +195,6 @@ button:disabled {
   button,
   .button,
   [role="button"] {
-    padding: 12px 20px;
-    min-height: 44px;
-  }
-
-  .button-lg {
-    padding: 14px 24px;
-    min-height: 48px;
-  }
-
-  .button-icon {
-    width: 44px;
-    height: 44px;
-  }
-
-  .button-icon svg,
-  .button-icon i {
-    width: 24px;
-    height: 24px;
+   min-height: 44px;
   }
 }

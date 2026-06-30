@@ -32,7 +32,7 @@ select {
   font-family: inherit;
 }
 
-/* FOCUS STATE */
+/* FOCUS STATE — Raycast white focus ring */
 input[type="text"]:focus,
 input[type="email"]:focus,
 input[type="password"]:focus,
@@ -45,9 +45,9 @@ input[type="datetime-local"]:focus,
 input[type="number"]:focus,
 textarea:focus,
 select:focus {
-  border-color: var(--brand);
-  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
-  background-color: #0A0A0A;
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.15);
+  background-color: var(--bg-card-hover);
 }
 
 /* ERROR STATE */
@@ -67,7 +67,7 @@ textarea[aria-invalid="true"]:focus,
 select.error:focus,
 select[aria-invalid="true"]:focus {
   border-color: var(--red);
-  box-shadow: 0 0 0 3px rgba(245, 34, 45, 0.1);
+  box-shadow: 0 0 0 2px rgba(255, 59, 48, 0.2);
 }
 
 /* SUCCESS STATE */
@@ -81,7 +81,7 @@ input.success:focus,
 textarea.success:focus,
 select.success:focus {
   border-color: var(--green);
-  box-shadow: 0 0 0 3px rgba(26, 127, 75, 0.1);
+  box-shadow: 0 0 0 2px rgba(89, 212, 153, 0.15);
 }
 
 /* DISABLED STATE */
