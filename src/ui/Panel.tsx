@@ -7,14 +7,17 @@ function Panel({
   children,
   variant = "default",
   style,
+  className,
 }: {
   children: ReactNode;
   variant?: "default" | "elevated";
   style?: CSSProperties;
+  className?: string;
 }) {
   const bg = variant === "elevated" ? colors.surface : colors.canvas;
   return (
     <div
+      className={className}
       style={{
         background: bg,
         borderRadius: radius.md,

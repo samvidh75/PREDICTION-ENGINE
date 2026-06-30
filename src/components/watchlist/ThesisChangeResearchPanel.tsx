@@ -1,5 +1,5 @@
-import { Card, CardLabel } from '../../ui/Card';
 import { Button } from '../../ui/Button';
+import { Panel } from '../../ui/Panel';
 import { colors, space, typography } from '../../design/tokens';
 import {
   toThesisChangeCardViewModel,
@@ -73,8 +73,8 @@ function ThesisChangeCard({
   const hasActionTarget = Boolean(symbol);
 
   return (
-    <Card variant="elevated" style={{ padding: 16 }}>
-      <div style={{ display: 'grid', gap: space[3] }}>
+    <Panel variant="elevated">
+      <div style={{ display: 'grid', gap: space[3], padding: 16 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', gap: space[3], alignItems: 'flex-start' }}>
           <div style={{ minWidth: 0 }}>
             <div style={{ color: colors.textPrimary, fontSize: typography.h3.desktop.size, fontWeight: 700, lineHeight: 1.2 }}>
@@ -125,7 +125,7 @@ function ThesisChangeCard({
           </div>
         )}
       </div>
-    </Card>
+    </Panel>
   );
 }
 
@@ -134,27 +134,29 @@ export function ThesisChangeResearchPanel({ items, onResearch, onCompare, onTrac
 
   if (!panelItems.length) {
     return (
-      <Card variant="elevated" style={{ padding: 18 }}>
-        <CardLabel>Thesis change</CardLabel>
-        <div style={{ display: 'grid', gap: space[1] }}>
+      <Panel variant="elevated">
+        <Panel.Header title="Thesis change" />
+        <Panel.Content style={{ display: 'grid', gap: space[1] }}>
           <h2 style={{ color: colors.textPrimary, fontSize: 16, fontWeight: 700, margin: 0 }}>Track thesis changes</h2>
           <p style={{ color: colors.textSecondary, fontSize: 13, lineHeight: 1.55, margin: 0 }}>
             Research changes will appear here when there is safe evidence to review.
           </p>
-        </div>
-      </Card>
+        </Panel.Content>
+      </Panel>
     );
   }
 
   return (
     <section style={{ display: 'grid', gap: space[3] }} aria-label="Thesis change research">
-      <div style={{ display: 'grid', gap: 4 }}>
-        <CardLabel>Thesis change</CardLabel>
-        <h2 style={{ color: colors.textPrimary, fontSize: 18, fontWeight: 700, margin: 0 }}>Watchlist research changes</h2>
-        <p style={{ color: colors.textSecondary, fontSize: 13, lineHeight: 1.55, margin: 0 }}>
-          Review thesis changes, risks, and what to watch before taking the next step.
-        </p>
-      </div>
+      <Panel variant="elevated">
+        <Panel.Header title="Thesis change" />
+        <Panel.Content style={{ display: 'grid', gap: space[3] }}>
+          <h2 style={{ color: colors.textPrimary, fontSize: 18, fontWeight: 700, margin: 0 }}>Watchlist research changes</h2>
+          <p style={{ color: colors.textSecondary, fontSize: 13, lineHeight: 1.55, margin: 0 }}>
+            Review thesis changes, risks, and what to watch before taking the next step.
+          </p>
+        </Panel.Content>
+      </Panel>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: space[3] }}>
         {panelItems.map((item) => (
           <ThesisChangeCard

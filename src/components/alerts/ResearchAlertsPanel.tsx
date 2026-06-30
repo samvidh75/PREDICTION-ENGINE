@@ -1,4 +1,4 @@
-import { Card, CardLabel } from '../../ui/Card';
+import { Panel } from '../../ui/Panel';
 import { Button } from '../../ui/Button';
 import { colors, space, typography } from '../../design/tokens';
 import {
@@ -71,8 +71,8 @@ function ResearchAlertCard({
   const hasActionTarget = Boolean(symbol);
 
   return (
-    <Card variant="elevated" style={{ padding: 16 }}>
-      <div style={{ display: 'grid', gap: space[3] }}>
+    <Panel variant="elevated">
+      <div style={{ display: 'grid', gap: space[3], padding: 16 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', gap: space[3], alignItems: 'flex-start' }}>
           <div style={{ minWidth: 0 }}>
             <div style={{ color: colors.textPrimary, fontSize: typography.h3.desktop.size, fontWeight: 700, lineHeight: 1.2 }}>
@@ -123,7 +123,7 @@ function ResearchAlertCard({
           </div>
         )}
       </div>
-    </Card>
+    </Panel>
   );
 }
 
@@ -132,27 +132,29 @@ export function ResearchAlertsPanel({ alerts, onResearch, onCompare, onTrack, on
 
   if (!panelAlerts.length) {
     return (
-      <Card variant="elevated" style={{ padding: 18 }}>
-        <CardLabel>Research alerts</CardLabel>
-        <div style={{ display: 'grid', gap: space[1] }}>
+      <Panel variant="elevated">
+        <Panel.Header title="Research alerts" />
+        <Panel.Content style={{ display: 'grid', gap: space[1] }}>
           <h2 style={{ color: colors.textPrimary, fontSize: 16, fontWeight: 700, margin: 0 }}>No research alerts to review</h2>
           <p style={{ color: colors.textSecondary, fontSize: 13, lineHeight: 1.55, margin: 0 }}>
             Important changes will appear here when there is safe research context to review.
           </p>
-        </div>
-      </Card>
+        </Panel.Content>
+      </Panel>
     );
   }
 
   return (
     <section style={{ display: 'grid', gap: space[3] }} aria-label="Research alerts">
-      <div style={{ display: 'grid', gap: 4 }}>
-        <CardLabel>Research alerts</CardLabel>
-        <h2 style={{ color: colors.textPrimary, fontSize: 18, fontWeight: 700, margin: 0 }}>Important changes to review</h2>
-        <p style={{ color: colors.textSecondary, fontSize: 13, lineHeight: 1.55, margin: 0 }}>
-          Review what changed, why it matters, and what to watch before taking the next step.
-        </p>
-      </div>
+      <Panel variant="elevated">
+        <Panel.Header title="Research alerts" />
+        <Panel.Content style={{ display: 'grid', gap: space[3] }}>
+          <h2 style={{ color: colors.textPrimary, fontSize: 18, fontWeight: 700, margin: 0 }}>Important changes to review</h2>
+          <p style={{ color: colors.textSecondary, fontSize: 13, lineHeight: 1.55, margin: 0 }}>
+            Review what changed, why it matters, and what to watch before taking the next step.
+          </p>
+        </Panel.Content>
+      </Panel>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: space[3] }}>
         {panelAlerts.map((alert) => (
           <ResearchAlertCard

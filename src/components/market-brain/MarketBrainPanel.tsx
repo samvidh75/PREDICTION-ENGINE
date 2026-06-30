@@ -2,8 +2,8 @@ import { useCallback, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Brain, AlertTriangle, BarChart3, TrendingUp, Shield } from 'lucide-react';
 import { fetchMarketBrainResearch } from '../../services/marketBrainResearch';
-import { colors, typography, radius } from '../../design/tokens';
-import { Card, CardLabel } from '../../ui/Card';
+import { colors, typography, radius, space } from '../../design/tokens';
+import { Panel } from '../../ui/Panel';
 import { Badge } from '../../ui/Badge';
 import { toMarketBrainPanelViewModel, type MarketBrainPanelViewModel } from './marketBrainViewModel';
 
@@ -238,13 +238,15 @@ function WhatToWatchSection({ whatToWatch }: { whatToWatch: string[] }) {
 /* ── Empty state ── */
 function EmptyMarketBrain() {
   return (
-    <Card className="market-brain-empty">
-      <CardLabel>Market Research</CardLabel>
-      <div style={{ padding: '16px 0', textAlign: 'center' }}>
-        <Brain size={24} color={colors.textSecondary} style={{ opacity: 0.4, marginBottom: '8px' }} />
-        <p style={{ fontSize: '13px', color: colors.textSecondary, margin: 0 }}>Detailed research analysis will appear here as it becomes available.</p>
-      </div>
-    </Card>
+    <Panel style={{ display: 'grid', gap: space[2] }}>
+      <Panel.Header title="Market Research" icon={<Brain size={16} color={colors.primary} />} />
+      <Panel.Content>
+        <div style={{ textAlign: 'center' }}>
+          <Brain size={24} color={colors.textSecondary} style={{ opacity: 0.4, marginBottom: '8px' }} />
+          <p style={{ fontSize: '13px', color: colors.textSecondary, margin: 0 }}>Detailed research analysis will appear here as it becomes available.</p>
+        </div>
+      </Panel.Content>
+    </Panel>
   );
 }
 
@@ -265,13 +267,15 @@ export function MarketBrainPanel({ symbol, companyName }: MarketBrainPanelProps)
 
   if (isLoading) {
     return (
-      <Card className="market-brain-loading">
-        <CardLabel>Market Research</CardLabel>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '16px 0' }}>
-          <div className="raycast-spinner" style={{ width: '14px', height: '14px', border: `2px solid ${colors.border}`, borderTopColor: colors.primary, borderRadius: '50%' }} />
-          <span style={{ color: colors.textSecondary, fontSize: '13px' }}>Loading research analysis…</span>
-        </div>
-      </Card>
+      <Panel style={{ display: 'grid', gap: space[2] }}>
+        <Panel.Header title="Market Research" icon={<Brain size={16} color={colors.primary} />} />
+        <Panel.Content>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div className="raycast-spinner" style={{ width: '14px', height: '14px', border: `2px solid ${colors.border}`, borderTopColor: colors.primary, borderRadius: '50%' }} />
+            <span style={{ color: colors.textSecondary, fontSize: '13px' }}>Loading research analysis…</span>
+          </div>
+        </Panel.Content>
+      </Panel>
     );
   }
 
@@ -282,16 +286,15 @@ export function MarketBrainPanel({ symbol, companyName }: MarketBrainPanelProps)
   if (!hasContent) return <EmptyMarketBrain />;
 
   return (
-    <Card className="market-brain-panel raycast-slideUp" style={{ animationDelay: '0.38s', animationFillMode: 'both' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-        <Brain size={16} color={colors.primary} />
-        <CardLabel>Market Research</CardLabel>
-        {vm.state && (
+    <Panel className="market-brain-panel raycast-slideUp" style={{ animationDelay: '0.38s', animationFillMode: 'both' }}>
+      <Panel.Header
+        icon={<Brain size={16} color={colors.primary} />}
+        title="Market Research"
+        action={vm.state ? (
           <Badge value={vm.state === 'In Review' ? 30 : vm.state === 'Stable' ? 70 : vm.state === 'Needs Review' ? 40 : 50} label={vm.state} />
-        )}
-      </div>
-
-      <div style={{ display: 'grid', gap: '16px' }}>
+        ) : undefined}
+      />
+      <Panel.Content style={{ display: 'grid', gap: '16px' }}>
         {/* Headline */}
         {vm.headline && (
           <p style={{ fontSize: '15px', fontWeight: 600, color: colors.textPrimary, lineHeight: '1.5', margin: 0 }}>{vm.headline}</p>
@@ -329,7 +332,7 @@ export function MarketBrainPanel({ symbol, companyName }: MarketBrainPanelProps)
             <p style={{ fontSize: '11px', color: colors.textSecondary, lineHeight: '1.4', margin: 0 }}>{vm.methodNote}</p>
           </div>
         )}
-      </div>
-    </Card>
+      </Panel.Content>
+    </Panel>
   );
 }
