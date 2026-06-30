@@ -98,6 +98,7 @@ export function toResearchAlertViewModel(input: unknown): ResearchAlertViewModel
   const nestedMove = isPlainObject(input.whyDidThisMove) ? input.whyDidThisMove : {};
 
   const summary = collectSafeStrings(
+    input.body,
     input.summary,
     input.thesis,
     input.thesisSummary,
@@ -128,7 +129,7 @@ export function toResearchAlertViewModel(input: unknown): ResearchAlertViewModel
   return {
     symbol,
     companyName,
-    category: normalizeCategory(input.category, headline, risksToReview, whatToWatch),
+    category: normalizeCategory(input.category ?? input.type, headline, risksToReview, whatToWatch),
     headline,
     summary,
     risksToReview,
