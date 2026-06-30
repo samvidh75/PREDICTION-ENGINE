@@ -21,13 +21,13 @@ const REGISTRY: Partial<Record<ResearchAiRuntime, RuntimeCapability>> = {
     runtime: 'browser-edge',
     available: false,
     ready: false,
-    label: 'Edge AI (in-browser)',
+    label: 'In-browser AI',
   },
   'user-local': {
     runtime: 'user-local',
     available: false,
     ready: false,
-    label: 'Local LLM (Ollama)',
+    label: 'Local inference',
   },
   'server-local': {
     runtime: 'server-local',
