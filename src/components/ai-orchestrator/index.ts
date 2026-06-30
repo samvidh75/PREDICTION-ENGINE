@@ -24,6 +24,14 @@ export {
 } from './researchAiContext';
 
 export {
+  buildWatchlistAiExplanationContext,
+} from './watchlistAiExplanationContext';
+
+export type {
+  WatchlistAiExplanationInput,
+} from './watchlistAiExplanationContext';
+
+export {
   applyGuardrails,
   applyResponseGuardrails,
   fallbackIfEmpty,
