@@ -27,7 +27,7 @@ const REGISTRY: Partial<Record<ResearchAiRuntime, RuntimeCapability>> = {
     runtime: 'browser_local',
     available: false,
     ready: false,
-    label: 'Browser LLM',
+    label: 'Enhanced explanation',
   },
   'user-local': {
     runtime: 'user-local',

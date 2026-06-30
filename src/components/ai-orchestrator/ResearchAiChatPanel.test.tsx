@@ -69,7 +69,7 @@ describe("ResearchAiChatPanel", () => {
 
     render(<ResearchAiChatPanel context={sampleContext} />);
 
-    expect(screen.getByTestId("runtime-badge").textContent).toMatch(/Algorithmic/i);
+    expect(screen.getByTestId("runtime-badge").textContent).toMatch(/Standard explanation/i);
   });
 
   it("disables input when context is missing", () => {

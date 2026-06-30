@@ -35,7 +35,7 @@ describe('PortfolioPage', () => {
   it('renders CTA buttons', () => {
     render(<PortfolioPage />);
     expect(screen.getByText('Go to Watchlist')).toBeTruthy();
-    expect(screen.getByText('Explore stocks')).toBeTruthy();
+    expect(screen.getByText('Add Holding Manually')).toBeTruthy();
   });
 
   it('renders disclaimer', () => {
@@ -47,11 +47,5 @@ describe('PortfolioPage', () => {
     render(<PortfolioPage />);
     screen.getByText('Go to Watchlist').click();
     expect(mockNavigate).toHaveBeenCalledWith('/watchlist');
-  });
-
-  it('navigation works — Explore stocks', () => {
-    render(<PortfolioPage />);
-    screen.getByText('Explore stocks').click();
-    expect(mockNavigate).toHaveBeenCalledWith('/scanner');
   });
 });

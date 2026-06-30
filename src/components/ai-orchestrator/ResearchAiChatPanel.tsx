@@ -19,17 +19,18 @@ interface ResearchAiChatPanelProps {
 
 /* ── Runtime label map ──────────────────────────────────────── */
 
+// Product-facing labels — never expose runtime/model/provider/backend terms.
 const RUNTIME_LABEL: Partial<Record<ResearchAiRuntime, string>> = {
   'browser-edge': 'Edge AI',
-  'browser_local': 'Browser LLM',
-  'user-local': 'Local LLM',
-  'server-local': 'Server AI',
-  'deterministic': 'Algorithmic',
+  'browser_local': 'Enhanced explanation',
+  'user-local': 'On-device',
+  'server-local': 'Enhanced research',
+  'deterministic': 'Standard explanation',
 };
 
 const RUNTIME_COLOR: Partial<Record<ResearchAiRuntime, string>> = {
   'browser-edge': '#2979FF',
-  'browser_local': '#7C3AED',
+  'browser_local': '#34C759',
   'user-local': '#7C3AED',
   'server-local': '#059669',
   'deterministic': '#888',
