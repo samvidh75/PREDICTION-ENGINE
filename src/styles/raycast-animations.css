@@ -72,10 +72,37 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* REAL-TIME DATA PULSE */
+/* REAL-TIME DATA PULSE — 0.5s green flash for live updates */
 @keyframes dataPulse {
   0%, 100% { background: transparent; }
-  50% { background: rgba(52, 199, 89, 0.1); }
+  50% { background: rgba(52, 199, 89, 0.15); box-shadow: inset 0 0 8px rgba(52, 199, 89, 0.08); }
+}
+
+/* Green flash for price changes — 0.5s ease-in-out */
+@keyframes greenFlash {
+  0% { background-color: transparent; }
+  20% { background-color: rgba(52, 199, 89, 0.2); box-shadow: 0 0 12px rgba(52, 199, 89, 0.1); }
+  100% { background-color: transparent; }
+}
+
+.raycast-greenFlash {
+  animation: greenFlash 0.5s ease-in-out;
+}
+
+/* Mobile-optimized stagger: faster entrance on small screens */
+@media (max-width: 480px) {
+  .raycast-stagger-1  { animation-delay: 0.03s; }
+  .raycast-stagger-2  { animation-delay: 0.06s; }
+  .raycast-stagger-3  { animation-delay: 0.09s; }
+  .raycast-stagger-4  { animation-delay: 0.12s; }
+  .raycast-stagger-5  { animation-delay: 0.15s; }
+  .raycast-stagger-6  { animation-delay: 0.18s; }
+  .raycast-stagger-7  { animation-delay: 0.21s; }
+  .raycast-stagger-8  { animation-delay: 0.24s; }
+  .raycast-stagger-9  { animation-delay: 0.27s; }
+  .raycast-stagger-10 { animation-delay: 0.30s; }
+  .raycast-stagger-11 { animation-delay: 0.33s; }
+  .raycast-stagger-12 { animation-delay: 0.36s; }
 }
 
 /* KEYBOARD SHORTCUT HINT FADE */
