@@ -80,6 +80,7 @@ function normalizeCategory(value: unknown, headline: string, risksToReview: stri
 
   const text = [headline, ...risksToReview, ...whatToWatch].join(' ').toLowerCase();
   if (/valuation|multiple|margin of safety/.test(text)) return 'valuation_changed';
+  if (/important move|decisive move|significant move/.test(text)) return 'important_move';
   if (/momentum|volume|price move|trend/.test(text)) return 'momentum_changed';
   if (/risk|pressure|concern/.test(text)) return 'risk_changed';
   if (/review|watch/.test(text)) return 'needs_review';

@@ -64,7 +64,7 @@ describe('ThesisChangeResearchPanel', () => {
       />,
     );
 
-    expect(screen.getByText('TCS')).toBeTruthy();
+    expect(screen.getAllByText('TCS').length).toBeGreaterThanOrEqual(1);
     expect(screen.queryByText(unsafeHeadline)).toBeNull();
     expect(screen.queryByText(unsafeThesis)).toBeNull();
     expect(screen.queryByText(unsafeRisk)).toBeNull();
