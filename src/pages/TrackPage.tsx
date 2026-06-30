@@ -23,7 +23,6 @@ import { Card } from "../ui/Card";
 import { Button } from "../ui/Button";
 import { Badge } from "../ui/Badge";
 import { colors, typography, space, radius, media } from "../design/tokens";
-import { SEBIComplianceBanner } from "../components/SEBICompliance";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -263,7 +262,6 @@ export default function TrackPage() {
 
   return (
     <div style={{ display: "grid", gap: "24px" }}>
-      <SEBIComplianceBanner />
 
       {/* ── Header ── */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "16px" }}>

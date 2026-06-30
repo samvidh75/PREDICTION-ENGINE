@@ -2,7 +2,6 @@ import { useNavigate } from "react-router-dom";
 import { Card } from "../ui/Card";
 import { useResponsiveValue } from "../ui/responsive";
 import { colors, typography, layout } from "../design/tokens";
-import { SEBIComplianceBanner } from "../components/SEBICompliance";
 import { SECTORS } from "../stockstory/content/sector/SectorTypes";
 
 function nameToSlug(name: string): string {
@@ -16,7 +15,6 @@ export default function Sectors() {
 
   return (
     <main style={{ maxWidth: "1200px", margin: "0 auto", padding: layout.pagePaddingDesktop, color: colors.textPrimary }}>
-      <SEBIComplianceBanner />
 
       <section style={{ marginBottom: "48px" }}>
         <h1 style={{ fontSize: typography.h2.desktop.size, fontWeight: 700, marginBottom: "8px", color: colors.textPrimary }}>

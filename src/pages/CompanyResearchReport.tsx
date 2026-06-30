@@ -1,7 +1,6 @@
 import { useParams } from "react-router-dom";
 import { useResponsiveValue } from "../ui/responsive";
 import { colors, typography, layout, radius, shadows } from "../design/tokens";
-import { SEBIComplianceBanner } from "../components/SEBICompliance";
 import { buildResearchReport } from "../stockstory/reports/CompanyResearchReportBuilder";
 import type { CompanyReportSection } from "../stockstory/reports/CompanyResearchReportTypes";
 
@@ -30,7 +29,6 @@ export default function CompanyResearchReport() {
   if (!symbol) {
     return (
       <main style={{ maxWidth: "1200px", margin: "0 auto", padding: layout.pagePaddingDesktop }}>
-        <SEBIComplianceBanner />
         <h1 style={{ fontSize: typography.h2.desktop.size, color: colors.textPrimary }}>Report Not Found</h1>
         <p style={{ color: colors.textSecondary }}>No symbol specified for the research report.</p>
       </main>
@@ -39,7 +37,6 @@ export default function CompanyResearchReport() {
 
   return (
     <main style={{ maxWidth: contentWidth, margin: "0 auto", padding: layout.pagePaddingDesktop, color: colors.textPrimary }}>
-      <SEBIComplianceBanner />
 
       <section style={{ marginBottom: "36px" }}>
         <p style={{ fontSize: typography.caption.desktop.size, color: colors.textSecondary, marginBottom: "4px" }}>

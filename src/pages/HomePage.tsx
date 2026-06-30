@@ -11,7 +11,6 @@ import { HealthometerMini } from "../ui/HealthometerMini";
 import { ConvictionBadge } from "../ui/ConvictionBadge";
 import { useResponsiveValue } from "../ui/responsive";
 import { colors, typography, space, layout, media, radius } from "../design/tokens";
-import { SEBIComplianceBanner } from "../components/SEBICompliance";
 import { scanByPreset } from "../services/scanner/presets";
 import { getAlerts } from "../services/personalization/AlertStore";
 import type { EnhancedScanType } from "../services/scanner/presets";
@@ -169,7 +168,6 @@ export default function HomePage() {
 
   return (
     <div style={{ display: "grid", gap: sectionGap }}>
-      <SEBIComplianceBanner />
 
       {/* ════════════════ HERO ════════════════ */}
       <section

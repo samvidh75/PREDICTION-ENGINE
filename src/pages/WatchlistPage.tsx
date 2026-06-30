@@ -6,7 +6,6 @@ import { Button } from "../ui/Button";
 import { Badge } from "../ui/Badge";
 import { ConvictionBadge } from "../ui/ConvictionBadge";
 import { colors, typography, space, radius, media } from "../design/tokens";
-import { SEBIComplianceBanner } from "../components/SEBICompliance";
 import { AnalystBriefCard } from "../components/analyst/AnalystBriefCard";
 import { ResearchAlertsPanel } from "../components/alerts/ResearchAlertsPanel";
 import { ThesisChangeResearchPanel } from "../components/watchlist/ThesisChangeResearchPanel";
@@ -122,7 +121,6 @@ export default function WatchlistPage() {
 
   return (
     <div style={{ display: "grid", gap: "24px" }}>
-      <SEBIComplianceBanner />
 
       {/* Header row */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: space[4] }}>
