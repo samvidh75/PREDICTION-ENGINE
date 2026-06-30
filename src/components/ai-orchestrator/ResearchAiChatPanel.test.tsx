@@ -1,109 +1,80 @@
-/**
- * Tests: ResearchAiChatPanel — chat UI rendering and message display.
- */
+import { render, screen } from "@testing-library/react";
+import { describe, expect, it, vi, beforeEach } from "vitest";
+import ResearchAiChatPanel from "./ResearchAiChatPanel";
+import type { ResearchAiContext } from "./researchAiTypes";
 
-import { describe, it, expect } from 'vitest';
-import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import ResearchAiChatPanel from './ResearchAiChatPanel';
-import type { ResearchAiChatMessage, ResearchAiContext } from './researchAiTypes';
+const orchestratorState = vi.hoisted(() => ({
+  messages: [] as Array<{ id: string; role: "user" | "assistant" | "system"; text: string; createdAt: number }>,
+  processing: false,
+  activeRuntime: null as "deterministic" | "browser-edge" | "user-local" | "server-local" | null,
+  send: vi.fn(),
+  reset: vi.fn(),
+  refresh: vi.fn(),
+  runtimes: {} as Record<string, unknown>,
+}));
 
-/* ── Fixtures ────────────────────────────────────────────────── */
+vi.mock("./useResearchAiOrchestrator", () => ({
+  useResearchAiOrchestrator: () => orchestratorState,
+}));
+
+vi.mock("./researchAiRuntimeRegistry", () => ({
+  initRuntimeRegistry: vi.fn(),
+}));
 
 const sampleContext: ResearchAiContext = {
-  surface: 'stock-detail',
-  symbol: 'TEST',
-  companyName: 'TestCorp',
-  narrative: ['Revenue grew 15% this quarter.'],
-  risksToReview: ['High debt levels.'],
-  whatToWatch: ['Upcoming earnings.'],
-  sector: 'Technology',
+  surface: "stock",
+  symbol: "TEST",
+  companyName: "TestCorp",
+  narrative: ["Revenue grew 15% this quarter."],
+  risksToReview: ["High debt levels."],
+  whatToWatch: ["Upcoming earnings."],
+  sector: "Technology",
   currentPrice: 1450,
   changeAbs: 23,
   changePercent: 1.64,
 };
 
-/* ── Rendering ───────────────────────────────────────────────── */
-
-describe('ResearchAiChatPanel rendering', () => {
-  it('renders the chat panel with context header', () => {
-    const messages: ResearchAiChatMessage[] = [];
-    const onSend = () => {};
-
-    render(
-      <ResearchAiChatPanel
-        messages={messages}
-        context={sampleContext}
-        onSend={onSend}
-        loading={false}
-      />,
-    );
-
-    expect(document.querySelector('[data-testid="chat-panel"]')).toBeTruthy();
-    expect(document.querySelector('[data-testid="chat-input"]')).toBeTruthy();
+describe("ResearchAiChatPanel", () => {
+  beforeEach(() => {
+    orchestratorState.messages = [];
+    orchestratorState.processing = false;
+    orchestratorState.activeRuntime = null;
+    orchestratorState.send.mockReset();
+    orchestratorState.reset.mockReset();
   });
 
-  it('displays a user message in the list', () => {
-    const messages: ResearchAiChatMessage[] = [
-      { role: 'user', text: 'How are the finances?', id: '1' },
+  it("renders the chat shell for a stock context", () => {
+    render(<ResearchAiChatPanel context={sampleContext} />);
+
+    expect(screen.getByTestId("chat-panel")).toBeTruthy();
+    expect(screen.getByTestId("chat-input")).toBeTruthy();
+    expect(screen.getByText("Research Chat")).toBeTruthy();
+  });
+
+  it("renders messages from the orchestrator state", () => {
+    orchestratorState.messages = [
+      { id: "u1", role: "user", text: "How are margins?", createdAt: 1 },
+      { id: "a1", role: "assistant", text: "Margins remain steady.", createdAt: 2 },
     ];
 
-    render(
-      <ResearchAiChatPanel
-        messages={messages}
-        context={sampleContext}
-        onSend={() => {}}
-        loading={false}
-      />,
-    );
+    render(<ResearchAiChatPanel context={sampleContext} />);
 
-    expect(document.querySelector('[data-testid="message-list"]')).toBeTruthy();
+    expect(screen.getByText("How are margins?")).toBeTruthy();
+    expect(screen.getByText("Margins remain steady.")).toBeTruthy();
+    expect(screen.getByTestId("message-list")).toBeTruthy();
   });
 
-  it('displays an assistant message', () => {
-    const messages: ResearchAiChatMessage[] = [
-      { role: 'assistant', text: 'Revenue is looking strong.', id: '2', runtime: 'deterministic' },
-    ];
+  it("renders the runtime badge when a runtime is active", () => {
+    orchestratorState.activeRuntime = "deterministic";
 
-    render(
-      <ResearchAiChatPanel
-        messages={messages}
-        context={sampleContext}
-        onSend={() => {}}
-        loading={false}
-      />,
-    );
+    render(<ResearchAiChatPanel context={sampleContext} />);
 
-    expect(document.querySelector('[data-testid="message-list"]')).toBeTruthy();
+    expect(screen.getByTestId("runtime-badge").textContent).toMatch(/Algorithmic/i);
   });
 
-  it('renders the runtime badge for assistant messages', () => {
-    const messages: ResearchAiChatMessage[] = [
-      { role: 'assistant', text: 'Analysis.', id: '3', runtime: 'deterministic' },
-    ];
+  it("disables input when context is missing", () => {
+    render(<ResearchAiChatPanel context={null} />);
 
-    render(
-      <ResearchAiChatPanel
-        messages={messages}
-        context={sampleContext}
-        onSend={() => {}}
-        loading={false}
-      />,
-    );
-
-    expect(document.querySelector('[data-testid="runtime-badge"]')).toBeTruthy();
-  });
-
-  it('handles empty messages gracefully', () => {
-    render(
-      <ResearchAiChatPanel
-        messages={[]}
-        context={sampleContext}
-        onSend={() => {}}
-        loading={false}
-      />,
-    );
-
-    expect(document.querySelector('[data-testid="chat-panel"]')).toBeTruthy();
+    expect(screen.getByTestId("chat-input")).toHaveProperty("disabled", true);
   });
 });

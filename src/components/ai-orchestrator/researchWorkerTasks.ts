@@ -62,13 +62,13 @@ export function executeTask(task: ResearchWorkerTask): ResearchWorkerResult {
 function buildWorkerPrompt(context: ResearchAiContext, question: string): string {
   return [
     'Research context for ' + context.companyName + ' (' + context.symbol + '):',
-    ...context.narrative,
+    ...(context.narrative ?? []),
     '',
     'Risks:',
-    ...context.risksToReview.map((r) => '- ' + r),
+    ...(context.risksToReview ?? []).map((r) => '- ' + r),
     '',
     'Watch items:',
-    ...context.whatToWatch.map((w) => '- ' + w),
+    ...(context.whatToWatch ?? []).map((w) => '- ' + w),
     '',
     'User question: ' + question,
   ].join('\n');
