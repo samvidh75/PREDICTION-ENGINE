@@ -119,7 +119,13 @@ export async function ensureWorker(callback?: (state: BrowserLocalRuntimeState) 
   const requestId = nextRequestId();
   const manifest = getBrowserLocalModelConfig();
   updateRuntimeState("checking", "Checking enhanced explanation.");
-  const response = await postRequest({ type: "init", requestId, config: manifest.profile === "disabled" ? undefined : { modelId: manifest.modelId, maxOutputTokens: manifest.maxOutputTokens, temperature: manifest.temperature, timeoutMs: manifest.timeoutMs } });
+  const response = await postRequest({ type: "init", requestId, config: manifest.profile === "disabled" ? undefined : { modelId: manifest.modelId, maxOutputTokens: manifest.maxOutputTokens, temperature: manifest.temperature, timeoutMs: manifest.timeoutMs } }).catch((err: Error) => {
+    // Cancelled during model download — return current state gracefully.
+    if (err.message === "cancelled") return null;
+    throw err;
+  });
+
+  if (!response) return getStatus();
 
   if (response.type === "safe-failure") {
     updateRuntimeState(response.reason === "unsupported" ? "unsupported" : "failed", "Enhanced explanation is unavailable on this device.");
@@ -165,6 +171,10 @@ export async function requestExplanation(
     updateRuntimeState("failed", "Enhanced explanation is unavailable on this device.");
     return { ok: false, text: null, reason: "failed" };
   } catch (error) {
+    // If cancelled, the state was already updated by cancelRequest — don't override.
+    if (error instanceof Error && error.message === "cancelled") {
+      return { ok: false, text: null };
+    }
     updateRuntimeState("failed", "Enhanced explanation took too long.");
     return {
       ok: false,
@@ -178,7 +188,12 @@ export async function cancelRequest(requestId?: string): Promise<void> {
   const id = requestId ?? lastRequestId;
   if (!worker || !id) return;
   worker.postMessage({ type: "cancel", requestId: id } satisfies BrowserLocalWorkerRequest);
-  pending.delete(id);
+  // Reject the pending promise so the caller doesn't hang until timeout.
+  const entry = pending.get(id);
+  if (entry) {
+    entry.reject(new Error("cancelled"));
+    pending.delete(id);
+  }
   lastRequestId = null;
   updateRuntimeState(runtimeState.status, "Enhanced explanation cancelled.");
 }
@@ -204,6 +219,7 @@ export async function unloadWorker(): Promise<void> {
     worker = null;
   }
   pending.clear();
+  lastRequestId = null;
   updateRuntimeState("unloaded", "");
 }
 

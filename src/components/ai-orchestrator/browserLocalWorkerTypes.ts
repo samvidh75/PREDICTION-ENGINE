@@ -6,6 +6,7 @@ export type BrowserLocalWorkerStatus =
   | "loading"
   | "ready"
   | "failed"
+  | "unloaded"
   | "unsupported";
 
 export interface BrowserLocalWorkerModelConfig {

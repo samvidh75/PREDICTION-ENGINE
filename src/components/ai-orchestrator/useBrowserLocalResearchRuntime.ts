@@ -143,7 +143,7 @@ export function useBrowserLocalResearchRuntime(): UseBrowserLocalRuntimeReturn {
 
   const cancel = useCallback(async () => {
     await cancelRequest();
-    if (mountedRef.current) { setBusy(false); setIsGenerating(false); setProgress(null); }
+    if (mountedRef.current) { setBusy(false); setIsStarting(false); setIsGenerating(false); setProgress(null); }
   }, []);
 
   const clearExplanation = useCallback(() => {

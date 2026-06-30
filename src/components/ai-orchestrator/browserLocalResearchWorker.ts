@@ -95,9 +95,17 @@ async function ensureEngine(requestId?: string): Promise<boolean> {
   try {
     engine = await engineFactory(activeModelId, {
       initProgressCallback: (report) => {
+        // Check for cancellation during download so we don't send progress for a cancelled request.
+        if (requestId && cancelledRequestIds.has(requestId)) return;
         postProgress(report.progress >= 1 ? "ready" : "loading", requestId, Math.round(report.progress * 100));
       },
     });
+
+    if (requestId && cancelledRequestIds.has(requestId)) {
+      engine = null;
+      return false;
+    }
+
     postProgress("ready", requestId, 100);
     return true;
   } catch {
@@ -218,6 +226,16 @@ self.onmessage = async (event: MessageEvent<BrowserLocalWorkerRequest>) => {
         answerTimeoutMs = request.config.timeoutMs;
       }
       await ensureEngine(request.requestId);
+      // Send a status response so the runtime's pending init promise resolves.
+      // The runtime checks for requestId-matched non-progress messages.
+      postStatus(
+        cancelledRequestIds.has(request.requestId) ? "unloaded" : "ready",
+        request.requestId,
+        cancelledRequestIds.has(request.requestId)
+          ? "Enhanced explanation cancelled."
+          : "Enhanced explanation is ready.",
+      );
+      cancelledRequestIds.delete(request.requestId);
       break;
     case "ask":
       await answerQuestion(request.requestId, request.compressedContext, request.question);
