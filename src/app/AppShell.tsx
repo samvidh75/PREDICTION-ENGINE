@@ -185,8 +185,27 @@ export function AppShell({ children }: { children: ReactNode }) {
       <KeyboardHelpOverlay open={helpOpen} onClose={() => setHelpOpen(false)} />
 
       {/* FEEDBACK FAB — Raycast-inspired premium glass pill */}
+      {/* Ambient glow behind FAB */}
+      <div
+        id="feedback-fab-glow"
+        style={{
+          position: "fixed",
+          bottom: "96px",
+          right: "24px",
+          zIndex: 98,
+          width: "48px",
+          height: "48px",
+          borderRadius: "16px",
+          pointerEvents: "none",
+          background: "radial-gradient(circle at center, rgba(255,149,0,0.12) 0%, transparent 70%)",
+          transform: "scale(1.8)",
+          opacity: 0,
+          transition: "opacity 0.6s cubic-bezier(0.16,1,0.3,1)",
+        }}
+      />
       <button
         id="feedback-fab"
+        className="feedback-fab"
         onClick={() => {
           const existing = document.getElementById("feedback-widget-root");
           if (existing) {
@@ -196,10 +215,10 @@ export function AppShell({ children }: { children: ReactNode }) {
           const root = document.createElement("div");
           root.id = "feedback-widget-root";
           document.body.appendChild(root);
-          root.innerHTML = `<div style="position:fixed;bottom:88px;right:24px;z-index:100;background:rgba(20,20,22,0.95);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:24px;width:380px;box-shadow:0 24px 80px rgba(0,0,0,0.6),0 0 0 1px rgba(255,255,255,0.04) inset;animation:fadeSlideIn 0.25s cubic-bezier(0.16,1,0.3,1);">
+          root.innerHTML = `<div style="position:fixed;bottom:88px;right:24px;z-index:100;background:rgba(18,18,22,0.96);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:24px;width:380px;box-shadow:0 32px 100px rgba(0,0,0,0.7),0 0 0 1px rgba(255,255,255,0.04) inset;animation:fadeSlideIn 0.3s cubic-bezier(0.16,1,0.3,1);">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
-              <h3 style="margin:0;font-size:15px;font-weight:600;color:rgba(255,255,255,0.9);letter-spacing:-0.01em;">Send Feedback</h3>
-              <button id="feedback-close" style="background:rgba(255,255,255,0.06);border:none;cursor:pointer;font-size:16px;color:rgba(255,255,255,0.4);transition:all 0.15s;padding:6px 10px;border-radius:8px;line-height:1;">✕</button>
+              <h3 style="margin:0;font-size:15px;font-weight:600;color:rgba(255,255,255,0.92);letter-spacing:-0.01em;">Send Feedback</h3>
+              <button id="feedback-close" style="background:rgba(255,255,255,0.06);border:none;cursor:pointer;font-size:16px;color:rgba(255,255,255,0.4);transition:all 0.2s;padding:6px 10px;border-radius:8px;line-height:1;">✕</button>
             </div>
             <form id="feedback-form" style="display:flex;flex-direction:column;gap:10px;font-size:13px;">
               <select id="fb-category" style="padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.08);font-size:13px;background:rgba(0,0,0,0.4);color:rgba(255,255,255,0.8);outline:none;transition:border-color 0.15s;cursor:pointer;">
@@ -213,7 +232,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               <input id="fb-title" type="text" required placeholder="Brief title" style="padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.08);font-size:13px;background:rgba(0,0,0,0.4);color:rgba(255,255,255,0.9);outline:none;transition:border-color 0.15s;" />
               <textarea id="fb-body" required rows="4" placeholder="Describe your feedback…" style="padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.08);font-size:13px;resize:vertical;font-family:inherit;background:rgba(0,0,0,0.4);color:rgba(255,255,255,0.9);outline:none;transition:border-color 0.15s;"></textarea>
               <div id="fb-error" style="color:#FF6B6B;font-size:13px;display:none;"></div>
-              <button type="submit" style="padding:10px 20px;border-radius:10px;border:none;background:rgba(255,255,255,0.9);color:#0A0A0A;font-size:13px;font-weight:600;cursor:pointer;transition:opacity 0.15s;">Submit Feedback</button>
+              <button type="submit" style="padding:10px 20px;border-radius:10px;border:none;background:rgba(255,255,255,0.92);color:#0A0A0A;font-size:13px;font-weight:600;cursor:pointer;transition:opacity 0.15s;">Submit Feedback</button>
             </form>
           </div>`;
 
@@ -231,7 +250,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 body: JSON.stringify({ category: cat, title, body, pageUrl: window.location.href }),
               });
               if (!res.ok) throw new Error();
-              root.innerHTML = '<div style="padding:40px 20px;text-align:center;animation:fadeSlideIn 0.25s cubic-bezier(0.16,1,0.3,1);"><div style="font-size:28px;margin-bottom:12px;color:rgba(255,255,255,0.9);">✓</div><h3 style="margin:0 0 8px;color:rgba(255,255,255,0.9);font-size:15px;font-weight:600;">Thank you!</h3><p style="color:rgba(255,255,255,0.5);font-size:13px;margin:0;">We\'ll review your feedback shortly.</p></div>';
+              root.innerHTML = '<div style="padding:40px 20px;text-align:center;animation:fadeSlideIn 0.3s cubic-bezier(0.16,1,0.3,1);"><div style="font-size:28px;margin-bottom:12px;color:rgba(255,255,255,0.9);">✓</div><h3 style="margin:0 0 8px;color:rgba(255,255,255,0.92);font-size:15px;font-weight:600;">Thank you!</h3><p style="color:rgba(255,255,255,0.5);font-size:13px;margin:0;">We\'ll review your feedback shortly.</p></div>';
               setTimeout(() => root.remove(), 2500);
             } catch {
               errEl.style.display = "block";
@@ -246,38 +265,58 @@ export function AppShell({ children }: { children: ReactNode }) {
           zIndex: 99,
           width: "48px",
           height: "48px",
-          borderRadius: "14px",
-          border: "1px solid rgba(255,255,255,0.1)",
-          background: "rgba(20,20,22,0.85)",
+          borderRadius: "16px",
+          border: "1px solid rgba(255,255,255,0.08)",
+          background: "linear-gradient(135deg, rgba(32,32,38,0.92) 0%, rgba(20,20,24,0.88) 100%)",
           color: "rgba(255,255,255,0.5)",
           cursor: "pointer",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          transition: "all 0.2s cubic-bezier(0.16,1,0.3,1)",
-          backdropFilter: "blur(16px)",
-          WebkitBackdropFilter: "blur(16px)",
+          transition: "all 0.25s cubic-bezier(0.16,1,0.3,1)",
+          backdropFilter: "blur(20px)",
+          WebkitBackdropFilter: "blur(20px)",
           boxShadow: "0 4px 24px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.04) inset",
         }}
         aria-label="Send feedback"
         onMouseEnter={(e) => {
           const btn = e.currentTarget;
-          btn.style.borderColor = "rgba(255,255,255,0.2)";
-          btn.style.color = "rgba(255,255,255,0.9)";
-          btn.style.transform = "translateY(-1px) scale(1.04)";
-          btn.style.boxShadow = "0 8px 32px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.08) inset";
-          btn.style.background = "rgba(30,30,34,0.9)";
+          btn.style.borderColor = "rgba(255,255,255,0.15)";
+          btn.style.color = "rgba(255,255,255,0.95)";
+          btn.style.transform = "translateY(-2px) scale(1.06)";
+          btn.style.boxShadow = "0 12px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.1) inset, 0 0 40px rgba(255,149,0,0.08)";
+          btn.style.background = "linear-gradient(135deg, rgba(42,42,50,0.95) 0%, rgba(26,26,32,0.9) 100%)";
+          const glow = document.getElementById("feedback-fab-glow");
+          if (glow) glow.style.opacity = "1";
+          // Show tooltip
+          let tip = document.getElementById("fb-tooltip");
+          if (!tip) {
+            tip = document.createElement("div");
+            tip.id = "fb-tooltip";
+            tip.textContent = "Feedback";
+            tip.style.cssText = "position:fixed;bottom:112px;right:24px;z-index:100;background:rgba(20,20,24,0.95);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:6px 12px;font-size:12px;color:rgba(255,255,255,0.8);font-weight:500;letter-spacing:-0.01em;white-space:nowrap;animation:fadeSlideIn 0.15s cubic-bezier(0.16,1,0.3,1);pointer-events:none;";
+            document.body.appendChild(tip);
+          }
+          tip.style.display = "block";
         }}
         onMouseLeave={(e) => {
           const btn = e.currentTarget;
-          btn.style.borderColor = "rgba(255,255,255,0.1)";
+          btn.style.borderColor = "rgba(255,255,255,0.08)";
           btn.style.color = "rgba(255,255,255,0.5)";
           btn.style.transform = "translateY(0) scale(1)";
           btn.style.boxShadow = "0 4px 24px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.04) inset";
-          btn.style.background = "rgba(20,20,22,0.85)";
+          btn.style.background = "linear-gradient(135deg, rgba(32,32,38,0.92) 0%, rgba(20,20,24,0.88) 100%)";
+          const glow = document.getElementById("feedback-fab-glow");
+          if (glow) glow.style.opacity = "0";
+          const tip = document.getElementById("fb-tooltip");
+          if (tip) tip.style.display = "none";
         }}
       >
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M13 8H7"/><path d="M17 12H7"/></svg>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          <path d="M13 8H7"/>
+          <path d="M17 12H7"/>
+        </svg>
       </button>
 
       {/* PRIVACY CONSENT BANNER */}
