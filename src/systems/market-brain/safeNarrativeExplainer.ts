@@ -100,7 +100,7 @@ const splitPayloadIntoSafeLines = (payload: string, maxBullets: number): string[
 
 const normalizeSymbol = (symbol: unknown): string => {
   if (typeof symbol !== 'string') return 'UNKNOWN';
-  const clean = symbol.trim().toUpperCase().replace(/[^A-Z0-9._-]/g, '');
+  const clean = symbol.trim().toUpperCase().replace(/[^A-Z0-9._-]/g, '').replace(/^[./]+/, '');
   return clean.length > 0 ? clean.slice(0, 24) : 'UNKNOWN';
 };
 
