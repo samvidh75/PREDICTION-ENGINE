@@ -127,11 +127,6 @@ function HeroSection({ stock, isUp, trendColor }: { stock: StockResearchDetail; 
       </div>
       <div style={{ fontSize: useResponsiveValue("40px", "64px"), fontWeight: 700, color: colors.textPrimary, lineHeight: "1.1", letterSpacing: "-0.02em", display: "flex", alignItems: "center", justifyContent: "center", gap: "12px" }}>
         <PriceFlash value={stock.price.current}>₹{stock.price.current.toLocaleString("en-IN")}</PriceFlash>
-        <span className="live-indicator" style={{
-          width: "10px", height: "10px", borderRadius: "50%", background: colors.marketGreen,
-          display: "inline-block", flexShrink: 0, marginTop: "8px",
-        }} title="Live data" />
-        <span style={{ fontSize: "11px", color: colors.marketGreen, fontWeight: 600, letterSpacing: "0.06em", marginTop: "8px" }}>LIVE</span>
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: "12px", marginTop: "12px", flexWrap: "wrap", justifyContent: "center" }}>
         <div style={{ color: trendColor, fontSize: "18px", fontWeight: 600, display: "inline-flex", alignItems: "center", gap: "6px" }}>
@@ -409,7 +404,7 @@ function StockError({ symbol }: { symbol: string }) {
         changePercent={stock.price.changePercent} trendColor={trendColor} />
       <style>{`
         .stock-sticky-header { transition: opacity 0.25s ease, transform 0.25s ease; opacity: ${stickyVisible ? "1" : "0"} !important; pointer-events: ${stickyVisible ? "auto" : "none"}; transform: translateY(${stickyVisible ? "0" : "-8px"}); }
-        .live-indicator { animation: livePulse 2s ease-in-out infinite; }
+        /* Intentionally empty — live indicator removed per trust cleanup */
       `}</style>
 
       {/* ── Hero Section ── */}
