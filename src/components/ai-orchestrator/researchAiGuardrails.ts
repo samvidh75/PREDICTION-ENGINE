@@ -14,7 +14,7 @@ const FORBIDDEN_PATTERNS: { regex: RegExp; reason: string }[] = [
   { regex: /\b(guaranteed|certain|no[- ]?risk|risk[- ]?free|sure thing|sure bet|sure win)\b/i, reason: 'no-absolute-claim' },
   { regex: /\b(price target|target price)\s*(:|\sof)?\s*[₹$€]\s*\d/i, reason: 'no-price-target' },
   { regex: /\b(should|must|ought to)\s+(buy|sell|invest|purchase|enter|exit)\b/i, reason: 'no-action-verb' },
-  { regex: /\b(earn|make|double|triple)\s+(money|returns|profit|gains)\b/i, reason: 'no-return-promise' },
+  { regex: /\b(earn|make|double|triple)\s+(?:\w+\s+)?(money|returns|profit|gains)\b/i, reason: 'no-return-promise' },
   { regex: /\b(stock pick|stock tip|tip|hot pick|hot stock)\b/i, reason: 'no-tip-language' },
   { regex: /\b(this is (not )?investment advice)\b/i, reason: 'no-advice-disclaimer-needed' },
   { regex: /\b(consult|contact|ask)\s+(a|your)\s+(financial|investment|professional|advisor|planner)\b/i, reason: 'no-external-consult-recommendation' },
@@ -52,12 +52,15 @@ export function applyGuardrails(text: string, _context: ResearchAiContext): Guar
     return { allowed: true, sanitized: '', reason: null };
   }
 
+  let detectedForbidden = false;
+
   // 1. Check for forbidden patterns
   for (const { regex, reason } of FORBIDDEN_PATTERNS) {
     if (regex.test(sanitized)) {
-      // Try to salvage by removing the forbidden phrase
+      detectedForbidden = true;
+      // Try to salvage by removing ALL instances of the forbidden phrase
       const before = sanitized;
-      sanitized = sanitized.replace(regex, '').trim();
+      sanitized = sanitized.replace(new RegExp(regex.source, 'gi'), '').trim();
       if (sanitized === before || !sanitized) {
         return { allowed: true, sanitized: '', reason: `removed-${reason}` };
       }
@@ -77,6 +80,10 @@ export function applyGuardrails(text: string, _context: ResearchAiContext): Guar
   // 4. Clean up whitespace
   sanitized = sanitized.replace(/\s+/g, ' ').trim();
 
+  if (detectedForbidden) {
+    return { allowed: true, sanitized, reason: 'partial-forbidden-removal' };
+  }
+
   return { allowed: true, sanitized, reason: null };
 }
 
@@ -90,7 +97,7 @@ export function applyResponseGuardrails(response: ResearchAiResponse, context: R
 
   const result = applyGuardrails(response.text, context);
 
-  if (!result.allowed || !result.sanitized) {
+  if (!result.allowed || !result.sanitized || result.reason !== null) {
     return {
       ...response,
       text: null,

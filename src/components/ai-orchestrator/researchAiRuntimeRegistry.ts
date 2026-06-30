@@ -66,6 +66,14 @@ function hasClientAICapability(): boolean {
  * browser capabilities, doesn't load any model weights.
  */
 export function initRuntimeRegistry(): void {
+  // Reset all AI runtimes to default (disabled) state
+  REGISTRY['browser-edge'].available = false;
+  REGISTRY['browser-edge'].ready = false;
+  REGISTRY['user-local'].available = false;
+  REGISTRY['user-local'].ready = false;
+  REGISTRY['server-local'].available = false;
+  REGISTRY['server-local'].ready = false;
+
   // Browser Edge AI
   if (supportsWorkers() && hasClientAICapability()) {
     REGISTRY['browser-edge'].available = true;

@@ -48,6 +48,9 @@ export function executeTask(task: ResearchWorkerTask): ResearchWorkerResult {
         const keywords = extractKeywords(task.text);
         return { type: 'extract-keywords-ok', keywords };
       }
+      default: {
+        return { type: 'error', message: `Unknown task type: ${(task as any).type}` };
+      }
     }
   } catch (err) {
     return { type: 'error', message: String(err) };
