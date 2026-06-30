@@ -34,6 +34,7 @@ import {
   enrichResearchContextWithEvents,
   buildNewsEventPack,
 } from "../components/ai-orchestrator/eventEvidenceAiContext";
+import { buildEvidenceRetrievalContext } from "../systems/market-brain/evidenceRetrievalOrchestrator";
 import { getStockResearch, type StockResearchDetail as LocalStockResearchDetail } from "../lib/stockResearch";
 
 type StockResearchDetail = {
@@ -409,6 +410,24 @@ function StockError({ symbol }: { symbol: string }) {
     ? (enrichResearchContextWithEvents(healthometerContext, newsEventPack, "healthometer") ?? healthometerContext)
     : null;
 
+  // Async enrich with full evidence retrieval (filings, corp actions, alerts, results)
+  const [retrievalContext, setRetrievalContext] = useState<string | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    buildEvidenceRetrievalContext(stock.symbol).then((ctx) => {
+      if (!cancelled && ctx) setRetrievalContext(ctx);
+    }).catch(() => { /* graceful degradation */ });
+    return () => { cancelled = true; };
+  }, [stock.symbol]);
+
+  // Append full retrieval context when available
+  const finalResearchContext: typeof enrichedResearchContext = enrichedResearchContext && retrievalContext
+    ? { ...enrichedResearchContext, extraContext: [enrichedResearchContext.extraContext, retrievalContext].filter(Boolean).join('\n') }
+    : enrichedResearchContext;
+  const finalHealthometerContext: typeof enrichedHealthometerContext = enrichedHealthometerContext && retrievalContext
+    ? { ...enrichedHealthometerContext, extraContext: [enrichedHealthometerContext.extraContext, retrievalContext].filter(Boolean).join('\n') }
+    : enrichedHealthometerContext;
+
   return (
     <div className="stock-page" style={{ display: "grid", gap: sectionGap }}>
 
@@ -523,8 +542,8 @@ function StockError({ symbol }: { symbol: string }) {
         className="stock-ai-explainer-grid"
         style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "24px" }}
       >
-        <ResearchAiExplanationPanel context={enrichedHealthometerContext} />
-        <ResearchAiExplanationPanel context={enrichedResearchContext} />
+        <ResearchAiExplanationPanel context={finalHealthometerContext} />
+        <ResearchAiExplanationPanel context={finalResearchContext} />
       </section>
 
       {/* ── Key Metrics Grid ── */}
