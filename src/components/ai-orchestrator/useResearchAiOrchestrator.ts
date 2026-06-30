@@ -251,6 +251,7 @@ export function buildDeterministicReply(context: ResearchAiContext, query: strin
   const lower = query.toLowerCase();
   const formattedPrice = formatPrice(context.currentPrice ?? 0);
   const MAX_LEN = 800;
+  const displayName = context.companyName ?? 'this company';
 
   let reply: string;
 
@@ -259,7 +260,7 @@ export function buildDeterministicReply(context: ResearchAiContext, query: strin
     if ((context.risksToReview ?? []).length > 0) {
       reply = `शोध में निम्नलिखित जोखिम कारकों की पहचान की गई है:\n${buildRisksBullets(context.risksToReview ?? [])}`;
     } else {
-      reply = `${context.companyName} के लिए शोध में कोई विशेष जोखिम कारक नहीं बताए गए हैं।`;
+      reply = `${displayName} के लिए शोध में कोई विशेष जोखिम कारक नहीं बताए गए हैं।`;
     }
   } else if (lower.includes('risk') || lower.includes('danger') || lower.includes('downside')) {
     if ((context.risksToReview ?? []).length > 0) {
@@ -270,7 +271,7 @@ export function buildDeterministicReply(context: ResearchAiContext, query: strin
           ? '\n\nWatch items:\n' + buildWatchBullets(context.whatToWatch ?? [])
           : '');
     } else {
-      reply = `The current research for ${context.companyName} does not highlight specific risk factors. Review the financial metrics for a fuller picture.`;
+      reply = `The current research for ${displayName} does not highlight specific risk factors. Review the financial metrics for a fuller picture.`;
     }
   } else if (lower.includes('revenue') || lower.includes('growth') || lower.includes('earn')) {
     const narrative = (context.narrative ?? []).filter(
@@ -279,7 +280,7 @@ export function buildDeterministicReply(context: ResearchAiContext, query: strin
     if (narrative.length > 0) {
       reply = 'Based on the research:\n' + buildNarrativeBullets(narrative);
     } else {
-      reply = `Revenue and growth details for ${context.companyName} are available in the financial metrics section of the research.`;
+      reply = `Revenue and growth details for ${displayName} are available in the financial metrics section of the research.`;
     }
   } else if (lower.includes('valuation') || lower.includes('overval') || lower.includes('underval') || lower.includes('pe') || lower.includes('price') || lower.includes('ratio')) {
     const narrative = (context.narrative ?? []).filter(
@@ -288,23 +289,23 @@ export function buildDeterministicReply(context: ResearchAiContext, query: strin
     if (narrative.length > 0) {
       reply = `At ${formattedPrice}, the research notes:\n${buildNarrativeBullets(narrative)}`;
     } else {
-      reply = `At ${formattedPrice}, valuation metrics for ${context.companyName} are shown in the research data.`;
+      reply = `At ${formattedPrice}, valuation metrics for ${displayName} are shown in the research data.`;
     }
   } else if (lower.includes('watch') || lower.includes('outlook') || lower.includes('upcoming') || lower.includes('future') || lower.includes('expect')) {
     if ((context.whatToWatch ?? []).length > 0) {
       reply = 'Key items to watch:\n' + buildWatchBullets(context.whatToWatch ?? []);
     } else {
-      reply = `No specific watch items are available for ${context.companyName} at this time.`;
+      reply = `No specific watch items are available for ${displayName} at this time.`;
     }
   } else if ((context.narrative ?? []).length > 0) {
     reply =
-      `The algorithmic assessment for ${context.companyName} (${formattedPrice}) indicates:\n` +
+      `The algorithmic assessment for ${displayName} (${formattedPrice}) indicates:\n` +
       buildNarrativeBullets(context.narrative ?? []) +
       ((context.risksToReview ?? []).length > 0
         ? '\n\nRisks flagged:\n' + buildRisksBullets(context.risksToReview ?? [])
         : '');
   } else {
-    reply = `The research analysis for ${context.companyName} (${formattedPrice}) is available. Review the research metrics and financial data displayed on this page for insights.`;
+    reply = `The research analysis for ${displayName} (${formattedPrice}) is available. Review the research metrics and financial data displayed on this page for insights.`;
   }
 
   return truncateTo(reply, MAX_LEN);

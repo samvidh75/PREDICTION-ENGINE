@@ -47,10 +47,11 @@ describe('initRuntimeRegistry', () => {
 /* ── getRuntimeRegistry ──────────────────────────────────────── */
 
 describe('getRuntimeRegistry', () => {
-  it('returns a snapshot (immutable copy) of all 4 runtimes', () => {
+  it('returns a snapshot (immutable copy) of all 5 runtimes', () => {
     const reg = getRuntimeRegistry();
     expect(Object.keys(reg).sort()).toEqual([
       'browser-edge',
+      'browser_local',
       'deterministic',
       'server-local',
       'user-local',
@@ -67,9 +68,10 @@ describe('getRuntimeRegistry', () => {
 /* ── getFallbackOrder ────────────────────────────────────────── */
 
 describe('getFallbackOrder', () => {
-  it('returns all 4 runtimes in correct fallback order', () => {
+  it('returns all 5 runtimes in correct fallback order', () => {
     expect(getFallbackOrder()).toEqual([
       'browser-edge',
+      'browser_local',
       'user-local',
       'server-local',
       'deterministic',
