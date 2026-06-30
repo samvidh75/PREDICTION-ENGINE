@@ -131,7 +131,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           StockStory<BetaBadge />
         </NavLink>
         <div style={{ display: "flex", alignItems: "center", gap: space[3] }}>
-          <Link to="/changelog" style={{ color: colors.textSecondary, display: "flex" }}>
+          <Link to="/changelog" aria-label="Changelog" style={{ color: colors.textSecondary, display: "flex" }}>
             <ArrowUpRight size={20} strokeWidth={1.75} />
           </Link>
           <NotificationBell />
@@ -397,6 +397,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           padding:${layout.pagePaddingMobile};
           padding-bottom:calc(${components.navBar.heightMobile} + ${space[4]} + env(safe-area-inset-bottom, 0px));
           width:100%;
+          overflow-x:hidden;
         }
 
         @media (min-width:768px) {
@@ -418,9 +419,11 @@ export function AppShell({ children }: { children: ReactNode }) {
           .tabbar { display:none; }
           .content {
             margin-left:${layout.sidebarWidth};
+            width:auto;
             padding:${layout.pagePaddingDesktop};
             padding-bottom:${layout.pagePaddingDesktop};
             max-width:${layout.contentMaxWidth};
+            overflow-x:hidden;
           }
         }
         /* ===== FEEDBACK FAB ANIMATION ===== */

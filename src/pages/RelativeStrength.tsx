@@ -121,9 +121,9 @@ export default function RelativeStrengthPage() {
   const topStocks = rankings.slice(0, 3);
 
   return (
-    <div style={{ padding: `${space[6]} ${space[8]}`, maxWidth: 1100, margin: "0 auto", color: colors.textPrimary, fontFamily: typography.fontFamily }}>
+    <div className="raycast-slideUp" style={{ padding: `${space[6]} ${space[8]}`, maxWidth: 1100, margin: "0 auto", color: colors.textPrimary, fontFamily: typography.fontFamily }}>
       {/* Header */}
-      <div style={{ marginBottom: space[8] }}>
+      <div className="raycast-stagger-1" style={{ marginBottom: space[8] }}>
         <h1 style={{ fontSize: typography.displayLg.size, fontWeight: 600, margin: 0, letterSpacing: "-0.02em" }}>
           Relative Strength
         </h1>
@@ -133,8 +133,9 @@ export default function RelativeStrengthPage() {
       </div>
 
       {/* Top 3 podium */}
-      <div
+      <div className="raycast-stagger-2"
         style={{
+          animationDelay: "0.1s",
           display: "grid",
           gridTemplateColumns: "1fr 1.2fr 1fr",
           gap: space[4],
@@ -179,7 +180,7 @@ export default function RelativeStrengthPage() {
       </div>
 
       {/* Metric tabs */}
-      <div style={{ display: "flex", gap: space[2], marginBottom: space[6], flexWrap: "wrap" }}>
+      <div className="raycast-stagger-3" style={{ animationDelay: "0.2s", display: "flex", gap: space[2], marginBottom: space[6], flexWrap: "wrap" }}>
         {METRICS.map((m) => (
           <button
             key={m.id}
@@ -206,7 +207,7 @@ export default function RelativeStrengthPage() {
       </div>
 
       {/* Sector filter chips */}
-      <div style={{ display: "flex", gap: space[2], marginBottom: space[6], flexWrap: "wrap" }}>
+      <div className="raycast-stagger-4" style={{ animationDelay: "0.3s", display: "flex", gap: space[2], marginBottom: space[6], flexWrap: "wrap" }}>
         <button
           onClick={() => setSelectedSector(null)}
           style={{
@@ -245,7 +246,7 @@ export default function RelativeStrengthPage() {
       </div>
 
       {/* Rankings table */}
-      <div style={{ borderRadius: radius.lg, border: `1px solid ${colors.hairline}`, overflow: "hidden" }}>
+      <div className="raycast-stagger-5" style={{ animationDelay: "0.4s", borderRadius: radius.lg, border: `1px solid ${colors.hairline}`, overflow: "hidden" }}>
         {/* Table header */}
         <div
           style={{

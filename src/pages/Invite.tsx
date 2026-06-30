@@ -26,9 +26,9 @@ export default function Invite() {
   };
 
   return (
-    <main style={{ maxWidth: contentWidth, margin: "0 auto", padding: layout.pagePaddingDesktop, color: colors.textPrimary }}>
+    <main className="raycast-slideUp" style={{ maxWidth: contentWidth, margin: "0 auto", padding: layout.pagePaddingDesktop, color: colors.textPrimary }}>
 
-      <section style={{ marginBottom: "36px" }}>
+      <section className="raycast-stagger-1" style={{ marginBottom: "36px" }}>
         <h1 style={{ fontSize: typography.h2.desktop.size, fontWeight: 700, marginBottom: "12px" }}>
           Invite Friends
         </h1>
@@ -37,6 +37,7 @@ export default function Invite() {
         </p>
       </section>
 
+      <div className="raycast-stagger-2" style={{ animationDelay: "0.1s" }}>
       <Card style={{ padding: "24px" }}>
         <label style={{ display: "block", fontSize: "14px", fontWeight: 600, marginBottom: "8px", color: colors.textSecondary }}>
           Your invite link
@@ -57,8 +58,9 @@ export default function Invite() {
           Share this link with anyone who might benefit from structured equity research.
         </p>
       </Card>
+      </div>
 
-      <footer style={{ marginTop: "48px", paddingTop: "24px", borderTop: `1px solid ${colors.border}`, fontSize: "13px", color: colors.textSecondary }}>
+      <footer className="raycast-stagger-3" style={{ animationDelay: "0.2s", marginTop: "48px", paddingTop: "24px", borderTop: `1px solid ${colors.border}`, fontSize: "13px", color: colors.textSecondary }}>
         <p>Research analysis only. Not investment advice.</p>
       </footer>
     </main>

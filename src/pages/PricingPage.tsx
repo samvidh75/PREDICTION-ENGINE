@@ -137,8 +137,8 @@ export default function PricingPage() {
   };
 
   return (
-    <div style={{ maxWidth: layout.contentMaxWidth, margin: "0 auto", padding: space[6] }}>
-      <div style={{ textAlign: "center", marginBottom: space[4] }}>
+    <div className="raycast-slideUp" style={{ maxWidth: layout.contentMaxWidth, margin: "0 auto", padding: space[6] }}>
+      <div className="raycast-stagger-1" style={{ textAlign: "center", marginBottom: space[4] }}>
         <h1 style={{ fontSize: 28, fontWeight: 700, margin: "0 0 8px" }}>Research Plans</h1>
         <p style={{ color: colors.textSecondary, fontSize: 16, maxWidth: 560, margin: "0 auto" }}>
           Choose a plan that fits your research needs. All plans provide access 
@@ -147,7 +147,7 @@ export default function PricingPage() {
       </div>
 
       {/* Annual/Monthly Toggle */}
-      <div style={{ display: "flex", justifyContent: "center", marginBottom: space[6] }}>
+      <div className="raycast-stagger-2" style={{ animationDelay: "0.1s", display: "flex", justifyContent: "center", marginBottom: space[6] }}>
         <div style={{
           display: "inline-flex",
           background: colors.fill,
@@ -206,7 +206,7 @@ export default function PricingPage() {
       </div>
 
       {/* Plan Cards */}
-      <div style={{ display: "flex", gap: space[5], justifyContent: "center", flexWrap: "wrap" }}>
+      <div className="raycast-stagger-3" style={{ animationDelay: "0.2s", display: "flex", gap: space[5], justifyContent: "center", flexWrap: "wrap" }}>
         {plans.map((plan) => (
           <PricingCard
             key={plan.id}

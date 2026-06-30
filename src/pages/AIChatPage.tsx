@@ -153,6 +153,7 @@ const Sidebar: FC<{
   if (compact) return null;
   return (
     <aside
+      className="raycast-slideUp"
       style={{
         width: 260,
         flexShrink: 0,
@@ -323,7 +324,7 @@ export default function AIChatPage() {
   };
 
   return (
-    <div style={{ display: "flex", height: "calc(100vh - 56px)", background: colors.canvas }}>
+    <div className="raycast-slideUp" style={{ display: "flex", height: "calc(100vh - 56px)", background: colors.canvas }}>
       <Sidebar
         conversations={conversations}
         activeId={activeId}
@@ -333,7 +334,7 @@ export default function AIChatPage() {
       />
 
       {/* Main Chat Area */}
-      <main style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
+      <main className="raycast-stagger-1" style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
         {/* Messages */}
         <div
           style={{
@@ -403,7 +404,9 @@ export default function AIChatPage() {
 
         {/* Input Bar */}
         <div
+          className="raycast-stagger-2"
           style={{
+            animationDelay: "0.1s",
             padding: `${space[4]} ${space[8]}`,
             borderTop: `1px solid ${colors.hairline}`,
             background: colors.canvas,

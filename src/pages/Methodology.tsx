@@ -8,9 +8,9 @@ export default function Methodology() {
   const contentWidth = useResponsiveValue("100%", "740px");
 
   return (
-    <main style={{ maxWidth: contentWidth, margin: "0 auto", padding: layout.pagePaddingDesktop, color: colors.textPrimary }}>
+    <main className="raycast-slideUp" style={{ maxWidth: contentWidth, margin: "0 auto", padding: layout.pagePaddingDesktop, color: colors.textPrimary }}>
 
-      <section style={{ marginBottom: "48px" }}>
+      <section className="raycast-stagger-1" style={{ marginBottom: "48px" }}>
         <h1 style={{ fontSize: typography.h2.desktop.size, fontWeight: 700, marginBottom: "12px" }}>
           Research Methodology
         </h1>
@@ -20,7 +20,7 @@ export default function Methodology() {
         </p>
       </section>
 
-      <nav style={{ marginBottom: "36px", padding: "16px", background: colors.fill, borderRadius: "8px" }}>
+      <nav className="raycast-stagger-2" style={{ animationDelay: "0.1s", marginBottom: "36px", padding: "16px", background: colors.fill, borderRadius: "8px" }}>
         <h2 style={{ fontSize: "15px", fontWeight: 600, marginBottom: "8px", color: colors.textSecondary }}>On this page</h2>
         {METHODOLOGY_SECTIONS.map((section) => (
           <a
@@ -38,6 +38,7 @@ export default function Methodology() {
         ))}
       </nav>
 
+      <div className="raycast-stagger-3" style={{ animationDelay: "0.2s" }}>
       {METHODOLOGY_SECTIONS.map((section) => (
         <article
           key={section.id}
@@ -62,8 +63,9 @@ export default function Methodology() {
           ))}
         </article>
       ))}
+      </div>
 
-      <footer style={{ marginTop: "48px", paddingTop: "24px", borderTop: `1px solid ${colors.border}`, fontSize: "13px", color: colors.textSecondary }}>
+      <footer className="raycast-stagger-4" style={{ animationDelay: "0.3s", marginTop: "48px", paddingTop: "24px", borderTop: `1px solid ${colors.border}`, fontSize: "13px", color: colors.textSecondary }}>
         <p>This methodology is updated as the framework evolves. Significant changes are logged in the changelog.</p>
       </footer>
     </main>
