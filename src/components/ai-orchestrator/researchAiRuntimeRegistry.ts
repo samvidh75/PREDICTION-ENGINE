@@ -10,7 +10,7 @@ import type { ResearchAiRuntime, RuntimeCapability } from './researchAiTypes';
 
 /* ── Runtime capability descriptors ─────────────────────────── */
 
-const REGISTRY: Record<ResearchAiRuntime, RuntimeCapability> = {
+const REGISTRY: Partial<Record<ResearchAiRuntime, RuntimeCapability>> = {
   'deterministic': {
     runtime: 'deterministic',
     available: true,
@@ -36,6 +36,10 @@ const REGISTRY: Record<ResearchAiRuntime, RuntimeCapability> = {
     label: 'Server-side inference',
   },
 };
+
+function getCapability(runtime: ResearchAiRuntime): RuntimeCapability | null {
+  return REGISTRY[runtime] ?? null;
+}
 
 /* ── Optimistic detection flags ─────────────────────────────── */
 
@@ -67,23 +71,36 @@ function hasClientAICapability(): boolean {
  */
 export function initRuntimeRegistry(): void {
   // Reset all AI runtimes to default (disabled) state
-  REGISTRY['browser-edge'].available = false;
-  REGISTRY['browser-edge'].ready = false;
-  REGISTRY['user-local'].available = false;
-  REGISTRY['user-local'].ready = false;
-  REGISTRY['server-local'].available = false;
-  REGISTRY['server-local'].ready = false;
+  const browserEdge = getCapability('browser-edge');
+  const userLocal = getCapability('user-local');
+  const serverLocal = getCapability('server-local');
+  if (browserEdge) {
+    browserEdge.available = false;
+    browserEdge.ready = false;
+  }
+  if (userLocal) {
+    userLocal.available = false;
+    userLocal.ready = false;
+  }
+  if (serverLocal) {
+    serverLocal.available = false;
+    serverLocal.ready = false;
+  }
 
   // Browser Edge AI
   if (supportsWorkers() && hasClientAICapability()) {
-    REGISTRY['browser-edge'].available = true;
-    REGISTRY['browser-edge'].ready = true;
+    if (browserEdge) {
+      browserEdge.available = true;
+      browserEdge.ready = true;
+    }
   }
 
   // User-local (Ollama) — purely env-flag gated
   const localLlmEnv = (typeof process !== 'undefined' && process.env?.LOCAL_LLM_EXPLAINER_ENABLED) === 'true';
   if (localLlmEnv) {
-    REGISTRY['user-local'].available = true;
+    if (userLocal) {
+      userLocal.available = true;
+    }
     // Not "ready" until we can actually ping the Ollama endpoint (lazy check)
   }
 }
@@ -93,8 +110,11 @@ export function initRuntimeRegistry(): void {
  * Called by the app shell once it knows the backend can serve inference.
  */
 export function enableServerLocalRuntime(): void {
-  REGISTRY['server-local'].available = true;
-  REGISTRY['server-local'].ready = true;
+  const serverLocal = getCapability('server-local');
+  if (serverLocal) {
+    serverLocal.available = true;
+    serverLocal.ready = true;
+  }
 }
 
 /* ── Queries ────────────────────────────────────────────────── */
@@ -126,7 +146,9 @@ export function getBestAvailableRuntime(): ResearchAiRuntime {
 
 /** Has any AI-capable runtime been activated? */
 export function hasAIRuntime(): boolean {
-  return REGISTRY['browser-edge'].available ||
-         REGISTRY['user-local'].available ||
-         REGISTRY['server-local'].available;
+  return Boolean(
+    getCapability('browser-edge')?.available ||
+    getCapability('user-local')?.available ||
+    getCapability('server-local')?.available,
+  );
 }

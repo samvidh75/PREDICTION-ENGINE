@@ -1,80 +1,105 @@
-// src/components/ai-orchestrator/researchAiTypes.ts
-// Phase 18 — Unified AI inference contracts for research surfaces.
-//
-// All types are safe for public-facing copy. No recommendation language,
-// backend/provider terminology, or hype claims.
-// =========================================================================
-
-/** Surface identifier for the research feature requesting AI inference. */
-export type ResearchAiSurface =
-  | 'stock-detail'
-  | 'why-did-this-move'
-  | 'scanner'
-  | 'compare'
-  | 'watchlist'
-  | 'alerts';
-
-/** Capability levels a runtime can declare. */
-export type ResearchAiCapability =
-  | 'deterministic'
-  | 'browser-edge'
-  | 'user-local'
-  | 'server-local';
-
-/** Runtime identifiers for the orchestrator fallback chain. */
 export type ResearchAiRuntime =
-  | 'browser-edge'
-  | 'user-local'
-  | 'server-local'
-  | 'deterministic';
+  | "deterministic"
+  | "browser-edge"
+  | "browser_local"
+  | "user-local"
+  | "user_local"
+  | "server-local"
+  | "server_local"
+  | "unavailable";
 
-/** Guardrail check result */
+export type ResearchAiCapability =
+  | "idle"
+  | "checking"
+  | "available"
+  | "unavailable"
+  | "loading"
+  | "ready"
+  | "failed"
+  | "deterministic"
+  | "browser-edge"
+  | "user-local"
+  | "server-local";
+
+export type ResearchAiSurface =
+  | "stock"
+  | "healthometer"
+  | "market_brain"
+  | "why_move"
+  | "scanner"
+  | "compare"
+  | "watchlist"
+  | "alerts"
+  | "portfolio"
+  | "methodology";
+
+export interface ResearchAiContext {
+  surface: ResearchAiSurface;
+  symbol?: string | null;
+  companyName?: string | null;
+  narrative?: string[];
+  title?: string | null;
+  headline?: string | null;
+  sector?: string | null;
+  currentPrice?: number | null;
+  changeAbs?: number | null;
+  changePercent?: number | null;
+  extraContext?: string | null;
+  healthometer?: {
+    score?: number | null;
+    state?: string | null;
+    explanation?: string[];
+    factors?: string[];
+  } | null;
+  researchNarrative?: string[];
+  whatChanged?: string[];
+  whyItMatters?: string[];
+  evidenceToReview?: string[];
+  risksToReview?: string[];
+  whatToWatch?: string[];
+  scannerContext?: string[];
+  comparisonContext?: string[];
+  watchlistContext?: string[];
+  alertContext?: string[];
+  historicalContext?: string[];
+  methodologyNote?: string | null;
+}
+
+export interface ResearchAiRequest {
+  surface?: ResearchAiSurface;
+  question: string;
+  context: ResearchAiContext;
+  preferredRuntime?: ResearchAiRuntime;
+}
+
+export interface ResearchAiResponse {
+  ok: boolean;
+  text: string | null;
+  runtime: ResearchAiRuntime;
+  needsReview: boolean;
+  reason?:
+    | "unsupported"
+    | "disabled"
+    | "not_ready"
+    | "unsafe_output"
+    | "timeout"
+    | "failed"
+    | "no_context";
+}
+
 export interface GuardrailResult {
   allowed: boolean;
   sanitized: string;
   reason: string | null;
 }
 
-/** Research context shared across all surfaces. */
-export interface ResearchAiContext {
-  surface: ResearchAiSurface;
-  symbol: string;
-  companyName: string;
-  /** Concatenated research narrative lines */
-  narrative: string[];
-  /** Flagged risks */
-  risksToReview: string[];
-  /** Items to watch */
-  whatToWatch: string[];
-  sector: string;
-  currentPrice: number;
-  changeAbs: number;
-  changePercent: number;
-  /** Surface-specific extra context (optional) */
-  extraContext?: string;
-}
-
-export interface ResearchAiRequest {
-  context: ResearchAiContext;
-  question: string;
-}
-
-export interface ResearchAiResponse {
-  ok: boolean;
-  text: string | null;
-  needsReview: boolean;
-  runtime: ResearchAiRuntime;
-}
-
-/** A single chat message in the conversation. */
 export interface ResearchAiChatMessage {
   id: string;
-  role: 'user' | 'assistant' | 'system';
+  role: "user" | "assistant" | "system";
   text: string;
   createdAt: number;
 }
 
-/** Capability descriptor returned by the registry. */
 export interface RuntimeCapability {
   runtime: ResearchAiRuntime;
   available: boolean;

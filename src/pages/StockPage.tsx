@@ -26,6 +26,10 @@ import { PriceTargets } from "../components/PriceTargets";
 import { NativeAd } from "../components/NativeAd";
 import { MarketBrainPanel } from "../components/market-brain/MarketBrainPanel";
 import { EdgeAiChatSection } from "../components/edge-ai/EdgeAiChatSection";
+import { ResearchAiExplanationPanel } from "../components/ai-orchestrator/ResearchAiExplanationPanel";
+import { toHealthometerAiContext } from "../components/ai-orchestrator/healthometerAiContext";
+import { toResearchAiContext } from "../components/ai-orchestrator/researchAiContext";
+import { getStockResearch, type StockResearchDetail as LocalStockResearchDetail } from "../lib/stockResearch";
 
 type StockResearchDetail = {
   symbol: string;
@@ -372,7 +376,29 @@ function StockError({ symbol }: { symbol: string }) {
     { label: "Growth", value: stock.scores.growth ?? 0 },
     { label: "Momentum", value: stock.scores.momentum ?? 0 },
     { label: "Risk", value: stock.scores.risk ?? 0 },
-  ];  return (
+  ];
+  const healthometerContext = toHealthometerAiContext({
+    symbol: stock.symbol,
+    companyName: stock.companyName,
+    title: "Healthometer",
+    score: stock.scores.health,
+    state: stock.thesis.stance,
+    explanation: [stock.thesis.thesis],
+    factors: factorBadges.map((factor) => `${factor.label}: ${factor.value}/100`),
+    risksToReview: [stock.thesis.bearCase],
+    whatToWatch: [stock.thesis.whatToWatch],
+  });
+  const researchContext = toResearchAiContext({
+    symbol: stock.symbol,
+    companyName: stock.companyName,
+    headline: stock.thesis.thesis,
+    thesis: [stock.thesis.bullCase],
+    risksToReview: [stock.thesis.bearCase],
+    whatToWatch: [stock.thesis.whatToWatch],
+    methodNote: "Research context only. Not a recommendation.",
+  }, "stock");
+
+  return (
     <div className="stock-page" style={{ display: "grid", gap: sectionGap }}>
 
       {/* ── Sticky Header ── */}
@@ -480,6 +506,14 @@ function StockError({ symbol }: { symbol: string }) {
             Timeline drift: {stock.timeline.map((item) => item.health).join(" → ")}
           </p>
         </Card>
+      </section>
+
+      <section
+        className="stock-ai-explainer-grid"
+        style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "24px" }}
+      >
+        <ResearchAiExplanationPanel context={healthometerContext} />
+        <ResearchAiExplanationPanel context={researchContext} />
       </section>
 
       {/* ── Key Metrics Grid ── */}

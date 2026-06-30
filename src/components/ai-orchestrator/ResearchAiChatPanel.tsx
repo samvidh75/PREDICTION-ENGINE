@@ -19,14 +19,14 @@ interface ResearchAiChatPanelProps {
 
 /* ── Runtime label map ──────────────────────────────────────── */
 
-const RUNTIME_LABEL: Record<ResearchAiRuntime, string> = {
+const RUNTIME_LABEL: Partial<Record<ResearchAiRuntime, string>> = {
   'browser-edge': 'Edge AI',
   'user-local': 'Local LLM',
   'server-local': 'Server AI',
   'deterministic': 'Algorithmic',
 };
 
-const RUNTIME_COLOR: Record<ResearchAiRuntime, string> = {
+const RUNTIME_COLOR: Partial<Record<ResearchAiRuntime, string>> = {
   'browser-edge': '#2979FF',
   'user-local': '#7C3AED',
   'server-local': '#059669',
@@ -83,20 +83,21 @@ export const ResearchAiChatPanel: React.FC<ResearchAiChatPanelProps> = ({
   };
 
   return (
-    <div style={styles.container}>
+    <div style={styles.container} data-testid="chat-panel">
       {/* ── Header ─────────────────────────────────────────── */}
       <div style={styles.header}>
         <span style={styles.headerTitle}>Research Chat</span>
         {activeRuntime && (
           <span
+            data-testid="runtime-badge"
             style={{
               ...styles.runtimeBadge,
-              color: RUNTIME_COLOR[activeRuntime],
-              borderColor: RUNTIME_COLOR[activeRuntime] + '44',
-              background: RUNTIME_COLOR[activeRuntime] + '11',
+              color: RUNTIME_COLOR[activeRuntime] ?? '#888',
+              borderColor: (RUNTIME_COLOR[activeRuntime] ?? '#888') + '44',
+              background: (RUNTIME_COLOR[activeRuntime] ?? '#888') + '11',
             }}
           >
-            {RUNTIME_LABEL[activeRuntime]}
+            {RUNTIME_LABEL[activeRuntime] ?? 'Algorithmic'}
           </span>
         )}
         {messages.length > 0 && (
@@ -114,7 +115,7 @@ export const ResearchAiChatPanel: React.FC<ResearchAiChatPanelProps> = ({
       </div>
 
       {/* ── Messages list ──────────────────────────────────── */}
-      <div style={styles.messageList}>
+      <div style={styles.messageList} data-testid="message-list">
         {messages.length === 0 && (
           <div style={styles.emptyState}>
             <div style={styles.emptyIcon}>
@@ -168,6 +169,7 @@ export const ResearchAiChatPanel: React.FC<ResearchAiChatPanelProps> = ({
       {/* ── Input bar ──────────────────────────────────────── */}
       <div style={styles.inputBar}>
         <textarea
+          data-testid="chat-input"
           ref={inputRef}
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
@@ -198,6 +200,8 @@ export const ResearchAiChatPanel: React.FC<ResearchAiChatPanelProps> = ({
     </div>
   );
 };
+
+export default ResearchAiChatPanel;
 
 /* ── Styles ─────────────────────────────────────────────────── */
 

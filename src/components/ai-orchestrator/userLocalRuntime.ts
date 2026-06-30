@@ -26,13 +26,13 @@ function buildPrompt(request: ResearchAiRequest): string {
     '- Keep replies under 600 characters.',
     '',
     'CONTEXT:',
-    ...context.narrative,
+    ...(context.narrative ?? []),
     '',
-    `Sector: ${context.sector} | Price: ₹${context.currentPrice.toFixed(2)} (${context.changePercent >= 0 ? '+' : ''}${context.changePercent.toFixed(2)}%)`,
+    `Sector: ${context.sector ?? ''} | Price: ₹${(context.currentPrice ?? 0).toFixed(2)} (${(context.changePercent ?? 0) >= 0 ? '+' : ''}${(context.changePercent ?? 0).toFixed(2)}%)`,
     '',
     'Risks:',
-    ...(context.risksToReview.length > 0
-      ? context.risksToReview.map((r) => `- ${r}`)
+    ...((context.risksToReview ?? []).length > 0
+      ? (context.risksToReview ?? []).map((r) => `- ${r}`)
       : ['- None highlighted']),
     '',
     'User question:',

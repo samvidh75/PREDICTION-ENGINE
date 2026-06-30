@@ -59,10 +59,10 @@ function nextMsgId(): string {
 
 /* ── Runtime query dispatch ─────────────────────────────────── */
 
-const RUNTIME_QUERIES: Record<
+const RUNTIME_QUERIES: Partial<Record<
   ResearchAiRuntime,
   (req: ResearchAiRequest) => Promise<ResearchAiResponse | null>
-> = {
+>> = {
   'browser-edge': queryBrowserEdgeWorker,
   'user-local': queryUserLocalRuntime,
   'server-local': queryServerLocalRuntime,
@@ -247,31 +247,31 @@ function truncateTo(text: string, maxLen: number): string {
 
 export function buildDeterministicReply(context: ResearchAiContext, query: string): string {
   const lower = query.toLowerCase();
-  const formattedPrice = formatPrice(context.currentPrice);
+  const formattedPrice = formatPrice(context.currentPrice ?? 0);
   const MAX_LEN = 800;
 
   let reply: string;
 
   // Hindi risk detection
   if (isHindiQuery(lower) && (lower.includes('risk') || lower.includes('खतर') || lower.includes('जोखिम'))) {
-    if (context.risksToReview.length > 0) {
-      reply = `शोध में निम्नलिखित जोखिम कारकों की पहचान की गई है:\n${buildRisksBullets(context.risksToReview)}`;
+    if ((context.risksToReview ?? []).length > 0) {
+      reply = `शोध में निम्नलिखित जोखिम कारकों की पहचान की गई है:\n${buildRisksBullets(context.risksToReview ?? [])}`;
     } else {
       reply = `${context.companyName} के लिए शोध में कोई विशेष जोखिम कारक नहीं बताए गए हैं।`;
     }
   } else if (lower.includes('risk') || lower.includes('danger') || lower.includes('downside')) {
-    if (context.risksToReview.length > 0) {
+    if ((context.risksToReview ?? []).length > 0) {
       reply =
         'The research has flagged the following risk factors:\n' +
-        buildRisksBullets(context.risksToReview) +
-        (context.whatToWatch.length > 0
-          ? '\n\nWatch items:\n' + buildWatchBullets(context.whatToWatch)
+        buildRisksBullets(context.risksToReview ?? []) +
+        ((context.whatToWatch ?? []).length > 0
+          ? '\n\nWatch items:\n' + buildWatchBullets(context.whatToWatch ?? [])
           : '');
     } else {
       reply = `The current research for ${context.companyName} does not highlight specific risk factors. Review the financial metrics for a fuller picture.`;
     }
   } else if (lower.includes('revenue') || lower.includes('growth') || lower.includes('earn')) {
-    const narrative = context.narrative.filter(
+    const narrative = (context.narrative ?? []).filter(
       (line) => line.toLowerCase().includes('revenue') || line.toLowerCase().includes('growth') || line.toLowerCase().includes('earn'),
     );
     if (narrative.length > 0) {
@@ -280,7 +280,7 @@ export function buildDeterministicReply(context: ResearchAiContext, query: strin
       reply = `Revenue and growth details for ${context.companyName} are available in the financial metrics section of the research.`;
     }
   } else if (lower.includes('valuation') || lower.includes('overval') || lower.includes('underval') || lower.includes('pe') || lower.includes('price') || lower.includes('ratio')) {
-    const narrative = context.narrative.filter(
+    const narrative = (context.narrative ?? []).filter(
       (line) => line.toLowerCase().includes('pe') || line.toLowerCase().includes('valuation') || line.toLowerCase().includes('ratio') || line.toLowerCase().includes('multiple'),
     );
     if (narrative.length > 0) {
@@ -289,17 +289,17 @@ export function buildDeterministicReply(context: ResearchAiContext, query: strin
       reply = `At ${formattedPrice}, valuation metrics for ${context.companyName} are shown in the research data.`;
     }
   } else if (lower.includes('watch') || lower.includes('outlook') || lower.includes('upcoming') || lower.includes('future') || lower.includes('expect')) {
-    if (context.whatToWatch.length > 0) {
-      reply = 'Key items to watch:\n' + buildWatchBullets(context.whatToWatch);
+    if ((context.whatToWatch ?? []).length > 0) {
+      reply = 'Key items to watch:\n' + buildWatchBullets(context.whatToWatch ?? []);
     } else {
       reply = `No specific watch items are available for ${context.companyName} at this time.`;
     }
-  } else if (context.narrative.length > 0) {
+  } else if ((context.narrative ?? []).length > 0) {
     reply =
       `The algorithmic assessment for ${context.companyName} (${formattedPrice}) indicates:\n` +
-      buildNarrativeBullets(context.narrative) +
-      (context.risksToReview.length > 0
-        ? '\n\nRisks flagged:\n' + buildRisksBullets(context.risksToReview)
+      buildNarrativeBullets(context.narrative ?? []) +
+      ((context.risksToReview ?? []).length > 0
+        ? '\n\nRisks flagged:\n' + buildRisksBullets(context.risksToReview ?? [])
         : '');
   } else {
     reply = `The research analysis for ${context.companyName} (${formattedPrice}) is available. Review the research metrics and financial data displayed on this page for insights.`;
