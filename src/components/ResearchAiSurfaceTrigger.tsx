@@ -8,7 +8,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { useState, useRef, useEffect } from "react";
-import { Sparkles, X } from "lucide-react";
+import { Info, X } from "lucide-react";
 import { colors, space } from "../design/tokens";
 import type { ResearchAiContext } from "../components/ai-orchestrator/researchAiTypes";
 
@@ -42,19 +42,17 @@ const TRIGGER_OPEN: import("react").CSSProperties = {
 function surfaceLabel(surface: string): string {
   switch (surface) {
     case "scanner":
-      return "Scanner insight";
+      return "Scanner research context";
     case "compare":
-      return "Compare insight";
+      return "Compare research context";
     case "watchlist":
-      return "Watchlist insight";
+      return "Watchlist research context";
     case "alerts":
-      return "Alert insight";
+      return "Alert research context";
     case "stock":
-      return "Stock insight";
-    case "healthometer":
-      return "Healthometer insight";
+      return "Stock research context";
     default:
-      return "AI context";
+      return "Research context";
   }
 }
 
@@ -79,9 +77,9 @@ function getSurfaceItems(ctx: ResearchAiContext): string[] {
 // ─── Props ───────────────────────────────────────────────────────────────────
 
 export interface ResearchAiSurfaceTriggerProps {
-  /** The AI context to display inside the popover */
+  /** The research context to display inside the popover (static, not AI-powered) */
   context: ResearchAiContext | null;
-  /** Short badge label (default "AI") */
+  /** Short badge label (default "Insight") */
   label?: string;
   /** Visual style (default "badge") */
   variant?: "badge" | "inline";
@@ -91,7 +89,7 @@ export interface ResearchAiSurfaceTriggerProps {
 
 export function ResearchAiSurfaceTrigger({
   context,
-  label = "AI",
+  label = "Insight",
   variant = "badge",
 }: ResearchAiSurfaceTriggerProps) {
   const [open, setOpen] = useState(false);
@@ -141,7 +139,7 @@ export function ResearchAiSurfaceTrigger({
         aria-expanded={open}
         style={open ? TRIGGER_OPEN : TRIGGER_CLOSED}
       >
-        <Sparkles size={13} color={colors.accentRed} />
+        <Info size={13} color={colors.accentRed} />
         {label}
       </button>
 

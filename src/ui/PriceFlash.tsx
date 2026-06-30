@@ -8,8 +8,8 @@ interface PriceFlashProps {
 }
 
 /**
- * PriceFlash wraps a numeric value and triggers a 0.5s green flash
- * animation whenever the value changes, simulating a live price update.
+ * PriceFlash wraps a value and triggers a 0.5s green flash
+ * animation whenever the value prop changes.
  */
 export function PriceFlash({ value, children, className = "" }: PriceFlashProps) {
   const prev = useRef(value);

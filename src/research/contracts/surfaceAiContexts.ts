@@ -14,6 +14,55 @@ import type {
 } from "./productContracts";
 import type { ResearchAiContext } from "../../components/ai-orchestrator/researchAiTypes";
 
+// ─── Forbidden terms ─────────────────────────────────────────────────────────
+// Terms that must not appear in public-facing AI context output.
+// Recommendation/direct-action, provider/runtime, and scoring plumbing words.
+
+const FORBIDDEN_PATTERNS = [
+  /\bbuy\b/gi,
+  /\bsell\b/gi,
+  /\bhold\b/gi,
+  /\bstrong buy\b/gi,
+  /\btarget\b/gi,
+  /\bguaranteed\b/gi,
+  /\bsure shot\b/gi,
+  /\bmultibagger\b/gi,
+  /\breal time\b/gi,
+  /\brealtime\b/gi,
+  /\blive price\b/gi,
+  /\blive portfolio\b/gi,
+  /\bP&L\b/gi,
+  /\bmock holdings\b/gi,
+  /\bfake\b/gi,
+  /\bprovider\b/gi,
+  /\bbackend\b/gi,
+  /\bmodel\b/gi,
+  /\bruntime\b/gi,
+  /\bRAG\b/gi,
+  /\bvector\b/gi,
+  /\bembedding\b/gi,
+  /\bchunk\b/gi,
+  /\badapter\b/gi,
+  /\bWebLLM\b/gi,
+  /\bWebGPU\b/gi,
+  /\bWASM\b/gi,
+  /\bOllama\b/gi,
+  /\bllama\b/gi,
+  /\bQwen\b/gi,
+  /\bPhi\b/gi,
+  /\bzero server load\b/gi,
+  /\bunlimited prompts\b/gi,
+  /\bserverless AI\b/gi,
+];
+
+function stripForbidden(text: string): string {
+  let cleaned = text;
+  for (const pattern of FORBIDDEN_PATTERNS) {
+    cleaned = cleaned.replace(pattern, "");
+  }
+  return cleaned.replace(/\s+/g, " ").trim();
+}
+
 // ─── Options ─────────────────────────────────────────────────────────────────
 
 export interface SurfaceAiContextOptions {
@@ -30,20 +79,25 @@ const DEFAULTS: Required<SurfaceAiContextOptions> = {
 
 // ─── Shared sanitization utilities ───────────────────────────────────────────
 
+function isString(value: unknown): value is string {
+  return typeof value === "string";
+}
+
 function sanitizeText(value: unknown, max: number): string | null {
-  if (typeof value !== "string") return null;
-  const text = value.replace(/\s+/g, " ").trim().slice(0, max);
+  if (!isString(value)) return null;
+  const text = stripForbidden(value).replace(/\s+/g, " ").trim().slice(0, max);
   return text || null;
 }
 
 function sanitizeArray(
-  value: unknown[],
+  value: unknown,
   max: number,
 ): string[] | undefined {
   if (!Array.isArray(value)) return undefined;
   const deduped = new Set<string>();
   const items = value
-    .map((item) => (typeof item === "string" ? sanitizeText(item, max) : null))
+    .filter(isString)
+    .map((item) => sanitizeText(item, max))
     .filter((item): item is string => Boolean(item))
     .filter((item) => {
       const key = item.toLowerCase();
@@ -56,7 +110,6 @@ function sanitizeArray(
 }
 
 function hasContent(ctx: ResearchAiContext): boolean {
-  // Returns true when at least one informational field is populated
   const informational: unknown[] = [
     ctx.title,
     ctx.companyName,
@@ -79,17 +132,27 @@ function hasContent(ctx: ResearchAiContext): boolean {
   });
 }
 
+function safeUnknownObject<T>(input: unknown, guard: (v: unknown) => v is T): T | null {
+  return guard(input) ? input : null;
+}
+
 // ─── Adapter: Scanner ────────────────────────────────────────────────────────
 
 /**
  * Convert a ScannerResultView into a ResearchAiContext.
- * Returns `null` when the output would carry no meaningful information.
+ * Returns `null` when input is invalid or output would carry no meaningful information.
  */
 export function toScannerResearchAiContext(
-  result: ScannerResultView,
+  input: unknown,
   opts?: SurfaceAiContextOptions,
 ): ResearchAiContext | null {
   const o = { ...DEFAULTS, ...opts };
+
+  const result = safeUnknownObject<ScannerResultView>(input, (v): v is ScannerResultView =>
+    !!v && typeof v === "object" && "symbol" in v && "companyName" in v,
+  );
+  if (!result) return null;
+
   const ctx: ResearchAiContext = {
     surface: "scanner",
     symbol: sanitizeText(result.symbol, 24) ?? null,
@@ -108,21 +171,28 @@ export function toScannerResearchAiContext(
 
 /**
  * Convert a CompareResultView into a ResearchAiContext.
- * Returns `null` when the output would carry no meaningful information.
+ * Uses a safe research-context title. Returns `null` when input is invalid
+ * or output would carry no meaningful information.
  */
 export function toCompareResearchAiContext(
-  result: CompareResultView,
+  input: unknown,
   opts?: SurfaceAiContextOptions,
 ): ResearchAiContext | null {
   const o = { ...DEFAULTS, ...opts };
+
+  const result = safeUnknownObject<CompareResultView>(input, (v): v is CompareResultView =>
+    !!v && typeof v === "object" && "companies" in v,
+  );
+  if (!result || !Array.isArray(result.companies)) return null;
+
   const symbols =
     result.companies
-      .map((c) => c.symbol)
+      .map((c) => (typeof c === "object" && c ? c.symbol : undefined))
       .filter(Boolean)
       .join("/") || null;
   const names =
     result.companies
-      .map((c) => c.companyName)
+      .map((c) => (typeof c === "object" && c ? c.companyName : undefined))
       .filter(Boolean)
       .join(" vs ") || null;
 
@@ -130,11 +200,16 @@ export function toCompareResearchAiContext(
     surface: "compare",
     symbol: symbols,
     companyName: names,
-    title: sanitizeText(result.recommendation ?? "Compare research", o.maxStringLength) ?? null,
+    title: "Compare research context",
     comparisonContext: sanitizeArray(
       [
-        ...result.companies.flatMap((c) => [c.companyName, ...c.strengths, ...c.risks]),
-        ...result.factorComparison.map((f) => f.explanation),
+        ...result.companies.flatMap((c) => {
+          if (typeof c !== "object" || !c) return [];
+          return [c.companyName, ...(Array.isArray(c.strengths) ? c.strengths : []), ...(Array.isArray(c.risks) ? c.risks : [])];
+        }),
+        ...(Array.isArray(result.factorComparison)
+          ? result.factorComparison.map((f) => (typeof f === "object" && f ? f.explanation : undefined))
+          : []),
         result.missingDataCaveat,
       ],
       o.maxItems + 3,
@@ -147,13 +222,19 @@ export function toCompareResearchAiContext(
 
 /**
  * Convert a WatchlistThesisView into a ResearchAiContext.
- * Returns `null` when the output would carry no meaningful information.
+ * Returns `null` when input is invalid or output would carry no meaningful information.
  */
 export function toWatchlistResearchAiContext(
-  result: WatchlistThesisView,
+  input: unknown,
   opts?: SurfaceAiContextOptions,
 ): ResearchAiContext | null {
   const o = { ...DEFAULTS, ...opts };
+
+  const result = safeUnknownObject<WatchlistThesisView>(input, (v): v is WatchlistThesisView =>
+    !!v && typeof v === "object" && "symbol" in v && "companyName" in v && "currentStatus" in v,
+  );
+  if (!result) return null;
+
   const ctx: ResearchAiContext = {
     surface: "watchlist",
     symbol: sanitizeText(result.symbol, 24) ?? null,
@@ -175,13 +256,19 @@ export function toWatchlistResearchAiContext(
 
 /**
  * Convert an AlertChangeView into a ResearchAiContext.
- * Returns `null` when the output would carry no meaningful information.
+ * Returns `null` when input is invalid or output would carry no meaningful information.
  */
 export function toAlertsResearchAiContext(
-  result: AlertChangeView,
+  input: unknown,
   opts?: SurfaceAiContextOptions,
 ): ResearchAiContext | null {
   const o = { ...DEFAULTS, ...opts };
+
+  const result = safeUnknownObject<AlertChangeView>(input, (v): v is AlertChangeView =>
+    !!v && typeof v === "object" && "symbol" in v && "title" in v && "body" in v && "type" in v,
+  );
+  if (!result) return null;
+
   const ctx: ResearchAiContext = {
     surface: "alerts",
     symbol: sanitizeText(result.symbol, 24) ?? null,
