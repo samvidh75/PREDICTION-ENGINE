@@ -20,7 +20,7 @@ const CHANGELOG_ENTRIES = [
     items: [
       "Initial private beta release",
       "NSE stock scanner with multi-factor screening",
-      "Watchlist with real-time price updates",
+      "Watchlist with timely price updates",
       "Stock detail pages with fundamental data",
       "Research profiles for tracking thesis",
     ],

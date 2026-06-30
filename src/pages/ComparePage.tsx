@@ -629,7 +629,7 @@ export default function ComparePage() {
             <Sparkles size={16} color={colors.warning} /> AI Comparison Insight
           </h2>
           <div style={{ display: "grid", gap: space[4], gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))" }}>
-            {/* Allocation recommendation */}
+            {/* Allocation suggestion */}
             <Card variant="elevated">
               {(() => {
                 const sorted = [...stocks].sort((a, b) => b.score - a.score);
