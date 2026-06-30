@@ -46,7 +46,7 @@ const strongPacket: IndiaEquityPacket = {
   },
 };
 
-const UNSAFE_PUBLIC_COPY = /Strong Buy|Buy now|Sell now|sure shot|guaranteed|multibagger|provider|API|backend|coverage|freshness|diagnostic|lineage|migration|backfill/i;
+const UNSAFE_PUBLIC_COPY = /Strong Buy|Buy now|Sell now|sure shot|guaranteed|multibagger|provider|\bAPI\b|backend|coverage|freshness|diagnostic|lineage|migration|backfill/i;
 
 function makeHistoricalCases(count: number): HistoricalSimilarityCase[] {
   return Array.from({ length: count }, (_, index) => ({
