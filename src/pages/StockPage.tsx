@@ -8,6 +8,7 @@ import { Button } from "../ui/Button";
 import { Card, CardLabel } from "../ui/Card";
 import { Stat } from "../ui/Stat";
 import { useResponsiveValue } from "../ui/responsive";
+import { PriceFlash } from "../ui/PriceFlash";
 import { BrokerHandoffModal } from "../components/BrokerHandoffModal";
 import { ThesisHistory } from "../components/ThesisHistory";
 import { listAvailableBrokers } from "../commercial/BrokerHandoffService";
@@ -95,9 +96,11 @@ function StickyHeader({ symbol, price, changeAbs, changePercent, trendColor }: {
         <span style={{ color: colors.textPrimary, fontSize: "16px", fontWeight: 700, letterSpacing: "-0.01em" }}>
           {symbol}
         </span>
-        <span style={{ color: colors.textPrimary, fontSize: "16px", fontWeight: 600 }}>
-          ₹{price.toLocaleString("en-IN")}
-        </span>
+        <PriceFlash value={price}>
+          <span style={{ color: colors.textPrimary, fontSize: "16px", fontWeight: 600 }}>
+            ₹{price.toLocaleString("en-IN")}
+          </span>
+        </PriceFlash>
         <span style={{ color: trendColor, fontSize: "13px", fontWeight: 500, display: "inline-flex", alignItems: "center", gap: "4px" }}>
           {isUp ? <ArrowUp size={12} /> : <ArrowDown size={12} />}
           {isUp ? "+" : ""}{changeAbs.toFixed(2)} ({changePercent.toFixed(2)}%)
@@ -123,7 +126,7 @@ function HeroSection({ stock, isUp, trendColor }: { stock: StockResearchDetail; 
         <span style={{ color: colors.textSecondary, fontSize: "14px", fontWeight: 500 }}>{stock.companyName}</span>
       </div>
       <div style={{ fontSize: useResponsiveValue("40px", "64px"), fontWeight: 700, color: colors.textPrimary, lineHeight: "1.1", letterSpacing: "-0.02em", display: "flex", alignItems: "center", justifyContent: "center", gap: "12px" }}>
-        ₹{stock.price.current.toLocaleString("en-IN")}
+        <PriceFlash value={stock.price.current}>₹{stock.price.current.toLocaleString("en-IN")}</PriceFlash>
         <span className="live-indicator" style={{
           width: "10px", height: "10px", borderRadius: "50%", background: colors.marketGreen,
           display: "inline-block", flexShrink: 0, marginTop: "8px",
