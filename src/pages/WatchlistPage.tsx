@@ -8,6 +8,7 @@ import { ConvictionBadge } from "../ui/ConvictionBadge";
 import { colors, typography, space, radius, media } from "../design/tokens";
 import { SEBIComplianceBanner } from "../components/SEBICompliance";
 import { AnalystBriefCard } from "../components/analyst/AnalystBriefCard";
+import { ResearchAlertsPanel } from "../components/alerts/ResearchAlertsPanel";
 import { ThesisChangeResearchPanel } from "../components/watchlist/ThesisChangeResearchPanel";
 import { watchlistReviewBriefGenerator } from "../stockstory/analyst/watchlist/WatchlistReviewBriefGenerator";
 import type { WatchlistThesisView } from "../research/contracts/productContracts";
@@ -97,6 +98,7 @@ export default function WatchlistPage() {
 
   const needsReviewCount = intel?.needsReview?.length ?? 0;
   const changedCount = intel?.changedItems?.length ?? 0;
+  const alertCount = intel?.alerts?.length ?? 0;
 
   const handleResearch = (symbol: string) => {
     recordAction("thesis_check", symbol);
@@ -251,6 +253,9 @@ export default function WatchlistPage() {
           {changedCount > 0 && (
             <Badge variant="info" value={`${changedCount} thesis change${changedCount === 1 ? "" : "s"}`} />
           )}
+          {alertCount > 0 && (
+            <Badge variant="warning" value={`${alertCount} research alert${alertCount === 1 ? "" : "s"}`} />
+          )}
           <span style={{ fontSize: "12px", color: colors.textSecondary, display: "flex", alignItems: "center" }}>
             Updated {new Date(intel.generatedAt).toLocaleTimeString()}
           </span>
@@ -260,6 +265,16 @@ export default function WatchlistPage() {
       {intel && (
         <ThesisChangeResearchPanel
           items={thesisChangeItems}
+          onResearch={handleResearch}
+          onCompare={handleCompare}
+          onTrack={handleTrack}
+          onInvest={handleInvestReview}
+        />
+      )}
+
+      {intel && (
+        <ResearchAlertsPanel
+          alerts={intel.alerts}
           onResearch={handleResearch}
           onCompare={handleCompare}
           onTrack={handleTrack}
