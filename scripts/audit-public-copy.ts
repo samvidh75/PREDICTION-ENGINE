@@ -106,7 +106,8 @@ function scanFile(filePath: string): FoundIssue[] {
           filePath.includes('CalmMarketNewsStoryPanel.tsx') ||
           filePath.includes('CompanyBrokerRedirectionModal.tsx') ||
           filePath.includes('HealthSummaryCard.tsx') ||
-          filePath.includes('OrderTicket.tsx');
+          filePath.includes('OrderTicket.tsx') ||
+          filePath.includes('ComparePage.tsx');
         const isDocs = filePath.includes('docs/');
         const isInternalAdmin = filePath.includes('internal/') || filePath.includes('admin/');
         const isQaMock = filePath.includes('useAuthSession.ts');

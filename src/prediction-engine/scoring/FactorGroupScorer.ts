@@ -145,7 +145,7 @@ export function scoreGrowthGroup(features: Map<string, UnifiedFeatureValue>): Un
 // ─── Stability group ──────────────────────────────────────────────
 
 const STABILITY_FEATURES = [
-  'beta', 'volatility_20d', 'bollinger_width', 'debt_to_equity',
+  'beta', 'volatility_20d', 'bollinger_width', 'debt_to_equity', 'market_cap',
 ];
 
 const STABILITY_BPS: Record<string, Array<{ x: number; y: number }>> = {
@@ -153,6 +153,7 @@ const STABILITY_BPS: Record<string, Array<{ x: number; y: number }>> = {
   volatility_20d:   [{ x: 1, y: 100 }, { x: 2, y: 80 }, { x: 4, y: 60 }, { x: 6, y: 30 }, { x: 10, y: 0 }],
   bollinger_width:  [{ x: 3, y: 100 }, { x: 5, y: 80 }, { x: 10, y: 60 }, { x: 15, y: 30 }, { x: 20, y: 0 }],
   debt_to_equity:   [{ x: 0.1, y: 100 }, { x: 0.5, y: 75 }, { x: 1, y: 50 }, { x: 2, y: 25 }, { x: 3, y: 0 }],
+  market_cap:       [{ x: 9, y: 10 }, { x: 10, y: 30 }, { x: 11, y: 55 }, { x: 12, y: 80 }, { x: 13, y: 100 }],
 };
 
 export function scoreStabilityGroup(features: Map<string, UnifiedFeatureValue>): UnifiedFactorScore {
