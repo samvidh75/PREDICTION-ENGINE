@@ -10,16 +10,21 @@ import type { MarketAnomalyEvidencePack } from "../../systems/market-brain/anoma
 function makePack(overrides: Partial<MarketAnomalyEvidencePack> = {}): MarketAnomalyEvidencePack {
   return {
     symbol: "TCS",
+    companyName: null,
     timeframe: "1d",
     anomalyType: "Stock-specific move",
     severity: "High",
+    headline: "Price moved significantly relative to sector and index",
     evidence: [
       "Price moved +5.2% over 1d",
       "Volume at 2.8x the 20-day average",
       "Sector moved +0.8% in the same period",
       "Index moved +0.3% in the same period",
     ],
+    risksToReview: [],
+    whatToWatch: [],
     missingEvidence: [],
+    compressedContext: "TCS | Stock-specific move | High | price: +5.2%, volume: 2.8x",
     narrativePromptPayload: JSON.stringify({ type: "stock-specific", severity: "High" }),
     ...overrides,
   };
@@ -49,9 +54,9 @@ describe("WhyDidThisMovePanel", () => {
       missingEvidence: ["Delivery volume", "Open interest change"],
     });
     render(<WhyDidThisMovePanel pack={pack} />);
-    // Items appear in both evidenceToReview and risksToReview
+    // Missing evidence items are surfaced as risks with "needs more context" suffix
     const items = screen.getAllByText(/— needs more context/);
-    expect(items.length).toBe(4); // 2 evidence + 2 risks
+    expect(items.length).toBe(2);
   });
 
   it("returns null when pack is null", () => {

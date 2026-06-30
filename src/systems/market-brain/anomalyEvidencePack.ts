@@ -37,6 +37,7 @@ export interface AnomalyEvidencePackInput {
 export interface MarketAnomalyInput {
   symbol: string;
   timeframe: MarketAnomalyTimeframe;
+  companyName?: string | null;
   priceMovePct?: number | null;
   volumeMultiple?: number | null;
   sectorMovePct?: number | null;
