@@ -41,6 +41,15 @@ export interface MarketBrainAnomalyReviewView {
   summary: string;
 }
 
+export interface MarketBrainHistoricalSimilarityReviewView {
+  usable: boolean;
+  sampleSize: number;
+  minSampleSize: number;
+  observations: string[];
+  limitations: string[];
+  summary: string;
+}
+
 export interface MarketBrainResearchView {
   symbol: string;
   companyName: string;
@@ -52,6 +61,7 @@ export interface MarketBrainResearchView {
   whatToWatch: string[];
   evidenceReview: MarketBrainEvidenceReviewView;
   anomalyReview: MarketBrainAnomalyReviewView | null;
+  historicalSimilarityReview: MarketBrainHistoricalSimilarityReviewView | null;
   factorViews: MarketBrainFactorView[];
   methodNote: string;
   generatedAt: string;
@@ -185,6 +195,11 @@ const isPublicScore = (value: unknown): value is number => (
 
 const asPublicScore = (value: unknown): number => (isPublicScore(value) ? value : 0);
 
+const asNonNegativeInteger = (value: unknown): number | null => {
+  if (typeof value !== 'number' || !Number.isFinite(value) || value < 0) return null;
+  return Math.floor(value);
+};
+
 const asPublicTimestamp = (value: unknown): string => {
   const timestamp = asTrimmedString(value);
   if (!timestamp) return '';
@@ -281,6 +296,35 @@ const normalizeAnomalyReview = (value: unknown): MarketBrainAnomalyReviewView | 
   };
 };
 
+const normalizeHistoricalSimilarityReview = (value: unknown): MarketBrainHistoricalSimilarityReviewView | null => {
+  if (!isRecord(value)) return null;
+
+  const candidate = value as Partial<MarketBrainHistoricalSimilarityReviewView>;
+  const sampleSize = asNonNegativeInteger(candidate.sampleSize);
+  const minSampleSize = asNonNegativeInteger(candidate.minSampleSize);
+
+  if (sampleSize == null || minSampleSize == null || minSampleSize <= 0) return null;
+
+  const observations = asStringArray(candidate.observations);
+  const limitations = asStringArray(candidate.limitations);
+  const usable = typeof candidate.usable === 'boolean'
+    ? candidate.usable && sampleSize >= minSampleSize
+    : sampleSize >= minSampleSize;
+  const summary = asPublicText(candidate.summary)
+    || (usable
+      ? 'Similar historical cases are available as research context.'
+      : 'Not enough similar historical cases for this view yet.');
+
+  return {
+    usable,
+    sampleSize,
+    minSampleSize,
+    observations,
+    limitations,
+    summary,
+  };
+};
+
 const normalizeResearchResponse = (
   payload: Record<string, unknown>,
   requestedSymbol: string,
@@ -303,6 +347,7 @@ const normalizeResearchResponse = (
       whatToWatch: asStringArray(research.whatToWatch),
       evidenceReview: normalizeEvidenceReview(research.evidenceReview),
       anomalyReview: normalizeAnomalyReview(research.anomalyReview),
+      historicalSimilarityReview: normalizeHistoricalSimilarityReview(research.historicalSimilarityReview),
       factorViews: asFactorViews(research.factorViews),
       methodNote: asPublicText(research.methodNote),
       generatedAt: asPublicTimestamp(research.generatedAt),
