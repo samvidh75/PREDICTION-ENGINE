@@ -58,11 +58,16 @@ export interface AnomalyEvidencePackOutput {
 
 export interface MarketAnomalyEvidencePack {
   symbol: string;
+  companyName: string | null;
   timeframe: string;
   anomalyType: AnomalyLabel;
   severity: AnomalySeverity;
+  headline: string;
   evidence: string[];
+  risksToReview: string[];
+  whatToWatch: string[];
   missingEvidence: string[];
+  compressedContext: string;
   narrativePromptPayload: string;
 }
 
@@ -204,10 +209,49 @@ function buildNarrativePayload(pack: Omit<MarketAnomalyEvidencePack, 'narrativeP
   return payload.slice(0, 900);
 }
 
+function buildRisksToReview(
+  priceMovePct: number | null,
+  volumeMultiple: number | null,
+  volatilityMultiple: number | null,
+): string[] {
+  const risks: string[] = [];
+  if (priceMovePct != null && Math.abs(priceMovePct) >= 5) pushUnique(risks, 'Large price swing may indicate heightened volatility');
+  if (volumeMultiple != null && volumeMultiple >= 3) pushUnique(risks, 'Abnormal volume could suggest unusual market activity');
+  if (volatilityMultiple != null && volatilityMultiple >= 2) pushUnique(risks, 'Expanded volatility signals uncertainty in recent price action');
+  if (risks.length === 0) pushUnique(risks, 'No immediate risk signals detected from current data');
+  return risks;
+}
+
+function buildWhatsToWatch(priceMovePct: number | null, volumeMultiple: number | null): string[] {
+  const watch: string[] = [];
+  if (priceMovePct != null && Math.abs(priceMovePct) >= 3) pushUnique(watch, 'Price action in next session to confirm direction');
+  if (volumeMultiple != null && volumeMultiple >= 2) pushUnique(watch, 'Volume trend to see if unusual activity sustains');
+  pushUnique(watch, 'Broader market and sector context for relative comparison');
+  return watch;
+}
+
+function buildCompressedContext(
+  symbol: string,
+  companyName: string | null,
+  timeframe: string,
+  priceMovePct: number | null,
+  volumeMultiple: number | null,
+): string {
+  const parts: string[] = [];
+  if (companyName) parts.push(companyName);
+  parts.push(symbol);
+  parts.push(`Over ${timeframe}`);
+  if (priceMovePct != null) parts.push(`price moved ${pct(priceMovePct)}`);
+  if (volumeMultiple != null) parts.push(`volume ${multiple(volumeMultiple)} average`);
+  return parts.join(' | ').slice(0, 300);
+}
+
 function safeMarketPack(pack: Omit<MarketAnomalyEvidencePack, 'narrativePromptPayload'>): MarketAnomalyEvidencePack {
   const evidence = Array.from(new Set(pack.evidence.map((item) => item.trim()).filter(Boolean)));
   const missingEvidence = Array.from(new Set(pack.missingEvidence.map((item) => item.trim()).filter(Boolean)));
-  const basePack = { ...pack, evidence, missingEvidence };
+  const risksToReview = Array.from(new Set(pack.risksToReview.map((item) => item.trim()).filter(Boolean)));
+  const whatToWatch = Array.from(new Set(pack.whatToWatch.map((item) => item.trim()).filter(Boolean)));
+  const basePack = { ...pack, evidence, missingEvidence, risksToReview, whatToWatch };
   const narrativePromptPayload = buildNarrativePayload(basePack);
   const text = [basePack.anomalyType, basePack.severity, ...evidence, ...missingEvidence, narrativePromptPayload].join(' ');
   assertSafeAnomalyCopy(text);
@@ -277,15 +321,21 @@ export function buildMarketAnomalyEvidencePack(input: MarketAnomalyInput): Marke
   const symbol = normalizeSymbol(input.symbol);
   const evidence: string[] = [];
   const missingEvidence: string[] = [];
+  const companyName = input.companyName ? input.companyName.trim().slice(0, 100) : null;
 
   if (!symbol || !VALID_TIMEFRAMES.includes(input.timeframe)) {
     return safeMarketPack({
       symbol: symbol ?? 'UNKNOWN',
+      companyName: null,
       timeframe: VALID_TIMEFRAMES.includes(input.timeframe) ? input.timeframe : 'unknown',
       anomalyType: 'Incomplete evidence',
       severity: 'Needs review',
+      headline: 'Market move needs more context',
       evidence: [],
+      risksToReview: ['No immediate risk signals detected from current data'],
+      whatToWatch: ['Broader market and sector context for relative comparison'],
       missingEvidence: ['valid symbol', 'valid timeframe'],
+      compressedContext: `${symbol ?? 'UNKNOWN'} | needs valid symbol and timeframe`,
     });
   }
 
@@ -336,12 +386,22 @@ export function buildMarketAnomalyEvidencePack(input: MarketAnomalyInput): Marke
     severity = 'Low';
   }
 
+  const headline = `${anomalyType} for ${companyName ?? symbol}`;
+  const compressedContext = buildCompressedContext(symbol, companyName, input.timeframe, priceMovePct, volumeMultiple);
+  const risksToReview = buildRisksToReview(priceMovePct, volumeMultiple, volatilityMultiple);
+  const whatToWatch = buildWhatsToWatch(priceMovePct, volumeMultiple);
+
   return safeMarketPack({
     symbol,
+    companyName,
     timeframe: input.timeframe,
     anomalyType,
     severity,
+    headline: headline.slice(0, 150),
     evidence,
+    risksToReview,
+    whatToWatch,
     missingEvidence,
+    compressedContext,
   });
 }
