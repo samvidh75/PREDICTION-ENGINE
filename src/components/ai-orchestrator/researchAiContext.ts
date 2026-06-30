@@ -245,10 +245,17 @@ function estimateChars(ctx: ResearchAiContext): number {
 }
 
 function truncateArray(arr: string[], maxTotalChars: number): string[] {
+  if (arr.length === 0) return [];
   let total = 0;
   const result: string[] = [];
   for (const item of arr) {
-    if (total + item.length > maxTotalChars) break;
+    if (total + item.length > maxTotalChars) {
+      if (result.length === 0) {
+        // Always keep at least one item, even if it exceeds the budget
+        result.push(item);
+      }
+      break;
+    }
     result.push(item);
     total += item.length;
   }

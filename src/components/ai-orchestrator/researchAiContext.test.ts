@@ -247,7 +247,9 @@ describe('compressResearchContext', () => {
     const compressed = compressResearchContext(ctx, 600);
     for (const items of [compressed.narrative, compressed.risksToReview, compressed.whatToWatch]) {
       for (const str of items) {
-        expect(str.length).toBeLessThanOrEqual(120); // second pass truncation limit
+        // Narrative limit is 120 + '…' = 121; risks/watch limit is 80 + '…' = 81
+        const maxLen = str === compressed.narrative[0] ? 121 : 81;
+        expect(str.length).toBeLessThanOrEqual(maxLen);
       }
     }
   });
