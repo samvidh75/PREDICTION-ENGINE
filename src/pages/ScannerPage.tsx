@@ -109,16 +109,16 @@ export default function ScannerPage() {
 
   return (
     <div style={{ display: "grid", gap: "24px" }}>
-      <div style={{ display: "grid", gap: "16px" }}>
+      <div className="raycast-slideUp" style={{ display: "grid", gap: "16px" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "8px" }}>
           <h1 style={{ color: colors.textPrimary, fontSize: typography.h1.desktop.size, fontWeight: 600, lineHeight: "1.25", margin: 0 }}>Scanner</h1>
           <span style={{ fontSize: "12px", color: colors.textSecondary }}>
-            <kbd style={{ background: colors.surfaceCard, border: `1px solid ${colors.hairlineStrong}`, borderRadius: 4, padding: "1px 6px", fontSize: 11, fontFamily: "inherit", color: colors.textSecondary }}>⌘K</kbd> to search
+            <kbd style={{ background: colors.surface, border: `1px solid ${colors.hairlineStrong}`, borderRadius: 4, padding: "1px 6px", fontSize: 11, fontFamily: "inherit", color: colors.textSecondary }}>⌘K</kbd> to search
           </span>
         </div>
 
-        <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
-          {SCAN_PRESETS.map((preset) => (
+        <div className="raycast-stagger-1" style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+          {SCAN_PRESETS.map((preset, i) => (
             <Button
               key={preset.id}
               variant={preset.id === activePresetId ? "primary" : "secondary"}
@@ -131,7 +131,7 @@ export default function ScannerPage() {
           ))}
         </div>
 
-        <div style={{ fontSize: "13px", color: colors.textSecondary, lineHeight: "1.45", maxWidth: "520px" }}>
+        <div className="raycast-stagger-2" style={{ fontSize: "13px", color: colors.textSecondary, lineHeight: "1.45", maxWidth: "520px" }}>
           <strong style={{ color: colors.textPrimary }}>{activePreset.label}</strong> — {activePreset.description}
           {activePreset.filters && (
             <span style={{ display: "block", marginTop: "4px", fontSize: "12px", color: colors.textTertiary }}>
@@ -149,118 +149,140 @@ export default function ScannerPage() {
           )}
         </div>
 
-        <input
-          value={query}
-          onChange={(event) => setQuery(event.target.value)}
-          placeholder="Search symbol or company"
-          style={{
-            maxWidth: "360px",
-            minHeight: "44px",
-            border: `1px solid ${colors.border}`,
-            borderRadius: "44px",
-            padding: "0 16px",
-          }}
-        />
+        <div className="raycast-stagger-3">
+          <input
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="Search symbol or company"
+            style={{
+              maxWidth: "360px",
+              minHeight: "44px",
+              border: `1px solid ${colors.hairline}`,
+              borderRadius: "44px",
+              padding: "0 16px",
+              background: "rgba(255,255,255,0.04)",
+              color: colors.textPrimary,
+              outline: "none",
+              backdropFilter: "blur(12px)",
+              WebkitBackdropFilter: "blur(12px)",
+              transition: "border-color 0.15s ease, background 0.15s ease",
+            }}
+            onFocus={(e) => { e.target.style.borderColor = colors.hairlineStrong; e.target.style.background = "rgba(255,255,255,0.06)"; }}
+            onBlur={(e) => { e.target.style.borderColor = colors.hairline; e.target.style.background = "rgba(255,255,255,0.04)"; }}
+          />
+        </div>
 
-        <ScannerPresets
-          scanType={activePresetId}
-          query={query}
-          onApply={(preset) => {
-            setQuery((preset.filters.query as string) || "");
-          }}
-        />
+        <div className="raycast-stagger-4">
+          <ScannerPresets
+            scanType={activePresetId}
+            query={query}
+            onApply={(preset) => {
+              setQuery((preset.filters.query as string) || "");
+            }}
+          />
+        </div>
       </div>
 
-      <Card>
-        <div style={{ overflowX: "auto" }}>
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: `32px 1fr repeat(${FACTOR_COLUMNS.length}, auto) 64px`,
-              gap: "8px",
-              minWidth: "680px",
-              padding: "4px",
-            }}
-          >
-            {/* Header */}
-            {[
-              { key: "rank", label: "#", width: "32px" },
-              { key: "company", label: "Company", width: "1fr" },
-              ...FACTOR_COLUMNS,
-              { key: "composite", label: "%", width: "64px" },
-            ].map((col) => (
-              <div
-                key={col.key}
-                style={{
-                  color: colors.textSecondary,
-                  fontSize: label,
-                  fontWeight: 500,
-                  lineHeight: "1.4",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.04em",
-                  padding: `0 6px 8px`,
-                  borderBottom: `1px solid ${colors.border}`,
-                  textAlign: col.key === "company" ? "left" : "right",
-                }}
-              >
-                {col.label}
-              </div>
-            ))}
+      <div className="raycast-stagger-5">
+        <Card variant="elevated">
+          <div style={{ overflowX: "auto" }}>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: `32px 1fr repeat(${FACTOR_COLUMNS.length}, auto) 64px`,
+                gap: "8px",
+                minWidth: "680px",
+                padding: "4px",
+              }}
+            >
+              {/* Header */}
+              {[
+                { key: "rank", label: "#", width: "32px" },
+                { key: "company", label: "Company", width: "1fr" },
+                ...FACTOR_COLUMNS,
+                { key: "composite", label: "%", width: "64px" },
+              ].map((col) => (
+                <div
+                  key={col.key}
+                  style={{
+                    color: colors.textSecondary,
+                    fontSize: label,
+                    fontWeight: 500,
+                    lineHeight: "1.4",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.04em",
+                    padding: `0 6px 8px`,
+                    borderBottom: `1px solid ${colors.hairline}`,
+                    textAlign: col.key === "company" ? "left" : "right",
+                  }}
+                >
+                  {col.label}
+                </div>
+              ))}
 
-            {/* Rows */}
-            {displayResults.map((stock) => (
-              <button
-                key={stock.symbol}
-                onClick={() => navigate(`/stock/${stock.symbol}`)}
-                onMouseEnter={() => setHoveredStock(stock)}
-                onMouseLeave={() => setHoveredStock((prev) => (prev?.symbol === stock.symbol ? null : prev))}
-                style={{
-                  all: "unset",
-                  display: "contents",
-                  cursor: "pointer",
-                }}
-              >
-                {[
-                  { value: String(stock.rank), color: colors.textSecondary, bold: false },
-                  { value: stock.name ? `${stock.name} (${stock.symbol})` : stock.symbol, color: colors.textPrimary, bold: true },
-                  ...FACTOR_COLUMNS.map((fc) => ({
-                    value: String(Math.round((stock as any)[fc.key] ?? 0)),
-                    color: colors.textPrimary,
-                    bold: false,
-                  })),
-                  { value: `${Math.round(stock.composite)}%`, color: colors.primary, bold: true },
-                ].map((cell, ci) => {
-                  const isLast = ci === FACTOR_COLUMNS.length + 2;
-                  return (
-                    <div
-                      key={ci}
-                      style={{
-                        color: cell.color,
-                        fontSize: label,
-                        fontWeight: cell.bold ? 600 : 400,
-                        lineHeight: "1.4",
-                        padding: "8px 6px",
-                        textAlign: ci === 1 ? "left" : "right",
-                        borderBottom: `1px solid ${colors.border}`,
-                        background: (stock.rank - 1) % 2 === 0 ? "transparent" : colors.fill,
-                        transition: "background 120ms ease",
-                        borderRadius: ci === 0 ? "6px 0 0 6px" : isLast ? "0 6px 6px 0" : "0",
-                        whiteSpace: "nowrap" as const,
-                      }}
-                    >
-                      {cell.value}
-                    </div>
-                  );
-                })}
-              </button>
-            ))}
+              {/* Rows */}
+              {displayResults.map((stock) => (
+                <button
+                  key={stock.symbol}
+                  onClick={() => navigate(`/stock/${stock.symbol}`)}
+                  onMouseEnter={() => setHoveredStock(stock)}
+                  onMouseLeave={() => setHoveredStock((prev) => (prev?.symbol === stock.symbol ? null : prev))}
+                  style={{
+                    all: "unset",
+                    display: "contents",
+                    cursor: "pointer",
+                  }}
+                >
+                  {[
+                    { value: String(stock.rank), color: colors.textSecondary, bold: false },
+                    { value: stock.name ? `${stock.name} (${stock.symbol})` : stock.symbol, color: colors.textPrimary, bold: true },
+                    ...FACTOR_COLUMNS.map((fc) => ({
+                      value: String(Math.round((stock as any)[fc.key] ?? 0)),
+                      color: colors.textPrimary,
+                      bold: false,
+                    })),
+                    { value: `${Math.round(stock.composite)}%`, color: colors.primary, bold: true },
+                  ].map((cell, ci) => {
+                    const isLast = ci === FACTOR_COLUMNS.length + 2;
+                    return (
+                      <div
+                        key={ci}
+                        style={{
+                          color: cell.color,
+                          fontSize: label,
+                          fontWeight: cell.bold ? 600 : 400,
+                          lineHeight: "1.4",
+                          padding: "8px 6px",
+                          textAlign: ci === 1 ? "left" : "right",
+                          borderBottom: `1px solid ${colors.hairline}`,
+                          background: (stock.rank - 1) % 2 === 0 ? "transparent" : `rgba(255,255,255,0.02)`,
+                          transition: "background 120ms ease",
+                          borderRadius: ci === 0 ? "6px 0 0 6px" : isLast ? "0 6px 6px 0" : "0",
+                          whiteSpace: "nowrap" as const,
+                        }}
+                      >
+                        {cell.value}
+                      </div>
+                    );
+                  })}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
-      </Card>
+        </Card>
+      </div>
 
       {/* AI Detail Panel — appears on row hover */}
       {hoveredStock && (
-        <Card style={{ padding: "16px 20px", background: colors.fill, border: `1px solid ${colors.border}` }}>
+        <div className="raycast-slideUp raycast-stagger-6" style={{
+          padding: "16px 20px",
+          background: "rgba(20,20,24,0.92)",
+          backdropFilter: "blur(20px)",
+          WebkitBackdropFilter: "blur(20px)",
+          border: `1px solid ${colors.hairline}`,
+          borderRadius: radius.md,
+          boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
+        }}>
           <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "12px" }}>
             <Sparkles size={14} color={colors.primary} />
             <span style={{ fontSize: "13px", fontWeight: 600, color: colors.primary }}>
@@ -304,33 +326,18 @@ export default function ScannerPage() {
                     transition: "background 150ms ease",
                   }}
                 >
-                  {/* Factor name */}
                   <span style={{ fontSize: "12px", fontWeight: 600, color: colors.textPrimary, textTransform: "uppercase", letterSpacing: "0.03em" }}>
                     {fc.label}
                   </span>
-
-                  {/* Bar */}
                   <div style={{ height: "6px", background: colors.border, borderRadius: "3px", overflow: "hidden" }}>
-                    <div
-                      style={{
-                        height: "100%",
-                        width: `${value}%`,
-                        background: barColor,
-                        borderRadius: "3px",
-                        transition: "width 300ms ease",
-                      }}
-                    />
+                    <div style={{ height: "100%", width: `${value}%`, background: barColor, borderRadius: "3px", transition: "width 300ms ease" }} />
                   </div>
-
-                  {/* Score + badge */}
                   <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
                     <Icon size={12} color={strengthColor} />
                     <span style={{ fontSize: "11px", fontWeight: 600, color: strengthColor }}>
                       {Math.round(value)}%
                     </span>
                   </div>
-
-                  {/* AI explanation */}
                   <span style={{ fontSize: "11px", color: colors.textSecondary, lineHeight: "1.5" }}>
                     {explanation}
                   </span>
@@ -343,9 +350,9 @@ export default function ScannerPage() {
           <div style={{
             marginTop: "12px",
             padding: "10px 14px",
-            background: colors.bgSecondary,
+            background: "rgba(255,255,255,0.03)",
             borderRadius: radius.md,
-            border: `1px solid ${colors.border}`,
+            border: `1px solid ${colors.hairline}`,
             display: "flex",
             alignItems: "flex-start",
             gap: "8px",
@@ -360,11 +367,11 @@ export default function ScannerPage() {
               </span>
             </span>
           </div>
-        </Card>
+        </div>
       )}
 
       {/* Results summary */}
-      <div style={{ fontSize: "12px", color: colors.textSecondary, textAlign: "center" }}>
+      <div className="raycast-stagger-7" style={{ fontSize: "12px", color: colors.textSecondary, textAlign: "center" }}>
         Showing <strong style={{ color: colors.textPrimary }}>{displayResults.length}</strong> of{" "}
         <strong style={{ color: colors.textPrimary }}>{results.length}</strong> results for{" "}
         <strong style={{ color: colors.primary }}>{activePreset.label}</strong>
