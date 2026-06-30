@@ -14,6 +14,7 @@ const mockEnsureWorker = vi.fn();
 const mockRequestExplanation = vi.fn();
 const mockCompress = vi.fn();
 const mockApplyGuardrails = vi.fn();
+const mockEvaluateAnswerQuality = vi.fn();
 
 vi.mock("./researchAiRuntimeRegistry", () => ({
   isRuntimeAvailable: (...args: unknown[]) => mockIsRuntimeAvailable(...args),
@@ -30,6 +31,10 @@ vi.mock("./researchAiContext", () => ({
 
 vi.mock("./researchAiGuardrails", () => ({
   applyGuardrails: (...args: unknown[]) => mockApplyGuardrails(...args),
+}));
+
+vi.mock("./researchAiQualityGate", () => ({
+  evaluateAnswerQuality: (...args: unknown[]) => mockEvaluateAnswerQuality(...args),
 }));
 
 import { queryBrowserLocalRuntime } from "./queryBrowserLocalRuntime";
@@ -54,6 +59,7 @@ describe("queryBrowserLocalRuntime", () => {
     mockEnsureWorker.mockResolvedValue(undefined);
     mockCompress.mockReturnValue("compressed: Revenue grew.");
     mockApplyGuardrails.mockReturnValue({ allowed: true, sanitized: "Safe output", reason: null });
+    mockEvaluateAnswerQuality.mockReturnValue({ accepted: true, reasons: [], sanitizedAnswer: "Safe output", confidence: "high", fallbackRequired: false });
     mockRequestExplanation.mockResolvedValue({ ok: true, text: "Safe output" });
   });
 
@@ -145,6 +151,7 @@ describe("lazy-init and error handling (fresh module state)", () => {
     mockEnsureWorker.mockResolvedValue(undefined);
     mockCompress.mockReturnValue("compressed: Revenue grew.");
     mockApplyGuardrails.mockReturnValue({ allowed: true, sanitized: "Safe output", reason: null });
+    mockEvaluateAnswerQuality.mockReturnValue({ accepted: true, reasons: [], sanitizedAnswer: "Safe output", confidence: "high", fallbackRequired: false });
     mockRequestExplanation.mockResolvedValue({ ok: true, text: "Safe output" });
   });
 
