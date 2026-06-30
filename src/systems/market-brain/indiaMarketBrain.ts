@@ -1,3 +1,4 @@
+import { mergeEvidenceWithAdapterState, type MarketBrainAdapterEvidenceState } from './adapterEvidenceState';
 import { buildMarketAnomalyEvidencePack, type MarketAnomalyEvidencePack, type MarketAnomalyInput } from './anomalyEvidencePack';
 import { normalizeEvidenceCoverage } from './evidenceNormalization';
 import {
@@ -58,6 +59,7 @@ export interface IndiaEquityPacket {
   technicals?: IndiaEquityTechnicals;
   ownership?: IndiaEquityOwnership;
   evidence?: Partial<Record<MarketDataDomain, EvidenceState>>;
+  adapterEvidenceState?: MarketBrainAdapterEvidenceState | null;
   anomaly?: MarketAnomalyInput | null;
   historicalSimilarity?: HistoricalSimilarityInput | null;
 }
@@ -274,7 +276,9 @@ export function evaluateIndiaEquity(packet: IndiaEquityPacket): IndiaMarketBrain
   const momentum = scoreMomentum(packet.technicals);
   const risk = scoreRisk(packet.fundamentals, packet.technicals, packet.ownership);
   const ownership = scoreOwnership(packet.ownership);
-  const evidenceCoverage = normalizeEvidenceCoverage(packet.evidence);
+  const evidenceCoverage = normalizeEvidenceCoverage(
+    mergeEvidenceWithAdapterState(packet.evidence, packet.adapterEvidenceState),
+  );
   const missing = evidenceCoverage.missing;
   const partial = evidenceCoverage.partial;
   const anomalyReview = packet.anomaly ? buildMarketAnomalyEvidencePack(packet.anomaly) : null;
