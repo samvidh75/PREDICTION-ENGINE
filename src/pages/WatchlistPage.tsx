@@ -8,6 +8,7 @@ import { ConvictionBadge } from "../ui/ConvictionBadge";
 import { colors, typography, space, radius, media } from "../design/tokens";
 import { SEBIComplianceBanner } from "../components/SEBICompliance";
 import { AnalystBriefCard } from "../components/analyst/AnalystBriefCard";
+import { ThesisChangeResearchPanel } from "../components/watchlist/ThesisChangeResearchPanel";
 import { watchlistReviewBriefGenerator } from "../stockstory/analyst/watchlist/WatchlistReviewBriefGenerator";
 import type { WatchlistThesisView } from "../research/contracts/productContracts";
 import type { WatchlistIntelligence } from "../services/personalization/WatchlistIntelligenceEngine";
@@ -40,6 +41,19 @@ function sortWatchlist(items: WatchlistThesisView[]): WatchlistThesisView[] {
   });
 }
 
+function mergeThesisChangeItems(intel: WatchlistIntelligence | null): WatchlistThesisView[] {
+  if (!intel) return [];
+  const merged = [...(intel.needsReview ?? []), ...(intel.changedItems ?? [])];
+  const seen = new Set<string>();
+
+  return merged.filter((item) => {
+    const key = item.symbol || `${item.companyName}-${item.currentStatus}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
 const WATCHLIST_TICKERS = [
   "HDFCBANK", "TCS", "INFY", "RELIANCE", "ICICIBANK",
   "LT", "BHARTIARTL", "ITC", "SBIN", "AXISBANK",
@@ -61,11 +75,11 @@ export default function WatchlistPage() {
       const res = await fetch("/api/watchlist-intelligence", {
         headers: { Authorization: `Bearer ${localStorage.getItem("auth_token") ?? ""}` },
       });
-      if (!res.ok) throw new Error(`Server error: ${res.status}`);
+      if (!res.ok) throw new Error("Unable to load watchlist intelligence");
       const data = await res.json();
       setIntel(data);
-    } catch (err: any) {
-      setError(err.message ?? "Failed to load watchlist intelligence");
+    } catch {
+      setError("Unable to load watchlist intelligence right now.");
     } finally {
       setLoading(false);
     }
@@ -76,11 +90,31 @@ export default function WatchlistPage() {
     [intel],
   );
 
+  const thesisChangeItems = useMemo(
+    () => mergeThesisChangeItems(intel),
+    [intel],
+  );
+
   const needsReviewCount = intel?.needsReview?.length ?? 0;
   const changedCount = intel?.changedItems?.length ?? 0;
 
   const handleResearch = (symbol: string) => {
     recordAction("thesis_check", symbol);
+    navigate(`/stock/${symbol}`);
+  };
+
+  const handleCompare = (symbol: string) => {
+    recordAction("compare_open", symbol);
+    navigate(`/compare?symbols=${encodeURIComponent(symbol)}`);
+  };
+
+  const handleTrack = (symbol: string) => {
+    recordAction("watchlist_review", symbol);
+    navigate(`/stock/${symbol}`);
+  };
+
+  const handleInvestReview = (symbol: string) => {
+    recordAction("invest_review", symbol);
     navigate(`/stock/${symbol}`);
   };
 
@@ -223,6 +257,16 @@ export default function WatchlistPage() {
         </div>
       )}
 
+      {intel && (
+        <ThesisChangeResearchPanel
+          items={thesisChangeItems}
+          onResearch={handleResearch}
+          onCompare={handleCompare}
+          onTrack={handleTrack}
+          onInvest={handleInvestReview}
+        />
+      )}
+
       {/* Error state */}
       {error && (
         <Card>
@@ -253,7 +297,7 @@ export default function WatchlistPage() {
                 Start tracking your thesis
               </h2>
               <p style={{ color: colors.textSecondary, margin: 0, fontSize: 13, lineHeight: 1.6 }}>
-                Add stocks to your track list and we'll monitor their fundamentals, surface conviction changes, 
+                Add stocks to your track list and we'll monitor their fundamentals, surface conviction changes,
                 and tell you when it's time to review your thesis.
               </p>
             </div>
