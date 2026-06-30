@@ -58,7 +58,9 @@ export const ResearchAiChatPanel: React.FC<ResearchAiChatPanelProps> = ({
 
   // Auto-scroll
   useEffect(() => {
-    listEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (typeof listEndRef.current?.scrollIntoView === "function") {
+      listEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
   }, [messages, processing]);
 
   // Focus input when not processing

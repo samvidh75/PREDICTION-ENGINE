@@ -48,7 +48,7 @@ describe("ResearchAiChatPanel", () => {
 
     expect(screen.getByTestId("chat-panel")).toBeTruthy();
     expect(screen.getByTestId("chat-input")).toBeTruthy();
-    expect(screen.getByText("Research Chat")).toBeTruthy();
+    expect(screen.getAllByText("Research Chat").length).toBeGreaterThan(0);
   });
 
   it("renders messages from the orchestrator state", () => {

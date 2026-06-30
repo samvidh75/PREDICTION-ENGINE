@@ -354,7 +354,11 @@ export function buildAlertContext(
     companyName: context?.companyName ?? sanitizeText(companyName) ?? symbol.trim().toUpperCase(),
     narrative:
       context?.alertContext ??
-      sanitizeArray([data.change, data.summary, data.description]) ??
+      sanitizeArray([
+        data.change,
+        ...(Array.isArray(data.summary) ? data.summary : [data.summary]),
+        data.description,
+      ]) ??
       [],
     risksToReview: context?.risksToReview ?? sanitizeArray(data.risksToReview ?? data.risks) ?? [],
     whatToWatch: context?.whatToWatch ?? sanitizeArray(data.whatToWatch ?? data.nextSteps) ?? [],

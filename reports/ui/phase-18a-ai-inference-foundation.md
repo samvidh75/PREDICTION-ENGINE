@@ -199,3 +199,96 @@
 - No force-push was used
 - Local AI remains explanation-only and not a source of truth
 - No public backend/provider/model wording was introduced in the reconciled Stock detail explanation UI
+
+## Phase 18A-R3 Rebase and Targeted Test Fix
+
+- Starting state after R2 fetch drift: local `main` moved from `ahead 1, behind 2` to `ahead 1, behind 4` after `origin/main` advanced again during reconciliation.
+- New remote commits found during R3:
+  - `488172995` `Trigger Render and Vercel redeploy`
+  - `4d529b04c` `Fix Docker Smoke CI healthz/readyz assertions and port mapping`
+  - `26a19be90` `Harden research AI context safe copy filtering`
+  - `71f556d99` `Test research AI context safe copy filtering`
+- Safety backup created before rebase: `backup/phase18a-r3-before-rebase-20260630-201156`
+- Rebased Phase 18A onto latest `origin/main`.
+- Rebase conflicts were limited to:
+  - `src/components/ai-orchestrator/researchAiContext.ts`
+  - `src/components/ai-orchestrator/researchAiContext.test.ts`
+- Kept the newer upstream safe-copy filtering while preserving the Phase 18A deterministic-first context model and compatibility helpers.
+- Fixed targeted `ai-orchestrator` failures by:
+  - stabilizing `ResearchAiChatPanel` for test/runtime environments with a guarded `scrollIntoView`
+  - aligning `ResearchAiChatPanel.test.tsx` with the current component contract
+  - keeping alert/body fallback wiring intact in `researchAiContext.ts`
+- Fixed targeted `StockDetail` failure by updating `src/pages/__tests__/StockDetailPage.test.tsx` to use a current stock-page payload fixture and mock unrelated browser-only widgets.
+- Fixed the follow-on full-suite regression in `src/components/alerts/researchAlertViewModel.ts` so watchlist research alerts preserve safe alert body copy and category mapping.
+- Phase 18B was not started.
+- No force-push was used.
+- No generated build output was committed.
+
+## Phase 18A-R3 final state
+
+- Final local commit hash before push: `b4fea3f29`
+- Branch state before final commit step: `main...origin/main [ahead 1]`
+
+## Phase 18A-R3 verification
+
+- `npm run typecheck:all`: passed
+- `npm run lint`: passed
+- `npm run validate:hygiene`: passed with one pre-existing warning in `src/stockstory/intelligence/__tests__/DeepIntegration.test.ts`
+- `npm run build:frontend`: passed
+- `npm run build:backend`: passed
+- `npm test -- ai-orchestrator -- --runInBand`: passed
+- `npm test -- StockDetail -- --runInBand`: passed
+- `npm test -- WatchlistPage -- --runInBand`: passed
+- `npm run test:unit`: passed (`209` files, `2044` tests passed, `7` skipped)
+
+## Phase 18A-R3 confirmations
+
+- Backend untouched confirmation: yes; no backend logic was changed in this pass
+- Local AI not official scoring source confirmation: yes
+- No fake data confirmation: yes outside test fixtures
+- No secrets confirmation: yes
+- No broker execution confirmation: yes
+- No recommendation language confirmation: yes in the reconciled public-facing explanation copy
+- No public backend/provider/model leakage confirmation: yes in the reconciled public-facing explanation and alert copy
+
+## Phase 18A-R4 Final Moving-Remote Rebase
+
+- Starting state after R3: local `ahead 2, behind 2`.
+- New remote commits found:
+  - `a146e927c` `Fix research AI context test call`
+  - `56ac32dfa` `Document research AI context safe copy hardening`
+- Backup branch created before rebase: `backup/phase18a-r4-before-final-rebase-20260630-202707`
+- Rebased local Phase 18A commits onto latest `origin/main`.
+- Preserved upstream safe-copy hardening.
+- Preserved Phase 18A deterministic explanation foundation.
+- Phase 18B was not started.
+- No force-push used.
+- No generated build output committed.
+
+## Phase 18A-R4 final commits
+
+- `4b3fae975` `Add deterministic AI explanation foundation`
+- `0a0557932` `Stabilize Phase 18A AI explanation tests`
+
+## Phase 18A-R4 verification
+
+- `npm run typecheck:all`: passed
+- `npm run lint`: passed
+- `npm run validate:hygiene`: passed with one pre-existing warning in `src/stockstory/intelligence/__tests__/DeepIntegration.test.ts`
+- `npm run build:frontend`: passed
+- `npm run build:backend`: passed
+- `npm test -- ai-orchestrator -- --runInBand`: passed
+- `npm test -- StockDetail -- --runInBand`: passed
+- `npm run test:unit`: passed (`209` files, `2044` tests passed, `7` skipped)
+- Generated artifact cleanup result: no tracked `dist/public` changes remained after verification
+
+## Phase 18A-R4 confirmations
+
+- Backend untouched confirmation: yes
+- Local AI not official scoring source confirmation: yes
+- Official scores remain deterministic confirmation: yes
+- No fake data confirmation: yes outside test fixtures
+- No secrets confirmation: yes
+- No broker execution confirmation: yes
+- No recommendation language confirmation: yes in public-facing explanation and alert copy
+- No public backend/provider/model leakage confirmation: yes
