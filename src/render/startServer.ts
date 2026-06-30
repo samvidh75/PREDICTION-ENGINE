@@ -160,19 +160,29 @@ async function bootstrap() {
   server.get("/healthz", async () => {
     try {
       await dbAdapter.query("SELECT 1");
-      return { status: "ok", db: "connected" };
+      return { ok: true, status: "ok", db: "connected" };
     } catch {
-      return { status: "degraded", db: "unavailable" };
+      return { ok: false, status: "degraded", db: "unavailable" };
     }
   });
 
   server.get("/readyz", async (_req, rep) => {
     try {
       await dbAdapter.query("SELECT 1");
-      return { status: "ok", db: "connected" };
+      const diag = dbAdapter.diagnostics();
+      return {
+        ok: true,
+        status: "ok",
+        database: { kind: diag.kind, fallbackUsed: diag.fallbackUsed },
+      };
     } catch (err) {
       rep.status(503);
-      return { status: "not_ready", db: "unavailable", error: String(err) };
+      return {
+        ok: false,
+        status: "not_ready",
+        database: { kind: "unavailable" as const, fallbackUsed: false },
+        error: String(err),
+      };
     }
   });
 

@@ -70,6 +70,7 @@ jobs:
             -e PROVIDER_BROKER_SINGLE_INSTANCE_ALLOWED=true \
             -e RATE_LIMIT_REDIS_REQUIRED=false \
             -e RATE_LIMIT_SINGLE_INSTANCE_ALLOWED=true \
+            -e PORT=4001 \
             stockstory-api:test
 
       - name: Wait for /healthz (liveness)
