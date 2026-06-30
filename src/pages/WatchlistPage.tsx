@@ -8,9 +8,11 @@ import { ConvictionBadge } from "../ui/ConvictionBadge";
 import { colors, typography, space, radius, media } from "../design/tokens";
 import { AnalystBriefCard } from "../components/analyst/AnalystBriefCard";
 import { ResearchAlertsPanel } from "../components/alerts/ResearchAlertsPanel";
+import { ResearchAiExplanationPanel, buildAlertContext, buildWatchlistContext } from "../components/ai-orchestrator";
+import type { ResearchAiContext } from "../components/ai-orchestrator";
 import { ThesisChangeResearchPanel } from "../components/watchlist/ThesisChangeResearchPanel";
 import { watchlistReviewBriefGenerator } from "../stockstory/analyst/watchlist/WatchlistReviewBriefGenerator";
-import type { WatchlistThesisView } from "../research/contracts/productContracts";
+import type { AlertChangeView, WatchlistThesisView } from "../research/contracts/productContracts";
 import type { WatchlistIntelligence } from "../services/personalization/WatchlistIntelligenceEngine";
 import { recordAction } from "../services/personalization/UserActionMemory";
 
@@ -54,6 +56,61 @@ function mergeThesisChangeItems(intel: WatchlistIntelligence | null): WatchlistT
   });
 }
 
+function uniqueCompact(values: Array<string | null | undefined>, max = 5): string[] {
+  const seen = new Set<string>();
+  const result: string[] = [];
+  for (const value of values) {
+    const text = value?.trim();
+    if (!text) continue;
+    const key = text.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    result.push(text);
+    if (result.length >= max) break;
+  }
+  return result;
+}
+
+function buildWatchlistAiExplanationContext(
+  intel: WatchlistIntelligence | null,
+  thesisChangeItems: WatchlistThesisView[],
+): ResearchAiContext | null {
+  if (!intel) return null;
+
+  const thesisContexts = thesisChangeItems
+    .map((item) => buildWatchlistContext(item.symbol, item.companyName, item))
+    .filter((context): context is ResearchAiContext => Boolean(context));
+  const alertContexts = (intel.alerts ?? [])
+    .map((alert: AlertChangeView) => buildAlertContext(alert.symbol, alert.symbol, alert))
+    .filter((context): context is ResearchAiContext => Boolean(context));
+  const primary = thesisContexts[0] ?? alertContexts[0] ?? null;
+  if (!primary) return null;
+
+  const watchlistContext = uniqueCompact(thesisContexts.flatMap((context) => context.watchlistContext ?? context.narrative ?? []));
+  const alertContext = uniqueCompact(alertContexts.flatMap((context) => context.alertContext ?? context.narrative ?? []));
+  const whatChanged = uniqueCompact(
+    thesisChangeItems.map((item) => `${item.symbol}: ${item.currentStatus}`),
+  );
+
+  return {
+    ...primary,
+    surface: "watchlist",
+    title: "Watchlist research explanation",
+    narrative: uniqueCompact([...watchlistContext, ...alertContext]),
+    watchlistContext,
+    alertContext,
+    whatChanged,
+    risksToReview: uniqueCompact([
+      ...thesisContexts.flatMap((context) => context.risksToReview ?? []),
+      ...alertContexts.flatMap((context) => context.risksToReview ?? []),
+    ]),
+    whatToWatch: uniqueCompact([
+      ...thesisContexts.flatMap((context) => context.whatToWatch ?? []),
+      ...alertContexts.flatMap((context) => context.whatToWatch ?? []),
+    ]),
+  };
+}
+
 const WATCHLIST_TICKERS = [
   "HDFCBANK", "TCS", "INFY", "RELIANCE", "ICICIBANK",
   "LT", "BHARTIARTL", "ITC", "SBIN", "AXISBANK",
@@ -93,6 +150,11 @@ export default function WatchlistPage() {
   const thesisChangeItems = useMemo(
     () => mergeThesisChangeItems(intel),
     [intel],
+  );
+
+  const watchlistAiContext = useMemo(
+    () => buildWatchlistAiExplanationContext(intel, thesisChangeItems),
+    [intel, thesisChangeItems],
   );
 
   const needsReviewCount = intel?.needsReview?.length ?? 0;
@@ -279,6 +341,8 @@ export default function WatchlistPage() {
           onInvest={handleInvestReview}
         />
       )}
+
+      {watchlistAiContext && <ResearchAiExplanationPanel context={watchlistAiContext} />}
 
       {/* Error state */}
       {error && (
