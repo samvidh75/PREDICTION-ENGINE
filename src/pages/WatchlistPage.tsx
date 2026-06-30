@@ -10,6 +10,7 @@ import { AnalystBriefCard } from "../components/analyst/AnalystBriefCard";
 import { ResearchAlertsPanel } from "../components/alerts/ResearchAlertsPanel";
 import { ResearchAiExplanationPanel, buildAlertContext, buildWatchlistContext } from "../components/ai-orchestrator";
 import type { ResearchAiContext } from "../components/ai-orchestrator";
+import { ResearchAiSurfaceTrigger } from "../components/ResearchAiSurfaceTrigger";
 import { ThesisChangeResearchPanel } from "../components/watchlist/ThesisChangeResearchPanel";
 import { watchlistReviewBriefGenerator } from "../stockstory/analyst/watchlist/WatchlistReviewBriefGenerator";
 import type { AlertChangeView, WatchlistThesisView } from "../research/contracts/productContracts";
@@ -194,7 +195,10 @@ export default function WatchlistPage() {
             Monitor your thesis and stay ahead of changes.
           </p>
         </div>
-        <div style={{ display: "flex", gap: space[3] }}>
+        <div style={{ display: "flex", gap: space[3], alignItems: "center" }}>
+          {watchlistAiContext && (
+            <ResearchAiSurfaceTrigger context={watchlistAiContext} variant="badge" label="AI Summary" />
+          )}
           <Button variant="secondary" onClick={() => setShowAddModal(true)}>
             <Plus size={14} style={{ marginRight: "4px" }} />
             Add Stock
