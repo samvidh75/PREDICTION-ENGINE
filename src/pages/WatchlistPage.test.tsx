@@ -5,6 +5,7 @@ import type { WatchlistIntelligence } from '../services/personalization/Watchlis
 
 const mockNavigate = vi.hoisted(() => vi.fn());
 const mockRecordAction = vi.hoisted(() => vi.fn());
+const unsafePublicCopy = /provider|transport|narrativePromptPayload|guaranteed|sure shot|multibagger/i;
 
 vi.mock('react-router-dom', () => ({
   useNavigate: () => mockNavigate,
@@ -60,6 +61,21 @@ const watchlistIntel: WatchlistIntelligence = {
   generatedAt: '2026-06-30T09:15:00.000Z',
 };
 
+const watchlistIntelWithAlerts: WatchlistIntelligence = {
+  ...watchlistIntel,
+  alerts: [
+    {
+      id: 'RELIANCE-risk-change-test',
+      symbol: 'RELIANCE',
+      type: 'risk_change',
+      title: 'RELIANCE thesis needs review',
+      body: 'Margin pressure should be reviewed before the next thesis update.',
+      timestamp: '2026-06-30T09:10:00.000Z',
+      acknowledged: false,
+    },
+  ],
+};
+
 function mockWatchlistFetch(payload: WatchlistIntelligence = watchlistIntel) {
   vi.stubGlobal(
     'fetch',
@@ -96,7 +112,45 @@ describe('WatchlistPage thesis change integration', () => {
     expect(screen.getByText('2 thesis changes')).toBeTruthy();
 
     const renderedText = document.body.textContent ?? '';
-    expect(renderedText).not.toMatch(/provider|backend|narrativePromptPayload|Strong Buy|sure shot|guaranteed|multibagger/i);
+    expect(renderedText).not.toMatch(unsafePublicCopy);
+  });
+
+  it('renders research alerts from watchlist intelligence safely', async () => {
+    mockWatchlistFetch(watchlistIntelWithAlerts);
+
+    render(<WatchlistPage />);
+
+    fireEvent.click(screen.getByText('Load Tracked Stocks'));
+
+    await waitFor(() => {
+      expect(screen.getByText('Important changes to review')).toBeTruthy();
+    });
+
+    expect(screen.getByText('1 research alert')).toBeTruthy();
+    expect(screen.getByText('RELIANCE thesis needs review')).toBeTruthy();
+    expect(screen.getByText('Margin pressure should be reviewed before the next thesis update.')).toBeTruthy();
+    expect(screen.getByText('Risk changed')).toBeTruthy();
+
+    const renderedText = document.body.textContent ?? '';
+    expect(renderedText).not.toMatch(unsafePublicCopy);
+  });
+
+  it('records safe handoff intent when research alert actions are used', async () => {
+    mockWatchlistFetch(watchlistIntelWithAlerts);
+
+    render(<WatchlistPage />);
+
+    fireEvent.click(screen.getByText('Load Tracked Stocks'));
+
+    await waitFor(() => {
+      expect(screen.getByText('Important changes to review')).toBeTruthy();
+    });
+
+    const compareButtons = screen.getAllByText('Compare');
+    fireEvent.click(compareButtons[compareButtons.length - 1]);
+
+    expect(mockRecordAction).toHaveBeenCalledWith('compare_open', 'RELIANCE');
+    expect(mockNavigate).toHaveBeenCalledWith('/compare?symbols=RELIANCE');
   });
 
   it('records safe handoff intent when panel actions are used', async () => {
@@ -134,6 +188,6 @@ describe('WatchlistPage thesis change integration', () => {
     });
 
     const renderedText = document.body.textContent ?? '';
-    expect(renderedText).not.toMatch(/status|provider|backend|API|diagnostics/i);
+    expect(renderedText).not.toMatch(/status|provider|transport|diagnostics/i);
   });
 });
