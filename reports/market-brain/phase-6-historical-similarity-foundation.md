@@ -29,6 +29,8 @@ No adapter was marked complete in this phase.
 ## Files updated
 
 - `src/systems/market-brain/index.ts`
+- `src/systems/market-brain/indiaMarketBrain.ts`
+- `src/systems/market-brain/indiaMarketBrain.test.ts`
 
 ## Result
 
@@ -43,6 +45,18 @@ Added `buildHistoricalSimilaritySummary`, which:
 - returns fresh arrays
 - rejects unsafe public copy
 - avoids provider, backend, diagnostic, and recommendation wording
+
+## Market Brain wiring
+
+`evaluateIndiaEquity` now accepts optional `historicalSimilarity` input and returns `historicalSimilarityReview` as research context.
+
+The wiring keeps the historical view separate from core evidence coverage:
+
+- undersized samples do not mark required evidence domains as missing
+- usable samples add only neutral research-context thesis copy
+- undersized samples add review limitations, not recommendations
+- watch items stay product-facing and do not expose data plumbing
+- the module still does not fetch records or call an LLM
 
 ## Safety rules preserved
 
@@ -67,6 +81,9 @@ Added unit tests covering:
 - malformed symbol review state
 - fresh array returns
 - unsafe copy prevention
+- Market Brain usable historical-context wiring
+- Market Brain undersized-sample handling
+- Market Brain separation from core evidence domains
 
 Connector runtime cannot execute local npm commands. Full verification remains:
 
@@ -83,8 +100,11 @@ Targeted verification remains:
 
 ```bash
 npm test -- historicalSimilarity
+npm test -- indiaMarketBrain
 ```
+
+GitHub commit status for the latest change shows Vercel pending and no workflow runs returned by the connector.
 
 ## Next remaining task
 
-Run local or CI verification. Then wire the historical similarity summary into Market Brain only as optional research context, keeping the same minimum-sample and frontend-safe copy constraints.
+Run full local or CI verification. Then expose a normalized historical-similarity public DTO through `marketBrainResearch` only if sample-size safeguards and frontend-safe copy can be preserved.
