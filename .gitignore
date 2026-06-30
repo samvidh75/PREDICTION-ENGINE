@@ -1,3 +1,6 @@
+# Temporary files
+.tmp/
+
 # Dependencies
 node_modules/
 
