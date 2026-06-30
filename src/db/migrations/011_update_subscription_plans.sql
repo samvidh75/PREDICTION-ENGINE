@@ -2,6 +2,11 @@
 -- Renames existing plans to match Free / Research Plus / Research Pro naming
 -- Adds price_monthly_inr constraints and improves the user_subscriptions table
 
+-- Expand tier check constraint to include the new 'plus' value
+ALTER TABLE subscription_plans DROP CONSTRAINT IF EXISTS subscription_plans_tier_check;
+ALTER TABLE subscription_plans ADD CONSTRAINT subscription_plans_tier_check
+  CHECK (tier IN ('free', 'investor', 'pro', 'professional', 'plus'));
+
 -- Update existing plans to new naming
 UPDATE subscription_plans SET name = 'Free' WHERE id = 'plan_free';
 
