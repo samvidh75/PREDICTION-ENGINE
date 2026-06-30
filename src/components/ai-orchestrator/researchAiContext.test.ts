@@ -54,7 +54,7 @@ describe('buildStockResearchContext', () => {
   });
 
   it('trims and uppercases the symbol', () => {
-    const ctx = buildStockResearchContext('  tech  ', 'X', stockData());
+    const ctx = buildStockResearchContext('stock-detail', '  tech  ', 'X', stockData());
     expect(ctx!.symbol).toBe('TECH');
   });
 
@@ -158,7 +158,7 @@ describe('buildCompareContext', () => {
 /* ── buildWatchlistContext ───────────────────────────────────── */
 
 describe('buildWatchlistContext', () => {
-  it('builds a watchlist context with therapist data', () => {
+  it('builds a watchlist context with thesis data', () => {
     const ctx = buildWatchlistContext('WATCH', 'WatchInc', {
       thesis: 'Strong moat in niche market.',
       bullCase: 'Market share gains expected.',
