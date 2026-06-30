@@ -52,9 +52,9 @@ function supportsWorkers(): boolean {
 function hasClientAICapability(): boolean {
   if (!('navigator' in globalThis)) return false;
   // Check for WebNN API
-  if (typeof (navigator as Record<string, unknown>).ml !== 'undefined') return true;
+  if (typeof (navigator as unknown as Record<string, unknown>).ml !== 'undefined') return true;
   // Check for WebGPU
-  if (typeof (navigator as Record<string, unknown>).gpu !== 'undefined') return true;
+  if (typeof (navigator as unknown as Record<string, unknown>).gpu !== 'undefined') return true;
   return false;
 }
 
