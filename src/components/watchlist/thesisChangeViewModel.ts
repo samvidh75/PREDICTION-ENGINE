@@ -76,6 +76,13 @@ function inferState(input: Record<string, unknown>, risksToReview: string[], sum
   if (explicit.includes('improv')) return 'thesis_improving';
   if (explicit.includes('unchanged') || explicit.includes('stable')) return 'unchanged';
 
+  const currentStatus = safeString(input.currentStatus).toLowerCase();
+  if (currentStatus.includes('needs') && currentStatus.includes('review')) return 'needs_review';
+  if (currentStatus.includes('weakening')) return 'risk_rising';
+  if (currentStatus.includes('strengthening')) return 'thesis_improving';
+  if (currentStatus.includes('stable')) return 'unchanged';
+  if (currentStatus.includes('tracking') || currentStatus.includes('pending')) return 'tracking_only';
+
   if ((booleanFlag(input.needsReview) || booleanFlag(input.needs_review)) && risksToReview.length > 0) return 'needs_review';
 
   const text = [...summary, ...risksToReview, ...whatToWatch, safeString(input.headline)].join(' ').toLowerCase();
@@ -101,6 +108,7 @@ export function toThesisChangeCardViewModel(input: unknown): ThesisChangeCardVie
     input.thesis,
     input.thesisSummary,
     input.evidenceSummary,
+    input.lastThesis,
     nestedResearch.summary,
     nestedResearch.thesis,
     nestedMove.summary,
