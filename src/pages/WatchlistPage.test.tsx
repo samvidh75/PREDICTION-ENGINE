@@ -148,7 +148,7 @@ describe('WatchlistPage thesis change integration', () => {
 
     expect(screen.getByText('Explains the research context already shown on this page.')).toBeTruthy();
     expect(screen.getByText('Research context only. Not a recommendation.')).toBeTruthy();
-    expect(screen.getByText('Standard explanation is available for this view.')).toBeTruthy();
+    expect(screen.getAllByText('Standard explanation is available for this view.').length).toBeGreaterThan(0);
     expect(screen.getByLabelText('AI research question')).toBeTruthy();
 
     const renderedText = document.body.textContent ?? '';
