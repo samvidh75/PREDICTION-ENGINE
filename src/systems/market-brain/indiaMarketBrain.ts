@@ -1,5 +1,10 @@
 import { buildMarketAnomalyEvidencePack, type MarketAnomalyEvidencePack, type MarketAnomalyInput } from './anomalyEvidencePack';
 import { normalizeEvidenceCoverage } from './evidenceNormalization';
+import {
+  buildHistoricalSimilaritySummary,
+  type HistoricalSimilarityInput,
+  type HistoricalSimilaritySummary,
+} from './historicalSimilarity';
 import type {
   MARKET_BRAIN_ALLOWED_STATES,
   MARKET_BRAIN_EVIDENCE_DOMAINS,
@@ -54,6 +59,7 @@ export interface IndiaEquityPacket {
   ownership?: IndiaEquityOwnership;
   evidence?: Partial<Record<MarketDataDomain, EvidenceState>>;
   anomaly?: MarketAnomalyInput | null;
+  historicalSimilarity?: HistoricalSimilarityInput | null;
 }
 
 export interface FactorScore {
@@ -78,6 +84,7 @@ export interface IndiaMarketBrainResult {
   risksToReview: string[];
   whatToWatch: string[];
   anomalyReview: MarketAnomalyEvidencePack | null;
+  historicalSimilarityReview: HistoricalSimilaritySummary | null;
   missingEvidence: MarketDataDomain[];
   partialEvidence: MarketDataDomain[];
   complianceNote: string;
@@ -123,6 +130,25 @@ function anomalyWatchItems(review: MarketAnomalyEvidencePack | null): string[] {
   const items = ['Whether the market event persists or fades after more evidence.'];
   if (review.missingEvidence.length > 0) {
     items.push('Whether missing market context becomes available before drawing stronger conclusions.');
+  }
+  return items;
+}
+
+function historicalSimilarityThesis(review: HistoricalSimilaritySummary | null): string[] {
+  if (!review || !review.usable) return [];
+  return ['Similar historical cases are available as research context.'];
+}
+
+function historicalSimilarityRisks(review: HistoricalSimilaritySummary | null): string[] {
+  if (!review || review.usable) return [];
+  return review.limitations.slice(0, 2);
+}
+
+function historicalSimilarityWatchItems(review: HistoricalSimilaritySummary | null): string[] {
+  if (!review) return [];
+  const items = ['Whether the historical context remains relevant as fresh evidence changes.'];
+  if (!review.usable) {
+    items.push('Whether enough comparable historical cases become available for this view.');
   }
   return items;
 }
@@ -252,6 +278,9 @@ export function evaluateIndiaEquity(packet: IndiaEquityPacket): IndiaMarketBrain
   const missing = evidenceCoverage.missing;
   const partial = evidenceCoverage.partial;
   const anomalyReview = packet.anomaly ? buildMarketAnomalyEvidencePack(packet.anomaly) : null;
+  const historicalSimilarityReview = packet.historicalSimilarity
+    ? buildHistoricalSimilaritySummary(packet.historicalSimilarity)
+    : null;
 
   const convictionScore = average([
     { score: quality.score, weight: 2 },
@@ -263,8 +292,27 @@ export function evaluateIndiaEquity(packet: IndiaEquityPacket): IndiaMarketBrain
     { score: 100 - risk.score, weight: 2 },
   ]);
 
-  const thesis = unique([quality.drivers, growth.drivers, valuation.drivers, stability.drivers, momentum.drivers, ownership.drivers, anomalyThesis(anomalyReview)]);
-  const risksToReview = unique([quality.risks, growth.risks, valuation.risks, stability.risks, momentum.risks, risk.risks, ownership.risks, anomalyRisks(anomalyReview)]);
+  const thesis = unique([
+    quality.drivers,
+    growth.drivers,
+    valuation.drivers,
+    stability.drivers,
+    momentum.drivers,
+    ownership.drivers,
+    anomalyThesis(anomalyReview),
+    historicalSimilarityThesis(historicalSimilarityReview),
+  ]);
+  const risksToReview = unique([
+    quality.risks,
+    growth.risks,
+    valuation.risks,
+    stability.risks,
+    momentum.risks,
+    risk.risks,
+    ownership.risks,
+    anomalyRisks(anomalyReview),
+    historicalSimilarityRisks(historicalSimilarityReview),
+  ]);
 
   return {
     symbol: normalizeSymbol(packet.symbol),
@@ -286,8 +334,10 @@ export function evaluateIndiaEquity(packet: IndiaEquityPacket): IndiaMarketBrain
       'Risk changes from leverage, volatility, pledge, or adverse events.',
       'Whether the original thesis improves or weakens after new evidence.',
       ...anomalyWatchItems(anomalyReview),
+      ...historicalSimilarityWatchItems(historicalSimilarityReview),
     ],
     anomalyReview,
+    historicalSimilarityReview,
     missingEvidence: missing,
     partialEvidence: partial,
     complianceNote: 'Research-only output.',
