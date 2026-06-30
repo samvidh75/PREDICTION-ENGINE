@@ -6,8 +6,10 @@
 // never invent facts, and never produce recommendation or backend-plumbing copy.
 
 import { assertMarketBrainCopyIsCompliant } from './marketBrainGuardrails';
+import type { NarrativeModelInput, NarrativeModelProvider, NarrativeModelResult } from './narrativeModelProvider';
+import { applyGuardrails } from './narrativeOutputGuardrails';
 
-export type SafeNarrativeExplainerMode = 'deterministic_fallback' | 'llm_ready_contract';
+export type SafeNarrativeExplainerMode = 'deterministic_fallback' | 'llm_ready_contract' | 'provider_enriched';
 
 export interface SafeNarrativeExplainerInput {
   symbol: string;
@@ -158,5 +160,76 @@ export function buildSafeNarrativeExplanation(
     evidenceToReview: [...result.evidenceToReview],
     risksToReview: [...result.risksToReview],
     whatToWatch: [...result.whatToWatch],
+  };
+}
+
+// ── Phase 15: Optional provider enrichment ─────────────────────────────
+
+/**
+ * Evidence bundle for the enrichment provider.
+ */
+export interface ProviderEnrichmentInput {
+  symbol: string;
+  narrative: string;
+  evidenceLines: string[];
+}
+
+/**
+ * Result of provider enrichment.
+ * If ok is false, callers SHOULD fall back to the deterministic result.
+ */
+export interface ProviderEnrichmentResult {
+  ok: boolean;
+  content?: string;
+  reason?: string;
+}
+
+const MAX_ENRICHMENT_CHARS = 2_000;
+
+/**
+ * Build a safe narrative explanation, optionally enriched by a model provider.
+ *
+ * Deterministic result is always computed first. If a provider is provided,
+ * enabled, and returns clean output, the enrichment is appended to the
+ * explanation array. Otherwise the deterministic result is returned as-is.
+ */
+export async function buildSafeNarrativeExplanationWithProvider(
+  input: SafeNarrativeExplainerInput,
+  provider?: NarrativeModelProvider,
+): Promise<SafeNarrativeExplainerResult> {
+  const deterministic = buildSafeNarrativeExplanation(input);
+
+  if (!provider || !provider.isEnabled()) {
+    return deterministic;
+  }
+
+  const enrichmentInput: NarrativeModelInput = {
+    symbol: deterministic.symbol,
+    narrative: deterministic.explanation.join(' '),
+    context: deterministic.evidenceToReview,
+  };
+
+  let modelResult: NarrativeModelResult;
+  try {
+    modelResult = await provider.explain(enrichmentInput);
+  } catch {
+    // Provider threw unexpectedly — safe deterministic fallback
+    return deterministic;
+  }
+
+  if (!modelResult.ok || !modelResult.content) {
+    return deterministic;
+  }
+
+  const sanitised = applyGuardrails(modelResult.content, MAX_ENRICHMENT_CHARS);
+
+  if (sanitised.length === 0) {
+    return deterministic;
+  }
+
+  return {
+    ...deterministic,
+    mode: 'provider_enriched',
+    explanation: [...deterministic.explanation, `[AI]: ${sanitised}`],
   };
 }

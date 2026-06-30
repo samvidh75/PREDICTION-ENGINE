@@ -9,3 +9,7 @@ export * from './eventClassifier';
 export * from './historicalSimilarity';
 export * from './whyDidThisMove';
 export * from './safeNarrativeExplainer';
+export * from './narrativeModelProvider';
+export * from './disabledNarrativeModelProvider';
+export * from './ollamaNarrativeModelProvider';
+export * from './narrativeOutputGuardrails';
