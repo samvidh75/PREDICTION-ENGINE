@@ -10,6 +10,7 @@
 
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
 import type {
   AdapterResult,
   AdapterWarning,
@@ -18,6 +19,9 @@ import type {
 } from '../dataAdapterTypes';
 import { adapterOk, adapterErr } from '../adapterResult';
 import { normalizeAdapterSymbol } from '../normalizeDataRecord';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // ─── Inline type for the raw JSON structure ──────────────────────────────────
 
