@@ -64,21 +64,11 @@ function hasContent(ctx: ResearchAiContext): boolean {
 // ─── Adapter ─────────────────────────────────────────────────────────────────
 
 /**
- * Derive a research headline from the deterministic evidence pack.
- * No recommendation language — purely descriptive.
- */
-function deriveHeadline(pack: MarketAnomalyEvidencePack): string {
-  const prefix = `${pack.symbol} ${pack.anomalyType}`;
-  if (pack.evidence.length > 0) {
-    const first = pack.evidence[0].replace(/^Price /, "").replace(/\.$/, "");
-    return `${prefix}: ${first}`;
-  }
-  return `${prefix} — evidence pending`;
-}
-
-/**
  * Convert a MarketAnomalyEvidencePack into a ResearchAiContext for the
  * "Why did this move?" surface.
+ *
+ * Uses the enhanced contract's own headline, risksToReview, whatToWatch
+ * and compressedContext fields — no derivation needed.
  *
  * Returns `null` when the pack is null, empty, or insufficient to carry
  * meaningful information.
@@ -89,36 +79,31 @@ export function toAnomalyResearchAiContext(
   if (!pack) return null;
   if (pack.evidence.length === 0 && pack.missingEvidence.length === 0) return null;
 
-  const headlineText = deriveHeadline(pack);
-
   const ctx: ResearchAiContext = {
     surface: "why_move",
     symbol: sanitizeText(pack.symbol, 24) ?? null,
-    companyName: null,
+    companyName: sanitizeText(pack.companyName, 100) ?? null,
     title: sanitizeText(`Why did ${pack.symbol} move?`, 80) ?? null,
-    headline: sanitizeText(headlineText, 180) ?? null,
+    headline: sanitizeText(pack.headline, 180) ?? null,
     researchNarrative: sanitizeArray(
-      [pack.anomalyType, headlineText].filter(Boolean),
+      [pack.anomalyType, pack.headline].filter(Boolean),
       3,
     ),
     evidenceToReview: sanitizeArray(pack.evidence, 8),
-    risksToReview: sanitizeArray(
-      pack.missingEvidence.map((m) => `${m} — needs more context`),
-      5,
-    ),
-    whatToWatch: undefined,
-    extraContext: sanitizeText(pack.narrativePromptPayload, 500) ?? null,
+    risksToReview: sanitizeArray(pack.risksToReview, 5),
+    whatToWatch: sanitizeArray(pack.whatToWatch, 5),
+    extraContext: sanitizeText(pack.compressedContext, 500) ?? null,
   };
 
-  // Include missing evidence note in evidenceToReview for discoverability.
+  // Include missing evidence as risks for discoverability.
   if (pack.missingEvidence.length > 0) {
     const missing = sanitizeArray(
       pack.missingEvidence.map((m) => `${m} — needs more context`),
       3,
     );
     if (missing) {
-      ctx.evidenceToReview = [
-        ...(ctx.evidenceToReview ?? []),
+      ctx.risksToReview = [
+        ...(ctx.risksToReview ?? []),
         ...missing,
       ];
     }
