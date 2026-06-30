@@ -32,7 +32,11 @@ export default function ScannerPage() {
   );
   const [query, setQuery] = useState("");
   const [hoveredStock, setHoveredStock] = useState<EnhancedScannedStock | null>(null);
+  const [selectedStock, setSelectedStock] = useState<EnhancedScannedStock | null>(null);
   const label = useResponsiveValue("13px", "14px");
+
+  // Active stock = hovered takes priority, else selected (for click/focus/mobile)
+  const activeStock = hoveredStock ?? selectedStock;
 
   const activePreset = SCAN_PRESETS.find((p) => p.id === activePresetId)!;
 
@@ -224,13 +228,26 @@ export default function ScannerPage() {
 
               {/* Rows */}
               {displayResults.map((stock) => (
-                <button
+                <div
                   key={stock.symbol}
-                  onClick={() => navigate(`/stock/${stock.symbol}`)}
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`${stock.name ?? stock.symbol} rank ${stock.rank}`}
+                  onClick={() => {
+                    setSelectedStock(stock);
+                    setHoveredStock(null);
+                  }}
+                  onDoubleClick={() => navigate(`/stock/${stock.symbol}`)}
                   onMouseEnter={() => setHoveredStock(stock)}
                   onMouseLeave={() => setHoveredStock((prev) => (prev?.symbol === stock.symbol ? null : prev))}
+                  onFocus={() => setSelectedStock(stock)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      setSelectedStock(stock);
+                    }
+                  }}
                   style={{
-                    all: "unset",
                     display: "contents",
                     cursor: "pointer",
                   }}
@@ -267,15 +284,15 @@ export default function ScannerPage() {
                       </div>
                     );
                   })}
-                </button>
+                </div>
               ))}
             </div>
           </div>
         </Card>
       </div>
 
-      {/* AI Detail Panel — appears on row hover */}
-      {hoveredStock && (
+      {/* AI Detail Panel — appears on row hover/select/focus */}
+      {activeStock && (
         <div className="raycast-slideUp raycast-stagger-6" style={{
           padding: "16px 20px",
           background: "rgba(20,20,24,0.92)",
@@ -291,7 +308,7 @@ export default function ScannerPage() {
               AI Factor Breakdown
             </span>
             <span style={{ fontSize: "14px", fontWeight: 700, color: colors.textPrimary }}>
-              {hoveredStock.name} ({hoveredStock.symbol})
+              {activeStock.name} ({activeStock.symbol})
             </span>
             <span style={{
               marginLeft: "auto",
@@ -302,16 +319,16 @@ export default function ScannerPage() {
               padding: "3px 10px",
               borderRadius: radius.md,
             }}>
-              Rank #{hoveredStock.rank} · Score {Math.round(hoveredStock.composite)}%
+              Rank #{activeStock.rank} · Score {Math.round(activeStock.composite)}%
             </span>
           </div>
 
           {/* Factor bars with AI explanations */}
           <div style={{ display: "grid", gap: "6px" }}>
             {FACTOR_COLUMNS.map((fc) => {
-              const value = (hoveredStock as any)[fc.key] ?? 0;
+              const value = (activeStock as any)[fc.key] ?? 0;
               const { label: strengthLabel, icon: Icon, color: strengthColor } = getFactorLabel(value);
-              const explanation = getFactorExplanation(fc.key, value, hoveredStock.symbol);
+              const explanation = getFactorExplanation(fc.key, value, activeStock.symbol);
               const barColor = value >= 70 ? colors.success : value >= 50 ? colors.primary : value >= 35 ? colors.warning : colors.marketRed;
 
               return (
@@ -362,7 +379,7 @@ export default function ScannerPage() {
             <BarChart3 size={14} color={colors.textSecondary} style={{ marginTop: "1px", flexShrink: 0 }} />
             <span style={{ fontSize: "12px", color: colors.textSecondary, lineHeight: "1.6" }}>
               <strong style={{ color: colors.textPrimary }}>Preset Match: </strong>
-              {hoveredStock.matchReason || `${hoveredStock.symbol} matches the ${activePreset.label} preset with a composite score of ${Math.round(hoveredStock.composite)}%. Top factor: ${FACTOR_COLUMNS.reduce((best, fc) => ((hoveredStock as any)[fc.key] ?? 0) > ((hoveredStock as any)[best.key] ?? 0) ? fc : best, FACTOR_COLUMNS[0]).label}.`}
+              {activeStock.matchReason || `${activeStock.symbol} matches the ${activePreset.label} preset with a composite score of ${Math.round(activeStock.composite)}%. Top factor: ${FACTOR_COLUMNS.reduce((best, fc) => ((activeStock as any)[fc.key] ?? 0) > ((activeStock as any)[best.key] ?? 0) ? fc : best, FACTOR_COLUMNS[0]).label}.`}
               <br />
               <span style={{ color: colors.textTertiary, fontSize: "11px" }}>
                 Click to view full stock detail · {new Date().toLocaleTimeString()} snapshot
@@ -372,19 +389,19 @@ export default function ScannerPage() {
         </div>
       )}
 
-      {/* AI Explanation Panel — appears below hovered stock detail */}
-      {hoveredStock && (() => {
+      {/* Enhanced Explanation Panel — appears below active stock detail */}
+      {activeStock && (() => {
         const scannerCtx = buildScannerContext(
-          hoveredStock.symbol,
-          hoveredStock.name || hoveredStock.symbol,
+          activeStock.symbol,
+          activeStock.name || activeStock.symbol,
           {
-            rank: hoveredStock.rank,
-            keyReason: hoveredStock.matchReason || `${hoveredStock.symbol} scores ${Math.round(hoveredStock.composite)}% on ${activePreset.label}`,
-            riskMarker: FACTOR_COLUMNS.reduce((lowest, fc) => ((hoveredStock as any)[fc.key] ?? 0) < ((hoveredStock as any)[lowest.key] ?? 0) ? fc : lowest, FACTOR_COLUMNS[0]).label,
-            conviction: hoveredStock.composite >= 70 ? "High conviction" : hoveredStock.composite >= 50 ? "Moderate conviction" : "Speculative",
-            oneLineThesis: `${hoveredStock.symbol} ranks #${hoveredStock.rank} in ${activePreset.label} with ${Math.round(hoveredStock.composite)}% composite score.`,
-            companyName: hoveredStock.name || hoveredStock.symbol,
-            symbol: hoveredStock.symbol,
+            rank: activeStock.rank,
+            keyReason: activeStock.matchReason || `${activeStock.symbol} scores ${Math.round(activeStock.composite)}% on ${activePreset.label}`,
+            riskMarker: FACTOR_COLUMNS.reduce((lowest, fc) => ((activeStock as any)[fc.key] ?? 0) < ((activeStock as any)[lowest.key] ?? 0) ? fc : lowest, FACTOR_COLUMNS[0]).label,
+            conviction: activeStock.composite >= 70 ? "High conviction" : activeStock.composite >= 50 ? "Moderate conviction" : "Speculative",
+            oneLineThesis: `${activeStock.symbol} ranks #${activeStock.rank} in ${activePreset.label} with ${Math.round(activeStock.composite)}% composite score.`,
+            companyName: activeStock.name || activeStock.symbol,
+            symbol: activeStock.symbol,
           }
         );
         return <ResearchAiExplanationPanel context={scannerCtx} />;
