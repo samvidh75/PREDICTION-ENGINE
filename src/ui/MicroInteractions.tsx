@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect, type ReactNode } from "react";
+import React, { useRef, useState, useEffect, type ReactNode } from "react";
 import { colors, shadows } from "../design/tokens";
 
 /* =============================================================
@@ -215,7 +215,7 @@ export function useSmoothScroll() {
   };
 }
 
-// ── Staggered Entrance Container ──────────────────────────────
+// ── Staggered Entrance Container — children animate in sequentially ──
 interface StaggerContainerProps {
   children: ReactNode;
   className?: string;
@@ -230,12 +230,25 @@ export function StaggerContainer({
   className,
   style,
   baseDelay = 0,
-  staggerMs = 50,
+  staggerMs = 70,
   count,
 }: StaggerContainerProps) {
+  const childCount = count ?? React.Children.count(children);
+  const clones = React.Children.map(children, (child, i) => {
+    if (!React.isValidElement(child)) return child;
+    const delay = baseDelay + i * staggerMs;
+    return React.cloneElement(child, {
+      style: {
+        ...(child.props.style as React.CSSProperties | undefined),
+        opacity: 0,
+        animation: `fadeInUp 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards`,
+        animationDelay: `${delay}ms`,
+      } as React.CSSProperties,
+    });
+  });
   return (
     <div className={className} style={style}>
-      {children}
+      {clones}
     </div>
   );
 }

@@ -9,6 +9,7 @@ const HomePage = lazy(() => import("../pages/HomePage"));
 const ScannerPage = lazy(() => import("../pages/ScannerPage"));
 const StockPage = lazy(() => import("../pages/StockPage"));
 const WatchlistPage = lazy(() => import("../pages/WatchlistPage"));
+const PortfolioPage = lazy(() => import("../pages/PortfolioPage"));
 const PricingPage = lazy(() => import("../pages/PricingPage"));
 const WaitlistPage = lazy(() => import("../pages/WaitlistPage"));
 const ChangelogPage = lazy(() => import("../pages/ChangelogPage"));
@@ -55,6 +56,7 @@ export function AppRoutes() {
           <Route path="/scanner" element={<ScannerPage />} />
           <Route path="/scanner/:preset" element={<ScannerLanding />} />
           <Route path="/watchlist" element={<WatchlistPage />} />
+          <Route path="/portfolio" element={<PortfolioPage />} />
           <Route path="/compare" element={<ComparePage />} />
           <Route path="/track" element={<TrackPage />} />
           <Route path="/about" element={<AboutPage />} />

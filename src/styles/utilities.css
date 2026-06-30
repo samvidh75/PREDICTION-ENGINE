@@ -203,11 +203,35 @@
 .bg-amber { background-color: var(--amber); }
 .bg-amber-light { background-color: var(--amber-light); }
 
-/* RESPONSIVE */
+/* RESPONSIVE — 375px–1440px gapless */
 @media (max-width: 767px) {
   .hide-mobile { display: none !important; }
 }
 
 @media (min-width: 768px) {
   .hide-desktop { display: none !important; }
+}
+
+/* Mobile-only overrides: tighten spacing, scale down typography */
+@media (max-width: 480px) {
+  .responsive-pad { padding-left: 12px; padding-right: 12px; }
+  .responsive-gap { gap: 8px; }
+  .responsive-stack { flex-direction: column; }
+  .responsive-full { width: 100%; }
+  .responsive-text-sm { font-size: 13px; }
+}
+
+/* Tablet tweaks */
+@media (min-width: 481px) and (max-width: 767px) {
+  .responsive-pad { padding-left: 20px; padding-right: 20px; }
+}
+
+/* Desktop safety — 1440px max-content */
+@media (min-width: 1440px) {
+  .responsive-wide { max-width: 1440px; margin-left: auto; margin-right: auto; }
+}
+
+/* Touch-friendly tap targets */
+@media (pointer: coarse) {
+  .touch-min { min-height: 44px; min-width: 44px; }
 }
