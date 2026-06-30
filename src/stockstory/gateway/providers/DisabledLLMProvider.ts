@@ -13,7 +13,7 @@ const DISABLED_NARRATIVE: StockStoryNarrativeOutput = {
   watchNext: 'Monitoring recommendations require full system availability.',
   peerContextSummary: 'Peer analysis is not available.',
   confidenceNote: 'This assessment is limited by system configuration.',
-  methodologyNote: 'Research methodology is documented on the Methodology page.',
+  methodologyNote: 'Research methodology is part of StockStory\'s deterministic analytical engine.',
   complianceSafeLabel: 'Research — Data Pending',
 };
 

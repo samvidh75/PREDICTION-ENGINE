@@ -23,6 +23,12 @@ const REGISTRY: Partial<Record<ResearchAiRuntime, RuntimeCapability>> = {
     ready: false,
     label: 'In-browser AI',
   },
+  'browser_local': {
+    runtime: 'browser_local',
+    available: false,
+    ready: false,
+    label: 'Browser LLM',
+  },
   'user-local': {
     runtime: 'user-local',
     available: false,
@@ -72,19 +78,15 @@ function hasClientAICapability(): boolean {
 export function initRuntimeRegistry(): void {
   // Reset all AI runtimes to default (disabled) state
   const browserEdge = getCapability('browser-edge');
+  const browserLocal = getCapability('browser_local');
   const userLocal = getCapability('user-local');
   const serverLocal = getCapability('server-local');
-  if (browserEdge) {
-    browserEdge.available = false;
-    browserEdge.ready = false;
-  }
-  if (userLocal) {
-    userLocal.available = false;
-    userLocal.ready = false;
-  }
-  if (serverLocal) {
-    serverLocal.available = false;
-    serverLocal.ready = false;
+  const runtimes = [browserEdge, browserLocal, userLocal, serverLocal];
+  for (const rt of runtimes) {
+    if (rt) {
+      rt.available = false;
+      rt.ready = false;
+    }
   }
 
   // Browser Edge AI
@@ -92,6 +94,14 @@ export function initRuntimeRegistry(): void {
     if (browserEdge) {
       browserEdge.available = true;
       browserEdge.ready = true;
+    }
+  }
+
+  // Browser-local LLM — available in any modern browser with Web Worker support
+  if (supportsWorkers()) {
+    if (browserLocal) {
+      browserLocal.available = true;
+      // Not marked "ready" until first user interaction triggers model download
     }
   }
 
@@ -128,7 +138,7 @@ export function getRuntimeRegistry(): Record<ResearchAiRuntime, RuntimeCapabilit
 
 /** Get all runtimes in fallback order. */
 export function getFallbackOrder(): ResearchAiRuntime[] {
-  return ['browser-edge', 'user-local', 'server-local', 'deterministic'];
+  return ['browser-edge', 'browser_local', 'user-local', 'server-local', 'deterministic'];
 }
 
 /** Is a specific runtime available? */
@@ -148,6 +158,7 @@ export function getBestAvailableRuntime(): ResearchAiRuntime {
 export function hasAIRuntime(): boolean {
   return Boolean(
     getCapability('browser-edge')?.available ||
+    getCapability('browser_local')?.available ||
     getCapability('user-local')?.available ||
     getCapability('server-local')?.available,
   );

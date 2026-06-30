@@ -3,7 +3,7 @@ export interface ContentOpportunity {
   title: string;
   description: string;
   priority: "high" | "medium" | "low";
-  category: "company" | "sector" | "methodology" | "scanner";
+  category: "company" | "sector" | "scanner";
   rationale: string;
   estimatedEffort: string;
 }

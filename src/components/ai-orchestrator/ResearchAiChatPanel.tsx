@@ -21,6 +21,7 @@ interface ResearchAiChatPanelProps {
 
 const RUNTIME_LABEL: Partial<Record<ResearchAiRuntime, string>> = {
   'browser-edge': 'Edge AI',
+  'browser_local': 'Browser LLM',
   'user-local': 'Local LLM',
   'server-local': 'Server AI',
   'deterministic': 'Algorithmic',
@@ -28,6 +29,7 @@ const RUNTIME_LABEL: Partial<Record<ResearchAiRuntime, string>> = {
 
 const RUNTIME_COLOR: Partial<Record<ResearchAiRuntime, string>> = {
   'browser-edge': '#2979FF',
+  'browser_local': '#7C3AED',
   'user-local': '#7C3AED',
   'server-local': '#059669',
   'deterministic': '#888',

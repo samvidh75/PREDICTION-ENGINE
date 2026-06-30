@@ -182,7 +182,6 @@ export function CommandPalette({ presets = [], open, onClose }: CommandPalettePr
       { id: 'page-scanner', label: 'Scanner', icon: '🔍', category: 'page', action: () => navigate('/scanner'), metadata: 'G S' },
       { id: 'page-watchlist', label: 'Watchlist', icon: '⭐', category: 'page', action: () => navigate('/watchlist'), metadata: 'G W' },
       { id: 'page-sectors', label: 'Sectors', icon: '📊', category: 'page', action: () => navigate('/sectors'), metadata: 'G E' },
-      { id: 'page-methodology', label: 'Methodology', icon: '📖', category: 'page', action: () => navigate('/methodology') },
       { id: 'page-trust', label: 'Trust & Safety', icon: '🛡️', category: 'page', action: () => navigate('/trust') },
     );
 

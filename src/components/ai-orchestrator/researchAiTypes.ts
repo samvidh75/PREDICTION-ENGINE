@@ -30,8 +30,7 @@ export type ResearchAiSurface =
   | "compare"
   | "watchlist"
   | "alerts"
-  | "portfolio"
-  | "methodology";
+  | "portfolio";
 
 export interface ResearchAiContext {
   surface: ResearchAiSurface;
@@ -62,7 +61,6 @@ export interface ResearchAiContext {
   watchlistContext?: string[];
   alertContext?: string[];
   historicalContext?: string[];
-  methodologyNote?: string | null;
 }
 
 export interface ResearchAiRequest {

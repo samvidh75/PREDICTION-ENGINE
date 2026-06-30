@@ -16,7 +16,6 @@ const ChangelogPage = lazy(() => import("../pages/ChangelogPage"));
 const Sectors = lazy(() => import("../pages/Sectors"));
 const SectorResearch = lazy(() => import("../pages/SectorResearch"));
 const ScannerLanding = lazy(() => import("../pages/ScannerLanding"));
-const Methodology = lazy(() => import("../pages/Methodology"));
 const Trust = lazy(() => import("../pages/Trust"));
 const Invite = lazy(() => import("../pages/Invite"));
 const SharedResearchSnapshot = lazy(() => import("../pages/SharedResearchSnapshot"));
@@ -64,7 +63,7 @@ export function AppRoutes() {
           <Route path="/stock/:symbol/*" element={<StockPage />} />
           <Route path="/sectors" element={<Sectors />} />
           <Route path="/sectors/:sectorSlug" element={<SectorResearch />} />
-          <Route path="/methodology" element={<Methodology />} />
+
           <Route path="/trust" element={<Trust />} />
           <Route path="/invite" element={<Invite />} />
           <Route path="/share/research/:shareId" element={<SharedResearchSnapshot />} />

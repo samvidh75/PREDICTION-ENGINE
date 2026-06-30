@@ -6,7 +6,6 @@ export type DistributionEventType =
   | "tour_completed"
   | "scanner_preset_shared"
   | "sector_page_viewed"
-  | "methodology_page_viewed"
   | "trust_page_viewed";
 
 export interface DistributionEvent {

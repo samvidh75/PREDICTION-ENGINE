@@ -61,6 +61,10 @@ export {
 } from './browserEdgeRuntime';
 
 export {
+  queryBrowserLocalRuntime,
+} from './queryBrowserLocalRuntime';
+
+export {
   queryUserLocalRuntime,
   pingUserLocalRuntime,
   tryActivateUserLocalRuntime,
