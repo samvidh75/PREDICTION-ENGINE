@@ -26,6 +26,8 @@ No adapter was marked complete in this phase.
 - `src/systems/market-brain/historicalSimilarity.ts`
 - `src/systems/market-brain/historicalSimilarity.test.ts`
 - `src/services/marketBrainResearchHistoricalSimilarity.test.ts`
+- `src/services/data/marketBrainEvidenceAdapter.ts`
+- `src/services/data/marketBrainEvidenceAdapter.test.ts`
 
 ## Files updated
 
@@ -83,6 +85,21 @@ The public normalizer:
 - returns `null` instead of exposing malformed historical context
 - keeps matched case identifiers and raw outcome statistics out of the public DTO
 
+## Adapter evidence mapping foundation
+
+Added `buildMarketBrainEvidenceFromAdapterResults` as a deterministic bridge from internal adapter results to Market Brain evidence states.
+
+The mapper:
+
+- maps successful results without warnings to `ready`
+- maps successful results with warnings to `partial`
+- maps failed, absent, or null results to `missing`
+- covers required Market Brain evidence domains and optional research domains
+- returns a fresh evidence object
+- does not fetch records, create providers, expose raw errors, or alter public copy
+
+This is only evidence-state plumbing. It does not mark any real provider integration complete.
+
 ## Safety rules preserved
 
 - No fake data
@@ -114,6 +131,11 @@ Added unit tests covering:
 - public DTO malformed numeric rejection
 - public DTO unsafe copy filtering
 - public DTO fresh array returns
+- adapter evidence ready mapping
+- adapter evidence partial mapping
+- adapter evidence missing mapping
+- optional research-domain evidence mapping
+- adapter evidence fresh object and unsafe-copy guard
 
 Connector runtime cannot execute local npm commands. Full verification remains:
 
@@ -133,10 +155,11 @@ npm test -- historicalSimilarity
 npm test -- indiaMarketBrain
 npm test -- marketBrainResearch
 npm test -- marketBrainResearchHistoricalSimilarity
+npm test -- marketBrainEvidenceAdapter
 ```
 
-GitHub commit status for the latest connector-visible change should be checked after the public normalization commits settle.
+GitHub commit status for the latest connector-visible change should be checked after the adapter evidence mapping commits settle.
 
 ## Next remaining task
 
-Run full local or CI verification. Then connect real historical case retrieval behind the existing adapter backlog, preserving minimum-sample safeguards and research-only language.
+Run full local or CI verification. Then wire adapter-derived evidence states into the first safe Market Brain ingestion path without exposing internal adapter errors or marking real provider integrations complete.
