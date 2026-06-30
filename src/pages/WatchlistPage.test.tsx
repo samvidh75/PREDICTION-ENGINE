@@ -5,7 +5,7 @@ import type { WatchlistIntelligence } from '../services/personalization/Watchlis
 
 const mockNavigate = vi.hoisted(() => vi.fn());
 const mockRecordAction = vi.hoisted(() => vi.fn());
-const unsafePublicCopy = /provider|transport|narrativePromptPayload|guaranteed|sure shot|multibagger/i;
+const unsafePublicCopy = /provider|transport|backend|adapter|narrativePromptPayload|guaranteed|sure shot|multibagger/i;
 
 vi.mock('react-router-dom', () => ({
   useNavigate: () => mockNavigate,
@@ -130,6 +130,26 @@ describe('WatchlistPage thesis change integration', () => {
     expect(screen.getByText('RELIANCE thesis needs review')).toBeTruthy();
     expect(screen.getByText('Margin pressure should be reviewed before the next thesis update.')).toBeTruthy();
     expect(screen.getByText('Risk changed')).toBeTruthy();
+
+    const renderedText = document.body.textContent ?? '';
+    expect(renderedText).not.toMatch(unsafePublicCopy);
+  });
+
+  it('wires sanitized watchlist and alert context into the shared AI explanation surface', async () => {
+    mockWatchlistFetch(watchlistIntelWithAlerts);
+
+    render(<WatchlistPage />);
+
+    fireEvent.click(screen.getByText('Load Tracked Stocks'));
+
+    await waitFor(() => {
+      expect(screen.getByText('AI explanation')).toBeTruthy();
+    });
+
+    expect(screen.getByText('Explains the research context already shown on this page.')).toBeTruthy();
+    expect(screen.getByText('Research context only. Not a recommendation.')).toBeTruthy();
+    expect(screen.getByText('Standard explanation is available for this view.')).toBeTruthy();
+    expect(screen.getByLabelText('AI research question')).toBeTruthy();
 
     const renderedText = document.body.textContent ?? '';
     expect(renderedText).not.toMatch(unsafePublicCopy);
