@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../ui/Button";
 import { Card, CardLabel } from "../ui/Card";
@@ -7,6 +7,8 @@ import { StaggerContainer } from "../ui/MicroInteractions";
 import { PriceFlash } from "../ui/PriceFlash";
 import { useResponsiveValue } from "../ui/responsive";
 import { colors, typography, layout, radius, space, animation } from "../design/tokens";
+import { ResearchAiExplanationPanel } from "../components/ai-orchestrator/ResearchAiExplanationPanel";
+import type { ResearchAiContext } from "../components/ai-orchestrator";
 import { BarChart3, ExternalLink, Plus, TrendingUp, Trash2, PieChart, Edit3 } from "lucide-react";
 import { PortfolioEngine, type UserHolding } from "../services/portfolio/PortfolioEngine";
 import { PortfolioPerformanceEngine } from "../services/portfolio/PortfolioPerformanceEngine";
@@ -123,6 +125,37 @@ export default function PortfolioPage() {
     PortfolioEngine.removeHolding(symbol);
     loadHoldings();
   };
+
+  // Build AI context from portfolio data for ResearchAiExplanationPanel
+  const portfolioContext = useMemo((): ResearchAiContext | null => {
+    if (!holdings.length) return null;
+    const totalValue = perf.currentValue;
+    const totalCost = perf.totalCost;
+    const topHolding = holdings.reduce((best, h) => {
+      const price = currentPrices[h.symbol] ?? 0;
+      const val = price * h.shares;
+      return val > (currentPrices[best.symbol] ?? 0) * best.shares ? h : best;
+    }, holdings[0]);
+
+    return {
+      surface: "portfolio",
+      headline: `${holdings.length} holding${holdings.length !== 1 ? "s" : ""} · ${formatInr(totalCost)} cost · ₹${formatInr(totalValue)} current`,
+      narrative: [
+        `${holdings.length} holding${holdings.length !== 1 ? "s" : ""} across ${sectorWeights.length} sector${sectorWeights.length !== 1 ? "s" : ""}.`,
+        `Top holding: ${topHolding.symbol} (${topHolding.shares} shares @ ${formatInr(topHolding.avgBuyPrice)}).`,
+        `Portfolio P&L: ${formatInr(perf.totalGainAmount)} (${formatPct(perf.totalGainPct)}). Best performer: ${perf.bestPerformerSymbol}.`,
+      ],
+      comparisonContext: holdings.slice(0, 10).map((h) => {
+        const price = currentPrices[h.symbol];
+        const gain = price ? ((price - h.avgBuyPrice) / h.avgBuyPrice * 100).toFixed(2) : "—";
+        return `${h.symbol} (${h.sector}): ${h.shares} shares, avg ${formatInr(h.avgBuyPrice)}, current ${price ? formatInr(price) : "—"}, P&L ${gain}%`;
+      }),
+      whatToWatch: [
+        `${perf.bestPerformerSymbol} is your best performer — monitor for trend continuation.`,
+        ...(sectorWeights.length > 1 ? [`Largest sector: ${sectorWeights[0].sector} at ${sectorWeights[0].weightPct}% — check concentration risk.`] : []),
+      ],
+    };
+  }, [holdings, currentPrices, perf, sectorWeights]);
 
   if (loading) {
     return (
@@ -449,6 +482,13 @@ export default function PortfolioPage() {
               <Button variant="secondary" size="sm" onClick={() => { PortfolioEngine.clearHoldings(); loadHoldings(); }}>
                 <Trash2 size={14} /> Clear All
               </Button>
+            </div>
+          )}
+
+          {/* AI Portfolio Explanation */}
+          {portfolioContext && (
+            <div style={{ marginTop: space[6] }}>
+              <ResearchAiExplanationPanel context={portfolioContext} />
             </div>
           )}
         </>
