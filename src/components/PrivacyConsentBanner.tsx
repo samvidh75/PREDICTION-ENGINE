@@ -17,15 +17,16 @@ export default function PrivacyConsentBanner() {
 
   return (
     <div style={bannerStyle}>
-      <p style={{ margin: 0, fontSize: typography.body.desktop.size, lineHeight: typography.body.desktop.line, flex: 1, color: colors.textSecondary }}>
+      <p style={{ margin: 0, fontSize: typography.body.desktop.size, lineHeight: typography.body.desktop.line, flex: 1, color: colors.body }}>
         We use privacy-first analytics to improve the app. No personal data is collected.
         <a
           href="/privacy"
-          style={{ color: colors.primary, marginLeft: space[1] }}
+          aria-label="Learn more about our privacy policy"
+          style={{ color: colors.primary, marginLeft: space[1], textDecoration: "underline" }}
           target="_blank"
           rel="noopener noreferrer"
         >
-          Learn more
+          Learn more about our privacy policy
         </a>.
       </p>
       <div style={{ display: "flex", gap: space[2], flexShrink: 0 }}>

@@ -299,6 +299,16 @@ async function bootstrap() {
     if (filePath.startsWith(distPath)) {
       const content = await tryReadFile(filePath);
       if (content) {
+        // Hashed assets (JS/CSS with hash in name) → 1 year cache
+        const isHashed = /[.-][a-f0-9]{8,}\.(js|css)$/.test(url.pathname);
+        const isImmutable = /\.(woff2?|png|jpg|jpeg|gif|webp|svg|ico)$/.test(url.pathname);
+        if (isHashed) {
+          reply.header("Cache-Control", "public, max-age=31536000, immutable");
+        } else if (isImmutable) {
+          reply.header("Cache-Control", "public, max-age=2592000, immutable");
+        } else {
+          reply.header("Cache-Control", "public, max-age=3600");
+        }
         return reply.type(getContentType(filePath)).send(content);
       }
     }
