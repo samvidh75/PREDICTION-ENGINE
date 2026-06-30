@@ -25,6 +25,7 @@ import { OptionsFlow } from "../components/OptionsFlow";
 import { InsiderActivity } from "../components/InsiderActivity";
 import { PriceTargets } from "../components/PriceTargets";
 import { NativeAd } from "../components/NativeAd";
+import { MarketBrainPanel } from "../components/market-brain/MarketBrainPanel";
 
 type StockResearchDetail = {
   symbol: string;
@@ -746,6 +747,9 @@ function StockError({ symbol }: { symbol: string }) {
           </div>
         </Card>
       )}
+
+      {/* ── Market Brain Panel ── */}
+      <MarketBrainPanel symbol={stock.symbol} companyName={stock.companyName} />
 
       {/* ── What Changed ── */}
       <Card className="stock-whatchanged-card raycast-slideUp" style={{ animationDelay: "0.4s", animationFillMode: "both" }}>
