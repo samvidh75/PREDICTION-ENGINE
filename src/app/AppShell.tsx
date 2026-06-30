@@ -184,7 +184,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       {/* KEYBOARD HELP */}
       <KeyboardHelpOverlay open={helpOpen} onClose={() => setHelpOpen(false)} />
 
-      {/* FEEDBACK FAB */}
+      {/* FEEDBACK FAB — Raycast-inspired */}
       <button
         id="feedback-fab"
         onClick={() => {
@@ -197,13 +197,13 @@ export function AppShell({ children }: { children: ReactNode }) {
           root.id = "feedback-widget-root";
           document.body.appendChild(root);
           // Simple mount via DOM — React would need a portal, this is a lightweight toggle
-          root.innerHTML = `<div style="position:fixed;bottom:80px;right:24px;z-index:100;background:#0A0A0A;border:1px solid #1A1A1A;border-radius:16px;padding:20px;width:360px;">
+          root.innerHTML = `<div style="position:fixed;bottom:80px;right:24px;z-index:100;background:#0A0A0A;border:1px solid #1A1A1A;border-radius:12px;padding:20px;width:360px;animation:fadeSlideIn 0.2s cubic-bezier(0.16,1,0.3,1);">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-              <h3 style="margin:0;font-size:16px;font-weight:700;color:#ffffff;">Send Feedback</h3>
-              <button id="feedback-close" style="background:none;border:none;cursor:pointer;font-size:18px;color:#A0A0A0;">×</button>
+              <h3 style="margin:0;font-size:15px;font-weight:600;color:#E8E8E8;letter-spacing:-0.01em;">Send Feedback</h3>
+              <button id="feedback-close" style="background:none;border:none;cursor:pointer;font-size:18px;color:#555;transition:color 0.15s;padding:4px;border-radius:6px;line-height:1;">×</button>
             </div>
-            <form id="feedback-form" style="display:flex;flex-direction:column;gap:12px;font-size:14px;">
-              <select id="fb-category" style="padding:8px 12px;border-radius:10px;border:1px solid #1A1A1A;font-size:14px;background:#000000;color:#ffffff;">
+            <form id="feedback-form" style="display:flex;flex-direction:column;gap:10px;font-size:13px;">
+              <select id="fb-category" style="padding:10px 12px;border-radius:8px;border:1px solid #1A1A1A;font-size:13px;background:#000;color:#C0C0C0;outline:none;transition:border-color 0.15s;cursor:pointer;">
                 <option value="bug">Bug Report</option>
                 <option value="feature-request">Feature Request</option>
                 <option value="accuracy">Accuracy Concern</option>
@@ -211,10 +211,10 @@ export function AppShell({ children }: { children: ReactNode }) {
                 <option value="data-quality">Data Quality</option>
                 <option value="other">Other</option>
               </select>
-              <input id="fb-title" type="text" required placeholder="Brief title" style="padding:8px 12px;border-radius:10px;border:1px solid #1A1A1A;font-size:14px;background:#000000;color:#ffffff;" />
-              <textarea id="fb-body" required rows="4" placeholder="Describe your feedback..." style="padding:8px 12px;border-radius:10px;border:1px solid #1A1A1A;font-size:14px;resize:vertical;font-family:inherit;background:#000000;color:#ffffff;"></textarea>
-              <div id="fb-error" style="color:#FF6B6B;font-size:14px;display:none;"></div>
-              <button type="submit" style="padding:8px 20px;border-radius:10px;border:none;background:#ffffff;color:#000000;font-size:14px;font-weight:600;cursor:pointer;">Submit Feedback</button>
+              <input id="fb-title" type="text" required placeholder="Brief title" style="padding:10px 12px;border-radius:8px;border:1px solid #1A1A1A;font-size:13px;background:#000;color:#E8E8E8;outline:none;transition:border-color 0.15s;" />
+              <textarea id="fb-body" required rows="4" placeholder="Describe your feedback…" style="padding:10px 12px;border-radius:8px;border:1px solid #1A1A1A;font-size:13px;resize:vertical;font-family:inherit;background:#000;color:#E8E8E8;outline:none;transition:border-color 0.15s;"></textarea>
+              <div id="fb-error" style="color:#FF6B6B;font-size:13px;display:none;"></div>
+              <button type="submit" style="padding:10px 20px;border-radius:8px;border:none;background:#E8E8E8;color:#0A0A0A;font-size:13px;font-weight:600;cursor:pointer;transition:opacity 0.15s;">Submit Feedback</button>
             </form>
           </div>`;
 
@@ -232,11 +232,11 @@ export function AppShell({ children }: { children: ReactNode }) {
                 body: JSON.stringify({ category: cat, title, body, pageUrl: window.location.href }),
               });
               if (!res.ok) throw new Error();
-              root.innerHTML = '<div style="padding:20px;text-align:center;"><h3 style="margin:0 0 12px;color:#ffffff;">Thank you!</h3><p style="color:#A0A0A0;font-size:14px;">Your feedback helps us improve.</p></div>';
-              setTimeout(() => root.remove(), 3000);
+              root.innerHTML = '<div style="padding:40px 20px;text-align:center;animation:fadeSlideIn 0.2s cubic-bezier(0.16,1,0.3,1);"><div style="font-size:28px;margin-bottom:12px;">✓</div><h3 style="margin:0 0 8px;color:#E8E8E8;font-size:15px;font-weight:600;">Thank you!</h3><p style="color:#777;font-size:13px;margin:0;">Feedback received. We\'ll review it shortly.</p></div>';
+              setTimeout(() => root.remove(), 2500);
             } catch {
               errEl.style.display = "block";
-              errEl.textContent = "Could not submit feedback. Try again.";
+              errEl.textContent = "Could not submit. Try again.";
             }
           });
         }}
@@ -245,21 +245,38 @@ export function AppShell({ children }: { children: ReactNode }) {
           bottom: "96px",
           right: "24px",
           zIndex: 99,
-          width: "48px",
-          height: "48px",
-          borderRadius: "50%",
-          border: "none",
-          background: colors.primary,
-          color: colors.onPrimary,
+          width: "36px",
+          height: "36px",
+          borderRadius: "10px",
+          border: "1px solid #1A1A1A",
+          background: "#0A0A0A",
+          color: "#555",
           cursor: "pointer",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          boxShadow: shadows.card,
+          opacity: 0.6,
+          transition: "opacity 0.2s, border-color 0.2s, color 0.2s, transform 0.15s",
+          backdropFilter: "blur(12px)",
+          WebkitBackdropFilter: "blur(12px)",
         }}
         aria-label="Send feedback"
+        onMouseEnter={(e) => {
+          const btn = e.currentTarget;
+          btn.style.opacity = "1";
+          btn.style.borderColor = "#333";
+          btn.style.color = "#C0C0C0";
+          btn.style.transform = "scale(1.05)";
+        }}
+        onMouseLeave={(e) => {
+          const btn = e.currentTarget;
+          btn.style.opacity = "0.6";
+          btn.style.borderColor = "#1A1A1A";
+          btn.style.color = "#555";
+          btn.style.transform = "scale(1)";
+        }}
       >
-        <MessageSquareText size={20} />
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
       </button>
 
       {/* PRIVACY CONSENT BANNER */}
@@ -364,6 +381,11 @@ export function AppShell({ children }: { children: ReactNode }) {
             padding-bottom:${layout.pagePaddingDesktop};
             max-width:${layout.contentMaxWidth};
           }
+        }
+        /* ===== FEEDBACK FAB ANIMATION ===== */
+        @keyframes fadeSlideIn {
+          from { opacity: 0; transform: translateY(8px) scale(0.97); }
+          to   { opacity: 1; transform: translateY(0) scale(1); }
         }
       `}</style>
     </div>
