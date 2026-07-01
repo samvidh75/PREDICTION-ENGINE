@@ -43,6 +43,8 @@ export interface CheckoutSession {
   /** URL to redirect the user to (hosted checkout page) */
   checkoutUrl: string;
   provider: PaymentProviderType;
+  /** 'order' for one-time payment (legacy), 'subscription' for recurring */
+  mode?: 'order' | 'subscription';
 }
 
 // ─── Billing Details ───────────────────────────────────────────────

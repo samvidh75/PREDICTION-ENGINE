@@ -84,6 +84,7 @@ function subToResponse(row: Record<string, any>) {
     createdAt: row.created_at,
     razorpayOrderId: row.razorpay_order_id,
     razorpayPaymentId: row.razorpay_payment_id,
+    razorpaySubscriptionId: row.razorpay_subscription_id,
   };
 }
 
@@ -92,8 +93,10 @@ function subToResponse(row: Record<string, any>) {
 export default async function registerBillingRoutes(server: FastifyInstance) {
 
   // ── POST /api/checkout/create ──────────────────────────────
-  // Creates a Razorpay order. Frontend uses the returned order_id
-  // to open the Razorpay checkout modal.
+  // Creates a Razorpay subscription with automated plan management.
+  // The provider auto-creates the plan on Razorpay (no dashboard needed).
+  // The user is redirected to the Razorpay hosted checkout page (short_url)
+  // to complete the E-mandate via UPI / card / netbanking.
   server.post<{ Body: CreateCheckoutBody }>(
     "/api/checkout/create",
     { preHandler: [requireAuth] },
@@ -116,6 +119,10 @@ export default async function registerBillingRoutes(server: FastifyInstance) {
         }
 
         const provider = getRazorpayProvider();
+
+        // Subscription-based checkout (Phase 16+)
+        // Auto-creates the Razorpay plan on first use, then creates a
+        // subscription with a 12-cycle E-mandate.
         const session = await provider.createCheckout({
           planId,
           userId: uid,
@@ -129,19 +136,25 @@ export default async function registerBillingRoutes(server: FastifyInstance) {
 
         await dbAdapter.query(
           `INSERT INTO user_subscriptions
-           (user_id, plan_id, tier, status, razorpay_order_id, current_period_start, current_period_end, amount_paid)
+           (user_id, plan_id, tier, status, razorpay_subscription_id, current_period_start, current_period_end, amount_paid)
            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
            ON CONFLICT(user_id, status) WHERE status IN ('active', 'trial')
            DO UPDATE SET plan_id = EXCLUDED.plan_id, tier = EXCLUDED.tier,
-                         razorpay_order_id = EXCLUDED.razorpay_order_id,
+                         razorpay_subscription_id = EXCLUDED.razorpay_subscription_id,
                          amount_paid = EXCLUDED.amount_paid,
                          current_period_start = EXCLUDED.current_period_start,
                          current_period_end = EXCLUDED.current_period_end`,
           [uid, planId, plan.tier, "active", session.sessionId, periodStart, periodEnd, plan.priceInr * 100]
         );
 
+        // Return data the frontend needs:
+        //   - checkoutUrl (short_url) for hosted Razorpay checkout page
+        //   - sessionId (subscription ID) for modal-based checkout
+        //   - key + amount for client-side RazorpayCheckout.open()
         return reply.status(200).send({
           sessionId: session.sessionId,
+          checkoutUrl: session.checkoutUrl,
+          mode: session.mode ?? "subscription",
           provider: "razorpay",
           key: process.env.VITE_RAZORPAY_KEY_ID ?? process.env.RAZORPAY_KEY_ID ?? "",
           amount: plan.priceInr * 100,
@@ -261,71 +274,152 @@ export default async function registerBillingRoutes(server: FastifyInstance) {
           "Webhook verified");
 
         // Route webhook event to DB updates
-        if (event.type === "checkout.completed") {
-          const payment = (event.raw as any)?.payload?.payment?.entity;
-          if (payment?.notes?.userId) {
-            await dbAdapter.query(
-              `UPDATE user_subscriptions
-               SET status = 'active',
-                   razorpay_payment_id = $1,
-                   razorpay_order_id = $2,
-                   updated_at = datetime('now')
-               WHERE user_id = $3 AND status = 'active'
-               ORDER BY created_at DESC LIMIT 1`,
-              [payment.id, payment.order_id, payment.notes.userId]
-            );
+        const rawPayload = event.raw as any;
 
-            // Record transaction
-            await dbAdapter.query(
-              `INSERT INTO billing_transactions
-               (user_id, event_type, razorpay_event_id, razorpay_order_id,
-                razorpay_payment_id, amount, currency, status, provider_data)
-               VALUES ($1, 'payment.captured', $2, $3, $4, $5, $6, 'captured', $7)`,
-              [
-                payment.notes.userId,
-                (event.raw as any)?.payload?.payment?.entity?.id ?? "",
-                payment.order_id,
-                payment.id,
-                payment.amount,
-                payment.currency ?? "INR",
-                JSON.stringify(event.raw),
-              ]
-            );
+        if (event.type === "checkout.completed") {
+          const payment = rawPayload?.payload?.payment?.entity;
+          if (payment) {
+            // Determine the user associated with this payment
+            const userId =
+              payment.notes?.userId ??
+              rawPayload?.payload?.subscription?.entity?.notes?.userId;
+
+            // If payment includes a subscription_id, look up the subscription
+            const subId = payment.subscription_id;
+
+            if (userId) {
+              // Update the subscription row (match by subscription_id or user)
+              if (subId) {
+                await dbAdapter.query(
+                  `UPDATE user_subscriptions
+                   SET status = 'active',
+                       razorpay_payment_id = $1,
+                       razorpay_order_id = $2,
+                       updated_at = datetime('now')
+                   WHERE razorpay_subscription_id = $3`,
+                  [payment.id, payment.order_id, subId]
+                );
+              } else {
+                await dbAdapter.query(
+                  `UPDATE user_subscriptions
+                   SET status = 'active',
+                       razorpay_payment_id = $1,
+                       razorpay_order_id = $2,
+                       updated_at = datetime('now')
+                   WHERE user_id = $3 AND status IN ('active', 'trial')
+                   ORDER BY created_at DESC LIMIT 1`,
+                  [payment.id, payment.order_id, userId]
+                );
+              }
+
+              // Record transaction
+              const eventId = payment.id ?? "";
+              await dbAdapter.query(
+                `INSERT INTO billing_transactions
+                 (user_id, event_type, razorpay_event_id, razorpay_order_id,
+                  razorpay_payment_id, amount, currency, status, provider_data)
+                 VALUES ($1, 'payment.captured', $2, $3, $4, $5, $6, 'captured', $7)`,
+                [
+                  userId,
+                  eventId,
+                  payment.order_id ?? "",
+                  payment.id ?? "",
+                  payment.amount ?? 0,
+                  payment.currency ?? "INR",
+                  JSON.stringify(event.raw),
+                ]
+              );
+            }
           }
         } else if (event.type === "payment.failed") {
-          // Update subscription status to past_due
-          const payment = (event.raw as any)?.payload?.payment?.entity;
-          if (payment?.notes?.userId) {
+          const payment = rawPayload?.payload?.payment?.entity;
+          const userId =
+            payment?.notes?.userId ??
+            rawPayload?.payload?.subscription?.entity?.notes?.userId;
+          if (userId) {
             await dbAdapter.query(
               `UPDATE user_subscriptions SET status = 'past_due', updated_at = datetime('now')
-               WHERE user_id = $1 AND status = 'active'`,
-              [payment.notes.userId]
+               WHERE user_id = $1 AND status IN ('active', 'trial')`,
+              [userId]
             );
 
+            const eventId = payment?.id ?? "";
             await dbAdapter.query(
               `INSERT INTO billing_transactions
                (user_id, event_type, razorpay_event_id, razorpay_order_id,
                 razorpay_payment_id, amount, currency, status, provider_data)
                VALUES ($1, 'payment.failed', $2, $3, $4, $5, $6, 'failed', $7)`,
               [
-                payment.notes.userId,
-                (event.raw as any)?.payload?.payment?.entity?.id ?? "",
-                payment.order_id,
-                payment.id,
-                payment.amount,
-                payment.currency ?? "INR",
+                userId,
+                eventId,
+                payment?.order_id ?? "",
+                payment?.id ?? "",
+                payment?.amount ?? 0,
+                payment?.currency ?? "INR",
                 JSON.stringify(event.raw),
               ]
             );
           }
         } else if (event.type === "subscription.cancelled") {
-          const sub = (event.raw as any)?.payload?.subscription?.entity;
+          const sub = rawPayload?.payload?.subscription?.entity;
+          if (sub?.id) {
+            await dbAdapter.query(
+              `UPDATE user_subscriptions SET status = 'cancelled', updated_at = datetime('now')
+               WHERE razorpay_subscription_id = $1 AND status IN ('active', 'trial')`,
+              [sub.id]
+            );
+          }
+          // Fallback: try notes.userId
           if (sub?.notes?.userId) {
             await dbAdapter.query(
               `UPDATE user_subscriptions SET status = 'cancelled', updated_at = datetime('now')
                WHERE user_id = $1 AND status IN ('active', 'trial')`,
               [sub.notes.userId]
             );
+          }
+        } else if (event.type === "subscription.updated") {
+          // Handles subscription.activated, subscription.charged
+          // for recurring billing events
+          const sub = rawPayload?.payload?.subscription?.entity;
+          if (sub?.id) {
+            const newStatus = sub.status === "active" ? "active"
+              : sub.status === "cancelled" ? "cancelled"
+              : sub.status === "past_due" ? "past_due"
+              : undefined;
+            if (newStatus) {
+              await dbAdapter.query(
+                `UPDATE user_subscriptions
+                 SET status = $1, current_period_start = $2, current_period_end = $3,
+                     updated_at = datetime('now')
+                 WHERE razorpay_subscription_id = $4`,
+                [
+                  newStatus,
+                  sub.current_start ? sub.current_start * 1000 : Date.now(),
+                  sub.current_end ? sub.current_end * 1000 : Date.now() + 30 * 24 * 60 * 60 * 1000,
+                  sub.id,
+                ]
+              );
+            }
+
+            // If subscription.charged, record the recurring payment
+            if (sub.status === "active" && rawPayload.event === "subscription.charged") {
+              const payment = rawPayload?.payload?.payment?.entity;
+              await dbAdapter.query(
+                `INSERT INTO billing_transactions
+                 (user_id, event_type, razorpay_event_id, razorpay_order_id,
+                  razorpay_payment_id, amount, currency, status, provider_data)
+                 VALUES ($1, 'subscription.charged', $2, $3, $4, $5, $6, 'captured', $7)`,
+                [
+                  sub.notes?.userId ?? "",
+                  payment?.id ?? "",
+                  payment?.order_id ?? "",
+                  payment?.id ?? "",
+                  payment?.amount ?? 0,
+                  payment?.currency ?? "INR",
+                  JSON.stringify(event.raw),
+                ]
+              );
+            }
           }
         }
 
