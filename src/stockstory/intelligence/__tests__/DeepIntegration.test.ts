@@ -1,12 +1,12 @@
 /**
  * Deep Intelligence Integration Test
  *
- * Tests all 20 engines (10 base + 10 new) via the DeepStockStoryOrchestrator.
+ * Tests all 20 engines (10 base + 10 new) via the DeepLensoryOrchestrator.
  * Uses the same realistic RELIANCE-like test data from Integration.test.ts.
  */
 
 import { describe, it, expect } from 'vitest';
-import { DeepStockStoryOrchestrator } from '../orchestrator/DeepStockStoryOrchestrator';
+import { DeepLensoryOrchestrator } from '../orchestrator/DeepLensoryOrchestrator';
 import type { IntelligenceInput } from '../types';
 
 // Also import individual engines for direct unit tests
@@ -83,8 +83,8 @@ const testInput: IntelligenceInput = {
   },
 };
 
-describe('DeepStockStoryOrchestrator — 20-Engine Pipeline', () => {
-  const deepOrch = new DeepStockStoryOrchestrator();
+describe('DeepLensoryOrchestrator — 20-Engine Pipeline', () => {
+  const deepOrch = new DeepLensoryOrchestrator();
 
   it('produces a complete deep intelligence report', async () => {
     const report = await deepOrch.analyze(testInput);

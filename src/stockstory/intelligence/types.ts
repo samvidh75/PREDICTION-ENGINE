@@ -1,9 +1,9 @@
 /**
- * StockStory Intelligence — Canonical Contracts
+ * Lensory Intelligence — Canonical Contracts
  *
  * This file defines the unified type contracts for ALL intelligence engines.
  * Every engine consumes IntelligenceInput and produces IntelligenceOutput[T].
- * The StockStoryOrchestrator aggregates per-engine outputs into a StockReport.
+ * The LensoryOrchestrator aggregates per-engine outputs into a StockReport.
  */
 
 // ─── Primitive scoring types ───────────────────────────────────────

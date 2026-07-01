@@ -1,5 +1,5 @@
 /**
- * PortfolioNormalizer converts broker data to StockStory canonical types.
+ * PortfolioNormalizer converts broker data to Lensory canonical types.
  */
 
 import { MasterCompanyRegistry } from '../data/MasterCompanyRegistry';

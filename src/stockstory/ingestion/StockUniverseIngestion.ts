@@ -1,7 +1,7 @@
 /**
  * Stock Universe Ingestion
  *
- * Maintains the master list of Indian stocks tracked by StockStory.
+ * Maintains the master list of Indian stocks tracked by Lensory.
  * Uses existing repo providers (DB symbols table, NSE/BSE sources).
  * Does NOT invent companies — uses only data from existing sources.
  */

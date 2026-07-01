@@ -65,7 +65,7 @@ export class MoneycontrolMetadataProvider implements MetadataProvider {
 
     const userAgent = this.authConfig
       ? getProviderUserAgent(this.authConfig)
-      : `StockStory/${PROVIDER_NAME} (research)`;
+      : `Lensory/${PROVIDER_NAME} (research)`;
 
     const url = `${MoneycontrolMetadataProvider.BASE_URL}/company/${slug}/${cleanSymbol}`;
 

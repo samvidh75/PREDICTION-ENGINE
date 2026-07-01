@@ -1,7 +1,7 @@
 /**
  * TRACK-50 AGENT A — Event Analytics Framework
  * 
- * Typed event definitions for the entire StockStory India application.
+ * Typed event definitions for the entire Lensory application.
  * Tracks: Discovery, Engagement, Trust, Retention events.
  * Non-blocking, fire-and-forget. Respects user privacy (no PII).
  */

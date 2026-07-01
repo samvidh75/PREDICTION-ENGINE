@@ -12,7 +12,7 @@ export function buildResearchReport(
     sector,
     generatedAt: new Date().toISOString(),
     sections,
-    disclaimer: "This research report is for informational purposes only. It does not constitute investment advice. StockStory India does not provide buy/sell recommendations. Consult a SEBI-registered investment advisor before making investment decisions.",
+    disclaimer: "This research report is for informational purposes only. It does not constitute investment advice. Lensory India does not provide buy/sell recommendations. Consult a SEBI-registered investment advisor before making investment decisions.",
   };
 }
 

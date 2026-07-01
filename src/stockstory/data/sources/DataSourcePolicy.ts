@@ -25,7 +25,7 @@ export class DataSourcePolicy {
       allowedInternal: true,
       requiresAttribution: true,
       attributionLabel: 'Exchange Data',
-      notes: 'Exchange data is public. Attribute to exchange, not StockStory.',
+      notes: 'Exchange data is public. Attribute to exchange, not Lensory.',
     },
     {
       kind: 'regulator',
@@ -119,7 +119,7 @@ export class DataSourcePolicy {
       case 'broker': return 'Broker Data';
       case 'public_db': return 'Public Database';
       case 'manual_upload': return 'User-Provided';
-      case 'derived': return 'StockStory Analysis';
+      case 'derived': return 'Lensory Analysis';
       default: return 'Data Provider';
     }
   }

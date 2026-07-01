@@ -30,7 +30,7 @@ export class ResearchAnswerEngine {
     if (questionType === 'unsupported_or_advice_request') {
       return {
         questionType,
-        answer: 'StockStory provides research context — thesis, risk, compare, and methodology — not personalized investment advice. Review the risk radar, thesis factors, and peer comparison for this company.',
+        answer: 'Lensory provides research context — thesis, risk, compare, and methodology — not personalized investment advice. Review the risk radar, thesis factors, and peer comparison for this company.',
         researchBasis: 'Research-only policy',
         limitations: ['Personal buy/sell guidance is not provided.'],
         confidence: 'High confidence',

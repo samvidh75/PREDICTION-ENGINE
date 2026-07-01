@@ -1,5 +1,5 @@
 /**
- * StockStory Scenario Intelligence — Canonical Contracts
+ * Lensory Scenario Intelligence — Canonical Contracts
  *
  * Defines scenario kinds, severity levels, input/output models
  * for the stock-agnostic scenario simulation layer.

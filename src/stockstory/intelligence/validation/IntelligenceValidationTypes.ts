@@ -1,5 +1,5 @@
 /**
- * StockStory Intelligence Validation Types
+ * Lensory Intelligence Validation Types
  * Part 8 — Intelligence Validation, Market Reality Calibration, Analyst-Grade QA
  *
  * Defines all validation result types for checking intelligence outputs

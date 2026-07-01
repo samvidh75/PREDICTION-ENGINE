@@ -1,12 +1,12 @@
 /**
- * PortfolioIngestionEngine — Converts broker portfolio data into StockStory format.
+ * PortfolioIngestionEngine — Converts broker portfolio data into Lensory format.
  * 
  * Handles:
- *   - Symbol normalization (NSE/BSE → StockStory format)
+ *   - Symbol normalization (NSE/BSE → Lensory format)
  *   - ISIN mapping via MasterCompanyRegistry
  *   - Sector enrichment
  *   - Market cap enrichment
- *   - Health score placeholder assignment (before StockStory analysis)
+ *   - Health score placeholder assignment (before Lensory analysis)
  */
 
 import { MasterCompanyRegistry } from '../data/MasterCompanyRegistry';
@@ -17,7 +17,7 @@ export class PortfolioIngestionEngine {
   private static registry = MasterCompanyRegistry.getInstance();
 
   /**
-   * Ingest a complete broker portfolio and normalize into StockStory format.
+   * Ingest a complete broker portfolio and normalize into Lensory format.
    */
   static ingest(brokerPortfolio: BrokerPortfolio, userId: string): PortfolioSnapshot {
     const holdings = this.normalizeHoldings(brokerPortfolio.holdings);
@@ -46,7 +46,7 @@ export class PortfolioIngestionEngine {
   }
 
   /**
-   * Normalize holdings — enrich with StockStory metadata.
+   * Normalize holdings — enrich with Lensory metadata.
    */
   private static normalizeHoldings(holdings: PortfolioHolding[]): PortfolioHolding[] {
     return holdings.map(h => {

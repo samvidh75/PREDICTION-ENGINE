@@ -1,5 +1,5 @@
 /**
- * StockStory Valuation Stress Simulator
+ * Lensory Valuation Stress Simulator
  *
  * Simulates how changes in valuation multiples (PE, PB, EV/EBITDA)
  * affect the valuation context and thesis assessment.

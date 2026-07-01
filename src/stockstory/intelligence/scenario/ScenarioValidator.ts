@@ -1,5 +1,5 @@
 /**
- * StockStory Scenario Validation Layer
+ * Lensory Scenario Validation Layer
  *
  * Validates scenario inputs and outputs for:
  * 1. Structural integrity (all required fields present)

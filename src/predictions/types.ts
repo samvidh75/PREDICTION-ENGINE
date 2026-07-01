@@ -33,7 +33,7 @@ export interface PredictionRecord {
   id: string;
   symbol: string;
   prediction_date: string;         // ISO date — when prediction was made
-  ranking_score: number;           // 0-100 composite StockStory score
+  ranking_score: number;           // 0-100 composite Lensory score
   classification: Classification;
   confidence_score: number;        // 0-100 from ConfidenceEngineV2
   confidence_level: ConfidenceLevel;

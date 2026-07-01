@@ -1,6 +1,6 @@
 export type {
-  StockStoryResearchInput,
-  StockStoryNarrativeOutput,
+  LensoryResearchInput,
+  LensoryNarrativeOutput,
   FactorBreakdown,
   RiskFlag,
   ValuationContext,

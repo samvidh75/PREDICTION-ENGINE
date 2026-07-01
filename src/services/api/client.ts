@@ -1,5 +1,5 @@
 /**
- * Centralized API client for StockStory India frontend.
+ * Centralized API client for Lensory India frontend.
  *
  * - Resolves base URL for Vercel rewrite (/api/*) and local dev
  * - Request timeout with AbortController
@@ -266,9 +266,9 @@ export interface SearchResponse {
   };
 }
 
-// -- StockStory --
+// -- Lensory --
 
-export interface StockStoryData {
+export interface LensoryData {
   symbol: string;
   predictionDate: string | null;
   predictionHorizon: number;
@@ -670,9 +670,9 @@ export const api = {
   searchUniversal: (query: string) =>
     apiFetch<SearchResponse>(`/api/search/universal?query=${encodeURIComponent(query)}`),
 
-  // -- StockStory --
-  getStockStory: (ticker: string, horizon = 30, options?: ApiRequestOptions) =>
-    apiFetch<{ ok: true; data: StockStoryData }>(
+  // -- Lensory --
+  getLensory: (ticker: string, horizon = 30, options?: ApiRequestOptions) =>
+    apiFetch<{ ok: true; data: LensoryData }>(
       `/api/stockstory/${encodeURIComponent(ticker)}?horizon=${horizon}`,
       options,
     ),

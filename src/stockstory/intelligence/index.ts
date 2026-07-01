@@ -1,5 +1,5 @@
 /**
- * StockStory Intelligence — Barrel Export
+ * Lensory Intelligence — Barrel Export
  *
  * Public API surface for the intelligence sub-system.
  */
@@ -59,8 +59,8 @@ export type { ExplainProvider, ExplainRequest, ExplainResponse } from './llm/LLM
 
 // ─── Orchestrator ─────────────────────────────────────────────────
 
-export { StockStoryOrchestrator, orchestrator } from './orchestrator/StockStoryOrchestrator';
-export type { OrchestratorOptions } from './orchestrator/StockStoryOrchestrator';
+export { LensoryOrchestrator, orchestrator } from './orchestrator/LensoryOrchestrator';
+export type { OrchestratorOptions } from './orchestrator/LensoryOrchestrator';
 
 // ─── Persistence ──────────────────────────────────────────────────
 

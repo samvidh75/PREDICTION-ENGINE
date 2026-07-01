@@ -1,12 +1,12 @@
-# StockStory India
+# Lensory
 > AI-powered stock research and analysis platform for Indian equities.
 
 ## Key links
-- [StockStory India Homepage](https://stockstory-india.com/)
+- [Lensory Homepage](https://stockstory-india.com/)
 - [Stock Scanner](https://stockstory-india.com/scanner)
 - [Market Reports](https://stockstory-india.com/reports)
 - [Portfolio](https://stockstory-india.com/portfolio)
 - [Stock Analysis](https://stockstory-india.com/stocks/)
 
 ## About
-StockStory India provides AI-powered fundamental research, technical analysis, and market insights for Indian stock market investors.
+Lensory provides AI-powered fundamental research, technical analysis, and market insights for Indian stock market investors.

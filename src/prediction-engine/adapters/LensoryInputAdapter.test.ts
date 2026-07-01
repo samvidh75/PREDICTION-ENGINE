@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { adaptStockStoryInputs } from './StockStoryInputAdapter';
+import { adaptLensoryInputs } from './LensoryInputAdapter';
 import type { EngineInputs } from '../../stockstory/types';
 
 function makeEngineInputs(overrides: Partial<EngineInputs> = {}): EngineInputs {
@@ -71,10 +71,10 @@ function makeEngineInputs(overrides: Partial<EngineInputs> = {}): EngineInputs {
   };
 }
 
-describe('adaptStockStoryInputs', () => {
+describe('adaptLensoryInputs', () => {
   it('converts EngineInputs with valid data into UnifiedPredictionInput', () => {
     const inputs = makeEngineInputs();
-    const result = adaptStockStoryInputs('AAPL', 30, inputs);
+    const result = adaptLensoryInputs('AAPL', 30, inputs);
 
     expect(result.symbol).toBe('AAPL');
     expect(result.horizon).toBe(30);
@@ -153,7 +153,7 @@ describe('adaptStockStoryInputs', () => {
         operatingMargin: null,
       },
     });
-    const result = adaptStockStoryInputs('AAPL', 30, inputs);
+    const result = adaptLensoryInputs('AAPL', 30, inputs);
 
     expect(result.peRatio).toBeNull();
     expect(result.pbRatio).toBeNull();
@@ -202,7 +202,7 @@ describe('adaptStockStoryInputs', () => {
         operatingMargin: null,
       },
     });
-    const result = adaptStockStoryInputs('AAPL', 30, inputs);
+    const result = adaptLensoryInputs('AAPL', 30, inputs);
 
     expect(result.peRatio).toBeNull();
     expect(result.pbRatio).toBeNull();
@@ -211,20 +211,20 @@ describe('adaptStockStoryInputs', () => {
 
   it('horizon mapping works for all 5 values', () => {
     const base = makeEngineInputs();
-    expect(adaptStockStoryInputs('A', 7, base).horizon).toBe(7);
-    expect(adaptStockStoryInputs('A', 30, base).horizon).toBe(30);
-    expect(adaptStockStoryInputs('A', 90, base).horizon).toBe(90);
-    expect(adaptStockStoryInputs('A', 180, base).horizon).toBe(180);
-    expect(adaptStockStoryInputs('A', 365, base).horizon).toBe(365);
+    expect(adaptLensoryInputs('A', 7, base).horizon).toBe(7);
+    expect(adaptLensoryInputs('A', 30, base).horizon).toBe(30);
+    expect(adaptLensoryInputs('A', 90, base).horizon).toBe(90);
+    expect(adaptLensoryInputs('A', 180, base).horizon).toBe(180);
+    expect(adaptLensoryInputs('A', 365, base).horizon).toBe(365);
   });
 
   it('horizon maps nearest valid value', () => {
     const base = makeEngineInputs();
-    expect(adaptStockStoryInputs('A', 14, base).horizon).toBe(7);
-    expect(adaptStockStoryInputs('A', 20, base).horizon).toBe(30);
-    expect(adaptStockStoryInputs('A', 75, base).horizon).toBe(90);
-    expect(adaptStockStoryInputs('A', 135, base).horizon).toBe(90);
-    expect(adaptStockStoryInputs('A', 320, base).horizon).toBe(365);
+    expect(adaptLensoryInputs('A', 14, base).horizon).toBe(7);
+    expect(adaptLensoryInputs('A', 20, base).horizon).toBe(30);
+    expect(adaptLensoryInputs('A', 75, base).horizon).toBe(90);
+    expect(adaptLensoryInputs('A', 135, base).horizon).toBe(90);
+    expect(adaptLensoryInputs('A', 320, base).horizon).toBe(365);
   });
 
   it('default values for missing optional fields', () => {
@@ -232,7 +232,7 @@ describe('adaptStockStoryInputs', () => {
       historical: undefined,
       sector: undefined,
     });
-    const result = adaptStockStoryInputs('AAPL', 30, inputs);
+    const result = adaptLensoryInputs('AAPL', 30, inputs);
 
     expect(result.close).toBeNull();
     expect(result.closePrices).toEqual([]);

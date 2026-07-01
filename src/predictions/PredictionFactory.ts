@@ -17,7 +17,7 @@ import { predictionRegistry } from './PredictionRegistry';
 import type { UnifiedPredictionOutput, UnifiedClassification } from '../prediction-engine/types';
 import { isFiniteNumber } from '../stockstory/types';
 import {
-  mapStockStoryClassification,
+  mapLensoryClassification,
   type RegistryPredictionHorizon,
   type RegistryClassification,
   type CreatePredictionInput as ContractCreatePredictionInput,
@@ -105,7 +105,7 @@ export class PredictionFactory {
             continue;
           }
 
-          // Run StockStory engine for this symbol
+          // Run Lensory engine for this symbol
           const engineResult = await this.evaluateSymbol(symbol, today);
           if (!engineResult) {
             skipped++;
@@ -130,8 +130,8 @@ export class PredictionFactory {
             continue;
           }
 
-          // Map StockStory classification to registry classification (throws on unknown)
-          const classification = mapStockStoryClassification(engineResult.classification);
+          // Map Lensory classification to registry classification (throws on unknown)
+          const classification = mapLensoryClassification(engineResult.classification);
 
           // P0-MEGA: Correct confidence formula — risk REDUCES confidence
           const riskStrength = Math.max(0, 100 - criticalScores.risk);
@@ -336,8 +336,10 @@ export class PredictionFactory {
       const predictionFactoryDelegation = process.env.F5_PREDICTION_FACTORY_DELEGATE === 'true';
 
       if (unifiedEngineEnabled && predictionFactoryDelegation) {
-        const { UnifiedPredictionEngine } = require('../../prediction-engine/UnifiedPredictionEngine');
-        const { adaptPredictionFactoryData } = require('../../prediction-engine/adapters/PredictionFactoryAdapter');
+        const [{ UnifiedPredictionEngine }, { adaptPredictionFactoryData }] = await Promise.all([
+          import('../../prediction-engine/UnifiedPredictionEngine'),
+          import('../../prediction-engine/adapters/PredictionFactoryAdapter'),
+        ]);
         const engine = new UnifiedPredictionEngine();
         const unifiedInput = adaptPredictionFactoryData(
           symbol,

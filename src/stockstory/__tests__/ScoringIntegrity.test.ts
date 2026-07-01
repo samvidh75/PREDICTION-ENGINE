@@ -3,7 +3,7 @@ import { growthEngine } from '../engines/GrowthEngine';
 import { qualityEngine } from '../engines/QualityEngine';
 import { stabilityEngine } from '../engines/StabilityEngine';
 import { valuationEngine } from '../engines/ValuationEngine';
-import { StockStoryEngine } from '../StockStoryEngine';
+import { LensoryEngine } from '../LensoryEngine';
 import type { EngineInputs } from '../types';
 
 const BASE_FIXTURE: EngineInputs = {
@@ -244,8 +244,8 @@ describe('GROUP I: Determinism', () => {
     expect(valuationA.score).toBe(valuationB.score);
   });
 
-  it('StockStoryEngine returns identical scores for identical input', () => {
-    const engine = new StockStoryEngine();
+  it('LensoryEngine returns identical scores for identical input', () => {
+    const engine = new LensoryEngine();
     const a = engine.evaluate(BASE_FIXTURE);
     const b = engine.evaluate(BASE_FIXTURE);
 
@@ -310,8 +310,8 @@ describe('GROUP J: Score Range', () => {
     }
   });
 
-  it('StockStoryEngine health score is within 0-100', () => {
-    const engine = new StockStoryEngine();
+  it('LensoryEngine health score is within 0-100', () => {
+    const engine = new LensoryEngine();
     const result = engine.evaluate(BASE_FIXTURE);
 
     expect(result.healthScore).toBeGreaterThanOrEqual(0);

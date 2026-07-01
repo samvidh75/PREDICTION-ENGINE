@@ -15,7 +15,7 @@ export function buildCompanySeo(
     : `Research-driven analysis of ${name} (${symbol}). Scorecard, thesis, risks, and peer context. Not investment advice.`;
 
   return {
-    title: `${name} (${symbol}) — Research Analysis | StockStory India`,
+    title: `${name} (${symbol}) — Research Analysis | Lensory`,
     description: desc,
     canonical: `/stocks/${symbol}`,
     ogImage: `/og/company-${symbol}.png`,

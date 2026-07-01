@@ -1,5 +1,5 @@
 /**
- * StockStory Financial Stress Simulator
+ * Lensory Financial Stress Simulator
  *
  * Simulates how changes in financial assumptions affect
  * financial quality, growth, and leverage scores.

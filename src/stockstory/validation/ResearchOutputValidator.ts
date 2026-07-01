@@ -1,4 +1,4 @@
-import type { StockStoryNarrativeOutput } from '../research/types';
+import type { LensoryNarrativeOutput } from '../research/types';
 
 const FORBIDDEN_PATTERNS = [
   /\bbuy\s+now\b/i,
@@ -28,7 +28,7 @@ const FORBIDDEN_PATTERNS = [
   /\bundefined\b/,
 ];
 
-const REQUIRED_FIELDS: (keyof StockStoryNarrativeOutput)[] = [
+const REQUIRED_FIELDS: (keyof LensoryNarrativeOutput)[] = [
   'thesis',
   'bullCase',
   'bearCase',
@@ -49,7 +49,7 @@ export interface ValidationResult {
 }
 
 export class ResearchOutputValidator {
-  validate(output: StockStoryNarrativeOutput): ValidationResult {
+  validate(output: LensoryNarrativeOutput): ValidationResult {
     const errors: string[] = [];
     const warnings: string[] = [];
 

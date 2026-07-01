@@ -72,10 +72,7 @@ export function NativeAd({ position, compact = false }: NativeAdProps) {
   const [dismissed, setDismissed] = useState(false);
   const [impressed, setImpressed] = useState(false);
   const adRef = useRef<HTMLDivElement>(null);
-
-  // Premium users see no ads
-  if (isPremium) return null;
-  if (dismissed) return null;
+  const hidden = isPremium || dismissed;
 
   // Rotate ads based on position
   const ad = AD_INVENTORY[position % AD_INVENTORY.length];
@@ -102,6 +99,9 @@ export function NativeAd({ position, compact = false }: NativeAdProps) {
     observer.observe(adRef.current);
     return () => observer.disconnect();
   }, [ad.id, position, impressed]);
+
+  // Premium users see no ads
+  if (hidden) return null;
 
   const handleClick = () => {
     // Track click
@@ -296,7 +296,7 @@ export function NativeAd({ position, compact = false }: NativeAdProps) {
         }}
       >
         <span style={{ fontSize: "12px", color: colors.textTertiary }}>
-          Ad-free with StockStory Premium
+          Ad-free with Lensory Premium
         </span>
         <span
           style={{

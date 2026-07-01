@@ -1,4 +1,4 @@
-import type { StockStoryResearchInput, StockStoryNarrativeOutput } from '../research/types';
+import type { LensoryResearchInput, LensoryNarrativeOutput } from '../research/types';
 import { researchOutputValidator } from '../validation/ResearchOutputValidator';
 import { researchNarrativeService } from '../research/ResearchNarrativeService';
 import { getLLMGatewayConfig, setLLMGatewayConfig, type LLMGatewayConfig, type LLMGatewayMode } from './config';
@@ -40,12 +40,12 @@ export class LLMGateway {
     setLLMGatewayConfig({ mode });
   }
 
-  generateThesis(input: StockStoryResearchInput): StockStoryNarrativeOutput {
+  generateThesis(input: LensoryResearchInput): LensoryNarrativeOutput {
     const startTime = performance.now();
     const provider = this.getActiveProvider();
     const config = getLLMGatewayConfig();
 
-    let output: StockStoryNarrativeOutput;
+    let output: LensoryNarrativeOutput;
     let fallbackUsed = false;
     let validationPassed = true;
     let schemaFailureReason: string | undefined;
@@ -75,6 +75,7 @@ export class LLMGateway {
       validationPassed,
       fallbackUsed,
       schemaFailureReason,
+      policyFailureReason: undefined,
       inputTokenEstimate: undefined,
       outputTokenEstimate: undefined,
       costEstimate: config.mode === 'deterministic' ? 0 : null,
@@ -202,7 +203,7 @@ export class LLMGateway {
     return result;
   }
 
-  private fallbackNarrative(input: StockStoryResearchInput): StockStoryNarrativeOutput {
+  private fallbackNarrative(input: LensoryResearchInput): LensoryNarrativeOutput {
     try {
       return researchNarrativeService.generateFullNarrative(input);
     } catch {

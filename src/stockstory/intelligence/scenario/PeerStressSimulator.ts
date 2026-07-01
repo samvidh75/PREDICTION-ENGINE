@@ -1,5 +1,5 @@
 /**
- * StockStory Peer Stress Simulator
+ * Lensory Peer Stress Simulator
  *
  * Simulates how peer-relative assessment could change
  * under different sector or market conditions.

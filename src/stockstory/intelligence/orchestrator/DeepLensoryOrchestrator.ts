@@ -1,14 +1,14 @@
 /**
- * Deep StockStory Orchestrator
+ * Deep Lensory Orchestrator
  *
- * Extends the base StockStoryOrchestrator with all 20 intelligence subsystems.
+ * Extends the base LensoryOrchestrator with all 20 intelligence subsystems.
  * Runs the 9 base engines + 11 deep intelligence engines in parallel,
  * producing a comprehensive DeepStockIntelligenceReport.
  */
 
 import type { IntelligenceInput, StockIntelligenceReport } from '../types';
 import { clampScore, toScoreBand } from '../scoring';
-import { orchestrator, StockStoryOrchestrator } from './StockStoryOrchestrator';
+import { orchestrator, LensoryOrchestrator } from './LensoryOrchestrator';
 
 // Base engines
 import { financialEngine } from '../engines/FinancialEngine';
@@ -79,10 +79,10 @@ export interface DeepIntelligenceReport extends StockIntelligenceReport {
   };
 }
 
-export class DeepStockStoryOrchestrator {
-  private baseOrchestrator: StockStoryOrchestrator;
+export class DeepLensoryOrchestrator {
+  private baseOrchestrator: LensoryOrchestrator;
 
-  constructor(base?: StockStoryOrchestrator) {
+  constructor(base?: LensoryOrchestrator) {
     this.baseOrchestrator = base ?? orchestrator;
   }
 
@@ -302,4 +302,4 @@ export class DeepStockStoryOrchestrator {
   }
 }
 
-export const deepOrchestrator = new DeepStockStoryOrchestrator();
+export const deepOrchestrator = new DeepLensoryOrchestrator();

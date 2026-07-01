@@ -1,5 +1,5 @@
 /**
- * Enhanced Scanner Presets — Part 1.2 of StockStory Master Prompt
+ * Enhanced Scanner Presets — Part 1.2 of Lensory Master Prompt
  *
  * 5 presets with weighted scoring algorithm:
  *   Quality Compounders → quality(0.40) + growth(0.25) + stability(0.20) + valuation(0.15)

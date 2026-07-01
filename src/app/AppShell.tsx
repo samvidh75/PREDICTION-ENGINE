@@ -3,9 +3,9 @@ import { useEffect, useState } from "react";
 import { Home, Search, Star, CreditCard, LayoutGrid, Shield, MessageSquareText, ArrowUpRight, MessageCircle, TrendingUp } from "lucide-react";
 import { NavLink, Link, useNavigate } from "react-router-dom";
 import { colors, typography, space, radius, layout, components, shadows, animation } from "../design/tokens";
+import { BrandMark } from "../components/BrandMark";
 import { NotificationBell } from "../components/NotificationBell";
 import { ResearchProfileModal } from "../components/ResearchProfileModal";
-import BetaBadge from "../components/BetaBadge";
 import PrivacyConsentBanner from "../components/PrivacyConsentBanner";
 import { CommandPalette } from "../components/CommandPalette";
 import { useKeyboardShortcuts, KeyboardHelpOverlay } from "../hooks/useKeyboardShortcuts";
@@ -68,7 +68,8 @@ export function AppShell({ children }: { children: ReactNode }) {
       {/* DESKTOP SIDEBAR */}
       <aside className="rail">
         <NavLink to="/" style={brandLinkStyle}>
-          StockStory<BetaBadge />
+          <BrandMark size={44} />
+          <span>Lensory</span>
         </NavLink>
         <nav style={navStackStyle} aria-label="Primary">
           {NAV.map((item) => (
@@ -128,7 +129,8 @@ export function AppShell({ children }: { children: ReactNode }) {
       {/* MOBILE TOP BAR */}
       <header className="mobile-brand" style={{ justifyContent: "space-between" }}>
         <NavLink to="/" style={mobileBrandLinkStyle}>
-          StockStory<BetaBadge />
+          <BrandMark size={36} />
+          <span>Lensory</span>
         </NavLink>
         <div style={{ display: "flex", alignItems: "center", gap: space[3] }}>
           <Link to="/changelog" aria-label="Changelog" style={{ color: colors.textSecondary, display: "flex" }}>
@@ -165,7 +167,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           lineHeight: "1.6",
         }}>
           <p>
-            © 2026 StockStory India. <strong>Not SEBI-registered</strong>. This service provides analysis for educational purposes only. Algorithms may contain errors. Data delayed 1-15 minutes. Consult a SEBI-registered investment advisor before investing. Past performance does not guarantee future results.
+            © 2026 Lensory. <strong>Not SEBI-registered</strong>. This service provides analysis for educational purposes only. Algorithms may contain errors. Data delayed 1-15 minutes. Consult a SEBI-registered investment advisor before investing. Past performance does not guarantee future results.
           </p>
         </footer>
       </main>

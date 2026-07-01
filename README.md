@@ -1,4 +1,4 @@
-# StockStory India — 100% Free AI Platform
+# Lensory — 100% Free AI Platform
 
 ## Cost Breakdown
 
@@ -35,7 +35,7 @@ A cinematic financial intelligence operating system focused on market storytelli
 
 ## Platform Direction
 
-StockStory India is evolving from a prototype-stage financial dashboard into a scalable market intelligence ecosystem.
+Lensory is evolving from a prototype-stage financial dashboard into a scalable market intelligence ecosystem.
 
 ## Refactor Goals
 

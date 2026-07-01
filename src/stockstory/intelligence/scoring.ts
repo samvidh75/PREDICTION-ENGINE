@@ -1,5 +1,5 @@
 /**
- * StockStory Intelligence — Shared Scoring Utilities
+ * Lensory Intelligence — Shared Scoring Utilities
  *
  * Standardised helpers every engine uses:
  *   - clampScore        bound a value to [0, 100]

@@ -1,7 +1,7 @@
 /**
  * TRACK-96C — Portfolio Outcome Engine
  * 
- * Measures whether following StockStory recommendations generates alpha.
+ * Measures whether following Lensory recommendations generates alpha.
  * Uses prediction_registry validated outcomes to compute:
  * - What if a user held top predictions?
  * - What if they avoided bottom predictions?

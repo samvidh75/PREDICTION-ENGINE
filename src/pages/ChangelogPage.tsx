@@ -32,7 +32,7 @@ export default function ChangelogPage() {
     <div style={{ maxWidth: "640px", margin: "0 auto" }}>
       <h1 style={{ fontSize: typography.h2.desktop.size, fontWeight: 700, marginBottom: space[2] }}>Changelog</h1>
       <p style={{ color: colors.textSecondary, marginBottom: space[8], fontSize: typography.body.desktop.size }}>
-        See what's new in StockStory India.
+        See what's new in Lensory India.
       </p>
       {CHANGELOG_ENTRIES.map((entry) => (
         <div key={entry.version} style={{ marginBottom: space[8] }}>

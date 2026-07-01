@@ -1,7 +1,7 @@
 /**
  * src/config/beta.ts
  *
- * Beta mode configuration for StockStory India.
+ * Beta mode configuration for Lensory.
  * Controls public access, feature gates, and beta lifecycle.
  *
  * Modes:
@@ -147,7 +147,7 @@ const MODE_LABELS: Record<BetaMode, string> = {
   closed: "Development",
   waitlist: "Private Beta",
   open: "Open Beta",
-  public: "StockStory India",
+  public: "Lensory",
 };
 
 /**

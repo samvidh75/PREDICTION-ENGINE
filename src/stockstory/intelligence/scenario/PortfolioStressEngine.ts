@@ -1,5 +1,5 @@
 /**
- * StockStory Portfolio Stress Engine
+ * Lensory Portfolio Stress Engine
  *
  * Aggregates scenario results across a portfolio of stocks.
  * Shows concentration risk, net portfolio direction,

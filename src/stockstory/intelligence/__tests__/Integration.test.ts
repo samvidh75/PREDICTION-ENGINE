@@ -6,7 +6,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { KnowledgeBase } from '../rag/KnowledgeBase';
 import { LLMExplainer, DeterministicExplainProvider, CachedExplainProvider } from '../llm/LLMExplainer';
 import { IntelligenceCache } from '../persistence/IntelligenceCache';
-import { StockStoryOrchestrator } from '../orchestrator/StockStoryOrchestrator';
+import { LensoryOrchestrator } from '../orchestrator/LensoryOrchestrator';
 import type { IntelligenceInput, StockIntelligenceReport } from '../types';
 
 // ─── KnowledgeBase ────────────────────────────────────────────────
@@ -165,7 +165,7 @@ describe('IntelligenceCache', () => {
 
 // ─── Orchestrator ─────────────────────────────────────────────────
 
-describe('StockStoryOrchestrator', () => {
+describe('LensoryOrchestrator', () => {
   const input: IntelligenceInput = {
     symbol: 'TEST',
     exchange: 'NSE_EQ',
@@ -217,7 +217,7 @@ describe('StockStoryOrchestrator', () => {
   };
 
   it('produces a complete report', async () => {
-    const orchestrator = new StockStoryOrchestrator({ enableRAG: false });
+    const orchestrator = new LensoryOrchestrator({ enableRAG: false });
     const report = await orchestrator.analyze(input);
 
     expect(report.symbol).toBe('TEST');
@@ -230,7 +230,7 @@ describe('StockStoryOrchestrator', () => {
   });
 
   it('includes all engine outputs', async () => {
-    const orchestrator = new StockStoryOrchestrator();
+    const orchestrator = new LensoryOrchestrator();
     const report = await orchestrator.analyze(input);
 
     const engines = report.engines;
@@ -246,7 +246,7 @@ describe('StockStoryOrchestrator', () => {
   });
 
   it('assesses data freshness correctly', async () => {
-    const orchestrator = new StockStoryOrchestrator();
+    const orchestrator = new LensoryOrchestrator();
     const report = await orchestrator.analyze(input);
     expect(['live', 'recent', 'stale', 'unavailable']).toContain(report.dataFreshness);
   });

@@ -7,8 +7,9 @@
 
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import type { IntelligenceInput, StockIntelligenceReport } from '../types';
-import { orchestrator } from '../orchestrator/StockStoryOrchestrator';
+import { orchestrator } from '../orchestrator/LensoryOrchestrator';
 import { globalIntelligenceCache } from '../persistence/IntelligenceCache';
+import { llmExplainer } from '../llm/LLMExplainer';
 
 interface StockQuery {
   symbol: string;
@@ -199,7 +200,6 @@ function buildInput(symbol: string, exchange: IntelligenceInput['exchange'], tra
 
 function llmExplainerName(): string {
   try {
-    const { llmExplainer } = require('../llm/LLMExplainer');
     return llmExplainer.activeProvider;
   } catch {
     return 'deterministic';

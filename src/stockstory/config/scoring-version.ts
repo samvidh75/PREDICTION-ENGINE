@@ -1,5 +1,5 @@
 /**
- * StockStory Scoring Version — Canonical calibration identifier.
+ * Lensory Scoring Version — Canonical calibration identifier.
  * 
  * TRACK-P4: Exposed in diagnostics, validation reports, and prediction metadata.
  * 

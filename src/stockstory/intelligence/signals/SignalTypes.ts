@@ -1,7 +1,7 @@
 /**
  * Signal Types — Canonical intelligence signal definitions
  *
- * Every signal StockStory generates MUST conform to this contract.
+ * Every signal Lensory generates MUST conform to this contract.
  * Signals are evidence-bound: no evidence → low confidence or no signal.
  */
 

@@ -1,5 +1,5 @@
 /**
- * StockStory Autonomous Analyst Desk — public exports
+ * Lensory Autonomous Analyst Desk — public exports
  */
 
 export * from './tasks/AnalystTaskTypes';

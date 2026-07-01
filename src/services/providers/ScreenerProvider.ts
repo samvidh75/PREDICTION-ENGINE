@@ -52,7 +52,7 @@ export class ScreenerProvider implements FinancialProvider {
   private async fetchPage(url: string, symbol: string): Promise<string> {
     const userAgent = this.authConfig
       ? getProviderUserAgent(this.authConfig)
-      : 'StockStory/screener (research project; contact: dev@stockstory.org)';
+      : 'Lensory/screener (research project; contact: dev@stockstory.org)';
 
     const result = await (await getSharedProviderRequestBroker()).execute(
       ScreenerProvider.PROVIDER_ID,

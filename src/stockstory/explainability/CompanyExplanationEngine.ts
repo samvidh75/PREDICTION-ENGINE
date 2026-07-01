@@ -1,32 +1,28 @@
 /**
  * CompanyExplanationEngine
- * Deterministic human-readable explanation generator for StockStory health scores.
+ * Deterministic human-readable explanation generator for Lensory health scores.
  */
 
-import { StockStoryOutput, CompanyClassification } from '../types';
+import { LensoryOutput, CompanyClassification } from '../types';
 
 export class CompanyExplanationEngine {
   /**
-   * Generate a natural-language description explaining the drivers behind a company's StockStory Health score.
+   * Generate a natural-language description explaining the drivers behind a company's Lensory Health score.
    */
-  static explain(symbol: string, result: StockStoryOutput): string {
+  static explain(symbol: string, result: LensoryOutput): string {
     const { healthScore, classification, growth, quality, stability, valuation, momentum, risk, engineDetails } = result;
 
     // 1. Core Summary Sentence
-    let summary = '';
-    const classText = classification.toLowerCase();
-    
-    if (classification === 'Excellent') {
-      summary = `${symbol} ranks as an Excellent business, showing outstanding fundamentals and robust structural health.`;
-    } else if (classification === 'Healthy') {
-      summary = `${symbol} presents a Healthy profile with a well-balanced fundamental structure and well-managed risk parameters.`;
-    } else if (classification === 'Stable') {
-      summary = `${symbol} registers a Stable classification, balancing solid metrics in some areas against headwinds in others.`;
-    } else if (classification === 'Weakening') {
-      summary = `${symbol} exhibits a Weakening profile, indicating declining fundamentals or technical support relative to history.`;
-    } else {
-      summary = `${symbol} is classified as At Risk, showing severe operational stress or high vulnerability across multiple dimensions.`;
-    }
+    const summary =
+      classification === 'Excellent'
+        ? `${symbol} ranks as an Excellent business, showing outstanding fundamentals and robust structural health.`
+        : classification === 'Healthy'
+          ? `${symbol} presents a Healthy profile with a well-balanced fundamental structure and well-managed risk parameters.`
+          : classification === 'Stable'
+            ? `${symbol} registers a Stable classification, balancing solid metrics in some areas against headwinds in others.`
+            : classification === 'Weakening'
+              ? `${symbol} exhibits a Weakening profile, indicating declining fundamentals or technical support relative to history.`
+              : `${symbol} is classified as At Risk, showing severe operational stress or high vulnerability across multiple dimensions.`;
 
     // 2. Identify top positive driver and worst negative driver
     const dimensions = [
@@ -59,13 +55,13 @@ export class CompanyExplanationEngine {
     let penaltyText = '';
     const penaltyTotal = healthScore - (healthScore + (result as any).totalPenalty || 0); // we will calculate it in runner or extract from engineDetails
     // Let's compute actual applied penalties if any are present in result or engineDetails.
-    // In our StockStoryEngine implementation, we apply penalties which might be printed in the narrative.
+    // In our LensoryEngine implementation, we apply penalties which might be printed in the narrative.
     // Let's see if there is volatility or risk dampening.
     if (risk > 65) {
       penaltyText += ` Elevated risk parameters (${risk}/100) trigger a risk dampening discount of ${Math.round(Math.max(0, (risk - 15) * 0.45))} points.`;
     }
 
     // Combine into final deterministic explanation paragraph
-    return `${summary}${driversText}${penaltyText} Overall, ${symbol} achieves a StockStory Health score of ${healthScore}/100.`.trim();
+    return `${summary}${driversText}${penaltyText} Overall, ${symbol} achieves a Lensory Health score of ${healthScore}/100.`.trim();
   }
 }

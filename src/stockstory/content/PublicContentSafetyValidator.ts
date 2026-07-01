@@ -17,7 +17,7 @@ const ERROR_PATTERNS: { pattern: RegExp; label: string; suggestion: string }[] =
   { pattern: /\bbest stocks? to buy\b/i, label: "Best stocks to buy", suggestion: 'Use "notable companies for research" or "companies with strong scores"' },
   { pattern: /\bmutlibagger\b/i, label: "Multibagger claim", suggestion: 'Use "high-growth companies" or "companies with strong momentum"' },
   { pattern: /\bguaranteed\s+(return|profit|income)\b/i, label: "Guaranteed return", suggestion: 'Remove guarantee language - returns are never guaranteed' },
-  { pattern: /\bSEBI\s+registered\b/i, label: "SEBI registered", suggestion: 'Be accurate - StockStory is not SEBI-registered' },
+  { pattern: /\bSEBI\s+registered\b/i, label: "SEBI registered", suggestion: 'Be accurate - Lensory is not SEBI-registered' },
   { pattern: /\binvestment\s+advisor\b/i, label: "Investment advisor claim", suggestion: 'Use "research platform" or "research tool"' },
   { pattern: /\bpast\s+returns?\s+(guarantee|assure)/i, label: "Past returns guarantee", suggestion: 'Add disclaimer that past performance does not guarantee future results' },
   { pattern: /\bfake\s+(testimonial|review|user|media|partner)/i, label: "Fake attribution", suggestion: 'Do not fabricate user quotes, media mentions, or partnerships' },
@@ -28,7 +28,7 @@ const WARNING_PATTERNS: { pattern: RegExp; label: string; suggestion: string }[]
   { pattern: /\btop\s+\d+\s+stocks?\b/i, label: "Top stocks list", suggestion: 'Use "stocks with strong scores" or "research-ranked companies"' },
   { pattern: /\b(recommendation|rating|target price)\b/i, label: "Recommendation language", suggestion: 'Use "research view" or "score" instead' },
   { pattern: /\b(winning|beating the market|outperform)\b/i, label: "Performance claim", suggestion: 'Use "scored highly" or "ranked favourably"' },
-  { pattern: /\bprice\s+target\b/i, label: "Price target", suggestion: 'StockStory does not set price targets' },
+  { pattern: /\bprice\s+target\b/i, label: "Price target", suggestion: 'Lensory does not set price targets' },
 ];
 
 export function validateContent(text: string, sourceFile?: string): SafetyViolation[] {

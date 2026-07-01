@@ -1,5 +1,5 @@
 /**
- * StockStory Scenario Utilities
+ * Lensory Scenario Utilities
  *
  * Deterministic helpers for scenario simulation math.
  * All functions are pure, evidence-bound, and NaN-safe.

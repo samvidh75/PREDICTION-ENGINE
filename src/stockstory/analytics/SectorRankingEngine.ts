@@ -1,4 +1,4 @@
-import type { StockStoryOutput } from '../types';
+import type { LensoryOutput } from '../types';
 import { getSectorProfile } from '../SectorAdapter';
 import { SectorPercentileEngine } from '../scoring/SectorPercentileEngine';
 
@@ -7,7 +7,7 @@ export interface RankedCompany {
   companyName: string;
   sector: string;
   healthScore: number;
-  classification: StockStoryOutput['classification'];
+  classification: LensoryOutput['classification'];
   peerPercentile: number;
   sectorQuartile: 'Q1' | 'Q2' | 'Q3' | 'Q4';
 }
@@ -17,13 +17,13 @@ export class SectorRankingEngine {
     symbol: string;
     companyName: string;
     sector: string;
-    output: StockStoryOutput;
+    output: LensoryOutput;
   }>): RankedCompany[] {
     const grouped = new Map<string, Array<{
       symbol: string;
       companyName: string;
       sector: string;
-      output: StockStoryOutput;
+      output: LensoryOutput;
     }>>();
 
     for (const entry of entries) {

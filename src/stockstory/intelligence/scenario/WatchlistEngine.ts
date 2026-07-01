@@ -1,5 +1,5 @@
 /**
- * StockStory Watchlist Engine
+ * Lensory Watchlist Engine
  *
  * Generates "Watch Next" items and "Review Triggers"
  * based on scenario results. Prioritizes by impact magnitude

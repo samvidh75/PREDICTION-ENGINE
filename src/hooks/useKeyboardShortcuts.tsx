@@ -1,5 +1,5 @@
 /**
- * Global keyboard shortcut hook — Part 4 of StockStory Master Prompt
+ * Global keyboard shortcut hook — Part 4 of Lensory Master Prompt
  *
  * Shortcuts:
  *   ↑ ↓       → Navigate search/palette results

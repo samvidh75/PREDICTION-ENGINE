@@ -79,7 +79,7 @@ export class EvidenceAnswerBuilder {
       case 'thesis_question':
         return input.context.thesisSummary ?? `Review thesis factors and conviction drivers for ${sym}.`;
       case 'methodology_question':
-        return 'StockStory research combines structured metrics (quality, valuation, growth, momentum, risk), filings data, and evidence-bound analysis. Scores and rankings are percentile-based within sectors, updated on market data cycles.';
+        return 'Lensory research combines structured metrics (quality, valuation, growth, momentum, risk), filings data, and evidence-bound analysis. Scores and rankings are percentile-based within sectors, updated on market data cycles.';
       default:
         return `Research overview for ${sym} — review thesis, risk, and what changed sections.`;
     }

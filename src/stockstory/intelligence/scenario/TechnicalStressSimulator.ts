@@ -1,5 +1,5 @@
 /**
- * StockStory Technical Stress Simulator
+ * Lensory Technical Stress Simulator
  *
  * Simulates how changes in price momentum or volatility
  * affect technical context and thesis timing.

@@ -60,7 +60,7 @@ export class MoneycontrolShareholdingProvider {
 
     const userAgent = this.authConfig
       ? getProviderUserAgent(this.authConfig)
-      : `StockStory/${PROVIDER_NAME} (research)`;
+      : `Lensory/${PROVIDER_NAME} (research)`;
 
     const url = `${MoneycontrolShareholdingProvider.BASE_URL}/company/${slug}/shareholding/${cleanSymbol}`;
 

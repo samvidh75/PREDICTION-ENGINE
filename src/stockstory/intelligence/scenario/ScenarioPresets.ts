@@ -1,5 +1,5 @@
 /**
- * StockStory Scenario Presets
+ * Lensory Scenario Presets
  *
  * Stock-agnostic, compliance-safe scenario presets.
  * Every preset shows explicit assumptions to the user.

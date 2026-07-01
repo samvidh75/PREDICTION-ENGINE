@@ -6,7 +6,7 @@
  * 
  * Security:
  *   - Client secret is NEVER exposed client-side
- *   - Token exchange happens through StockStory backend proxy
+ *   - Token exchange happens through Lensory backend proxy
  *   - State parameter prevents CSRF
  *   - PKCE (code challenge) for additional security
  */
@@ -36,7 +36,7 @@ export class UpstoxOAuth {
 
   /**
    * Build the Upstox authorization URL.
-   * User is redirected here to grant StockStory access to their portfolio.
+   * User is redirected here to grant Lensory access to their portfolio.
    */
   static buildAuthUrl(options: {
     clientId: string;
@@ -59,7 +59,7 @@ export class UpstoxOAuth {
   /**
    * Exchange authorization code for access/refresh tokens.
    * 
-   * IMPORTANT: This MUST go through the StockStory backend proxy
+   * IMPORTANT: This MUST go through the Lensory backend proxy
    * to avoid exposing the Upstox client secret in client-side code.
    * 
    * The backend endpoint /api/upstox/token adds the client_secret

@@ -61,7 +61,7 @@ export class MoneycontrolFinancialsProvider implements FinancialProvider {
 
     const userAgent = this.authConfig
       ? getProviderUserAgent(this.authConfig)
-      : `StockStory/${PROVIDER_NAME} (research)`;
+      : `Lensory/${PROVIDER_NAME} (research)`;
 
     const ratiosUrl = `${MoneycontrolFinancialsProvider.BASE_URL}/financials/${slug}/ratios/${cleanSymbol}`;
 

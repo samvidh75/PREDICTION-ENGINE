@@ -1,5 +1,5 @@
 -- ============================================================
--- SCHEMA: LLM-related data tables for StockStory
+-- SCHEMA: LLM-related data tables for Lensory
 -- ============================================================
 
 CREATE TABLE IF NOT EXISTS llm_responses (

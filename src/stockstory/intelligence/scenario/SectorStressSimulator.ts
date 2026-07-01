@@ -1,5 +1,5 @@
 /**
- * StockStory Sector Stress Simulator
+ * Lensory Sector Stress Simulator
  *
  * Simulates how sector-wide valuation and growth changes
  * affect the sector-relative assessment of a company.

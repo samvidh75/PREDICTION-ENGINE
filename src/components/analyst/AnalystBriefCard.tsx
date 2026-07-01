@@ -40,7 +40,7 @@ export function AnalystQABox({ symbol, onAsk, answer, loading, limitations }: An
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: space[3] }}>
       <p style={{ fontSize: typography.body.desktop.size, color: colors.textSecondary }}>
-        Ask StockStory about {symbol ?? 'this company'}. Research only — not investment advice.
+        Ask Lensory about {symbol ?? 'this company'}. Research only — not investment advice.
       </p>
       <form
         onSubmit={(e) => {

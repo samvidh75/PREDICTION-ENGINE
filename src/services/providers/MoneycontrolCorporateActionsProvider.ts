@@ -60,7 +60,7 @@ export class MoneycontrolCorporateActionsProvider {
 
     const userAgent = this.authConfig
       ? getProviderUserAgent(this.authConfig)
-      : `StockStory/${PROVIDER_NAME} (research)`;
+      : `Lensory/${PROVIDER_NAME} (research)`;
 
     const url = `${MoneycontrolCorporateActionsProvider.BASE_URL}/company/${slug}/corporate-actions/${cleanSymbol}`;
 

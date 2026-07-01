@@ -1,7 +1,7 @@
 -- 007_create_master_registry.sql
 -- TRACK-21 Phase 2 Task 6: master_security_registry table
 --
--- Canonical source of truth for all securities tracked by StockStory.
+-- Canonical source of truth for all securities tracked by Lensory.
 -- Populated by RegistryUpdater.runUpdate() nightly.
 -- Used by the population pipeline as the authoritative symbol list.
 

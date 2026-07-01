@@ -1,7 +1,7 @@
 /**
  * commercial/plans — Product tier definitions and plan registry.
  *
- * StockStory India provides research scores and analysis tools only.
+ * Lensory provides research scores and analysis tools only.
  * No buy/sell recommendations, no investment advice, no portfolio
  * management. Plans unlock research features, not trading.
  *

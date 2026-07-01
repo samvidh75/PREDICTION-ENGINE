@@ -1,7 +1,7 @@
 /**
  * Evidence & Data Lineage Types
  *
- * Every data point in StockStory must be traceable back to its source
+ * Every data point in Lensory must be traceable back to its source
  * through an evidence chain that records: who said it, when, via what source,
  * and with what confidence.
  */
