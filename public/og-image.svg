@@ -30,7 +30,7 @@
   <circle cx="246" cy="175" r="12" fill="#2F80FF"/>
   <circle cx="246" cy="175" r="4" fill="white"/>
 
-  <text x="390" y="220" font-family="Inter, system-ui, sans-serif" font-size="86" font-weight="600" letter-spacing="-3" fill="white">StockEX</text>
+  <text x="390" y="220" font-family="Inter, system-ui, sans-serif" font-size="86" font-weight="600" letter-spacing="-3" fill="white">STOCKEX</text>
   <text x="390" y="272" font-family="Inter, system-ui, sans-serif" font-size="22" font-weight="500" letter-spacing="7" fill="#AAB6C8">PREMIUM INDIAN EQUITY RESEARCH</text>
   <text x="390" y="330" font-family="Inter, system-ui, sans-serif" font-size="26" fill="#94A3B8" font-weight="300">Research. Thesis. Conviction. Risk.</text>
   <text x="390" y="374" font-family="Inter, system-ui, sans-serif" font-size="18" fill="#64748B" font-weight="300">AI-powered research for Indian equities with scorecards, comparisons, and scenario analysis.</text>

@@ -10,6 +10,7 @@ import { Button } from "../ui/Button";
 import { Card } from "../ui/Card";
 import { HealthometerMini } from "../ui/HealthometerMini";
 import { ConvictionBadge } from "../ui/ConvictionBadge";
+import { BrandMark } from "../components/BrandMark";
 import { useResponsiveValue } from "../ui/responsive";
 import { colors, typography, space, layout, media, radius } from "../design/tokens";
 import { scanByPreset } from "../services/scanner/presets";
@@ -99,7 +100,7 @@ const FOOTER_COLUMNS = [
   {
     title: "Resources",
     links: [
-      { label: "StockEX Trust", href: "/trust" },
+      { label: "STOCKEX Trust", href: "/trust" },
       { label: "Disclaimer", href: "/trust" },
       { label: "Privacy", href: "/trust" },
       { label: "Terms of Use", href: "/trust" },
@@ -237,6 +238,30 @@ export default function HomePage() {
 
         <div style={{ maxWidth: "680px", display: "grid", gap: space[6], position: "relative", zIndex: 1 }}>
           <div style={{ display: "grid", gap: space[4] }}>
+            <div style={{ display: "flex", justifyContent: "center" }}>
+              <div style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: space[3],
+                padding: `${space[2]} ${space[4]}`,
+                borderRadius: radius.xl,
+                border: `1px solid ${colors.hairline}`,
+                background: "linear-gradient(135deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.02) 100%)",
+                boxShadow: "0 20px 50px rgba(0,0,0,0.28)",
+                backdropFilter: "blur(18px)",
+                WebkitBackdropFilter: "blur(18px)",
+              }}>
+                <BrandMark size={44} />
+                <div style={{ display: "grid", gap: 2 }}>
+                  <span style={{ fontSize: 18, fontWeight: 760, letterSpacing: "-0.04em", color: colors.ink, lineHeight: 1 }}>
+                    STOCKEX
+                  </span>
+                  <span style={{ fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase", color: colors.body }}>
+                    Premium Indian Equity Research
+                  </span>
+                </div>
+              </div>
+            </div>
             <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 8, marginBottom: space[2] }}>
               <span style={{
                 display: "inline-flex", alignItems: "center", gap: 4,
@@ -853,7 +878,7 @@ export default function HomePage() {
               background: "linear-gradient(135deg, #fff 30%, rgba(255,255,255,0.6) 100%)",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
-            }}>StockEX</span>
+            }}>STOCKEX</span>
             <span style={{ fontSize: 12, color: colors.body }}>
               © {new Date().getFullYear()} · educational purposes only
             </span>

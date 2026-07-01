@@ -182,6 +182,29 @@ export default function AdvancedScanner() {
     };
   }, []);
 
+  // ── Dispatch scanner alerts to WhatsApp/Telegram ─────────────────
+  useEffect(() => {
+    if (stocks.length === 0) return;
+
+    const signals = stocks.filter(
+      (s) => s.scannerFlag !== "CONSOLIDATION_STATE" && s.scannerFlag !== "NEUTRAL",
+    );
+
+    for (const stock of signals.slice(0, 5)) {
+      fetch("/api/v1/alerts/scanner-trigger", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ticker: stock.symbol,
+          signalType: stock.scannerFlag,
+          signalDescription: flagHint(stock.scannerFlag),
+          currentPrice: stock.price,
+          strength: stock.healthometer,
+        }),
+      }).catch(() => {});
+    }
+  }, [stocks]);
+
   // ── Sorting & Filtering ────────────────────────────────────────────
 
   const filtered = useMemo(() => {

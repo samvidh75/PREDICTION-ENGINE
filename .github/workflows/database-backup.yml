@@ -1,0 +1,62 @@
+name: Database Backup Replication
+
+on:
+  schedule:
+    # Runs every day at 00:00 IST (18:30 UTC)
+    - cron: '30 18 * * *'
+  workflow_dispatch:
+    inputs:
+      retention:
+        description: 'Snapshots to retain per source'
+        type: number
+        default: 30
+      dry_run:
+        description: 'Dry run (no files written)'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      BACKUP_REMOTE_DEST: ${{ secrets.BACKUP_REMOTE_DEST }}
+      BACKUP_DEST_DIR: data/snapshots
+      BACKUP_RETENTION: 30
+      BACKUP_INCLUDE_SQLITE: "true"
+      BACKUP_INCLUDE_POSTGRES: "true"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install PostgreSQL client tools
+        run: sudo apt-get update && sudo apt-get install -y postgresql-client rsync
+
+      - name: Run database backup replication
+        run: |
+          EXTRA_ARGS=""
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ -n "${{ inputs.retention }}" ]; then
+            export BACKUP_RETENTION="${{ inputs.retention }}"
+          fi
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.dry_run }}" = "true" ]; then
+            EXTRA_ARGS="--dry-run"
+          fi
+          python3 scripts/python/backup_snapshot.py --cron $EXTRA_ARGS
+
+      - name: Upload backup manifest on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: database-backup-logs
+          path: data/snapshots/manifest_*.json
+          if-no-files-found: ignore
