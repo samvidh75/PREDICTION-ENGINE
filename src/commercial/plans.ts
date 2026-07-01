@@ -41,6 +41,8 @@ export type FeatureKey =
   | 'advanced_search'
   | 'api_access'
   | 'priority_support'
+  | 'sms_alerts'
+  | 'whatsapp_alerts'
   ;
 
 // ─── Plan Definition ────────────────────────────────────────────────
@@ -118,6 +120,8 @@ const PLANS: Plan[] = [
       'Price & health change alerts',
       'Daily research digest email',
       'Prediction accuracy history',
+      'SMS breakout alerts',
+      'WhatsApp breakout alerts',
     ],
     limits: {
       maxWatchlists: Infinity,
@@ -147,6 +151,8 @@ const PLANS: Plan[] = [
       'portfolio_tracking',
       'api_access',
       'priority_support',
+      'sms_alerts',
+      'whatsapp_alerts',
     ],
     highlights: [
       'Everything in Research Plus',
@@ -157,6 +163,8 @@ const PLANS: Plan[] = [
       'Advanced search with filters',
       'Ad-free experience',
       'Priority email support',
+      'SMS breakout alerts',
+      'WhatsApp breakout alerts',
     ],
     limits: {
       maxWatchlists: Infinity,

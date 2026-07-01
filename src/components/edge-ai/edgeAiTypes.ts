@@ -61,3 +61,28 @@ export interface EdgeAiWorkerInput {
   /** The user's latest question */
   query: string;
 }
+
+// ── Pattern Scanner Types (Phase 18) ─────────────────────────────
+
+export interface ScannerWorkerInput {
+  type: 'scan';
+  priceHistory: number[];
+  volumeHistory: number[];
+}
+
+export interface ScannerWorkerResult {
+  type: 'scan';
+  healthometer: number;
+  scannerFlag: string;
+  signalStrength: number;
+  technicalMetrics: {
+    upperBand: number;
+    lowerBand: number;
+    middleBand: number;
+    macdLine: number;
+    divergencePattern: string;
+  };
+}
+
+export type WorkerMessage = EdgeAiWorkerInput | ScannerWorkerInput;
+export type WorkerResponse = EdgeAiWorkerResult | ScannerWorkerResult;
