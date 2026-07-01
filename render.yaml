@@ -55,11 +55,11 @@ services:
         sync: false
 
       - key: DB_ADAPTER
-        value: postgres
+        value: auto
       - key: ALLOW_SQLITE_FALLBACK
-        value: "false"
+        value: "true"
       - key: ALLOW_SQLITE_IN_PRODUCTION
-        value: "false"
+        value: "true"
       - key: FORCE_MIGRATIONS
         value: "true"
 
