@@ -12,6 +12,8 @@ import { useState } from "react";
 import { GitBranch, ArrowRight, ChevronRight } from "lucide-react";
 import { colors, radius, animation } from "../design/tokens";
 import { ConvictionBadge, scoreToConviction } from "../ui/ConvictionBadge";
+import { formatNumber } from "../services/ui/dataFormatting";
+import { formatPercent } from "../services/ui/indianNumberFormat";
 
 interface SimilarStock {
   symbol: string;
@@ -83,16 +85,6 @@ const MOCK_SIMILAR: SimilarStock[] = [
     changePercent: 0.5,
   },
 ];
-
-function formatInr(value: number | null | undefined) {
-  if (value == null || Number.isNaN(value)) return "—";
-  return new Intl.NumberFormat("en-IN").format(value);
-}
-
-function formatPct(value: number | null | undefined, digits = 1) {
-  if (value == null || Number.isNaN(value)) return "—";
-  return `${value >= 0 ? "+" : ""}${value.toFixed(digits)}%`;
-}
 
 export function SimilarStocks() {
   const [expanded, setExpanded] = useState(false);
@@ -203,7 +195,7 @@ export function SimilarStocks() {
             {/* Price & change */}
             <div style={{ textAlign: "right", flexShrink: 0 }}>
               <div style={{ fontSize: "14px", fontWeight: 600, color: colors.textPrimary }}>
-                ₹{formatInr(stock.price)}
+                ₹{formatNumber(stock.price)}
               </div>
               <div
                 style={{
@@ -212,7 +204,7 @@ export function SimilarStocks() {
                   color: stock.changePercent >= 0 ? colors.marketGreen : colors.marketRed,
                 }}
               >
-                {formatPct(stock.changePercent)}
+                {formatPercent(stock.changePercent)}
               </div>
             </div>
 

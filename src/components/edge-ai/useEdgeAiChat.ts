@@ -6,6 +6,7 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import type { EdgeAiChatMessage, EdgeAiWorkerStatus, EdgeAiResearchContext } from './edgeAiTypes';
 import { sanitizeChatReply } from './edgeAiOutputGuardrails';
+import { formatNumber } from "../../services/ui/dataFormatting";
 
 /* ── Hook return type ──────────────────────────────────────────────── */
 
@@ -22,14 +23,6 @@ let _messageCounter = 0;
 function nextId(): string {
   _messageCounter += 1;
   return `chat-${_messageCounter}-${Date.now()}`;
-}
-
-function formatInr(value: number | null | undefined, digits = 2): string {
-  if (value == null || Number.isNaN(value)) return "—";
-  return value.toLocaleString("en-IN", {
-    minimumFractionDigits: digits,
-    maximumFractionDigits: digits,
-  });
 }
 
 function buildSystemPrompt(context: EdgeAiResearchContext): string {
@@ -49,7 +42,7 @@ function buildSystemPrompt(context: EdgeAiResearchContext): string {
     ...context.narrative,
     '',
     `Sector: ${context.sector}`,
-    `Current price: ₹${formatInr(context.currentPrice)} (${(context.changePercent ?? 0) >= 0 ? '+' : ''}${formatInr(context.changePercent, 2)}%)`,
+    `Current price: ₹${formatNumber(context.currentPrice)} (${(context.changePercent ?? 0) >= 0 ? '+' : ''}${context.changePercent != null ? context.changePercent.toFixed(2) : '0.00'}%)`,
     '',
     'Risks flagged:',
     ...(context.risksToReview.length > 0

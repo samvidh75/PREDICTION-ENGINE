@@ -5,6 +5,7 @@ import { colors, typography, space, radius } from "../design/tokens";
 import type { FC } from "react";
 import { ResearchAiExplanationPanel } from "../components/ai-orchestrator/ResearchAiExplanationPanel";
 import type { ResearchAiContext } from "../components/ai-orchestrator/researchAiTypes";
+import { formatNumber } from "../services/ui/dataFormatting";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 type RankingMetric = "quality" | "growth" | "value" | "momentum" | "stability";
@@ -37,11 +38,6 @@ const METRICS: { id: RankingMetric; label: string; icon: LucideIcon; color: stri
   { id: "momentum", label: "Momentum", icon: Zap, color: "#FF6B6B", description: "Price & earnings momentum, RS" },
   { id: "stability", label: "Stability", icon: BarChart3, color: "#b0b0b0", description: "Beta, debt/equity, earnings volatility" },
 ];
-
-function formatInr(value: number | null | undefined) {
-  if (value == null || Number.isNaN(value)) return "—";
-  return value.toLocaleString("en-IN");
-}
 
 // ── Mock ranking data ──────────────────────────────────────────────────────────
 function generateMockRankings(metric: RankingMetric): StockRank[] {
@@ -332,7 +328,7 @@ export default function RelativeStrengthPage() {
               <ScoreBar value={stock.scores[activeMetric]} color={active.color} />
             </div>
             <div><RankChange change={stock.change} /></div>
-            <div style={{ color: colors.textSecondary, fontVariantNumeric: "tabular-nums" }}>₹{formatInr(stock.price)}</div>
+            <div style={{ color: colors.textSecondary, fontVariantNumeric: "tabular-nums" }}>₹{formatNumber(stock.price)}</div>
           </div>
         ))}
       </div>

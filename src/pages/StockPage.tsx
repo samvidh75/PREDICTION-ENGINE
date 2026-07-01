@@ -31,6 +31,7 @@ import { NativeAd } from "../components/NativeAd";
 import { MarketBrainPanel } from "../components/market-brain/MarketBrainPanel";
 import { EdgeAiChatSection } from "../components/edge-ai/EdgeAiChatSection";
 import { ResearchAiExplanationPanel } from "../components/ai-orchestrator/ResearchAiExplanationPanel";
+import { formatNumber } from "../services/ui/dataFormatting";
 import { toHealthometerAiContext } from "../components/ai-orchestrator/healthometerAiContext";
 import { toResearchAiContext } from "../components/ai-orchestrator/researchAiContext";
 import {
@@ -91,14 +92,6 @@ function formatNewsTime(value?: string): string {
   return `${Math.round(minutesAgo / 1440)}d ago`;
 }
 
-function formatInr(value: number | null | undefined, digits = 0) {
-  if (value == null || Number.isNaN(value)) return "—";
-  return new Intl.NumberFormat("en-IN", {
-    maximumFractionDigits: digits,
-    minimumFractionDigits: digits,
-  }).format(value);
-}
-
 function formatDecimal(value: number | null | undefined, digits = 1) {
   if (value == null || Number.isNaN(value)) return "—";
   return value.toFixed(digits);
@@ -124,7 +117,7 @@ function StickyHeader({ symbol, price, changeAbs, changePercent, trendColor }: {
         </span>
         <PriceFlash value={price}>
         <span style={{ color: colors.textPrimary, fontSize: "16px", fontWeight: 600 }}>
-            ₹{formatInr(price)}
+            ₹{formatNumber(price)}
           </span>
         </PriceFlash>
         <span style={{ color: trendColor, fontSize: "13px", fontWeight: 500, display: "inline-flex", alignItems: "center", gap: "4px" }}>
@@ -152,7 +145,7 @@ function HeroSection({ stock, isUp, trendColor }: { stock: StockResearchDetail; 
         <span style={{ color: colors.textSecondary, fontSize: "14px", fontWeight: 500 }}>{stock.companyName}</span>
       </div>
       <div style={{ fontSize: useResponsiveValue("40px", "64px"), fontWeight: 700, color: colors.textPrimary, lineHeight: "1.1", letterSpacing: "-0.02em", display: "flex", alignItems: "center", justifyContent: "center", gap: "12px" }}>
-        <PriceFlash value={stock.price.current}>₹{formatInr(stock.price.current)}</PriceFlash>
+        <PriceFlash value={stock.price.current}>₹{formatNumber(stock.price.current)}</PriceFlash>
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: "12px", marginTop: "12px", flexWrap: "wrap", justifyContent: "center" }}>
         <div style={{ color: trendColor, fontSize: "18px", fontWeight: 600, display: "inline-flex", alignItems: "center", gap: "6px" }}>
@@ -169,7 +162,7 @@ function HeroSection({ stock, isUp, trendColor }: { stock: StockResearchDetail; 
         </div>
       </div>
       <div style={{ fontSize: "13px", color: colors.textSecondary, marginTop: "10px" }}>
-        Conf: {stock.confidenceMeter}% · Market Cap: ₹{formatInr(Math.round(stock.price.marketCap))} Cr
+        Conf: {stock.confidenceMeter}% · Market Cap: ₹{formatNumber(Math.round(stock.price.marketCap))} Cr
       </div>
     </section>
   );
@@ -728,7 +721,7 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
       <Card className="stock-metrics-card raycast-slideUp" style={{ animationDelay: "0.15s", animationFillMode: "both" }}>
         <CardLabel>Key metrics</CardLabel>
         <div className="stock-metric-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "16px" }}>
-          <MetricCard label="Market Cap" value={`₹${formatInr(Math.round(stock.price.marketCap))} Cr`} />
+          <MetricCard label="Market Cap" value={`₹${formatNumber(Math.round(stock.price.marketCap))} Cr`} />
           <MetricCard label="PE (TTM)" value={formatDecimal(fundamentals.pe, 1)}
             trend={fundamentals.pe != null && fundamentals.pe < 20 ? "up" : fundamentals.pe != null && fundamentals.pe > 30 ? "down" : "neutral"}
             subtitle={fundamentals.industryPe != null ? `Sector: ${formatDecimal(fundamentals.industryPe, 1)}` : sectorRelMap["pe"] ? `Sector: ${sectorRelMap["pe"]}` : undefined} />
@@ -749,8 +742,8 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
           <MetricCard label="EPS (TTM)" value={fundamentals.eps != null ? `₹${formatDecimal(fundamentals.eps, 1)}` : "—"} />
           <MetricCard label="RSI (14)" value={stock.rsi != null ? String(stock.rsi) : "—"}
             trend={stock.rsi != null && stock.rsi >= 30 && stock.rsi <= 70 ? "neutral" : "down"} />
-          <MetricCard label="52W High" value={fundamentals.high52w != null ? `₹${formatInr(fundamentals.high52w)}` : "—"} />
-          <MetricCard label="52W Low" value={fundamentals.low52w != null ? `₹${formatInr(fundamentals.low52w)}` : "—"} />
+          <MetricCard label="52W High" value={fundamentals.high52w != null ? `₹${formatNumber(fundamentals.high52w)}` : "—"} />
+          <MetricCard label="52W Low" value={fundamentals.low52w != null ? `₹${formatNumber(fundamentals.low52w)}` : "—"} />
         </div>
       </Card>      {/* ── Company Identity ── */}
       <Card className="stock-company-card raycast-slideUp" style={{ animationDelay: "0.2s", animationFillMode: "both" }}>
@@ -819,7 +812,7 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
                   return (
                     <tr key={entry.period} style={{ borderBottom: `1px solid ${colors.border}` }}>
                       <td style={{ padding: "8px", color: colors.textPrimary }}>{entry.period}</td>
-                      <td style={{ padding: "8px", textAlign: "right", color: colors.textPrimary }}>{formatInr(entry.value)}</td>
+                      <td style={{ padding: "8px", textAlign: "right", color: colors.textPrimary }}>{formatNumber(entry.value)}</td>
                       <td style={{ padding: "8px", textAlign: "right", color: growth != null && parseFloat(growth) >= 0 ? colors.success : colors.danger }}>{growth != null ? `${parseFloat(growth) >= 0 ? "+" : ""}${growth}%` : "—"}</td>
                     </tr>
                   );
