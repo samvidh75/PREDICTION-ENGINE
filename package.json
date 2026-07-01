@@ -8,6 +8,7 @@
   },
   "scripts": {
     "dev": "vite",
+    "dev:stockstory": "VITE_APP_DOMAIN=stockstory-india.com VITE_APP_ORIGIN=http://stockstory-india.com:5174 VITE_API_DOMAIN=stockstory-india.com vite --host 0.0.0.0",
     "build": "npm run build:frontend",
     "redis:health": "npx tsx scripts/redis-health.ts",
     "build:frontend": "npm run typecheck:frontend && vite build",
@@ -196,6 +197,7 @@
     "@fastify/cookie": "^11.0.2",
     "@fastify/cors": "^11.2.0",
     "@fastify/helmet": "^13.0.2",
+    "@fastify/rate-limit": "^11.1.0",
     "@fastify/websocket": "^11.2.0",
     "@mlc-ai/web-llm": "^0.2.84",
     "@qdrant/js-client-rest": "^1.18.0",

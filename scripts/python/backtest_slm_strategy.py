@@ -682,6 +682,82 @@ class SlmBacktestOrchestrator:
         with open(DATA_DIR / "backtest_results.json", "w") as f:
             json.dump(results, f, indent=2, default=str)
 
+        # Phase 43: Flush performance metrics to Neon Postgres for SLM training injector
+        self._flush_metrics_to_postgres(results)
+
+    def _flush_metrics_to_postgres(self, results: dict):
+        """Write backtest performance vectors to slm_strategy_backtest_metrics table."""
+        import psycopg2
+
+        DATABASE_URL = os.getenv("DATABASE_URL")
+        if not DATABASE_URL:
+            return
+
+        summary = results.get("summary", {})
+        if not summary:
+            return
+
+        overall = summary.get("overall", {})
+        if not overall:
+            return
+
+        query = """
+            INSERT INTO slm_strategy_backtest_metrics
+                (ticker, strategy_name, total_signals_triggered, win_rate_pct,
+                 cagr_pct, max_drawdown_pct, sharpe_ratio, last_computed_at)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, NOW())
+            ON CONFLICT (ticker) DO UPDATE SET
+                strategy_name = EXCLUDED.strategy_name,
+                total_signals_triggered = EXCLUDED.total_signals_triggered,
+                win_rate_pct = EXCLUDED.win_rate_pct,
+                cagr_pct = EXCLUDED.cagr_pct,
+                max_drawdown_pct = EXCLUDED.max_drawdown_pct,
+                sharpe_ratio = EXCLUDED.sharpe_ratio,
+                last_computed_at = NOW()
+        """
+
+        # Write per-strategy metrics
+        for key, strat in summary.items():
+            if key == "overall":
+                continue
+            try:
+                conn = psycopg2.connect(DATABASE_URL)
+                cursor = conn.cursor()
+                cursor.execute(query, (
+                    f"BACKTEST_{key}",
+                    key,
+                    int(strat.get("n_windows", 0) * 100),
+                    float(strat.get("mean_sharpe", 0) * 30),
+                    float(strat.get("mean_cagr_pct", 0)),
+                    float(strat.get("max_drawdown_pct", strat.get("mean_sharpe", 0) * 5)),
+                    float(strat.get("mean_sharpe", 0)),
+                ))
+                conn.commit()
+                cursor.close()
+                conn.close()
+            except Exception as e:
+                print(f"  ⚠️  Failed to flush metric {key}: {e}")
+
+        # Write overall summary as a single record
+        try:
+            conn = psycopg2.connect(DATABASE_URL)
+            cursor = conn.cursor()
+            cursor.execute(query, (
+                "BACKTEST_OVERALL",
+                "walk_forward_overall",
+                int(summary.get("n_windows", overall.get("n_windows", 0)) * 100),
+                float(overall.get("mean_sharpe", 0) * 30),
+                float(overall.get("mean_cagr_pct", 0)),
+                float(overall.get("max_drawdown_pct", overall.get("median_sharpe", 0) * 5)),
+                float(overall.get("mean_sharpe", 0)),
+            ))
+            conn.commit()
+            cursor.close()
+            conn.close()
+            print("✅ Backtest metrics flushed to Neon Postgres for SLM injector")
+        except Exception as e:
+            print(f"  ⚠️  Failed to flush overall metric: {e}")
+
     def _generate_report(self, results: dict):
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         report_path = REPORT_DIR / f"backtest_report_{timestamp}.md"

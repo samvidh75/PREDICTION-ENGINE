@@ -673,8 +673,10 @@ export default async function registerApiRoutes(server: FastifyInstance) {
 
   // ── Asymmetric Data Gateway — cached market data ──────────────────────────
 
-  // GET /api/v1/market-stream/:ticker
-  server.get("/api/v1/market-stream/:ticker", async (request, reply) => {
+  // GET /api/v1/market-stream/:ticker — relaxed limit (30/min)
+  server.get("/api/v1/market-stream/:ticker", {
+    config: { rateLimit: { max: 30, timeWindow: "1 minute" } },
+  }, async (request, reply) => {
     const { ticker } = request.params as { ticker: string };
     if (!ticker || typeof ticker !== "string") {
       return reply.status(400).send({ error: "ticker param required" });
@@ -685,6 +687,23 @@ export default async function registerApiRoutes(server: FastifyInstance) {
       return packet;
     } catch (err: any) {
       return reply.status(502).send({ error: err.message || String(err), ticker });
+    }
+  });
+
+  // POST /api/v1/sync-cache — client-contributed cache upload (Phase 42)
+  server.post("/api/v1/sync-cache", async (request, reply) => {
+    const body = (request.body || {}) as Record<string, any>;
+    if (!body?.ticker) {
+      return reply.status(400).send({ error: "ticker required in body" });
+    }
+    try {
+      const result = await AsymmetricDataGateway.handleClientCacheContribution(
+        body.ticker,
+        body as any,
+      );
+      return { success: true, status: result.status };
+    } catch (err: any) {
+      return reply.status(502).send({ error: err.message || String(err) });
     }
   });
 
@@ -1655,6 +1674,18 @@ export default async function registerApiRoutes(server: FastifyInstance) {
   // ── Broker OAuth & Trading Routes ────────────────────────────
   const { registerBrokerRoutes } = await import("../commercial/api/brokerRoutes.js");
   await registerBrokerRoutes(server);
+
+  // ── Alert Preferences Routes ─────────────────────────────────
+  const { registerAlertPreferencesRoutes } = await import("../commercial/api/alertPreferencesRoutes.js");
+  await registerAlertPreferencesRoutes(server);
+
+  // ── F&O Options Chain Routes ─────────────────────────────────
+  const { registerOptionsRoutes } = await import("../commercial/api/optionsRoutes.js");
+  await registerOptionsRoutes(server);
+
+  // ── Portfolio Sync Routes ────────────────────────────────────
+  const { registerPortfolioSyncRoutes } = await import("../commercial/api/portfolioSyncRoutes.js");
+  await registerPortfolioSyncRoutes(server);
 
   // ── Ops / Admin Telemetry Routes ─────────────────────────────
   const { registerOpsRoutes } = await import("../commercial/api/opsRoutes.js");

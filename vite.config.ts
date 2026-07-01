@@ -21,6 +21,8 @@ export default defineConfig(({ mode }) => {
     plugins: [react(), ...(useLocalApi ? [localApiPlugin()] : [])],
     server: {
       port: 5174,
+      host: true,
+      allowedHosts: ["stockstory-india.com", "www.stockstory-india.com"],
       strictPort: false,
       proxy: useLocalApi
         ? undefined

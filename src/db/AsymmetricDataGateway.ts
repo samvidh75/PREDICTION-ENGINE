@@ -124,15 +124,14 @@ export class AsymmetricDataGateway {
           : 0;
 
       // Upsert baseline fundamental parameters into the cache table
-      // (bridges the tables until morning background cron scripts execute)
+      // Only update if no existing data (Python scripts are the source of truth for fundamentals)
       await dbAdapter.query(
         `INSERT INTO asset_fundamental_ratios
            (ticker, market_cap_cr, pe_ratio, debt_to_equity,
             promoter_pledged_pct, auditor_remarks, last_updated)
-         VALUES ($1, $2, $3, $4, $5, $6, NOW())
-         ON CONFLICT (ticker)
-         DO UPDATE SET last_updated = NOW()`,
-        [ticker, 25000.0, 18.5, 0.4, 0.0, "Clean Unqualified Data Matrix"],
+         VALUES ($1, NULL, NULL, NULL, NULL, 'Pending background ingestion', NOW())
+         ON CONFLICT (ticker) DO NOTHING`,
+        [ticker],
       );
 
       // Seed a historical candle node to maintain chart parity
@@ -157,11 +156,111 @@ export class AsymmetricDataGateway {
         price: currentPrice,
         change_pct: Number(changePct.toFixed(2)),
         context_snippet:
-          "M-Cap: 25000.0Cr | P/E: 18.5 | D/E: 0.4 | Pledge: 0% | Auditor: Clean Unqualified Data Matrix",
+          "Fundamentals pending background ingestion. Price data sourced from Yahoo Finance.",
       };
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       throw new Error(`External unauthenticated cloud parsing failure: ${message}`, { cause: err });
     }
+  }
+
+  /**
+   * Phase 42: Client-contributed cache loop.
+   *
+   * Returns fresh cache data, or signals the client browser to fetch
+   * live public data and push it back via /api/v1/sync-cache.
+   */
+  public static async processMarketRequest(
+    ticker: string,
+  ): Promise<{
+    status: "success" | "stale";
+    source: string;
+    payload?: Record<string, any>;
+    message?: string;
+  }> {
+    const symbol = ticker.toUpperCase().trim();
+    const cacheWindowSeconds = 60;
+    const currentUnix = Math.floor(Date.now() / 1000);
+
+    try {
+      const result = await dbAdapter.query(
+        `SELECT *, EXTRACT(EPOCH FROM last_updated) as updated_epoch
+         FROM asset_fundamental_ratios WHERE ticker = $1`,
+        [symbol],
+      );
+
+      if (result.rows.length > 0) {
+        const row = result.rows[0];
+        const updatedEpoch = Number(row.updated_epoch || 0);
+        const isFresh = currentUnix - updatedEpoch < cacheWindowSeconds;
+
+        if (isFresh) {
+          return {
+            status: "success",
+            source: "server_postgres_cache",
+            payload: row,
+          };
+        }
+      }
+
+      return {
+        status: "stale",
+        source: "client_execution_required",
+        message:
+          "Database record expired. Client browser required to fetch public web metrics and update core cache.",
+      };
+    } catch {
+      return {
+        status: "stale",
+        source: "client_execution_required",
+        message: "Cache unavailable. Client-side fetch required.",
+      };
+    }
+  }
+
+  /**
+   * Upserts data contributed by a client browser after a live web fetch.
+   * Called by the POST /api/v1/sync-cache endpoint.
+   */
+  public static async handleClientCacheContribution(
+    ticker: string,
+    payload: {
+      price: number;
+      change_pct: number;
+      market_cap_cr?: number;
+      pe_ratio?: number;
+      debt_to_equity?: number;
+      close?: number;
+      volume?: number;
+    },
+  ): Promise<{ status: string }> {
+    const symbol = ticker.toUpperCase().trim();
+    const currentPrice = payload.price || payload.close || 0;
+    const volume = payload.volume || 0;
+    const now = Math.floor(Date.now() / 1000);
+
+    // Upsert fundamentals
+    await dbAdapter.query(
+      `INSERT INTO asset_fundamental_ratios
+         (ticker, market_cap_cr, pe_ratio, debt_to_equity, last_updated)
+       VALUES ($1, $2, $3, $4, NOW())
+       ON CONFLICT (ticker) DO UPDATE SET
+         market_cap_cr = COALESCE(EXCLUDED.market_cap_cr, asset_fundamental_ratios.market_cap_cr),
+         pe_ratio = COALESCE(EXCLUDED.pe_ratio, asset_fundamental_ratios.pe_ratio),
+         debt_to_equity = COALESCE(EXCLUDED.debt_to_equity, asset_fundamental_ratios.debt_to_equity),
+         last_updated = NOW()`,
+      [symbol, payload.market_cap_cr ?? null, payload.pe_ratio ?? null, payload.debt_to_equity ?? null],
+    );
+
+    // Upsert candle
+    await dbAdapter.query(
+      `INSERT INTO asset_historical_candles (ticker, timestamp, open, high, low, close, volume)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)
+       ON CONFLICT (ticker, timestamp) DO UPDATE SET
+         close = EXCLUDED.close, volume = EXCLUDED.volume`,
+      [symbol, now, currentPrice, currentPrice, currentPrice, currentPrice, volume],
+    );
+
+    return { status: "ok" };
   }
 }

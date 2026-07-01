@@ -247,6 +247,53 @@ export class DatabaseAdapter {
   }
 
   /**
+   * Execute a query within a tenant-isolated transaction using PostgreSQL RLS.
+   *
+   * Sets app.current_user_id in the session context before the query,
+   * so the RLS policies defined in migration 044 automatically filter by user_id.
+   * Falls back to a manual WHERE user_id filter when RLS is unavailable (SQLite).
+   *
+   * @param text - SQL query string
+   * @param params - Query parameters
+   * @param userId - The authenticated user's ID (sets app.current_user_id)
+   */
+  async queryWithTenantContext(
+    text: string,
+    params: unknown[],
+    userId: string,
+  ): Promise<DbQueryResult> {
+    if (!this._initialized) {
+      await this.initialize();
+    }
+
+    if (this._kind === "postgres" && this.pool) {
+      const client = await this.pool.connect();
+      try {
+        await client.query("BEGIN");
+        await client.query("SELECT set_config('app.current_user_id', $1, true)", [userId]);
+        const result = await client.query(text, params as unknown[]);
+        await client.query("COMMIT");
+        return { rows: result.rows as Record<string, any>[], rowCount: result.rowCount ?? 0 };
+      } catch (err) {
+        await client.query("ROLLBACK");
+        throw err;
+      } finally {
+        client.release();
+      }
+    }
+
+    // SQLite fallback: manual WHERE filter (no RLS support)
+    if (this._kind === "sqlite" && this.sqlitePool) {
+      const hasUserWhere = text.toLowerCase().includes("where") && text.toLowerCase().includes("user_id");
+      const safeQuery = hasUserWhere ? text : text.replace(/\s*;\s*$/, "") + " AND user_id = ?";
+      const safeParams = hasUserWhere ? params : [...params, userId];
+      return this.sqlitePool.query(safeQuery, safeParams as unknown[]);
+    }
+
+    throw new Error("DATABASE_UNAVAILABLE: No database adapter is active");
+  }
+
+  /**
    * Ping the active database.
    */
   async ping(): Promise<{ ok: boolean; detail?: string }> {

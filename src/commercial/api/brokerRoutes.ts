@@ -140,14 +140,25 @@ export async function registerBrokerRoutes(fastify: FastifyInstance): Promise<vo
 
     try {
       const { dbAdapter } = await import("../../db/DatabaseAdapter");
-      const result = await dbAdapter.query(
-        `SELECT id, broker, label, status, broker_user_id,
-                expires_at, created_at, updated_at
-         FROM broker_connections
-         WHERE user_id = $1
-         ORDER BY created_at DESC`,
-        [uid],
-      );
+
+      // Using tenant-context query — RLS policy enforces user_id isolation
+      const result = uid !== "anonymous"
+        ? await dbAdapter.queryWithTenantContext(
+            `SELECT id, broker, label, status, broker_user_id,
+                    expires_at, created_at, updated_at
+             FROM broker_connections
+             ORDER BY created_at DESC`,
+            [],
+            uid,
+          )
+        : await dbAdapter.query(
+            `SELECT id, broker, label, status, broker_user_id,
+                    expires_at, created_at, updated_at
+             FROM broker_connections
+             WHERE user_id = $1
+             ORDER BY created_at DESC`,
+            [uid],
+          );
 
       return reply.send({ success: true, connections: result.rows ?? [] });
     } catch (err) {
@@ -233,43 +244,98 @@ export async function registerBrokerRoutes(fastify: FastifyInstance): Promise<vo
 
       const row = result.rows[0];
       const accessToken = decrypt(row.access_token_enc);
+      const broker = row.broker as string;
+      let orderResult: Record<string, unknown>;
 
-      const orderPayload: Record<string, unknown> = {
-        instrument_key: `${exchange}|${symbol}`,
-        quantity,
-        product: "D",
-        validity: "DAY",
-        side: side === "BUY" ? "buy" : "sell",
-        order_type: orderType === "LIMIT" ? "limit" : "market",
-      };
-
-      if (orderType === "LIMIT" && price) {
-        orderPayload.price = price;
-      }
-
-      const orderRes = await fetch("https://api.upstox.com/v2/order/place", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify(orderPayload),
-      });
-
-      const orderData = await orderRes.json();
-
-      if (!orderRes.ok) {
-        return reply.status(502).send({
-          success: false,
-          error: orderData?.errors?.[0]?.message ?? "Order placement failed",
+      if (broker === "upstox") {
+        const orderPayload: Record<string, unknown> = {
+          instrument_key: `${exchange}|${symbol}`,
+          quantity,
+          product: "D",
+          validity: "DAY",
+          side: side === "BUY" ? "buy" : "sell",
+          order_type: orderType === "LIMIT" ? "limit" : "market",
+        };
+        if (orderType === "LIMIT" && price) {
+          orderPayload.price = price;
+        }
+        const res = await fetch("https://api.upstox.com/v2/order/place", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify(orderPayload),
         });
+        orderResult = await res.json();
+        if (!res.ok) {
+          return reply.status(502).send({
+            success: false,
+            error: (orderResult as any)?.errors?.[0]?.message ?? "Upstox order failed",
+          });
+        }
+      } else if (broker === "zerodha") {
+        const apiKey = process.env.ZERODHA_API_KEY || process.env.VITE_ZERODHA_API_KEY || "";
+        const res = await fetch("https://api.kite.trade/orders/regular", {
+          method: "POST",
+          headers: {
+            Authorization: `token ${apiKey}:${accessToken}`,
+            "X-Kite-Version": "3",
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: new URLSearchParams({
+            tradingsymbol: symbol,
+            exchange: exchange || "NSE",
+            transaction_type: side === "BUY" ? "BUY" : "SELL",
+            quantity: String(quantity),
+            price: orderType === "LIMIT" && price ? String(price) : "0",
+            order_type: orderType === "LIMIT" ? "LIMIT" : "MARKET",
+            product: "CNC",
+            validity: "DAY",
+          }).toString(),
+        });
+        orderResult = await res.json();
+        if (!res.ok) {
+          return reply.status(502).send({
+            success: false,
+            error: (orderResult as any)?.message ?? "Zerodha order failed",
+          });
+        }
+      } else if (broker === "angel_one") {
+        const res = await fetch("https://apiconnect.angelone.in/smart-api/v1/orders", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            tradingsymbol: symbol,
+            symboltoken: symbol,
+            exchange: exchange || "NSE",
+            transactiontype: side === "BUY" ? "BUY" : "SELL",
+            quantity: String(quantity),
+            price: orderType === "LIMIT" && price ? String(price) : "0",
+            order_type: orderType === "LIMIT" ? "LIMIT" : "MARKET",
+            product: "DELIVERY",
+            duration: "DAY",
+          }),
+        });
+        orderResult = await res.json();
+        if (!res.ok) {
+          return reply.status(502).send({
+            success: false,
+            error: (orderResult as any)?.message ?? "Angel One order failed",
+          });
+        }
+      } else {
+        return reply.status(400).send({ success: false, error: `Unsupported broker: ${broker}` });
       }
 
       return reply.send({
         success: true,
-        orderId: orderData?.data?.order_id,
-        status: orderData?.status,
+        order: orderResult,
+        broker,
       });
     } catch (err) {
       req.log.error({ err }, "Trade placement failed");

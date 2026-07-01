@@ -33,6 +33,22 @@ const REGISTERED_BROKERS: BrokerEntry[] = [
     sebiRegistered: true,
     supports: ['research_review', 'portfolio_import'],
   },
+  {
+    id: 'zerodha',
+    name: 'Zerodha',
+    connected: true,
+    description: 'India\'s largest broker. Continue research on Kite.',
+    sebiRegistered: true,
+    supports: ['research_review', 'portfolio_import'],
+  },
+  {
+    id: 'angel_one',
+    name: 'Angel One',
+    connected: true,
+    description: 'Full-service broker with SmartAPI integration.',
+    sebiRegistered: true,
+    supports: ['research_review', 'portfolio_import'],
+  },
 ];
 
 export function getRegisteredBrokers(): BrokerEntry[] {

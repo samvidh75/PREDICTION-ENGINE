@@ -166,6 +166,54 @@ export class MigrationRunner {
 
     return this.status();
   }
+
+  /**
+   * Roll back the last applied migration.
+   * Generates DROP TABLE statements from CREATE TABLE calls in the migration SQL.
+   * Removes the migration record from schema_migrations on success.
+   */
+  async rollbackLast(): Promise<{ rolledBack: string | null; remaining: number }> {
+    await this.ensureTable();
+    const applied = await this.listApplied();
+    if (applied.length === 0) {
+      return { rolledBack: null, remaining: 0 };
+    }
+
+    const last = applied[applied.length - 1];
+    const available = await this.listAvailable();
+    const match = available.find((a) => a.id === last.id);
+    if (!match) {
+      throw new Error(`Cannot rollback: migration file for "${last.id}" not found on disk`);
+    }
+
+    // Extract table names from CREATE TABLE statements in the migration
+    const tableRegex = /CREATE\s+TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?(\w+)/gi;
+    const tables: string[] = [];
+    let tblMatch: RegExpExecArray | null;
+    while ((tblMatch = tableRegex.exec(match.sql)) !== null) {
+      tables.push(tblMatch[1]);
+    }
+
+    // Generate DOWN SQL: DROP TABLE IF EXISTS in reverse order
+    const downStatements = tables.reverse().map((t) => `DROP TABLE IF EXISTS ${t};`).join("\n");
+
+    if (downStatements) {
+      if (this.db.executeScript) {
+        await this.db.executeScript(downStatements);
+      } else {
+        await this.db.query(downStatements);
+      }
+    }
+
+    // Remove migration record
+    await this.db.query(
+      `DELETE FROM schema_migrations WHERE id = $1`,
+      [last.id],
+    );
+
+    const remaining = applied.length - 1;
+    return { rolledBack: last.id, remaining };
+  }
 }
 
 export default MigrationRunner;

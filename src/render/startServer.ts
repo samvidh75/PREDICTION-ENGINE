@@ -9,6 +9,8 @@
  */
 import Fastify from "fastify";
 import cors from "@fastify/cors";
+import websocket from "@fastify/websocket";
+import rateLimit from "@fastify/rate-limit";
 import { fileURLToPath } from "url";
 import { dirname, join, extname } from "path";
 import { existsSync, readFile, readFileSync } from "fs";
@@ -17,6 +19,7 @@ import { MigrationRunner } from "../db/MigrationRunner";
 import registerApiRoutes from "./apiRouter.js";
 import { StockUniverseAdapter } from "../services/data/providers/StockUniverseAdapter.js";
 import { defaultDataAdapterRegistry } from "../services/data/dataAdapterRegistry.js";
+import { startWebSocketDataProducer } from "../services/market/websocketDataProducer.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -114,6 +117,22 @@ async function bootstrap() {
     credentials: true,
   });
 
+  // ── WebSocket support for live price streaming ────────────────────
+  await server.register(websocket);
+
+  // ── Rate limiting — 15 req/s per IP ─────────────────────────────────
+  await server.register(rateLimit, {
+    max: 15,
+    timeWindow: "1 second",
+    cache: 10000,
+    keyGenerator: (req) => (req.headers["x-real-ip"] as string) || req.ip,
+    errorResponseBuilder: (_req, context) => ({
+      success: false,
+      error: "Too Many Requests",
+      message: `StockEX rate ceiling exceeded. Retrying in ${context.after}.`,
+    }),
+  });
+
   // ── Security headers ──────────────────────────────────────────────
   server.addHook("onSend", async (_request, reply, payload) => {
     reply.header("X-Content-Type-Options", "nosniff");
@@ -205,6 +224,86 @@ async function bootstrap() {
       };
     }
   });
+
+  // ── SMTP health check (Phase 43) ────────────────────────────────────
+  server.get("/health/smtp", async (_req, reply) => {
+    const { SMTP_HOST, SMTP_PORT } = process.env;
+    if (!SMTP_HOST) {
+      return reply.send({ ok: false, status: "not_configured", message: "SMTP not configured" });
+    }
+    try {
+      const { connect } = await import("net");
+      const { hostname } = await import("os");
+      await new Promise<void>((resolve, reject) => {
+        const socket = connect(parseInt(SMTP_PORT || "587", 10), SMTP_HOST, () => {
+          socket.end();
+          resolve();
+        });
+        socket.on("error", reject);
+        socket.setTimeout(5000, () => { socket.destroy(); reject(new Error("timeout")); });
+      });
+      return reply.send({ ok: true, status: "reachable", host: SMTP_HOST });
+    } catch (err: any) {
+      return reply.send({ ok: false, status: "unreachable", message: err.message });
+    }
+  });
+
+  // ── WebSocket: Live price streaming ──────────────────────────────
+  const wsConnections = new Set<any>();
+
+  server.get("/ws/v1/live-stream", { websocket: true }, (socket) => {
+    // Per-connection ticker subscription set (Phase 43 filtering)
+    (socket as any).subscribedTickers = new Set<string>();
+
+    wsConnections.add(socket);
+    server.log.info(`[ws] Client connected. Pool size: ${wsConnections.size}`);
+
+    socket.on("message", (raw: string) => {
+      try {
+        const msg = JSON.parse(raw);
+        if (msg.type === "subscribe" && Array.isArray(msg.tickers)) {
+          (socket as any).subscribedTickers = new Set(msg.tickers.map((t: string) => t.toUpperCase()));
+          server.log.info(`[ws] Client subscribed to ${msg.tickers.length} tickers`);
+        }
+      } catch {
+        // ignore malformed messages
+      }
+    });
+
+    socket.on("close", () => {
+      wsConnections.delete(socket);
+      server.log.info(`[ws] Client disconnected. Pool size: ${wsConnections.size}`);
+    });
+
+    socket.on("error", () => {
+      wsConnections.delete(socket);
+    });
+
+    // Send initial connection confirmation
+    socket.send(JSON.stringify({ type: "connected", message: "Live price stream active" }));
+  });
+
+  // Broadcast helper — sends tick only to clients subscribed to that ticker
+  function broadcastTickerTick(ticker: string, price: number, changePct: number) {
+    const upper = ticker.toUpperCase();
+    const payload = JSON.stringify({
+      type: "ticker_tick",
+      ticker: upper,
+      price,
+      change_pct: changePct,
+    });
+    for (const conn of wsConnections) {
+      const subs = (conn as any).subscribedTickers as Set<string> | undefined;
+      if (subs && subs.size > 0 && !subs.has(upper)) continue; // skip unsubscribed
+      try { conn.send(payload); } catch { wsConnections.delete(conn); }
+    }
+  }
+
+  // Attach broadcast function to server for external access
+  (server as any).broadcastTickerTick = broadcastTickerTick;
+
+  // Start WebSocket data producer — polls Postgres and broadcasts price ticks
+  startWebSocketDataProducer(broadcastTickerTick);
 
   server.get("/version", async () => {
     const { readdirSync } = await import("fs");
