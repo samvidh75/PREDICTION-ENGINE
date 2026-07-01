@@ -165,13 +165,7 @@ describe("StockDetailPage", () => {
     const stock = buildStockPayload();
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
       ok: true,
-      json: async () => ({
-        stock,
-        financialChartData: stock.financials.annual.revenue,
-        shareholding: stock.shareholding[0],
-        shareholdingSeries: stock.shareholding,
-        period: "Mar 2025",
-      }),
+      json: async () => stock,
     }));
     renderPage();
 

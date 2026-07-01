@@ -66,11 +66,8 @@ export function loadDatabasePolicy(
       ? (isExplicitPostgres ? env.ALLOW_SQLITE_FALLBACK === 'true' : true)
       : env.ALLOW_SQLITE_FALLBACK !== 'false';
 
-  // SQLite in production
-  const allowSqliteInProduction =
-    isProduction
-      ? (isExplicitPostgres ? env.ALLOW_SQLITE_IN_PRODUCTION === 'true' : true)
-      : env.ALLOW_SQLITE_IN_PRODUCTION === 'true';
+  // SQLite in production — must be explicitly opted into via env var
+  const allowSqliteInProduction = env.ALLOW_SQLITE_IN_PRODUCTION === 'true';
   const sqliteProductionAllowed = isProduction ? allowSqliteInProduction : true;
 
   // SQLite DB path

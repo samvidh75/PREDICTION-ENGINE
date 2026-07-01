@@ -68,7 +68,7 @@ export function TradeFromWatchlist({ symbol, exchange = "NSE", currentPrice }: T
       });
       const data = await res.json();
       if (data.success) {
-        setResult(`Order placed: ${data.orderId ?? "pending"}`);
+        setResult(`Order request sent to broker: ${data.orderId ?? "pending"}`);
       } else {
         setResult(`Failed: ${data.error ?? "Unknown error"}`);
       }
