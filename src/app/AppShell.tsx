@@ -1,10 +1,9 @@
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
-import { Home, Search, Star, CreditCard, LayoutGrid, Shield, MessageSquareText, ArrowUpRight, MessageCircle, TrendingUp } from "lucide-react";
+import { Home, Search, Star, LayoutGrid, Shield, MessageSquareText, MessageCircle, TrendingUp } from "lucide-react";
 import { NavLink, Link, useNavigate } from "react-router-dom";
 import { colors, typography, space, radius, layout, components, shadows, animation } from "../design/tokens";
 import { BrandMark } from "../components/BrandMark";
-import { NotificationBell } from "../components/NotificationBell";
 import { ResearchProfileModal } from "../components/ResearchProfileModal";
 import PrivacyConsentBanner from "../components/PrivacyConsentBanner";
 import { CommandPalette } from "../components/CommandPalette";
@@ -17,7 +16,6 @@ const NAV = [
   { to: "/sectors", label: "Sectors", icon: LayoutGrid },
   { to: "/watchlist", label: "Watchlist", icon: Star },
   { to: "/portfolio", label: "Portfolio", icon: TrendingUp },
-  { to: "/pricing", label: "Pricing", icon: CreditCard },
 ] as const;
 
 const SECONDARY_NAV = [
@@ -109,7 +107,6 @@ export function AppShell({ children }: { children: ReactNode }) {
           borderTop: `1px solid ${colors.border}`,
         }}>
           <Link to="/changelog" className="nav-link" style={{ gap: space[2] }}>
-            <ArrowUpRight size={20} strokeWidth={1.75} />
             <span>What's New</span>
           </Link>
           <NavLink
@@ -117,7 +114,6 @@ export function AppShell({ children }: { children: ReactNode }) {
             className={({ isActive }) => `nav-link${isActive ? " is-active" : ""}`}
             style={{ gap: space[2] }}
           >
-            <NotificationBell />
             <span>Alerts</span>
           </NavLink>
           <div style={{ display: "flex", justifyContent: "center" }}>
@@ -133,10 +129,6 @@ export function AppShell({ children }: { children: ReactNode }) {
           <span>Equity Lens</span>
         </NavLink>
         <div style={{ display: "flex", alignItems: "center", gap: space[3] }}>
-          <Link to="/changelog" aria-label="Changelog" style={{ color: colors.textSecondary, display: "flex" }}>
-            <ArrowUpRight size={20} strokeWidth={1.75} />
-          </Link>
-          <NotificationBell />
           <ResearchProfileModal />
         </div>
       </header>
