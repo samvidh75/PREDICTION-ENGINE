@@ -50,27 +50,36 @@ export default function PortfolioPage() {
   const [syncMessage, setSyncMessage] = useState<string | null>(null);
   const [brokerSyncs, setBrokerSyncs] = useState<{ broker: string; status: string; holdingsCount: number }[]>([]);
 
+  const getQuoteWithTimeout = useCallback(async (symbol: string, timeoutMs = 1800) => {
+    return await Promise.race([
+      MarketDataGateway.getQuote(symbol),
+      new Promise<never>((_, reject) => {
+        setTimeout(() => reject(new Error("quote_timeout")), timeoutMs);
+      }),
+    ]);
+  }, []);
+
   const loadHoldings = useCallback(async () => {
     setLoading(true);
     const h = PortfolioEngine.getHoldings();
     setHoldings(h);
+    setLoading(false);
 
     if (h.length > 0) {
       const prices: Record<string, number> = {};
       await Promise.allSettled(
         h.map(async (holding) => {
           try {
-            const quote = await MarketDataGateway.getQuote(holding.symbol);
+            const quote = await getQuoteWithTimeout(holding.symbol);
             prices[holding.symbol] = quote.price;
           } catch {
             // price remains unavailable
           }
         })
       );
-      setCurrentPrices(prices);
+      setCurrentPrices((prev) => ({ ...prev, ...prices }));
     }
-    setLoading(false);
-  }, []);
+  }, [getQuoteWithTimeout]);
 
   const handleBrokerSync = useCallback(async () => {
     setSyncing(true);
