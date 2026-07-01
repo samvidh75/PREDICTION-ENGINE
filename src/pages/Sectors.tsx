@@ -51,7 +51,7 @@ export default function Sectors() {
       </section>
 
       <footer className="raycast-stagger-3" style={{ animationDelay: "0.2s", marginTop: "64px", paddingTop: "24px", borderTop: `1px solid ${colors.border}`, fontSize: "13px", color: colors.textSecondary }}>
-        <p>Lensory India provides research analysis only. Not investment advice. Consult a SEBI-registered investment advisor.</p>
+        <p>Equity Lens India provides research analysis only. Not investment advice. Consult a SEBI-registered investment advisor.</p>
       </footer>
     </main>
   );

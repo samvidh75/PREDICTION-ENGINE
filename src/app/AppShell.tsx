@@ -69,7 +69,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       <aside className="rail">
         <NavLink to="/" style={brandLinkStyle}>
           <BrandMark size={44} />
-          <span>Lensory</span>
+          <span>Equity Lens</span>
         </NavLink>
         <nav style={navStackStyle} aria-label="Primary">
           {NAV.map((item) => (
@@ -130,7 +130,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       <header className="mobile-brand" style={{ justifyContent: "space-between" }}>
         <NavLink to="/" style={mobileBrandLinkStyle}>
           <BrandMark size={36} />
-          <span>Lensory</span>
+          <span>Equity Lens</span>
         </NavLink>
         <div style={{ display: "flex", alignItems: "center", gap: space[3] }}>
           <Link to="/changelog" aria-label="Changelog" style={{ color: colors.textSecondary, display: "flex" }}>
@@ -167,7 +167,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           lineHeight: "1.6",
         }}>
           <p>
-            © 2026 Lensory. <strong>Not SEBI-registered</strong>. This service provides analysis for educational purposes only. Algorithms may contain errors. Data delayed 1-15 minutes. Consult a SEBI-registered investment advisor before investing. Past performance does not guarantee future results.
+            © 2026 Equity Lens. <strong>Not SEBI-registered</strong>. This service provides analysis for educational purposes only. Algorithms may contain errors. Data delayed 1-15 minutes. Consult a SEBI-registered investment advisor before investing. Past performance does not guarantee future results.
           </p>
         </footer>
       </main>

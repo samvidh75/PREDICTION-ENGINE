@@ -33,7 +33,7 @@ export default function Invite() {
           Invite Friends
         </h1>
         <p style={{ fontSize: typography.body.desktop.size, color: colors.textSecondary, lineHeight: 1.6, marginBottom: "24px" }}>
-          Share Lensory India with fellow researchers. Help them discover structured research analysis for Indian equities.
+          Share Equity Lens India with fellow researchers. Help them discover structured research analysis for Indian equities.
         </p>
       </section>
 

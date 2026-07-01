@@ -365,7 +365,7 @@ function StockError({ symbol }: { symbol: string }) {
   }, []);
   // Native ads
   const nativeAdSlots = [
-    { type: "ad" as const, id: "ad1", data: { icon: "📈", title: "Track your portfolio like a pro", subtitle: "Get timely alerts and expert analysis", cta: "Try Lensory Pro →" } },
+    { type: "ad" as const, id: "ad1", data: { icon: "📈", title: "Track your portfolio like a pro", subtitle: "Get timely alerts and expert analysis", cta: "Try Equity Lens Pro →" } },
     { type: "ad" as const, id: "ad2", data: { icon: "🎯", title: "AI-powered stock screening", subtitle: "Find the next multi-bagger before the crowd", cta: "Start free trial →" } },
   ];
   const newsFeedWithAds = filteredNews.reduce<Array<{ type: "news" | "ad"; id: string; data: any }>>((acc, item, idx) => {

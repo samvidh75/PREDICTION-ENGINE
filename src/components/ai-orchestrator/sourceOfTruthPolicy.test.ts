@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   canLocalAiComputeOfficialScores,
-  isOfficialLensorySourceOfTruth,
+  isOfficialEquityLensSourceOfTruth,
   STOCKSTORY_SOURCE_OF_TRUTH_POLICY,
 } from "./sourceOfTruthPolicy";
 
@@ -12,8 +12,8 @@ describe("sourceOfTruthPolicy", () => {
   });
 
   it("accepts only deterministic official sources", () => {
-    expect(isOfficialLensorySourceOfTruth("healthometer")).toBe(true);
-    expect(isOfficialLensorySourceOfTruth("browser_local")).toBe(false);
+    expect(isOfficialEquityLensSourceOfTruth("healthometer")).toBe(true);
+    expect(isOfficialEquityLensSourceOfTruth("browser_local")).toBe(false);
   });
 
   it("treats the policy constants as readonly", () => {

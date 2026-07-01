@@ -1,4 +1,4 @@
-# Lensory — 100% Free AI Platform
+# Equity Lens — 100% Free AI Platform
 
 ## Cost Breakdown
 
@@ -35,7 +35,7 @@ A cinematic financial intelligence operating system focused on market storytelli
 
 ## Platform Direction
 
-Lensory is evolving from a prototype-stage financial dashboard into a scalable market intelligence ecosystem.
+Equity Lens is evolving from a prototype-stage financial dashboard into a scalable market intelligence ecosystem.
 
 ## Refactor Goals
 
