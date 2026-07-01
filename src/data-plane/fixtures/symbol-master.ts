@@ -160,7 +160,7 @@ function etfEntry(
     nseSymbol: symbol,
     faceValue: 10,
     marketCapCr,
-    marketCapCategory: 'large',
+    marketCapCategory: null,
     firstSeenAt: NOW - 5 * YEAR_MS,
     lastSeenAt: NOW - 3600 * 1000,
   };

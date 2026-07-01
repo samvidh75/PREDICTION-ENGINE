@@ -1,13 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { IndianEodIngestionPipeline } from '../ingestion/IndianEodIngestionPipeline';
 import type { EodDataCacheLike, RawCandleInput } from '../ingestion/IndianEodIngestionPipeline';
-import type { IndianSymbolResolver } from '../symbols/IndianSymbolResolver';
-import type { SymbolResolutionResult } from '../symbols/IndianSymbolResolver';
-import type { IndianEodCandle } from '../eod/IndianEodCandle';
+import type { IndianSymbolResolver, SymbolResolutionResult } from '../symbols/IndianSymbolResolver';
 import type { IndianEquitySymbol } from '../symbols/IndianEquitySymbol';
+import type { EodIngestionBatch } from '../ingestion/IndianEodIngestionTypes';
 
 // ---------------------------------------------------------------------------
-// Mocks
+// Helpers
 // ---------------------------------------------------------------------------
 
 function makeSymbol(canonicalSymbol: string): IndianEquitySymbol & { canonicalSymbol: string } {
@@ -37,120 +36,140 @@ function makeResolver(results: Record<string, SymbolResolutionResult>): IndianSy
       const norm = raw.replace(/\.(NS|NSE|BO|EQ)$/i, '').toUpperCase();
       return results[norm] ?? results[raw] ?? { status: 'not_found', symbol: null };
     }),
-    resolveByIsin: vi.fn(async (_isin: string) => null),
-    resolveByBseCode: vi.fn(async (_code: string) => null),
+    resolveByIsin: vi.fn(async () => null),
+    resolveByBseCode: vi.fn(async () => null),
     listActive: vi.fn(async () => []),
   };
 }
 
 function makeCache(): EodDataCacheLike {
+  return { get: vi.fn(async () => null), set: vi.fn(async () => {}) };
+}
+
+function makeBatch(tradeDate = '2026-06-17'): EodIngestionBatch {
   return {
-    get: vi.fn(async () => null),
-    set: vi.fn(async () => {}),
+    batchId: crypto.randomUUID(),
+    source: 'nse_bhavcopy',
+    tradeDate,
+    count: 0,
+    createdAt: new Date().toISOString(),
+    label: `test-${tradeDate}`,
   };
 }
 
-let resolver: IndianSymbolResolver;
-let cache: EodDataCacheLike;
-let pipeline: IndianEodIngestionPipeline;
+function candleInput(ticker: string, overrides: Partial<RawCandleInput> = {}): RawCandleInput {
+  return { ticker, open: 2500, high: 2550, low: 2480, close: 2540, volume: 5_000_000, ...overrides };
+}
 
 const RESOLVABLE = 'RELIANCE';
 const UNRESOLVED = 'UNKNOWN123';
 
-beforeEach(() => {
-  resolver = makeResolver({
-    [RESOLVABLE]: { status: 'exact' as const, symbol: makeSymbol(RESOLVABLE) as IndianEquitySymbol },
-  });
-  cache = makeCache();
-  pipeline = new IndianEodIngestionPipeline(resolver, cache);
-});
-
 describe('IndianEodIngestionPipeline', () => {
+  let resolver: IndianSymbolResolver;
+  let cache: EodDataCacheLike;
+  let pipeline: IndianEodIngestionPipeline;
+
+  beforeEach(() => {
+    resolver = makeResolver({
+      [RESOLVABLE]: { status: 'exact' as const, symbol: makeSymbol(RESOLVABLE) as IndianEquitySymbol },
+    });
+    cache = makeCache();
+    pipeline = new IndianEodIngestionPipeline(resolver, cache);
+  });
+
   it('processes valid candles through the pipeline', async () => {
-    const inputs: RawCandleInput[] = [
-      { symbol: RESOLVABLE, date: '2026-06-17', open: 2500, high: 2550, low: 2480, close: 2540, volume: 5000000 },
-    ];
-    const result = await pipeline.ingest(inputs);
-    expect(result.totalCandles).toBe(1);
-    expect(result.acceptedCandles).toBe(1);
-    expect(result.rejectedCandles).toBe(0);
+    const inputs = [candleInput(RESOLVABLE)];
+    const result = await pipeline.ingest(makeBatch(), inputs);
+    expect(result.accepted).toBe(1);
+    expect(result.rejected).toBe(0);
+    expect(result.duplicates).toBe(0);
   });
 
   it('caches accepted candles to EodDataCacheService', async () => {
-    const inputs: RawCandleInput[] = [
-      { symbol: RESOLVABLE, date: '2026-06-17', open: 2500, high: 2550, low: 2480, close: 2540, volume: 5000000 },
-    ];
-    await pipeline.ingest(inputs);
+    const inputs = [candleInput(RESOLVABLE)];
+    await pipeline.ingest(makeBatch(), inputs);
+
     expect(cache.set).toHaveBeenCalledTimes(1);
-    const [key, value] = (cache.set as ReturnType<typeof vi.fn>).mock.calls[0];
+    const [namespace, key] = (cache.set as ReturnType<typeof vi.fn>).mock.calls[0];
     expect(key).toContain(RESOLVABLE);
     expect(key).toContain('2026-06-17');
-    expect(value).toHaveProperty('close', 2540);
   });
 
   it('rejects unresolvable symbols', async () => {
-    const inputs: RawCandleInput[] = [
-      { symbol: UNRESOLVED, date: '2026-06-17', open: 100, high: 110, low: 95, close: 105, volume: 1000 },
-    ];
-    const result = await pipeline.ingest(inputs);
-    expect(result.rejectedCandles).toBe(1);
-    expect(result.results[0].accepted).toBe(false);
+    const inputs = [candleInput(UNRESOLVED)];
+    const result = await pipeline.ingest(makeBatch(), inputs);
+    expect(result.rejected).toBe(1);
+    expect(result.accepted).toBe(0);
   });
 
-  it('rejects invalid candle data', async () => {
-    const inputs: RawCandleInput[] = [
-      { symbol: RESOLVABLE, date: '2026-06-17', open: -100, high: 100, low: -100, close: 50, volume: 0 },
-    ];
-    const result = await pipeline.ingest(inputs);
-    expect(result.rejectedCandles).toBe(1);
+  it('rejects invalid candle data (negative price)', async () => {
+    const inputs = [candleInput(RESOLVABLE, { open: -100, high: 100, low: -100, close: 50, volume: 0 })];
+    const result = await pipeline.ingest(makeBatch(), inputs);
+    expect(result.rejected).toBe(1);
+    expect(result.accepted).toBe(0);
   });
 
   it('handles mixed batch (some accepted, some rejected)', async () => {
-    const inputs: RawCandleInput[] = [
-      { symbol: RESOLVABLE, date: '2026-06-17', open: 2500, high: 2550, low: 2480, close: 2540, volume: 5000000 },
-      { symbol: UNRESOLVED, date: '2026-06-17', open: 100, high: 110, low: 95, close: 105, volume: 1000 },
-      { symbol: RESOLVABLE, date: '2026-06-17', open: -1, high: -1, low: -1, close: -1, volume: 0 },
+    const inputs = [
+      candleInput(RESOLVABLE),
+      candleInput(UNRESOLVED),
+      candleInput(RESOLVABLE, { open: -1, high: -1, low: -1, close: -1, volume: 0 }),
     ];
-    const result = await pipeline.ingest(inputs);
-    expect(result.totalCandles).toBe(3);
-    expect(result.acceptedCandles).toBe(1);
-    expect(result.rejectedCandles).toBe(2);
+    const result = await pipeline.ingest(makeBatch(), inputs);
+    expect(result.accepted).toBe(1);
+    expect(result.rejected).toBe(2);
+    expect(result.duplicates).toBe(0);
   });
 
-  it('deduplicates identical candles within the same batch', async () => {
-    const inputs: RawCandleInput[] = [
-      { symbol: RESOLVABLE, date: '2026-06-17', open: 2500, high: 2550, low: 2480, close: 2540, volume: 5000000 },
-      { symbol: RESOLVABLE, date: '2026-06-17', open: 2500, high: 2550, low: 2480, close: 2540, volume: 5000000 },
-    ];
-    const result = await pipeline.ingest(inputs);
-    expect(result.totalCandles).toBe(2);
-    expect(result.acceptedCandles).toBe(1);
-    expect(result.rejectedCandles).toBe(1);
-    // Only one set call for the accepted candle
-    expect(cache.set).toHaveBeenCalledTimes(1);
+  it('deduplicates candles already in cache', async () => {
+    // First call: cache miss → accepted
+    const inputs = [candleInput(RESOLVABLE)];
+    const r1 = await pipeline.ingest(makeBatch(), inputs);
+    expect(r1.accepted).toBe(1);
+    expect(r1.duplicates).toBe(0);
+
+    // Second call: cache hit → duplicate
+    (cache.get as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ close: 2540 });
+    const r2 = await pipeline.ingest(makeBatch(), inputs);
+    expect(r2.accepted).toBe(0);
+    expect(r2.duplicates).toBe(1);
   });
 
-  it('ingestFromCache uses previous results for chain processing', async () => {
-    const inputs: RawCandleInput[] = [
-      { symbol: RESOLVABLE, date: '2026-06-17', open: 2500, high: 2550, low: 2480, close: 2540, volume: 5000000 },
-    ];
-    const result = await pipeline.ingestFromCache(inputs);
-    // ingestFromCache filters to only cache misses, so with no cache data, should process all
-    expect(result.totalCandles).toBe(1);
-    expect(result.acceptedCandles).toBe(1);
+  it('returns sample rejection reasons for rejected candles', async () => {
+    const inputs = [candleInput(UNRESOLVED)];
+    const result = await pipeline.ingest(makeBatch(), inputs);
+    expect(result.sampleRejections.length).toBeGreaterThan(0);
+    expect(result.sampleRejections[0]).toContain(UNRESOLVED);
   });
 
-  it('stores result in batchId format', async () => {
-    const inputs: RawCandleInput[] = [
-      { symbol: RESOLVABLE, date: '2026-06-17', open: 2500, high: 2550, low: 2480, close: 2540, volume: 5000000 },
-    ];
-    const result = await pipeline.ingest(inputs);
-    const batchEntry = pipeline.getBatch(result.batchId);
-    expect(batchEntry).toBeDefined();
-    expect(batchEntry!.batchId).toBe(result.batchId);
+  it('tracks durationMs in result', async () => {
+    const inputs = [candleInput(RESOLVABLE)];
+    const result = await pipeline.ingest(makeBatch(), inputs);
+    expect(result.durationMs).toBeGreaterThanOrEqual(0);
   });
 
-  it('getBatch returns undefined for unknown batch', () => {
-    expect(pipeline.getBatch('nonexistent')).toBeUndefined();
+  it('returns batch descriptor in result', async () => {
+    const batch = makeBatch('2026-06-17');
+    const inputs = [candleInput(RESOLVABLE)];
+    const result = await pipeline.ingest(batch, inputs);
+    expect(result.batch.batchId).toBe(batch.batchId);
+    expect(result.batch.tradeDate).toBe('2026-06-17');
+    expect(result.batch.source).toBe('nse_bhavcopy');
+  });
+
+  it('createTaskRecord produces valid task record', async () => {
+    const startedAt = new Date().toISOString();
+    const record = await pipeline.createTaskRecord({
+      source: 'nse_bhavcopy',
+      tradeDate: '2026-06-17',
+      startedAt,
+      status: 'running',
+      accepted: 5,
+      rejected: 0,
+    });
+    expect(record.taskId).toBeDefined();
+    expect(record.source).toBe('nse_bhavcopy');
+    expect(record.status).toBe('running');
+    expect(record.accepted).toBe(5);
   });
 });
