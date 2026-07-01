@@ -136,9 +136,9 @@ export class IndiaTradingCalendar {
     const result: string[] = [];
     const cursor = new Date(from);
 
-    while (result.length < n) {
+    while (result.length <= n) {
       if (this.isTradingDay(cursor)) {
-        result.unshift(toDateStr(cursor));
+        result.push(toDateStr(cursor));
       }
       cursor.setUTCDate(cursor.getUTCDate() - 1);
     }

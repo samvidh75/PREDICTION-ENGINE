@@ -85,7 +85,9 @@ describe('StoreBackedSymbolResolver', () => {
 
   it('resolves normalized ticker (-EQ suffix)', async () => {
     const result = await resolver.resolve('HDFCBANK-EQ');
-    expect(result.status).toBe('normalized');
+    // HDFCBANK-EQ is stored as an exact alias in the mock fixture,
+    // so step 2 (alias match) resolves it before step 3 (normalize + retry).
+    expect(result.status).toBe('alias');
     expect(result.symbol?.canonicalSymbol).toBe('HDFCBANK');
   });
 

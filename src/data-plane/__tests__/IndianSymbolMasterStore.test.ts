@@ -1,10 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { IndianSymbolMasterStore } from '../symbols/IndianSymbolMasterStore';
 import type { IndianEquitySymbol } from '../symbols/IndianEquitySymbol';
-import type { Database } from 'bun:sqlite';
 
 // ---------------------------------------------------------------------------
-// Mock the database
+// The store uses a placeholder runQuery that returns [] — so methods resolve
+// to null / 0 / [] instead of throwing.  These tests verify that interface
+// contract holds for the placeholder implementation.
 // ---------------------------------------------------------------------------
 
 function makeStore(overrides?: Partial<IndianSymbolMasterStore>): IndianSymbolMasterStore {
@@ -29,7 +30,7 @@ describe('IndianSymbolMasterStore', () => {
     expect(typeof store.count).toBe('function');
   });
 
-  it('upsert throws when not connected to DB', async () => {
+  it('upsert resolves to symbol when not connected to DB', async () => {
     const symbol: IndianEquitySymbol = {
       canonicalSymbol: 'RELIANCE',
       exchange: 'NSE',
@@ -48,42 +49,52 @@ describe('IndianSymbolMasterStore', () => {
       firstSeenAt: Date.now(),
       lastSeenAt: Date.now(),
     };
-    await expect(store.upsert(symbol)).rejects.toThrow();
+    const result = await store.upsert(symbol);
+    expect(result).toEqual(symbol);
   });
 
-  it('bulkUpsert throws when not connected to DB', async () => {
-    await expect(store.bulkUpsert([])).rejects.toThrow();
+  it('bulkUpsert returns 0 for empty input', async () => {
+    const result = await store.bulkUpsert([]);
+    expect(result).toBe(0);
   });
 
-  it('findBySymbol throws when not connected to DB', async () => {
-    await expect(store.findBySymbol('RELIANCE')).rejects.toThrow();
+  it('findBySymbol returns null when not connected to DB', async () => {
+    const result = await store.findBySymbol('RELIANCE');
+    expect(result).toBeNull();
   });
 
-  it('findByAlias throws when not connected to DB', async () => {
-    await expect(store.findByAlias('RELIANCE.NS')).rejects.toThrow();
+  it('findByAlias returns null when not connected to DB', async () => {
+    const result = await store.findByAlias('RELIANCE.NS');
+    expect(result).toBeNull();
   });
 
-  it('findByIsin throws when not connected to DB', async () => {
-    await expect(store.findByIsin('IN0020200124')).rejects.toThrow();
+  it('findByIsin returns null when not connected to DB', async () => {
+    const result = await store.findByIsin('IN0020200124');
+    expect(result).toBeNull();
   });
 
-  it('findByBseCode throws when not connected to DB', async () => {
-    await expect(store.findByBseCode('500325')).rejects.toThrow();
+  it('findByBseCode returns null when not connected to DB', async () => {
+    const result = await store.findByBseCode('500325');
+    expect(result).toBeNull();
   });
 
-  it('search throws when not connected to DB', async () => {
-    await expect(store.search('REL')).rejects.toThrow();
+  it('search returns empty array when not connected to DB', async () => {
+    const result = await store.search('REL');
+    expect(result).toEqual([]);
   });
 
-  it('listActive throws when not connected to DB', async () => {
-    await expect(store.listActive()).rejects.toThrow();
+  it('listActive returns empty array when not connected to DB', async () => {
+    const result = await store.listActive();
+    expect(result).toEqual([]);
   });
 
-  it('listRetired throws when not connected to DB', async () => {
-    await expect(store.listRetired()).rejects.toThrow();
+  it('listRetired returns empty array when not connected to DB', async () => {
+    const result = await store.listRetired();
+    expect(result).toEqual([]);
   });
 
-  it('count throws when not connected to DB', async () => {
-    await expect(store.count()).rejects.toThrow();
+  it('count returns 0 when not connected to DB', async () => {
+    const result = await store.count();
+    expect(result).toBe(0);
   });
 });

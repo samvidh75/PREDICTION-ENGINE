@@ -23,10 +23,7 @@ export function getEodDate(now: Date = new Date()): string {
   }
 
   // Before close or not a trading day — previous trading day
-  // We only need date precision here; move back one day, then snap back
-  const prev = new Date(now);
-  prev.setUTCDate(prev.getUTCDate() - 1);
-  return cal.previousTradingDay(prev).toISOString().slice(0, 10);
+  return cal.previousTradingDay(now).toISOString().slice(0, 10);
 }
 
 /**
@@ -40,7 +37,9 @@ export function fmtDate(d: Date): string {
  * Parse 'YYYY-MM-DD' to a Date at 00:00:00 UTC.
  */
 export function parseDate(s: string): Date {
-  return new Date(`${s}T00:00:00.000Z`);
+  // Strip any time component so we always get midnight UTC
+  const datePart = s.includes('T') ? s.split('T')[0] : s;
+  return new Date(`${datePart}T00:00:00.000Z`);
 }
 
 /**
