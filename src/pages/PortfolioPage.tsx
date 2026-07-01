@@ -9,6 +9,7 @@ import { useResponsiveValue } from "../ui/responsive";
 import { colors, typography, layout, radius, space, animation } from "../design/tokens";
 import { ResearchAiExplanationPanel } from "../components/ai-orchestrator/ResearchAiExplanationPanel";
 import type { ResearchAiContext } from "../components/ai-orchestrator";
+import { DataLoading } from "../ui/ResearchDataState";
 import { BarChart3, ExternalLink, Plus, TrendingUp, Trash2, PieChart, Edit3 } from "lucide-react";
 import { PortfolioEngine, type UserHolding } from "../services/portfolio/PortfolioEngine";
 import { PortfolioPerformanceEngine } from "../services/portfolio/PortfolioPerformanceEngine";
@@ -160,7 +161,42 @@ export default function PortfolioPage() {
   if (loading) {
     return (
       <div style={{ maxWidth: layout.contentMaxWidth, margin: "0 auto", padding: layout.pagePaddingDesktop }}>
-        <div style={{ color: colors.mute, padding: 48, textAlign: "center" }}>Loading portfolio…</div>
+        <DataLoading />
+      </div>
+    );
+  }
+
+  if (holdings.length === 0 && !showAddForm) {
+    return (
+      <div style={{ maxWidth: layout.contentMaxWidth, margin: "0 auto", padding: isMobile ? layout.pagePaddingMobile : layout.pagePaddingDesktop }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 24 }}>
+          <BarChart3 size={24} color={colors.primary} />
+          <h1 style={{ fontSize: typography.h2.desktop.size, fontWeight: 700, color: colors.ink, margin: 0 }}>Portfolio</h1>
+        </div>
+        <Card variant="elevated" style={{ padding: "48px 24px", textAlign: "center" }}>
+          <div style={{ marginBottom: 20 }}>
+            <TrendingUp size={48} color={colors.body} style={{ opacity: 0.3 }} />
+          </div>
+          <h2 style={{ fontSize: typography.h3.desktop.size, fontWeight: 600, color: colors.ink, margin: "0 0 12px 0" }}>
+            No portfolio companies are being tracked yet.
+          </h2>
+          <p style={{ color: colors.body, fontSize: typography.body.desktop.size, margin: "0 0 24px 0", maxWidth: 480, lineHeight: 1.6 }}>
+            Add companies to start tracking thesis and allocation context.
+          </p>
+          <div style={{ display: "flex", justifyContent: "center", gap: 12, flexWrap: "wrap" }}>
+            <Button variant="primary" size="sm" onClick={() => { setShowAddForm(true); }}>
+              <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                <Plus size={16} /> Add Holding Manually
+              </span>
+            </Button>
+            <Button variant="secondary" size="sm" onClick={() => navigate("/watchlist")}>
+              Go to Watchlist
+            </Button>
+          </div>
+          <p style={{ color: colors.body, fontSize: "12px", margin: "32px 0 0 0", fontStyle: "italic", opacity: 0.6 }}>
+            Portfolio research context only. Not a broker account.
+          </p>
+        </Card>
       </div>
     );
   }
