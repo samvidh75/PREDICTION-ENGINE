@@ -187,11 +187,7 @@ function generateReply(input: EdgeAiWorkerInput): string {
   const narrativeSnippet = context.narrative.slice(0, 3).join(' ');
   const riskCount = context.risksToReview.length;
   const watchCount = context.whatToWatch.length;
-  const formatPrice = (value: number | null | undefined) => {
-    if (value == null || Number.isNaN(value)) return '—';
-    return value.toFixed(2);
-  };
-  const formatPct = (value: number | null | undefined) => {
+  const formatVal = (value: number | null | undefined) => {
     if (value == null || Number.isNaN(value)) return '—';
     return value.toFixed(2);
   };
@@ -199,7 +195,7 @@ function generateReply(input: EdgeAiWorkerInput): string {
   const contextPrompt = [
     `Company: ${context.companyName} (${context.symbol})`,
     `Sector: ${context.sector}`,
-    `Price: \u20b9${formatPrice(context.currentPrice)} (${(context.changePercent ?? 0) >= 0 ? '+' : ''}${formatPct(context.changePercent)}%)`,
+    `Price: \u20b9${formatVal(context.currentPrice)} (${(context.changePercent ?? 0) >= 0 ? '+' : ''}${formatVal(context.changePercent)}%)`,
     narrativeSnippet ? `Narrative: ${narrativeSnippet}` : '',
     riskCount > 0 ? `Risks flagged: ${riskCount} item(s).` : '',
     watchCount > 0 ? `What to watch: ${watchCount} item(s).` : '',
@@ -248,8 +244,8 @@ function generateReply(input: EdgeAiWorkerInput): string {
 
   if (lower.includes('price') || lower.includes('return') || lower.includes('performance')) {
     return [
-      `${context.companyName} is currently at \u20b9${formatPrice(context.currentPrice)}.`,
-      `Today: ${(context.changePercent ?? 0) >= 0 ? '+' : ''}${formatPct(context.changePercent)}%`,
+      `${context.companyName} is currently at \u20b9${formatVal(context.currentPrice)}.`,
+      `Today: ${(context.changePercent ?? 0) >= 0 ? '+' : ''}${formatVal(context.changePercent)}%`,
       '',
       'Past performance is not indicative of future results. The research context covers fundamentals, sector trends, and flagged risks.',
     ].join('\n');

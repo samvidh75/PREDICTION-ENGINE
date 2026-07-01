@@ -9,6 +9,7 @@
 
 import { Activity, TrendingUp, TrendingDown, BarChart3 } from "lucide-react";
 import { colors, radius, animation } from "../design/tokens";
+import { formatNumber } from "../services/ui/dataFormatting";
 
 interface OptionsData {
   pcr: number;               // Put/Call ratio
@@ -39,13 +40,7 @@ const MOCK_OPTIONS_DATA: OptionsData = {
   highestPutOI: 320,
 };
 
-function formatNumber(n: number): string {
-  if (n >= 1000000) return `${(n / 1000000).toFixed(1)}M`;
-  if (n >= 1000) return `${(n / 1000).toFixed(1)}K`;
-  return n.toString();
-}
-
-function formatDecimal(n: number | null | undefined, digits = 1): string {
+function safeDecimal(n: number | null | undefined, digits = 1): string {
   if (n == null || Number.isNaN(n)) return "—";
   return n.toFixed(digits);
 }
@@ -109,7 +104,7 @@ export function OptionsFlow() {
             Put/Call Ratio
           </div>
           <div style={{ fontSize: "22px", fontWeight: 700, color: colors.textPrimary, marginBottom: "2px" }}>
-            {formatDecimal(d.pcr, 2)}
+            {safeDecimal(d.pcr, 2)}
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
             {d.pcrChange > 0 ? (
@@ -136,7 +131,7 @@ export function OptionsFlow() {
             Implied Volatility
           </div>
           <div style={{ fontSize: "22px", fontWeight: 700, color: colors.textPrimary, marginBottom: "2px" }}>
-            {formatDecimal(d.impliedVolatility, 1)}%
+            {safeDecimal(d.impliedVolatility, 1)}%
           </div>
           <div style={{ fontSize: "12px", fontWeight: 500, color: ivSignal.color }}>
             {ivSignal.label} · {d.ivPercentile}th %ile
@@ -156,10 +151,10 @@ export function OptionsFlow() {
             Max Pain
           </div>
           <div style={{ fontSize: "22px", fontWeight: 700, color: colors.textPrimary, marginBottom: "2px" }}>
-            ₹{formatNumber(d.maxPain)}
+            ₹{d.maxPain}
           </div>
           <div style={{ fontSize: "12px", fontWeight: 500, color: maxPainDelta > 0 ? colors.marketGreen : colors.marketRed }}>
-            {maxPainDelta > 0 ? "+" : ""}{formatDecimal(maxPainDelta, 1)}% vs CMP
+            {maxPainDelta > 0 ? "+" : ""}{safeDecimal(maxPainDelta, 1)}% vs CMP
           </div>
         </div>
 

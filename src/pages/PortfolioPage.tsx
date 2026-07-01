@@ -15,18 +15,8 @@ import { PortfolioEngine, type UserHolding } from "../services/portfolio/Portfol
 import { PortfolioPerformanceEngine } from "../services/portfolio/PortfolioPerformanceEngine";
 import { PortfolioAnalyticsEngine } from "../services/portfolio/PortfolioAnalyticsEngine";
 import { MarketDataGateway } from "../services/data/MarketDataGateway";
-import { loadAuthSession } from "../services/auth/sessionStore";
-
-function formatInr(n: number): string {
-  if (n == null || Number.isNaN(n)) return "—";
-  return "₹" + n.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-}
-
-function formatPct(n: number | null): string {
-  if (n === null) return "—";
-  if (Number.isNaN(n)) return "—";
-  return (n >= 0 ? "+" : "") + n.toFixed(2) + "%";
-}
+import { formatINR } from "../services/ui/dataFormatting";
+import { formatPercent } from "../services/ui/indianNumberFormat";
 
 export default function PortfolioPage() {
   const navigate = useNavigate();
@@ -184,16 +174,16 @@ export default function PortfolioPage() {
 
     return {
       surface: "portfolio",
-      headline: `${holdings.length} holding${holdings.length !== 1 ? "s" : ""} · ${formatInr(totalCost)} cost · ₹${formatInr(totalValue)} current`,
+      headline: `${holdings.length} holding${holdings.length !== 1 ? "s" : ""} · ${formatINR(totalCost)} cost · ${formatINR(totalValue)} current`,
       narrative: [
         `${holdings.length} holding${holdings.length !== 1 ? "s" : ""} across ${sectorWeights.length} sector${sectorWeights.length !== 1 ? "s" : ""}.`,
-        `Top holding: ${topHolding.symbol} (${topHolding.shares} shares @ ${formatInr(topHolding.avgBuyPrice)}).`,
-        `Portfolio P&L: ${formatInr(perf.totalGainAmount)} (${formatPct(perf.totalGainPct)}). Best performer: ${perf.bestPerformerSymbol}.`,
+        `Top holding: ${topHolding.symbol} (${topHolding.shares} shares @ ${formatINR(topHolding.avgBuyPrice)}).`,
+        `Portfolio P&L: ${formatINR(perf.totalGainAmount)} (${formatPercent(perf.totalGainPct)}). Best performer: ${perf.bestPerformerSymbol}.`,
       ],
       comparisonContext: holdings.slice(0, 10).map((h) => {
         const price = currentPrices[h.symbol];
-        const gain = price ? formatPct((price - h.avgBuyPrice) / h.avgBuyPrice * 100) : "—";
-        return `${h.symbol} (${h.sector}): ${h.shares} shares, avg ${formatInr(h.avgBuyPrice)}, current ${price ? formatInr(price) : "—"}, P&L ${gain}`;
+        const gain = price ? formatPercent((price - h.avgBuyPrice) / h.avgBuyPrice * 100) : "—";
+        return `${h.symbol} (${h.sector}): ${h.shares} shares, avg ${formatINR(h.avgBuyPrice)}, current ${price ? formatINR(price) : "—"}, P&L ${gain}`;
       }),
       whatToWatch: [
         `${perf.bestPerformerSymbol} is your best performer — monitor for trend continuation.`,
@@ -388,14 +378,14 @@ export default function PortfolioPage() {
               <Card variant="elevated" style={{ padding: "16px" }}>
                 <CardLabel>Total Cost</CardLabel>
                 <span style={{ fontSize: typography.headingSm.size, fontWeight: 600, color: colors.ink }}>
-                  {formatInr(perf.totalCost)}
+                  {formatINR(perf.totalCost)}
                 </span>
               </Card>
               <Card variant="elevated" style={{ padding: "16px" }}>
                 <CardLabel>Current Value</CardLabel>
                 <PriceFlash value={perf.currentValue}>
                   <span style={{ fontSize: typography.headingSm.size, fontWeight: 600, color: colors.ink }}>
-                    {formatInr(perf.currentValue)}
+                    {formatINR(perf.currentValue)}
                   </span>
                 </PriceFlash>
               </Card>
@@ -407,9 +397,9 @@ export default function PortfolioPage() {
                     fontWeight: 600,
                     color: perf.totalGainAmount >= 0 ? colors.marketGreen : colors.marketRed,
                   }}>
-                    {formatInr(perf.totalGainAmount)}
+                    {formatINR(perf.totalGainAmount)}
                     <span style={{ marginLeft: 6, fontSize: typography.captionMd.size }}>
-                      ({formatPct(perf.totalGainPct)})
+                      ({formatPercent(perf.totalGainPct)})
                     </span>
                   </span>
                 </PriceFlash>
@@ -473,7 +463,7 @@ export default function PortfolioPage() {
                               {h.shares}
                             </td>
                             <td style={{ padding: "12px 16px", color: colors.body, fontSize: typography.bodySm.size }}>
-                              {formatInr(h.avgBuyPrice)}
+                              {formatINR(h.avgBuyPrice)}
                             </td>
                             <td style={{ padding: "12px 16px" }}>
                               <PriceFlash value={price ?? 0}>
@@ -482,7 +472,7 @@ export default function PortfolioPage() {
                                   fontSize: typography.bodySm.size,
                                   fontWeight: 500,
                                 }}>
-                                  {price ? formatInr(price) : "—"}
+                                  {price ? formatINR(price) : "—"}
                                 </span>
                               </PriceFlash>
                             </td>
@@ -494,7 +484,7 @@ export default function PortfolioPage() {
                                     fontSize: typography.bodySm.size,
                                     fontWeight: 600,
                                   }}>
-                                    {formatPct(gain)}
+                                    {formatPercent(gain)}
                                   </span>
                                 </PriceFlash>
                               ) : (
