@@ -17,12 +17,47 @@ import type {
 /* ── Self-registering worker ───────────────────────────────────────── */
 
 // eslint-disable-next-line no-restricted-globals
-self.onmessage = (event: MessageEvent<WorkerMessage>): void => {
-  const input: WorkerMessage = event.data;
+self.onmessage = async (event: MessageEvent<WorkerMessage | { type: string; payload: any }>): Promise<void> => {
+  const input = event.data;
 
   try {
+    // Phase 35: GPU order-flow delta computation
+    if ('type' in input && input.type === 'compute_gpu_order_flow') {
+      try {
+        const res = await computeGpuOrderFlowDelta(
+          input.payload.callVols as number[],
+          input.payload.putVols as number[],
+        );
+        // eslint-disable-next-line no-restricted-globals
+        self.postMessage({ type: 'gpu_order_flow_result', payload: res });
+      } catch {
+        // eslint-disable-next-line no-restricted-globals
+        self.postMessage({
+          type: 'gpu_order_flow_result',
+          payload: { delta: 0, signal: 'CPU_FALLBACK_ACTIVE' },
+        });
+      }
+      return;
+    }
+
+    // Phase 41: Bulk option Greeks computation
+    if ('type' in input && input.type === 'compute_option_greeks_bulk') {
+      const { spot, strikesData } = input.payload as {
+        spot: number;
+        strikesData: Array<{ strike: number; iv: number; isCall: boolean }>;
+      };
+      const results = strikesData.map((item) => ({
+        strike: item.strike,
+        isCall: item.isCall,
+        greeks: computeClientOptionGreeks(spot, item.strike, 30, 0.07, item.iv, item.isCall),
+      }));
+      // eslint-disable-next-line no-restricted-globals
+      self.postMessage({ type: 'greeks_bulk_result', results });
+      return;
+    }
+
     if ('type' in input && input.type === 'scan') {
-      const result = runScanner(input);
+      const result = runScanner(input as ScannerWorkerInput);
       // eslint-disable-next-line no-restricted-globals
       self.postMessage(result);
     } else {
@@ -230,4 +265,359 @@ function generateReply(input: EdgeAiWorkerInput): string {
 }
 
 // Export for testability
-export { runScanner, computeBollingerBands, computeEma, detectPriceVolumeDivergence, generateReply };
+export { runScanner, computeBollingerBands, computeEma, detectPriceVolumeDivergence, generateReply, runWebGpuScanner };
+
+/* ── WebGPU-Accelerated Scanner (Phase 30) ──────────────────────────── */
+
+/**
+ * GPU-accelerated Bollinger Band mean computation using WebGPU compute shaders.
+ * Falls back to CPU if WebGPU is unavailable.
+ *
+ * @param priceHistory - Array of recent closing prices (minimum 20)
+ * @returns Computed health score (0-100) based on price position relative to bands
+ */
+async function runWebGpuScanner(priceHistory: number[]): Promise<number> {
+  // Fallback to CPU if WebGPU is not supported
+  if (typeof navigator === 'undefined' || !navigator.gpu) {
+    return computeCpuFallback(priceHistory);
+  }
+
+  try {
+    const adapter = await navigator.gpu.requestAdapter();
+    if (!adapter) return computeCpuFallback(priceHistory);
+
+    const device = await adapter.requestDevice();
+    if (!device) return computeCpuFallback(priceHistory);
+
+    // WGSL Compute Shader: calculates 20-period SMA on GPU
+    const computeShaderCode = `
+      @group(0) @binding(0) var<storage, read> prices: array<f32>;
+      @group(0) @binding(1) var<storage, read_write> output: array<f32>;
+
+      @compute @workgroup_size(1)
+      fn main(@builtin(global_invocation_id) id: vec3<u32>) {
+        var sum: f32 = 0.0;
+        let len: u32 = arrayLength(&prices);
+        let period: u32 = min(20u, len);
+        let start: u32 = len - period;
+
+        for (var i: u32 = 0u; i < period; i = i + 1u) {
+          sum = sum + prices[start + i];
+        }
+        let mean: f32 = sum / f32(period);
+
+        // Calculate standard deviation
+        var sumSq: f32 = 0.0;
+        for (var i: u32 = 0u; i < period; i = i + 1u) {
+          let diff = prices[start + i] - mean;
+          sumSq = sumSq + diff * diff;
+        }
+        let stdDev: f32 = sqrt(sumSq / f32(period));
+
+        // Output: [0] = mean, [1] = upper band, [2] = lower band
+        output[0] = mean;
+        output[1] = mean + 2.0 * stdDev;
+        output[2] = mean - 2.0 * stdDev;
+      }
+    `;
+
+    const shaderModule = device.createShaderModule({ code: computeShaderCode });
+
+    const inputBuffer = device.createBuffer({
+      size: Float32Array.BYTES_PER_ELEMENT * priceHistory.length,
+      usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC,
+      mappedAtCreation: true,
+    });
+    new Float32Array(inputBuffer.getMappedRange()).set(priceHistory);
+    inputBuffer.unmap();
+
+    const outputBuffer = device.createBuffer({
+      size: Float32Array.BYTES_PER_ELEMENT * 3,
+      usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ,
+    });
+
+    const computePipeline = device.createComputePipeline({
+      layout: "auto",
+      compute: { module: shaderModule, entryPoint: "main" },
+    });
+
+    const bindGroup = device.createBindGroup({
+      layout: computePipeline.getBindGroupLayout(0),
+      entries: [
+        { binding: 0, resource: { buffer: inputBuffer } },
+        { binding: 1, resource: { buffer: outputBuffer } },
+      ],
+    });
+
+    const commandEncoder = device.createCommandEncoder();
+    const passEncoder = commandEncoder.beginComputePass();
+    passEncoder.setPipeline(computePipeline);
+    passEncoder.setBindGroup(0, bindGroup);
+    passEncoder.dispatchWorkgroups(1);
+    passEncoder.end();
+
+    device.queue.submit([commandEncoder.finish()]);
+    await outputBuffer.mapAsync(GPUMapMode.READ);
+
+    const resultData = new Float32Array(outputBuffer.getMappedRange());
+    const mean = resultData[0];
+    const upperBand = resultData[1];
+    const lowerBand = resultData[2];
+    outputBuffer.unmap();
+
+    // Cleanup GPU resources
+    inputBuffer.destroy();
+    outputBuffer.destroy();
+    device.destroy();
+
+    // Map current price position to health score
+    const currentPrice = priceHistory[priceHistory.length - 1];
+    if (currentPrice <= lowerBand) return 85;  // Below lower band — oversold
+    if (currentPrice >= upperBand) return 20;  // Above upper band — overbought
+
+    // Linear interpolation between bands
+    const bandRange = upperBand - lowerBand;
+    if (bandRange <= 0) return 50;
+    const position = (currentPrice - lowerBand) / bandRange;
+    return Math.round(85 - position * 65); // 85 at bottom, 20 at top
+
+  } catch {
+    return computeCpuFallback(priceHistory);
+  }
+}
+
+/* ── Black-Scholes Option Greeks (Phase 41) ────────────────────────── */
+
+/**
+ * Standard normal cumulative distribution function (A&S 26.2.17).
+ * High-precision polynomial approximation computed locally — no server calls.
+ */
+function standardNormalCDF(x: number): number {
+  const t = 1 / (1 + 0.2316419 * Math.abs(x));
+  const d = 0.39894228 * Math.exp((-x * x) / 2);
+  const p =
+    d *
+    t *
+    (0.31938153 +
+      t * (-0.356563782 + t * (1.781477937 + t * (-1.821255978 + t * 1.330274429))));
+  return x >= 0 ? 1 - p : p;
+}
+
+/** Normal probability density function. */
+function normalPDF(x: number): number {
+  return 0.3989422804014327 * Math.exp(-0.5 * x * x);
+}
+
+export interface GreeksOutput {
+  delta: number;
+  gamma: number;
+  theta: number;
+  vega: number;
+}
+
+/**
+ * Compute Black-Scholes option Greeks for a single strike.
+ * All calculations run client-side — zero server cost, zero API tokens.
+ *
+ * @param spotPrice - Current underlying price
+ * @param strikePrice - Option strike price
+ * @param daysToExpiry - Days until expiration
+ * @param riskFreeRate - Risk-free rate (default 7% for INR)
+ * @param impliedVol - Implied volatility percentage (e.g. 18.5)
+ * @param isCall - true for Call, false for Put
+ */
+export function computeClientOptionGreeks(
+  spotPrice: number,
+  strikePrice: number,
+  daysToExpiry: number,
+  riskFreeRate: number = 0.07,
+  impliedVol: number,
+  isCall: boolean,
+): GreeksOutput {
+  const t = Math.max(daysToExpiry, 0.5) / 365;
+  const v = Math.max(impliedVol, 0.01) / 100;
+
+  const d1 =
+    (Math.log(spotPrice / strikePrice) + (riskFreeRate + (v * v) / 2) * t) /
+    (v * Math.sqrt(t));
+  const d2 = d1 - v * Math.sqrt(t);
+
+  const nd1 = standardNormalCDF(d1);
+  const nd2 = standardNormalCDF(d2);
+  const nPrimeD1 = normalPDF(d1);
+
+  const delta = isCall ? nd1 : nd1 - 1;
+  const gamma = nPrimeD1 / (spotPrice * v * Math.sqrt(t));
+  const vega = (spotPrice * Math.sqrt(t) * nPrimeD1) / 100;
+
+  let theta: number;
+  if (isCall) {
+    theta =
+      (-spotPrice * v * nPrimeD1) / (2 * Math.sqrt(t)) -
+      riskFreeRate * strikePrice * Math.exp(-riskFreeRate * t) * nd2;
+  } else {
+    theta =
+      (-spotPrice * v * nPrimeD1) / (2 * Math.sqrt(t)) +
+      riskFreeRate * strikePrice * Math.exp(-riskFreeRate * t) * (1 - nd2);
+  }
+
+  return {
+    delta: parseFloat(delta.toFixed(3)),
+    gamma: parseFloat(gamma.toFixed(4)),
+    theta: parseFloat((theta / 365).toFixed(3)),
+    vega: parseFloat(vega.toFixed(3)),
+  };
+}
+
+/* ── WebGPU Order-Flow Delta (Phase 35) ────────────────────────────── */
+
+/**
+ * GPU-accelerated options order-flow delta computation using WebGPU compute shaders.
+ * Calculates net institutional call vs. put volume differentials on the GPU.
+ * Falls back to CPU if WebGPU is unavailable.
+ *
+ * @param callVols - Array of call option volumes at each strike
+ * @param putVols  - Array of put option volumes at each strike
+ * @returns Net delta and momentum signal string
+ */
+export async function computeGpuOrderFlowDelta(
+  callVols: number[],
+  putVols: number[],
+): Promise<{ delta: number; signal: string }> {
+  if (typeof navigator === 'undefined' || !navigator.gpu) {
+    return computeOrderFlowCpuFallback(callVols, putVols);
+  }
+
+  try {
+    const adapter = await navigator.gpu.requestAdapter();
+    if (!adapter) return computeOrderFlowCpuFallback(callVols, putVols);
+
+    const device = await adapter.requestDevice();
+    if (!device) return computeOrderFlowCpuFallback(callVols, putVols);
+
+    const count = Math.min(callVols.length, putVols.length, 64);
+
+    // WGSL compute shader: sums call volumes, subtracts put volumes
+    const wgslShader = `
+      @group(0) @binding(0) var<storage, read> calls: array<f32>;
+      @group(0) @binding(1) var<storage, read> puts: array<f32>;
+      @group(0) @binding(2) var<storage, read_write> net_delta: array<f32>;
+
+      @compute @workgroup_size(1)
+      fn main(@builtin(global_invocation_id) id: vec3<u32>) {
+        var call_total: f32 = 0.0;
+        var put_total: f32 = 0.0;
+        let len: u32 = arrayLength(&calls);
+        for (var i: u32 = 0u; i < len; i = i + 1u) {
+          call_total = call_total + calls[i];
+          put_total = put_total + puts[i];
+        }
+        net_delta[0] = call_total - put_total;
+      }
+    `;
+
+    const shaderModule = device.createShaderModule({ code: wgslShader });
+
+    const callBuffer = device.createBuffer({
+      size: Float32Array.BYTES_PER_ELEMENT * count,
+      usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC,
+      mappedAtCreation: true,
+    });
+    new Float32Array(callBuffer.getMappedRange()).set(callVols.slice(0, count));
+    callBuffer.unmap();
+
+    const putBuffer = device.createBuffer({
+      size: Float32Array.BYTES_PER_ELEMENT * count,
+      usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC,
+      mappedAtCreation: true,
+    });
+    new Float32Array(putBuffer.getMappedRange()).set(putVols.slice(0, count));
+    putBuffer.unmap();
+
+    const resultBuffer = device.createBuffer({
+      size: Float32Array.BYTES_PER_ELEMENT,
+      usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ,
+    });
+
+    const computePipeline = device.createComputePipeline({
+      layout: 'auto',
+      compute: { module: shaderModule, entryPoint: 'main' },
+    });
+
+    const bindGroup = device.createBindGroup({
+      layout: computePipeline.getBindGroupLayout(0),
+      entries: [
+        { binding: 0, resource: { buffer: callBuffer } },
+        { binding: 1, resource: { buffer: putBuffer } },
+        { binding: 2, resource: { buffer: resultBuffer } },
+      ],
+    });
+
+    const commandEncoder = device.createCommandEncoder();
+    const passEncoder = commandEncoder.beginComputePass();
+    passEncoder.setPipeline(computePipeline);
+    passEncoder.setBindGroup(0, bindGroup);
+    passEncoder.dispatchWorkgroups(1);
+    passEncoder.end();
+
+    device.queue.submit([commandEncoder.finish()]);
+    await resultBuffer.mapAsync(GPUMapMode.READ);
+
+    const output = new Float32Array(resultBuffer.getMappedRange());
+    const netDelta = output[0];
+    resultBuffer.unmap();
+
+    callBuffer.destroy();
+    putBuffer.destroy();
+    resultBuffer.destroy();
+    device.destroy();
+
+    const rounded = parseFloat(netDelta.toFixed(2));
+    let signal = 'NEUTRAL_FLOW';
+    if (rounded > 150000) signal = 'HEAVY_CALL_ACCUMULATION_BULLISH';
+    else if (rounded > 50000) signal = 'MODERATE_CALL_BIAS';
+    else if (rounded < -150000) signal = 'HEAVY_PUT_ACCUMULATION_BEARISH';
+    else if (rounded < -50000) signal = 'MODERATE_PUT_BIAS';
+
+    return { delta: rounded, signal };
+  } catch {
+    return computeOrderFlowCpuFallback(callVols, putVols);
+  }
+}
+
+/** CPU fallback for WebGPU order-flow delta calculation */
+function computeOrderFlowCpuFallback(
+  callVols: number[],
+  putVols: number[],
+): { delta: number; signal: string } {
+  const count = Math.min(callVols.length, putVols.length);
+  let callTotal = 0;
+  let putTotal = 0;
+
+  for (let i = 0; i < count; i++) {
+    callTotal += callVols[i];
+    putTotal += putVols[i];
+  }
+
+  const netDelta = callTotal - putTotal;
+  let signal = 'NEUTRAL_FLOW';
+  if (netDelta > 150000) signal = 'HEAVY_CALL_ACCUMULATION_BULLISH';
+  else if (netDelta > 50000) signal = 'MODERATE_CALL_BIAS';
+  else if (netDelta < -150000) signal = 'HEAVY_PUT_ACCUMULATION_BEARISH';
+  else if (netDelta < -50000) signal = 'MODERATE_PUT_BIAS';
+
+  return { delta: netDelta, signal };
+}
+
+/** CPU fallback for WebGPU-unavailable browsers */
+function computeCpuFallback(prices: number[]): number {
+  if (prices.length < 20) return 50;
+  const bands = computeBollingerBands(prices, 20, 2);
+  const current = prices[prices.length - 1];
+  if (current <= bands.lower) return 85;
+  if (current >= bands.upper) return 20;
+  const range = bands.upper - bands.lower;
+  if (range <= 0) return 50;
+  const pos = (current - bands.lower) / range;
+  return Math.round(85 - pos * 65);
+}
