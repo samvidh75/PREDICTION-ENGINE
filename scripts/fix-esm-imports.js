@@ -32,7 +32,6 @@ for (const file of files) {
     const resolvedPath = path.resolve(dir, importPath);
     let newPath = importPath;
 
-    // Prioritize file matches first (to avoid shadowed directories like routes/intelligence.js vs routes/intelligence/)
     if (fs.existsSync(`${resolvedPath}.js`) && !fs.statSync(`${resolvedPath}.js`).isDirectory()) {
       newPath = `${importPath}.js`;
     } else if (fs.existsSync(resolvedPath) && fs.statSync(resolvedPath).isDirectory()) {
@@ -47,6 +46,24 @@ for (const file of files) {
       }
     }
     return `${type}${prefix}"${newPath}"`;
+  });
+
+  content = content.replace(/import\s*\(['"](\.\.?\/[^'"]*)['"]\)/g, (match, importPath) => {
+    const resolvedPath = path.resolve(dir, importPath);
+    let newPath = importPath;
+
+    if (fs.existsSync(`${resolvedPath}.js`) && !fs.statSync(`${resolvedPath}.js`).isDirectory()) {
+      newPath = `${importPath}.js`;
+    } else if (!importPath.endsWith('.js') && !importPath.endsWith('.json') && !importPath.endsWith('.node')) {
+      if (fs.existsSync(`${resolvedPath}.js`)) {
+        newPath = `${importPath}.js`;
+      } else if (fs.existsSync(`${resolvedPath}/index.js`)) {
+        newPath = `${importPath}/index.js`;
+      } else {
+        newPath = `${importPath}.js`;
+      }
+    }
+    return `import("${newPath}")`;
   });
 
   fs.writeFileSync(file, content, 'utf-8');
