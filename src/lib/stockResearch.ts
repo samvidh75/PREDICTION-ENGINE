@@ -130,6 +130,17 @@ function normalizeCategory(value: string | null | undefined, fallback: string): 
   return normalized;
 }
 
+function isPlaceholderCompanyIdentity(stock: { symbol: string; name: string }): boolean {
+  const symbol = stock.symbol.trim().toUpperCase();
+  const name = stock.name.trim().toUpperCase();
+
+  if (/^BSE\d{6}$/.test(symbol)) return true;
+  if (/^BSE\d{6}$/.test(name)) return true;
+  if (name.includes("BSE LISTED SECURITY CODE")) return true;
+
+  return false;
+}
+
 function expandUniverse(base: BaseStockCandidate[]): BaseStockCandidate[] {
   const merged = new Map<string, BaseStockCandidate>();
   const keyFor = (stock: BaseStockCandidate) => `${stock.exchange}:${stock.symbol.toUpperCase()}`;
@@ -558,13 +569,14 @@ export function getUniverseCount(): number {
 }
 
 export function listAllStockResearch(): StockResearchSummary[] {
-  return mergedUniverse;
+  return mergedUniverse.filter((stock) => !isPlaceholderCompanyIdentity(stock));
 }
 
 export function searchStocks(query: string, limit = 20): StockResearchSummary[] {
   const normalized = query.trim().toLowerCase();
   if (!normalized) return [];
   const ranked = mergedUniverse
+    .filter((stock) => !isPlaceholderCompanyIdentity(stock))
     .map((stock) => {
       let rank = 0;
       const symbol = stock.symbol.toLowerCase();
@@ -605,6 +617,7 @@ export function getScannerStocks(scanType: "quality" | "value" | "momentum" | "s
 
   const seen = new Set<string>();
   return [...mergedUniverse]
+    .filter((stock) => !isPlaceholderCompanyIdentity(stock))
     .filter((stock) => {
       const key = stock.symbol.toUpperCase();
       if (seen.has(key)) return false;

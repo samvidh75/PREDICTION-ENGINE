@@ -15,6 +15,7 @@ import { PortfolioEngine, type UserHolding } from "../services/portfolio/Portfol
 import { PortfolioPerformanceEngine } from "../services/portfolio/PortfolioPerformanceEngine";
 import { PortfolioAnalyticsEngine } from "../services/portfolio/PortfolioAnalyticsEngine";
 import { MarketDataGateway } from "../services/data/MarketDataGateway";
+import { loadAuthSession } from "../services/auth/sessionStore";
 
 function formatInr(n: number): string {
   if (n == null || Number.isNaN(n)) return "—";
@@ -44,6 +45,11 @@ export default function PortfolioPage() {
   const [formSector, setFormSector] = useState("");
   const [formError, setFormError] = useState("");
 
+  // Broker sync state (Phase 36)
+  const [syncing, setSyncing] = useState(false);
+  const [syncMessage, setSyncMessage] = useState<string | null>(null);
+  const [brokerSyncs, setBrokerSyncs] = useState<{ broker: string; status: string; holdingsCount: number }[]>([]);
+
   const loadHoldings = useCallback(async () => {
     setLoading(true);
     const h = PortfolioEngine.getHoldings();
@@ -65,6 +71,33 @@ export default function PortfolioPage() {
     }
     setLoading(false);
   }, []);
+
+  const handleBrokerSync = useCallback(async () => {
+    setSyncing(true);
+    setSyncMessage(null);
+    const session = loadAuthSession();
+    if (session.status !== "authenticated" || !session.uid) {
+      setSyncMessage("Please sign in to sync broker portfolios");
+      setSyncing(false);
+      return;
+    }
+    try {
+      const resp = await fetch(`/api/v1/portfolio/sync/${session.uid}`, { method: "POST" });
+      const data = await resp.json();
+      if (data.synced) {
+        setBrokerSyncs(data.brokers || []);
+        const successCount = (data.brokers || []).filter((b: any) => b.status === "success").length;
+        setSyncMessage(`Synced ${successCount}/${data.brokers.length} broker connections`);
+        loadHoldings();
+      } else {
+        setSyncMessage(data.message || "No broker connections found");
+      }
+    } catch {
+      setSyncMessage("Sync failed — check broker connections");
+    } finally {
+      setSyncing(false);
+    }
+  }, [loadHoldings]);
 
   useEffect(() => {
     loadHoldings();
@@ -221,11 +254,43 @@ export default function PortfolioPage() {
                 : "Track thesis, allocation context, and portfolio research."}
             </p>
           </div>
-          <Button variant="primary" size="sm" onClick={() => { setShowAddForm(!showAddForm); setEditSymbol(null); setFormError(""); }}>
-            <Plus size={16} /> {showAddForm ? "Cancel" : "Add Holding"}
-          </Button>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            <Button variant="secondary" size="sm" onClick={handleBrokerSync} disabled={syncing}>
+              <BarChart3 size={14} /> {syncing ? "Syncing..." : "Sync from Brokers"}
+            </Button>
+            <Button variant="primary" size="sm" onClick={() => { setShowAddForm(!showAddForm); setEditSymbol(null); setFormError(""); }}>
+              <Plus size={16} /> {showAddForm ? "Cancel" : "Add Holding"}
+            </Button>
+          </div>
         </div>
       </StaggerContainer>
+
+      {/* Sync status message */}
+      {syncMessage && (
+        <StaggerContainer>
+          <div style={{
+            marginBottom: space[4], padding: `${space[2]} ${space[4]}`,
+            borderRadius: radius.md, fontSize: 12,
+            background: syncMessage.includes("failed") || syncMessage.includes("sign in")
+              ? `${colors.danger}15` : `${colors.success}15`,
+            color: syncMessage.includes("failed") || syncMessage.includes("sign in")
+              ? colors.danger : colors.success,
+            border: `1px solid ${syncMessage.includes("failed") || syncMessage.includes("sign in")
+              ? `${colors.danger}30` : `${colors.success}30`}`,
+          }}>
+            {syncMessage}
+            {brokerSyncs.length > 0 && (
+              <span style={{ marginLeft: 12, opacity: 0.7 }}>
+                {brokerSyncs.map((b) => (
+                  <span key={b.broker} style={{ marginLeft: 8 }}>
+                    {b.broker.replace(/_/g, " ")}: {b.status} ({b.holdingsCount}h)
+                  </span>
+                ))}
+              </span>
+            )}
+          </div>
+        </StaggerContainer>
+      )}
 
       {/* Add / Edit Form */}
       {showAddForm && (
