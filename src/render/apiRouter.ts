@@ -1617,6 +1617,6 @@ export default async function registerApiRoutes(server: FastifyInstance) {
     }
   });
   // ── Billing & Subscription Routes ────────────────────────────
-  const { registerCheckoutRoutes } = await import("../commercial/api/checkoutRoutes");
+  const { registerCheckoutRoutes } = await import("../commercial/api/checkoutRoutes.js");
   await registerCheckoutRoutes(server);
 }
