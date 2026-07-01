@@ -36,8 +36,13 @@ export function loadDatabasePolicy(
   const rawAdapter = (env.DB_ADAPTER ?? '').toLowerCase();
   let requestedAdapter: RequestedDbAdapter;
   if (isProduction) {
-    // Production: default to postgres
-    requestedAdapter = rawAdapter === 'sqlite' ? 'sqlite' : 'postgres';
+    // Production: auto (default) → tries postgres first, falls back to sqlite
+    // Explicit 'postgres' requires a working DATABASE_URL in production
+    // Explicit 'sqlite' skips postgres entirely
+    requestedAdapter =
+      rawAdapter === 'postgres' ? 'postgres' :
+      rawAdapter === 'sqlite'   ? 'sqlite'   :
+      'auto';
   } else if (nodeEnv === 'test') {
     // Test: require explicit selection
     if (rawAdapter === 'postgres' || rawAdapter === 'sqlite') {
@@ -52,14 +57,20 @@ export function loadDatabasePolicy(
     requestedAdapter = (rawAdapter === 'postgres' || rawAdapter === 'sqlite') ? rawAdapter : 'auto';
   }
 
-  // SQLite fallback
+  // SQLite fallback in production:
+  //   - Explicit 'postgres' → only if ALLOW_SQLITE_FALLBACK=true (env var must be set)
+  //   - 'auto' or 'sqlite'  → default true (resilient when render.yaml not synced)
+  const isExplicitPostgres = requestedAdapter === 'postgres';
   const allowSqliteFallback =
     isProduction
-      ? env.ALLOW_SQLITE_FALLBACK === 'true'
+      ? (isExplicitPostgres ? env.ALLOW_SQLITE_FALLBACK === 'true' : true)
       : env.ALLOW_SQLITE_FALLBACK !== 'false';
 
   // SQLite in production
-  const allowSqliteInProduction = env.ALLOW_SQLITE_IN_PRODUCTION === 'true';
+  const allowSqliteInProduction =
+    isProduction
+      ? (isExplicitPostgres ? env.ALLOW_SQLITE_IN_PRODUCTION === 'true' : true)
+      : env.ALLOW_SQLITE_IN_PRODUCTION === 'true';
   const sqliteProductionAllowed = isProduction ? allowSqliteInProduction : true;
 
   // SQLite DB path
