@@ -80,7 +80,7 @@ export function CompanyAnalystSection({ symbol }: CompanyAnalystSectionProps) {
       </Card>
 
       <Card>
-        <CardLabel>Ask StockStory about this company</CardLabel>
+        <CardLabel>Ask Lensory about this company</CardLabel>
         <AnalystQABox
           symbol={symbol}
           onAsk={handleAsk}

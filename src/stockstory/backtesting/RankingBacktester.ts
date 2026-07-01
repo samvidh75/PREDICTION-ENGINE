@@ -1,7 +1,7 @@
 /**
  * Ranking Backtester
  *
- * Measures whether StockStory factor scores have historical usefulness
+ * Measures whether Lensory factor scores have historical usefulness
  * by comparing scores at time T with future returns.
  */
 

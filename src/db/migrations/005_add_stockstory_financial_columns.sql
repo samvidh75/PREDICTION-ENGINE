@@ -1,5 +1,5 @@
 -- src/db/migrations/005_add_stockstory_financial_columns.sql
--- Add financial columns to financial_snapshots table to fully support all 7 engines in the StockStory Engine
+-- Add financial columns to financial_snapshots table to fully support all 7 engines in the Lensory Engine
 
 ALTER TABLE financial_snapshots ADD COLUMN IF NOT EXISTS roe NUMERIC(8,4);
 ALTER TABLE financial_snapshots ADD COLUMN IF NOT EXISTS roic NUMERIC(8,4);

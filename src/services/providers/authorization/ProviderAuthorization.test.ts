@@ -237,7 +237,7 @@ describe('getProviderUserAgent', () => {
     expect(getProviderUserAgent(config)).toBe('MyCustomAgent/2.0');
   });
 
-  it('returns StockStory/recordId when user agent is empty but contact email is set', async () => {
+  it('returns Lensory/recordId when user agent is empty but contact email is set', async () => {
     vi.stubEnv('AUTHORIZED_PROVIDER_CONTACT_EMAIL', 'dev@example.com');
     vi.resetModules();
 
@@ -253,10 +253,10 @@ describe('getProviderUserAgent', () => {
       userAgent: '',
     };
 
-    expect(getAgent(config)).toBe('StockStory/rec_abc12345 (dev@example.com)');
+    expect(getAgent(config)).toBe('Lensory/rec_abc12345 (dev@example.com)');
   });
 
-  it('returns StockStory/recordId when both user agent and contact email are empty', () => {
+  it('returns Lensory/recordId when both user agent and contact email are empty', () => {
     delete process.env.AUTHORIZED_PROVIDER_CONTACT_EMAIL;
 
     const config: ProviderAuthorizationConfig = {
@@ -269,7 +269,7 @@ describe('getProviderUserAgent', () => {
       userAgent: '',
     };
 
-    expect(getProviderUserAgent(config)).toBe('StockStory/rec_abc12345');
+    expect(getProviderUserAgent(config)).toBe('Lensory/rec_abc12345');
   });
 });
 

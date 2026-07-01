@@ -16,7 +16,7 @@ export interface PortfolioHolding {
   dayChange?: number;        // Day change amount
   dayChangePercent?: number; // Day change percentage
   instrumentToken?: string;  // Broker-specific token
-  sector?: string;           // Resolved from StockStory registry
+  sector?: string;           // Resolved from Lensory registry
   marketCap?: number;        // From registry
 }
 
@@ -41,7 +41,7 @@ export interface PortfolioFunds {
   currency: string;
 }
 
-/** Aggregated portfolio snapshot (StockStory format) */
+/** Aggregated portfolio snapshot (Lensory format) */
 export interface PortfolioSnapshot {
   userId: string;
   broker: string;
@@ -54,7 +54,7 @@ export interface PortfolioSnapshot {
   totalUnrealizedPnl: number;
   totalUnrealizedPnlPercent: number;
   
-  // Computed by StockStory
+  // Computed by Lensory
   healthScore?: number;
   riskScore?: number;
   qualityScore?: number;

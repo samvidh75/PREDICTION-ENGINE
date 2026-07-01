@@ -1,5 +1,5 @@
 /**
- * EntitlementService — Runtime feature gating for StockStory India.
+ * EntitlementService — Runtime feature gating for Lensory.
  *
  * Checks whether a given user (by their resolved subscription) may
  * access a FeatureKey.  This is the single source of truth for all

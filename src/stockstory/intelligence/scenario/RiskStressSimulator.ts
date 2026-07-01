@@ -1,5 +1,5 @@
 /**
- * StockStory Risk Stress Simulator
+ * Lensory Risk Stress Simulator
  *
  * Simulates how a hypothetical risk event changes the risk assessment.
  * Models risk score propagation across risk dimensions.

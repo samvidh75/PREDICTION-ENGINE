@@ -342,7 +342,7 @@ export default function PricingPage() {
       </div>
 
       <div style={{ marginTop: space[6], padding: space[5], background: colors.fill, borderRadius: radius.lg, fontSize: 13, color: colors.textSecondary, textAlign: "center" }}>
-        <strong>Compliance Notice:</strong> StockStory India is not SEBI-registered. 
+        <strong>Compliance Notice:</strong> Lensory India is not SEBI-registered. 
         All plans provide research analysis tools only — no investment advice, 
         no buy/sell recommendations, no portfolio management. Past performance 
         does not guarantee future results. Subscription will be processed via 

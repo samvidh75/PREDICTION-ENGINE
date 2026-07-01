@@ -2,11 +2,11 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { LLMGateway } from '../LLMGateway';
 import { getLLMGatewayConfig, setLLMGatewayConfig } from '../config';
 import { aiObservability } from '../../observability/AiObservability';
-import type { StockStoryResearchInput } from '../../research/types';
+import type { LensoryResearchInput } from '../../research/types';
 
 const gateway = new LLMGateway();
 
-function makeResearchInput(): StockStoryResearchInput {
+function makeResearchInput(): LensoryResearchInput {
   return {
     symbol: 'TEST',
     companyName: 'Test Company Ltd',

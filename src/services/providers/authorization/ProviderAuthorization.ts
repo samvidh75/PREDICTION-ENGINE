@@ -47,6 +47,6 @@ export function isPublicDisplayAllowed(config: ProviderAuthorizationConfig): boo
 
 export function getProviderUserAgent(config: ProviderAuthorizationConfig): string {
   if (config.userAgent) return config.userAgent;
-  if (CONTACT_EMAIL) return `StockStory/${config.authorizationRecordId} (${CONTACT_EMAIL})`;
-  return `StockStory/${config.authorizationRecordId}`;
+  if (CONTACT_EMAIL) return `Lensory/${config.authorizationRecordId} (${CONTACT_EMAIL})`;
+  return `Lensory/${config.authorizationRecordId}`;
 }

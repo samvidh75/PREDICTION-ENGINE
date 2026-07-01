@@ -21,7 +21,7 @@ function daysBetween(dateStr: string | null): number | null {
   return Math.max(0, Math.floor((Date.now() - then) / 86_400_000));
 }
 
-export function adaptStockStoryInputs(
+export function adaptLensoryInputs(
   symbol: string,
   horizon: number,
   inputs: EngineInputs,

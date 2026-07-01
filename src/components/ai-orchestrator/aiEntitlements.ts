@@ -1,5 +1,5 @@
 /**
- * aiEntitlements — AI feature entitlement policy for StockStory India.
+ * aiEntitlements — AI feature entitlement policy for Lensory.
  *
  * Wraps/complements the commercial entitlement system (useEntitlements)
  * with AI-specific checks.  Uses FeatureGate keys from plans.ts to gate

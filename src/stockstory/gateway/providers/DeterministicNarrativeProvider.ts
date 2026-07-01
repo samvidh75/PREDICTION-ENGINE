@@ -1,4 +1,4 @@
-import type { StockStoryResearchInput, StockStoryNarrativeOutput } from '../../research/types';
+import type { LensoryResearchInput, LensoryNarrativeOutput } from '../../research/types';
 import { researchNarrativeService } from '../../research/ResearchNarrativeService';
 import type { ScannerQueryPlan, ScannerFilter, AlertExplanationInput, CompareSummaryInput, LLMProvider } from '../types';
 import type { LLMGatewayMode } from '../config';
@@ -7,7 +7,7 @@ export class DeterministicNarrativeProvider implements LLMProvider {
   name = 'DeterministicNarrativeProvider';
   mode: LLMGatewayMode = 'deterministic';
 
-  generateThesis(input: StockStoryResearchInput): StockStoryNarrativeOutput {
+  generateThesis(input: LensoryResearchInput): LensoryNarrativeOutput {
     return researchNarrativeService.generateFullNarrative(input);
   }
 

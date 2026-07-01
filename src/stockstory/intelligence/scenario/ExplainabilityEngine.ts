@@ -1,5 +1,5 @@
 /**
- * StockStory Scenario Explainability Engine
+ * Lensory Scenario Explainability Engine
  *
  * Generates human-readable, compliance-safe explanations
  * for scenario results. Breaks down why a scenario produced

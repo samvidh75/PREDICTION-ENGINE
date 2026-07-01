@@ -44,7 +44,7 @@ export default function WaitlistPage() {
       <div style={cardStyle}>
         <h1 style={headingStyle}>Join the Private Beta</h1>
         <p style={textStyle}>
-          StockStory India is currently in private beta. Leave your email to
+          Lensory India is currently in private beta. Leave your email to
           get early access and be notified when we open to more users.
         </p>
         <form onSubmit={handleSubmit} style={formStyle}>

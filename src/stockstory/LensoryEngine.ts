@@ -1,21 +1,21 @@
 /**
- * F5: StockStoryEngine is RETAINED as the presentation/explanation layer.
+ * F5: LensoryEngine is RETAINED as the presentation/explanation layer.
  * 
  * Decision: The unified engine (UnifiedPredictionEngine) is the authoritative
- * scoring engine. StockStoryEngine continues to serve as:
+ * scoring engine. LensoryEngine continues to serve as:
  *   - The analytical narrative generator (explanations, strengths, risks)
- *   - The engine detail provider for the StockStoryPage UI
+ *   - The engine detail provider for the LensoryPage UI
  *   - A compatibility layer for existing API consumers
  * 
  * The unified engine produces rankingScore, classification, and confidence.
- * StockStoryEngine's healthScore and narrative are used for display, not
+ * LensoryEngine's healthScore and narrative are used for display, not
  * for prediction registry writes (which now come from the unified engine).
  * 
- * No duplicate writes to prediction_registry originate from StockStoryEngine.
+ * No duplicate writes to prediction_registry originate from LensoryEngine.
  */
 
 /**
- * StockStory Engine — Orchestrator (RC-ENGINE-003)
+ * Lensory Engine — Orchestrator (RC-ENGINE-003)
  * 
  * TRACK-P1: Single risk dampening policy.
  * Risk dampening applied exactly once: preAdjustHealth → stretch → dampen → classify directly.
@@ -31,7 +31,7 @@
 
 import {
   EngineInputs,
-  StockStoryOutput,
+  LensoryOutput,
   CompanyClassification,
   ConfidenceLevel,
   clampScore,
@@ -65,13 +65,13 @@ function ensurePercentileData(): void {
   }
 }
 
-export class StockStoryEngine {
+export class LensoryEngine {
   constructor() {
     ensurePercentileData();
   }
   public riskDampeningCoefficient: number = 0.45;
 
-  evaluate(inputs: EngineInputs): StockStoryOutput {
+  evaluate(inputs: EngineInputs): LensoryOutput {
     // ── Run all engines ─────────────────────────────────────────────
     const growth = growthEngine.evaluate(inputs);
     const quality = qualityEngine.evaluate(inputs);
@@ -192,7 +192,7 @@ export class StockStoryEngine {
 
   private assessFreshness(
     inputs: EngineInputs
-  ): StockStoryOutput['dataFreshness'] {
+  ): LensoryOutput['dataFreshness'] {
     const tradeDate = new Date(inputs.tradeDate);
     const now = new Date();
     const daysSince =
@@ -299,5 +299,5 @@ export class StockStoryEngine {
   }
 }
 
-export const stockStoryEngine = new StockStoryEngine();
+export const stockStoryEngine = new LensoryEngine();
 export default stockStoryEngine;

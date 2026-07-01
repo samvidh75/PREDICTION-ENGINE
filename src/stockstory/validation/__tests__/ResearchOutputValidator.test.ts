@@ -1,10 +1,10 @@
 import { describe, it, expect } from 'vitest';
 import { ResearchOutputValidator } from '../ResearchOutputValidator';
-import type { StockStoryNarrativeOutput } from '../../research/types';
+import type { LensoryNarrativeOutput } from '../../research/types';
 
 const validator = new ResearchOutputValidator();
 
-function makeValidOutput(): StockStoryNarrativeOutput {
+function makeValidOutput(): LensoryNarrativeOutput {
   return {
     thesis: 'Test Company shows balanced fundamentals across key dimensions.',
     bullCase: 'Business quality supports the research profile.',

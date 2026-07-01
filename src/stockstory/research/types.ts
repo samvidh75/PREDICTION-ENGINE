@@ -54,7 +54,7 @@ export interface PeerContext {
   weaknesses: string[];
 }
 
-export interface StockStoryResearchInput {
+export interface LensoryResearchInput {
   symbol: string;
   companyName: string;
   sector: string;
@@ -86,7 +86,7 @@ export interface StockStoryResearchInput {
   dataCompletenessForInternalUseOnly: number;
 }
 
-export interface StockStoryNarrativeOutput {
+export interface LensoryNarrativeOutput {
   thesis: string;
   bullCase: string;
   bearCase: string;

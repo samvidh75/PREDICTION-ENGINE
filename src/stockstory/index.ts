@@ -1,11 +1,11 @@
 /**
- * StockStory Engine — Barrel Export (RC-ENGINE-003)
+ * Lensory Engine — Barrel Export (RC-ENGINE-003)
  */
 
 // Types
 export {
   type EngineInputs,
-  type StockStoryOutput,
+  type LensoryOutput,
   type CompanyClassification,
   type ConfidenceLevel,
   type GrowthEngineOutput,
@@ -20,7 +20,7 @@ export {
 } from './types';
 
 // Orchestrator
-export { StockStoryEngine, stockStoryEngine } from './StockStoryEngine';
+export { LensoryEngine, stockStoryEngine } from './LensoryEngine';
 
 // Individual engines
 export { GrowthEngine, growthEngine } from './engines/GrowthEngine';

@@ -1,7 +1,7 @@
 /**
  * IndianEquityUniverseTypes — canonical types for the Indian equity universe.
  *
- * Every listed Indian equity tracked by StockStory. These types represent the
+ * Every listed Indian equity tracked by Lensory. These types represent the
  * "golden record" of what companies exist, their identifiers, and their
  * current trading status.
  */

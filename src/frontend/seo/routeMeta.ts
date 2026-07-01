@@ -15,7 +15,7 @@ export function resolveRouteMeta(
   // Home
   if (p === "" || p === "/") {
     return {
-      title: "StockStory India — Research-Driven Stock Analysis",
+      title: "Lensory — Research-Driven Stock Analysis",
       description:
         "Independent research analysis for Indian stocks. Scorecards, theses, risks, peer comparisons, and scenario modelling. Not investment advice.",
       canonical: "/",
@@ -23,7 +23,7 @@ export function resolveRouteMeta(
       structuredData: {
         "@context": "https://schema.org",
         "@type": "WebSite",
-        name: "StockStory India",
+        name: "Lensory",
         url: "https://stockstory-india.com",
       },
     };
@@ -32,7 +32,7 @@ export function resolveRouteMeta(
   // Scanner
   if (p === "/scanner") {
     return {
-      title: "Stock Scanner — Research Screening Tool | StockStory India",
+      title: "Stock Scanner — Research Screening Tool | Lensory",
       description:
         "Screen and filter Indian stocks using research-driven criteria. Quality, valuation, growth, momentum, and risk scores.",
       canonical: "/scanner",
@@ -43,7 +43,7 @@ export function resolveRouteMeta(
   if (p.startsWith("/scanner/")) {
     const preset = p.replace("/scanner/", "");
     return {
-      title: `${preset} Stocks — Scanner Preset | StockStory India`,
+      title: `${preset} Stocks — Scanner Preset | Lensory`,
       description: `Browse ${preset} stocks screened by research criteria. Scorecard and thesis context for each result.`,
       canonical: `/scanner/${preset}`,
     };
@@ -58,7 +58,7 @@ export function resolveRouteMeta(
   // Watchlist
   if (p === "/watchlist") {
     return {
-      title: "Watchlist — Track Research | StockStory India",
+      title: "Watchlist — Track Research | Lensory",
       description: "Track and monitor your research watchlist. Stay updated on thesis changes and score shifts.",
       canonical: "/watchlist",
     };
@@ -67,8 +67,8 @@ export function resolveRouteMeta(
   // Pricing
   if (p === "/pricing") {
     return {
-      title: "Pricing — StockStory India Plans",
-      description: "Choose the right StockStory India plan for your research needs. Free tier available.",
+      title: "Pricing — Lensory Plans",
+      description: "Choose the right Lensory plan for your research needs. Free tier available.",
       canonical: "/pricing",
     };
   }
@@ -76,9 +76,9 @@ export function resolveRouteMeta(
   // Trust & Disclosures
   if (p === "/trust" || p === "/disclosures") {
     return {
-      title: "Trust and Disclosures — StockStory India",
+      title: "Trust and Disclosures — Lensory",
       description:
-        "What StockStory is, what it is not, research-only policy, and limitations. Transparency you can rely on.",
+        "What Lensory is, what it is not, research-only policy, and limitations. Transparency you can rely on.",
       canonical: "/trust",
     };
   }
@@ -86,8 +86,8 @@ export function resolveRouteMeta(
   // Support
   if (p === "/support" || p === "/contact") {
     return {
-      title: "Support — StockStory India",
-      description: "Get help with StockStory India. FAQs, feedback, and contact information.",
+      title: "Support — Lensory",
+      description: "Get help with Lensory. FAQs, feedback, and contact information.",
       canonical: "/support",
     };
   }
@@ -95,8 +95,8 @@ export function resolveRouteMeta(
   // Changelog
   if (p === "/changelog") {
     return {
-      title: "Changelog — StockStory India Updates",
-      description: "Latest updates and improvements to StockStory India research platform.",
+      title: "Changelog — Lensory Updates",
+      description: "Latest updates and improvements to Lensory research platform.",
       canonical: "/changelog",
     };
   }
@@ -104,8 +104,8 @@ export function resolveRouteMeta(
   // Waitlist
   if (p === "/waitlist") {
     return {
-      title: "Join the Waitlist — StockStory India",
-      description: "Join the waitlist for early access to StockStory India research platform.",
+      title: "Join the Waitlist — Lensory",
+      description: "Join the waitlist for early access to Lensory research platform.",
       canonical: "/waitlist",
       noindex: true,
     };
@@ -114,8 +114,8 @@ export function resolveRouteMeta(
   // Invite / Referral
   if (p === "/invite") {
     return {
-      title: "Invite Friends — StockStory India",
-      description: "Share StockStory India with friends and fellow researchers.",
+      title: "Invite Friends — Lensory",
+      description: "Share Lensory with friends and fellow researchers.",
       canonical: "/invite",
       noindex: true,
     };
@@ -124,7 +124,7 @@ export function resolveRouteMeta(
   // Share / Report
   if (p.startsWith("/share/")) {
     return {
-      title: "Shared Research — StockStory India",
+      title: "Shared Research — Lensory",
       description: "View a shared research analysis snapshot.",
       canonical: p,
       noindex: true,
@@ -134,7 +134,7 @@ export function resolveRouteMeta(
   // Sectors
   if (p === "/sectors") {
     return {
-      title: "Sector Research — Indian Stock Sectors | StockStory India",
+      title: "Sector Research — Indian Stock Sectors | Lensory",
       description:
         "Research-driven analysis of Indian stock sectors. Scorecards, trends, and peer comparisons by sector.",
       canonical: "/sectors",
@@ -144,7 +144,7 @@ export function resolveRouteMeta(
   if (p.startsWith("/sectors/")) {
     const sectorSlug = p.replace("/sectors/", "").replace(/-/g, " ");
     return {
-      title: `${sectorSlug} Sector — Research Analysis | StockStory India`,
+      title: `${sectorSlug} Sector — Research Analysis | Lensory`,
       description: `Research-driven analysis of the ${sectorSlug} sector. Company scorecards, trends, and peer comparisons.`,
       canonical: `/sectors/${p.replace("/sectors/", "")}`,
     };

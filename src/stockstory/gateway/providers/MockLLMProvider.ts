@@ -1,8 +1,8 @@
-import type { StockStoryResearchInput, StockStoryNarrativeOutput } from '../../research/types';
+import type { LensoryResearchInput, LensoryNarrativeOutput } from '../../research/types';
 import type { LLMProvider, ScannerQueryPlan, ScannerFilter, AlertExplanationInput, CompareSummaryInput } from '../types';
 import type { LLMGatewayMode } from '../config';
 
-const FIXTURE_THESIS: StockStoryNarrativeOutput = {
+const FIXTURE_THESIS: LensoryNarrativeOutput = {
   thesis: 'Mock thesis output for testing purposes. This is a deterministic fixture, not an LLM response.',
   bullCase: 'Mock bull case: The company shows potential in its addressable market.',
   bearCase: 'Mock bear case: Competitive pressures may impact market position.',
@@ -20,7 +20,7 @@ export class MockLLMProvider implements LLMProvider {
   name = 'MockLLMProvider';
   mode: LLMGatewayMode = 'mock';
 
-  generateThesis(_input: StockStoryResearchInput): StockStoryNarrativeOutput {
+  generateThesis(_input: LensoryResearchInput): LensoryNarrativeOutput {
     return { ...FIXTURE_THESIS };
   }
 

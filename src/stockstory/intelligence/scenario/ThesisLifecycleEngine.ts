@@ -1,5 +1,5 @@
 /**
- * StockStory Thesis Lifecycle Engine
+ * Lensory Thesis Lifecycle Engine
  *
  * Assesses what a scenario means for the thesis lifecycle:
  * - Does it strengthen or weaken the thesis?

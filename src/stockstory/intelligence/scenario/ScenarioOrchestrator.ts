@@ -1,5 +1,5 @@
 /**
- * StockStory Scenario Orchestrator
+ * Lensory Scenario Orchestrator
  *
  * Chains all 14 scenario subsystems:
  *   1-6. Stress Simulators (Financial, Valuation, Earnings, Risk, Technical, Sector)
@@ -10,7 +10,7 @@
  *   11.  Explainability Engine
  *   12.  Scenario Validator
  *
- * Runs simulators in parallel (following StockStoryOrchestrator pattern),
+ * Runs simulators in parallel (following LensoryOrchestrator pattern),
  * then aggregates through thesis, watchlist, portfolio, explainability, and validation.
  */
 

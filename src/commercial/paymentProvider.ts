@@ -1,7 +1,7 @@
 /**
  * commercial/paymentProvider — Payment provider abstraction.
  *
- * StockStory India will integrate Razorpay (primary, India-optimised).
+ * Lensory will integrate Razorpay (primary, India-optimised).
  * This file defines the interface; actual provider implementations
  * ship in a follow-up when payment processing is ready to launch.
  *

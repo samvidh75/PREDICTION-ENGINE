@@ -1,9 +1,9 @@
-import type { StockStoryResearchInput, StockStoryNarrativeOutput } from '../../research/types';
+import type { LensoryResearchInput, LensoryNarrativeOutput } from '../../research/types';
 import { researchNarrativeService } from '../../research/ResearchNarrativeService';
 import type { LLMProvider, ScannerQueryPlan, AlertExplanationInput, CompareSummaryInput } from '../types';
 import type { LLMGatewayMode } from '../config';
 
-const DISABLED_NARRATIVE: StockStoryNarrativeOutput = {
+const DISABLED_NARRATIVE: LensoryNarrativeOutput = {
   thesis: 'Research narrative generation is not available at this time.',
   bullCase: 'Detailed analysis is currently unavailable.',
   bearCase: 'Detailed analysis is currently unavailable.',
@@ -13,7 +13,7 @@ const DISABLED_NARRATIVE: StockStoryNarrativeOutput = {
   watchNext: 'Monitoring recommendations require full system availability.',
   peerContextSummary: 'Peer analysis is not available.',
   confidenceNote: 'This assessment is limited by system configuration.',
-  methodologyNote: 'Research methodology is part of StockStory\'s deterministic analytical engine.',
+  methodologyNote: 'Research methodology is part of Lensory\'s deterministic analytical engine.',
   complianceSafeLabel: 'Research — Data Pending',
 };
 
@@ -21,7 +21,7 @@ export class DisabledLLMProvider implements LLMProvider {
   name = 'DisabledLLMProvider';
   mode: LLMGatewayMode = 'disabled';
 
-  generateThesis(_input: StockStoryResearchInput): StockStoryNarrativeOutput {
+  generateThesis(_input: LensoryResearchInput): LensoryNarrativeOutput {
     return { ...DISABLED_NARRATIVE };
   }
 
@@ -54,6 +54,6 @@ export class DisabledLLMProvider implements LLMProvider {
 
 export const disabledLLMProvider = new DisabledLLMProvider();
 
-export function getDisabledNarrative(): StockStoryNarrativeOutput {
+export function getDisabledNarrative(): LensoryNarrativeOutput {
   return { ...DISABLED_NARRATIVE };
 }

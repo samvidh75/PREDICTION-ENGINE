@@ -1,7 +1,7 @@
 /**
  * DataQualityEngine — TRACK-21 Phase 6 Task 16
  *
- * Validates data entering the StockStory pipeline before it reaches
+ * Validates data entering the Lensory pipeline before it reaches
  * the FactorEngine and ranking system.
  *
  * Checks:

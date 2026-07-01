@@ -1,7 +1,7 @@
 /**
  * RankingAccuracyEngine — TRACK-32 Phase 5
  *
- * Tests whether the StockStory ranking_score reliably separates
+ * Tests whether the Lensory ranking_score reliably separates
  * winners from losers. Performs cohort comparisons on validated
  * predictions at a 30-day horizon.
  *

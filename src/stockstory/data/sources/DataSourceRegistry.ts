@@ -1,7 +1,7 @@
 /**
  * Data Source Registry
  *
- * Central registry of all data sources used by StockStory.
+ * Central registry of all data sources used by Lensory.
  * Every ingested data point must trace back to a source declared here.
  * No source is added without explicit review.
  */

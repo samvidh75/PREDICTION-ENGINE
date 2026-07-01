@@ -1,5 +1,5 @@
 /**
- * StockStory Orchestrator
+ * Lensory Orchestrator
  *
  * Top-level pipeline that:
  *   1. Runs all 9 intelligence engines in parallel
@@ -31,7 +31,7 @@ export interface OrchestratorOptions {
   enableRAG?: boolean;
 }
 
-export class StockStoryOrchestrator {
+export class LensoryOrchestrator {
   private kb: KnowledgeBase;
   private explainer: LLMExplainer;
   private enableRAG: boolean;
@@ -290,4 +290,4 @@ export class StockStoryOrchestrator {
   }
 }
 
-export const orchestrator = new StockStoryOrchestrator();
+export const orchestrator = new LensoryOrchestrator();

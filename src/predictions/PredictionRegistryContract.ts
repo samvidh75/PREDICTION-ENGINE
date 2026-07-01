@@ -127,10 +127,10 @@ export interface CreatePredictionInput {
   createdBy?: RegistryCreatedBy;
 }
 
-// ── Classification Mapping (StockStory to Registry) ────────────────
+// ── Classification Mapping (Lensory to Registry) ────────────────
 
 /**
- * StockStory classifications map to registry classifications.
+ * Lensory classifications map to registry classifications.
  * This is the ONE mapping used everywhere.
  */
 export const STOCKSTORY_TO_REGISTRY_CLASSIFICATION: Record<string, RegistryClassification> = {
@@ -182,7 +182,7 @@ export function isValidHorizon(v: number): v is RegistryPredictionHorizon {
   return (REGISTRY_PREDICTION_HORIZONS as readonly number[]).includes(v);
 }
 
-export function mapStockStoryClassification(ssClassification: string): RegistryClassification {
+export function mapLensoryClassification(ssClassification: string): RegistryClassification {
   const mapped = STOCKSTORY_TO_REGISTRY_CLASSIFICATION[ssClassification];
   if (!mapped) {
     throw new Error(`UNKNOWN_STOCKSTORY_CLASSIFICATION: ${ssClassification}`);
@@ -207,7 +207,7 @@ export function mapToRegistryInput(
   benchmarkLevel: number | null,
   createdBy: RegistryCreatedBy = 'DailyPredictionCapture',
 ): CreatePredictionInput {
-  const classification = mapStockStoryClassification(ssClassification);
+  const classification = mapLensoryClassification(ssClassification);
   const confidenceLevel: RegistryConfidenceLevel =
     confidenceScore >= 80 ? 'High' : confidenceScore >= 65 ? 'Medium' : 'Low';
 

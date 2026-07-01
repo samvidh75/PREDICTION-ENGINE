@@ -50,7 +50,7 @@ export interface BrokerPortfolio {
  * Each implementation handles:
  *   - OAuth/token lifecycle
  *   - API request formatting
- *   - Data normalization into StockStory's PortfolioPosition/Holding types
+ *   - Data normalization into Lensory's PortfolioPosition/Holding types
  * 
  * Future implementations:
  *   - ZerodhaProvider (Kite Connect API)

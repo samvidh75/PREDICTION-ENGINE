@@ -1,7 +1,7 @@
 {
   "dashboards": [
     {
-      "name": "StockStory LLM Metrics",
+      "name": "Lensory LLM Metrics",
       "panels": [
         {
           "title": "LLM Calls Per Hour",

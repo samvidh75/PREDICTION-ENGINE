@@ -1,5 +1,5 @@
 /**
- * StockStory Earnings Stress Simulator
+ * Lensory Earnings Stress Simulator
  *
  * Simulates how changes in revenue and profit growth assumptions
  * affect earnings quality and trajectory assessment.

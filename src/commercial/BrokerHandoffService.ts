@@ -6,7 +6,7 @@
  *  2. Shows a SEBI disclaimer
  *  3. Provides a broker-specific URL (deep‑link or external)
  *
- * StockStory India does NOT place trades, charge brokerage, or
+ * Lensory does NOT place trades, charge brokerage, or
  * handle funds.  All trade execution happens on the broker's platform.
  */
 
@@ -25,7 +25,7 @@ export interface HandoffPayload {
 }
 
 const SEBI_DISCLAIMER =
-  'StockStory India is not a SEBI-registered investment advisor. All research is for educational ' +
+  'Lensory is not a SEBI-registered investment advisor. All research is for educational ' +
   'and informational purposes only. Trade execution occurs solely on the broker platform. ' +
   'Past performance does not guarantee future results. Consult your financial advisor before trading.';
 

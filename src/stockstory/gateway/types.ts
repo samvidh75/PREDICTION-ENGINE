@@ -1,4 +1,4 @@
-import type { StockStoryResearchInput, StockStoryNarrativeOutput } from '../research/types';
+import type { LensoryResearchInput, LensoryNarrativeOutput } from '../research/types';
 import type { LLMGatewayMode } from './config';
 
 export interface ScannerQueryPlan {
@@ -56,7 +56,7 @@ export type LLMTaskType =
 export interface LLMProvider {
   name: string;
   mode: LLMGatewayMode;
-  generateThesis(input: StockStoryResearchInput): StockStoryNarrativeOutput;
+  generateThesis(input: LensoryResearchInput): LensoryNarrativeOutput;
   parseScannerQuery(query: string): ScannerQueryPlan;
   explainScoreChange(input: AlertExplanationInput): string;
   summarizeNewsContext(input: { symbol: string; news: string[] }): string;

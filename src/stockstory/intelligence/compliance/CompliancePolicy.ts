@@ -1,8 +1,8 @@
 /**
  * CompliancePolicy
  *
- * Defines the compliance rules for StockStory research output.
- * StockStory output is research-only — never personalized advice.
+ * Defines the compliance rules for Lensory research output.
+ * Lensory output is research-only — never personalized advice.
  * No guarantees, no direct Buy/Sell/Hold (unless compliance flag enabled).
  * No target prices unless sourced and compliant.
  * No suitability claims.

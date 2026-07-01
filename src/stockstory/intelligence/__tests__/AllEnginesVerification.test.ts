@@ -2,7 +2,7 @@
  * Comprehensive Engine Verification Test
  * 
  * Tests ALL 11 engines listed in the system architecture:
- * 1. StockStory Orchestrator
+ * 1. Lensory Orchestrator
  * 2. Financial Engine
  * 3. Technical Engine
  * 4. Valuation Engine
@@ -34,7 +34,7 @@ import { ragEngine } from '../engines/RAGEngine';
 import { llmExplainer } from '../llm/LLMExplainer';
 
 // ── Orchestrator ────────────────────────────────────────────────────
-import { orchestrator } from '../orchestrator/StockStoryOrchestrator';
+import { orchestrator } from '../orchestrator/LensoryOrchestrator';
 
 // ── Test fixtures ───────────────────────────────────────────────────
 
@@ -365,8 +365,8 @@ describe('LLM Explainer', () => {
   });
 });
 
-// ── 11. StockStory Orchestrator (integration) ───────────────────────
-describe('StockStory Orchestrator', () => {
+// ── 11. Lensory Orchestrator (integration) ───────────────────────
+describe('Lensory Orchestrator', () => {
   it('orchestrates all engines for healthy company', async () => {
     const result = await orchestrator.analyze(healthyLargeCapInput);
     expect(result).toBeDefined();

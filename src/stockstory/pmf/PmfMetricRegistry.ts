@@ -1,5 +1,5 @@
 /**
- * PmfMetricRegistry — Typed PMF metric definitions for StockStory India.
+ * PmfMetricRegistry — Typed PMF metric definitions for Lensory India.
  *
  * Central registry of all PMF metrics. Each metric has a typed key,
  * human-readable label, unit, and tracking category.

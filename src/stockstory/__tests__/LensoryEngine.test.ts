@@ -1,9 +1,9 @@
 /**
- * StockStory Engine Tests — RC-ENGINE-002
+ * Lensory Engine Tests — RC-ENGINE-002
  * 
  * Covers: all 7 engines + AccountingEngine + SectorAdapter + confidence gate + narrative compliance
  */
-import { StockStoryEngine } from '../StockStoryEngine';
+import { LensoryEngine } from '../LensoryEngine';
 import { GrowthEngine } from '../engines/GrowthEngine';
 import { QualityEngine } from '../engines/QualityEngine';
 import { StabilityEngine } from '../engines/StabilityEngine';
@@ -434,10 +434,10 @@ describe('ConfidenceEngine', () => {
   });
 });
 
-// ─── StockStory Orchestrator ──────────────────────────────────────
+// ─── Lensory Orchestrator ──────────────────────────────────────
 
-describe('StockStoryEngine (orchestrator)', () => {
-  const engine = new StockStoryEngine();
+describe('LensoryEngine (orchestrator)', () => {
+  const engine = new LensoryEngine();
 
   it('produces a complete output contract', () => {
     const result = engine.evaluate(makeInputs());

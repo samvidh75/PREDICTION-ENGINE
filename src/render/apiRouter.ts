@@ -1,5 +1,5 @@
 /**
- * apiRouter.ts — Fastify API routes for StockStory India
+ * apiRouter.ts — Fastify API routes for Lensory
  *
  * Serves the same /api/* endpoints that Vercel serverless functions used to.
  * Uses real Yahoo Finance data with deterministic fallbacks.
@@ -177,7 +177,7 @@ async function yahooQuote(symbol: string, exchangeSuffix = "NS") {
     const ticker = `${symbol}.${exchangeSuffix}`;
     const r = await fetch(
       `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(ticker)}?range=1d&interval=1m`,
-      { headers: { "User-Agent": "Mozilla/5.0 StockStory/2.0" }, signal: AbortSignal.timeout(5_000) }
+      { headers: { "User-Agent": "Mozilla/5.0 Lensory/2.0" }, signal: AbortSignal.timeout(5_000) }
     );
     if (!r.ok) return null;
     const d = await r.json();
@@ -207,7 +207,7 @@ async function yahooPriceHistory(symbol: string, exchangeSuffix = "NS"): Promise
       const ticker = `${symbol}.${exchangeSuffix}`;
       const r = await fetch(
         `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(ticker)}?range=${range}&interval=${interval}`,
-        { headers: { "User-Agent": "Mozilla/5.0 StockStory/2.0" }, signal: AbortSignal.timeout(6_000) }
+        { headers: { "User-Agent": "Mozilla/5.0 Lensory/2.0" }, signal: AbortSignal.timeout(6_000) }
       );
       if (!r.ok) continue;
       const d = await r.json();
@@ -555,7 +555,7 @@ export default async function registerApiRoutes(server: FastifyInstance) {
       financials: financialsData,
       shareholding: shareholdingData,
       news: news.length > 0 ? news : [
-        { headline: "Quarterly results show steady performance", source: "StockStory Research", time: new Date(Date.now() - 86400000).toISOString() },
+        { headline: "Quarterly results show steady performance", source: "Lensory Research", time: new Date(Date.now() - 86400000).toISOString() },
         { headline: "Sector outlook remains positive for coming quarters", source: "Financial Express", time: new Date(Date.now() - 172800000).toISOString() },
       ],
       thesis: thesisData,
@@ -629,7 +629,7 @@ export default async function registerApiRoutes(server: FastifyInstance) {
             const ticker = `${r.symbol}.${exchSuffix}`;
             const yr = await fetch(
               `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(ticker)}?range=1d&interval=1m`,
-              { headers: { "User-Agent": "Mozilla/5.0 StockStory/2.0" }, signal: AbortSignal.timeout(3_000) }
+              { headers: { "User-Agent": "Mozilla/5.0 Lensory/2.0" }, signal: AbortSignal.timeout(3_000) }
             );
             if (yr.ok) {
               const yd = await yr.json();

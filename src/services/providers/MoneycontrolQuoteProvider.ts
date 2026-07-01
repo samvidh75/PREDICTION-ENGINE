@@ -59,7 +59,7 @@ export class MoneycontrolQuoteProvider implements PriceProvider {
 
     const userAgent = this.authConfig
       ? getProviderUserAgent(this.authConfig)
-      : `StockStory/${PROVIDER_NAME} (research)`;
+      : `Lensory/${PROVIDER_NAME} (research)`;
 
     const url = `${MoneycontrolQuoteProvider.BASE_URL}/india/stockpricequote/${slug}/${cleanSymbol}`;
 

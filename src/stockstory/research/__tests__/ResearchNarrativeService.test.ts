@@ -1,10 +1,10 @@
 import { describe, it, expect } from 'vitest';
 import { ResearchNarrativeService } from '../ResearchNarrativeService';
-import type { StockStoryResearchInput } from '../types';
+import type { LensoryResearchInput } from '../types';
 
 const service = new ResearchNarrativeService();
 
-function makeInput(overrides: Partial<StockStoryResearchInput> = {}): StockStoryResearchInput {
+function makeInput(overrides: Partial<LensoryResearchInput> = {}): LensoryResearchInput {
   return {
     symbol: 'TEST',
     companyName: 'Test Company Ltd',

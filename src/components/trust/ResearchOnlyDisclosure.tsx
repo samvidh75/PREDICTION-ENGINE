@@ -12,7 +12,7 @@ export function ResearchOnlyDisclosure() {
       color: colors.textSecondary,
       lineHeight: 1.7,
     }}>
-      <strong style={{ color: colors.textPrimary }}>StockStory India is a structured research analysis platform.</strong>
+      <strong style={{ color: colors.textPrimary }}>Lensory is a structured research analysis platform.</strong>
       <br />
       We provide scorecards, theses, risk assessments, scenario analysis, and peer comparisons for Indian equities.
       All outputs are for research — not investment advice. We do not make buy/sell/hold recommendations or set target prices.

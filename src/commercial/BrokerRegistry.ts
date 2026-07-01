@@ -1,7 +1,7 @@
 /**
  * commercial/BrokerRegistry — Registered brokers for handoff.
  *
- * StockStory India provides read-only research analysis and a
+ * Lensory provides read-only research analysis and a
  * "Continue with broker" handoff.  No order placement, no trading,
  * no transaction fees, no SEBI registration for brokerage.
  *

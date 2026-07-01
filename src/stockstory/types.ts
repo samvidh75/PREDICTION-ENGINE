@@ -1,5 +1,5 @@
 /**
- * StockStory Engine — Shared Types
+ * Lensory Engine — Shared Types
  * 
  * Output contract for every company page:
  * {
@@ -158,7 +158,7 @@ export interface ConfidenceEngineOutput {
 
 // ─── Final Output Contract ────────────────────────────────────────
 
-export interface StockStoryOutput {
+export interface LensoryOutput {
   healthScore: number;            // 0-100
   classification: CompanyClassification;
   confidence: ConfidenceLevel;

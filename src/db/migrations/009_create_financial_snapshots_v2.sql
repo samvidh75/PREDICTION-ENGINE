@@ -2,7 +2,7 @@
 -- V5 Data Truth Layer Migration
 --
 -- Ensures financial_snapshots table has all required columns for the
--- StockStory V5 multi-engine scoring system (Quality, Growth, Value,
+-- Lensory V5 multi-engine scoring system (Quality, Growth, Value,
 -- Momentum, Risk, Sector engines).
 --
 -- Also creates data_quality_registry for tracking data freshness and

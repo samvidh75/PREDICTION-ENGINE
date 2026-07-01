@@ -1,5 +1,5 @@
 /**
- * StockStory Scenario Registry
+ * Lensory Scenario Registry
  *
  * Central registry for scenario kinds, severity levels,
  * and scenario validation. Provides lookup and metadata

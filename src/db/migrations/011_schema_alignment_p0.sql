@@ -4,7 +4,7 @@
 -- Aligns PostgreSQL schemas with the canonical contracts used by:
 --   - FeatureEngine (feature_snapshots)
 --   - FactorEngine (factor_snapshots)
---   - StockStory route (prediction_registry)
+--   - Lensory route (prediction_registry)
 --
 -- All migrations are idempotent (IF NOT EXISTS / IF EXISTS patterns).
 

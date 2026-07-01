@@ -1,7 +1,7 @@
 /**
  * Backtesting Types
  *
- * Types for the StockStory intelligence engine backtesting framework.
+ * Types for the Lensory intelligence engine backtesting framework.
  * Measures whether factor scores/rankings have historical predictive value.
  */
 

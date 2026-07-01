@@ -2,7 +2,7 @@
  * Master Engine Configuration
  * 
  * All weights, thresholds, and scoring bands for all 7 engines.
- * Imported by SectorWeightEngine and StockStoryEngine.
+ * Imported by SectorWeightEngine and LensoryEngine.
  */
 
 import { GROWTH_WEIGHTS, GROWTH_FACTOR_ADJUST } from './GrowthWeights';

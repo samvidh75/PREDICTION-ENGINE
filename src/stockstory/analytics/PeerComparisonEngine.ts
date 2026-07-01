@@ -1,4 +1,4 @@
-import type { StockStoryOutput } from '../types';
+import type { LensoryOutput } from '../types';
 
 export interface PeerComparison {
   symbol: string;
@@ -18,7 +18,7 @@ export class PeerComparisonEngine {
       symbol: string;
       companyName: string;
       sector: string;
-      output: StockStoryOutput;
+      output: LensoryOutput;
     }>
   ): PeerComparison | null {
     const target = entries.find((entry) => entry.symbol === targetSymbol);
