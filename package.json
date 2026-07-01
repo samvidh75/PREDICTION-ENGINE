@@ -181,7 +181,13 @@
     "analyst:filing-briefs": "tsx scripts/analyst/generate-filing-briefs.ts",
     "analyst:sector-briefs": "tsx scripts/analyst/generate-sector-briefs.ts",
     "analyst:watchlist-briefs": "tsx scripts/analyst/generate-watchlist-review-briefs.ts",
-    "analyst:validate": "tsx scripts/analyst/validate-analyst-outputs.ts"
+    "analyst:validate": "tsx scripts/analyst/validate-analyst-outputs.ts",
+    "data-plane:cycle": "tsx scripts/data-plane/run-data-plane-cycle.ts",
+    "data-plane:precompute": "tsx scripts/data-plane/run-precompute-cycle.ts",
+    "data-plane:eod-refresh": "tsx scripts/data-plane/run-scheduled-eod-cycle.ts",
+    "data-plane:cache-cleanup": "tsx scripts/data-plane/run-cache-cleanup.ts",
+    "data-plane:quota-report": "tsx scripts/data-plane/run-quota-report.ts",
+    "data-plane:health-report": "node scripts/data-plane/run-health-report.mjs"
   },
   "dependencies": {
     "@fastify/compress": "^8.3.1",
