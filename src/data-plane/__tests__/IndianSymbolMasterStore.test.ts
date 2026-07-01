@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { IndianSymbolMasterStore } from '../symbols/IndianSymbolMasterStore';
 import type { IndianEquitySymbol } from '../symbols/IndianEquitySymbol';
 
@@ -8,7 +8,7 @@ import type { IndianEquitySymbol } from '../symbols/IndianEquitySymbol';
 // contract holds for the placeholder implementation.
 // ---------------------------------------------------------------------------
 
-function makeStore(overrides?: Partial<IndianSymbolMasterStore>): IndianSymbolMasterStore {
+function makeStore(_overrides?: Partial<IndianSymbolMasterStore>): IndianSymbolMasterStore {
   const store = new IndianSymbolMasterStore();
   // We're testing the interface shape, not actual DB queries
   return store;

@@ -5,7 +5,6 @@
  * Designed for admin CLI / internal use — never exposed on public routes.
  */
 
-import { EodDataCacheService } from '../../services/marketData/EodDataCacheService';
 import { ProviderQuotaMonitor } from '../../services/scheduler/ProviderQuotaMonitor';
 import { DataPlaneHealthReport } from './dataPlaneHealthContracts';
 import { getSnapshotReadiness } from './snapshotReadiness';

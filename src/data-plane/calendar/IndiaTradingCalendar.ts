@@ -49,7 +49,8 @@ function toDateStr(date: Date): string {
   return date.toISOString().slice(0, 10);
 }
 
-function toDate(dateStr: string): Date {
+/** @internal Visible for testing */
+export function toDate(dateStr: string): Date {
   return new Date(`${dateStr}T00:00:00.000Z`);
 }
 

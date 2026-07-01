@@ -90,7 +90,7 @@ describe('IndianEodIngestionPipeline', () => {
     await pipeline.ingest(makeBatch(), inputs);
 
     expect(cache.set).toHaveBeenCalledTimes(1);
-    const [namespace, key] = (cache.set as ReturnType<typeof vi.fn>).mock.calls[0];
+    const [, key] = (cache.set as ReturnType<typeof vi.fn>).mock.calls[0];
     expect(key).toContain(RESOLVABLE);
     expect(key).toContain('2026-06-17');
   });
