@@ -98,3 +98,4 @@ tmp-debug.html
 .aider*
 *.png
 stockstory-demo
+__pycache__/
