@@ -343,15 +343,27 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
   const newsItems = stock.news.slice(0, 7);
   const filteredNews = newsFilter === "all" ? newsItems : newsItems.filter((n: any) => n.sentiment === newsFilter);
   const disclaimer = "This is not investment advice. All data is for educational purposes. Past performance does not guarantee future results.";
+  const fundamentals = stock.fundamentals ?? {};
+  const companyProfile = stock.companyProfile ?? {
+    founded: "—",
+    ceo: "—",
+    hq: "—",
+    employees: "—",
+    website: "—",
+    isin: "—",
+    businessSegments: [],
+  };
+  const sectorComparisons = stock.sectorComparison ?? [];
+  const sectorRelativeItems = stock.sectorRelative ?? [];
 
   // Sector relative lookup for metric subtitles
   const sectorRelMap = useMemo(() => {
     const map: Record<string, string> = {};
-    for (const item of stock.sectorRelative ?? []) {
+    for (const item of sectorRelativeItems) {
       map[item.label.toLowerCase()] = item.sectorMedian;
     }
     return map;
-  }, [stock.sectorRelative]);
+  }, [sectorRelativeItems]);
 
   // AI analysis
   useEffect(() => {
@@ -592,28 +604,28 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
         <CardLabel>Key metrics</CardLabel>
         <div className="stock-metric-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "16px" }}>
           <MetricCard label="Market Cap" value={`₹${Math.round(stock.price.marketCap).toLocaleString("en-IN")} Cr`} />
-          <MetricCard label="PE (TTM)" value={stock.fundamentals.pe?.toFixed(1) ?? "—"}
-            trend={stock.fundamentals.pe != null && stock.fundamentals.pe < 20 ? "up" : stock.fundamentals.pe != null && stock.fundamentals.pe > 30 ? "down" : "neutral"}
-            subtitle={stock.fundamentals.industryPe != null ? `Sector: ${stock.fundamentals.industryPe.toFixed(1)}` : sectorRelMap["pe"] ? `Sector: ${sectorRelMap["pe"]}` : undefined} />
-          <MetricCard label="PB Ratio" value={stock.fundamentals.pb?.toFixed(1) ?? "—"}
-            trend={stock.fundamentals.pb != null && stock.fundamentals.pb < 3 ? "up" : stock.fundamentals.pb != null && stock.fundamentals.pb > 5 ? "down" : "neutral"} />
+          <MetricCard label="PE (TTM)" value={fundamentals.pe?.toFixed(1) ?? "—"}
+            trend={fundamentals.pe != null && fundamentals.pe < 20 ? "up" : fundamentals.pe != null && fundamentals.pe > 30 ? "down" : "neutral"}
+            subtitle={fundamentals.industryPe != null ? `Sector: ${fundamentals.industryPe.toFixed(1)}` : sectorRelMap["pe"] ? `Sector: ${sectorRelMap["pe"]}` : undefined} />
+          <MetricCard label="PB Ratio" value={fundamentals.pb?.toFixed(1) ?? "—"}
+            trend={fundamentals.pb != null && fundamentals.pb < 3 ? "up" : fundamentals.pb != null && fundamentals.pb > 5 ? "down" : "neutral"} />
           <MetricCard label="ROE" value={stock.roe != null ? `${stock.roe.toFixed(1)}%` : "—"}
             trend={stock.roe != null && stock.roe > 15 ? "up" : stock.roe != null ? "down" : "neutral"}
             subtitle={sectorRelMap["roe"] ? `Sector: ${sectorRelMap["roe"]}` : undefined} />
           <MetricCard label="Debt/Equity" value={stock.debtToEquity != null ? stock.debtToEquity.toFixed(2) : "—"}
             trend={stock.debtToEquity != null && stock.debtToEquity < 0.5 ? "up" : stock.debtToEquity != null && stock.debtToEquity > 1 ? "down" : "neutral"} />
-          <MetricCard label="Dividend Yield" value={stock.fundamentals.dividendYield != null ? `${stock.fundamentals.dividendYield.toFixed(2)}%` : "—"}
-            trend={stock.fundamentals.dividendYield != null && stock.fundamentals.dividendYield > 1 ? "up" : "neutral"} />
+          <MetricCard label="Dividend Yield" value={fundamentals.dividendYield != null ? `${fundamentals.dividendYield.toFixed(2)}%` : "—"}
+            trend={fundamentals.dividendYield != null && fundamentals.dividendYield > 1 ? "up" : "neutral"} />
           <MetricCard label="Revenue Growth" value={stock.revenueGrowth != null ? `${stock.revenueGrowth.toFixed(1)}%` : "—"}
             trend={stock.revenueGrowth != null && stock.revenueGrowth > 10 ? "up" : stock.revenueGrowth != null ? "down" : "neutral"}
             subtitle={sectorRelMap["revenue growth"] ? `Sector: ${sectorRelMap["revenue growth"]}` : undefined} />
           <MetricCard label="Profit Growth" value={stock.profitGrowth != null ? `${stock.profitGrowth.toFixed(1)}%` : "—"}
             trend={stock.profitGrowth != null && stock.profitGrowth > 10 ? "up" : stock.profitGrowth != null ? "down" : "neutral"} />
-          <MetricCard label="EPS (TTM)" value={stock.fundamentals.eps != null ? `₹${stock.fundamentals.eps.toFixed(1)}` : "—"} />
+          <MetricCard label="EPS (TTM)" value={fundamentals.eps != null ? `₹${fundamentals.eps.toFixed(1)}` : "—"} />
           <MetricCard label="RSI (14)" value={stock.rsi != null ? String(stock.rsi) : "—"}
             trend={stock.rsi != null && stock.rsi >= 30 && stock.rsi <= 70 ? "neutral" : "down"} />
-          <MetricCard label="52W High" value={stock.fundamentals.high52w != null ? `₹${stock.fundamentals.high52w.toLocaleString("en-IN")}` : "—"} />
-          <MetricCard label="52W Low" value={stock.fundamentals.low52w != null ? `₹${stock.fundamentals.low52w.toLocaleString("en-IN")}` : "—"} />
+          <MetricCard label="52W High" value={fundamentals.high52w != null ? `₹${fundamentals.high52w.toLocaleString("en-IN")}` : "—"} />
+          <MetricCard label="52W Low" value={fundamentals.low52w != null ? `₹${fundamentals.low52w.toLocaleString("en-IN")}` : "—"} />
         </div>
       </Card>      {/* ── Company Identity ── */}
       <Card className="stock-company-card raycast-slideUp" style={{ animationDelay: "0.2s", animationFillMode: "both" }}>
@@ -622,12 +634,12 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
           {stock.description}
         </p>
         <div className="stock-about-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "16px", marginBottom: "20px" }}>
-          <Stat label="Founded" value={stock.companyProfile.founded} />
-          <Stat label="CEO" value={stock.companyProfile.ceo} />
-          <Stat label="HQ" value={stock.companyProfile.hq} />
-          <Stat label="Employees" value={stock.companyProfile.employees} />
+          <Stat label="Founded" value={companyProfile.founded} />
+          <Stat label="CEO" value={companyProfile.ceo} />
+          <Stat label="HQ" value={companyProfile.hq} />
+          <Stat label="Employees" value={companyProfile.employees} />
           <Stat label="Exchange" value={stock.exchange} />
-          <Stat label="ISIN" value={stock.companyProfile.isin} />
+          <Stat label="ISIN" value={companyProfile.isin} />
           <Stat label="Sector" value={stock.sector} />
           <Stat label="Industry" value={stock.industry} />
           <Stat label="Listed on" value="BSE, NSE" />
@@ -644,7 +656,7 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
           </a>
         </div>
         <div className="stock-chip-row" style={{ display: "flex", gap: "8px", flexWrap: "wrap", marginTop: "16px" }}>
-          {stock.companyProfile.businessSegments.map((segment) => (
+          {companyProfile.businessSegments.map((segment) => (
             <Badge key={segment} value={60} label={segment} />
           ))}
         </div>
@@ -875,7 +887,7 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
       </div>
       <ExpandingPanel isOpen={sectorExpanded}>
         <div style={{ display: "grid", gap: "16px" }}>
-          {stock.sectorComparison.map((cmp, i) => (
+          {sectorComparisons.map((cmp, i) => (
             <div key={i} style={{ display: "grid", gap: "6px" }}>
               <div style={{ display: "flex", justifyContent: "space-between", gap: "12px" }}>
                 <span style={{ fontSize: "13px", color: colors.textPrimary }}>
