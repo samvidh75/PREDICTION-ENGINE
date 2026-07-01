@@ -8,9 +8,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { defineChecks, runGateChecks, generateGateReport } from '../release-gate';
 
-const isCI = process.env.CI === 'true' || process.env.REQUIRE_FULL_RELEASE_GATE === 'true';
-const runOnlyInCI = isCI ? describe : describe.skip;
-
 describe('release-gate', () => {
   beforeEach(() => {
     vi.unstubAllEnvs();
@@ -48,7 +45,7 @@ describe('release-gate', () => {
     });
   });
 
-  runOnlyInCI('runGateChecks', () => {
+  describe('runGateChecks', () => {
     it('local missing API → NOT_EXECUTED_ENVIRONMENT_MISSING', async () => {
       vi.stubEnv('REQUIRE_FULL_RELEASE_GATE', 'false');
       const checks = defineChecks();
