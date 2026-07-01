@@ -29,7 +29,6 @@ function formatPct(n: number | null): string {
   if (Number.isNaN(n)) return "—";
   return (n >= 0 ? "+" : "") + n.toFixed(2) + "%";
 }
->>>>>>> 66a1601c (Phase 45: rate limiter 60req/min, Cloudflare AI failover, ingestion retry)
 
 export default function PortfolioPage() {
   const navigate = useNavigate();
