@@ -34,7 +34,6 @@ import { getNotificationSnapshot, acknowledgeAll } from "../services/personaliza
 import { usageLimits } from "../commercial/UsageLimits.js";
 import type { UsageMetric } from "../commercial/UsageLimits.js";
 import { dbAdapter } from "../db/DatabaseAdapter.js";
-import registerBillingRoutes from "../commercial/api/billingRoutes.js";
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -1618,6 +1617,8 @@ export default async function registerApiRoutes(server: FastifyInstance) {
     }
   });
 
-  // ── Billing / Checkout ─────────────────────────────────────────────
-  await registerBillingRoutes(server);
+<<<<<<< HEAD
+  // ── Billing & Subscription Routes ────────────────────────────
+  const { registerCheckoutRoutes } = await import("../commercial/api/checkoutRoutes");
+  await registerCheckoutRoutes(server);
 }
