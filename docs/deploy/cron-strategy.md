@@ -35,6 +35,7 @@ Add to `daily-pipeline.yml` or create `intelligence-pipeline.yml`:
 | Generate Research Snapshots | Daily 05:30 IST | `npm run job:research-snapshots` | After data refresh |
 | Refresh Rankings | Daily 06:00 IST | `npm run job:refresh-rankings` | After snapshots |
 | Generate Watchlist Alerts | Daily 06:15 IST | `npm run job:watchlist-alerts` | After rankings |
+| Database Backup Replication | Daily 00:00 IST | `npm run job:database-backup` | Off-site archive |
 
 ## Run Order (Dependency Chain)
 
@@ -67,6 +68,9 @@ npm run job:research-snapshots -- --symbols RELIANCE,TCS,INFY
 
 # Evaluate research output quality
 npm run job:research-eval
+
+# Dry-run the database archive
+npm run job:database-backup:dry-run
 ```
 
 ## Adding New Jobs

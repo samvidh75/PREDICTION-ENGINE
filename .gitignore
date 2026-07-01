@@ -60,6 +60,8 @@ vite.config.ts.timestamp-*
 *.sqlite
 *.sqlite-shm
 *.sqlite-wal
+data/snapshots/
+data/backups/
 
 # Temporary files
 .cache/

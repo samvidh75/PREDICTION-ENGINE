@@ -66,8 +66,10 @@ export function AppShell({ children }: { children: ReactNode }) {
       {/* DESKTOP SIDEBAR */}
       <aside className="rail">
         <NavLink to="/" style={brandLinkStyle}>
-          <BrandMark size={44} />
-          <span>StockEX</span>
+          <span style={brandBadgeStyle}>
+            <BrandMark size={52} />
+            <span style={brandWordmarkStyle}>STOCKEX</span>
+          </span>
         </NavLink>
         <nav style={navStackStyle} aria-label="Primary">
           {NAV.map((item) => (
@@ -125,8 +127,10 @@ export function AppShell({ children }: { children: ReactNode }) {
       {/* MOBILE TOP BAR */}
       <header className="mobile-brand" style={{ justifyContent: "space-between" }}>
         <NavLink to="/" style={mobileBrandLinkStyle}>
-          <BrandMark size={36} />
-          <span>StockEX</span>
+          <span style={mobileBrandBadgeStyle}>
+            <BrandMark size={40} />
+            <span style={mobileBrandWordmarkStyle}>STOCKEX</span>
+          </span>
         </NavLink>
         <div style={{ display: "flex", alignItems: "center", gap: space[3] }}>
           <ResearchProfileModal />
@@ -159,7 +163,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           lineHeight: "1.6",
         }}>
           <p>
-            © 2026 StockEX. <strong>Not SEBI-registered</strong>. This service provides analysis for educational purposes only. Algorithms may contain errors. Data delayed 1-15 minutes. Consult a SEBI-registered investment advisor before investing. Past performance does not guarantee future results.
+            © 2026 STOCKEX. <strong>Not SEBI-registered</strong>. This service provides analysis for educational purposes only. Algorithms may contain errors. Data delayed 1-15 minutes. Consult a SEBI-registered investment advisor before investing. Past performance does not guarantee future results.
           </p>
         </footer>
       </main>
@@ -432,12 +436,29 @@ export function AppShell({ children }: { children: ReactNode }) {
 
 const brandLinkStyle = {
   color: colors.textPrimary,
-  fontSize: typography.h2.desktop.size,
-  fontWeight: 700,
-  lineHeight: typography.h2.desktop.line,
   textDecoration: "none",
   marginBottom: space[8],
-  display: "block",
+  display: "inline-flex",
+  alignItems: "center",
+} as const;
+
+const brandBadgeStyle = {
+  display: "inline-flex",
+  alignItems: "center",
+  gap: space[3],
+  padding: `${space[2]} ${space[3]}`,
+  borderRadius: radius.xl,
+  border: `1px solid ${colors.hairline}`,
+  background: "linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)",
+  boxShadow: shadows.elevated,
+} as const;
+
+const brandWordmarkStyle = {
+  fontSize: "18px",
+  fontWeight: 750,
+  letterSpacing: "-0.03em",
+  lineHeight: 1,
+  color: colors.textPrimary,
 } as const;
 
 const navStackStyle = {
@@ -448,8 +469,25 @@ const navStackStyle = {
 
 const mobileBrandLinkStyle = {
   color: colors.textPrimary,
-  fontSize: typography.h3.desktop.size,
-  fontWeight: 600,
-  lineHeight: typography.h3.desktop.line,
   textDecoration: "none",
+  display: "inline-flex",
+  alignItems: "center",
+} as const;
+
+const mobileBrandBadgeStyle = {
+  display: "inline-flex",
+  alignItems: "center",
+  gap: space[2],
+  padding: `${space[1]} ${space[2]}`,
+  borderRadius: radius.lg,
+  border: `1px solid ${colors.hairline}`,
+  background: "linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)",
+} as const;
+
+const mobileBrandWordmarkStyle = {
+  fontSize: "16px",
+  fontWeight: 750,
+  letterSpacing: "-0.03em",
+  lineHeight: 1,
+  color: colors.textPrimary,
 } as const;

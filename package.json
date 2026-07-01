@@ -187,7 +187,9 @@
     "data-plane:eod-refresh": "tsx scripts/data-plane/run-scheduled-eod-cycle.ts",
     "data-plane:cache-cleanup": "tsx scripts/data-plane/run-cache-cleanup.ts",
     "data-plane:quota-report": "tsx scripts/data-plane/run-quota-report.ts",
-    "data-plane:health-report": "tsx scripts/data-plane/run-health-report.mjs"
+    "data-plane:health-report": "tsx scripts/data-plane/run-health-report.mjs",
+    "job:database-backup": "python3 scripts/python/backup_snapshot.py --cron",
+    "job:database-backup:dry-run": "python3 scripts/python/backup_snapshot.py --cron --dry-run"
   },
   "dependencies": {
     "@fastify/compress": "^8.3.1",

@@ -34,6 +34,7 @@ import { getNotificationSnapshot, acknowledgeAll } from "../services/personaliza
 import { usageLimits } from "../commercial/UsageLimits.js";
 import type { UsageMetric } from "../commercial/UsageLimits.js";
 import { dbAdapter } from "../db/DatabaseAdapter.js";
+import { AsymmetricDataGateway } from "../db/AsymmetricDataGateway.js";
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -669,6 +670,23 @@ export default async function registerApiRoutes(server: FastifyInstance) {
 
   // GET /api/research?action=scanner&preset=quality&limit=20
   // (research endpoint with scanner, compare, watchlist, broker — handled here)
+
+  // ── Asymmetric Data Gateway — cached market data ──────────────────────────
+
+  // GET /api/v1/market-stream/:ticker
+  server.get("/api/v1/market-stream/:ticker", async (request, reply) => {
+    const { ticker } = request.params as { ticker: string };
+    if (!ticker || typeof ticker !== "string") {
+      return reply.status(400).send({ error: "ticker param required" });
+    }
+    try {
+      const packet = await AsymmetricDataGateway.getSynchronizedMarketPacket(ticker);
+      reply.header("Cache-Control", "public, s-maxage=30");
+      return packet;
+    } catch (err: any) {
+      return reply.status(502).send({ error: err.message || String(err), ticker });
+    }
+  });
 
   // ── Intelligence Engine Routes ──────────────────────────────────────────
 

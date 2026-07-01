@@ -1,7 +1,9 @@
 jugaad-data==0.28
 nsepython==2.97
 requests-cache==1.2.0
+pandas>=2.0.0
 pandas-market-calendars>=4.3.0
 lxml
 html5lib
 beautifulsoup4
+psycopg2-binary>=2.9.0

@@ -66,7 +66,27 @@ npx tsx scripts/data-plane/run-quota-report.ts --json
 
 Prints provider call quotas, cache hit rates, and budget status.
 
-### 5. Full Pipeline
+### 5. Database Backup Replication
+
+```bash
+python3 scripts/python/backup_snapshot.py --cron
+python3 scripts/python/backup_snapshot.py --cron --dry-run
+python3 scripts/python/backup_snapshot.py --cron --remote-dest user@backup-host:/backups
+```
+
+Archives SQLite databases and the active PostgreSQL database (when `DATABASE_URL`
+is present) into timestamped snapshot files, then mirrors the archive directory
+to an off-site host with `rsync`.
+
+Recommended environment variables:
+
+- `BACKUP_DEST_DIR` - local archive directory
+- `BACKUP_REMOTE_DEST` - rsync destination for off-site replication
+- `BACKUP_RETENTION` - per-source retention count
+- `BACKUP_INCLUDE_SQLITE` - disable local SQLite archival when set to `false`
+- `BACKUP_INCLUDE_POSTGRES` - disable PostgreSQL archival when set to `false`
+
+### 6. Full Pipeline
 
 ```bash
 npx tsx scripts/data-plane/run-data-plane-cycle.ts
@@ -109,6 +129,13 @@ Or use the full pipeline as a single cron entry:
 
 ```
 30 23 * * 1-5 cd /app && npx tsx scripts/data-plane/run-data-plane-cycle.ts
+```
+
+For midnight database archival:
+
+```
+# Every day at 00:00 IST — database backup replication
+30 18 * * * cd /app && python3 scripts/python/backup_snapshot.py --cron
 ```
 
 ## Health Checks

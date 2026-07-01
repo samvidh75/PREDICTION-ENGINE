@@ -1,12 +1,12 @@
 {
-  "name": "StockEX",
-  "short_name": "StockEX",
+  "name": "STOCKEX",
+  "short_name": "STOCKEX",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#070A0F",
   "theme_color": "#070A0F",
   "icons": [
-    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "/logo-512.png", "sizes": "512x512", "type": "image/png" }
+    { "src": "/icon-192.svg", "sizes": "192x192", "type": "image/svg+xml" },
+    { "src": "/icon-512.svg", "sizes": "512x512", "type": "image/svg+xml" }
   ]
 }

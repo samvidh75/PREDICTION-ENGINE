@@ -1,8 +1,38 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192">
-  <rect width="192" height="192" rx="42" fill="#0F1A31"/>
-  <circle cx="96" cy="96" r="70" fill="#234B7A"/>
-  <rect x="54" y="116" width="21" height="28" rx="6" fill="#356CB8"/>
-  <rect x="85.5" y="97" width="21" height="47" rx="6" fill="#4080D8"/>
-  <rect x="117" y="73" width="21" height="71" rx="6" fill="#58A0F4"/>
-  <path d="M120 49C137 60 148 76 153 96" fill="none" stroke="#27D3A3" stroke-width="11" stroke-linecap="round"/>
+<svg width="512" height="512" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="stockex_tile" x1="8" y1="6" x2="56" y2="58" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#232936"/>
+      <stop offset="0.46" stop-color="#090B10"/>
+      <stop offset="1" stop-color="#050608"/>
+    </linearGradient>
+    <linearGradient id="stockex_inner" x1="10" y1="10" x2="54" y2="54" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF" stop-opacity="0.18"/>
+      <stop offset="0.28" stop-color="#FFFFFF" stop-opacity="0.06"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="stockex_glow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(22 18) rotate(40) scale(34 34)">
+      <stop stop-color="#DCE8FF" stop-opacity="0.24"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="stockex_stroke" x1="18" y1="15" x2="47" y2="48" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF"/>
+      <stop offset="0.45" stop-color="#FCFDFF"/>
+      <stop offset="1" stop-color="#D4E2FF"/>
+    </linearGradient>
+    <filter id="stockex_shadow" x="-12%" y="-12%" width="124%" height="124%">
+      <feDropShadow dx="0" dy="5" stdDeviation="6" flood-color="#000000" flood-opacity="0.62"/>
+    </filter>
+  </defs>
+  <g filter="url(#stockex_shadow)">
+    <rect x="1.5" y="1.5" width="61" height="61" rx="17" fill="url(#stockex_tile)" stroke="#FFFFFF" stroke-opacity="0.24"/>
+  </g>
+  <rect x="2.5" y="2.5" width="59" height="59" rx="16" fill="url(#stockex_glow)" opacity="0.9"/>
+  <rect x="5.5" y="5.5" width="53" height="53" rx="14" fill="url(#stockex_inner)" opacity="1"/>
+  <rect x="9" y="9" width="46" height="46" rx="12" fill="none" stroke="#FFFFFF" stroke-opacity="0.08"/>
+  <path d="M23.8 22.6C23.8 19.6 26.2 17.2 29.2 17.2H37.4C40.2 17.2 42.4 19.4 42.4 22.2C42.4 24.6 40.8 26.5 38.6 27.3L31.6 30.1C28.8 31.2 27 33.6 27 36.6C27 40.1 29.8 42.9 33.3 42.9H40.2" stroke="url(#stockex_stroke)" stroke-width="4.25" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M22.2 20.8L46.8 45.6" stroke="url(#stockex_stroke)" stroke-width="4.15" stroke-linecap="round" opacity="1"/>
+  <path d="M43.9 17.6L23.4 41.6" stroke="url(#stockex_stroke)" stroke-width="4.15" stroke-linecap="round" opacity="1"/>
+  <path d="M22.8 20.8H35.8C39.4 20.8 42.2 23.6 42.2 27.2" stroke="#FFFFFF" stroke-opacity="0.22" stroke-width="1.25" stroke-linecap="round"/>
+  <circle cx="44.9" cy="21.1" r="3.7" fill="#2F80FF"/>
+  <circle cx="44.9" cy="21.1" r="1.15" fill="#FFFFFF" opacity="0.98"/>
 </svg>
