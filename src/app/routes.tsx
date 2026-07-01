@@ -26,6 +26,7 @@ const AboutPage = lazy(() => import("../pages/AboutPage"));
 const TrackPage = lazy(() => import("../pages/TrackPage"));
 const AIChatPage = lazy(() => import("../pages/AIChatPage"));
 const RelativeStrengthPage = lazy(() => import("../pages/RelativeStrength"));
+const AdvancedScanner = lazy(() => import("../components/AdvancedScanner"));
 
 function RouteFallback() {
   return (
@@ -71,6 +72,7 @@ export function AppRoutes() {
           <Route path="/analyst" element={<AnalystWorkspace />} />
           <Route path="/chat" element={<AIChatPage />} />
           <Route path="/relative-strength" element={<RelativeStrengthPage />} />
+          <Route path="/technical-scanner" element={<AdvancedScanner />} />
           {enableWaitlistPage && (
             <Route path="/waitlist" element={<WaitlistPage />} />
           )}
