@@ -17,11 +17,13 @@ import { PortfolioAnalyticsEngine } from "../services/portfolio/PortfolioAnalyti
 import { MarketDataGateway } from "../services/data/MarketDataGateway";
 
 function formatInr(n: number): string {
+  if (n == null || Number.isNaN(n)) return "—";
   return "₹" + n.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
 function formatPct(n: number | null): string {
   if (n === null) return "—";
+  if (Number.isNaN(n)) return "—";
   return (n >= 0 ? "+" : "") + n.toFixed(2) + "%";
 }
 
@@ -148,8 +150,8 @@ export default function PortfolioPage() {
       ],
       comparisonContext: holdings.slice(0, 10).map((h) => {
         const price = currentPrices[h.symbol];
-        const gain = price ? ((price - h.avgBuyPrice) / h.avgBuyPrice * 100).toFixed(2) : "—";
-        return `${h.symbol} (${h.sector}): ${h.shares} shares, avg ${formatInr(h.avgBuyPrice)}, current ${price ? formatInr(price) : "—"}, P&L ${gain}%`;
+        const gain = price ? formatPct((price - h.avgBuyPrice) / h.avgBuyPrice * 100) : "—";
+        return `${h.symbol} (${h.sector}): ${h.shares} shares, avg ${formatInr(h.avgBuyPrice)}, current ${price ? formatInr(price) : "—"}, P&L ${gain}`;
       }),
       whatToWatch: [
         `${perf.bestPerformerSymbol} is your best performer — monitor for trend continuation.`,

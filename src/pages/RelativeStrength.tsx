@@ -38,6 +38,11 @@ const METRICS: { id: RankingMetric; label: string; icon: LucideIcon; color: stri
   { id: "stability", label: "Stability", icon: BarChart3, color: "#b0b0b0", description: "Beta, debt/equity, earnings volatility" },
 ];
 
+function formatInr(value: number | null | undefined) {
+  if (value == null || Number.isNaN(value)) return "—";
+  return value.toLocaleString("en-IN");
+}
+
 // ── Mock ranking data ──────────────────────────────────────────────────────────
 function generateMockRankings(metric: RankingMetric): StockRank[] {
   const base: Omit<StockRank, "scores" | "rank" | "change">[] = [
@@ -327,7 +332,7 @@ export default function RelativeStrengthPage() {
               <ScoreBar value={stock.scores[activeMetric]} color={active.color} />
             </div>
             <div><RankChange change={stock.change} /></div>
-            <div style={{ color: colors.textSecondary, fontVariantNumeric: "tabular-nums" }}>₹{stock.price.toLocaleString()}</div>
+            <div style={{ color: colors.textSecondary, fontVariantNumeric: "tabular-nums" }}>₹{formatInr(stock.price)}</div>
           </div>
         ))}
       </div>

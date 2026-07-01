@@ -45,6 +45,11 @@ function formatNumber(n: number): string {
   return n.toString();
 }
 
+function formatDecimal(n: number | null | undefined, digits = 1): string {
+  if (n == null || Number.isNaN(n)) return "—";
+  return n.toFixed(digits);
+}
+
 export function OptionsFlow() {
   const d = MOCK_OPTIONS_DATA;
 
@@ -104,7 +109,7 @@ export function OptionsFlow() {
             Put/Call Ratio
           </div>
           <div style={{ fontSize: "22px", fontWeight: 700, color: colors.textPrimary, marginBottom: "2px" }}>
-            {d.pcr.toFixed(2)}
+            {formatDecimal(d.pcr, 2)}
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
             {d.pcrChange > 0 ? (
@@ -131,7 +136,7 @@ export function OptionsFlow() {
             Implied Volatility
           </div>
           <div style={{ fontSize: "22px", fontWeight: 700, color: colors.textPrimary, marginBottom: "2px" }}>
-            {d.impliedVolatility.toFixed(1)}%
+            {formatDecimal(d.impliedVolatility, 1)}%
           </div>
           <div style={{ fontSize: "12px", fontWeight: 500, color: ivSignal.color }}>
             {ivSignal.label} · {d.ivPercentile}th %ile
@@ -151,10 +156,10 @@ export function OptionsFlow() {
             Max Pain
           </div>
           <div style={{ fontSize: "22px", fontWeight: 700, color: colors.textPrimary, marginBottom: "2px" }}>
-            ₹{d.maxPain}
+            ₹{formatNumber(d.maxPain)}
           </div>
           <div style={{ fontSize: "12px", fontWeight: 500, color: maxPainDelta > 0 ? colors.marketGreen : colors.marketRed }}>
-            {maxPainDelta > 0 ? "+" : ""}{maxPainDelta.toFixed(1)}% vs CMP
+            {maxPainDelta > 0 ? "+" : ""}{formatDecimal(maxPainDelta, 1)}% vs CMP
           </div>
         </div>
 
