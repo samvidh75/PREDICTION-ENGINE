@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { buildSymbolMasterFixture } from '../fixtures/symbol-master';
-import type { IndianEquitySymbol, IndianExchange, IndianInstrumentSegment, IndianListingStatus } from '../symbols/IndianEquitySymbol';
+import type { IndianExchange, IndianInstrumentSegment, IndianListingStatus } from '../symbols/IndianEquitySymbol';
 
 describe('IndianEquitySymbol contract', () => {
   const symbols = buildSymbolMasterFixture();

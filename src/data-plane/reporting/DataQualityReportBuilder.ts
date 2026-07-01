@@ -11,7 +11,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import type { IndianEquitySymbol, IndianExchange, IndianInstrumentSegment } from '../symbols/IndianEquitySymbol';
-import type { IndianEodCandle, EodCandleQuality } from '../eod/IndianEodCandle';
+import type { IndianEodCandle } from '../eod/IndianEodCandle';
 import { validateEodCandle } from '../eod/IndianEodCandle';
 import type { IndiaTradingCalendar } from '../calendar/IndiaTradingCalendar';
 

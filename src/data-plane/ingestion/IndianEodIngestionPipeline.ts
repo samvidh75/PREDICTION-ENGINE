@@ -8,8 +8,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import type { IndianEodCandle } from '../eod/IndianEodCandle';
-import { validateEodCandle, validateEodCandleBatch } from '../eod/IndianEodCandle';
-import type { IndianEquitySymbol } from '../symbols/IndianEquitySymbol';
+import { validateEodCandle } from '../eod/IndianEodCandle';
 import { normalizeTicker } from '../symbols/IndianSymbolNormalizer';
 import type { IndianSymbolResolver } from '../symbols/IndianSymbolResolver';
 import type {
