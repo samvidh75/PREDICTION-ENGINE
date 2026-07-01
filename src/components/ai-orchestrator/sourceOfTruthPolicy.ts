@@ -1,4 +1,4 @@
-export type LensorySourceOfTruth =
+export type EquityLensSourceOfTruth =
   | "market_brain"
   | "healthometer"
   | "scanner_engine"
@@ -25,7 +25,7 @@ export const STOCKSTORY_SOURCE_OF_TRUTH_POLICY = Object.freeze({
   localAiCanCreateRecommendations: false,
 } satisfies SourceOfTruthPolicy);
 
-const OFFICIAL_SOURCES = new Set<LensorySourceOfTruth>([
+const OFFICIAL_SOURCES = new Set<EquityLensSourceOfTruth>([
   "market_brain",
   "healthometer",
   "scanner_engine",
@@ -35,8 +35,8 @@ const OFFICIAL_SOURCES = new Set<LensorySourceOfTruth>([
   "deterministic_fallback",
 ]);
 
-export function isOfficialLensorySourceOfTruth(value: unknown): value is LensorySourceOfTruth {
-  return typeof value === "string" && OFFICIAL_SOURCES.has(value as LensorySourceOfTruth);
+export function isOfficialEquityLensSourceOfTruth(value: unknown): value is EquityLensSourceOfTruth {
+  return typeof value === "string" && OFFICIAL_SOURCES.has(value as EquityLensSourceOfTruth);
 }
 
 export function canLocalAiComputeOfficialScores(): false {

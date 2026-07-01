@@ -1,12 +1,12 @@
-# Lensory
+# Equity Lens
 > AI-powered stock research and analysis platform for Indian equities.
 
 ## Key links
-- [Lensory Homepage](https://stockstory-india.com/)
+- [Equity Lens Homepage](https://stockstory-india.com/)
 - [Stock Scanner](https://stockstory-india.com/scanner)
 - [Market Reports](https://stockstory-india.com/reports)
 - [Portfolio](https://stockstory-india.com/portfolio)
 - [Stock Analysis](https://stockstory-india.com/stocks/)
 
 ## About
-Lensory provides AI-powered fundamental research, technical analysis, and market insights for Indian stock market investors.
+Equity Lens provides AI-powered fundamental research, technical analysis, and market insights for Indian stock market investors.

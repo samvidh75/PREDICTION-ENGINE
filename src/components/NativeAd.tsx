@@ -296,7 +296,7 @@ export function NativeAd({ position, compact = false }: NativeAdProps) {
         }}
       >
         <span style={{ fontSize: "12px", color: colors.textTertiary }}>
-          Ad-free with Lensory Premium
+          Ad-free with Equity Lens Premium
         </span>
         <span
           style={{

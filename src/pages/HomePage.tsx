@@ -99,7 +99,7 @@ const FOOTER_COLUMNS = [
   {
     title: "Resources",
     links: [
-      { label: "Lensory Trust", href: "/trust" },
+      { label: "Equity Lens Trust", href: "/trust" },
       { label: "Disclaimer", href: "/trust" },
       { label: "Privacy", href: "/trust" },
       { label: "Terms of Use", href: "/trust" },
@@ -830,7 +830,7 @@ export default function HomePage() {
               background: "linear-gradient(135deg, #fff 30%, rgba(255,255,255,0.6) 100%)",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
-            }}>Lensory</span>
+            }}>Equity Lens</span>
             <span style={{ fontSize: 12, color: colors.body }}>
               © {new Date().getFullYear()} · educational purposes only
             </span>
