@@ -25,7 +25,6 @@ const STATIC_HOLIDAYS: readonly string[] = [
   '2026-05-01', // Maharashtra Day
   '2026-07-01', // Ramzan-Id-Ul-Zuha (Bakri Eid)
   '2026-07-30', // Muharram
-  '2026-08-15', // Independence Day
   '2026-08-19', // Parsi New Year
   '2026-10-02', // Mahatma Gandhi Jayanti
   '2026-10-09', // Dussehra
@@ -37,13 +36,9 @@ const STATIC_HOLIDAYS: readonly string[] = [
   // 2027 (major — extend before year-end)
   '2027-01-26', // Republic Day
   '2027-03-05', // Holi
-  '2027-03-14', // Ramzan-Id-Ul-Fitar
   '2027-03-26', // Good Friday
   '2027-04-14', // Dr. Baba Saheb Ambedkar Jayanti
-  '2027-08-15', // Independence Day
-  '2027-10-02', // Mahatma Gandhi Jayanti
   '2027-11-23', // Gurunanak Jayanti
-  '2027-12-25', // Christmas
 ];
 
 // ---------------------------------------------------------------------------

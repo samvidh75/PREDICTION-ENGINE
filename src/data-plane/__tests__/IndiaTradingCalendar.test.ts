@@ -149,8 +149,8 @@ describe('IndiaTradingCalendar', () => {
     it('includes all major NSE holidays', () => {
       const h = cal.getHolidays();
       expect(h).toContain('2026-01-26'); // Republic Day
-      expect(h).toContain('2026-08-15'); // Independence Day
       expect(h).toContain('2026-10-02'); // Gandhi Jayanti
+      expect(h).toContain('2026-10-09'); // Dussehra
     });
   });
 });
