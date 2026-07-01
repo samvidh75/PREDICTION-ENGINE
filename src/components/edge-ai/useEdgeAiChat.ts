@@ -24,6 +24,14 @@ function nextId(): string {
   return `chat-${_messageCounter}-${Date.now()}`;
 }
 
+function formatInr(value: number | null | undefined, digits = 2): string {
+  if (value == null || Number.isNaN(value)) return "—";
+  return value.toLocaleString("en-IN", {
+    minimumFractionDigits: digits,
+    maximumFractionDigits: digits,
+  });
+}
+
 function buildSystemPrompt(context: EdgeAiResearchContext): string {
   return [
     `You are a research assistant analysing ${context.companyName} (${context.symbol}).`,
@@ -41,7 +49,7 @@ function buildSystemPrompt(context: EdgeAiResearchContext): string {
     ...context.narrative,
     '',
     `Sector: ${context.sector}`,
-    `Current price: ₹${context.currentPrice.toFixed(2)} (${context.changePercent >= 0 ? '+' : ''}${context.changePercent.toFixed(2)}%)`,
+    `Current price: ₹${formatInr(context.currentPrice)} (${(context.changePercent ?? 0) >= 0 ? '+' : ''}${formatInr(context.changePercent, 2)}%)`,
     '',
     'Risks flagged:',
     ...(context.risksToReview.length > 0

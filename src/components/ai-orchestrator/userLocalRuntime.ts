@@ -15,6 +15,10 @@ const TIMEOUT_MS = 8000;
 
 function buildPrompt(request: ResearchAiRequest): string {
   const { context, question } = request;
+  const formatPrice = (value: number | null | undefined) => {
+    if (value == null || Number.isNaN(value)) return '—';
+    return value.toFixed(2);
+  };
   return [
     `You are a research assistant analysing ${context.companyName} (${context.symbol}).`,
     'Help the user understand the research. Do NOT make predictions or give recommendations.',
@@ -28,7 +32,7 @@ function buildPrompt(request: ResearchAiRequest): string {
     'CONTEXT:',
     ...(context.narrative ?? []),
     '',
-    `Sector: ${context.sector ?? ''} | Price: ₹${(context.currentPrice ?? 0).toFixed(2)} (${(context.changePercent ?? 0) >= 0 ? '+' : ''}${(context.changePercent ?? 0).toFixed(2)}%)`,
+    `Sector: ${context.sector ?? ''} | Price: ₹${formatPrice(context.currentPrice)} (${(context.changePercent ?? 0) >= 0 ? '+' : ''}${formatPrice(context.changePercent)}%)`,
     '',
     'Risks:',
     ...((context.risksToReview ?? []).length > 0
