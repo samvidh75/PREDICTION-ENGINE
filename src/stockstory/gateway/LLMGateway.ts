@@ -6,6 +6,7 @@ import { deterministicNarrativeProvider } from './providers/DeterministicNarrati
 import { mockLLMProvider } from './providers/MockLLMProvider';
 import { disabledLLMProvider, getDisabledNarrative } from './providers/DisabledLLMProvider';
 import { ollamaExternalProvider } from './providers/OllamaExternalProvider';
+import { cloudflareAiProvider } from './providers/CloudflareAiProvider';
 import { DiscordNotifier } from './monitoring/DiscordNotifier';
 import { aiObservability } from '../observability/AiObservability';
 import type {
@@ -25,6 +26,7 @@ export class LLMGateway {
     this.providers.set('mock', mockLLMProvider);
     this.providers.set('disabled', disabledLLMProvider);
     this.providers.set('ollama', ollamaExternalProvider);
+    this.providers.set('cloudflare', cloudflareAiProvider);
   }
 
   getActiveProvider(): LLMProvider {

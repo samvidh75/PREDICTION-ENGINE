@@ -21,6 +21,8 @@ import time
 from datetime import datetime
 
 import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 from bs4 import BeautifulSoup
 
 try:
@@ -45,10 +47,24 @@ DEFAULT_TICKERS = [
 class MasterIngestionMesh:
     """Unified multi-source data ingestion pipeline."""
 
+    def _create_resilient_session(self) -> requests.Session:
+        """Create a requests session with exponential backoff retry."""
+        session = requests.Session()
+        retries = Retry(
+            total=3,
+            backoff_factor=1,
+            status_forcelist=[429, 500, 502, 503, 504],
+            allowed_methods=["GET", "POST"],
+        )
+        adapter = HTTPAdapter(max_retries=retries)
+        session.mount("https://", adapter)
+        session.mount("http://", adapter)
+        return session
+
     def __init__(self, dry_run: bool = False, delay: float = 1.2):
         self.dry_run = dry_run
         self.delay = delay
-        self.session = requests.Session()
+        self.session = self._create_resilient_session()
         self.session.headers.update({
             "User-Agent": (
                 "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
