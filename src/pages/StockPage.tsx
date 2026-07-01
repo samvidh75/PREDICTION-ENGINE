@@ -281,7 +281,8 @@ function StockSkeleton() {
 
 function StockError({ symbol }: { symbol: string }) {
   return <div style={{ color: colors.textPrimary, padding: "40px", textAlign: "center" }}>We could not load research for {symbol}.</div>;
-}function StockView({ stock, financialChartData, shareholding, shareholdingSeries, period: initialPeriod }: {
+}
+function StockView({ stock, financialChartData, shareholding, shareholdingSeries, period: initialPeriod }: {
   stock: StockResearchDetail;
   financialChartData: { period: string; value: number }[];
   shareholding?: { period: string; promoter: number; fii: number; dii: number; retail: number; deltas: { promoter: number; fii: number; dii: number; retail: number } };
