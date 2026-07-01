@@ -92,6 +92,16 @@ const SCENARIO_CONFIG: Record<PriceTarget["scenario"], { icon: React.ReactNode; 
   },
 };
 
+function formatInr(value: number | null | undefined) {
+  if (value == null || Number.isNaN(value)) return "—";
+  return new Intl.NumberFormat("en-IN").format(value);
+}
+
+function formatPct(value: number | null | undefined, digits = 1) {
+  if (value == null || Number.isNaN(value)) return "—";
+  return `${value.toFixed(digits)}%`;
+}
+
 export function PriceTargets({ currentPrice = 342.50 }: { currentPrice?: number }) {
   return (
     <div>
@@ -132,7 +142,7 @@ export function PriceTargets({ currentPrice = 342.50 }: { currentPrice?: number 
       >
         <span style={{ fontSize: "13px", color: colors.textSecondary }}>Current Price (CMP)</span>
         <span style={{ fontSize: "20px", fontWeight: 700, color: colors.textPrimary }}>
-          ₹{currentPrice.toLocaleString("en-IN")}
+          ₹{formatInr(currentPrice)}
         </span>
       </div>
 
@@ -170,7 +180,7 @@ export function PriceTargets({ currentPrice = 342.50 }: { currentPrice?: number 
                 </div>
                 <div style={{ textAlign: "right" }}>
                   <div style={{ fontSize: "22px", fontWeight: 700, color: colors.textPrimary }}>
-                    ₹{target.price.toLocaleString("en-IN")}
+                    ₹{formatInr(target.price)}
                   </div>
                   <div
                     style={{
@@ -179,7 +189,7 @@ export function PriceTargets({ currentPrice = 342.50 }: { currentPrice?: number 
                       color: target.potentialReturn >= 0 ? colors.marketGreen : colors.marketRed,
                     }}
                   >
-                    {target.potentialReturn >= 0 ? "+" : ""}{target.potentialReturn}%
+                    {target.potentialReturn >= 0 ? "+" : ""}{formatPct(target.potentialReturn)}
                   </div>
                 </div>
               </div>

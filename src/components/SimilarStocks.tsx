@@ -84,6 +84,16 @@ const MOCK_SIMILAR: SimilarStock[] = [
   },
 ];
 
+function formatInr(value: number | null | undefined) {
+  if (value == null || Number.isNaN(value)) return "—";
+  return new Intl.NumberFormat("en-IN").format(value);
+}
+
+function formatPct(value: number | null | undefined, digits = 1) {
+  if (value == null || Number.isNaN(value)) return "—";
+  return `${value >= 0 ? "+" : ""}${value.toFixed(digits)}%`;
+}
+
 export function SimilarStocks() {
   const [expanded, setExpanded] = useState(false);
 
@@ -193,7 +203,7 @@ export function SimilarStocks() {
             {/* Price & change */}
             <div style={{ textAlign: "right", flexShrink: 0 }}>
               <div style={{ fontSize: "14px", fontWeight: 600, color: colors.textPrimary }}>
-                ₹{stock.price.toLocaleString("en-IN")}
+                ₹{formatInr(stock.price)}
               </div>
               <div
                 style={{
@@ -202,7 +212,7 @@ export function SimilarStocks() {
                   color: stock.changePercent >= 0 ? colors.marketGreen : colors.marketRed,
                 }}
               >
-                {stock.changePercent >= 0 ? "+" : ""}{stock.changePercent}%
+                {formatPct(stock.changePercent)}
               </div>
             </div>
 
