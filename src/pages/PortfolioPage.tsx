@@ -17,6 +17,19 @@ import { PortfolioAnalyticsEngine } from "../services/portfolio/PortfolioAnalyti
 import { MarketDataGateway } from "../services/data/MarketDataGateway";
 import { formatINR } from "../services/ui/dataFormatting";
 import { formatPercent } from "../services/ui/indianNumberFormat";
+import { loadAuthSession } from "../services/auth/sessionStore";
+
+function formatInr(n: number): string {
+  if (n == null || Number.isNaN(n)) return "—";
+  return "₹" + n.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function formatPct(n: number | null): string {
+  if (n === null) return "—";
+  if (Number.isNaN(n)) return "—";
+  return (n >= 0 ? "+" : "") + n.toFixed(2) + "%";
+}
+>>>>>>> 66a1601c (Phase 45: rate limiter 60req/min, Cloudflare AI failover, ingestion retry)
 
 export default function PortfolioPage() {
   const navigate = useNavigate();
@@ -42,7 +55,19 @@ export default function PortfolioPage() {
 
   const getQuoteWithTimeout = useCallback(async (symbol: string, timeoutMs = 1800) => {
     return await Promise.race([
-      MarketDataGateway.getQuote(symbol),
+      (async () => {
+        const response = await fetch(`/api/market-data/quote/${encodeURIComponent(symbol)}`, {
+          headers: { Accept: "application/json" },
+        });
+        if (!response.ok) {
+          throw new Error(`quote_http_${response.status}`);
+        }
+        const quote = await response.json();
+        if (!quote || typeof quote.price !== "number" || !Number.isFinite(quote.price)) {
+          throw new Error("quote_invalid");
+        }
+        return quote as { price: number };
+      })(),
       new Promise<never>((_, reject) => {
         setTimeout(() => reject(new Error("quote_timeout")), timeoutMs);
       }),

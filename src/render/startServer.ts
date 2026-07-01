@@ -120,16 +120,19 @@ async function bootstrap() {
   // ── WebSocket support for live price streaming ────────────────────
   await server.register(websocket);
 
-  // ── Rate limiting — 15 req/s per IP ─────────────────────────────────
+  // ── Rate limiting — 60 req/min per IP ───────────────────────────────
   await server.register(rateLimit, {
-    max: 15,
-    timeWindow: "1 second",
+    max: 60,
+    timeWindow: "1 minute",
     cache: 10000,
-    keyGenerator: (req) => (req.headers["x-real-ip"] as string) || req.ip,
+    keyGenerator: (req) =>
+      (req.headers["x-real-ip"] as string) ||
+      (req.headers["x-forwarded-for"] as string) ||
+      req.ip,
     errorResponseBuilder: (_req, context) => ({
       success: false,
-      error: "Too Many Requests",
-      message: `StockEX rate ceiling exceeded. Retrying in ${context.after}.`,
+      error: "Rate Limit Exceeded",
+      message: `StockEX rate limit hit (60 req/min). Resets in ${context.after}.`,
     }),
   });
 
