@@ -180,6 +180,7 @@ export function CommandPalette({ presets = [], open, onClose }: CommandPalettePr
     // Pages
     result.push(
       { id: 'page-scanner', label: 'Scanner', icon: '🔍', category: 'page', action: () => navigate('/scanner'), metadata: 'G S' },
+      { id: 'page-technical-scanner', label: 'Technical Scanner', icon: '📊', category: 'page', action: () => navigate('/technical-scanner'), metadata: 'G T' },
       { id: 'page-watchlist', label: 'Watchlist', icon: '⭐', category: 'page', action: () => navigate('/watchlist'), metadata: 'G W' },
       { id: 'page-sectors', label: 'Sectors', icon: '📊', category: 'page', action: () => navigate('/sectors'), metadata: 'G E' },
       { id: 'page-trust', label: 'Trust & Safety', icon: '🛡️', category: 'page', action: () => navigate('/trust') },
