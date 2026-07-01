@@ -24,7 +24,7 @@ const featureLabels: Record<string, string> = {
   watchlist_alerts: "Watchlist alerts",
   daily_digest_email: "Daily digest email",
   prediction_accuracy_history: "Prediction accuracy history",
-  api_access: "API access",
+  api_access: "Advanced data access",
   priority_support: "Priority support",
 };
 
