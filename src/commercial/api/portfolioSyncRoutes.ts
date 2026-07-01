@@ -99,22 +99,6 @@ async function fetchZerodhaHoldings(apiKey: string, accessToken: string): Promis
   }));
 }
 
-async function fetchAngelOneHoldings(accessToken: string): Promise<UnifiedHolding[]> {
-  const res = await fetch("https://apiconnect.angelone.in/smart-api/v1/portfolio/holdings", {
-    headers: { Authorization: `Bearer ${accessToken}`, "Content-Type": "application/json" },
-  });
-  if (!res.ok) throw new Error(`Angel One API ${res.status}`);
-  const data = (await res.json()) as { data?: any[] };
-  return (data.data || []).map((h: any) => ({
-    symbol: (h.symbol || h.tradingsymbol || "").replace(/-/g, "") || h.isin || "UNKNOWN",
-    quantity: h.quantity || h.totalQty || 0,
-    avgPrice: h.avgPrice || h.averagePrice || 0,
-    currentValue: (h.ltp || h.lastPrice || 0) * (h.quantity || h.totalQty || 0),
-    pnl: h.pnl || 0,
-    broker: "angel_one",
-  }));
-}
-
 async function fetchBrokerHoldings(
   broker: string,
   accessToken: string,
@@ -128,8 +112,6 @@ async function fetchBrokerHoldings(
       const parts = accessToken.match(/^([^:]+):(.+)$/);
       return fetchZerodhaHoldings(parts?.[1] || accessToken, parts?.[2] || accessToken);
     }
-    case "angel_one":
-      return fetchAngelOneHoldings(accessToken);
     default:
       throw new Error(`Unsupported broker: ${broker}`);
   }
@@ -162,9 +144,6 @@ async function tryRefreshBrokerToken(
         const data = await res.json();
         newAccessToken = data.access_token || null;
       }
-    } else if (broker === "angel_one") {
-      // Angel One: JWT token can be refreshed via same auth endpoint
-      return refreshToken; // Use existing JWT as-is
     }
     // Zerodha tokens cannot be refreshed — needs re-login
 

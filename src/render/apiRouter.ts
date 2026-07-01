@@ -18,6 +18,12 @@ import { sectorEngine } from "../services/intelligence/engines/SectorEngine/inde
 import { ragEngine } from "../services/intelligence/engines/RAGEngine/index.js";
 import { orchestrator } from "../services/intelligence/Orchestrator.js";
 import type { AllEngineInputs } from "../services/intelligence/Orchestrator.js";
+
+// ── Cache helper ───────────────────────────────────────────────────────
+function setCache(reply: FastifyReply, maxAge: number = 300): void {
+  reply.header("Cache-Control", `public, max-age=${maxAge}`);
+  reply.header("ETag", `"${Date.now()}"`);
+}
 import type { EarningsMetrics, EventMetrics, FinancialMetrics, NewsMetrics, RAGMetrics, RiskMetrics, SectorMetrics, TechnicalMetrics, ValuationMetrics } from "../services/intelligence/types.js";
 import intelligenceQualityGate from "./intelligenceQualityGate.js";
 import type { UserResearchProfile, AlertChangeView, SavedScannerPreset, DailyResearchDigest, WatchlistThesisView } from "../research/contracts/productContracts.js";

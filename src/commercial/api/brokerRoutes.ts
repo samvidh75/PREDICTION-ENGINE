@@ -302,32 +302,9 @@ export async function registerBrokerRoutes(fastify: FastifyInstance): Promise<vo
             error: (orderResult as any)?.message ?? "Zerodha order failed",
           });
         }
-      } else if (broker === "angel_one") {
-        const res = await fetch("https://apiconnect.angelone.in/smart-api/v1/orders", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            tradingsymbol: symbol,
-            symboltoken: symbol,
-            exchange: exchange || "NSE",
-            transactiontype: side === "BUY" ? "BUY" : "SELL",
-            quantity: String(quantity),
-            price: orderType === "LIMIT" && price ? String(price) : "0",
-            order_type: orderType === "LIMIT" ? "LIMIT" : "MARKET",
-            product: "DELIVERY",
-            duration: "DAY",
-          }),
-        });
-        orderResult = await res.json();
-        if (!res.ok) {
-          return reply.status(502).send({
-            success: false,
-            error: (orderResult as any)?.message ?? "Angel One order failed",
-          });
-        }
+      } else if (broker === "dhan") {
+        // Dhan - not yet implemented
+        orderResult = { status: "error", message: "Dhan broker not yet implemented" };
       } else {
         return reply.status(400).send({ success: false, error: `Unsupported broker: ${broker}` });
       }

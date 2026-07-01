@@ -20,6 +20,7 @@ Environment:
 import argparse
 import hashlib
 import json
+import logging
 import os
 import sys
 import time
@@ -27,6 +28,8 @@ from datetime import datetime, date
 
 import numpy as np
 import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
 try:
     import psycopg2
@@ -48,6 +51,15 @@ FNO_STOCKS = [
 ]
 
 # ── Helpers ──────────────────────────────────────────────────────────
+
+# Logging setup
+logger = logging.getLogger("fo_ingest")
+if not logger.handlers:
+    handler = logging.StreamHandler()
+    formatter = logging.Formatter("%(asctime)s [%(levelname)s] %(message)s")
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+    logger.setLevel(logging.INFO)
 
 
 def _round_strike(price: float, step: float = 50.0) -> float:
@@ -86,7 +98,7 @@ class FoIngestEngine:
     def __init__(self, dry_run: bool = False, delay: float = 1.2):
         self.dry_run = dry_run
         self.delay = delay
-        self.session = requests.Session()
+        self.session = self._create_resilient_session()
         self.session.headers.update({
             "User-Agent": (
                 "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
@@ -97,11 +109,26 @@ class FoIngestEngine:
             "Accept-Language": "en-US,en;q=0.9",
         })
 
+    def _create_resilient_session(self) -> requests.Session:
+        """Create a requests session with exponential backoff retry logic."""
+        session = requests.Session()
+        retries = Retry(
+            total=3,
+            backoff_factor=1,  # 1s, 2s, 4s
+            status_forcelist=[429, 500, 502, 503, 504],
+            allowed_methods=["GET", "POST"],
+        )
+        adapter = HTTPAdapter(max_retries=retries)
+        session.mount("https://", adapter)
+        session.mount("http://", adapter)
+        return session
+
     # ── Data Sources ──────────────────────────────────────────────
 
     def fetch_nse_option_chain(self, ticker: str) -> dict | None:
-        """Fetch live option chain from NSE's free public API."""
+        """Fetch live option chain from NSE's free public API with retry logic."""
         try:
+            logger.info(f"Fetching NSE option chain for {ticker}")
             # Seed NSE session cookie
             self.session.get("https://www.nseindia.com", timeout=8)
 
@@ -112,11 +139,12 @@ class FoIngestEngine:
 
             resp = self.session.get(url, timeout=10)
             if resp.status_code == 200:
+                logger.info(f"NSE fetch succeeded for {ticker}")
                 return resp.json()
-            print(f"  ⚠️  NSE returned {resp.status_code} for {ticker}")
+            logger.warning(f"NSE returned {resp.status_code} for {ticker}")
             return None
         except Exception as e:
-            print(f"  ⚠️  NSE fetch failed for {ticker}: {e}")
+            logger.error(f"NSE fetch failed for {ticker}: {e}")
             return None
 
     def fetch_yahoo_spot(self, ticker: str) -> float | None:
