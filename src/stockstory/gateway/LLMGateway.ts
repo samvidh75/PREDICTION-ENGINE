@@ -6,6 +6,7 @@ import { deterministicNarrativeProvider } from './providers/DeterministicNarrati
 import { mockLLMProvider } from './providers/MockLLMProvider';
 import { disabledLLMProvider, getDisabledNarrative } from './providers/DisabledLLMProvider';
 import { ollamaExternalProvider } from './providers/OllamaExternalProvider';
+import { DiscordNotifier } from './monitoring/DiscordNotifier';
 import { aiObservability } from '../observability/AiObservability';
 import type {
   LLMProvider,
@@ -51,7 +52,8 @@ export class LLMGateway {
 
     try {
       output = provider.generateThesis(input);
-    } catch {
+    } catch (err) {
+      void DiscordNotifier.sendErrorAlert('LLMGateway.generateThesis', err);
       output = this.fallbackNarrative(input);
       fallbackUsed = true;
     }
@@ -90,7 +92,8 @@ export class LLMGateway {
     let result: ScannerQueryPlan;
     try {
       result = provider.parseScannerQuery(query);
-    } catch {
+    } catch (err) {
+      void DiscordNotifier.sendErrorAlert('LLMGateway.parseScannerQuery', err);
       result = {
         filters: [],
         sort: 'score',
@@ -123,7 +126,8 @@ export class LLMGateway {
     let result: string;
     try {
       result = provider.explainScoreChange(input);
-    } catch {
+    } catch (err) {
+      void DiscordNotifier.sendErrorAlert('LLMGateway.explainScoreChange', err);
       result = 'Score change explanation unavailable.';
     }
 
@@ -150,7 +154,8 @@ export class LLMGateway {
     let result: string;
     try {
       result = provider.generateAlertExplanation(input);
-    } catch {
+    } catch (err) {
+      void DiscordNotifier.sendErrorAlert('LLMGateway.generateAlertExplanation', err);
       result = 'Alert explanation unavailable.';
     }
 
@@ -177,7 +182,8 @@ export class LLMGateway {
     let result: string;
     try {
       result = provider.generateCompareSummary(input);
-    } catch {
+    } catch (err) {
+      void DiscordNotifier.sendErrorAlert('LLMGateway.generateCompareSummary', err);
       result = 'Comparison summary unavailable.';
     }
 
