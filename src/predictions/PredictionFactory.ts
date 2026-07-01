@@ -337,8 +337,8 @@ export class PredictionFactory {
 
       if (unifiedEngineEnabled && predictionFactoryDelegation) {
         const [{ UnifiedPredictionEngine }, { adaptPredictionFactoryData }] = await Promise.all([
-          import('../../prediction-engine/UnifiedPredictionEngine'),
-          import('../../prediction-engine/adapters/PredictionFactoryAdapter'),
+          import('../prediction-engine/UnifiedPredictionEngine'),
+          import('../prediction-engine/adapters/PredictionFactoryAdapter'),
         ]);
         const engine = new UnifiedPredictionEngine();
         const unifiedInput = adaptPredictionFactoryData(

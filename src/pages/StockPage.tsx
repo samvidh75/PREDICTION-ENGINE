@@ -37,7 +37,8 @@ import {
   enrichResearchContextWithEvents,
   buildNewsEventPack,
 } from "../components/ai-orchestrator/eventEvidenceAiContext";
-import { buildEvidenceRetrievalContext } from "../systems/market-brain/evidenceRetrievalOrchestrator";
+import { buildEvidenceRetrievalContext, buildEvidenceRetrievalAggregate } from "../systems/market-brain/evidenceRetrievalOrchestrator";
+import { compressEventEvidencePack } from "../systems/market-brain/eventEvidencePack";
 import type { EvidenceRetrievalAggregate } from "../research/contracts/evidenceRetrievalContracts";
 import { EvidenceSummaryPanel } from "../ui/EvidenceSummaryPanel";
 import { getStockResearch, type StockResearchDetail as LocalStockResearchDetail } from "../lib/stockResearch";
@@ -366,9 +367,9 @@ function buildFallbackStockResponse(symbol: string): {
       period: item.period,
       value: Math.round(item.value),
     })),
-    shareholding: normalized.shareholding[0],
-    shareholdingSeries: normalized.shareholding,
-    period: normalized.shareholding[0]?.period ?? "Latest",
+    shareholding: normalized.shareholding?.[0],
+    shareholdingSeries: normalized.shareholding ?? [],
+    period: normalized.shareholding?.[0]?.period ?? "Latest",
   };
 }
 function StockView({ stock, financialChartData, shareholding, shareholdingSeries, period: initialPeriod }: {
@@ -405,7 +406,8 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
   const sectionGap = useResponsiveValue("48px", "80px");
   const isUp = stock.price.changeAbs >= 0;
   const trendColor = isUp ? colors.success : colors.danger;
-  const effectiveShareholding = shareholding ?? shareholdingSeries.find((item) => item.period === period) ?? shareholdingSeries[0];
+  const shareholdingSeriesArr = Array.isArray(shareholdingSeries) ? shareholdingSeries : [];
+  const effectiveShareholding = shareholding ?? shareholdingSeriesArr.find((item) => item.period === period) ?? shareholdingSeriesArr[0];
   const selectedFinancialSeries = stock.financials[financialPeriod][financialMetric];
   const effectiveChartData = financialChartData.length > 0 ? financialChartData : selectedFinancialSeries.map((item) => ({ period: item.period, value: Math.round(item.value) }));
   const newsItems = stock.news.slice(0, 7);
@@ -562,10 +564,8 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
     let cancelled = false;
     (async () => {
       try {
-        const { buildEvidenceRetrievalAggregate } = await import("../systems/market-brain/evidenceRetrievalOrchestrator");
         const result = await buildEvidenceRetrievalAggregate(stock.symbol, { symbol: stock.symbol, maxPerSource: 8, lookbackDays: 90 });
         if (!cancelled) {
-          const { compressEventEvidencePack } = await import("../systems/market-brain/eventEvidencePack");
           setEvidenceAggregate(result.aggregate);
           setRetrievalContext(compressEventEvidencePack(result.pack));
         }
@@ -849,7 +849,7 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
         <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", flexWrap: "wrap", marginBottom: "16px" }}>
           <CardLabel>Shareholdings</CardLabel>
           <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
-            {shareholdingSeries.map((value) => (
+            {shareholdingSeriesArr.map((value) => (
               <Button key={value.period} variant={value.period === period ? "secondary" : "tertiary"} onClick={() => setPeriod(value.period)}>{value.period}</Button>
             ))}
           </div>

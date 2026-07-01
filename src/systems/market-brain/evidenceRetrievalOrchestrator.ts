@@ -17,7 +17,7 @@ import {
   retrieveResultEventEvidence,
   retrieveAlertEvidence,
 } from './evidenceRetrievalAdapters';
-import { buildEventEvidencePack } from './eventEvidencePack';
+import { buildEventEvidencePack, compressEventEvidencePack } from './eventEvidencePack';
 
 /* ── Orchestrator ───────────────────────────────────────────────── */
 
@@ -178,6 +178,5 @@ export async function buildEvidenceRetrievalContext(
   options?: RetrievalOptions
 ): Promise<string> {
   const { pack } = await buildEvidenceRetrievalAggregate(symbol, options);
-  const { compressEventEvidencePack } = await import('./eventEvidencePack');
   return compressEventEvidencePack(pack);
 }

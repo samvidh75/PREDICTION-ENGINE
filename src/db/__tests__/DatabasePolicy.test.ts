@@ -3,9 +3,9 @@ import { loadDatabasePolicy, resolveAdapter } from '../DatabasePolicy';
 
 describe('DatabasePolicy', () => {
   describe('loadDatabasePolicy', () => {
-    it('loads postgres adapter in production by default', () => {
+    it('defaults to auto adapter in production', () => {
       const policy = loadDatabasePolicy({ NODE_ENV: 'production' });
-      expect(policy.requestedAdapter).toBe('postgres');
+      expect(policy.requestedAdapter).toBe('auto');
       expect(policy.allowSqliteInProduction).toBe(false);
       expect(policy.sqliteProductionAllowed).toBe(false);
     });
