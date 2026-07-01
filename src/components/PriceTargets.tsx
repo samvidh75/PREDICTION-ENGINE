@@ -181,7 +181,7 @@ export function PriceTargets({ currentPrice = 342.50 }: { currentPrice?: number 
                       color: target.potentialReturn >= 0 ? colors.marketGreen : colors.marketRed,
                     }}
                   >
-                    {target.potentialReturn >= 0 ? "+" : ""}{formatPercent(target.potentialReturn)}
+                    {formatPercent(target.potentialReturn)}
                   </div>
                 </div>
               </div>

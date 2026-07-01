@@ -471,6 +471,31 @@ import { registerAnalystRoutes } from "../stockstory/analyst/api/analystRoutes.j
 
 export default async function registerApiRoutes(server: FastifyInstance) {
   await registerAnalystRoutes(server);
+
+  // ── Network Response Caching Layer ──────────────────────────────
+  // Global hook to attach downstream performance caching headers
+  server.addHook('onSend', async (request, reply, payload) => {
+    const urlPath = request.raw.url || '';
+
+    // Gate 1: Public market data cache rules
+    if (urlPath.includes('/api/v1/market-stream/')) {
+      reply.header('Cache-Control', 'public, max-age=30, s-maxage=60, stale-while-revalidate=10');
+    }
+    // Gate 2: Public options derivatives analytics cache rules
+    else if (urlPath.includes('/api/v1/fo/scanner/')) {
+      reply.header('Cache-Control', 'public, max-age=60, s-maxage=120');
+    }
+    // Gate 3: Enforce strict private data safety containment on sensitive user data
+    else if (urlPath.includes('/api/v1/broker/') || urlPath.includes('/api/v1/portfolio/')) {
+      reply.header('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+      reply.header('Pragma', 'no-cache');
+      reply.header('Expires', '0');
+    }
+
+    return payload;
+  });
+  // ── End Caching Layer ────────────────────────────────────────────
+
   // Register intelligence quality gate (sanitizes all /api/intelligence/* responses)
   await server.register(intelligenceQualityGate);
   // Shared stock detail handler — supports both ?symbol=TCS and /api/stock/TCS
