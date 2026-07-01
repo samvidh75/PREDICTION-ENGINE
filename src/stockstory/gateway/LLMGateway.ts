@@ -5,6 +5,7 @@ import { getLLMGatewayConfig, setLLMGatewayConfig, type LLMGatewayConfig, type L
 import { deterministicNarrativeProvider } from './providers/DeterministicNarrativeProvider';
 import { mockLLMProvider } from './providers/MockLLMProvider';
 import { disabledLLMProvider, getDisabledNarrative } from './providers/DisabledLLMProvider';
+import { ollamaExternalProvider } from './providers/OllamaExternalProvider';
 import { aiObservability } from '../observability/AiObservability';
 import type {
   LLMProvider,
@@ -22,6 +23,7 @@ export class LLMGateway {
     this.providers.set('deterministic', deterministicNarrativeProvider);
     this.providers.set('mock', mockLLMProvider);
     this.providers.set('disabled', disabledLLMProvider);
+    this.providers.set('ollama', ollamaExternalProvider);
   }
 
   getActiveProvider(): LLMProvider {
@@ -46,7 +48,6 @@ export class LLMGateway {
     let fallbackUsed = false;
     let validationPassed = true;
     let schemaFailureReason: string | undefined;
-    let policyFailureReason: string | undefined;
 
     try {
       output = provider.generateThesis(input);
@@ -72,7 +73,6 @@ export class LLMGateway {
       validationPassed,
       fallbackUsed,
       schemaFailureReason,
-      policyFailureReason,
       inputTokenEstimate: undefined,
       outputTokenEstimate: undefined,
       costEstimate: config.mode === 'deterministic' ? 0 : null,
