@@ -120,7 +120,7 @@ export default function PricingPage() {
     { label: "Advanced search", free: false, plus: false, pro: true },
     { label: "Search history", free: "90 days", plus: "1 year", pro: "3 years" },
     { label: "Ad-free", free: false, plus: false, pro: true },
-    { label: "API access", free: false, plus: false, pro: true },
+    { label: "Advanced data access", free: false, plus: false, pro: true },
     { label: "Priority support", free: false, plus: false, pro: true },
   ];
 
