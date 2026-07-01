@@ -98,9 +98,9 @@ export function normalizeTicker(raw: string): string {
 export function inferExchange(raw: string): IndianExchange | null {
   const s = raw.trim();
 
-  // Explicit prefix
-  if (/^NSI?:/i.test(s)) return 'NSE';
-  if (/^BSI?:/i.test(s)) return 'BSE';
+  // Explicit prefix — support NSE:, NSI: (Bloomberg), BSE:, BSI: (Bloomberg)
+  if (/^NSE:/i.test(s) || /^NSI:/i.test(s)) return 'NSE';
+  if (/^BSE:/i.test(s) || /^BSI:/i.test(s)) return 'BSE';
 
   // Suffix-based
   if (/\.NS$/i.test(s) || /\.NSE$/i.test(s)) return 'NSE';

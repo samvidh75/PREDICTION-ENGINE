@@ -3,30 +3,35 @@ import { IndiaTradingCalendar, isMarketHour } from '../calendar/IndiaTradingCale
 
 const cal = new IndiaTradingCalendar();
 
+/** Create a UTC-midnight Date for a YYYY-MM-DD string. */
+function utcDate(isoDate: string): Date {
+  return new Date(`${isoDate}T00:00:00.000Z`);
+}
+
 describe('IndiaTradingCalendar', () => {
   describe('isTradingDay', () => {
     it('returns true for a weekday in middle of week', () => {
-      expect(cal.isTradingDay('2026-06-17')).toBe(true); // Wednesday
+      expect(cal.isTradingDay(utcDate('2026-06-17'))).toBe(true); // Wednesday
     });
 
     it('returns false for Saturday', () => {
-      expect(cal.isTradingDay('2026-06-20')).toBe(false); // Saturday
+      expect(cal.isTradingDay(utcDate('2026-06-20'))).toBe(false);
     });
 
     it('returns false for Sunday', () => {
-      expect(cal.isTradingDay('2026-06-21')).toBe(false); // Sunday
+      expect(cal.isTradingDay(utcDate('2026-06-21'))).toBe(false);
     });
 
     it('returns false for Republic Day (Jan 26)', () => {
-      expect(cal.isTradingDay('2026-01-26')).toBe(false);
+      expect(cal.isTradingDay(utcDate('2026-01-26'))).toBe(false);
     });
 
     it('returns false for Independence Day (Aug 15)', () => {
-      expect(cal.isTradingDay('2026-08-15')).toBe(false);
+      expect(cal.isTradingDay(utcDate('2026-08-15'))).toBe(false);
     });
 
     it('returns false for Gandhi Jayanti (Oct 2)', () => {
-      expect(cal.isTradingDay('2026-10-02')).toBe(false);
+      expect(cal.isTradingDay(utcDate('2026-10-02'))).toBe(false);
     });
   });
 
@@ -59,36 +64,39 @@ describe('IndiaTradingCalendar', () => {
   describe('previousTradingDay', () => {
     it('returns the previous trading day for Monday', () => {
       // Monday June 22 -> previous is Friday June 19 (not Saturday/Sunday)
-      const prev = cal.previousTradingDay('2026-06-22');
-      expect(prev).toBe('2026-06-19');
+      const prev = cal.previousTradingDay(utcDate('2026-06-22'));
+      expect(prev.toISOString().slice(0, 10)).toBe('2026-06-19');
     });
 
-    it('returns same date if already a trading day', () => {
-      expect(cal.previousTradingDay('2026-06-17')).toBe('2026-06-17');
+    it('returns the previous trading day even if the given day is a trading day', () => {
+      const prev = cal.previousTradingDay(utcDate('2026-06-17'));
+      expect(prev.toISOString().slice(0, 10)).toBe('2026-06-16');
     });
   });
 
   describe('nextTradingDay', () => {
     it('returns next trading day for Friday', () => {
       // Friday June 19 -> next is Monday June 22
-      const next = cal.nextTradingDay('2026-06-19');
-      expect(next).toBe('2026-06-22');
+      const next = cal.nextTradingDay(utcDate('2026-06-19'));
+      expect(next.toISOString().slice(0, 10)).toBe('2026-06-22');
     });
 
     it('returns Monday for Saturday', () => {
-      expect(cal.nextTradingDay('2026-06-20')).toBe('2026-06-22');
+      const next = cal.nextTradingDay(utcDate('2026-06-20'));
+      expect(next.toISOString().slice(0, 10)).toBe('2026-06-22');
     });
 
     it('returns Monday for Sunday', () => {
-      expect(cal.nextTradingDay('2026-06-21')).toBe('2026-06-22');
+      const next = cal.nextTradingDay(utcDate('2026-06-21'));
+      expect(next.toISOString().slice(0, 10)).toBe('2026-06-22');
     });
   });
 
   describe('lastTradingDays', () => {
     it('returns 5 trading days for mid-week day', () => {
-      const days = cal.lastTradingDays('2026-06-17', 5);
+      const days = cal.lastTradingDays(4, utcDate('2026-06-17'));
       expect(days).toHaveLength(5);
-      // Should include June 17, 16, 15, 12, 11 (skipping weekend)
+      // Should include June 17, 16, 15, 12, 11 (skipping weekend, from + 4 back)
       expect(days).toContain('2026-06-17');
       expect(days).toContain('2026-06-16');
       expect(days).toContain('2026-06-15');
@@ -98,7 +106,7 @@ describe('IndiaTradingCalendar', () => {
 
     it('returns n calendar days (skipping weekends)', () => {
       // Monday June 22 -> 1 trading day back = Friday June 19
-      const days = cal.lastTradingDays('2026-06-22', 1);
+      const days = cal.lastTradingDays(1, utcDate('2026-06-22'));
       expect(days).toEqual(['2026-06-22', '2026-06-19']);
     });
   });
@@ -106,12 +114,12 @@ describe('IndiaTradingCalendar', () => {
   describe('countTradingDays', () => {
     it('counts trading days between two dates', () => {
       // June 17 (Weds) to June 22 (Mon) -> 4 trading days (17, 18, 19, 22)
-      const count = cal.countTradingDays('2026-06-17', '2026-06-22');
+      const count = cal.countTradingDays(utcDate('2026-06-17'), utcDate('2026-06-22'));
       expect(count).toBe(4);
     });
 
     it('returns 1 for same day', () => {
-      expect(cal.countTradingDays('2026-06-17', '2026-06-17')).toBe(1);
+      expect(cal.countTradingDays(utcDate('2026-06-17'), utcDate('2026-06-17'))).toBe(1);
     });
   });
 
@@ -135,11 +143,11 @@ describe('IndiaTradingCalendar', () => {
 
   describe('static holiday list', () => {
     it('has at least 10 holidays defined for 2026', () => {
-      expect(cal.holidays.length).toBeGreaterThanOrEqual(10);
+      expect(cal.getHolidays().length).toBeGreaterThanOrEqual(10);
     });
 
     it('includes all major NSE holidays', () => {
-      const h = cal.holidays.map(h => h.date);
+      const h = cal.getHolidays();
       expect(h).toContain('2026-01-26'); // Republic Day
       expect(h).toContain('2026-08-15'); // Independence Day
       expect(h).toContain('2026-10-02'); // Gandhi Jayanti
