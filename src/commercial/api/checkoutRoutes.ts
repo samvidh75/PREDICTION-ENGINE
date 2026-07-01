@@ -24,6 +24,12 @@ interface CancelBody {
   subscriptionId: string;
 }
 
+interface NotificationPrefsBody {
+  userId: string;
+  phoneNumber: string;
+  preference: "SMS" | "WHATSAPP";
+}
+
 const provider = new RazorpayProvider();
 
 export async function registerCheckoutRoutes(fastify: FastifyInstance): Promise<void> {
@@ -124,6 +130,46 @@ export async function registerCheckoutRoutes(fastify: FastifyInstance): Promise<
     } catch (err) {
       req.log.error({ err }, "Webhook verification failed");
       return reply.status(400).send({ error: "Webhook verification failed" });
+    }
+  });
+
+  // ── POST /api/checkout/notification-preferences ─────────────
+  fastify.post("/api/checkout/notification-preferences", async (req: FastifyRequest<{ Body: NotificationPrefsBody }>, reply: FastifyReply) => {
+    const { userId, phoneNumber, preference } = req.body;
+
+    if (!userId || !phoneNumber) {
+      return reply.status(400).send({ error: "userId and phoneNumber are required" });
+    }
+
+    if (!["SMS", "WHATSAPP"].includes(preference)) {
+      return reply.status(400).send({ error: 'preference must be "SMS" or "WHATSAPP"' });
+    }
+
+    try {
+      const { dbAdapter } = await import("../../db/DatabaseAdapter");
+
+      // Upsert phone_number and notification_preference in user_subscriptions
+      const existing = await dbAdapter.query(
+        "SELECT id FROM user_subscriptions WHERE user_id = $1",
+        [userId],
+      );
+
+      if (existing.rows.length > 0) {
+        await dbAdapter.query(
+          "UPDATE user_subscriptions SET phone_number = $1, notification_preference = $2 WHERE user_id = $3",
+          [phoneNumber, preference, userId],
+        );
+      } else {
+        await dbAdapter.query(
+          "INSERT INTO user_subscriptions (user_id, plan_id, status, phone_number, notification_preference) VALUES ($1, 'plan_free', 'active', $2, $3)",
+          [userId, phoneNumber, preference],
+        );
+      }
+
+      return reply.send({ success: true, phoneNumber, preference });
+    } catch (err) {
+      req.log.error({ err }, "Failed to save notification preferences");
+      return reply.status(500).send({ error: "Internal server error" });
     }
   });
 

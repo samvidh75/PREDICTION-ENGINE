@@ -36,17 +36,38 @@ DB_PATH = os.getenv("DB_PATH", "market_master.db")
 
 
 def ensure_notification_schema():
-    """Add phone/notification columns if they don't exist yet."""
+    """Create billing tables and add phone/notification columns if missing."""
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
-    for col in ["phone_number", "notification_preference"]:
-        cursor.execute(
-            f"SELECT COUNT(*) FROM pragma_table_info('customer_subscriptions') WHERE name='{col}'"
-        )
-        if cursor.fetchone()[0] == 0:
-            cursor.execute(
-                f"ALTER TABLE customer_subscriptions ADD COLUMN {col} TEXT"
+
+    cursor.execute(
+        "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='customer_subscriptions'"
+    )
+    if cursor.fetchone()[0] == 0:
+        cursor.execute("""
+            CREATE TABLE customer_subscriptions (
+                user_id TEXT PRIMARY KEY,
+                subscription_id TEXT,
+                plan_id TEXT,
+                billing_status TEXT,
+                tier_clearance TEXT,
+                expiry_timestamp INTEGER,
+                phone_number TEXT,
+                notification_preference TEXT DEFAULT 'SMS',
+                created_at TEXT DEFAULT (datetime('now')),
+                updated_at TEXT DEFAULT (datetime('now'))
             )
+        """)
+    else:
+        for col in ["phone_number", "notification_preference"]:
+            cursor.execute(
+                f"SELECT COUNT(*) FROM pragma_table_info('customer_subscriptions') WHERE name='{col}'"
+            )
+            if cursor.fetchone()[0] == 0:
+                cursor.execute(
+                    f"ALTER TABLE customer_subscriptions ADD COLUMN {col} TEXT"
+                )
+
     conn.commit()
     conn.close()
 
@@ -185,15 +206,17 @@ class EquityLensNotificationGateway:
         conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
         cursor.execute(
-            "UPDATE customer_subscriptions "
-            "SET phone_number = ?, notification_preference = ?, updated_at = datetime('now') "
-            "WHERE user_id = ?",
-            (phone_number, preference.upper(), user_id),
+            "INSERT INTO customer_subscriptions (user_id, phone_number, notification_preference, billing_status) "
+            "VALUES (?, ?, ?, 'ACTIVE') "
+            "ON CONFLICT(user_id) DO UPDATE SET "
+            "phone_number = excluded.phone_number, "
+            "notification_preference = excluded.notification_preference, "
+            "updated_at = datetime('now')",
+            (user_id, phone_number, preference.upper()),
         )
-        updated = cursor.rowcount
         conn.commit()
         conn.close()
-        return updated > 0
+        return True
 
     def get_subscriber(self, user_id: str) -> Optional[dict]:
         conn = sqlite3.connect(DB_PATH)

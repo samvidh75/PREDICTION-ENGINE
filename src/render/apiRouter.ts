@@ -1616,8 +1616,6 @@ export default async function registerApiRoutes(server: FastifyInstance) {
       return reply.status(500).send({ error: "Internal server error" });
     }
   });
-
-<<<<<<< HEAD
   // ── Billing & Subscription Routes ────────────────────────────
   const { registerCheckoutRoutes } = await import("../commercial/api/checkoutRoutes");
   await registerCheckoutRoutes(server);
