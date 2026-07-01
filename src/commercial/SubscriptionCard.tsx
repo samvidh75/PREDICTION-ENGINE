@@ -60,7 +60,7 @@ export function SubscriptionCard({
         const options = {
           key: import.meta.env.VITE_RAZORPAY_KEY_ID,
           subscription_id: session.sessionId,
-          name: "StockStory",
+          name: "StockEX",
           description: `Research ${planId === "plan_pro_299" ? "Pro" : "Plus"} — ₹${session.plan.priceInr}/mo`,
           image: "/logo.png",
           handler: () => {

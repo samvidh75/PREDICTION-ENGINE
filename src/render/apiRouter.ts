@@ -1,5 +1,5 @@
 /**
- * apiRouter.ts — Fastify API routes for Lensory
+ * apiRouter.ts — Fastify API routes for StockEX
  *
  * Serves the same /api/* endpoints that Vercel serverless functions used to.
  * Uses real Yahoo Finance data with deterministic fallbacks.
@@ -1625,4 +1625,12 @@ export default async function registerApiRoutes(server: FastifyInstance) {
   // ── Billing & Subscription Routes ────────────────────────────
   const { registerCheckoutRoutes } = await import("../commercial/api/checkoutRoutes.js");
   await registerCheckoutRoutes(server);
+
+  // ── Analytics Dashboard Routes ───────────────────────────────
+  const { registerAnalyticsRoutes } = await import("../commercial/api/analyticsRoutes.js");
+  await registerAnalyticsRoutes(server);
+
+  // ── Scanner Alert Broadcast Routes ───────────────────────────
+  const { registerAlertRoutes } = await import("../commercial/api/alertRoutes.js");
+  await registerAlertRoutes(server);
 }

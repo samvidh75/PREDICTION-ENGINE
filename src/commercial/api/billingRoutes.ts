@@ -159,7 +159,7 @@ export default async function registerBillingRoutes(server: FastifyInstance) {
           key: process.env.VITE_RAZORPAY_KEY_ID ?? process.env.RAZORPAY_KEY_ID ?? "",
           amount: plan.priceInr * 100,
           currency: "INR",
-          name: "Equity Lens",
+          name: "StockEX",
           description: plan.name,
           plan: { id: plan.id, name: plan.name, tier: plan.tier, priceInr: plan.priceInr },
         });

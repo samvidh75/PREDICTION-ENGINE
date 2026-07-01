@@ -42,11 +42,11 @@ export const IS_PROD_ENVIRONMENT: boolean = !IS_DEV_ENVIRONMENT;
 
 /** Canonical SEO values */
 export const SEO = {
-  siteName: "Equity Lens",
+  siteName: "StockEX",
   domain: APP_DOMAIN,
   origin: APP_ORIGIN,
-  twitterHandle: "@EquityLensIndia",
+  twitterHandle: "@StockEXIndia",
   defaultDescription:
-    "Equity Lens — AI-powered investor intelligence for the Indian stock market. Discover, analyse and track NSE/BSE equities with real-time data.",
+    "StockEX — AI-powered investor intelligence for the Indian stock market. Discover, analyse and track NSE/BSE equities with real-time data.",
   defaultImage: `https://${APP_DOMAIN}/og-image.png`,
 } as const;

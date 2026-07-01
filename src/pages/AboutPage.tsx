@@ -46,7 +46,7 @@ const TEAM = [
 const MILESTONES = [
   { year: "2023 Q3", title: "The idea", body: "Samvidh noticed how hard it was to research Indian stocks without getting lost in data vomit. The spark lit." },
   { year: "2024 Q1", title: "First prototype", body: "A bare-bones scanner with 3 presets. Shared in a WhatsApp group — 47 users in 24 hours." },
-  { year: "2024 Q3", title: "Public launch", body: "Equity Lens goes public with health scores, alerts, and thesis tracking. 2,000+ MAU within a month." },
+  { year: "2024 Q3", title: "Public launch", body: "StockEX goes public with health scores, alerts, and thesis tracking. 2,000+ MAU within a month." },
   { year: "2025 Q1", title: "Compare & Track", body: "Side-by-side comparisons, conviction badges, and the Track module launch. 10,000+ MAU." },
   { year: "2025 Q3", title: "What's next?", body: "AI-powered thesis generation, portfolio heatmaps, and community ratings. Stay tuned." },
 ];
@@ -105,7 +105,7 @@ const FOOTER_COLUMNS = [
     title: "Support",
     links: [
       { label: "Help Centre", href: "/support" },
-      { label: "Contact Us", href: "mailto:hello@stockstory.org" },
+      { label: "Contact Us", href: "mailto:hello@stockex.com" },
       { label: "Feature Requests", href: "/feedback" },
       { label: "Report a Bug", href: "/feedback?type=bug" },
     ],
@@ -175,7 +175,7 @@ export default function AboutPage() {
           >
             <Sparkles size={14} color={colors.mute} />
             <span style={{ fontSize: 13, fontWeight: 500, color: colors.mute }}>
-              About Equity Lens
+              About StockEX
             </span>
           </div>
           <h1
@@ -209,7 +209,7 @@ export default function AboutPage() {
               margin: 0,
             }}
           >
-            Equity Lens helps retail investors research Indian stocks through clean, conviction-driven tools — 
+            StockEX helps retail investors research Indian stocks through clean, conviction-driven tools — 
             health scores, side-by-side comparisons, and thesis tracking. No noise. No fluff.
           </p>
           <div style={{ display: "flex", gap: space[3], flexWrap: "wrap", justifyContent: "center" }}>
@@ -380,7 +380,7 @@ export default function AboutPage() {
             }}
           >
             We believe every retail investor deserves the same quality of research tools that institutions have. 
-            Equity Lens distils complex financial data into clear signals, so you spend less time sifting and 
+            StockEX distils complex financial data into clear signals, so you spend less time sifting and 
             more time understanding.
           </p>
         </Card>
@@ -765,7 +765,7 @@ export default function AboutPage() {
           >
             <div style={{ display: "flex", alignItems: "center", gap: space[3] }}>
               <span style={{ fontSize: "13px", fontWeight: 700, color: colors.ink }}>
-                Equity Lens
+                StockEX
               </span>
               <span style={{ fontSize: "12px", color: colors.mute }}>
                 © {new Date().getFullYear()} For educational purposes only.
@@ -781,7 +781,7 @@ export default function AboutPage() {
               <a href="https://github.com" target="_blank" rel="noopener noreferrer" style={{ color: colors.mute }}>
                 <Github size={16} />
               </a>
-              <a href="mailto:hello@stockstory.org" style={{ color: colors.mute }}>
+              <a href="mailto:hello@stockex.com" style={{ color: colors.mute }}>
                 <Mail size={16} />
               </a>
             </div>

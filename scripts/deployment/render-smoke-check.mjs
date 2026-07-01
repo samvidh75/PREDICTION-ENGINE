@@ -2,7 +2,7 @@
 /**
  * render-smoke-check.mjs
  *
- * Post-deployment smoke test for Equity Lens on Render.
+ * Post-deployment smoke test for StockEX on Render.
  * Verifies the live backend is running the expected commit,
  * health endpoints respond, DB is connected, and static assets are served.
  *
@@ -95,7 +95,7 @@ async function main() {
   try {
     const res = await fetch(BASE_URL, { signal: AbortSignal.timeout(15_000) });
     const html = await res.text();
-    if (html.includes("<title>") || html.includes("Equity Lens")) {
+    if (html.includes("<title>") || html.includes("StockEX")) {
       console.log(`  ${PASS}  [${res.status}] SPA index.html served`);
     } else {
       console.log(`  ${FAIL}  [${res.status}] SPA index.html missing expected content`);
