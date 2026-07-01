@@ -11,7 +11,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { EntitlementService, entitlementService } from "./EntitlementService";
-import type { EntitlementCheck, ResolvedEntitlements, EntitlementStoreState } from "./entitlementTypes";
+import type { EntitlementCheck, ResolvedEntitlements, EntitlementStoreState, UserSubscription } from "./entitlementTypes";
 import type { FeatureKey } from "./plans";
 
 // Singleton service instance
@@ -41,9 +41,28 @@ class Store {
     this.notify();
 
     try {
-      // In production: fetch user_subscription from API / DB
-      // For now, resolve as free (no subscription)
-      const sub = null; // await fetchUserSubscription(userId);
+      // Fetch subscription from the billing API
+      const token = await this.getIdToken();
+      const res = await fetch("/api/checkout/subscription-status", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      let sub: UserSubscription | null = null;
+      if (res.ok) {
+        const data = await res.json();
+        if (data.tier && data.tier !== "free") {
+          sub = {
+            userId: data.userId ?? "",
+            planId: data.planId,
+            tier: data.tier,
+            status: data.status,
+            startedAt: data.currentPeriodStart ?? Date.now(),
+            expiresAt: data.currentPeriodEnd ?? null,
+            autoRenew: data.autoRenew ?? true,
+          };
+        }
+      }
+
       const entitlements = service.resolve(sub);
       this.state = {
         loaded: true,
@@ -62,6 +81,28 @@ class Store {
       };
     }
     this.notify();
+  }
+
+  /**
+   * Retrieve a Firebase ID token from the auth context.
+   * Falls back to localStorage token for development.
+   */
+  private async getIdToken(): Promise<string> {
+    // Try Firebase auth instance on window (set by App.tsx or auth provider)
+    try {
+      const { getAuth } = await import("firebase/auth");
+      const auth = getAuth();
+      if (auth.currentUser) {
+        return await auth.currentUser.getIdToken();
+      }
+    } catch {
+      // Firebase SDK not available in this context
+    }
+    // Dev fallback: check for stored token
+    if (typeof localStorage !== "undefined") {
+      return localStorage.getItem("firebase_id_token") ?? "";
+    }
+    return "";
   }
 
   subscribe(listener: Listener): () => void {

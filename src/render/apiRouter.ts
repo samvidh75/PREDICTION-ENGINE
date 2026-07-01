@@ -34,6 +34,7 @@ import { getNotificationSnapshot, acknowledgeAll } from "../services/personaliza
 import { usageLimits } from "../commercial/UsageLimits.js";
 import type { UsageMetric } from "../commercial/UsageLimits.js";
 import { dbAdapter } from "../db/DatabaseAdapter.js";
+import registerBillingRoutes from "../commercial/api/billingRoutes.js";
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -1616,4 +1617,7 @@ export default async function registerApiRoutes(server: FastifyInstance) {
       return reply.status(500).send({ error: "Internal server error" });
     }
   });
+
+  // ── Billing / Checkout ─────────────────────────────────────────────
+  await registerBillingRoutes(server);
 }
