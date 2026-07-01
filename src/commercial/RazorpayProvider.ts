@@ -68,7 +68,7 @@ export class RazorpayProvider implements PaymentProvider {
       body: JSON.stringify({
         period: "monthly",
         interval: 1,
-        item: { name: req.planId, amount: 29900, currency: "INR" },
+        item: { name: req.planName, amount: req.amount * 100, currency: "INR" },
       } satisfies Omit<RazorpayPlan, "id">),
     });
 
