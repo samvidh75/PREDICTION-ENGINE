@@ -1,4 +1,4 @@
-export type LLMGatewayMode = 'deterministic' | 'disabled' | 'mock';
+export type LLMGatewayMode = 'deterministic' | 'disabled' | 'mock' | 'ollama';
 
 export interface LLMGatewayConfig {
   mode: LLMGatewayMode;
