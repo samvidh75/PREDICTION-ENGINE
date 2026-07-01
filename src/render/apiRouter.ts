@@ -1721,4 +1721,8 @@ export default async function registerApiRoutes(server: FastifyInstance) {
   // ── Ops / Admin Telemetry Routes ─────────────────────────────
   const { registerOpsRoutes } = await import("../commercial/api/opsRoutes.js");
   await registerOpsRoutes(server);
+
+  // ── Trading Ledger Routes (Phase 46) ─────────────────────────
+  const { registerLedgerRoutes } = await import("../commercial/api/ledgerRoutes.js");
+  await registerLedgerRoutes(server);
 }
