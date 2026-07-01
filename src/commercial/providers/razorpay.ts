@@ -255,7 +255,7 @@ export class RazorpayPaymentProvider implements PaymentProvider {
       period: "monthly" as const,
       interval: 1,
       item: {
-        name: `Equity Lens - ${plan.name}`,
+        name: `StockEX - ${plan.name}`,
         amount: amountInPaise,
         currency: "INR",
         description: `${plan.name} — ${plan.highlights.slice(0, 2).join(", ")}`,

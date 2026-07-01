@@ -99,7 +99,7 @@ const FOOTER_COLUMNS = [
   {
     title: "Resources",
     links: [
-      { label: "Equity Lens Trust", href: "/trust" },
+      { label: "StockEX Trust", href: "/trust" },
       { label: "Disclaimer", href: "/trust" },
       { label: "Privacy", href: "/trust" },
       { label: "Terms of Use", href: "/trust" },
@@ -111,7 +111,7 @@ const FOOTER_COLUMNS = [
       { label: "Twitter / X", href: "https://x.com" },
       { label: "LinkedIn", href: "https://linkedin.com" },
       { label: "GitHub", href: "https://github.com" },
-      { label: "Contact", href: "mailto:hello@stockstory.org" },
+      { label: "Contact", href: "mailto:hello@stockex.com" },
       { label: "Report an issue", href: "https://github.com" },
     ],
   },
@@ -853,7 +853,7 @@ export default function HomePage() {
               background: "linear-gradient(135deg, #fff 30%, rgba(255,255,255,0.6) 100%)",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
-            }}>Equity Lens</span>
+            }}>StockEX</span>
             <span style={{ fontSize: 12, color: colors.body }}>
               © {new Date().getFullYear()} · educational purposes only
             </span>
@@ -863,7 +863,7 @@ export default function HomePage() {
               { icon: Twitter, href: "https://x.com", label: "X / Twitter" },
               { icon: Linkedin, href: "https://linkedin.com", label: "LinkedIn" },
               { icon: Github, href: "https://github.com", label: "GitHub" },
-              { icon: Mail, href: "mailto:hello@stockstory.org", label: "Contact us" },
+              { icon: Mail, href: "mailto:hello@stockex.com", label: "Contact us" },
             ].map(({ icon: Icon, href, label }) => (
               <a
                 key={href}

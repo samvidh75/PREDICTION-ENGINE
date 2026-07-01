@@ -1,7 +1,7 @@
 /**
  * src/config/firebase.ts
  *
- * Canonical Firebase client configuration for Equity Lens.
+ * Canonical Firebase client configuration for StockEX.
  *
  * Known project values (projectId, authDomain, storageBucket) are hardcoded.
  * Secret values (apiKey, messagingSenderId, appId) are read from VITE_* env vars.
@@ -66,7 +66,7 @@ function assertFirebaseEnv(): void {
 
   if (missing.length > 0) {
     const msg =
-      `[Equity Lens Firebase] Missing required environment variables: ${missing.join(", ")}.\n` +
+      `[StockEX Firebase] Missing required environment variables: ${missing.join(", ")}.\n` +
       `Get them from: https://console.firebase.google.com/project/${PROJECT_ID}/settings/general`;
 
     console.warn(msg);

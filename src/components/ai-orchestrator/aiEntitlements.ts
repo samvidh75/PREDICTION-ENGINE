@@ -1,5 +1,5 @@
 /**
- * aiEntitlements — AI feature entitlement policy for Equity Lens.
+ * aiEntitlements — AI feature entitlement policy for StockEX.
  *
  * Wraps/complements the commercial entitlement system (useEntitlements)
  * with AI-specific checks.  Uses FeatureGate keys from plans.ts to gate

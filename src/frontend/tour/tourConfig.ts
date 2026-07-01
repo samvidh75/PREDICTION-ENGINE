@@ -15,11 +15,11 @@ export interface TourConfig {
 
 const WELCOME_TOUR: TourConfig = {
   id: "welcome",
-  name: "Welcome to Equity Lens",
+  name: "Welcome to StockEX",
   description: "A quick tour of the research platform.",
   dismissible: true,
   steps: [
-    { target: "#hero-section", title: "Research-Driven Analysis", content: "Equity Lens helps you research Indian equities with structured scorecards, not tips or recommendations.", placement: "bottom" },
+    { target: "#hero-section", title: "Research-Driven Analysis", content: "StockEX helps you research Indian equities with structured scorecards, not tips or recommendations.", placement: "bottom" },
     { target: ".scanner-section", title: "Research Scanner", content: "Screen companies by research criteria — quality, value, momentum, and more.", placement: "top" },
     { target: ".sector-section", title: "Sector Research", content: "Explore companies by sector with score distributions and peer comparisons.", placement: "top" },
   ],

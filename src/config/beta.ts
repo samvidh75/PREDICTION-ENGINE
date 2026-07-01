@@ -1,7 +1,7 @@
 /**
  * src/config/beta.ts
  *
- * Beta mode configuration for Equity Lens.
+ * Beta mode configuration for StockEX.
  * Controls public access, feature gates, and beta lifecycle.
  *
  * Modes:
@@ -147,7 +147,7 @@ const MODE_LABELS: Record<BetaMode, string> = {
   closed: "Development",
   waitlist: "Private Beta",
   open: "Open Beta",
-  public: "Equity Lens",
+  public: "StockEX",
 };
 
 /**

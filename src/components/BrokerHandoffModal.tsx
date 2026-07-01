@@ -7,7 +7,7 @@
  *  3. Risk acknowledgment checkbox
  *  4. "Continue with broker" CTA
  *
- * Equity Lens does NOT place trades, charge brokerage, or handle funds.
+ * StockEX does NOT place trades, charge brokerage, or handle funds.
  */
 
 import { useState } from "react";
@@ -130,7 +130,7 @@ export function BrokerHandoffModal({
             style={{ marginTop: "3px", accentColor: colors.primary }}
           />
           <span>
-            I understand that Equity Lens provides only research analysis and does not execute trades.
+            I understand that StockEX provides only research analysis and does not execute trades.
             All order placement and execution will happen on {broker.name}'s platform.
             I have reviewed the research and accept the risks involved.
           </span>

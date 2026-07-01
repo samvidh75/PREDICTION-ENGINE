@@ -224,7 +224,7 @@ export default function AIChatPage() {
           id: "welcome",
           role: "assistant",
           content:
-            "👋 Hi! I'm Equity Lens AI — your equity research analyst.\n\nI can help you with:\n• **Stock analysis** — bull/bear cases, 8-factor scoring\n• **Screening** — find stocks matching your criteria\n• **Comparisons** — side-by-side peer analysis\n• **Market context** — sector trends, macro signals\n• **Portfolio insights** — conviction tracking, risk\n\nAsk me anything about Indian equities!",
+            "👋 Hi! I'm StockEX AI — your equity research analyst.\n\nI can help you with:\n• **Stock analysis** — bull/bear cases, 8-factor scoring\n• **Screening** — find stocks matching your criteria\n• **Comparisons** — side-by-side peer analysis\n• **Market context** — sector trends, macro signals\n• **Portfolio insights** — conviction tracking, risk\n\nAsk me anything about Indian equities!",
           timestamp: Date.now(),
         },
       ],
@@ -474,7 +474,7 @@ export default function AIChatPage() {
               color: colors.textTertiary,
             }}
           >
-            Equity Lens AI may make mistakes. Verify critical data before investing.
+            StockEX AI may make mistakes. Verify critical data before investing.
           </div>
         </div>
       </main>

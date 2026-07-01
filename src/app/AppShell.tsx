@@ -67,7 +67,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       <aside className="rail">
         <NavLink to="/" style={brandLinkStyle}>
           <BrandMark size={44} />
-          <span>Equity Lens</span>
+          <span>StockEX</span>
         </NavLink>
         <nav style={navStackStyle} aria-label="Primary">
           {NAV.map((item) => (
@@ -126,7 +126,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       <header className="mobile-brand" style={{ justifyContent: "space-between" }}>
         <NavLink to="/" style={mobileBrandLinkStyle}>
           <BrandMark size={36} />
-          <span>Equity Lens</span>
+          <span>StockEX</span>
         </NavLink>
         <div style={{ display: "flex", alignItems: "center", gap: space[3] }}>
           <ResearchProfileModal />
@@ -159,7 +159,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           lineHeight: "1.6",
         }}>
           <p>
-            © 2026 Equity Lens. <strong>Not SEBI-registered</strong>. This service provides analysis for educational purposes only. Algorithms may contain errors. Data delayed 1-15 minutes. Consult a SEBI-registered investment advisor before investing. Past performance does not guarantee future results.
+            © 2026 StockEX. <strong>Not SEBI-registered</strong>. This service provides analysis for educational purposes only. Algorithms may contain errors. Data delayed 1-15 minutes. Consult a SEBI-registered investment advisor before investing. Past performance does not guarantee future results.
           </p>
         </footer>
       </main>

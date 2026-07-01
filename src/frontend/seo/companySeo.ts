@@ -15,7 +15,7 @@ export function buildCompanySeo(
     : `Research-driven analysis of ${name} (${symbol}). Scorecard, thesis, risks, and peer context. Not investment advice.`;
 
   return {
-    title: `${name} (${symbol}) — Research Analysis | Equity Lens`,
+    title: `${name} (${symbol}) — Research Analysis | StockEX`,
     description: desc,
     canonical: `/stocks/${symbol}`,
     ogImage: `/og/company-${symbol}.png`,

@@ -197,7 +197,7 @@ export function formatSmokeTestResult(result: SmokeTestResult): string {
 }
 
 export async function runSmokeTestFromConsole(): Promise<void> {
-  console.log("%c StockStory Diagnostic Smoke Test", "font-size:18px;font-weight:bold;color:#38bdf8");
+  console.log("%c StockEX Diagnostic Smoke Test", "font-size:18px;font-weight:bold;color:#38bdf8");
   console.log(` Asset: ${SMOKE_TEST_ASSET}`);
   console.log(" Running...");
   console.log("");
