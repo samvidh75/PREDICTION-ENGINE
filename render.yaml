@@ -1,11 +1,11 @@
 # render.yaml
-# Render Blueprint — StockStory India
+# Render Blueprint — StockStory India backend
 # Architecture:
-#   Frontend (SPA) + Backend (API proxy) → Render
-#   API serverless functions → Vercel
+#   Frontend (SPA) → Vercel
+#   Backend (API) → Render
 #   Database → Neon (PostgreSQL)
 #   Cache → Upstash (Redis)
-# Deploys both the SPA (from dist/) and API proxy on Render free tier.
+# Deploys the backend API service on Render.
 #
 # ── Required Environment Variables (set in Render Dashboard) ───────────
 #   DATABASE_URL    → Neon PostgreSQL connection string
@@ -19,13 +19,13 @@
 
 services:
   - type: web
-    name: stockstory-app
+    name: stockstory-api
     runtime: node
     region: singapore
     plan: free
     branch: main
-    buildCommand: NODE_ENV=development npm ci && npm run build:docker
-    startCommand: npm start
+    buildCommand: NODE_ENV=development npm ci && npm run build:render
+    startCommand: npm run start:render
     healthCheckPath: /healthz
     autoDeploy: true
 
@@ -45,10 +45,6 @@ services:
         value: Asia/Kolkata
       - key: NODE_OPTIONS
         value: --max-old-space-size=512
-
-      # ── API Proxy: Vercel deployment hosting /api/* serverless fns ────
-      - key: VERCEL_API_URL
-        sync: false
 
       # ── Self origin (for CORS when accessed via onrender.com domain) ──
       - key: SELF_ORIGIN
