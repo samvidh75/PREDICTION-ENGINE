@@ -668,7 +668,7 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
         <CardLabel>Key metrics</CardLabel>
         <div className="stock-metric-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "16px" }}>
           <MetricCard label="Market Cap" value={`₹${formatInr(Math.round(stock.price.marketCap))} Cr`} />
-          <MetricCard label="PE (TTM)" value={fundamentals.pe?.toFixed(1) ?? "—"}
+          <MetricCard label="PE (TTM)" value={formatDecimal(fundamentals.pe, 1)}
             trend={fundamentals.pe != null && fundamentals.pe < 20 ? "up" : fundamentals.pe != null && fundamentals.pe > 30 ? "down" : "neutral"}
             subtitle={fundamentals.industryPe != null ? `Sector: ${formatDecimal(fundamentals.industryPe, 1)}` : sectorRelMap["pe"] ? `Sector: ${sectorRelMap["pe"]}` : undefined} />
           <MetricCard label="PB Ratio" value={formatDecimal(fundamentals.pb, 1)}
