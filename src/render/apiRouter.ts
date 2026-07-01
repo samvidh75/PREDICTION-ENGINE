@@ -4,7 +4,7 @@
  * Serves the same /api/* endpoints that Vercel serverless functions used to.
  * Uses real Yahoo Finance data with deterministic fallbacks.
  */
-import type { FastifyInstance } from "fastify";
+import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
 import { StockUniverseAdapter } from "../services/data/providers/StockUniverseAdapter.js";
 import { getPersistedStockResearch } from "../lib/stockResearchSnapshot.js";
 import { financialEngine } from "../services/intelligence/engines/FinancialEngine/index.js";
@@ -466,9 +466,11 @@ export default async function registerApiRoutes(server: FastifyInstance) {
   await registerAnalystRoutes(server);
   // Register intelligence quality gate (sanitizes all /api/intelligence/* responses)
   await server.register(intelligenceQualityGate);
-  // GET /api/stock?symbol=TCS
-  server.get("/api/stock", async (req, reply) => {
-    const symbol = String((req.query as any)?.symbol ?? "").toUpperCase().trim();
+  // Shared stock detail handler — supports both ?symbol=TCS and /api/stock/TCS
+  async function stockHandler(req: FastifyRequest, reply: FastifyReply) {
+    const symbol = String(
+      (req.query as any)?.symbol ?? (req.params as any)?.symbol ?? ""
+    ).toUpperCase().trim();
     if (!symbol) return reply.status(400).send({ error: "symbol required" });
 
     // Normalize exchange-prefixed symbols (BSE502865 → clean=502865, suffix=BO)
@@ -565,7 +567,11 @@ export default async function registerApiRoutes(server: FastifyInstance) {
     stockCache.set(symbol, { data: payload, expiresAt: Date.now() + CACHE_TTL });
     reply.header("Cache-Control", "public, s-maxage=300");
     return payload;
-  });
+  }
+
+  // GET /api/stock?symbol=TCS  or  /api/stock/TCS
+  server.get("/api/stock", stockHandler);
+  server.get("/api/stock/:symbol", stockHandler);
 
   // GET /api/company-master?symbol=RELIANCE
   server.get("/api/company-master", async (req, reply) => {
