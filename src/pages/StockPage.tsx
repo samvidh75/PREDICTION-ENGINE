@@ -95,6 +95,11 @@ function formatInr(value: number | null | undefined, digits = 0) {
   }).format(value);
 }
 
+function formatDecimal(value: number | null | undefined, digits = 1) {
+  if (value == null || Number.isNaN(value)) return "—";
+  return value.toFixed(digits);
+}
+
 // ── Sticky Header (48px, shows on scroll past hero) ─────────────
 function StickyHeader({ symbol, price, changeAbs, changePercent, trendColor }: {
   symbol: string; price: number; changeAbs: number; changePercent: number; trendColor: string;
@@ -120,7 +125,7 @@ function StickyHeader({ symbol, price, changeAbs, changePercent, trendColor }: {
         </PriceFlash>
         <span style={{ color: trendColor, fontSize: "13px", fontWeight: 500, display: "inline-flex", alignItems: "center", gap: "4px" }}>
           {isUp ? <ArrowUp size={12} /> : <ArrowDown size={12} />}
-          {isUp ? "+" : ""}{changeAbs.toFixed(2)} ({changePercent.toFixed(2)}%)
+          {isUp ? "+" : ""}{formatDecimal(changeAbs, 2)} ({formatDecimal(changePercent, 2)}%)
         </span>
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: "4px", color: colors.textTertiary, fontSize: "12px" }}>
@@ -148,7 +153,7 @@ function HeroSection({ stock, isUp, trendColor }: { stock: StockResearchDetail; 
       <div style={{ display: "flex", alignItems: "center", gap: "12px", marginTop: "12px", flexWrap: "wrap", justifyContent: "center" }}>
         <div style={{ color: trendColor, fontSize: "18px", fontWeight: 600, display: "inline-flex", alignItems: "center", gap: "6px" }}>
           {isUp ? <ArrowUp size={20} /> : <ArrowDown size={20} />}
-          {isUp ? "+" : ""}{stock.price.changeAbs.toFixed(2)} ({stock.price.changePercent.toFixed(2)}%)
+          {isUp ? "+" : ""}{formatDecimal(stock.price.changeAbs, 2)} ({formatDecimal(stock.price.changePercent, 2)}%)
         </div>
         <div className="raycast-badgePulse" style={{
           display: "inline-flex", alignItems: "center", gap: "6px", padding: "6px 14px",
@@ -616,22 +621,22 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
           <MetricCard label="Market Cap" value={`₹${formatInr(Math.round(stock.price.marketCap))} Cr`} />
           <MetricCard label="PE (TTM)" value={fundamentals.pe?.toFixed(1) ?? "—"}
             trend={fundamentals.pe != null && fundamentals.pe < 20 ? "up" : fundamentals.pe != null && fundamentals.pe > 30 ? "down" : "neutral"}
-            subtitle={fundamentals.industryPe != null ? `Sector: ${fundamentals.industryPe.toFixed(1)}` : sectorRelMap["pe"] ? `Sector: ${sectorRelMap["pe"]}` : undefined} />
-          <MetricCard label="PB Ratio" value={fundamentals.pb?.toFixed(1) ?? "—"}
+            subtitle={fundamentals.industryPe != null ? `Sector: ${formatDecimal(fundamentals.industryPe, 1)}` : sectorRelMap["pe"] ? `Sector: ${sectorRelMap["pe"]}` : undefined} />
+          <MetricCard label="PB Ratio" value={formatDecimal(fundamentals.pb, 1)}
             trend={fundamentals.pb != null && fundamentals.pb < 3 ? "up" : fundamentals.pb != null && fundamentals.pb > 5 ? "down" : "neutral"} />
-          <MetricCard label="ROE" value={stock.roe != null ? `${stock.roe.toFixed(1)}%` : "—"}
+          <MetricCard label="ROE" value={stock.roe != null ? `${formatDecimal(stock.roe, 1)}%` : "—"}
             trend={stock.roe != null && stock.roe > 15 ? "up" : stock.roe != null ? "down" : "neutral"}
             subtitle={sectorRelMap["roe"] ? `Sector: ${sectorRelMap["roe"]}` : undefined} />
-          <MetricCard label="Debt/Equity" value={stock.debtToEquity != null ? stock.debtToEquity.toFixed(2) : "—"}
+          <MetricCard label="Debt/Equity" value={formatDecimal(stock.debtToEquity, 2)}
             trend={stock.debtToEquity != null && stock.debtToEquity < 0.5 ? "up" : stock.debtToEquity != null && stock.debtToEquity > 1 ? "down" : "neutral"} />
-          <MetricCard label="Dividend Yield" value={fundamentals.dividendYield != null ? `${fundamentals.dividendYield.toFixed(2)}%` : "—"}
+          <MetricCard label="Dividend Yield" value={fundamentals.dividendYield != null ? `${formatDecimal(fundamentals.dividendYield, 2)}%` : "—"}
             trend={fundamentals.dividendYield != null && fundamentals.dividendYield > 1 ? "up" : "neutral"} />
-          <MetricCard label="Revenue Growth" value={stock.revenueGrowth != null ? `${stock.revenueGrowth.toFixed(1)}%` : "—"}
+          <MetricCard label="Revenue Growth" value={stock.revenueGrowth != null ? `${formatDecimal(stock.revenueGrowth, 1)}%` : "—"}
             trend={stock.revenueGrowth != null && stock.revenueGrowth > 10 ? "up" : stock.revenueGrowth != null ? "down" : "neutral"}
             subtitle={sectorRelMap["revenue growth"] ? `Sector: ${sectorRelMap["revenue growth"]}` : undefined} />
-          <MetricCard label="Profit Growth" value={stock.profitGrowth != null ? `${stock.profitGrowth.toFixed(1)}%` : "—"}
+          <MetricCard label="Profit Growth" value={stock.profitGrowth != null ? `${formatDecimal(stock.profitGrowth, 1)}%` : "—"}
             trend={stock.profitGrowth != null && stock.profitGrowth > 10 ? "up" : stock.profitGrowth != null ? "down" : "neutral"} />
-          <MetricCard label="EPS (TTM)" value={fundamentals.eps != null ? `₹${fundamentals.eps.toFixed(1)}` : "—"} />
+          <MetricCard label="EPS (TTM)" value={fundamentals.eps != null ? `₹${formatDecimal(fundamentals.eps, 1)}` : "—"} />
           <MetricCard label="RSI (14)" value={stock.rsi != null ? String(stock.rsi) : "—"}
             trend={stock.rsi != null && stock.rsi >= 30 && stock.rsi <= 70 ? "neutral" : "down"} />
           <MetricCard label="52W High" value={fundamentals.high52w != null ? `₹${formatInr(fundamentals.high52w)}` : "—"} />
@@ -700,7 +705,7 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
               <tbody>
                 {effectiveChartData.map((entry, idx) => {
                   const prev = effectiveChartData[idx + 1];
-                  const growth = prev ? ((entry.value - prev.value) / prev.value * 100).toFixed(1) : null;
+                  const growth = prev ? formatDecimal(((entry.value - prev.value) / prev.value) * 100, 1) : null;
                   return (
                     <tr key={entry.period} style={{ borderBottom: `1px solid ${colors.border}` }}>
                       <td style={{ padding: "8px", color: colors.textPrimary }}>{entry.period}</td>
@@ -752,7 +757,7 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
                 <div style={{ display: "flex", justifyContent: "space-between", gap: "12px" }}>
                   <span style={{ fontSize: "13px", color: colors.textPrimary }}>{item.label}</span>
                   <span style={{ display: "inline-flex", alignItems: "center", gap: "4px", color: positive ? colors.success : colors.danger, fontSize: "13px" }}>
-                    {positive ? <ArrowUp size={14} /> : <ArrowDown size={14} />}{item.value.toFixed(1)}%
+                    {positive ? <ArrowUp size={14} /> : <ArrowDown size={14} />}{formatDecimal(item.value, 1)}%
                   </span>
                 </div>
                 <div style={{ height: "8px", background: colors.border, borderRadius: radius.lg, overflow: "hidden" }}>
