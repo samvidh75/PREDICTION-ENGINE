@@ -24,8 +24,8 @@ services:
     region: singapore
     plan: free
     branch: main
-    buildCommand: NODE_ENV=development npm ci && npm run build:docker
-    startCommand: npm start
+    buildCommand: npm ci --include=dev && npm run render:build
+    startCommand: npm run render:start
     healthCheckPath: /healthz
     autoDeploy: true
 

@@ -28,7 +28,7 @@ export const APP_ORIGIN: string =
 /** Full base URL for API requests (used by fetch / axios callers) */
 export const API_BASE_URL: string =
   import.meta.env.VITE_API_BASE_URL ??
-  (IS_PROD ? "https://stockstory-india.com/api" : "/api");
+  (IS_PROD ? "/api" : "/api");
 
 /** Whether the app is running in a local dev environment */
 export const IS_DEV_ENVIRONMENT: boolean =

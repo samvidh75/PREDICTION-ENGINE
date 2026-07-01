@@ -11,7 +11,7 @@ import Fastify from "fastify";
 import cors from "@fastify/cors";
 import { fileURLToPath } from "url";
 import { dirname, join, extname } from "path";
-import { existsSync, readFile } from "fs";
+import { existsSync, readFile, readFileSync } from "fs";
 import { dbAdapter } from "../db/DatabaseAdapter";
 import { MigrationRunner } from "../db/MigrationRunner";
 import registerApiRoutes from "./apiRouter.js";
@@ -24,6 +24,26 @@ const __dirname = dirname(__filename);
 const PORT = parseInt(process.env.PORT ?? "10000", 10);
 const HOST = process.env.HOST ?? "0.0.0.0";
 const SELF_ORIGIN = process.env.SELF_ORIGIN ?? "https://stockstory-api.onrender.com";
+const BUILD_TIME = __filename.includes("node_modules") ? "" : __filename;
+
+// ── Capture deploy commit & build timestamp at import time ─────────────
+const GIT_HEAD: string = (() => {
+  try {
+    return readFileSync(join(__dirname, "..", "..", ".git", "HEAD"), "utf-8").trim();
+  } catch { return "unknown"; }
+})();
+const COMMIT_SHA: string = (() => {
+  try {
+    // HEAD might be a ref like "ref: refs/heads/main"
+    if (GIT_HEAD.startsWith("ref: ")) {
+      const refPath = GIT_HEAD.slice(5).trim();
+      const ref = readFileSync(join(__dirname, "..", "..", ".git", refPath), "utf-8").trim();
+      return ref;
+    }
+    return GIT_HEAD;
+  } catch { return "unknown"; }
+})();
+const BUILD_ISO: string = new Date().toISOString();
 
 // ── Lightweight metrics for /metrics endpoint ────────────────────
 const metrics = {
@@ -187,13 +207,12 @@ async function bootstrap() {
   });
 
   server.get("/version", async () => {
+    const { readdirSync } = await import("fs");
     const distPath = join(process.cwd(), "dist", "public");
-    const indexPath = join(distPath, "index.html");
     let indexExists = false;
     let distFiles: string[] = [];
     try {
       indexExists = existsSync(indexPath);
-      const { readdirSync } = await import("fs");
       distFiles = readdirSync(distPath).slice(0, 20);
     } catch {
       // ignore — distPath may not exist on first deploy
@@ -208,8 +227,34 @@ async function bootstrap() {
       distPath,
       indexExists,
       distFiles,
+      commitSha: COMMIT_SHA,
+      commitShaShort: COMMIT_SHA.length > 8 ? COMMIT_SHA.slice(0, 8) : COMMIT_SHA,
+      buildTime: BUILD_ISO,
+      uptimeSeconds: Math.floor((Date.now() - metrics.startTime) / 1000),
     };
   });
+
+  // ── /api/health: same as /healthz but under /api namespace ─────────
+  server.get("/api/health", async () => {
+    try {
+      await dbAdapter.query("SELECT 1");
+      return { ok: true, status: "ok", db: "connected", commitSha: COMMIT_SHA.slice(0, 8) };
+    } catch {
+      return { ok: false, status: "degraded", db: "unavailable", commitSha: COMMIT_SHA.slice(0, 8) };
+    }
+  });
+
+  // ── /api/version: same as /version but under /api namespace ────────
+  server.get("/api/version", async () => ({
+    name: "equity-lens-api",
+    version: "1.0.0",
+    commitSha: COMMIT_SHA,
+    commitShaShort: COMMIT_SHA.slice(0, 8),
+    nodeVersion: process.version,
+    env: process.env.NODE_ENV ?? "development",
+    buildTime: BUILD_ISO,
+    uptimeSeconds: Math.floor((Date.now() - metrics.startTime) / 1000),
+  }));
 
   // ── Data adapter initialization ────────────────────────────────────
   const adaptedRegistry = defaultDataAdapterRegistry;
@@ -364,6 +409,7 @@ async function bootstrap() {
 
   await server.listen({ port: PORT, host: HOST });
   server.log.info(`Render server listening on ${HOST}:${PORT} — SPA served from ${distPath}`);
+  server.log.info(`Deployed commit: ${COMMIT_SHA.slice(0, 8)} | Build time: ${BUILD_ISO} | Node: ${process.version}`);
 
   // ── Warm-up: self-ping to pre-warm DB pool, caches, and connections ─
   server.inject({ method: "GET", url: "/healthz" }).then(res => {
