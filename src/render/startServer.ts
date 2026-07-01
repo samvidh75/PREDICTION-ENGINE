@@ -243,6 +243,23 @@ async function bootstrap() {
     server.log.warn(`PriceRealAdapter init error: ${err}`);
   }
 
+  // ── Raw body parser for webhook HMAC verification ───────────────
+  // Captures the raw JSON payload so Razorpay webhook handlers can
+  // verify HMAC SHA256 signatures before parsing.
+  server.addContentTypeParser(
+    "application/json",
+    { parseAs: "string", bodyLimit: 1024 * 1024 },
+    function (this: any, req: any, body: string, done: (err: Error | null, result?: any) => void) {
+      try {
+        // Store raw body for webhook signature verification
+        (req as any).__rawBody = body;
+        done(null, JSON.parse(body));
+      } catch (err: any) {
+        done(err, undefined);
+      }
+    }
+  );
+
   // ── API routes: /api/stock, /api/search ────────────────────────────
   await registerApiRoutes(server);
 
