@@ -99,3 +99,5 @@ tmp-debug.html
 *.png
 stockstory-demo
 __pycache__/
+data/chroma_db/
+data/training_dataset/
