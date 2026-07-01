@@ -30,6 +30,7 @@ const AdvancedScanner = lazy(() => import("../components/AdvancedScanner"));
 const BillingSuccessPage = lazy(() => import("../pages/BillingSuccessPage"));
 const BillingCancelPage = lazy(() => import("../pages/BillingCancelPage"));
 const OpsDashboard = lazy(() => import("../pages/OpsDashboard"));
+const DashboardPage = lazy(() => import("../pages/DashboardPage"));
 
 function RouteFallback() {
   return (
@@ -79,6 +80,7 @@ export function AppRoutes() {
           <Route path="/billing/success" element={<BillingSuccessPage />} />
           <Route path="/billing/cancel" element={<BillingCancelPage />} />
           <Route path="/ops" element={<OpsDashboard />} />
+          <Route path="/dashboard" element={<DashboardPage />} />
           {enableWaitlistPage && (
             <Route path="/waitlist" element={<WaitlistPage />} />
           )}
