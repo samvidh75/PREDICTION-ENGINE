@@ -27,6 +27,8 @@ const TrackPage = lazy(() => import("../pages/TrackPage"));
 const AIChatPage = lazy(() => import("../pages/AIChatPage"));
 const RelativeStrengthPage = lazy(() => import("../pages/RelativeStrength"));
 const AdvancedScanner = lazy(() => import("../components/AdvancedScanner"));
+const BillingSuccessPage = lazy(() => import("../pages/BillingSuccessPage"));
+const BillingCancelPage = lazy(() => import("../pages/BillingCancelPage"));
 
 function RouteFallback() {
   return (
@@ -73,6 +75,8 @@ export function AppRoutes() {
           <Route path="/chat" element={<AIChatPage />} />
           <Route path="/relative-strength" element={<RelativeStrengthPage />} />
           <Route path="/technical-scanner" element={<AdvancedScanner />} />
+          <Route path="/billing/success" element={<BillingSuccessPage />} />
+          <Route path="/billing/cancel" element={<BillingCancelPage />} />
           {enableWaitlistPage && (
             <Route path="/waitlist" element={<WaitlistPage />} />
           )}

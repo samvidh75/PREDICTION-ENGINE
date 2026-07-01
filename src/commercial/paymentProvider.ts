@@ -31,6 +31,8 @@ export interface PaymentProviderConfig {
 
 export interface CreateCheckoutRequest {
   planId: string;
+  planName: string;
+  amount: number;       // INR (e.g. 99 for ₹99)
   userId: string;
   successUrl: string;
   cancelUrl: string;

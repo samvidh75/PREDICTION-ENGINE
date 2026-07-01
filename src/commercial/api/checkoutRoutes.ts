@@ -54,6 +54,8 @@ export async function registerCheckoutRoutes(fastify: FastifyInstance): Promise<
     try {
       const session = await provider.createCheckout({
         planId,
+        planName: plan.name,
+        amount: plan.priceInr,
         userId,
         successUrl: successUrl ?? `${req.headers.origin}/billing/success`,
         cancelUrl: cancelUrl ?? `${req.headers.origin}/pricing`,

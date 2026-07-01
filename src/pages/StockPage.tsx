@@ -298,6 +298,53 @@ function StockError({ symbol }: { symbol: string }) {
   return <div style={{ color: colors.textPrimary, padding: "40px", textAlign: "center" }}>We could not load research for {symbol}.</div>;
 }
 
+/** Normalize both API and local fallback data to StockPage's StockResearchDetail shape */
+function normalizeStockData(raw: Record<string, any>): StockResearchDetail {
+  return {
+    symbol: raw.symbol ?? "",
+    companyName: raw.companyName ?? "",
+    exchange: raw.exchange ?? "NSE",
+    sector: raw.sector ?? "",
+    industry: raw.industry ?? "",
+    price: raw.price ?? { current: 0, changeAbs: 0, changePercent: 0, marketCap: 0 },
+    fundamentals: raw.fundamentals ?? { pe: null, industryPe: null, pb: null, dividendYield: null, eps: null },
+    roe: raw.roe ?? null,
+    debtToEquity: raw.debtToEquity ?? null,
+    revenueGrowth: raw.revenueGrowth ?? null,
+    profitGrowth: raw.profitGrowth ?? null,
+    rsi: raw.rsi ?? null,
+    scores: raw.scores ?? { quality: null, valuation: null, growth: null, momentum: null, risk: null, health: null, riskAdjusted: null },
+    confidenceMeter: raw.confidenceMeter ?? 0,
+    timeline: raw.timeline ?? [],
+    whatChanged: raw.whatChanged ?? [],
+    sectorRelative: raw.sectorRelative ?? [],
+    // Map sectorRelative → sectorComparison when missing
+    sectorComparison: raw.sectorComparison ?? (raw.sectorRelative ?? []).map((item: any) => ({
+      company: item.company,
+      value: item.sectorMedian ?? item.value ?? "",
+      percentile: parseInt(item.sectorMedian ?? item.value) || 0,
+      metric: item.label ?? item.metric ?? "",
+    })),
+    description: raw.description ?? "",
+    // Handle flat → nested companyProfile
+    companyProfile: raw.companyProfile ?? {
+      founded: raw.founded ?? "",
+      ceo: raw.ceo ?? "",
+      hq: raw.hq ?? "",
+      employees: raw.employees ?? "",
+      website: raw.website ?? "",
+      isin: raw.isin ?? "",
+      businessSegments: raw.businessSegments ?? [],
+    },
+    financials: raw.financials ?? { annual: { revenue: [], profit: [], ebitda: [] }, quarterly: { revenue: [], profit: [], ebitda: [] } },
+    shareholding: raw.shareholding ?? [],
+    shareholdings: raw.shareholdings ?? raw.shareholding ?? [],
+    news: raw.news ?? [],
+    thesis: raw.thesis ?? { thesis: "", bullCase: "", bearCase: "", whatToWatch: "", stance: "Watch" },
+    priceHistory: raw.priceHistory ?? {},
+  };
+}
+
 function buildFallbackStockResponse(symbol: string): {
   stock: StockResearchDetail;
   financialChartData: { period: string; value: number }[];
@@ -308,15 +355,17 @@ function buildFallbackStockResponse(symbol: string): {
   const local = getStockResearch(symbol);
   if (!local) return null;
 
+  const normalized = normalizeStockData(local as unknown as Record<string, any>);
+
   return {
-    stock: local as unknown as StockResearchDetail,
-    financialChartData: local.financials.annual.revenue.map((item) => ({
+    stock: normalized,
+    financialChartData: (normalized.financials?.annual?.revenue ?? []).map((item) => ({
       period: item.period,
       value: Math.round(item.value),
     })),
-    shareholding: local.shareholding[0],
-    shareholdingSeries: local.shareholding,
-    period: local.shareholding[0]?.period ?? "Latest",
+    shareholding: normalized.shareholding[0],
+    shareholdingSeries: normalized.shareholding,
+    period: normalized.shareholding[0]?.period ?? "Latest",
   };
 }
 function StockView({ stock, financialChartData, shareholding, shareholdingSeries, period: initialPeriod }: {
@@ -1022,7 +1071,18 @@ export default function StockPage() {
       try {
         const res = await fetch(`/api/stock/${symbol}`);
         if (res.ok) {
-          return res.json() as Promise<{ stock: StockResearchDetail; financialChartData: { period: string; value: number }[]; shareholding?: any; shareholdingSeries?: any[]; period?: string }>;
+          const raw = await res.json();
+          const normalized = normalizeStockData(raw);
+          return {
+            stock: normalized,
+            financialChartData: (normalized.financials?.annual?.revenue ?? []).map((item: { period: string; value: number }) => ({
+              period: item.period,
+              value: Math.round(item.value),
+            })),
+            shareholding: normalized.shareholding?.[0],
+            shareholdingSeries: normalized.shareholding ?? [],
+            period: normalized.shareholding?.[0]?.period ?? "Latest",
+          };
         }
       } catch {
         // fall through to local fallback

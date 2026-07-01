@@ -10,9 +10,10 @@
  *            "Guaranteed returns", "Strong buy"
  */
 
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { getAllPlans } from "../commercial/plans";
 import type { Plan, PlanTier } from "../commercial/plans";
+import { createCheckout, getUserId, redirectToCheckout } from "../commercial/checkoutClient";
 import { colors, space, radius, layout } from "../design/tokens";
 
 const ANNUAL_DISCOUNT_MULTIPLIER = 10; // 2 months free on annual
@@ -101,7 +102,32 @@ function PricingCard({ plan, featured, annual, onSelect }: { plan: Plan; feature
 export default function PricingPage() {
   const plans = useMemo(() => getAllPlans(), []);
   const [annual, setAnnual] = useState(false);
-  const [activeTier, setActiveTier] = useState<PlanTier | null>(null);
+  const [checkoutTier, setCheckoutTier] = useState<PlanTier | null>(null);
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
+
+  const handleSelect = useCallback(async (plan: Plan) => {
+    setCheckoutTier(plan.tier);
+    setCheckoutLoading(true);
+    setCheckoutError(null);
+
+    try {
+      const userId = getUserId();
+      const result = await createCheckout(plan.id, userId);
+
+      if (!result.success || !result.checkoutUrl) {
+        setCheckoutError(result.error ?? "Checkout could not be created. Please try again.");
+        setCheckoutLoading(false);
+        return;
+      }
+
+      redirectToCheckout(result.checkoutUrl);
+      // Don't reset loading — user is on Razorpay page now
+    } catch {
+      setCheckoutError("Something went wrong. Please try again.");
+      setCheckoutLoading(false);
+    }
+  }, []);
 
   // Feature comparison rows
   const comparisonRows = [
@@ -213,19 +239,19 @@ export default function PricingPage() {
             plan={plan}
             featured={plan.tier === "plus"}
             annual={annual}
-            onSelect={plan.priceInr > 0 ? () => setActiveTier(plan.tier) : undefined}
+            onSelect={plan.priceInr > 0 ? () => handleSelect(plan) : undefined}
           />
         ))}
       </div>
 
-      {/* Early Access Modal */}
-      {activeTier && (
+      {/* Checkout Modal */}
+      {checkoutTier && (
         <div style={{
           position: "fixed", inset: 0,
           background: "rgba(0,0,0,0.7)",
           display: "flex", alignItems: "center", justifyContent: "center",
           zIndex: 1000,
-        }} onClick={() => setActiveTier(null)}>
+        }} onClick={() => { if (!checkoutLoading) { setCheckoutTier(null); setCheckoutError(null); } }}>
           <div style={{
             background: colors.card,
             padding: space[6],
@@ -234,57 +260,54 @@ export default function PricingPage() {
             width: "90%",
             textAlign: "center",
           }} onClick={(e) => e.stopPropagation()}>
-            <div style={{ fontSize: 48, marginBottom: space[3] }}>🚀</div>
-            <h3 style={{ margin: "0 0 8px", fontSize: 20, fontWeight: 700 }}>
-              {activeTier === "plus" ? "Research Plus" : "Research Pro"} — Early Access
-            </h3>
-            <p style={{ color: colors.textSecondary, fontSize: 14, marginBottom: space[4] }}>
-              We're launching paid plans soon! Enter your email to get notified
-              when subscriptions open and receive an <strong>early-bird discount</strong>.
-            </p>
-            <div style={{ display: "flex", gap: space[2], flexDirection: "column" }}>
-              <input
-                placeholder="you@email.com"
-                style={{
-                  padding: "10px 16px",
-                  borderRadius: radius.md,
-                  border: `1px solid ${colors.border}`,
-                  background: colors.page,
-                  color: colors.textPrimary,
-                  fontSize: 14,
-                  width: "100%",
-                  boxSizing: "border-box",
-                }}
-              />
-              <button style={{
-                padding: "10px 24px",
-                borderRadius: radius.md,
-                background: colors.primary,
-                color: colors.onPrimary,
-                border: "none",
-                fontSize: 14,
-                fontWeight: 600,
-                cursor: "pointer",
-              }}>
-                Notify me
-              </button>
-            </div>
-            <button
-              onClick={() => setActiveTier(null)}
-              style={{
-                marginTop: space[3],
-                background: "none",
-                border: "none",
-                color: colors.textSecondary,
-                fontSize: 13,
-                cursor: "pointer",
-              }}
-            >
-              Maybe later
-            </button>
+            {checkoutLoading ? (
+              <>
+                <div style={{ fontSize: 48, marginBottom: space[3] }}>
+                  <span style={{ display: "inline-block", animation: "spin 1s linear infinite" }}>⏳</span>
+                </div>
+                <h3 style={{ margin: "0 0 8px", fontSize: 20, fontWeight: 700 }}>
+                  Redirecting to Razorpay…
+                </h3>
+                <p style={{ color: colors.textSecondary, fontSize: 14 }}>
+                  You'll be redirected to Razorpay's secure checkout to complete payment. If nothing happens, check your popup blocker.
+                </p>
+              </>
+            ) : checkoutError ? (
+              <>
+                <div style={{ fontSize: 48, marginBottom: space[3] }}>⚠️</div>
+                <h3 style={{ margin: "0 0 8px", fontSize: 20, fontWeight: 700 }}>
+                  Checkout unavailable
+                </h3>
+                <p style={{ color: colors.textSecondary, fontSize: 14, marginBottom: space[4] }}>
+                  {checkoutError}
+                </p>
+                <p style={{ color: colors.textTertiary, fontSize: 12, marginBottom: space[4] }}>
+                  Make sure the backend is running with RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET set.
+                </p>
+                <button
+                  onClick={() => { setCheckoutTier(null); setCheckoutError(null); }}
+                  style={{
+                    padding: "10px 24px",
+                    borderRadius: radius.md,
+                    background: colors.primary,
+                    color: colors.onPrimary,
+                    border: "none",
+                    fontSize: 14,
+                    fontWeight: 600,
+                    cursor: "pointer",
+                  }}
+                >
+                  Go back
+                </button>
+              </>
+            ) : null}
           </div>
         </div>
       )}
+
+      <style>{`
+        @keyframes spin { to { transform: rotate(360deg); } }
+      `}</style>
 
       {/* Feature Comparison Table */}
       <div style={{ marginTop: space[8] }}>
