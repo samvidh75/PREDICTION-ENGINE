@@ -1,6 +1,6 @@
 import { useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Bell, Clock, Crosshair, Eye, Plus, Search, Star, TrendingDown, TrendingUp, X } from "lucide-react";
+import { Bell, Clock, Crosshair, Eye, Plus, Search, ShieldCheck, Sparkles, Star, TrendingDown, TrendingUp, X } from "lucide-react";
 import { Card } from "../ui/Card";
 import { Button } from "../ui/Button";
 import { Badge } from "../ui/Badge";
@@ -371,17 +371,54 @@ export default function WatchlistPage() {
             </div>
             <div style={{
               display: "flex",
-              gap: space[4],
-              fontSize: 11,
+              flexWrap: "wrap",
+              gap: 0,
               color: colors.textSecondary,
               borderTop: `1px solid ${colors.separator}`,
               paddingTop: space[4],
               width: "100%",
-              justifyContent: "center",
+              borderRadius: 20,
+              border: `1px solid ${colors.hairlineSoft}`,
+              background: "linear-gradient(180deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.015) 100%)",
+              overflow: "hidden",
             }}>
-              <span>🔍 Health scores update daily</span>
-              <span>📊 Compare side by side</span>
-              <span>🔔 Alerts when things change</span>
+              {[
+                { icon: Sparkles, title: "Review updates", body: "See thesis changes as they land." },
+                { icon: ShieldCheck, title: "Compare names", body: "Keep watchlist peers in one view." },
+                { icon: Bell, title: "Stay alerted", body: "Know when conviction shifts." },
+              ].map(({ icon: Icon, title, body }, index, items) => (
+                <div
+                  key={title}
+                  style={{
+                    display: "grid",
+                    gap: space[2],
+                    padding: `${space[4]} ${space[3]}`,
+                    flex: "1 1 160px",
+                    minHeight: 108,
+                    borderRight: index === items.length - 1 ? "none" : `1px solid ${colors.hairlineSoft}`,
+                  }}
+                >
+                  <div style={{
+                    width: 28,
+                    height: 28,
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    borderRadius: 10,
+                    border: `1px solid ${colors.hairlineSoft}`,
+                    background: "rgba(255,255,255,0.04)",
+                    color: colors.textPrimary,
+                  }}>
+                    <Icon size={14} strokeWidth={1.8} />
+                  </div>
+                  <div style={{ display: "grid", gap: 6 }}>
+                    <strong style={{ fontSize: 14, fontWeight: 600, color: colors.textPrimary }}>{title}</strong>
+                    <p style={{ margin: 0, fontSize: 12, lineHeight: 1.5, color: colors.textSecondary }}>
+                      {body}
+                    </p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </Card>

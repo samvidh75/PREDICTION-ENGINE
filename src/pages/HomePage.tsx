@@ -1,7 +1,7 @@
 import {
   BarChart3, Bell, BookOpen, Compass, Gauge, Shield,
   Sparkles, Star, TrendingUp, Zap, Lightbulb, Command,
-  Keyboard, Github, Twitter, Linkedin, Mail, ChevronRight,
+  Keyboard, ChevronDown,
   Search, ArrowRight,
 } from "lucide-react";
 import { useEffect, useMemo, useState, useRef } from "react";
@@ -10,11 +10,13 @@ import { Button } from "../ui/Button";
 import { Card } from "../ui/Card";
 import { HealthometerMini } from "../ui/HealthometerMini";
 import { ConvictionBadge } from "../ui/ConvictionBadge";
-import { BrandMark } from "../components/BrandMark";
 import { useResponsiveValue } from "../ui/responsive";
 import { colors, typography, space, layout, media, radius } from "../design/tokens";
 import { scanByPreset } from "../services/scanner/presets";
 import { getAlerts } from "../services/personalization/AlertStore";
+import OnboardingWizard from "../components/GuidedOnboarding";
+import { loadFirstDashboardFlag, dismissFirstDashboardOverlay, markFirstDashboardPending } from "../services/onboarding/onboardingFirstRunMemory";
+import WatchlistWebSocket from "../components/WatchlistWebSocket";
 import type { EnhancedScanType } from "../services/scanner/presets";
 import type { AlertStoreItem } from "../services/personalization/AlertStore";
 
@@ -76,48 +78,6 @@ const EDUCATIONAL_FACTS = [
   },
 ];
 
-// ─── Footer links ──────────────────────────────────────────────────
-
-const FOOTER_COLUMNS = [
-  {
-    title: "Research",
-    links: [
-      { label: "Scanner", href: "/scanner" },
-      { label: "Compare", href: "/compare" },
-      { label: "Sectors", href: "/sectors" },
-      { label: "Watchlist", href: "/watchlist" },
-      { label: "Portfolio", href: "/portfolio" },
-    ],
-  },
-  {
-    title: "Company",
-    links: [
-      { label: "About", href: "/about" },
-      { label: "Changelog", href: "/changelog" },
-      { label: "Pricing", href: "/pricing" },
-    ],
-  },
-  {
-    title: "Resources",
-    links: [
-      { label: "STOCKEX Trust", href: "/trust" },
-      { label: "Disclaimer", href: "/trust" },
-      { label: "Privacy", href: "/trust" },
-      { label: "Terms of Use", href: "/trust" },
-    ],
-  },
-  {
-    title: "Connect",
-    links: [
-      { label: "Twitter / X", href: "https://x.com" },
-      { label: "LinkedIn", href: "https://linkedin.com" },
-      { label: "GitHub", href: "https://github.com" },
-      { label: "Contact", href: "mailto:hello@stockex.com" },
-      { label: "Report an issue", href: "https://github.com" },
-    ],
-  },
-];
-
 // ─── Page component ──────────────────────────────────────────────────
 
 export default function HomePage() {
@@ -125,8 +85,28 @@ export default function HomePage() {
   const searchRef = useRef<HTMLInputElement>(null);
   const [query, setQuery] = useState("");
   const [searchResults, setSearchResults] = useState<Array<{ symbol: string; name: string }>>([]);
+  const [didYouKnowOpen, setDidYouKnowOpen] = useState(false);
   const sectionGap = useResponsiveValue(layout.sectionGapMobile, layout.sectionGapDesktop);
   const normalizedQuery = query.trim().toUpperCase();
+
+  // Onboarding state — show wizard for first-time visitors
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  useEffect(() => {
+    // Mark first dashboard visit if no flag exists
+    const existingFlag = loadFirstDashboardFlag();
+    if (!existingFlag) {
+      markFirstDashboardPending();
+    }
+    const flag = loadFirstDashboardFlag();
+    if (flag?.pending && !flag.dismissedAt) {
+      setShowOnboarding(true);
+    }
+  }, []);
+
+  const handleOnboardingComplete = () => {
+    dismissFirstDashboardOverlay();
+    setShowOnboarding(false);
+  };
 
   const resolveSearchTarget = () => {
     if (!normalizedQuery) return null;
@@ -191,6 +171,11 @@ export default function HomePage() {
 
   // ── Render ─────────────────────────────────────────────────────────
 
+  // Show onboarding wizard for first-time visitors
+  if (showOnboarding) {
+    return <OnboardingWizard onComplete={handleOnboardingComplete} />;
+  }
+
   return (
     <div style={{ display: "grid", gap: sectionGap }}>
 
@@ -238,30 +223,6 @@ export default function HomePage() {
 
         <div style={{ maxWidth: "680px", display: "grid", gap: space[6], position: "relative", zIndex: 1 }}>
           <div style={{ display: "grid", gap: space[4] }}>
-            <div style={{ display: "flex", justifyContent: "center" }}>
-              <div style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: space[3],
-                padding: `${space[2]} ${space[4]}`,
-                borderRadius: radius.xl,
-                border: `1px solid ${colors.hairline}`,
-                background: "linear-gradient(135deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.02) 100%)",
-                boxShadow: "0 20px 50px rgba(0,0,0,0.28)",
-                backdropFilter: "blur(18px)",
-                WebkitBackdropFilter: "blur(18px)",
-              }}>
-                <BrandMark size={44} />
-                <div style={{ display: "grid", gap: 2 }}>
-                  <span style={{ fontSize: 18, fontWeight: 760, letterSpacing: "-0.04em", color: colors.ink, lineHeight: 1 }}>
-                    STOCKEX
-                  </span>
-                  <span style={{ fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase", color: colors.body }}>
-                    Premium Indian Equity Research
-                  </span>
-                </div>
-              </div>
-            </div>
             <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 8, marginBottom: space[2] }}>
               <span style={{
                 display: "inline-flex", alignItems: "center", gap: 4,
@@ -291,13 +252,14 @@ export default function HomePage() {
             </h1>
             <p
               style={{
-                color: colors.body,
-                fontSize: "16px",
-                fontWeight: 400,
-                lineHeight: 1.6,
-                maxWidth: 540,
-                margin: "0 auto",
-              }}
+              color: colors.body,
+              fontSize: "16px",
+              fontWeight: 400,
+              lineHeight: 1.6,
+              maxWidth: 540,
+              margin: "0 auto",
+              marginBottom: space[2],
+            }}
             >
               Build conviction with calmer research flows, cleaner comparisons, and the key numbers that changed.
             </p>
@@ -413,61 +375,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ════════════════ QUICK ACTIONS ════════════════ */}
-      <section className="raycast-stagger-7" style={{ display: "grid", gap: space[4] }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: space[2] }}>
-          <div style={{ display: "grid", gap: space[1] }}>
-            <span style={{ fontSize: 10, fontWeight: 600, color: colors.body, textTransform: "uppercase", letterSpacing: "0.08em" }}>
-              Actions
-            </span>
-            <h2 style={{ color: colors.ink, fontSize: "18px", fontWeight: 600, margin: 0, letterSpacing: "-0.01em" }}>
-              Quick Actions
-            </h2>
-          </div>
-          <span style={{ fontSize: 11, color: colors.body, letterSpacing: "0.02em" }}>
-            ⌘ 1 – {QUICK_ACTIONS.length}
-          </span>
-        </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: space[4] }}>
-          {QUICK_ACTIONS.map((action, i) => (
-            <Card
-              key={action.label}
-              onClick={() => navigate(action.route)}
-              className={`raycast-slideUp raycast-stagger-${i + 1}`}
-              style={{ cursor: "pointer", position: "relative" }}
-            >
-              <div style={{ display: "grid", gap: space[2] }}>
-                <div style={{
-                  width: 34, height: 34, borderRadius: "9px",
-                  background: `linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 100%)`,
-                  border: "1px solid rgba(255,255,255,0.06)",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                }}>
-                  <action.icon color={colors.primary} size={16} strokeWidth={1.75} />
-                </div>
-                <h3 style={{ fontSize: "14px", fontWeight: 600, color: colors.ink, margin: 0 }}>
-                  {action.label}
-                </h3>
-                <p style={{ fontSize: 12, color: colors.body, lineHeight: 1.4, margin: 0 }}>
-                  {action.desc}
-                </p>
-              </div>
-              {/* Keyboard shortcut badge */}
-              <div style={{
-                position: "absolute", top: 12, right: 12,
-                display: "flex", alignItems: "center", gap: 2,
-                padding: "2px 6px", borderRadius: "4px",
-                background: colors.surfaceElevated,
-                border: `1px solid ${colors.hairline}`,
-                fontSize: 10, fontWeight: 600, color: colors.body,
-              }}>
-                <Command size={9} />{i + 1}
-              </div>
-            </Card>
-          ))}
-        </div>
-      </section>
-
       {/* ════════════════ AI INSIGHTS ════════════════ */}
       <div className="ai-insights-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: sectionGap, alignItems: "start" }}>
         {/* Market pulse */}
@@ -534,6 +441,19 @@ export default function HomePage() {
               ))}
             </div>
           </Card>
+        </section>
+
+        {/* Live WebSocket feed */}
+        <section style={{ display: "grid", gap: space[4] }}>
+          <div style={{ display: "grid", gap: space[1] }}>
+            <span style={{ fontSize: 10, fontWeight: 600, color: colors.body, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+              Live
+            </span>
+            <h2 style={{ display: "flex", alignItems: "center", gap: space[2], color: colors.ink, fontSize: "18px", fontWeight: 600, margin: 0, letterSpacing: "-0.01em" }}>
+              <Zap size={15} /> Live Price Feed
+            </h2>
+          </div>
+          <WatchlistWebSocket maxDisplay={10} />
         </section>
 
         {/* Recent alerts */}
@@ -721,56 +641,91 @@ export default function HomePage() {
 
       {/* ════════════════ DID YOU KNOW ════════════════ */}
       <section style={{ display: "grid", gap: space[4] }}>
-        <div style={{ display: "grid", gap: space[1] }}>
-          <span style={{ fontSize: 10, fontWeight: 600, color: colors.body, textTransform: "uppercase", letterSpacing: "0.08em" }}>
-            Learn
-          </span>
-          <div style={{ display: "flex", alignItems: "center", gap: space[2] }}>
+        <button
+          type="button"
+          onClick={() => setDidYouKnowOpen((prev) => !prev)}
+          aria-expanded={didYouKnowOpen}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: space[3],
+            width: "100%",
+            padding: `${space[2]} ${space[3]}`,
+            borderRadius: 14,
+            border: `1px solid ${colors.hairlineSoft}`,
+            background: "linear-gradient(135deg, rgba(255,255,255,0.045) 0%, rgba(255,255,255,0.02) 100%)",
+            backdropFilter: "blur(18px)",
+            WebkitBackdropFilter: "blur(18px)",
+            boxShadow: "0 0 0 1px rgba(255,255,255,0.02) inset",
+            color: colors.ink,
+            cursor: "pointer",
+            textAlign: "left",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: space[3], minWidth: 0 }}>
             <div style={{
-              width: 24, height: 24, borderRadius: "6px",
-              background: "rgba(255,149,0,0.1)",
-              border: "1px solid rgba(255,149,0,0.15)",
+              width: 18, height: 18, borderRadius: "5px",
+              background: "rgba(255,149,0,0.08)",
+              border: "1px solid rgba(255,149,0,0.12)",
               display: "flex", alignItems: "center", justifyContent: "center",
+              flexShrink: 0,
             }}>
-              <Lightbulb size={12} color={colors.warning} />
+              <Lightbulb size={10} color={colors.warning} />
             </div>
-            <h2 style={{ color: colors.ink, fontSize: "18px", fontWeight: 600, margin: 0, letterSpacing: "-0.01em" }}>
-              Did You Know?
-            </h2>
+            <div style={{ display: "grid", gap: 2 }}>
+              <span style={{ fontSize: 9, fontWeight: 600, color: colors.body, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                Learn
+              </span>
+              <span style={{ color: colors.ink, fontSize: "15px", fontWeight: 600, letterSpacing: "-0.01em" }}>
+                Did You Know?
+              </span>
+            </div>
           </div>
-        </div>
-        <div style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(270px, 1fr))",
-          gap: space[4],
-        }}>
-          {EDUCATIONAL_FACTS.map((fact, i) => (
-            <Card
-              key={fact.title}
-              className={`raycast-slideUp raycast-stagger-${i + 1}`}
-              style={{
-                display: "grid", gap: space[3],
-                padding: space[5],
-                border: "1px solid rgba(255,255,255,0.06)",
-              }}
-            >
-              <div style={{
-                width: 36, height: 36, borderRadius: "9px",
-                background: "rgba(255,255,255,0.05)",
-                border: "1px solid rgba(255,255,255,0.06)",
-                display: "flex", alignItems: "center", justifyContent: "center",
-              }}>
-                <fact.icon size={16} color={colors.primary} strokeWidth={1.75} />
-              </div>
-              <h3 style={{ fontSize: "14px", fontWeight: 600, color: colors.ink, margin: 0 }}>
-                {fact.title}
-              </h3>
-              <p style={{ fontSize: 12, color: colors.body, lineHeight: 1.5, margin: 0 }}>
-                {fact.body}
-              </p>
-            </Card>
-          ))}
-        </div>
+          <ChevronDown
+            size={16}
+            color={colors.body}
+            style={{
+              flexShrink: 0,
+              transform: didYouKnowOpen ? "rotate(180deg)" : "rotate(0deg)",
+              transition: "transform 0.18s ease",
+            }}
+          />
+        </button>
+        {didYouKnowOpen && (
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fill, minmax(270px, 1fr))",
+            gap: space[4],
+          }}>
+            {EDUCATIONAL_FACTS.map((fact, i) => (
+              <Card
+                key={fact.title}
+                className={`raycast-slideUp raycast-stagger-${i + 1}`}
+                style={{
+                  display: "grid", gap: space[3],
+                  padding: space[5],
+                  border: "1px solid rgba(255,255,255,0.06)",
+                }}
+              >
+                <div style={{
+                  width: 36, height: 36, borderRadius: "9px",
+                  background: "rgba(255,255,255,0.05)",
+                  border: "1px solid rgba(255,255,255,0.06)",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                }}>
+                  <fact.icon size={16} color={colors.primary} strokeWidth={1.75} />
+                </div>
+                <h3 style={{ fontSize: "14px", fontWeight: 600, color: colors.ink, margin: 0 }}>
+                  {fact.title}
+                </h3>
+                <p style={{ fontSize: 12, color: colors.body, lineHeight: 1.5, margin: 0 }}>
+                  {fact.body}
+                </p>
+              </Card>
+            ))}
+          </div>
+        )}
       </section>
 
       {/* ════════════════ KEYBOARD SHORTCUTS HINT ════════════════ */}
@@ -785,7 +740,7 @@ export default function HomePage() {
       }}>
         {[
           { keys: ["⌘", "K"], desc: "Search" },
-          { keys: ["⌘", "1–6"], desc: "Quick actions" },
+          { keys: ["⌘", "1–6"], desc: "Desktop tutorial" },
           { keys: ["R"], desc: "Refresh data" },
           { keys: ["?"], desc: "All shortcuts" },
         ].map((shortcut) => (
@@ -808,114 +763,6 @@ export default function HomePage() {
           </div>
         ))}
       </section>
-
-      {/* ════════════════ FOOTER ════════════════ */}
-      <footer style={{
-        marginTop: space[8],
-        paddingTop: space[8],
-        borderTop: `1px solid ${colors.hairline}`,
-        display: "grid",
-        gap: space[8],
-      }}>
-        <div style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
-          gap: space[6],
-        }}>
-          {FOOTER_COLUMNS.map((col) => (
-            <div key={col.title} style={{ display: "grid", gap: space[3] }}>
-              <h4 style={{ fontSize: "11px", fontWeight: 600, color: colors.body, textTransform: "uppercase", letterSpacing: "0.06em", margin: 0 }}>
-                {col.title}
-              </h4>
-              <nav style={{ display: "grid", gap: space[2] }}>
-                {col.links.map((link) => (
-                  <a
-                    key={link.label}
-                    href={link.href}
-                    onClick={(e) => {
-                      if (link.href.startsWith("/")) {
-                        e.preventDefault();
-                        navigate(link.href);
-                      }
-                    }}
-                    style={{
-                      fontSize: 13,
-                      color: colors.ink,
-                      textDecoration: "none",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 4,
-                      padding: "3px 6px",
-                      borderRadius: "5px",
-                      margin: "0 -6px",
-                      transition: "background 0.12s ease",
-                    }}
-                    onMouseEnter={(e) => e.currentTarget.style.background = "rgba(255,255,255,0.04)"}
-                    onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}
-                    target={link.href.startsWith("http") ? "_blank" : undefined}
-                    rel={link.href.startsWith("http") ? "noopener noreferrer" : undefined}
-                  >
-                    {link.label} {link.href.startsWith("http") && <ChevronRight size={10} />}
-                  </a>
-                ))}
-              </nav>
-            </div>
-          ))}
-        </div>
-
-        <div style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          flexWrap: "wrap",
-          gap: space[4],
-          paddingTop: space[6],
-          borderTop: `1px solid ${colors.hairline}`,
-        }}>
-          <div style={{ display: "flex", alignItems: "center", gap: space[3] }}>
-            <span style={{
-              fontSize: 14, fontWeight: 700, color: colors.ink,
-              background: "linear-gradient(135deg, #fff 30%, rgba(255,255,255,0.6) 100%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-            }}>STOCKEX</span>
-            <span style={{ fontSize: 12, color: colors.body }}>
-              © {new Date().getFullYear()} · educational purposes only
-            </span>
-          </div>
-          <div style={{ display: "flex", gap: space[2] }}>
-            {[
-              { icon: Twitter, href: "https://x.com", label: "X / Twitter" },
-              { icon: Linkedin, href: "https://linkedin.com", label: "LinkedIn" },
-              { icon: Github, href: "https://github.com", label: "GitHub" },
-              { icon: Mail, href: "mailto:hello@stockex.com", label: "Contact us" },
-            ].map(({ icon: Icon, href, label }) => (
-              <a
-                key={href}
-                href={href}
-                aria-label={label}
-                target={href.startsWith("mailto") ? undefined : "_blank"}
-                rel={href.startsWith("mailto") ? undefined : "noopener noreferrer"}
-                style={{
-                  width: 32, height: 32, borderRadius: "7px",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  color: colors.body, transition: "all 0.12s ease",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = "rgba(255,255,255,0.06)";
-                  e.currentTarget.style.color = colors.ink;
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = "transparent";
-                  e.currentTarget.style.color = colors.body;
-                }}
-              >
-                <Icon size={15} />
-              </a>
-            ))}
-          </div>
-        </div>
-      </footer>
 
       {/* Responsive + Animations */}
       <style>{`

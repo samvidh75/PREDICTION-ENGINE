@@ -34,7 +34,7 @@ export function BrandMark({ size = 40 }: { size?: number }) {
           <stop stopColor="#DCE8FF" stopOpacity="0.24" />
           <stop offset="1" stopColor="#FFFFFF" stopOpacity="0" />
         </radialGradient>
-        <linearGradient id={strokeId} x1="18" y1="15" x2="47" y2="48" gradientUnits="userSpaceOnUse">
+        <linearGradient id={strokeId} x1="18" y1="14" x2="48" y2="44" gradientUnits="userSpaceOnUse">
           <stop stopColor="#FFFFFF" />
           <stop offset="0.45" stopColor="#FCFDFF" />
           <stop offset="1" stopColor="#D4E2FF" />
@@ -51,18 +51,12 @@ export function BrandMark({ size = 40 }: { size?: number }) {
       <rect x="5.5" y="5.5" width="53" height="53" rx="14" fill={`url(#${tileInnerId})`} opacity="1" />
       <rect x="9" y="9" width="46" height="46" rx="12" fill="none" stroke="#FFFFFF" strokeOpacity="0.08" />
 
-      <path
-        d="M23.8 22.6C23.8 19.6 26.2 17.2 29.2 17.2H37.4C40.2 17.2 42.4 19.4 42.4 22.2C42.4 24.6 40.8 26.5 38.6 27.3L31.6 30.1C28.8 31.2 27 33.6 27 36.6C27 40.1 29.8 42.9 33.3 42.9H40.2"
-        stroke={`url(#${strokeId})`}
-        strokeWidth="4.25"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path d="M22.2 20.8L46.8 45.6" stroke={`url(#${strokeId})`} strokeWidth="4.15" strokeLinecap="round" opacity="1" />
-      <path d="M43.9 17.6L23.4 41.6" stroke={`url(#${strokeId})`} strokeWidth="4.15" strokeLinecap="round" opacity="1" />
-      <path d="M22.8 20.8H35.8C39.4 20.8 42.2 23.6 42.2 27.2" stroke="#FFFFFF" strokeOpacity="0.22" strokeWidth="1.25" strokeLinecap="round" />
-      <circle cx="44.9" cy="21.1" r="3.7" fill="#2F80FF" />
-      <circle cx="44.9" cy="21.1" r="1.15" fill="#FFFFFF" opacity="0.98" />
+      <path d="M21.9 19.9C24.3 17.1 28.1 15.6 32.2 15.6H39.1" stroke={`url(#${strokeId})`} strokeWidth="4.2" strokeLinecap="round" />
+      <path d="M39.1 15.6V22.4" stroke={`url(#${strokeId})`} strokeWidth="4.2" strokeLinecap="round" />
+      <path d="M21.8 42.3L46.1 18.1" stroke={`url(#${strokeId})`} strokeWidth="4.15" strokeLinecap="round" />
+      <path d="M22.8 20.6C22.8 18.1 24.9 16 27.4 16H34.6C37.3 16 39.4 18.1 39.4 20.8C39.4 23.1 37.8 24.9 35.7 25.6L29.2 28.1C26.7 29.1 25.1 31.3 25.1 34C25.1 37.1 27.6 39.6 30.7 39.6H39.5" stroke={`url(#${strokeId})`} strokeWidth="3.9" strokeLinecap="round" strokeLinejoin="round" opacity="0.92" />
+      <circle cx="45" cy="20.1" r="3.8" fill="#2F80FF" />
+      <circle cx="45" cy="20.1" r="1.15" fill="#FFFFFF" opacity="0.98" />
     </svg>
   );
 }

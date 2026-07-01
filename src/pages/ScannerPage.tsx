@@ -5,7 +5,6 @@ import { Button } from "../ui/Button";
 import { Card } from "../ui/Card";
 import { useResponsiveValue } from "../ui/responsive";
 import { colors, typography, radius } from "../design/tokens";
-import { ScannerPresets } from "../components/ScannerPresets";
 import { Sparkles, TrendingUp, TrendingDown, Minus, BarChart3 } from "lucide-react";
 import { ResearchAiExplanationPanel } from "../components/ai-orchestrator/ResearchAiExplanationPanel";
 import { buildScannerContext } from "../components/ai-orchestrator/researchAiContext";
@@ -34,6 +33,9 @@ export default function ScannerPage() {
   const [hoveredStock, setHoveredStock] = useState<EnhancedScannedStock | null>(null);
   const [selectedStock, setSelectedStock] = useState<EnhancedScannedStock | null>(null);
   const label = useResponsiveValue("13px", "14px");
+  const isDesktop = useResponsiveValue(false, true) as boolean;
+  const headingSize = useResponsiveValue("52px", typography.h1.desktop.size) as string;
+  const searchWidth = useResponsiveValue("100%", "360px") as string;
 
   // Active stock = hovered takes priority, else selected (for click/focus/mobile)
   const activeStock = hoveredStock ?? selectedStock;
@@ -117,24 +119,74 @@ export default function ScannerPage() {
     <div style={{ display: "grid", gap: "24px" }}>
       <div className="raycast-slideUp" style={{ display: "grid", gap: "16px" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "8px" }}>
-          <h1 style={{ color: colors.textPrimary, fontSize: typography.h1.desktop.size, fontWeight: 600, lineHeight: "1.25", margin: 0 }}>Scanner</h1>
+          <h1 style={{ color: colors.textPrimary, fontSize: headingSize, fontWeight: 600, lineHeight: "0.98", letterSpacing: "-0.055em", margin: 0 }}>Scanner</h1>
           <span style={{ fontSize: "12px", color: colors.textSecondary }}>
             <kbd style={{ background: colors.surface, border: `1px solid ${colors.hairlineStrong}`, borderRadius: 4, padding: "1px 6px", fontSize: 11, fontFamily: "inherit", color: colors.textSecondary }}>⌘K</kbd> to search
           </span>
         </div>
 
-        <div className="raycast-stagger-1" style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
-          {SCAN_PRESETS.map((preset, i) => (
-            <Button
-              key={preset.id}
-              variant={preset.id === activePresetId ? "primary" : "secondary"}
-              size="sm"
-              onClick={() => setActivePresetId(preset.id)}
-              title={preset.description}
-            >
-              {preset.icon} {preset.shortLabel}
-            </Button>
-          ))}
+        <div className="raycast-stagger-1" style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+          {SCAN_PRESETS.map((preset) => {
+            const isActive = preset.id === activePresetId;
+            return (
+              <button
+                key={preset.id}
+                type="button"
+                onClick={() => setActivePresetId(preset.id)}
+                title={preset.description}
+                style={{
+                  minHeight: isDesktop ? "42px" : "46px",
+                  padding: isDesktop ? "0 16px" : "0 18px",
+                  borderRadius: "16px",
+                  border: isActive ? "1px solid rgba(255,255,255,0.18)" : `1px solid ${colors.hairline}`,
+                  background: isActive
+                    ? "linear-gradient(180deg, rgba(86, 115, 160, 0.24) 0%, rgba(30, 41, 59, 0.52) 100%)"
+                    : "linear-gradient(180deg, rgba(255,255,255,0.045) 0%, rgba(255,255,255,0.018) 100%)",
+                  color: colors.textPrimary,
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "10px",
+                  cursor: "pointer",
+                  boxShadow: isActive
+                    ? "0 16px 32px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.08)"
+                    : "inset 0 1px 0 rgba(255,255,255,0.03)",
+                  backdropFilter: "blur(18px)",
+                  WebkitBackdropFilter: "blur(18px)",
+                  transition: "transform 160ms ease, border-color 160ms ease, background 160ms ease, box-shadow 160ms ease",
+                  fontFamily: typography.fontFamily,
+                  fontSize: isDesktop ? "14px" : "15px",
+                  fontWeight: isActive ? 600 : 500,
+                  letterSpacing: "-0.01em",
+                }}
+                onMouseEnter={(event) => {
+                  event.currentTarget.style.transform = "translateY(-1px)";
+                  event.currentTarget.style.borderColor = "rgba(255,255,255,0.16)";
+                }}
+                onMouseLeave={(event) => {
+                  event.currentTarget.style.transform = "translateY(0)";
+                  event.currentTarget.style.borderColor = isActive ? "rgba(255,255,255,0.18)" : colors.hairline;
+                }}
+              >
+                <span
+                  aria-hidden="true"
+                  style={{
+                    width: isDesktop ? "24px" : "26px",
+                    height: isDesktop ? "24px" : "26px",
+                    borderRadius: "9px",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    background: isActive ? "rgba(255,255,255,0.10)" : "rgba(255,255,255,0.04)",
+                    boxShadow: "inset 0 1px 0 rgba(255,255,255,0.05)",
+                    fontSize: isDesktop ? "14px" : "15px",
+                  }}
+                >
+                  {preset.icon}
+                </span>
+                <span>{preset.shortLabel}</span>
+              </button>
+            );
+          })}
         </div>
 
         <div className="raycast-stagger-2" style={{ fontSize: "13px", color: colors.textSecondary, lineHeight: "1.45", maxWidth: "520px" }}>
@@ -161,16 +213,19 @@ export default function ScannerPage() {
             onChange={(event) => setQuery(event.target.value)}
             placeholder="Search symbol or company"
             style={{
-              maxWidth: "360px",
+              width: searchWidth,
+              maxWidth: isDesktop ? "360px" : "100%",
               minHeight: "44px",
               border: `1px solid ${colors.hairline}`,
               borderRadius: "44px",
-              padding: "0 16px",
-              background: "rgba(255,255,255,0.04)",
+              padding: "0 20px",
+              background: "rgba(255,255,255,0.035)",
               color: colors.textPrimary,
               outline: "none",
               backdropFilter: "blur(12px)",
               WebkitBackdropFilter: "blur(12px)",
+              boxSizing: "border-box",
+              boxShadow: "inset 0 1px 0 rgba(255,255,255,0.04)",
               transition: "border-color 0.15s ease, background 0.15s ease",
             }}
             onFocus={(e) => { e.target.style.borderColor = colors.hairlineStrong; e.target.style.background = "rgba(255,255,255,0.06)"; }}
@@ -178,18 +233,20 @@ export default function ScannerPage() {
           />
         </div>
 
-        <div className="raycast-stagger-4">
-          <ScannerPresets
-            scanType={activePresetId}
-            query={query}
-            onApply={(preset) => {
-              setQuery((preset.filters.query as string) || "");
-            }}
-          />
-        </div>
       </div>
 
       <div className="raycast-stagger-5" style={{ maxWidth: "100%" }}>
+        <div
+          style={
+            isDesktop
+              ? undefined
+              : {
+                  display: "grid",
+                  gap: "8px",
+                }
+          }
+        >
+        {isDesktop ? (
         <Card variant="elevated">
           <div style={{ overflowX: "auto" }}>
             <div
@@ -201,7 +258,6 @@ export default function ScannerPage() {
                 padding: "4px",
               }}
             >
-              {/* Header */}
               {[
                 { key: "rank", label: "#", width: "32px" },
                 { key: "company", label: "Company", width: "1fr" },
@@ -226,7 +282,6 @@ export default function ScannerPage() {
                 </div>
               ))}
 
-              {/* Rows */}
               {displayResults.map((stock) => (
                 <div
                   key={stock.symbol}
@@ -236,8 +291,8 @@ export default function ScannerPage() {
                   onClick={() => {
                     setSelectedStock(stock);
                     setHoveredStock(null);
+                    navigate(`/stock/${stock.symbol}`);
                   }}
-                  onDoubleClick={() => navigate(`/stock/${stock.symbol}`)}
                   onMouseEnter={() => setHoveredStock(stock)}
                   onMouseLeave={() => setHoveredStock((prev) => (prev?.symbol === stock.symbol ? null : prev))}
                   onFocus={() => setSelectedStock(stock)}
@@ -289,10 +344,61 @@ export default function ScannerPage() {
             </div>
           </div>
         </Card>
+          ) : (
+            <div style={{ display: "grid", gap: "10px" }}>
+              {displayResults.map((stock) => (
+                <button
+                  key={stock.symbol}
+                  type="button"
+                  onClick={() => navigate(`/stock/${stock.symbol}`)}
+                  style={{
+                    width: "100%",
+                    display: "grid",
+                    gridTemplateColumns: "42px minmax(0, 1fr)",
+                    gap: "14px",
+                    alignItems: "center",
+                    padding: "0 14px",
+                    minHeight: "66px",
+                    borderRadius: "18px",
+                    border: `1px solid ${colors.hairline}`,
+                    background: "linear-gradient(180deg, rgba(255,255,255,0.028) 0%, rgba(255,255,255,0.014) 100%)",
+                    color: colors.textPrimary,
+                    textAlign: "left",
+                    cursor: "pointer",
+                    backdropFilter: "blur(18px)",
+                    WebkitBackdropFilter: "blur(18px)",
+                    boxShadow: "inset 0 1px 0 rgba(255,255,255,0.035)",
+                  }}
+                >
+                  <span style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    width: "42px",
+                    height: "42px",
+                    borderRadius: "14px",
+                    background: "rgba(255,255,255,0.04)",
+                    color: colors.textSecondary,
+                    fontSize: "16px",
+                    fontWeight: 600,
+                    boxShadow: "inset 0 1px 0 rgba(255,255,255,0.04)",
+                  }}>
+                    {stock.rank}
+                  </span>
+                  <div style={{ minWidth: 0, display: "grid", gap: "2px" }}>
+                    <span style={{ fontSize: "15px", fontWeight: 600, color: colors.textPrimary, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                      {stock.name ? `${stock.name} (${stock.symbol})` : stock.symbol}
+                    </span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* AI Detail Panel — appears on row hover/select/focus */}
-      {activeStock && (
+      {isDesktop && activeStock && (
         <div className="raycast-slideUp raycast-stagger-6" style={{
           padding: "16px 20px",
           background: "rgba(20,20,24,0.92)",
@@ -390,7 +496,7 @@ export default function ScannerPage() {
       )}
 
       {/* Enhanced Explanation Panel — appears below active stock detail */}
-      {activeStock && (() => {
+      {isDesktop && activeStock && (() => {
         const scannerCtx = buildScannerContext(
           activeStock.symbol,
           activeStock.name || activeStock.symbol,
@@ -412,7 +518,7 @@ export default function ScannerPage() {
         Showing <strong style={{ color: colors.textPrimary }}>{displayResults.length}</strong> of{" "}
         <strong style={{ color: colors.textPrimary }}>{results.length}</strong> results for{" "}
         <strong style={{ color: colors.primary }}>{activePreset.label}</strong>
-        &nbsp;· Hover a row for AI factor breakdown
+        {isDesktop ? <>&nbsp;· Hover a row for AI factor breakdown</> : null}
       </div>
     </div>
   );

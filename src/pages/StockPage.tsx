@@ -22,6 +22,9 @@ import { buildCompanySeo } from "../frontend/seo/companySeo";
 import { CompanyAnalystSection } from "../components/analyst/CompanyAnalystSection";
 import { SimilarStocks } from "../components/SimilarStocks";
 import { OptionsFlow } from "../components/OptionsFlow";
+import OptionsChainScanner from "../components/OptionsChainScanner";
+import { StockExWorkerPool } from "../components/edge-ai/StockExWorkerPool";
+import { FeatureGate } from "../commercial/FeatureGate";
 import { InsiderActivity } from "../components/InsiderActivity";
 import { PriceTargets } from "../components/PriceTargets";
 import { NativeAd } from "../components/NativeAd";
@@ -394,6 +397,7 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
   const [isCompareOpen, setIsCompareOpen] = useState(false);
   const [isExportOpen, setIsExportOpen] = useState(false);
   const [sectorExpanded, setSectorExpanded] = useState(false);
+  const [gpuDelta, setGpuDelta] = useState<{ delta: number; signal: string } | null>(null);
 
   const [period, setPeriod] = useState(initialPeriod);
   const availableBrokers = listAvailableBrokers();
@@ -441,6 +445,46 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
       .then((result) => { if (!cancelled) { setAi(result); setAiLoading(false); } })
       .catch(() => { if (!cancelled) { setAi(fallbackAnalysis(scores)); setAiLoading(false); } });
     return () => { cancelled = true; };
+  }, [stock.symbol]);
+
+  // GPU order-flow delta from WebWorker via shared pool (Phase 43)
+  useEffect(() => {
+    const symbol = stock.symbol;
+    if (!symbol) return;
+
+    let cancelled = false;
+
+    (async () => {
+      try {
+        const res = await fetch(`/api/v1/fo/scanner/${encodeURIComponent(symbol)}`);
+        const data = await res.json();
+        if (cancelled || !data.success || !data.heavyStrikes) return;
+
+        const callVols = data.heavyStrikes
+          .filter((s: any) => s.option_type === "CE")
+          .map((s: any) => Number(s.open_interest));
+        const putVols = data.heavyStrikes
+          .filter((s: any) => s.option_type === "PE")
+          .map((s: any) => Number(s.open_interest));
+
+        StockExWorkerPool.on("gpu_order_flow_result", (response: any) => {
+          if (!cancelled) setGpuDelta(response.payload);
+          StockExWorkerPool.off("gpu_order_flow_result");
+        });
+
+        StockExWorkerPool.dispatch("compute_gpu_order_flow", {
+          callVols: callVols.length > 0 ? callVols : [1000],
+          putVols: putVols.length > 0 ? putVols : [1000],
+        });
+      } catch {
+        // Graceful degradation
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+      StockExWorkerPool.off("gpu_order_flow_result");
+    };
   }, [stock.symbol]);
 
   // Sticky header scroll direction observer
@@ -560,6 +604,23 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
           </button>
         </div>
         <HeroSection stock={stock} isUp={isUp} trendColor={trendColor} />
+        {gpuDelta && (
+          <div style={{
+            marginTop: "12px", display: "inline-flex", alignItems: "center", gap: "8px",
+            padding: "6px 14px", borderRadius: "8px", background: colors.fill,
+            border: `1px solid ${colors.border}`, fontSize: "11px",
+          }}>
+            <span style={{ color: colors.textTertiary }}>GPU Delta:</span>
+            <strong style={{
+              color: gpuDelta.signal.includes("BULLISH") ? colors.success
+                : gpuDelta.signal.includes("BEARISH") ? colors.danger
+                : colors.textSecondary,
+            }}>
+              {gpuDelta.signal.replace(/_/g, " ")}
+            </strong>
+            <span style={{ color: colors.textTertiary }}>({gpuDelta.delta.toLocaleString("en-IN")})</span>
+          </div>
+        )}
       </div>
 
       {/* ── Price Chart ── */}
@@ -985,6 +1046,11 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
 
       {/* ── Options Flow ── */}
       <OptionsFlow />
+
+      {/* ── F&O Options Chain Scanner (Phase 35) ── */}
+      <FeatureGate feature="api_access">
+        <OptionsChainScanner ticker={stock.symbol} />
+      </FeatureGate>
 
       {/* ── Insider Activity ── */}
       <InsiderActivity />

@@ -3,19 +3,59 @@ import { colors, typography, radius, animation } from "../design/tokens";
 
 export type Variant = "primary" | "secondary" | "tertiary" | "install";
 
-const STYLE_MAP: Record<Variant, { background: string; color: string; border: string }> = {
-  primary:   { background: colors.primary, color: colors.onPrimary, border: "1px solid transparent" },
-  secondary: { background: "transparent", color: colors.onDark, border: `1px solid ${colors.hairline}` },
-  tertiary:  { background: colors.surfaceElevated, color: colors.onDark, border: "1px solid transparent" },
-  install:   { background: colors.surfaceCard, color: colors.onDark, border: `1px solid ${colors.hairline}` },
+const STYLE_MAP: Record<Variant, { background: string; color: string; border: string; boxShadow?: string }> = {
+  primary: {
+    background: "linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.04) 100%)",
+    color: colors.textPrimary,
+    border: `1px solid ${colors.hairlineSoft}`,
+    boxShadow: "0 0 0 1px rgba(255,255,255,0.03) inset",
+  },
+  secondary: {
+    background: "rgba(255,255,255,0.02)",
+    color: colors.onDark,
+    border: `1px solid ${colors.hairline}`,
+    boxShadow: "0 0 0 1px rgba(255,255,255,0.02) inset",
+  },
+  tertiary: {
+    background: "linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.025) 100%)",
+    color: colors.onDark,
+    border: `1px solid ${colors.hairlineSoft}`,
+    boxShadow: "0 0 0 1px rgba(255,255,255,0.02) inset",
+  },
+  install: {
+    background: "linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.03) 100%)",
+    color: colors.onDark,
+    border: `1px solid ${colors.hairlineSoft}`,
+    boxShadow: "0 0 0 1px rgba(255,255,255,0.02) inset",
+  },
 };
 
-// Principle 4: Interaction states — hover → 15% lift, active → 30%
-const HOVER_BG: Record<Variant, string> = {
-  primary:   colors.surface,       // subtle darken on white CTA
-  secondary: colors.surfaceElevated,
-  tertiary:  colors.surfaceCard,
-  install:   colors.surfaceCard,
+const HOVER_MAP: Record<Variant, { background: string; borderColor: string; color: string; boxShadow?: string; transform?: string }> = {
+  primary: {
+    background: "linear-gradient(180deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.06) 100%)",
+    borderColor: colors.hairlineStrong,
+    color: colors.textPrimary,
+    boxShadow: "0 0 0 1px rgba(255,255,255,0.04) inset, 0 14px 30px rgba(0,0,0,0.24)",
+    transform: "translateY(-1px)",
+  },
+  secondary: {
+    background: colors.surfaceElevated,
+    borderColor: colors.hairlineStrong,
+    color: colors.textPrimary,
+    boxShadow: "0 0 0 1px rgba(255,255,255,0.02) inset",
+  },
+  tertiary: {
+    background: colors.surfaceCard,
+    borderColor: colors.hairlineStrong,
+    color: colors.textPrimary,
+    boxShadow: "0 0 0 1px rgba(255,255,255,0.02) inset",
+  },
+  install: {
+    background: colors.surfaceCard,
+    borderColor: colors.hairlineStrong,
+    color: colors.textPrimary,
+    boxShadow: "0 0 0 1px rgba(255,255,255,0.02) inset",
+  },
 };
 
 type Size = "sm" | "md" | "lg" | "icon";
@@ -39,7 +79,7 @@ export function Button({
   children: ReactNode;
 } & ButtonHTMLAttributes<HTMLButtonElement>) {
   const base = STYLE_MAP[variant];
-  const hoverBg = HOVER_BG[variant];
+  const hover = HOVER_MAP[variant];
   const sizeStyles = SIZE_MAP[size];
 
   return (
@@ -60,18 +100,28 @@ export function Button({
         justifyContent: "center",
         gap: "8px",
         cursor: "pointer",
-        transition: `background-color ${animation.fast}, border-color ${animation.fast}`,
+        transition: `background ${animation.fast}, border-color ${animation.fast}, color ${animation.fast}, box-shadow ${animation.fast}, transform ${animation.fast}`,
         userSelect: "none",
         WebkitFontSmoothing: "antialiased",
+        backdropFilter: "blur(18px)",
+        WebkitBackdropFilter: "blur(18px)",
         ...base,
         ...style,
       }}
       onMouseEnter={(e) => {
-        e.currentTarget.style.backgroundColor = hoverBg;
+        e.currentTarget.style.background = hover.background;
+        e.currentTarget.style.borderColor = hover.borderColor;
+        e.currentTarget.style.color = hover.color;
+        e.currentTarget.style.boxShadow = hover.boxShadow ?? "";
+        e.currentTarget.style.transform = hover.transform ?? "translateY(0)";
         props.onMouseEnter?.(e);
       }}
       onMouseLeave={(e) => {
-        e.currentTarget.style.backgroundColor = base.background;
+        e.currentTarget.style.background = base.background;
+        e.currentTarget.style.borderColor = base.border.replace("1px solid ", "");
+        e.currentTarget.style.color = base.color;
+        e.currentTarget.style.boxShadow = base.boxShadow ?? "";
+        e.currentTarget.style.transform = "translateY(0)";
         props.onMouseLeave?.(e);
       }}
     >
