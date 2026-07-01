@@ -19,9 +19,9 @@
 const reportJson = process.argv.includes('--json');
 
 async function main() {
-  // Dynamic import so this works as an ESM script
+  // Dynamic import via tsx — tsx resolves .ts extensions in ESM context
   const { buildDataPlaneHealthReport } = await import(
-    '../../src/data-plane/admin/dataPlaneHealthBuilder.js'
+    '../../src/data-plane/admin/dataPlaneHealthBuilder.ts'
   );
 
   const health = await buildDataPlaneHealthReport();
