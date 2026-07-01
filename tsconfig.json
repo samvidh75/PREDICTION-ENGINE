@@ -57,6 +57,7 @@
     "src/engines/**/*.ts",
     "src/providers/*.ts",
     "src/services/*.ts",
+    "src/data-plane/**/*.ts",
     "src/aggregators/**/*.ts",
     "src/utils/*.ts",
     "src/**/*.d.ts"

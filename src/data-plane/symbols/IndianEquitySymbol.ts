@@ -1,0 +1,93 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// Phase 21A — Canonical Indian equity symbol contract
+//
+// Single-source-of-truth interface for any Indian equity symbol in the
+// prediction-engine system. All ingestion, storage, and display code
+// references this contract — not multiple ad-hoc type definitions.
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** Recognised Indian stock exchanges for equity trading. */
+export type IndianExchange = 'NSE' | 'BSE';
+
+/**
+ * Instrument segment for an Indian equity.
+ * - `EQ` = Normal equity (most common)
+ * - `SM` = Small and Medium Enterprise (SME)
+ * - `ET` = Exchange Traded Fund / Index Fund
+ * - `BE` = Book Building / Trade-to-Trade
+ * - Defaults to `EQ` when unknown.
+ */
+export type IndianInstrumentSegment = 'EQ' | 'SM' | 'ET' | 'BE';
+
+/**
+ * Listing status as reported by the exchange.
+ * - `active`  = Currently trading
+ * - `suspended` = Trading halted (can be reinstated)
+ * - `delisted` = Permanently removed
+ */
+export type IndianListingStatus = 'active' | 'suspended' | 'delisted';
+
+/**
+ * Canonical Indian equity symbol.
+ *
+ * Every symbol in the system MUST be expressed as an instance of this
+ * interface.  The canonical symbol is always the NSE ticker (uppercase,
+ * no suffix).  BSE-only symbols use their BSE code as `canonicalSymbol`
+ * with `exchange: 'BSE'`.
+ */
+export interface IndianEquitySymbol {
+  /** Primary stable identifier — always the NSE ticker (uppercase, no
+   *  `.NS` / `-EQ` suffix) for NSE-traded equities, or the BSE ticker
+   *  for BSE-only equities. */
+  readonly canonicalSymbol: string;
+
+  /** The primary exchange for this equity. */
+  readonly exchange: IndianExchange;
+
+  /** Instrument segment — defaults to `EQ`. */
+  readonly segment: IndianInstrumentSegment;
+
+  /** ISIN (International Securities Identification Number)
+   *  — 12 alphanumeric characters.  May be empty for very small-Cap /
+   *  unlisted instruments. */
+  readonly isin: string;
+
+  /** Company / fund long name. */
+  readonly companyName: string;
+
+  /** Sector classification (nullable). */
+  readonly sector: string | null;
+
+  /** Industry classification (nullable). */
+  readonly industry: string | null;
+
+  /** Listing status on the primary exchange. */
+  readonly listingStatus: IndianListingStatus;
+
+  /** Historical / alternative tickers that resolve to this symbol.
+   *  Includes `.NS`/`.BO`-suffixed variants, BSE numeric codes as strings,
+   *  previous tickers after renames, and known provider-specific aliases. */
+  readonly aliases: readonly string[];
+
+  /** BSE scrip code (numeric) if cross-listed — stored as string
+   *  to preserve leading-zero codes.  `null` if not applicable. */
+  readonly bseCode: string | null;
+
+  /** NSE symbol (same as `canonicalSymbol` for NSE-primary equities). */
+  readonly nseSymbol: string | null;
+
+  /** Face value per share in INR (if known). */
+  readonly faceValue: number | null;
+
+  /** Market capitalisation in INR Crores (if known). */
+  readonly marketCapCr: number | null;
+
+  /** Category derived from market cap tier. */
+  readonly marketCapCategory: 'large' | 'mid' | 'small' | 'micro' | null;
+
+  /** Timestamp (Unix ms) when this symbol was first seen. */
+  readonly firstSeenAt: number;
+
+  /** Timestamp (Unix ms) when this symbol was last refreshed. */
+  readonly lastSeenAt: number;
+}
