@@ -125,6 +125,19 @@ export default function HomePage() {
   const [query, setQuery] = useState("");
   const [searchResults, setSearchResults] = useState<Array<{ symbol: string; name: string }>>([]);
   const sectionGap = useResponsiveValue(layout.sectionGapMobile, layout.sectionGapDesktop);
+  const normalizedQuery = query.trim().toUpperCase();
+
+  const resolveSearchTarget = () => {
+    if (!normalizedQuery) return null;
+
+    const exactSymbol = searchResults.find((stock) => stock.symbol.toUpperCase() === normalizedQuery);
+    if (exactSymbol) return exactSymbol.symbol;
+
+    const exactName = searchResults.find((stock) => stock.name.toUpperCase() === normalizedQuery);
+    if (exactName) return exactName.symbol;
+
+    return searchResults[0]?.symbol ?? normalizedQuery;
+  };
 
   // Auto-focus search on desktop
   useEffect(() => {
@@ -147,7 +160,16 @@ export default function HomePage() {
       try {
         const res = await fetch(`/api/search?q=${encodeURIComponent(normalized)}&limit=5`);
         const payload = await res.json();
-        if (!cancelled) setSearchResults((payload.results ?? []));
+        if (!cancelled) {
+          const results = payload.results ?? [];
+          const exact = normalized.toUpperCase();
+          const sorted = [...results].sort((a, b) => {
+            const aExact = a.symbol.toUpperCase() === exact || a.name.toUpperCase() === exact ? 1 : 0;
+            const bExact = b.symbol.toUpperCase() === exact || b.name.toUpperCase() === exact ? 1 : 0;
+            return bExact - aExact;
+          });
+          setSearchResults(sorted);
+        }
       } catch { /* search is optional */ }
     }, 200);
     return () => { cancelled = true; clearTimeout(timer); };
@@ -276,8 +298,9 @@ export default function HomePage() {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={(e) => {
-                  if (e.key === "Enter" && searchResults[0]) {
-                    navigate(`/stock/${searchResults[0].symbol}`);
+                  if (e.key === "Enter") {
+                    const target = resolveSearchTarget();
+                    if (target) navigate(`/stock/${target}`);
                   }
                 }}
                 style={{
@@ -323,7 +346,7 @@ export default function HomePage() {
                 <Command size={10} />K
               </kbd>
             </div>
-            <Button onClick={() => navigate(`/stock/${searchResults[0]?.symbol ?? "HDFCBANK"}`)}>Research</Button>
+            <Button onClick={() => navigate(`/stock/${resolveSearchTarget() ?? "HDFCBANK"}`)}>Research</Button>
           </div>
           {searchResults.length > 0 && (
             <div style={{

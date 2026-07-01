@@ -282,6 +282,28 @@ function StockSkeleton() {
 function StockError({ symbol }: { symbol: string }) {
   return <div style={{ color: colors.textPrimary, padding: "40px", textAlign: "center" }}>We could not load research for {symbol}.</div>;
 }
+
+function buildFallbackStockResponse(symbol: string): {
+  stock: StockResearchDetail;
+  financialChartData: { period: string; value: number }[];
+  shareholding?: any;
+  shareholdingSeries?: any[];
+  period?: string;
+} | null {
+  const local = getStockResearch(symbol);
+  if (!local) return null;
+
+  return {
+    stock: local as unknown as StockResearchDetail,
+    financialChartData: local.financials.annual.revenue.map((item) => ({
+      period: item.period,
+      value: Math.round(item.value),
+    })),
+    shareholding: local.shareholding[0],
+    shareholdingSeries: local.shareholding,
+    period: local.shareholding[0]?.period ?? "Latest",
+  };
+}
 function StockView({ stock, financialChartData, shareholding, shareholdingSeries, period: initialPeriod }: {
   stock: StockResearchDetail;
   financialChartData: { period: string; value: number }[];
@@ -970,10 +992,18 @@ export default function StockPage() {
   const { data, isLoading, error } = useQuery({
     queryKey: ["stock", symbol],
     queryFn: async () => {
-      // In production this would call the API; for now return a minimal shape
-      const res = await fetch(`/api/stock/${symbol}`);
-      if (!res.ok) throw new Error("Failed to load stock data");
-      return res.json() as Promise<{ stock: StockResearchDetail; financialChartData: { period: string; value: number }[]; shareholding?: any; shareholdingSeries?: any[]; period?: string }>;
+      try {
+        const res = await fetch(`/api/stock/${symbol}`);
+        if (res.ok) {
+          return res.json() as Promise<{ stock: StockResearchDetail; financialChartData: { period: string; value: number }[]; shareholding?: any; shareholdingSeries?: any[]; period?: string }>;
+        }
+      } catch {
+        // fall through to local fallback
+      }
+
+      const fallback = buildFallbackStockResponse(symbol ?? "");
+      if (fallback) return fallback;
+      throw new Error("Failed to load stock data");
     },
     enabled: !!symbol,
     staleTime: 30_000,
