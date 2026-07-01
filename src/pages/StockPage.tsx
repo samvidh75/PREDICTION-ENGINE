@@ -85,7 +85,17 @@ function formatNewsTime(value?: string): string {
   if (minutesAgo < 60) return `${Math.max(minutesAgo, 1)}m ago`;
   if (minutesAgo < 1440) return `${Math.round(minutesAgo / 60)}h ago`;
   return `${Math.round(minutesAgo / 1440)}d ago`;
-}// ── Sticky Header (48px, shows on scroll past hero) ─────────────
+}
+
+function formatInr(value: number | null | undefined, digits = 0) {
+  if (value == null || Number.isNaN(value)) return "—";
+  return new Intl.NumberFormat("en-IN", {
+    maximumFractionDigits: digits,
+    minimumFractionDigits: digits,
+  }).format(value);
+}
+
+// ── Sticky Header (48px, shows on scroll past hero) ─────────────
 function StickyHeader({ symbol, price, changeAbs, changePercent, trendColor }: {
   symbol: string; price: number; changeAbs: number; changePercent: number; trendColor: string;
 }) {
@@ -104,8 +114,8 @@ function StickyHeader({ symbol, price, changeAbs, changePercent, trendColor }: {
           {symbol}
         </span>
         <PriceFlash value={price}>
-          <span style={{ color: colors.textPrimary, fontSize: "16px", fontWeight: 600 }}>
-            ₹{price.toLocaleString("en-IN")}
+        <span style={{ color: colors.textPrimary, fontSize: "16px", fontWeight: 600 }}>
+            ₹{formatInr(price)}
           </span>
         </PriceFlash>
         <span style={{ color: trendColor, fontSize: "13px", fontWeight: 500, display: "inline-flex", alignItems: "center", gap: "4px" }}>
@@ -133,7 +143,7 @@ function HeroSection({ stock, isUp, trendColor }: { stock: StockResearchDetail; 
         <span style={{ color: colors.textSecondary, fontSize: "14px", fontWeight: 500 }}>{stock.companyName}</span>
       </div>
       <div style={{ fontSize: useResponsiveValue("40px", "64px"), fontWeight: 700, color: colors.textPrimary, lineHeight: "1.1", letterSpacing: "-0.02em", display: "flex", alignItems: "center", justifyContent: "center", gap: "12px" }}>
-        <PriceFlash value={stock.price.current}>₹{stock.price.current.toLocaleString("en-IN")}</PriceFlash>
+        <PriceFlash value={stock.price.current}>₹{formatInr(stock.price.current)}</PriceFlash>
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: "12px", marginTop: "12px", flexWrap: "wrap", justifyContent: "center" }}>
         <div style={{ color: trendColor, fontSize: "18px", fontWeight: 600, display: "inline-flex", alignItems: "center", gap: "6px" }}>
@@ -150,7 +160,7 @@ function HeroSection({ stock, isUp, trendColor }: { stock: StockResearchDetail; 
         </div>
       </div>
       <div style={{ fontSize: "13px", color: colors.textSecondary, marginTop: "10px" }}>
-        Conf: {stock.confidenceMeter}% · Market Cap: ₹{Math.round(stock.price.marketCap).toLocaleString("en-IN")} Cr
+        Conf: {stock.confidenceMeter}% · Market Cap: ₹{formatInr(Math.round(stock.price.marketCap))} Cr
       </div>
     </section>
   );
@@ -603,7 +613,7 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
       <Card className="stock-metrics-card raycast-slideUp" style={{ animationDelay: "0.15s", animationFillMode: "both" }}>
         <CardLabel>Key metrics</CardLabel>
         <div className="stock-metric-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "16px" }}>
-          <MetricCard label="Market Cap" value={`₹${Math.round(stock.price.marketCap).toLocaleString("en-IN")} Cr`} />
+          <MetricCard label="Market Cap" value={`₹${formatInr(Math.round(stock.price.marketCap))} Cr`} />
           <MetricCard label="PE (TTM)" value={fundamentals.pe?.toFixed(1) ?? "—"}
             trend={fundamentals.pe != null && fundamentals.pe < 20 ? "up" : fundamentals.pe != null && fundamentals.pe > 30 ? "down" : "neutral"}
             subtitle={fundamentals.industryPe != null ? `Sector: ${fundamentals.industryPe.toFixed(1)}` : sectorRelMap["pe"] ? `Sector: ${sectorRelMap["pe"]}` : undefined} />
@@ -624,8 +634,8 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
           <MetricCard label="EPS (TTM)" value={fundamentals.eps != null ? `₹${fundamentals.eps.toFixed(1)}` : "—"} />
           <MetricCard label="RSI (14)" value={stock.rsi != null ? String(stock.rsi) : "—"}
             trend={stock.rsi != null && stock.rsi >= 30 && stock.rsi <= 70 ? "neutral" : "down"} />
-          <MetricCard label="52W High" value={fundamentals.high52w != null ? `₹${fundamentals.high52w.toLocaleString("en-IN")}` : "—"} />
-          <MetricCard label="52W Low" value={fundamentals.low52w != null ? `₹${fundamentals.low52w.toLocaleString("en-IN")}` : "—"} />
+          <MetricCard label="52W High" value={fundamentals.high52w != null ? `₹${formatInr(fundamentals.high52w)}` : "—"} />
+          <MetricCard label="52W Low" value={fundamentals.low52w != null ? `₹${formatInr(fundamentals.low52w)}` : "—"} />
         </div>
       </Card>      {/* ── Company Identity ── */}
       <Card className="stock-company-card raycast-slideUp" style={{ animationDelay: "0.2s", animationFillMode: "both" }}>
@@ -694,7 +704,7 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
                   return (
                     <tr key={entry.period} style={{ borderBottom: `1px solid ${colors.border}` }}>
                       <td style={{ padding: "8px", color: colors.textPrimary }}>{entry.period}</td>
-                      <td style={{ padding: "8px", textAlign: "right", color: colors.textPrimary }}>{entry.value.toLocaleString("en-IN")}</td>
+                      <td style={{ padding: "8px", textAlign: "right", color: colors.textPrimary }}>{formatInr(entry.value)}</td>
                       <td style={{ padding: "8px", textAlign: "right", color: growth != null && parseFloat(growth) >= 0 ? colors.success : colors.danger }}>{growth != null ? `${parseFloat(growth) >= 0 ? "+" : ""}${growth}%` : "—"}</td>
                     </tr>
                   );
