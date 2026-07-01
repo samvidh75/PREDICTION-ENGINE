@@ -1,0 +1,23 @@
+name = "stockstory-model-worker"
+main = "src/index.ts"
+compatibility_date = "2025-04-01"
+
+routes = [
+  { pattern = "api.stockstory.in/*", zone_id = "your-zone-id" },
+]
+
+[env.production]
+name = "stockstory-model-worker-prod"
+
+[env.staging]
+name = "stockstory-model-worker-staging"
+
+[site]
+bucket = "./model-weights"
+include = ["*.gguf"]
+
+[triggers]
+crons = []
+
+[limits]
+cpu_ms = 5000
