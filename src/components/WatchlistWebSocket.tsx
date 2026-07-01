@@ -12,14 +12,17 @@ interface WatchlistWebSocketProps {
   maxDisplay?: number;
   /** CSS class name for the container */
   className?: string;
+  /** Tickers to subscribe to for per-ticker filtering */
+  watchlistTickers?: string[];
 }
 
 export default function WatchlistWebSocket({
   maxDisplay = 20,
   className = "",
+  watchlistTickers,
 }: WatchlistWebSocketProps) {
   const { livePrices, connectionState, tickCount, reconnect } =
-    useWatchlistWebSocket();
+    useWatchlistWebSocket({ watchlistTickers });
 
   const tickers = Array.from(livePrices.values()).slice(0, maxDisplay);
 

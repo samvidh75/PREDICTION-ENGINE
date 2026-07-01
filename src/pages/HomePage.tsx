@@ -453,7 +453,7 @@ export default function HomePage() {
               <Zap size={15} /> Live Price Feed
             </h2>
           </div>
-          <WatchlistWebSocket maxDisplay={10} />
+          <WatchlistWebSocket maxDisplay={10} watchlistTickers={["RELIANCE", "TCS", "INFY", "HDFCBANK", "SBIN"]} />
         </section>
 
         {/* Recent alerts */}

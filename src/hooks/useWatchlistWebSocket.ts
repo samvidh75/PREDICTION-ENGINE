@@ -24,6 +24,8 @@ interface UseWatchlistWebSocketOptions {
   reconnectDelay?: number;
   /** Maximum reconnect attempts (default: 10) */
   maxReconnects?: number;
+  /** Tickers to subscribe to for per-ticker filtering (default: all) */
+  watchlistTickers?: string[];
 }
 
 interface UseWatchlistWebSocketReturn {
@@ -44,6 +46,7 @@ export function useWatchlistWebSocket(
     url = "/ws/v1/live-stream",
     reconnectDelay = 5000,
     maxReconnects = 10,
+    watchlistTickers,
   } = options;
 
   const [livePrices, setLivePrices] = useState<Map<string, TickerTick>>(new Map());
@@ -70,6 +73,11 @@ export function useWatchlistWebSocket(
       ws.onopen = () => {
         setConnectionState("connected");
         reconnectCountRef.current = 0;
+
+        // Subscribe to specific tickers for per-ticker filtering
+        if (watchlistTickers && watchlistTickers.length > 0) {
+          ws.send(JSON.stringify({ type: "subscribe", tickers: watchlistTickers }));
+        }
       };
 
       ws.onmessage = (event) => {
