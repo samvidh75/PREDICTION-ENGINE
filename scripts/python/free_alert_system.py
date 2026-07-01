@@ -14,6 +14,7 @@ import sys
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from datetime import datetime
+from typing import Optional
 
 import requests
 
@@ -106,6 +107,37 @@ class FreeEquityLensNotificationEngine:
         except requests.RequestException as e:
             print(f"  Telegram network error: {e}")
 
+    def log_email_delivery(self, user_id: str, email: str, subject: str,
+                          status: str = "sent", error: Optional[str] = None):
+        """Record an email delivery attempt in email_delivery_log."""
+        try:
+            conn = sqlite3.connect(DB_PATH)
+            cursor = conn.cursor()
+            cursor.execute(
+                "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='email_delivery_log'"
+            )
+            if cursor.fetchone()[0] == 0:
+                cursor.execute("""
+                    CREATE TABLE IF NOT EXISTS email_delivery_log (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        user_id TEXT NOT NULL,
+                        recipient_email TEXT NOT NULL,
+                        subject TEXT NOT NULL,
+                        status TEXT NOT NULL DEFAULT 'sent',
+                        sent_at TEXT NOT NULL DEFAULT (datetime('now')),
+                        error TEXT
+                    )
+                """)
+            cursor.execute(
+                "INSERT INTO email_delivery_log (user_id, recipient_email, subject, status, error) "
+                "VALUES (?, ?, ?, ?, ?)",
+                (user_id, email, subject, status, error),
+            )
+            conn.commit()
+            conn.close()
+        except Exception as e:
+            print(f"  Failed to log email delivery: {e}")
+
     def dispatch_weekly_reports_to_subscribers(self):
         """Scan for the latest markdown report, email to all active premium users
         via free Gmail SMTP relay (App Password). ~500 emails/day limit."""
@@ -117,10 +149,10 @@ class FreeEquityLensNotificationEngine:
         conn.row_factory = sqlite3.Row
         cursor = conn.cursor()
         cursor.execute(
-            "SELECT user_email FROM customer_subscriptions "
+            "SELECT user_id, user_email FROM customer_subscriptions "
             "WHERE billing_status = 'ACTIVE' AND user_email IS NOT NULL"
         )
-        subscribers = [row["user_email"] for row in cursor.fetchall()]
+        subscribers = [(row["user_id"], row["user_email"]) for row in cursor.fetchall()]
         conn.close()
 
         if not subscribers:
@@ -145,6 +177,11 @@ class FreeEquityLensNotificationEngine:
             print(f"  Failed to read reports: {e}")
             return
 
+        subject = (
+            f"Your Weekly Market Intelligence Digest - "
+            f"{datetime.now().strftime('%d %B %Y')}"
+        )
+
         if DRY_RUN:
             print(
                 f"  [DRY-RUN] Would email {len(subscribers)} subscribers via {GMAIL_USER}"
@@ -159,14 +196,11 @@ class FreeEquityLensNotificationEngine:
             server.starttls()
             server.login(GMAIL_USER, GMAIL_APP_PASSWORD)
 
-            for email in subscribers:
+            for user_id, email in subscribers:
                 msg = MIMEMultipart()
                 msg["From"] = f"StockStory <{GMAIL_USER}>"
                 msg["To"] = email
-                msg["Subject"] = (
-                    f"Your Weekly Market Intelligence Digest - "
-                    f"{datetime.now().strftime('%d %B %Y')}"
-                )
+                msg["Subject"] = subject
                 body_text = (
                     f"Hello Investor,\n\n"
                     f"Here is your weekly stock analysis report:\n\n"
@@ -176,8 +210,16 @@ class FreeEquityLensNotificationEngine:
                     f"https://stockstory.in"
                 )
                 msg.attach(MIMEText(body_text, "plain"))
-                server.sendmail(GMAIL_USER, email, msg.as_string())
-                print(f"  ✓ Report emailed to {email}")
+                try:
+                    server.sendmail(GMAIL_USER, email, msg.as_string())
+                    print(f"  ✓ Report emailed to {email}")
+                    self.log_email_delivery(user_id, email, subject, "sent")
+                except smtplib.SMTPRecipientsRefused as e:
+                    print(f"  ✗ Recipient refused for {email}: {e}")
+                    self.log_email_delivery(user_id, email, subject, "bounced", str(e))
+                except smtplib.SMTPSenderRefused as e:
+                    print(f"  ✗ Sender refused for {email}: {e}")
+                    self.log_email_delivery(user_id, email, subject, "failed", str(e))
 
             server.quit()
             print("  Weekly digest broadcast complete")

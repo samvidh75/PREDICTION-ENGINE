@@ -1633,4 +1633,8 @@ export default async function registerApiRoutes(server: FastifyInstance) {
   // ── Scanner Alert Broadcast Routes ───────────────────────────
   const { registerAlertRoutes } = await import("../commercial/api/alertRoutes.js");
   await registerAlertRoutes(server);
+
+  // ── Broker OAuth & Trading Routes ────────────────────────────
+  const { registerBrokerRoutes } = await import("../commercial/api/brokerRoutes.js");
+  await registerBrokerRoutes(server);
 }

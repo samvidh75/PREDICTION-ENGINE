@@ -141,6 +141,30 @@ def run_weekly_pipeline_cleanup(base_dir: str, dry_run: bool = False):
     if pyc_count > 0:
         print(f"  Removed {pyc_count} .pyc orphan files")
 
+    # 7. Prune email delivery log (market_master.db)
+    email_db = os.path.join(base_dir, "scripts", "python", "market_master.db")
+    if os.path.exists(email_db):
+        try:
+            import importlib.util
+            email_cleanup_path = os.path.join(base_dir, "scripts", "python", "cleanup_email_logs.py")
+            if os.path.exists(email_cleanup_path):
+                spec = importlib.util.spec_from_file_location("cleanup_email_logs", email_cleanup_path)
+                if spec is not None and spec.loader is not None:
+                    mod = importlib.util.module_from_spec(spec)
+                    spec.loader.exec_module(mod)
+                    rows_pruned = mod.prune_email_logs(email_db, days_to_keep=90, dry_run=dry_run)
+                else:
+                    print("  Email log cleanup spec not loaded — skipping")
+                    rows_pruned = 0
+                bytes_saved += rows_pruned * 512
+                print(f"  Email log cleanup: {rows_pruned} record(s) affected")
+            else:
+                print("  Email log cleanup script not found — skipping")
+        except Exception as e:
+            print(f"  Email log cleanup skipped: {e}")
+    else:
+        print("  No market_master.db found — skipping email log cleanup")
+
     megabytes_saved = round(bytes_saved / (1024 * 1024), 2)
     print(f"Maintenance complete. Recovered {megabytes_saved} MB of disk space.\n")
     return bytes_saved
