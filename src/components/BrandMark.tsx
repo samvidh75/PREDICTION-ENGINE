@@ -1,7 +1,7 @@
 export function BrandMark({ size = 40 }: { size?: number }) {
   return (
     <img
-      src="/logo-mark.svg"
+      src="/stockex-mark.svg?v=20260703"
       alt=""
       width={size}
       height={size}

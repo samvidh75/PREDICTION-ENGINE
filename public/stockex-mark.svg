@@ -1,0 +1,65 @@
+<svg width="512" height="512" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="tileGradient" x1="15" y1="10" x2="63" y2="68" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#2D3139"/>
+      <stop offset="0.52" stop-color="#121418"/>
+      <stop offset="1" stop-color="#050608"/>
+    </linearGradient>
+    <linearGradient id="tileSheen" x1="18" y1="12" x2="58" y2="64" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF" stop-opacity="0.26"/>
+      <stop offset="0.34" stop-color="#FFFFFF" stop-opacity="0.06"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="tileEdge" x1="14" y1="10" x2="67" y2="70" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#A9C8FF" stop-opacity="0.95"/>
+      <stop offset="0.28" stop-color="#6E7C98" stop-opacity="0.42"/>
+      <stop offset="0.7" stop-color="#354154" stop-opacity="0.2"/>
+      <stop offset="1" stop-color="#7DA5FF" stop-opacity="0.72"/>
+    </linearGradient>
+    <linearGradient id="markStroke" x1="24" y1="18" x2="54" y2="56" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF"/>
+      <stop offset="0.55" stop-color="#F3F7FF"/>
+      <stop offset="1" stop-color="#D9E3F3"/>
+    </linearGradient>
+    <radialGradient id="accentGlow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(53.5 27.5) rotate(90) scale(8.8)">
+      <stop stop-color="#79C6FF"/>
+      <stop offset="0.55" stop-color="#2F80FF"/>
+      <stop offset="1" stop-color="#125BFF"/>
+    </radialGradient>
+    <filter id="tileGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="18" stdDeviation="10" flood-color="#000000" flood-opacity="0.42"/>
+      <feDropShadow dx="0" dy="0" stdDeviation="6" flood-color="#8AB8FF" flood-opacity="0.12"/>
+    </filter>
+    <filter id="markGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2.5" flood-color="#FFFFFF" flood-opacity="0.06"/>
+      <feDropShadow dx="0" dy="10" stdDeviation="8" flood-color="#000000" flood-opacity="0.42"/>
+    </filter>
+  </defs>
+
+  <g filter="url(#tileGlow)">
+    <rect x="8" y="8" width="64" height="64" rx="17.5" fill="url(#tileGradient)"/>
+    <rect x="8.8" y="8.8" width="62.4" height="62.4" rx="16.6" stroke="url(#tileEdge)" stroke-opacity="0.85" stroke-width="1.6"/>
+    <path
+      d="M16 18C16 14.7 18.7 12 22 12H60C65.5 12 68.6 18.4 65.2 22.7L39.6 54.8C37.1 57.9 32.4 58.4 29.3 55.9L17.9 46.7C16.7 45.8 16 44.3 16 42.8V18Z"
+      fill="url(#tileSheen)"
+      opacity="0.72"
+    />
+  </g>
+
+  <g filter="url(#markGlow)">
+    <path d="M26.2 24.5H47.8" stroke="url(#markStroke)" stroke-width="5.4" stroke-linecap="round"/>
+    <path
+      d="M26.2 24.5C26.2 24.5 26.6 34 36.5 39C46.5 44 47.8 49.2 47.8 56"
+      stroke="url(#markStroke)"
+      stroke-width="5.4"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+    <path d="M47.6 24.6L30.8 54.2" stroke="url(#markStroke)" stroke-width="5.4" stroke-linecap="round"/>
+    <path d="M36.5 54.2H56" stroke="url(#markStroke)" stroke-width="5.4" stroke-linecap="round"/>
+    <path d="M46.4 33.4L52.4 27.2" stroke="url(#markStroke)" stroke-width="4.7" stroke-linecap="round"/>
+  </g>
+
+  <circle cx="53.5" cy="27.5" r="4.35" fill="url(#accentGlow)"/>
+  <circle cx="53.5" cy="27.5" r="1.18" fill="#FFFFFF" opacity="0.96"/>
+</svg>

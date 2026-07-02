@@ -867,20 +867,17 @@ export default function AboutPage() {
     setAuthError(null);
     setSigningIn(true);
     try {
-      await authService.signInWithGoogle();
+      if (window.matchMedia("(max-width: 860px)").matches || window.matchMedia("(display-mode: standalone)").matches) {
+        await authService.beginGoogleRedirect();
+        return;
+      }
+
+      await authService.beginGoogleRedirect().catch(async () => {
+        await authService.signInWithGoogle();
+      });
       openWorkspace();
     } catch (error) {
-      const message = mapAuthError(error);
-      if (message.includes("popup blocked")) {
-        try {
-          await authService.beginGoogleRedirect();
-          return;
-        } catch (redirectError) {
-          setAuthError(mapAuthError(redirectError));
-        }
-      } else {
-        setAuthError(message);
-      }
+      setAuthError(mapAuthError(error));
     } finally {
       setSigningIn(false);
     }
