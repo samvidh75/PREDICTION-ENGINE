@@ -6,32 +6,16 @@ import { CloudflareAiProvider } from '../../services/llm/CloudflareAiProvider';
 const execPromise = util.promisify(exec);
 
 const DETERMINISTIC_FALLBACKS: Record<string, string[]> = {
-  BULLISH_MOMENTUM: [
+  STRONG_BULLISH_CONVERGENCE: [
     'trading above both its 50-day and 200-day SMAs with strong RSI momentum',
     'price action confirms a sustained uptrend with broad market participation',
   ],
-  BEARISH_MOMENTUM: [
-    'trading below key moving averages with weakening RSI momentum',
+  BEARISH_DOWN_DRIFT: [
+    'trading below both its 50-day and 200-day SMAs with weakening momentum',
     'price structure suggests continued downside pressure in the near term',
   ],
-  BULLISH_CONVERGENCE: [
-    'holding above its 200-day SMA floor while RSI indicators stabilise',
-    'long-term support base remains intact for potential recovery',
-  ],
-  BEARISH_CONVERGENCE: [
-    'trading below its 200-day SMA with RSI in bearish territory',
-    'structural resistance caps upside until momentum shifts',
-  ],
-  NEUTRAL_RECOVERY: [
-    'showing early recovery signals with 50-day SMA converging towards 200-day',
-    'price consolidation within a defined range warrants close monitoring',
-  ],
-  CAUTIOUS_CROSSOVER: [
-    'death cross pattern forming as shorter-term averages lag',
-    'risk management remains paramount until trend re-establishes',
-  ],
-  NEUTRAL_STABLE: [
-    'range-bound price action with balanced risk-reward setup',
+  CONSOLIDATION_RANGE: [
+    'range-bound price action with SMAs in a mixed alignment',
     'waiting for a catalyst-driven breakout above resistance levels',
   ],
 };
@@ -41,29 +25,38 @@ function buildDeterministicResponse(symbol: string, sector: string, metrics: Rec
   const rsi = Number(metrics.rsi_14).toFixed(3);
   const pe = Number(metrics.pe_ratio);
   const de = Number(metrics.debt_to_equity);
-  const promoterPledged = Number(metrics.promoter_pledged_pct);
   const sma50 = Number(metrics.sma_50).toFixed(3);
   const sma200 = Number(metrics.sma_200).toFixed(3);
-  const trend = String(metrics.trend_state || 'NEUTRAL_STABLE');
-  const lines = DETERMINISTIC_FALLBACKS[trend] || DETERMINISTIC_FALLBACKS.NEUTRAL_STABLE;
+  const mcap = String(metrics.market_cap_display || '0.000 Cr (Pending Ingestion)');
+  const trend = String(metrics.trend_state || 'CONSOLIDATION_RANGE');
+  const lines = DETERMINISTIC_FALLBACKS[trend] || DETERMINISTIC_FALLBACKS.CONSOLIDATION_RANGE;
   const line = lines[Math.floor(Math.random() * lines.length)];
-
   const fundamentalsBlock = pe !== 0 || de !== 0
-    ? `P/E at ${pe.toFixed(3)}x, D/E at ${de.toFixed(3)}, promoter pledge at ${promoterPledged.toFixed(3)}%`
+    ? `P/E at ${pe.toFixed(3)}x, D/E at ${de.toFixed(3)}`
     : `fundamental ratios are pending synchronization`;
-
-  return `${symbol} (${sector || 'exchange pending'}) is currently at INR ${price} and ${line}. Key metrics show RSI-14 at ${rsi}, ${fundamentalsBlock}, with SMA-50 at INR ${sma50} and SMA-200 at INR ${sma200}.`;
+  return `${symbol} (${sector || 'exchange pending'}, ${mcap}) is at INR ${price} and ${line}. Key metrics: RSI-14 at ${rsi}, ${fundamentalsBlock}, SMA-50 at INR ${sma50}, SMA-200 at INR ${sma200}.`;
 }
 
 function buildSystemContextPrompt(symbol: string, metrics: Record<string, number | string>): string {
-  const dataMode = String(metrics.data_mode || '');
+  const dataMode = String(metrics.data_mode || 'UNKNOWN');
   const fundamentalsAvailable = Number(metrics.pe_ratio) !== 0 || Number(metrics.debt_to_equity) !== 0;
   const sector = String(metrics.sector || 'exchange pending');
+  const mcap = String(metrics.market_cap_display || '0.000 Cr (Pending Ingestion)');
+
+  const dataConfidenceTag = dataMode === 'POSTGRES_CACHE'
+    ? 'CACHED SNAPSHOT RUNTIME: Active data compiled via historical end-of-day rows. Live market sync pending.'
+    : dataMode === 'LIVE_PUBLIC_STREAM'
+      ? 'REAL-TIME VERIFIED DATA STREAM: Outbound connection lines verified active.'
+      : 'Data source status unknown. Treat values as indicative.';
+
+  const header = `System Notice: ${dataConfidenceTag}\n\n[CRITICAL FINANCIAL MATRIX]`;
   const priceLine = `- Live Price Close: INR ${Number(metrics.current_price).toFixed(3)}`;
+  const mcapLine = `- Market Cap Scale: ${mcap}`;
   const sma50Line = `- 50-Day SMA Support: INR ${Number(metrics.sma_50).toFixed(3)}`;
   const sma200Line = `- 200-Day SMA Floor: INR ${Number(metrics.sma_200).toFixed(3)}`;
   const rsiLine = `- Relative Strength Index (RSI-14): ${Number(metrics.rsi_14).toFixed(3)}`;
   const trendLine = `- Momentum Trajectory Flag: ${metrics.trend_state}`;
+
   const fundamentalsLines = fundamentalsAvailable
     ? [
         `- Price-to-Earnings (P/E) Ratio: ${Number(metrics.pe_ratio).toFixed(3)}x`,
@@ -72,20 +65,15 @@ function buildSystemContextPrompt(symbol: string, metrics: Record<string, number
       ]
     : [`- Fundamental ratios: pending extraction (balance sheet sync in progress)`];
 
-  const preamble = dataMode === 'POSTGRES_CACHE' || dataMode === 'AUTHENTIC_DATABASE_RECORD'
-    ? `Ground your response on these 3rd-decimal variables from the audited database:`
-    : dataMode === 'YAHOO_MIRROR'
-      ? `Ground your response on these 3rd-decimal variables from the live price mirror (fundamentals queued for sync):`
-      : `Ground your response on these computed price-based indicators:`;
-
   const parts = [
     `You are the official fine-tuned StockEX Market Encyclopedia. Answer user queries using exactly two sentences.`,
-    preamble,
+    `Ground your response entirely on the following verified 3rd-decimal matrix.`,
     ``,
-    `[AUTHORITATIVE REAL-TIME DATA MATRIX]`,
+    header,
     `- Asset Code: ${symbol}`,
     `- Exchange Board Sector: ${sector}`,
     priceLine,
+    mcapLine,
     sma50Line,
     sma200Line,
     rsiLine,
