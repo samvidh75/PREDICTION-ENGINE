@@ -28,7 +28,6 @@ import type { EarningsMetrics, EventMetrics, FinancialMetrics, NewsMetrics, RAGM
 import intelligenceQualityGate from "./intelligenceQualityGate.js";
 import type { UserResearchProfile, AlertChangeView, SavedScannerPreset, DailyResearchDigest, WatchlistThesisView } from "../research/contracts/productContracts.js";
 import { saveProfile, getProfile, createDefaultProfile } from "../services/personalization/researchProfileStore.js";
-import { verifyFirebaseToken } from "../config/firebaseAdmin.js";
 import { loadAuthSession } from "../services/auth/sessionStore";
 import { ingestAlerts, getAlerts, getAlertsBySymbol, acknowledgeAlert, removeAlert } from "../services/personalization/AlertStore.js";
 import { DigestGenerator } from "../services/personalization/DailyResearchDigestGenerator.js";
@@ -50,38 +49,7 @@ function n(v: unknown): number | undefined {
   return Number.isFinite(p) ? p : undefined;
 }
 
-/** Auth preHandler — verifies Firebase ID token via Admin SDK on write routes.
- *  Blocks unauthenticated requests in production. In development, logs and allows through. */
-async function requireAuth(req: any, reply: any) {
-  try {
-    const auth = req.headers?.authorization;
-    if (!auth || !auth.startsWith("Bearer ")) {
-      req.log.warn({ url: req.url }, "Unauthenticated write attempt — no Bearer token");
-      if (process.env.NODE_ENV === "production") {
-        return reply.status(401).send({ error: "Authentication required" });
-      }
-      (req as any).uid = null;
-      return;
-    }
-    const token = auth.slice(7);
-    const decoded = await verifyFirebaseToken(token);
-    if (!decoded) {
-      req.log.warn({ url: req.url }, "Invalid Firebase token");
-      if (process.env.NODE_ENV === "production") {
-        return reply.status(401).send({ error: "Authentication required" });
-      }
-      (req as any).uid = null;
-      return;
-    }
-    (req as any).uid = decoded.uid;
-  } catch (err) {
-    req.log.warn({ url: req.url, err }, "Firebase token verification failed");
-    if (process.env.NODE_ENV === "production") {
-      return reply.status(401).send({ error: "Authentication required" });
-    }
-    (req as any).uid = null;
-  }
-}
+import { requireAuth } from "../services/auth/authMiddleware.js";
 
 /**
  * Create a rate-limit preHandler for a given metric.
