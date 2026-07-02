@@ -1,4 +1,5 @@
 import type { NormalizedFundamentals } from "../normalization/types";
+import { mean } from "@/utils/statisticalUtils";
 
 export interface ValuationFeatures {
   peScore: number | null;
@@ -42,11 +43,8 @@ export function computeValuationFeatures(f: NormalizedFundamentals): ValuationFe
   const present = [f.peRatio, f.pbRatio, f.evEbitda, f.dividendYield].filter(v => v !== null).length;
   const confidence = Math.round((present / 4) * 100);
 
-  let overallValuation: number | null = null;
   const scores = [peScore, pbScore, evEbitdaScore, dividendScore].filter((s): s is number => s !== null);
-  if (scores.length >= 2) {
-    overallValuation = Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
-  }
+  const overallValuation = scores.length >= 2 ? mean(scores) : null;
 
   return { peScore, pbScore, evEbitdaScore, dividendScore, overallValuation, confidence, missingInputs: missing };
 }

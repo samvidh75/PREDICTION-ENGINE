@@ -1,4 +1,5 @@
 import type { NormalizedFundamentals } from "../normalization/types";
+import { mean } from "@/utils/statisticalUtils";
 
 export interface GrowthFeatures {
   revenueGrowthScore: number | null;
@@ -32,11 +33,8 @@ export function computeGrowthFeatures(f: NormalizedFundamentals): GrowthFeatures
   const present = [f.revenueGrowth, f.profitGrowth, f.epsGrowth].filter(v => v !== null).length;
   const confidence = Math.round((present / 3) * 100);
 
-  let overallGrowth: number | null = null;
   const scores = [revenueGrowthScore, profitGrowthScore, epsGrowthScore].filter((s): s is number => s !== null);
-  if (scores.length >= 1) {
-    overallGrowth = Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
-  }
+  const overallGrowth = mean(scores);
 
   return { revenueGrowthScore, profitGrowthScore, epsGrowthScore, overallGrowth, confidence, missingInputs: missing };
 }

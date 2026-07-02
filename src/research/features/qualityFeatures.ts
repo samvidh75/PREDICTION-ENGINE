@@ -1,4 +1,5 @@
 import type { NormalizedFundamentals } from "../normalization/types";
+import { mean } from "@/utils/statisticalUtils";
 
 export interface QualityFeatures {
   profitabilityScore: number | null;
@@ -46,11 +47,8 @@ export function computeQualityFeatures(f: NormalizedFundamentals): QualityFeatur
   const present = [f.roe, f.roa, f.grossMargin, f.operatingMargin, f.debtToEquity].filter(v => v !== null).length;
   const confidence = Math.round((present / 5) * 100);
 
-  let overallQuality: number | null = null;
   const scores = [profitabilityScore, marginScore, balanceSheetScore].filter((s): s is number => s !== null);
-  if (scores.length >= 2) {
-    overallQuality = Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
-  }
+  const overallQuality = scores.length >= 2 ? mean(scores) : null;
 
   return { profitabilityScore, marginScore, efficiencyScore: null, balanceSheetScore, overallQuality, confidence, missingInputs: missing };
 }

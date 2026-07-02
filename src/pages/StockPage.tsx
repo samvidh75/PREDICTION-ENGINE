@@ -26,6 +26,7 @@ import OptionsChainScanner from "../components/OptionsChainScanner";
 import { StockExWorkerPool } from "../components/edge-ai/StockExWorkerPool";
 import { FeatureGate } from "../commercial/FeatureGate";
 import { InsiderActivity } from "../components/InsiderActivity";
+import InsiderTrackingPanel from "../components/InsiderTrackingPanel";
 import { PriceTargets } from "../components/PriceTargets";
 import { NativeAd } from "../components/NativeAd";
 import SubscriptionBanner from "../components/SubscriptionBanner";
@@ -1046,6 +1047,9 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
       <FeatureGate feature="api_access">
         <OptionsChainScanner ticker={stock.symbol} />
       </FeatureGate>
+
+      {/* ── SEBI Insider Disclosure Radar (Phase 52) ── */}
+      <InsiderTrackingPanel ticker={stock.symbol} />
 
       {/* ── Insider Activity ── */}
       <InsiderActivity />

@@ -1,5 +1,6 @@
 import type { HealthometerInput, HealthometerScore, HealthometerDimension, HealthometerLabel } from './types';
 import { classifyHealthometer } from './labels';
+import { mean } from '@/utils/statisticalUtils';
 
 function parseFinite(value: unknown): number | null {
   if (value === null || value === undefined) return null;
@@ -59,7 +60,7 @@ function scoreQuality(f: HealthometerInput['financials']): number | null {
     else if (nm >= 0) scores.push(28);
     else scores.push(12);
   }
-  return scores.length > 0 ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : null;
+  return mean(scores);
 }
 
 function scoreFinancialStrength(f: HealthometerInput['financials']): number | null {
@@ -93,7 +94,7 @@ function scoreFinancialStrength(f: HealthometerInput['financials']): number | nu
     else scores.push(15);
   }
 
-  return scores.length > 0 ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : null;
+  return mean(scores);
 }
 
 function scoreGrowth(f: HealthometerInput['financials']): number | null {
@@ -128,7 +129,7 @@ function scoreGrowth(f: HealthometerInput['financials']): number | null {
     else if (eg >= -0.10) scores.push(20);
     else scores.push(8);
   }
-  return scores.length > 0 ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : null;
+  return mean(scores);
 }
 
 function scoreValuation(f: HealthometerInput['financials']): number | null {
@@ -162,7 +163,7 @@ function scoreValuation(f: HealthometerInput['financials']): number | null {
     else scores.push(12);
   }
 
-  return scores.length > 0 ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : null;
+  return mean(scores);
 }
 
 function scoreRisk(f: HealthometerInput['financials'], factors: HealthometerInput['factors'], features: HealthometerInput['features']): number | null {
@@ -204,7 +205,7 @@ function scoreRisk(f: HealthometerInput['financials'], factors: HealthometerInpu
     else if (v <= 0.50) scores.push(25);
     else scores.push(10);
   }
-  return scores.length > 0 ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : null;
+  return mean(scores);
 }
 
 function scoreMomentum(features: HealthometerInput['features'], factors: HealthometerInput['factors']): number | null {
@@ -245,7 +246,7 @@ function scoreMomentum(features: HealthometerInput['features'], factors: Healtho
     else if (rsi >= 20 && rsi < 30) scores.push(20);
     else scores.push(10);
   }
-  return scores.length > 0 ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : null;
+  return mean(scores);
 }
 
 function scoreStability(f: HealthometerInput['financials'], features: HealthometerInput['features']): number | null {
@@ -285,7 +286,7 @@ function scoreStability(f: HealthometerInput['financials'], features: Healthomet
     else if (logMc >= 1.5) scores.push(28);
     else scores.push(15);
   }
-  return scores.length > 0 ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : null;
+  return mean(scores);
 }
 
 function scoreCashFlowQuality(f: HealthometerInput['financials']): number | null {
@@ -305,7 +306,7 @@ function scoreCashFlowQuality(f: HealthometerInput['financials']): number | null
     else if (conversionRatio >= 0.3) scores.push(55);
     else scores.push(35);
   }
-  return scores.length > 0 ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : null;
+  return mean(scores);
 }
 
 export class HealthometerEngine {
@@ -359,7 +360,7 @@ export class HealthometerEngine {
           totalWeight += w;
         }
       }
-      overallScore = totalWeight > 0 ? Math.round(weightedSum / totalWeight) : Math.round(validScores.reduce((a, b) => a + b, 0) / validScores.length);
+      overallScore = totalWeight > 0 ? Math.round(weightedSum / totalWeight) : mean(validScores);
     }
 
     const label: HealthometerLabel = classifyHealthometer(overallScore, validDimensionCount, totalDimensionCount);

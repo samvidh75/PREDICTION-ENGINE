@@ -1,4 +1,5 @@
 import type { NormalizedFundamentals } from "../normalization/types";
+import { mean } from "@/utils/statisticalUtils";
 
 export interface RiskFeatures {
   leverageScore: number | null;
@@ -48,12 +49,8 @@ export function computeRiskFeatures(f: NormalizedFundamentals, beta: number | nu
   const present = [f.debtToEquity, beta, f.netProfit, f.currentRatio].filter(v => v !== null).length;
   const confidence = Math.round((present / 4) * 100);
 
-  let overallRisk: number | null = null;
   const scores = [leverageScore, volatilityScore, earningsRiskScore, liquidityScore].filter((s): s is number => s !== null);
-
-  if (scores.length >= 2) {
-    overallRisk = Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
-  }
+  const overallRisk = scores.length >= 2 ? mean(scores) : null;
 
   return { leverageScore, volatilityScore, earningsRiskScore, liquidityScore, overallRisk, riskFlags: flags, confidence, missingInputs: missing };
 }

@@ -8,6 +8,7 @@
 import type { IntelligenceInput, StockIntelligenceReport } from "../types";
 import type { ScenarioAssumptions, ScenarioOutput, ScenarioImpact, PeerScenarioResult } from "./ScenarioTypes";
 import { deriveDeltas, safeSimulatedScore, scoreDelta, computeScenarioConfidence } from "./ScenarioUtils";
+import { mean } from "@/utils/statisticalUtils.ts";
 
 export class PeerStressSimulator {
   /**
@@ -95,7 +96,7 @@ export class PeerStressSimulator {
     ].filter((s) => s != null) as number[];
 
     return scores.length > 0
-      ? scores.reduce((a, b) => a + b, 0) / scores.length
+      ? mean(scores) ?? 0
       : null;
   }
 
