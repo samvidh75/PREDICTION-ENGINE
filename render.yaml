@@ -75,8 +75,10 @@ services:
       - key: REDIS_URL
         sync: false
 
-      # ── LLM / AI (optional — backend uses deterministic fallback when absent) ─
+      # ── LLM / AI (deterministic fallback on Render — no external API keys needed) ─
       - key: SGLANG_URL
+        sync: false
+      - key: OLLAMA_URL
         sync: false
       - key: LOCAL_AI_ENABLED
         value: "false"
