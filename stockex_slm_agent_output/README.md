@@ -1,15 +1,12 @@
 ---
 base_model: Qwen/Qwen2.5-0.5B-Instruct
-library_name: peft
+library_name: transformers
 model_name: stockex_slm_agent_output
 tags:
-- base_model:adapter:Qwen/Qwen2.5-0.5B-Instruct
-- lora
-- sft
-- transformers
+- generated_from_trainer
 - trl
+- sft
 licence: license
-pipeline_tag: text-generation
 ---
 
 # Model Card for stockex_slm_agent_output
@@ -38,7 +35,6 @@ This model was trained with SFT.
 
 ### Framework versions
 
-- PEFT 0.19.1
 - TRL: 1.7.0
 - Transformers: 5.12.1
 - Pytorch: 2.12.1

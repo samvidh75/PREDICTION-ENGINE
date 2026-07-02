@@ -100,7 +100,7 @@ export default function PortfolioPage() {
     setSyncMessage(null);
     const session = loadAuthSession();
     if (session.status !== "authenticated" || !session.uid) {
-      setSyncMessage("Please sign in to sync broker portfolios");
+      setSyncMessage("Sign in to sync portfolio data");
       setSyncing(false);
       return;
     }
@@ -110,13 +110,13 @@ export default function PortfolioPage() {
       if (data.synced) {
         setBrokerSyncs(data.brokers || []);
         const successCount = (data.brokers || []).filter((b: any) => b.status === "success").length;
-        setSyncMessage(`Synced ${successCount}/${data.brokers.length} broker connections`);
+        setSyncMessage(`Synced ${successCount}/${data.brokers.length} accounts`);
         loadHoldings();
       } else {
-        setSyncMessage(data.message || "No broker connections found");
+        setSyncMessage(data.message || "No accounts found");
       }
     } catch {
-      setSyncMessage("Sync failed — check broker connections");
+      setSyncMessage("Sync failed");
     } finally {
       setSyncing(false);
     }
@@ -279,7 +279,7 @@ export default function PortfolioPage() {
           </div>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
             <Button variant="secondary" size="sm" onClick={handleBrokerSync} disabled={syncing}>
-              <BarChart3 size={14} /> {syncing ? "Syncing..." : "Sync from Brokers"}
+              <BarChart3 size={14} /> {syncing ? "Syncing..." : "Sync portfolio"}
             </Button>
             <Button variant="primary" size="sm" onClick={() => { setShowAddForm(!showAddForm); setEditSymbol(null); setFormError(""); }}>
               <Plus size={16} /> {showAddForm ? "Cancel" : "Add Holding"}

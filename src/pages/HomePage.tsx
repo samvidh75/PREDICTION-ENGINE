@@ -17,8 +17,6 @@ import { getAlerts } from "../services/personalization/AlertStore";
 import OnboardingWizard from "../components/GuidedOnboarding";
 import { loadFirstDashboardFlag, dismissFirstDashboardOverlay, markFirstDashboardPending } from "../services/onboarding/onboardingFirstRunMemory";
 import WatchlistWebSocket from "../components/WatchlistWebSocket";
-import BrokerStatusBar from "../components/BrokerStatusBar";
-import SubscriptionBanner from "../components/SubscriptionBanner";
 import DataSourceBadge from "../components/DataSourceBadge";
 import type { EnhancedScanType } from "../services/scanner/presets";
 import type { AlertStoreItem } from "../services/personalization/AlertStore";
@@ -181,13 +179,6 @@ export default function HomePage() {
 
   return (
     <div style={{ display: "grid", gap: sectionGap }}>
-
-      {/* ════════════════ BROKER STATUS BAR ════════════════ */}
-      <BrokerStatusBar />
-
-      {/* ════════════════ SUBSCRIPTION BANNER ════════════════ */}
-      <SubscriptionBanner />
-
       {/* ════════════════ HERO ════════════════ */}
       <section
         style={{

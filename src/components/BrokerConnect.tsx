@@ -215,9 +215,6 @@ function BrokerConnectContent() {
         ))}
       </div>
 
-      <p style={{ fontSize: 9, color: colors.textTertiary, fontFamily: "monospace", margin: 0, lineHeight: 1.5, padding: space[2], border: `1px solid ${colors.hairline}`, borderRadius: radius.sm }}>
-        Equity Lens is not a SEBI-registered investment advisor. Trade execution occurs on the broker platform.
-      </p>
     </div>
   );
 }

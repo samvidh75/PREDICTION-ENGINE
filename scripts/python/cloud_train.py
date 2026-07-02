@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-cloud_train.py — Native Qwen2.5-0.5B-Instruct LoRA Fine-Tuning (TRL 1.7.0).
-Trains on the encyclopedia dataset and patches adapter_config.json
-for Cloudflare Workers AI compatibility (model_type: "qwen2").
+cloud_train.py — Production LoRA Fine-Tuning for StockEX.
+Trains Qwen2.5-0.5B on stockex_encyclopedia_dataset.jsonl and patches
+adapter_config.json for Cloudflare compatibility.
 
 Usage:
     python3 scripts/python/cloud_train.py
@@ -14,15 +14,15 @@ import json
 from datasets import load_dataset
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from peft import LoraConfig, get_peft_model
-from trl import SFTTrainer, SFTConfig
+from trl import SFTConfig, SFTTrainer
 
 MODEL_ID = "Qwen/Qwen2.5-0.5B-Instruct"
 DATASET_PATH = "stockex_encyclopedia_dataset.jsonl"
 OUTPUT_DIR = "./stockex_slm_agent_output"
 
 
-def execute_qwen_cloud_finetune():
-    print("Initializing Qwen2.5-0.5B-Instruct Cloud Fine-Tuning Pipeline...")
+def execute_production_finetune():
+    print("Initializing Production StockEX Fine-Tuning Pipeline...")
 
     if not os.path.exists(DATASET_PATH):
         print(f"Dataset missing at: {DATASET_PATH}")
@@ -43,15 +43,16 @@ def execute_qwen_cloud_finetune():
     lora_config = LoraConfig(
         r=16,
         lora_alpha=32,
-        target_modules=["q_proj", "v_proj"],
+        target_modules=["q_proj", "v_proj", "k_proj", "o_proj"],
         lora_dropout=0.05,
         bias="none",
         task_type="CAUSAL_LM",
     )
     model = get_peft_model(model, lora_config)
 
-    training_args = SFTConfig(
+    sft_config = SFTConfig(
         output_dir=OUTPUT_DIR,
+        max_length=512,
         per_device_train_batch_size=4,
         gradient_accumulation_steps=4,
         learning_rate=2e-4,
@@ -60,35 +61,32 @@ def execute_qwen_cloud_finetune():
         fp16=True,
         logging_steps=10,
         report_to="none",
-        max_length=512,
-        packing=False,
     )
 
     trainer = SFTTrainer(
         model=model,
-        args=training_args,
         train_dataset=dataset,
-        processing_class=tokenizer,
+        args=sft_config,
     )
 
-    print("Running parameter convergence matrix calculations across GPU channels...")
+    print("Running parameter optimizations...")
     trainer.train()
 
     trainer.model.save_pretrained(OUTPUT_DIR)
     tokenizer.save_pretrained(OUTPUT_DIR)
-    print(f"Fine-tuning completed! Model weights compiled inside: {OUTPUT_DIR}")
+    print(f"Training finished! Saved inside: {OUTPUT_DIR}")
 
     config_path = os.path.join(OUTPUT_DIR, "adapter_config.json")
     if os.path.exists(config_path):
         with open(config_path, "r", encoding="utf-8") as f:
-            config_meta = json.load(f)
+            meta = json.load(f)
 
-        config_meta["model_type"] = "qwen2"
+        meta["model_type"] = "qwen2"
 
         with open(config_path, "w", encoding="utf-8") as f:
-            json.dump(config_meta, f, indent=2)
-        print("adapter_config.json patched with model_type: 'qwen2'.")
+            json.dump(meta, f, indent=2)
+        print("adapter_config.json patched.")
 
 
 if __name__ == "__main__":
-    execute_qwen_cloud_finetune()
+    execute_production_finetune()

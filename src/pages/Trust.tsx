@@ -1,22 +1,20 @@
 import { useResponsiveValue } from "../ui/responsive";
 import { colors, typography, layout } from "../design/tokens";
-import { ResearchOnlyDisclosure } from "../components/trust/ResearchOnlyDisclosure";
-
 const SECTIONS = [
   {
     id: "what-we-are",
     title: "What StockEX India Is",
-    content: "StockEX India is a structured equity research platform. We provide scorecards, theses, risk assessments, scenario analysis, and peer comparisons for listed Indian equities. Our output is research analysis — not investment advice."
+    content: "StockEX India is a structured equity research platform. We provide scorecards, theses, risk assessments, scenario analysis, and peer comparisons for listed Indian equities."
   },
   {
     id: "what-we-are-not",
     title: "What StockEX India Is Not",
-    content: "We are not a SEBI-registered investment advisor. We do not make buy/sell/hold recommendations. We do not provide target prices. We do not offer portfolio management services. We are not a trading platform or brokerage."
+    content: "We do not provide portfolio management services. We are not a trading platform or brokerage."
   },
   {
     id: "research-only",
     title: "Research-Only Policy",
-    content: "Every feature on StockEX India is designed for research purposes. Scorecards are for relative comparison within our framework, not for making specific trading decisions. Confidence indicators signal data quality, not conviction in a price outcome."
+    content: "Every feature on StockEX India is designed for research purposes. Scorecards are for relative comparison within our framework."
   },
   {
     id: "data-sources",
@@ -31,12 +29,7 @@ const SECTIONS = [
   {
     id: "conflicts",
     title: "Conflicts of Interest",
-    content: "StockEX India does not accept compensation from listed companies for research. We do not engage in paid promotions of stocks. We do not hold trading positions in securities we analyze. Our revenue comes from user subscriptions for premium research — not from companies or market intermediaries."
-  },
-  {
-    id: "user-responsibility",
-    title: "User Responsibility",
-    content: "Users are responsible for their own investment decisions. Research outputs from StockEX India should be independently verified. Consult a SEBI-registered investment advisor before making investment decisions. Past performance of any company or score does not guarantee future results."
+    content: "StockEX India does not accept compensation from listed companies for research. We do not engage in paid promotions of stocks."
   },
   {
     id: "feedback",
@@ -60,11 +53,6 @@ export default function Trust() {
         </p>
       </section>
 
-      <div className="raycast-stagger-2" style={{ animationDelay: "0.1s" }}>
-      <ResearchOnlyDisclosure />
-
-      </div>
-
       <div className="raycast-stagger-3" style={{ animationDelay: "0.2s" }}>
       {SECTIONS.map((section) => (
         <article
@@ -83,7 +71,7 @@ export default function Trust() {
       </div>
 
       <footer className="raycast-stagger-4" style={{ animationDelay: "0.3s", marginTop: "48px", paddingTop: "24px", borderTop: `1px solid ${colors.border}`, fontSize: "13px", color: colors.textSecondary }}>
-        <p>Research analysis only. Not investment advice. Consult a SEBI-registered investment advisor before making investment decisions.</p>
+        <p>StockEX India research overview.</p>
       </footer>
     </main>
   );

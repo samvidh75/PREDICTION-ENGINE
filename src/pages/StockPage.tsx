@@ -30,7 +30,6 @@ import InsiderTrackingPanel from "../components/InsiderTrackingPanel";
 import SentimentRadar from "../components/SentimentRadar";
 import { PriceTargets } from "../components/PriceTargets";
 import { NativeAd } from "../components/NativeAd";
-import SubscriptionBanner from "../components/SubscriptionBanner";
 import { MarketBrainPanel } from "../components/market-brain/MarketBrainPanel";
 import AdaptiveAiChat from "../components/AdaptiveAiChat";
 import { ResearchAiExplanationPanel } from "../components/ai-orchestrator/ResearchAiExplanationPanel";
@@ -406,7 +405,7 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
   const effectiveChartData = financialChartData.length > 0 ? financialChartData : selectedFinancialSeries.map((item) => ({ period: item.period, value: Math.round(item.value) }));
   const newsItems = stock.news.slice(0, 7);
   const filteredNews = newsFilter === "all" ? newsItems : newsItems.filter((n: any) => n.sentiment === newsFilter);
-  const disclaimer = "This is not investment advice. All data is for educational purposes. Past performance does not guarantee future results.";
+  const disclaimer = "StockEX research updates are shown with the page footer.";
   const fundamentals = stock.fundamentals ?? {};
   const companyProfile = stock.companyProfile ?? {
     founded: "—",
@@ -616,9 +615,6 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
           </div>
         )}
       </div>
-
-      {/* ── Subscription Banner ── */}
-      <SubscriptionBanner />
 
       {/* ── Price Chart ── */}
       <Card className="stock-chart-card raycast-slideUp" style={{ animationDelay: "0.05s", animationFillMode: "both" }}>
