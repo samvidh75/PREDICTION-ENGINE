@@ -1,6 +1,6 @@
 {
-  "name": "STOCKEX",
-  "short_name": "STOCKEX",
+  "name": "StockEx",
+  "short_name": "StockEx",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#070A0F",
