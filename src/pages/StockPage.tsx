@@ -24,6 +24,7 @@ import { SimilarStocks } from "../components/SimilarStocks";
 import { OptionsFlow } from "../components/OptionsFlow";
 import OptionsChainScanner from "../components/OptionsChainScanner";
 import { StockExWorkerPool } from "../components/edge-ai/StockExWorkerPool";
+import { EdgeAiChatSection } from "../components/edge-ai/EdgeAiChatSection";
 import { FeatureGate } from "../commercial/FeatureGate";
 import { InsiderActivity } from "../components/InsiderActivity";
 import InsiderTrackingPanel from "../components/InsiderTrackingPanel";
@@ -675,8 +676,9 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
         </Card>
       </section>
 
-      <section className="stock-ai-explainer-grid" style={{ display: "grid", gridTemplateColumns: "1fr", gap: "20px" }}>
+      <section className="stock-ai-explainer-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }}>
         <ResearchAiExplanationPanel context={finalResearchContext} />
+        <EdgeAiChatSection symbol={stock.symbol} companyName={stock.companyName} />
       </section>
 
       {/* ── Evidence Summary Panel ── */}

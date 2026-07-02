@@ -4,9 +4,10 @@
 // =========================================================================
 
 import { useState, useRef, useCallback, useEffect } from 'react';
-import type { EdgeAiChatMessage, EdgeAiWorkerStatus, EdgeAiResearchContext } from './edgeAiTypes';
+import type { EdgeAiChatMessage, EdgeAiWorkerStatus, EdgeAiResearchContext, EdgeAiWorkerInput } from './edgeAiTypes';
 import { sanitizeChatReply } from './edgeAiOutputGuardrails';
 import { formatNumber } from "../../services/ui/dataFormatting";
+import { StockExWorkerPool } from './StockExWorkerPool';
 
 /* ── Hook return type ──────────────────────────────────────────────── */
 
@@ -88,13 +89,13 @@ export function useEdgeAiChat(context: EdgeAiResearchContext): UseEdgeAiChatRetu
       setStatus('processing');
 
       try {
-        // TODO: In Phase 8 this will call the actual worker.
-        //       For now we simulate with a synthetic reply.
-        const rawReply = await simulateWorkerReply(
-          systemPromptRef.current,
-          [...messages.map((m) => ({ role: m.role, content: m.content })), userMessage],
+        const workerInput: EdgeAiWorkerInput = {
+          context,
+          history: [...messages.map((m) => ({ role: m.role, content: m.content })), userMessage],
           query,
-        );
+        };
+        const workerResult: any = await StockExWorkerPool.executeTask('chat', workerInput);
+        const rawReply: string = workerResult?.rawReply || '';
 
         // Apply output guardrails
         const safeLines = sanitizeChatReply(rawReply);
@@ -130,41 +131,4 @@ export function useEdgeAiChat(context: EdgeAiResearchContext): UseEdgeAiChatRetu
   return { messages, status, send, reset };
 }
 
-/* ── Temporary synthetic reply (replaced by worker in Phase 8) ─────── */
 
-async function simulateWorkerReply(
-  _systemPrompt: string,
-  _history: { role: string; content: string }[],
-  query: string,
-): Promise<string> {
-  // Simulate a small delay
-  await new Promise((r) => setTimeout(r, 600 + Math.random() * 400));
-
-  const lower = query.toLowerCase();
-
-  if (lower.includes('risk') || lower.includes('risk')) {
-    return [
-      'Based on the research context, the key risks for this stock include margin pressure from rising input costs and the concentration of revenue in the domestic market. The research notes that debt levels have increased 8% over the last quarter.',
-      'The what-to-watch items flag management guidance on the next earnings call as a potential catalyst.',
-    ].join('\n\n');
-  }
-
-  if (lower.includes('growth') || lower.includes('revenue')) {
-    return [
-      `Revenue grew ${Math.round(10 + Math.random() * 20)}% YoY according to the latest financials. Operating margins expanded, though the pace of growth has moderated versus the prior year.`,
-      'The sector context suggests peer comparison would be useful here.',
-    ].join('\n\n');
-  }
-
-  if (lower.includes('valuation') || lower.includes('pe') || lower.includes('price')) {
-    return [
-      'The current PE ratio of approximately 18–22x places it in line with the sector median. The research does not flag the current valuation as extreme in either direction.',
-      'You may want to compare with direct peers for a fuller picture.',
-    ].join('\n\n');
-  }
-
-  return [
-    'The research context available does not include a direct answer to that question. I can see the narrative, sector backdrop, and flagged risks, but this specific detail was not captured.',
-    'You may want to check the company filings or ask about a related topic covered in the research.',
-  ].join('\n\n');
-}

@@ -1,30 +1,26 @@
-// src/components/edge-ai/EdgeAiChatSection.tsx
-// Phase 8 — Integrates research fetch, context mapping, and chat hook
-// into a single section ready for placement in StockPage.
-// =========================================================================
-
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchMarketBrainResearch } from '../../services/marketBrainResearch';
 import { toEdgeAiResearchContext } from './edgeAiContextMapper';
 import { useEdgeAiChat } from './useEdgeAiChat';
 import { EdgeAiChat } from './EdgeAiChat';
-
-/* ── Props ── */
+import { ClientDataMesh } from './clientDataMesh';
+import { StockExWorkerPool } from './StockExWorkerPool';
+import type { EdgeAiResearchContext, EdgeAiWorkerInput } from './edgeAiTypes';
+import { colors } from '../../design/tokens';
 
 export interface EdgeAiChatSectionProps {
   symbol: string;
   companyName: string;
 }
 
-/* ── Component ── */
-
 export const EdgeAiChatSection: React.FC<EdgeAiChatSectionProps> = ({
   symbol,
   companyName,
 }) => {
-  // Fetch the same research data as MarketBrainPanel — React Query dedupes
-  const { data } = useQuery({
+  const [dataMode, setDataMode] = useState<string | null>(null);
+
+  const { data: researchData } = useQuery({
     queryKey: ['marketBrainResearch', symbol],
     queryFn: () => fetchMarketBrainResearch(symbol),
     enabled: !!symbol,
@@ -32,15 +28,36 @@ export const EdgeAiChatSection: React.FC<EdgeAiChatSectionProps> = ({
     retry: false,
   });
 
-  // Map research response into chat context
-  const context = useMemo(() => toEdgeAiResearchContext(data), [data]);
+  const { data: meshData } = useQuery({
+    queryKey: ['clientDataMesh', symbol],
+    queryFn: async () => {
+      const result = await ClientDataMesh.fetchUnrestrictedHistory(symbol);
+      setDataMode(result.data_mode);
+      return result;
+    },
+    enabled: !!symbol,
+    staleTime: 60_000,
+    retry: 2,
+  });
 
-  // Manage chat state via the hook (hook only runs when context is non-null)
-  const safely: { symbol: string; companyName: string } = useMemo(
-    () => ({ symbol, companyName }),
-    [symbol, companyName],
-  );
-  const fallbackContext = useMemo(
+  const context = useMemo(() => {
+    const base = toEdgeAiResearchContext(researchData);
+    if (!base) return null;
+    const candle = meshData?.candles?.slice(-1)?.[0];
+    return {
+      ...base,
+      narrative: [
+        ...base.narrative,
+        ...(candle
+          ? [`Live mesh close: INR ${candle.close.toFixed(3)} via ${meshData?.source || 'direct'}`]
+          : []),
+      ],
+    } as EdgeAiResearchContext;
+  }, [researchData, meshData]);
+
+  const safely = useMemo(() => ({ symbol, companyName }), [symbol, companyName]);
+
+  const fallbackContext: EdgeAiResearchContext = useMemo(
     () => ({
       symbol: safely.symbol,
       companyName: safely.companyName,
@@ -57,5 +74,25 @@ export const EdgeAiChatSection: React.FC<EdgeAiChatSectionProps> = ({
 
   const chat = useEdgeAiChat(context ?? fallbackContext);
 
-  return <EdgeAiChat messages={chat.messages} status={chat.status} onSend={chat.send} />;
+  return (
+    <div>
+      {dataMode === 'DETERMINISTIC_SAFE_ANCHOR' && (
+        <div
+          style={{
+            padding: '8px 12px',
+            marginBottom: '8px',
+            fontSize: '12px',
+            color: colors.warning,
+            background: '#1A1500',
+            border: `1px solid ${colors.warning}33`,
+            borderRadius: '8px',
+            textAlign: 'center',
+          }}
+        >
+          Cached asset sync active — data from deterministic anchor
+        </div>
+      )}
+      <EdgeAiChat messages={chat.messages} status={chat.status} onSend={chat.send} />
+    </div>
+  );
 };
