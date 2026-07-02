@@ -1,38 +1,23 @@
-// src/components/DataSourceBadge.tsx
-// Shows whether data came from cache or live fetch, with response time.
+import React from 'react';
 
-import { colors, radius, space } from "../design/tokens";
-
-interface DataSourceBadgeProps {
-  cacheHit: boolean;
-  responseTimeMs: number;
-  provider?: string;
-}
-
-export default function DataSourceBadge({
-  cacheHit,
-  responseTimeMs,
-  provider,
-}: DataSourceBadgeProps) {
+export default function DataSourceBadge({ isStale }: { isStale?: boolean }) {
   return (
-    <div
-      style={{
-        display: "inline-flex",
-        alignItems: "center",
-        gap: space[2],
-        padding: `${space[1]} ${space[3]}`,
-        borderRadius: radius.full,
-        fontSize: 10,
-        fontFamily: "monospace",
-        background: cacheHit ? "rgba(52, 211, 153, 0.1)" : "rgba(96, 165, 250, 0.1)",
-        border: `1px solid ${cacheHit ? "rgba(52, 211, 153, 0.2)" : "rgba(96, 165, 250, 0.2)"}`,
-        color: cacheHit ? colors.marketGreen : "#60a5fa",
-      }}
-    >
-      <span>{cacheHit ? "\uD83D\uDCE6" : "\uD83D\uDD04"}</span>
-      <span>{cacheHit ? "Cached" : "Live"}</span>
-      <span style={{ opacity: 0.6 }}>{responseTimeMs}ms</span>
-      {provider && <span style={{ opacity: 0.4 }}>{provider}</span>}
+    <div style={{
+      display: 'inline-flex', alignItems: 'center', gap: '8px',
+      backgroundColor: '#0D0D0D', border: '1px solid #1A1A1A',
+      padding: '6px 12px', borderRadius: '6px',
+      fontFamily: 'monospace', fontSize: '10px'
+    }}>
+      <span style={{
+        height: '6px', width: '6px', borderRadius: '50%',
+        backgroundColor: isStale ? '#f59e0b' : '#3b82f6'
+      }} />
+      <span style={{
+        color: '#8892b0', textTransform: 'uppercase',
+        fontWeight: 'bold', letterSpacing: '0.05em'
+      }}>
+        {isStale ? "Web Cache Resync Pending" : "Public Web-Mesh Data Link"}
+      </span>
     </div>
   );
 }

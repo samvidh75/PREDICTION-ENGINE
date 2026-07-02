@@ -17,6 +17,9 @@ import { getAlerts } from "../services/personalization/AlertStore";
 import OnboardingWizard from "../components/GuidedOnboarding";
 import { loadFirstDashboardFlag, dismissFirstDashboardOverlay, markFirstDashboardPending } from "../services/onboarding/onboardingFirstRunMemory";
 import WatchlistWebSocket from "../components/WatchlistWebSocket";
+import BrokerStatusBar from "../components/BrokerStatusBar";
+import SubscriptionBanner from "../components/SubscriptionBanner";
+import DataSourceBadge from "../components/DataSourceBadge";
 import type { EnhancedScanType } from "../services/scanner/presets";
 import type { AlertStoreItem } from "../services/personalization/AlertStore";
 
@@ -178,6 +181,12 @@ export default function HomePage() {
 
   return (
     <div style={{ display: "grid", gap: sectionGap }}>
+
+      {/* ════════════════ BROKER STATUS BAR ════════════════ */}
+      <BrokerStatusBar />
+
+      {/* ════════════════ SUBSCRIPTION BANNER ════════════════ */}
+      <SubscriptionBanner currentTier="FREE" />
 
       {/* ════════════════ HERO ════════════════ */}
       <section
@@ -379,13 +388,16 @@ export default function HomePage() {
       <div className="ai-insights-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: sectionGap, alignItems: "start" }}>
         {/* Market pulse */}
         <section style={{ display: "grid", gap: space[4] }}>
-          <div style={{ display: "grid", gap: space[1] }}>
-            <span style={{ fontSize: 10, fontWeight: 600, color: colors.body, textTransform: "uppercase", letterSpacing: "0.08em" }}>
-              Market
-            </span>
-            <h2 style={{ color: colors.ink, fontSize: "18px", fontWeight: 600, margin: 0, letterSpacing: "-0.01em" }}>
-              Market Pulse
-            </h2>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <div style={{ display: "grid", gap: space[1] }}>
+              <span style={{ fontSize: 10, fontWeight: 600, color: colors.body, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                Market
+              </span>
+              <h2 style={{ color: colors.ink, fontSize: "18px", fontWeight: 600, margin: 0, letterSpacing: "-0.01em" }}>
+                Market Pulse
+              </h2>
+            </div>
+            <DataSourceBadge />
           </div>
           <Card style={{
             display: "grid", gap: space[5],

@@ -1,91 +1,49 @@
-// src/components/BrokerStatusBar.tsx
-// Shows real-time status of all connected broker accounts.
-
-import { useCallback, useEffect, useState } from "react";
-import { colors, radius, space } from "../design/tokens";
-import { loadAuthSession } from "../services/auth/sessionStore";
-
-interface BrokerConnection {
-  id: string;
-  broker: string;
-  label: string;
-  status: string;
-  broker_user_id?: string;
-  created_at?: string;
-}
+import React, { useEffect, useState } from 'react';
 
 export default function BrokerStatusBar() {
-  const [connections, setConnections] = useState<BrokerConnection[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  const fetchConnections = useCallback(async () => {
-    const session = loadAuthSession();
-    if (session.status !== "authenticated") {
-      setLoading(false);
-      return;
-    }
-    try {
-      const res = await fetch("/api/v1/broker/connections");
-      if (res.ok) {
-        const data = await res.json();
-        setConnections(data.connections || []);
-      }
-    } catch {
-      // silently fail
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const [statuses, setStatuses] = useState<Record<string, boolean>>({ upstox: false, zerodha: false });
+  const [error, setError] = useState(false);
 
   useEffect(() => {
-    fetchConnections();
-    const interval = setInterval(fetchConnections, 30000);
-    return () => clearInterval(interval);
-  }, [fetchConnections]);
-
-  if (loading) return null;
-
-  const connected = connections.filter((c) => c.status === "active");
-
-  if (connections.length === 0) return null;
+    let cancelled = false;
+    fetch('/api/v1/broker/status-map')
+      .then(res => res.json())
+      .then(data => {
+        if (cancelled) return;
+        if (data.success && data.statuses) {
+          setStatuses({
+            upstox: data.statuses.upstox?.isConnected && !data.statuses.upstox?.isExpired,
+            zerodha: data.statuses.zerodha?.isConnected && !data.statuses.zerodha?.isExpired
+          });
+        }
+      }).catch(() => { if (!cancelled) setError(true); });
+    return () => { cancelled = true; };
+  }, []);
 
   return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: space[2],
-        flexWrap: "wrap",
-        fontSize: 11,
-        fontFamily: "monospace",
-      }}
-    >
-      <span style={{ color: colors.textTertiary, fontSize: 10 }}>
-        {connected.length}/{connections.length} brokers connected
-      </span>
-      {connections.map((c) => {
-        const isActive = c.status === "active";
-        return (
-          <div
-            key={c.id}
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: space[1],
-              padding: `${space[1]} ${space[2]}`,
-              borderRadius: radius.sm,
-              background: isActive ? "rgba(52, 211, 153, 0.08)" : "rgba(248, 113, 113, 0.08)",
-              border: `1px solid ${isActive ? "rgba(52, 211, 153, 0.2)" : "rgba(248, 113, 113, 0.2)"}`,
-              color: isActive ? colors.marketGreen : colors.danger,
-            }}
-          >
-            <span>{isActive ? "\u2713" : "\u25CB"}</span>
-            <span style={{ textTransform: "capitalize" }}>
-              {c.broker.replace(/_/g, " ")}
-            </span>
+    <div style={{
+      display: 'flex', gap: '16px', padding: '10px 24px',
+      backgroundColor: '#0D0D0D', borderBottom: '1px solid #1A1A1A',
+      fontFamily: 'monospace', fontSize: '11px', alignItems: 'center'
+    }}>
+      <span style={{ color: '#64748b', fontWeight: 'bold' }}>NETWORK NODE AUTHENTICATIONS:</span>
+      {error ? (
+        <span style={{ color: '#EF4444' }}>UNAVAILABLE</span>
+      ) : (
+        Object.entries(statuses).map(([broker, isLive]) => (
+          <div key={broker} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span style={{
+              width: '6px', height: '6px', borderRadius: '50%',
+              backgroundColor: isLive ? '#34d399' : '#EF4444',
+              boxShadow: isLive ? '0 0 8px #34d399' : 'none'
+            }} />
+            <span style={{
+              color: isLive ? '#f4f4f5' : '#4b5563',
+              textTransform: 'uppercase', fontWeight: 'bold'
+            }}>{broker}</span>
           </div>
-        );
-      })}
+        ))
+      )}
     </div>
   );
 }

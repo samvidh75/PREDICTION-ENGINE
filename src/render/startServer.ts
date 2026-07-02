@@ -20,6 +20,7 @@ import registerApiRoutes from "./apiRouter.js";
 import { StockUniverseAdapter } from "../services/data/providers/StockUniverseAdapter.js";
 import { defaultDataAdapterRegistry } from "../services/data/dataAdapterRegistry.js";
 import { startWebSocketDataProducer } from "../services/market/websocketDataProducer.js";
+import { MetricsCollector } from "../commercial/api/monitoring/MetricsCollector.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -508,6 +509,9 @@ async function bootstrap() {
   } catch (err) {
     server.log.warn(`Database unavailable: ${err}. Health endpoint will report degraded.`);
   }
+
+  // ── Start background metrics collector ───────────────────────
+  MetricsCollector.startCollector();
 
   await server.listen({ port: PORT, host: HOST });
   server.log.info(`Render server listening on ${HOST}:${PORT} — SPA served from ${distPath}`);
