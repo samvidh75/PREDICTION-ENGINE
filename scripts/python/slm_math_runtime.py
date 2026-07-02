@@ -53,28 +53,76 @@ def _to_google_exchange(symbol: str) -> tuple:
 def fetch_google_finance_live_price(symbol: str) -> float | None:
     """
     Scrapes the live unadjusted spot price from Google Finance.
-    Bypasses all Yahoo split/bonus retroactive adjustments.
+    Uses a multi-strategy extraction pipeline to resist layout changes:
+      1. data-last-price attribute (structural metadata, class-agnostic)
+      2. og:price:amount meta tag
+      3. Title tag price extraction
+      4. Known CSS class selectors (N6SYTe, fxKb6c, YMlKec, YMlbe)
+      5. First page element containing ₹
     """
     if BeautifulSoup is None:
         return None
     clean_symbol, exchange = _to_google_exchange(symbol)
     url = GOOGLE_FINANCE_URL.format(ticker=clean_symbol, exchange=exchange)
-    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Accept-Language": "en-US,en;q=0.9",
+    }
     try:
-        res = requests.get(url, headers=headers, timeout=7)
+        res = requests.get(url, headers=headers, timeout=8)
         if res.status_code != 200:
             return None
         soup = BeautifulSoup(res.text, "html.parser")
-        price_el = soup.find("div", class_="N6SYTe")
-        if not price_el:
-            price_el = soup.find("div", class_="fxKb6c")
-        if not price_el:
-            price_el = soup.find("div", class_="YMlKec")
-        if not price_el:
-            price_el = soup.find("div", class_="YMlbe")
-        if price_el:
-            raw = price_el.text.replace("₹", "").replace(",", "").replace(" ", "").strip()
-            return float(raw)
+
+        # Strategy 1: data-last-price attribute (structural, class-agnostic)
+        container = soup.find(attrs={"data-last-price": True})
+        if container:
+            try:
+                return float(container["data-last-price"])
+            except (ValueError, TypeError):
+                pass
+
+        # Strategy 2: og:price:amount meta tag
+        meta_price = soup.find("meta", attrs={"property": "og:price:amount"})
+        if meta_price and meta_price.get("content"):
+            try:
+                return float(meta_price["content"].replace(",", ""))
+            except (ValueError, TypeError):
+                pass
+
+        # Strategy 3: Title tag parsing (format: "TCS Stock Price, Live ...")
+        if soup.title:
+            parts = soup.title.text.replace(",", "").split(" ")
+            for p in parts:
+                p_clean = p.replace("₹", "").strip()
+                try:
+                    v = float(p_clean)
+                    if 1 < v < 1000000:
+                        return v
+                except ValueError:
+                    continue
+
+        # Strategy 4: Known CSS class selectors
+        for cls in ("N6SYTe", "fxKb6c", "YMlKec", "YMlbe"):
+            el = soup.find("div", class_=cls)
+            if el:
+                raw = el.text.replace("₹", "").replace(",", "").replace(" ", "").strip()
+                try:
+                    return float(raw)
+                except ValueError:
+                    continue
+
+        # Strategy 5: First element with ₹ text that looks like a valid price
+        for el in soup.find_all(["div", "span"]):
+            txt = el.get_text(strip=True)
+            if txt.startswith("₹"):
+                raw = txt.replace("₹", "").replace(",", "").strip()
+                try:
+                    v = float(raw)
+                    if 1 < v < 1000000:
+                        return v
+                except ValueError:
+                    continue
     except Exception:
         return None
     return None
