@@ -19,9 +19,8 @@ const STARTER_PROMPTS = [
 ];
 
 async function callChatApi(message: string): Promise<string> {
-  const apiBase = ((typeof document !== 'undefined' && (document.querySelector('meta[name="api-base"]') as HTMLMetaElement)?.content) ||
-    (import.meta as any).env?.VITE_API_BASE_URL) ?? "";
-  const apiUrl = `${apiBase}/api/chat`;
+  const isProduction = window.location.hostname === "www.stockstory-india.com" || window.location.hostname === "stockstory-india.com";
+  const apiUrl = isProduction ? "https://stockstory-api.onrender.com/api/chat" : "/api/chat";
 
   try {
     const res = await fetch(apiUrl, {
