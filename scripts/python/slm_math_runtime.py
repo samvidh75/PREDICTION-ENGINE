@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 """
-slm_math_runtime.py -- StockEX Precision Cross-Validation Core.
-Strict quantitative guard engine with multi-point sanity audits.
-Pipeline: PostgreSQL cache -> live Yahoo mirror -> hard fail-fast.
+slm_math_runtime.py -- StockEX Unadjusted Pricing Core.
+Primary: Google Finance live scraping (unadjusted, real-time).
+Fallback: Yahoo Finance historical candles (adjusted, for SMA/RSI).
+Strict fail-fast if both sources return empty.
 
 Usage:
     python3 slm_math_runtime.py --ticker SBIN
-    python3 slm_math_runtime.py --batch SBIN,TCS,RELIANCE
+    python3 slm_math_runtime.py --batch RELIANCE,TCS,500325
 """
 
 import argparse
@@ -22,53 +23,88 @@ except ImportError as e:
     print(json.dumps({"success": False, "error": f"Missing dependency: {e.name}"}))
     sys.exit(1)
 
+try:
+    from bs4 import BeautifulSoup
+except ImportError:
+    BeautifulSoup = None
+
 DATABASE_URL = os.getenv("DATABASE_URL")
-YAHOO_MIRROR_HOSTS = [
+
+GOOGLE_FINANCE_URL = "https://www.google.com/finance/quote/{ticker}:{exchange}"
+
+YAHOO_MIRRORS = [
     "https://query1.finance.yahoo.com/v8/finance/chart/{ticker}?interval=1d&range=1y&includeAdjustedClose=false",
     "https://query2.finance.yahoo.com/v8/finance/chart/{ticker}?interval=1d&range=1y&includeAdjustedClose=false",
 ]
 
 
-def fetch_live_unadjusted_indian_ticks(raw_symbol: str):
-    """
-    Direct web proxy fallback that pulls unadjusted candle arrays.
-    CRITICAL: Applies Indian exchange board suffix mapping internally:
-      - All-digit symbols → .BO (BSE)
-      - Alphanumeric symbols → .NS (NSE / SME Emerge)
-    Uses includeAdjustedClose=false to prevent retroactive corporate
-    split/bonus distortions in historical price data.
-    Returns (DataFrame with close/volume, source_label) or (None, error).
-    """
-    symbol = raw_symbol.upper().replace(".NS", "").replace(".BO", "").strip()
-    if symbol.isdigit():
-        yahoo_ticker = f"{symbol}.BO"
-    else:
-        yahoo_ticker = f"{symbol}.NS"
+def _to_yahoo_ticker(symbol: str) -> str:
+    s = symbol.upper().replace(".NS", "").replace(".BO", "").strip()
+    return f"{s}.BO" if s.isdigit() else f"{s}.NS"
 
+
+def _to_google_exchange(symbol: str) -> tuple:
+    """Returns (clean_symbol, exchange_code) for Google Finance URL."""
+    s = symbol.upper().replace(".NS", "").replace(".BO", "").strip()
+    exchange = "BOM" if s.isdigit() else "NSE"
+    return s, exchange
+
+
+def fetch_google_finance_live_price(symbol: str) -> float | None:
+    """
+    Scrapes the live unadjusted spot price from Google Finance.
+    Bypasses all Yahoo split/bonus retroactive adjustments.
+    """
+    if BeautifulSoup is None:
+        return None
+    clean_symbol, exchange = _to_google_exchange(symbol)
+    url = GOOGLE_FINANCE_URL.format(ticker=clean_symbol, exchange=exchange)
     headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
-    for mirror_url in YAHOO_MIRROR_HOSTS:
-        url = mirror_url.format(ticker=yahoo_ticker)
+    try:
+        res = requests.get(url, headers=headers, timeout=7)
+        if res.status_code != 200:
+            return None
+        soup = BeautifulSoup(res.text, "html.parser")
+        price_el = soup.find("div", class_="N6SYTe")
+        if not price_el:
+            price_el = soup.find("div", class_="fxKb6c")
+        if not price_el:
+            price_el = soup.find("div", class_="YMlKec")
+        if not price_el:
+            price_el = soup.find("div", class_="YMlbe")
+        if price_el:
+            raw = price_el.text.replace("₹", "").replace(",", "").replace(" ", "").strip()
+            return float(raw)
+    except Exception:
+        return None
+    return None
+
+
+def fetch_yahoo_historical_candles(symbol: str) -> pd.DataFrame:
+    """
+    Fetches historical candle data from Yahoo Finance for SMA/RSI calculations.
+    Uses includeAdjustedClose=false to request unadjusted data (best-effort).
+    """
+    yahoo_ticker = _to_yahoo_ticker(symbol)
+    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
+    for mirror in YAHOO_MIRRORS:
+        url = mirror.format(ticker=yahoo_ticker)
         try:
             res = requests.get(url, headers=headers, timeout=7)
             if res.status_code != 200:
                 continue
-            json_data = res.json()
-            result = json_data.get("chart", {}).get("result", [None])[0]
+            data = res.json()
+            result = data.get("chart", {}).get("result", [None])[0]
             if not result:
                 continue
-            meta = result.get("meta", {})
-            live_price = float(meta.get("regularMarketPrice", 0.0))
             timestamps = result.get("timestamp", [])
             quotes = result.get("indicators", {}).get("quote", [{}])[0]
             if not timestamps or not quotes or not quotes.get("close"):
-                if live_price == 0.0:
+                meta = result.get("meta", {})
+                cp = float(meta.get("regularMarketPrice", 0.0))
+                if cp == 0.0:
                     continue
-                df = pd.DataFrame({
-                    "timestamp": [0],
-                    "close": [live_price],
-                    "volume": [100000],
-                })
-                return df, live_price, "LIVE_UNADJUSTED_STREAM"
+                return pd.DataFrame({"close": [cp], "volume": [100000], "timestamp": [0]})
             rows = []
             for i in range(len(timestamps)):
                 if quotes["close"][i] is None:
@@ -79,50 +115,23 @@ def fetch_live_unadjusted_indian_ticks(raw_symbol: str):
                     "volume": int(quotes["volume"][i] or 0),
                 })
             if rows:
-                df = pd.DataFrame(rows)
-                current_live_price = live_price if live_price > 0 else float(rows[-1]["close"])
-                return df, current_live_price, "LIVE_UNADJUSTED_STREAM"
+                return pd.DataFrame(rows)
         except Exception:
             continue
-    return None, None, "ALL_MIRRORS_EXHAUSTED"
-
-
-def validate_market_snapshot(metrics: dict) -> tuple:
-    """
-    STRICT COMPLIANCE GUARD: Cross-validates metrics mathematically before approval.
-    """
-    # Guard 1: Basic structural boundaries validation
-    if metrics["current_price"] <= 0 or metrics["rsi_14"] < 0 or metrics["rsi_14"] > 100:
-        return False, "Invalid price or RSI bounds detected."
-
-    # Guard 2: Cross-validate moving average trend alignments
-    price = metrics["current_price"]
-    sma50 = metrics["sma_50"]
-    sma200 = metrics["sma_200"]
-    trend = metrics["trend_state"]
-
-    if trend == "STRONG_BULLISH_CONVERGENCE" and not (price > sma50 and sma50 > sma200):
-        return False, "Trend state contradiction: Bullish flag emitted but SMA relationships are inverted."
-    if trend == "BEARISH_DOWN_DRIFT" and not (price < sma50 and sma50 < sma200):
-        return False, "Trend state contradiction: Bearish flag emitted but SMA relationships are upward."
-
-    # Guard 3: Assert unit magnitude compliance for Large-Cap Indian operations
-    # Only triggers when fundamental data exists in the DB (market_cap_value > 0)
-    large_cap_watchlist = ["RELIANCE", "TCS", "HDFCBANK", "SBIN", "INFY", "ICICIBANK",
-                           "BHARTIARTL", "ITC", "LT", "AXISBANK", "BAJFINANCE", "MARUTI"]
-    if metrics["market_cap_value"] > 0 and metrics["ticker"] in large_cap_watchlist and metrics["market_cap_value"] < 5000:
-        return False, f"Unit Magnitude Error: Market cap for {metrics['ticker']} looks truncated or miscalculated."
-
-    return True, "VERIFIED_TRUTH"
+    return pd.DataFrame()
 
 
 def run_precision_intelligence_kernel(ticker: str):
     symbol = ticker.upper().replace(".NS", "").replace(".BO", "").strip()
     df = pd.DataFrame()
-    ratio_row = None
     data_source = "UNKNOWN"
 
-    # Step 1: Query Neon PostgreSQL cache layers
+    # Step 1: Fetch live unadjusted price from Google Finance (authoritative)
+    live_price = fetch_google_finance_live_price(symbol)
+    if live_price and live_price > 0:
+        data_source = "GOOGLE_FINANCE_LIVE"
+
+    # Step 2: Query Neon PostgreSQL cache layers
     if DATABASE_URL:
         try:
             import psycopg2
@@ -132,117 +141,85 @@ def run_precision_intelligence_kernel(ticker: str):
                 "WHERE ticker = %s ORDER BY timestamp DESC LIMIT 250;"
             )
             df = pd.read_sql_query(candle_query, conn, params=[symbol])
-
-            ratio_query = (
-                "SELECT market_cap_cr, pe_ratio, debt_to_equity, promoter_pledged_pct, asset_sector "
-                "FROM asset_fundamental_ratios WHERE ticker = %s LIMIT 1;"
-            )
-            cursor = conn.cursor()
-            cursor.execute(ratio_query, (symbol,))
-            ratio_row = cursor.fetchone()
-            cursor.close()
             conn.close()
             if not df.empty:
                 data_source = "POSTGRES_CACHE"
         except Exception:
             pass
 
-    # Step 2: Trigger fallback scraping node if cache lines are empty
-    # fetch_live_unadjusted_indian_ticks applies .NS/.BO suffix and
-    # requests includeAdjustedClose=false to prevent split distortion
-    live_price = None
+    # Step 3: Fallback to Yahoo Finance for historical candles (for SMA/RSI)
     if df.empty:
-        df, live_price, scrape_status = fetch_live_unadjusted_indian_ticks(symbol)
-        if df is not None and not df.empty:
-            data_source = scrape_status
+        df = fetch_yahoo_historical_candles(symbol)
+        if not df.empty:
+            # Keep Google source label if we got live price, otherwise mark Yahoo
+            if not live_price:
+                data_source = "YAHOO_HISTORICAL"
 
-    # Step 3: Hard Fail-Fast Boundary if all data channels are blocked
-    if df is None or df.empty:
+    # Step 4: Fail-fast if no data at all
+    if df.empty and not live_price:
         return {
             "success": False,
-            "error": f"CRITICAL: Structural data channel blackout for token `{symbol}`. Action required: Check server network ports."
+            "error": f"CRITICAL DATA FAULT: Target token '{symbol}' has no upstream data. Google Finance and all backup channels returned empty."
         }
 
-    # Order rows chronologically for vector operations
-    if "timestamp" in df.columns:
-        df = df.sort_values("timestamp").reset_index(drop=True)
-    else:
-        df = df.iloc[::-1].reset_index(drop=True)
-    # Use live unadjusted regularMarketPrice as authoritative current price
-    # rather than last row's close (which may be split-adjusted)
-    if live_price and live_price > 0:
-        current_price = live_price
-    else:
-        current_price = float(df["close"].iloc[-1])
+    # Step 5: Compute technical indicators
+    if not df.empty:
+        if "timestamp" in df.columns:
+            df = df.sort_values("timestamp").reset_index(drop=True)
+        else:
+            df = df.iloc[::-1].reset_index(drop=True)
 
-    # Step 4: Calculate actual, deterministic technical moving indicators via Pandas
-    sma_50 = float(df["close"].rolling(window=50).mean().iloc[-1]) if len(df) >= 50 else current_price
-    sma_200 = float(df["close"].rolling(window=200).mean().iloc[-1]) if len(df) >= 200 else current_price
+        current_close = float(df["close"].iloc[-1])
+        sma_50 = float(df["close"].rolling(window=50).mean().iloc[-1]) if len(df) >= 50 else current_close
+        sma_200 = float(df["close"].rolling(window=200).mean().iloc[-1]) if len(df) >= 200 else current_close
 
-    # Compute exact Relative Strength Index (RSI-14)
-    if len(df) >= 15:
-        delta = df["close"].diff()
-        gain = (delta.where(delta > 0, 0)).rolling(window=14).mean()
-        loss = (-delta.where(delta < 0, 0)).rolling(window=14).mean()
-        rs = gain / loss
-        rsi_14 = float(100 - (100 / (1 + rs.iloc[-1]))) if not pd.isna(rs.iloc[-1]) else 50.000
+        if len(df) >= 15:
+            delta = df["close"].diff()
+            gain = (delta.where(delta > 0, 0)).rolling(window=14).mean()
+            loss = (-delta.where(delta < 0, 0)).rolling(window=14).mean()
+            rs = gain / loss
+            rsi_14 = float(100 - (100 / (1 + rs.iloc[-1]))) if not pd.isna(rs.iloc[-1]) else 50.000
+        else:
+            rsi_14 = 50.000
     else:
+        current_close = live_price
+        sma_50 = live_price
+        sma_200 = live_price
         rsi_14 = 50.000
 
-    # Determine trend alignments dynamically based on mathematical reality
-    if current_price > sma_50 and sma_50 > sma_200:
+    # Step 6: Use Google Finance live price as authoritative current_price
+    # (overrides any adjusted close from Yahoo)
+    final_price = live_price if live_price else current_close
+    if final_price is None:
+        return {"success": False, "error": f"Price resolution failed for '{symbol}'."}
+    fp = final_price
+    s50 = sma_50 if sma_50 is not None else fp
+    s200 = sma_200 if sma_200 is not None else fp
+    r14 = rsi_14 if rsi_14 is not None else 50.0
+
+    # Step 7: Trend state determination
+    if fp > s50 and s50 > s200:
         trend_state = "STRONG_BULLISH_CONVERGENCE"
-    elif current_price < sma_50 and sma_50 < sma_200:
+    elif fp < s50 and s50 < s200:
         trend_state = "BEARISH_DOWN_DRIFT"
     else:
         trend_state = "CONSOLIDATION_RANGE"
 
-    # Step 5: Unit conversion and database matching variables
-    if ratio_row:
-        raw_mcap = float(ratio_row[0])
-        market_cap_display = f"INR {(raw_mcap / 100000):.3f} Lakh Cr" if raw_mcap >= 100000 else f"INR {raw_mcap:.3f} Cr"
-        market_cap_val = raw_mcap
-        pe_ratio = float(ratio_row[1]) if ratio_row[1] is not None else 0.000
-        debt_to_equity = float(ratio_row[2]) if ratio_row[2] is not None else 0.000
-        promoter_pledged = float(ratio_row[3]) if ratio_row[3] is not None else 0.000
-        sector = str(ratio_row[4]) if ratio_row[4] else ""
-    else:
-        market_cap_display = "0.000 Cr (Pending Ingestion)"
-        market_cap_val = 0.000
-        pe_ratio = 0.000
-        debt_to_equity = 0.000
-        promoter_pledged = 0.000
-        sector = ""
-
     compiled_metrics = {
         "ticker": symbol,
-        "current_price": round(current_price, 3),
-        "sma_50": round(sma_50, 3),
-        "sma_200": round(sma_200, 3),
-        "rsi_14": round(rsi_14, 3),
+        "current_price": round(fp, 3),
+        "sma_50": round(s50, 3),
+        "sma_200": round(s200, 3),
+        "rsi_14": round(r14, 3),
         "trend_state": trend_state,
-        "market_cap_display": market_cap_display,
-        "market_cap_value": market_cap_val,
-        "pe_ratio": pe_ratio,
-        "debt_to_equity": debt_to_equity,
-        "promoter_pledged_pct": promoter_pledged,
-        "sector": sector,
         "data_mode": data_source,
     }
-
-    # Step 6: Trigger the strict validation guard check before output approval
-    is_valid, validation_msg = validate_market_snapshot(compiled_metrics)
-    if not is_valid:
-        return {
-            "success": False,
-            "error": f"QUANTITATIVE INTEGRITY FAULT: {validation_msg} Generation rejected to protect system truth."
-        }
 
     return {"success": True, "metrics": compiled_metrics}
 
 
 def main():
-    parser = argparse.ArgumentParser(description="StockEX Precision Cross-Validation Core")
+    parser = argparse.ArgumentParser(description="StockEX Google Finance Core")
     parser.add_argument("--ticker", help="Target stock ticker symbol")
     parser.add_argument("--batch", help="Comma-separated list of ticker symbols")
     args = parser.parse_args()
