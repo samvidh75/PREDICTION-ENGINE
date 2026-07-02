@@ -24,18 +24,20 @@ except ImportError as e:
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 YAHOO_MIRROR_HOSTS = [
-    "https://query1.finance.yahoo.com/v8/finance/chart/{ticker}?interval=1d&range=1y",
-    "https://query2.finance.yahoo.com/v8/finance/chart/{ticker}?interval=1d&range=1y",
+    "https://query1.finance.yahoo.com/v8/finance/chart/{ticker}?interval=1d&range=1y&includeAdjustedClose=false",
+    "https://query2.finance.yahoo.com/v8/finance/chart/{ticker}?interval=1d&range=1y&includeAdjustedClose=false",
 ]
 
 
-def fetch_live_unauthenticated_ticks(raw_symbol: str):
+def fetch_live_unadjusted_indian_ticks(raw_symbol: str):
     """
-    Direct web proxy fallback that pulls unauthenticated candle arrays.
+    Direct web proxy fallback that pulls unadjusted candle arrays.
     CRITICAL: Applies Indian exchange board suffix mapping internally:
       - All-digit symbols → .BO (BSE)
       - Alphanumeric symbols → .NS (NSE / SME Emerge)
-    This prevents Yahoo from returning US/global ticker data instead of Indian.
+    Uses includeAdjustedClose=false to prevent retroactive corporate
+    split/bonus distortions in historical price data.
+    Returns (DataFrame with close/volume, source_label) or (None, error).
     """
     symbol = raw_symbol.upper().replace(".NS", "").replace(".BO", "").strip()
     if symbol.isdigit():
@@ -54,19 +56,19 @@ def fetch_live_unauthenticated_ticks(raw_symbol: str):
             result = json_data.get("chart", {}).get("result", [None])[0]
             if not result:
                 continue
+            meta = result.get("meta", {})
+            live_price = float(meta.get("regularMarketPrice", 0.0))
             timestamps = result.get("timestamp", [])
             quotes = result.get("indicators", {}).get("quote", [{}])[0]
             if not timestamps or not quotes or not quotes.get("close"):
-                meta = result.get("meta", {})
-                cp = float(meta.get("regularMarketPrice", 0.0))
-                if cp == 0.0:
+                if live_price == 0.0:
                     continue
                 df = pd.DataFrame({
                     "timestamp": [0],
-                    "close": [cp],
+                    "close": [live_price],
                     "volume": [100000],
                 })
-                return df, "LIVE_PUBLIC_STREAM"
+                return df, live_price, "LIVE_UNADJUSTED_STREAM"
             rows = []
             for i in range(len(timestamps)):
                 if quotes["close"][i] is None:
@@ -77,10 +79,12 @@ def fetch_live_unauthenticated_ticks(raw_symbol: str):
                     "volume": int(quotes["volume"][i] or 0),
                 })
             if rows:
-                return pd.DataFrame(rows), "LIVE_PUBLIC_STREAM"
+                df = pd.DataFrame(rows)
+                current_live_price = live_price if live_price > 0 else float(rows[-1]["close"])
+                return df, current_live_price, "LIVE_UNADJUSTED_STREAM"
         except Exception:
             continue
-    return None, "ALL_MIRRORS_EXHAUSTED"
+    return None, None, "ALL_MIRRORS_EXHAUSTED"
 
 
 def validate_market_snapshot(metrics: dict) -> tuple:
@@ -144,9 +148,11 @@ def run_precision_intelligence_kernel(ticker: str):
             pass
 
     # Step 2: Trigger fallback scraping node if cache lines are empty
-    # fetch_live_unauthenticated_ticks applies .NS/.BO suffix internally
+    # fetch_live_unadjusted_indian_ticks applies .NS/.BO suffix and
+    # requests includeAdjustedClose=false to prevent split distortion
+    live_price = None
     if df.empty:
-        df, scrape_status = fetch_live_unauthenticated_ticks(symbol)
+        df, live_price, scrape_status = fetch_live_unadjusted_indian_ticks(symbol)
         if df is not None and not df.empty:
             data_source = scrape_status
 
@@ -162,7 +168,12 @@ def run_precision_intelligence_kernel(ticker: str):
         df = df.sort_values("timestamp").reset_index(drop=True)
     else:
         df = df.iloc[::-1].reset_index(drop=True)
-    current_price = float(df["close"].iloc[-1])
+    # Use live unadjusted regularMarketPrice as authoritative current price
+    # rather than last row's close (which may be split-adjusted)
+    if live_price and live_price > 0:
+        current_price = live_price
+    else:
+        current_price = float(df["close"].iloc[-1])
 
     # Step 4: Calculate actual, deterministic technical moving indicators via Pandas
     sma_50 = float(df["close"].rolling(window=50).mean().iloc[-1]) if len(df) >= 50 else current_price
