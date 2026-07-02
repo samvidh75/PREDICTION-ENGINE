@@ -27,6 +27,7 @@ import { StockExWorkerPool } from "../components/edge-ai/StockExWorkerPool";
 import { FeatureGate } from "../commercial/FeatureGate";
 import { InsiderActivity } from "../components/InsiderActivity";
 import InsiderTrackingPanel from "../components/InsiderTrackingPanel";
+import SentimentRadar from "../components/SentimentRadar";
 import { PriceTargets } from "../components/PriceTargets";
 import { NativeAd } from "../components/NativeAd";
 import SubscriptionBanner from "../components/SubscriptionBanner";
@@ -1050,6 +1051,9 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
 
       {/* ── SEBI Insider Disclosure Radar (Phase 52) ── */}
       <InsiderTrackingPanel ticker={stock.symbol} />
+
+      {/* ── Machine-Readable Sentiment Radar (Phase 53) ── */}
+      <SentimentRadar ticker={stock.symbol} />
 
       {/* ── Insider Activity ── */}
       <InsiderActivity />
