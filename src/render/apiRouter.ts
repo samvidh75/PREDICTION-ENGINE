@@ -38,6 +38,7 @@ import { WatchlistIntelligenceEngine } from "../services/personalization/Watchli
 import { getNotificationSnapshot, acknowledgeAll } from "../services/personalization/UserNotificationCenter.js";
 import { usageLimits } from "../commercial/UsageLimits.js";
 import type { UsageMetric } from "../commercial/UsageLimits.js";
+import { DeterministicResearchProvider } from "../services/ai/DeterministicResearchProvider.js";
 import { dbAdapter } from "../db/DatabaseAdapter.js";
 import { AsymmetricDataGateway } from "../db/AsymmetricDataGateway.js";
 
@@ -568,6 +569,31 @@ export default async function registerApiRoutes(server: FastifyInstance) {
     reply.header("Cache-Control", "public, s-maxage=300");
     return payload;
   }
+
+  // POST /api/chat — AI chat assistant
+  // Uses deterministic fallback when no external LLM is configured
+  server.post("/api/chat", async (req, reply) => {
+    const { message, symbol, context } = (req.body || {}) as {
+      message?: string;
+      symbol?: string;
+      context?: string;
+    };
+    if (!message || typeof message !== "string" || message.trim().length === 0) {
+      return reply.status(400).send({ error: "message is required" });
+    }
+    try {
+      const provider = new DeterministicResearchProvider();
+      const response = await provider.chat(
+        (symbol ?? "").trim().toUpperCase(),
+        message.trim(),
+        context ?? ""
+      );
+      return { response };
+    } catch (err: any) {
+      req.log.error({ err }, "Chat handler failed");
+      return reply.status(500).send({ error: err.message || "Internal error" });
+    }
+  });
 
   // GET /api/stock?symbol=TCS  or  /api/stock/TCS
   server.get("/api/stock", stockHandler);
