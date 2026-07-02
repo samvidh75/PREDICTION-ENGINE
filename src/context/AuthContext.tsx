@@ -41,11 +41,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsub = authService.subscribeSession((authUser) => {
-      setUser(authUser);
+    try {
+      const unsub = authService.subscribeSession((authUser) => {
+        setUser(authUser);
+        setLoading(false);
+      });
+      return unsub;
+    } catch (err: unknown) {
+      const msg =
+        err && typeof err === "object" && "message" in err
+          ? (err as { message: string }).message
+          : "Firebase auth unavailable";
+      console.warn("[AuthProvider] Failed to subscribe to auth session:", msg);
       setLoading(false);
-    });
-    return unsub;
+      return undefined;
+    }
   }, []);
 
   return (

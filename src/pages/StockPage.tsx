@@ -1128,10 +1128,10 @@ export default function StockPage() {
   useSeo(seoMeta);
   const [inView, setInView] = useState(false);
   const ref = useCallback((node: HTMLDivElement | null) => {
-    if (!node) return;
-    const obs = new IntersectionObserver(([entry]) => { if (entry.isIntersecting) { setInView(true); obs.disconnect(); } }, { threshold: 0.05 });
-    obs.observe(node);
-    return () => obs.disconnect();
+    if (node) {
+      const obs = new IntersectionObserver(([entry]) => { if (entry.isIntersecting) { setInView(true); obs.disconnect(); } }, { threshold: 0.05 });
+      obs.observe(node);
+    }
   }, []);
 
   const { data, isLoading, error } = useQuery({

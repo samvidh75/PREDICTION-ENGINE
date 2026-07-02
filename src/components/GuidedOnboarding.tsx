@@ -3,6 +3,18 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { ArrowRight, CheckCircle2, Cpu, Eye, Radar, ShieldCheck, Sparkles } from "lucide-react";
 import { animation, colors, radius, space, typography } from "../design/tokens";
 
+// ── Raycast design helpers ──────────────────────────────────────────────────
+const h = colors.hairline;             // #1A1A1A
+const ink = colors.ink;                 // #ffffff
+const body = colors.body;               // #a0a0a0
+const mute = colors.mute;               // #707070
+const charcoal = colors.charcoal;       // #c0c0c0
+const stone = colors.stone;             // #404040
+const surf = colors.surface;            // #0D0D0D
+const elevated = colors.surfaceElevated; // #141414
+const accentRed = colors.accentRed;     // #FF6B6B
+const backdrop = colors.backdropMuted;  // rgba(112,112,112,0.12)
+
 interface GuidedOnboardingProps {
   onComplete: () => void;
 }
@@ -92,31 +104,32 @@ export default function GuidedOnboarding({ onComplete }: GuidedOnboardingProps) 
     window.scrollTo({ top: 0, left: 0, behavior: "auto" });
   }, [currentStep]);
 
-  const glassBorder = `1px solid #1A1A1A`;
+  const glassBorder = `1px solid ${h}`;
 
   const buttonStyle: CSSProperties = {
     minHeight: "clamp(48px, 8vw, 56px)",
     width: "100%",
     borderRadius: radius.lg,
     border: glassBorder,
-    background: "linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.04) 100%)",
-    color: "#f4f4f5",
+    background: colors.primary,
+    color: colors.onPrimary,
     display: "inline-flex",
     alignItems: "center",
     justifyContent: "center",
     gap: space[2],
     padding: `clamp(10px, 2.2vw, 12px) ${space[4]}`,
     fontSize: "clamp(14px, 2.4vw, 16px)",
+    fontWeight: 500,
     cursor: "pointer",
     transition: `transform ${animation.standard}`,
-    fontFamily: "monospace",
+    fontFamily: typography.fontFamily,
   };
 
   const toggleStyle = (active: boolean): CSSProperties => ({
     width: 40,
     height: 22,
     borderRadius: 11,
-    background: active ? "#4f46e5" : "#1A1A1A",
+    background: active ? colors.primary : h,
     border: "none",
     cursor: "pointer",
     position: "relative",
@@ -127,7 +140,7 @@ export default function GuidedOnboarding({ onComplete }: GuidedOnboardingProps) 
     width: 16,
     height: 16,
     borderRadius: "50%",
-    background: active ? "#ffffff" : "#64748b",
+    background: active ? colors.onPrimary : stone,
     position: "absolute",
     top: 3,
     left: active ? 21 : 3,
@@ -139,10 +152,8 @@ export default function GuidedOnboarding({ onComplete }: GuidedOnboardingProps) 
       position: "fixed", inset: 0, zIndex: 60,
       display: "flex", alignItems: "center", justifyContent: "center",
       overflow: "hidden",
-      background: "rgba(0,0,0,0.85)",
-      backdropFilter: "blur(18px)",
-      WebkitBackdropFilter: "blur(18px)",
-      fontFamily: "monospace",
+      background: colors.backdropGlassmorphic,
+      fontFamily: typography.fontFamily,
     }}>
       <section ref={panelRef} style={{
         position: "relative", zIndex: 1,
@@ -150,25 +161,22 @@ export default function GuidedOnboarding({ onComplete }: GuidedOnboardingProps) 
         maxHeight: "min(calc(100dvh - 40px), 920px)",
         borderRadius: radius.lg,
         border: glassBorder,
-        background: "linear-gradient(180deg, rgba(20,20,20,0.88) 0%, rgba(10,10,10,0.94) 100%)",
-        backdropFilter: "blur(24px)",
-        WebkitBackdropFilter: "blur(24px)",
-        boxShadow: "0 0 0 1px rgba(255,255,255,0.03) inset, 0 32px 120px rgba(0,0,0,0.45)",
+        background: surf,
         boxSizing: "border-box",
         padding: "clamp(16px, 3.5vw, 32px)",
         display: "grid",
         gap: "clamp(12px, 2.5vw, 24px)",
         overflowY: "auto",
-        color: "#f4f4f5",
+        color: ink,
       }}>
         {/* Header */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: space[3], flexWrap: "wrap" }}>
-          <span style={{ fontSize: 13, color: "#a1a1aa", fontWeight: 500 }}>Welcome to StockEX</span>
+          <span style={{ fontSize: 13, color: mute, fontWeight: 500 }}>Welcome to StockEX</span>
           <span style={{
             display: "inline-flex", alignItems: "center", justifyContent: "center",
             minHeight: "30px", padding: `0 ${space[3]}`, borderRadius: radius.full,
-            background: "rgba(255,255,255,0.04)", border: glassBorder,
-            color: "#f4f4f5", fontSize: 11, fontWeight: 600,
+            background: elevated, border: glassBorder,
+            color: charcoal, fontSize: 11, fontWeight: 600,
           }}>
             Step {currentStep} of 5
           </span>
@@ -178,12 +186,12 @@ export default function GuidedOnboarding({ onComplete }: GuidedOnboardingProps) 
         <div>
           <h1 style={{
             margin: 0, fontSize: "clamp(26px, 5vw, 48px)", lineHeight: 1.02,
-            fontWeight: 650, color: "#ffffff",
+            fontWeight: 650, color: ink,
           }}>
             Your Edge AI terminal.
           </h1>
           <p style={{
-            margin: `${space[2]} 0 0 0`, color: "#a1a1aa",
+            margin: `${space[2]} 0 0 0`, color: body,
             fontSize: "clamp(14px, 2vw, 16px)", lineHeight: 1.55,
           }}>
             Configure your local intelligence engine and get your workspace ready.
@@ -196,8 +204,8 @@ export default function GuidedOnboarding({ onComplete }: GuidedOnboardingProps) 
             <div key={step} style={{
               height: 4, borderRadius: radius.full,
               background: step <= currentStep
-                ? "linear-gradient(90deg, rgba(255,107,107,0.92) 0%, rgba(255,255,255,0.72) 100%)"
-                : "rgba(255,255,255,0.08)",
+                ? accentRed
+                : backdrop,
             }} />
           ))}
         </div>
@@ -208,21 +216,21 @@ export default function GuidedOnboarding({ onComplete }: GuidedOnboardingProps) 
             <div style={{
               display: "grid", gridTemplateColumns: "auto 1fr", gap: space[4], alignItems: "start",
               padding: "clamp(14px, 2.5vw, 20px)", borderRadius: radius.lg,
-              border: glassBorder, background: "rgba(255,255,255,0.03)",
+              border: glassBorder, background: elevated,
             }}>
               <div style={{
                 width: 40, height: 40, borderRadius: 14,
                 display: "flex", alignItems: "center", justifyContent: "center",
-                background: "rgba(255,255,255,0.05)", border: glassBorder,
-                color: "#818cf8", flexShrink: 0,
+                background: elevated, border: glassBorder,
+                color: ink, flexShrink: 0,
               }}>
                 <ShieldCheck size={18} />
               </div>
               <div>
-                <h2 style={{ margin: 0, color: "#ffffff", fontSize: 16, fontWeight: 560 }}>
+                <h2 style={{ margin: 0, color: ink, fontSize: 16, fontWeight: 500 }}>
                   Decentralized intelligence, zero data cost
                 </h2>
-                <p style={{ margin: `${space[1]} 0 0 0`, color: "#a1a1aa", fontSize: 13, lineHeight: 1.5 }}>
+                <p style={{ margin: `${space[1]} 0 0 0`, color: body, fontSize: 13, lineHeight: 1.5 }}>
                   StockEX runs analysis on your device — not on central servers.
                   Your GPU handles Bollinger bands, volume divergences, and order-flow deltas.
                   No data leaves your browser. No API tokens needed.
@@ -231,19 +239,19 @@ export default function GuidedOnboarding({ onComplete }: GuidedOnboardingProps) 
             </div>
 
             <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: space[3] }}>
-              <div style={{ display: "grid", gap: space[2], padding: space[4], borderRadius: radius.lg, background: "rgba(255,255,255,0.03)", border: glassBorder }}>
-                <span style={{ fontSize: 10, color: "#64748b", textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 600 }}>
+              <div style={{ display: "grid", gap: space[2], padding: space[4], borderRadius: radius.lg, background: elevated, border: glassBorder }}>
+                <span style={{ fontSize: 10, color: mute, textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 600 }}>
                   What you get
                 </span>
-                <span style={{ fontSize: 15, fontWeight: 560, color: "#e4e4e7" }}>Local machine scanning</span>
-                <span style={{ fontSize: 12, color: "#a1a1aa" }}>WebGPU compute shaders for real-time indicators</span>
+                <span style={{ fontSize: 15, fontWeight: 500, color: charcoal }}>Local machine scanning</span>
+                <span style={{ fontSize: 12, color: body }}>WebGPU compute shaders for real-time indicators</span>
               </div>
-              <div style={{ display: "grid", gap: space[2], padding: space[4], borderRadius: radius.lg, background: "rgba(255,255,255,0.03)", border: glassBorder }}>
-                <span style={{ fontSize: 10, color: "#64748b", textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 600 }}>
+              <div style={{ display: "grid", gap: space[2], padding: space[4], borderRadius: radius.lg, background: elevated, border: glassBorder }}>
+                <span style={{ fontSize: 10, color: mute, textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 600 }}>
                   Why it matters
                 </span>
-                <span style={{ fontSize: 15, fontWeight: 560, color: "#e4e4e7" }}>Zero server costs</span>
-                <span style={{ fontSize: 12, color: "#a1a1aa" }}>Your GPU does the heavy lifting — we never bill for compute</span>
+                <span style={{ fontSize: 15, fontWeight: 500, color: charcoal }}>Zero server costs</span>
+                <span style={{ fontSize: 12, color: body }}>Your GPU does the heavy lifting — we never bill for compute</span>
               </div>
             </div>
 
@@ -259,21 +267,21 @@ export default function GuidedOnboarding({ onComplete }: GuidedOnboardingProps) 
             <div style={{
               display: "grid", gridTemplateColumns: "auto 1fr", gap: space[4], alignItems: "start",
               padding: "clamp(14px, 2.5vw, 20px)", borderRadius: radius.lg,
-              border: glassBorder, background: "rgba(255,255,255,0.03)",
+              border: glassBorder, background: elevated,
             }}>
               <div style={{
                 width: 40, height: 40, borderRadius: 14,
                 display: "flex", alignItems: "center", justifyContent: "center",
-                background: "rgba(255,255,255,0.05)", border: glassBorder,
-                color: "#34d399", flexShrink: 0,
+                background: elevated, border: glassBorder,
+                color: ink, flexShrink: 0,
               }}>
                 <Cpu size={18} />
               </div>
               <div>
-                <h2 style={{ margin: 0, color: "#ffffff", fontSize: 16, fontWeight: 560 }}>
+                <h2 style={{ margin: 0, color: ink, fontSize: 16, fontWeight: 500 }}>
                   Configure your scanner engine
                 </h2>
-                <p style={{ margin: `${space[1]} 0 0 0`, color: "#a1a1aa", fontSize: 13 }}>
+                <p style={{ margin: `${space[1]} 0 0 0`, color: body, fontSize: 13 }}>
                   Choose which indicators run locally on your device.
                 </p>
               </div>
@@ -282,12 +290,12 @@ export default function GuidedOnboarding({ onComplete }: GuidedOnboardingProps) 
             {/* Bollinger Sensitivity */}
             <div style={{
               padding: space[4], borderRadius: radius.lg,
-              background: "rgba(255,255,255,0.03)", border: glassBorder,
+              background: elevated, border: glassBorder,
               display: "grid", gap: space[3],
             }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <span style={{ fontSize: 13, fontWeight: 500, color: "#e4e4e7" }}>Bollinger Band Sensitivity</span>
-                <span style={{ fontSize: 11, color: "#64748b", textTransform: "capitalize" }}>{config.bollingerSensitivity}</span>
+                <span style={{ fontSize: 13, fontWeight: 500, color: charcoal }}>Bollinger Band Sensitivity</span>
+                <span style={{ fontSize: 11, color: mute, textTransform: "capitalize" }}>{config.bollingerSensitivity}</span>
               </div>
               <div style={{ display: "flex", gap: space[2] }}>
                 {(["low", "normal", "high"] as const).map((level) => (
@@ -297,11 +305,11 @@ export default function GuidedOnboarding({ onComplete }: GuidedOnboardingProps) 
                     style={{
                       flex: 1, padding: `${space[2]} ${space[3]}`, borderRadius: radius.sm,
                       border: glassBorder, cursor: "pointer",
-                      background: config.bollingerSensitivity === level ? "#4f46e5" : "transparent",
-                      color: config.bollingerSensitivity === level ? "#ffffff" : "#a1a1aa",
+                      background: config.bollingerSensitivity === level ? colors.primary : "transparent",
+                      color: config.bollingerSensitivity === level ? colors.onPrimary : body,
                       fontSize: 11, fontWeight: config.bollingerSensitivity === level ? 600 : 400,
-                      transition: "all 0.15s",
-                      fontFamily: "monospace",
+                      transition: `all ${animation.fast}`,
+                      fontFamily: typography.fontFamily,
                     }}
                   >
                     {level === "low" ? "Wide" : level === "normal" ? "Standard" : "Tight"}
@@ -314,11 +322,11 @@ export default function GuidedOnboarding({ onComplete }: GuidedOnboardingProps) 
             <div style={{
               display: "flex", justifyContent: "space-between", alignItems: "center",
               padding: space[4], borderRadius: radius.lg,
-              background: "rgba(255,255,255,0.03)", border: glassBorder,
+              background: elevated, border: glassBorder,
             }}>
               <div>
-                <span style={{ fontSize: 13, fontWeight: 500, color: "#e4e4e7" }}>Volume Divergence Detection</span>
-                <p style={{ margin: `${space[1]} 0 0 0`, fontSize: 11, color: "#64748b" }}>
+                <span style={{ fontSize: 13, fontWeight: 500, color: charcoal }}>Volume Divergence Detection</span>
+                <p style={{ margin: `${space[1]} 0 0 0`, fontSize: 11, color: mute }}>
                   Flags accumulation when price drops but volume rises
                 </p>
               </div>
@@ -334,11 +342,11 @@ export default function GuidedOnboarding({ onComplete }: GuidedOnboardingProps) 
             <div style={{
               display: "flex", justifyContent: "space-between", alignItems: "center",
               padding: space[4], borderRadius: radius.lg,
-              background: "rgba(255,255,255,0.03)", border: glassBorder,
+              background: elevated, border: glassBorder,
             }}>
               <div>
-                <span style={{ fontSize: 13, fontWeight: 500, color: "#e4e4e7" }}>MACD Trend Signals</span>
-                <p style={{ margin: `${space[1]} 0 0 0`, fontSize: 11, color: "#64748b" }}>
+                <span style={{ fontSize: 13, fontWeight: 500, color: charcoal }}>MACD Trend Signals</span>
+                <p style={{ margin: `${space[1]} 0 0 0`, fontSize: 11, color: mute }}>
                   Moving average convergence-divergence momentum tracker
                 </p>
               </div>
@@ -362,22 +370,21 @@ export default function GuidedOnboarding({ onComplete }: GuidedOnboardingProps) 
             <div style={{
               display: "grid", gridTemplateColumns: "auto 1fr", gap: space[4], alignItems: "start",
               padding: "clamp(14px, 2.5vw, 20px)", borderRadius: radius.lg,
-              border: glassBorder, background: "rgba(255,255,255,0.03)",
+              border: glassBorder, background: elevated,
             }}>
               <div style={{
                 width: 40, height: 40, borderRadius: 14,
                 display: "flex", alignItems: "center", justifyContent: "center",
-                background: "rgba(255,255,255,0.05)", border: glassBorder,
-                color: webgpuStatus === "available" ? "#34d399" : "#fbbf24",
-                flexShrink: 0,
+                background: elevated, border: glassBorder,
+                color: ink, flexShrink: 0,
               }}>
                 <Radar size={18} />
               </div>
               <div>
-                <h2 style={{ margin: 0, color: "#ffffff", fontSize: 16, fontWeight: 560 }}>
+                <h2 style={{ margin: 0, color: ink, fontSize: 16, fontWeight: 500 }}>
                   Hardware verification
                 </h2>
-                <p style={{ margin: `${space[1]} 0 0 0`, color: "#a1a1aa", fontSize: 13 }}>
+                <p style={{ margin: `${space[1]} 0 0 0`, color: body, fontSize: 13 }}>
                   {webgpuStatus === "checking" && "Scanning your browser for WebGPU compute capabilities..."}
                   {webgpuStatus === "available" && "WebGPU detected — your GPU will handle local matrix calculations."}
                   {webgpuStatus === "unavailable" && "WebGPU not available. Activating WASM CPU thread fallback."}
@@ -388,15 +395,15 @@ export default function GuidedOnboarding({ onComplete }: GuidedOnboardingProps) 
             <div style={{
               display: "grid", gap: space[2],
               padding: space[4], borderRadius: radius.lg,
-              background: "#000000", border: glassBorder,
+              background: surf, border: glassBorder,
             }}>
               {[
-                { label: "WebGPU", value: webgpuStatus === "available" ? "Active" : "Fallback", color: webgpuStatus === "available" ? "#34d399" : "#fbbf24" },
-                { label: "Scanner Engine", value: webgpuStatus === "available" ? "GPU Compute Shaders" : "WASM CPU Threads", color: "#e4e4e7" },
-                { label: "Privacy Mode", value: "100% On-Device", color: "#34d399" },
+                { label: "WebGPU", value: webgpuStatus === "available" ? "Active" : "Fallback", color: webgpuStatus === "available" ? charcoal : mute },
+                { label: "Scanner Engine", value: webgpuStatus === "available" ? "GPU Compute Shaders" : "WASM CPU Threads", color: charcoal },
+                { label: "Privacy Mode", value: "100% On-Device", color: charcoal },
               ].map((spec) => (
                 <div key={spec.label} style={{ display: "flex", justifyContent: "space-between", fontSize: 11 }}>
-                  <span style={{ color: "#64748b" }}>{spec.label}</span>
+                  <span style={{ color: mute }}>{spec.label}</span>
                   <span style={{ color: spec.color }}>{spec.value}</span>
                 </div>
               ))}
@@ -414,21 +421,21 @@ export default function GuidedOnboarding({ onComplete }: GuidedOnboardingProps) 
             <div style={{
               display: "grid", gridTemplateColumns: "auto 1fr", gap: space[4], alignItems: "start",
               padding: "clamp(14px, 2.5vw, 20px)", borderRadius: radius.lg,
-              border: glassBorder, background: "rgba(255,255,255,0.03)",
+              border: glassBorder, background: elevated,
             }}>
               <div style={{
                 width: 40, height: 40, borderRadius: 14,
                 display: "flex", alignItems: "center", justifyContent: "center",
-                background: "rgba(255,255,255,0.05)", border: glassBorder,
-                color: "#818cf8", flexShrink: 0,
+                background: elevated, border: glassBorder,
+                color: ink, flexShrink: 0,
               }}>
                 <Eye size={18} />
               </div>
               <div>
-                <h2 style={{ margin: 0, color: "#ffffff", fontSize: 16, fontWeight: 560 }}>
+                <h2 style={{ margin: 0, color: ink, fontSize: 16, fontWeight: 500 }}>
                   Dashboard quick tour
                 </h2>
-                <p style={{ margin: `${space[1]} 0 0 0`, color: "#a1a1aa", fontSize: 13 }}>
+                <p style={{ margin: `${space[1]} 0 0 0`, color: body, fontSize: 13 }}>
                   Here is where you will spend your time:
                 </p>
               </div>
@@ -460,12 +467,12 @@ export default function GuidedOnboarding({ onComplete }: GuidedOnboardingProps) 
                 <div key={item.title} style={{
                   display: "flex", gap: space[3], alignItems: "flex-start",
                   padding: space[3], borderRadius: radius.sm,
-                  background: "rgba(255,255,255,0.02)", border: glassBorder,
+                  background: surf, border: glassBorder,
                 }}>
                   <span style={{ fontSize: 16, flexShrink: 0 }}>{item.icon}</span>
                   <div>
-                    <span style={{ fontSize: 13, fontWeight: 600, color: "#e4e4e7" }}>{item.title}</span>
-                    <p style={{ margin: `${space[1]} 0 0 0`, fontSize: 11, color: "#a1a1aa", lineHeight: 1.4 }}>
+                    <span style={{ fontSize: 13, fontWeight: 600, color: charcoal }}>{item.title}</span>
+                    <p style={{ margin: `${space[1]} 0 0 0`, fontSize: 11, color: body, lineHeight: 1.4 }}>
                       {item.desc}
                     </p>
                   </div>
@@ -485,21 +492,21 @@ export default function GuidedOnboarding({ onComplete }: GuidedOnboardingProps) 
             <div style={{
               display: "grid", gridTemplateColumns: "auto 1fr", gap: space[4], alignItems: "start",
               padding: "clamp(14px, 2.5vw, 20px)", borderRadius: radius.lg,
-              border: glassBorder, background: "rgba(255,255,255,0.03)",
+              border: glassBorder, background: elevated,
             }}>
               <div style={{
                 width: 40, height: 40, borderRadius: 14,
                 display: "flex", alignItems: "center", justifyContent: "center",
-                background: "rgba(255,255,255,0.05)", border: glassBorder,
-                color: "#34d399", flexShrink: 0,
+                background: elevated, border: glassBorder,
+                color: ink, flexShrink: 0,
               }}>
                 <Sparkles size={18} />
               </div>
               <div>
-                <h2 style={{ margin: 0, color: "#ffffff", fontSize: 16, fontWeight: 560 }}>
+                <h2 style={{ margin: 0, color: ink, fontSize: 16, fontWeight: 500 }}>
                   Your starting watchlist is ready
                 </h2>
-                <p style={{ margin: `${space[1]} 0 0 0`, color: "#a1a1aa", fontSize: 13 }}>
+                <p style={{ margin: `${space[1]} 0 0 0`, color: body, fontSize: 13 }}>
                   We have pre-loaded a focused India watchlist so your first view is useful immediately.
                 </p>
               </div>
@@ -510,8 +517,8 @@ export default function GuidedOnboarding({ onComplete }: GuidedOnboardingProps) 
                 <span key={symbol} style={{
                   display: "inline-flex", alignItems: "center", justifyContent: "center",
                   minHeight: "34px", padding: `0 ${space[3]}`, borderRadius: radius.full,
-                  border: glassBorder, background: "rgba(255,255,255,0.04)",
-                  color: "#e4e4e7", fontSize: 12, fontWeight: 600, letterSpacing: "0.04em",
+                  border: glassBorder, background: elevated,
+                  color: charcoal, fontSize: 12, fontWeight: 600, letterSpacing: "0.04em",
                 }}>
                   {symbol}
                 </span>
@@ -522,7 +529,7 @@ export default function GuidedOnboarding({ onComplete }: GuidedOnboardingProps) 
             <div style={{
               display: "grid", gap: space[2],
               padding: space[4], borderRadius: radius.lg,
-              background: "#000000", border: glassBorder,
+              background: surf, border: glassBorder,
             }}>
               {[
                 { label: "Scanner Engine", value: config.bollingerSensitivity === "normal" ? "Standard" : config.bollingerSensitivity === "high" ? "Tight" : "Wide" },
@@ -531,8 +538,8 @@ export default function GuidedOnboarding({ onComplete }: GuidedOnboardingProps) 
                 { label: "Compute", value: webgpuStatus === "available" ? "GPU" : "CPU/WASM" },
               ].map((row) => (
                 <div key={row.label} style={{ display: "flex", justifyContent: "space-between", fontSize: 11 }}>
-                  <span style={{ color: "#64748b" }}>{row.label}</span>
-                  <span style={{ color: "#e4e4e7" }}>{row.value}</span>
+                  <span style={{ color: mute }}>{row.label}</span>
+                  <span style={{ color: charcoal }}>{row.value}</span>
                 </div>
               ))}
             </div>
