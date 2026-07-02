@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
 """
 slm_math_runtime.py -- StockEX 3rd-Decimal Precision Math Engine.
-Multi-source resilient fallback mesh:
-  1. Neon PostgreSQL cache tables
-  2. Backup Yahoo Finance mirror (direct HTTP)
-  3. Deterministic SHA-256 seeded synthetic data (guaranteed non-empty output)
+Strict fail-fast data sourcing pipeline:
+  1. Neon PostgreSQL cache tables (authentic stored data)
+  2. Backup Yahoo Finance mirror (live unauthenticated HTTP)
+  3. Explicit error if both sources fail (no synthetic fallbacks)
 
 Usage:
     python3 slm_math_runtime.py --ticker SBIN
-    python3 slm_math_runtime.py --ticker TCS --metrics ALL
     python3 slm_math_runtime.py --batch SBIN,TCS,RELIANCE
 """
 
@@ -16,14 +15,12 @@ import argparse
 import json
 import os
 import sys
-import random
-import hashlib
 
 try:
     import pandas as pd
     import numpy as np
 except ImportError as e:
-    print(json.dumps({"error": f"Missing dependency: {e.name}"}))
+    print(json.dumps({"success": False, "error": f"Missing dependency: {e.name}"}))
     sys.exit(1)
 
 DATABASE_URL = os.getenv("DATABASE_URL")
@@ -31,22 +28,6 @@ YAHOO_MIRRORS = [
     "https://query1.finance.yahoo.com/v8/finance/chart/{ticker}?interval=1d&range=6mo",
     "https://query2.finance.yahoo.com/v8/finance/chart/{ticker}?interval=1d&range=6mo",
 ]
-
-
-def calculate_sha256_synthetic_candles(ticker: str, length: int = 250) -> pd.DataFrame:
-    """Deterministic price array using SHA-256 seed. Guarantees non-empty output."""
-    prices = []
-    base_seed = int(hashlib.sha256(ticker.encode("utf-8")).hexdigest()[:8], 16) % 1000 + 500
-    np.random.seed(base_seed)
-    current_price = float(base_seed)
-    for _ in range(length):
-        pct_change = np.random.uniform(-0.025, 0.027)
-        current_price = current_price * (1 + pct_change)
-        prices.append(round(current_price, 3))
-    return pd.DataFrame({
-        "open": prices, "high": prices, "low": prices,
-        "close": prices, "volume": [100000] * length
-    })
 
 
 def _compute_trend_state(current_price: float, sma_50: float, sma_200: float, rsi_14: float) -> str:
@@ -65,7 +46,7 @@ def _compute_trend_state(current_price: float, sma_50: float, sma_200: float, rs
     return "NEUTRAL_STABLE"
 
 
-def _fetch_db_data(ticker: str) -> tuple:
+def _fetch_db_candles(ticker: str) -> pd.DataFrame:
     conn = None
     try:
         import psycopg2
@@ -75,17 +56,30 @@ def _fetch_db_data(ticker: str) -> tuple:
             "WHERE ticker = %s ORDER BY timestamp DESC LIMIT 250;",
             conn, params=[ticker]
         )
+        return df
+    except Exception:
+        return pd.DataFrame()
+    finally:
+        if conn:
+            conn.close()
+
+
+def _fetch_db_fundamentals(ticker: str) -> tuple | None:
+    conn = None
+    try:
+        import psycopg2
+        conn = psycopg2.connect(DATABASE_URL)
         cursor = conn.cursor()
         cursor.execute(
             "SELECT market_cap_cr, pe_ratio, debt_to_equity, promoter_pledged_pct, asset_sector "
             "FROM asset_fundamental_ratios WHERE ticker = %s LIMIT 1;",
             (ticker,)
         )
-        ratio_row = cursor.fetchone()
+        row = cursor.fetchone()
         cursor.close()
-        return df, ratio_row
+        return row
     except Exception:
-        return pd.DataFrame(), None
+        return None
     finally:
         if conn:
             conn.close()
@@ -108,7 +102,9 @@ def _fetch_backup_mirror(ticker: str) -> pd.DataFrame:
             quotes = result.get("indicators", {}).get("quote", [{}])[0]
             if not timestamps or not quotes.get("close"):
                 meta = result.get("meta", {})
-                cp = float(meta.get("regularMarketPrice", 1500.0))
+                cp = float(meta.get("regularMarketPrice", 0.0))
+                if cp == 0.0:
+                    continue
                 return pd.DataFrame({
                     "open": [cp], "high": [cp], "low": [cp], "close": [cp], "volume": [100000]
                 })
@@ -134,14 +130,16 @@ def calculate_precision_market_analytics(ticker: str):
     raw_symbol = ticker.upper().replace(".NS", "").replace(".BO", "").strip()
     suffix = ".NS" if ".NS" in ticker.upper() else ".BO" if ".BO" in ticker.upper() else ".NS"
     symbol = raw_symbol
+
     df = pd.DataFrame()
     ratio_row = None
     data_mode = "LIVE_MARKET_MESH"
 
     if DATABASE_URL:
-        df, ratio_row = _fetch_db_data(symbol)
+        df = _fetch_db_candles(symbol)
         if not df.empty:
             data_mode = "POSTGRES_CACHE"
+            ratio_row = _fetch_db_fundamentals(symbol)
 
     if df.empty:
         df = _fetch_backup_mirror(symbol + suffix)
@@ -149,9 +147,10 @@ def calculate_precision_market_analytics(ticker: str):
             data_mode = "YAHOO_MIRROR"
 
     if df.empty:
-        print(f"Network lines throttled for {symbol}. Engaging deterministic SHA-256 seeding core...", file=sys.stderr)
-        df = calculate_sha256_synthetic_candles(symbol)
-        data_mode = "DETERMINISTIC_SAFE_ANCHOR"
+        return {
+            "success": False,
+            "error": f"Data verification fault: ticker '{symbol}' has no upstream data. All database and live mirror sources returned empty."
+        }
 
     df = df.iloc[::-1].reset_index(drop=True)
     current_price = float(df["close"].iloc[-1])
@@ -166,15 +165,23 @@ def calculate_precision_market_analytics(ticker: str):
         rs = gain / loss
         rsi_14 = float(100 - (100 / (1 + rs.iloc[-1]))) if not pd.isna(rs.iloc[-1]) else 50.0
     else:
-        rsi_14 = 54.321
+        rsi_14 = 50.0
 
     trend_state = _compute_trend_state(current_price, sma_50, sma_200, rsi_14)
 
-    market_cap = float(ratio_row[0]) if ratio_row and ratio_row[0] else round(current_price * 0.15, 3)
-    pe_ratio = float(ratio_row[1]) if ratio_row and ratio_row[1] else 22.45
-    debt_to_equity = float(ratio_row[2]) if ratio_row and ratio_row[2] else 0.42
-    promoter_pledged = float(ratio_row[3]) if ratio_row and ratio_row[3] else 0.0
-    sector = str(ratio_row[4]) if ratio_row and ratio_row[4] else "Technology Banking Infrastructure"
+    if ratio_row:
+        market_cap = float(ratio_row[0]) if ratio_row[0] is not None else 0.000
+        pe_ratio = float(ratio_row[1]) if ratio_row[1] is not None else 0.000
+        debt_to_equity = float(ratio_row[2]) if ratio_row[2] is not None else 0.000
+        promoter_pledged = float(ratio_row[3]) if ratio_row[3] is not None else 0.000
+        sector = str(ratio_row[4]) if ratio_row[4] is not None else ""
+        data_mode = "AUTHENTIC_DATABASE_RECORD"
+    else:
+        market_cap = 0.000
+        pe_ratio = 0.000
+        debt_to_equity = 0.000
+        promoter_pledged = 0.000
+        sector = ""
 
     return {
         "success": True,
@@ -198,8 +205,6 @@ def main():
     parser = argparse.ArgumentParser(description="StockEX Precision Resilient Kernel")
     parser.add_argument("--ticker", help="Target stock ticker symbol")
     parser.add_argument("--batch", help="Comma-separated list of ticker symbols")
-    parser.add_argument("--metrics", default="STANDARD", choices=["STANDARD", "ALL"],
-                        help="Metric detail level")
     args = parser.parse_args()
 
     if args.batch:
