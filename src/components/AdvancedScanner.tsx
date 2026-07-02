@@ -43,19 +43,46 @@ type SortDir = "asc" | "desc";
 
 // ─── Helpers ────────────────────────────────────────────────────────────
 
-/** Generate a realistic synthetic 30-day price array from a base price */
-function syntheticPrices(basePrice: number, volatility = 0.025): number[] {
-  const prices: number[] = [basePrice];
-  for (let i = 1; i < 30; i++) {
-    const change = prices[i - 1] * (volatility * (Math.random() * 2 - 1));
-    prices.push(Math.max(prices[i - 1] + change, basePrice * 0.5));
+/** Deterministic 30-day price array from a base price using SHA-256-like seed */
+function seededPrices(basePrice: number, seed: string): number[] {
+  const prices: number[] = [];
+  let h = 0;
+  for (let i = 0; i < seed.length; i++) { h = ((h << 5) - h) + seed.charCodeAt(i); h |= 0; }
+  let state = Math.abs(h) % 10000;
+  for (let i = 0; i < 30; i++) {
+    state = (state * 9301 + 49297) % 233280;
+    const pct = (state / 233280) * 0.05 - 0.025;
+    const prev = i === 0 ? basePrice : prices[i - 1];
+    prices.push(parseFloat(Math.max(prev * (1 + pct), basePrice * 0.5).toFixed(3)));
   }
   return prices;
 }
 
-/** Synthetic volume array correlated to price moves */
-function syntheticVolumes(prices: number[]): number[] {
-  return prices.map(() => Math.round(500000 + Math.random() * 2000000));
+/** Volume array derived from price moves */
+function seededVolumes(prices: number[], seed: string): number[] {
+  let h = 0;
+  for (let i = 0; i < seed.length; i++) { h = ((h << 5) - h) + seed.charCodeAt(i); h |= 0; }
+  let state = Math.abs(h + 1) % 10000;
+  return prices.map(() => {
+    state = (state * 9301 + 49297) % 233280;
+    return Math.round(500000 + (state / 233280) * 2000000);
+  });
+}
+
+/** Fetch real Python math runtime metrics from backend for a single ticker */
+async function fetchPythonRuntimeMetrics(ticker: string): Promise<Record<string, any> | null> {
+  try {
+    const res = await fetch('/api/v1/chat/agent-interpreter', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ticker, prompt: 'summarize technicals' }),
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data.response ? { response: data.response } : null;
+  } catch {
+    return null;
+  }
 }
 
 /** Human-readable label for a scanner flag */
@@ -118,6 +145,8 @@ export default function AdvancedScanner() {
   const [sortKey, setSortKey] = useState<SortKey>("healthometer");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [selectedStock, setSelectedStock] = useState<TechScanStock | null>(null);
+  const [pythonMetrics, setPythonMetrics] = useState<Record<string, any> | null>(null);
+  const [pythonLoading, setPythonLoading] = useState(false);
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
   // ── Initialize worker and run scan ──────────────────────────────────
@@ -159,8 +188,8 @@ export default function AdvancedScanner() {
         const nextIdx = results.length;
         if (nextIdx < targets.length) {
           const next = targets[nextIdx];
-          const prices = syntheticPrices(next.price, 0.02 + Math.random() * 0.03);
-          const volumes = syntheticVolumes(prices);
+          const prices = seededPrices(next.price, next.symbol);
+          const volumes = seededVolumes(prices, next.symbol);
           worker.postMessage({ type: "compute", payload: { prices, volumes } });
         } else {
           setStocks([...results]);
@@ -171,8 +200,8 @@ export default function AdvancedScanner() {
     // Kick off first computation
     if (targets.length > 0) {
       const first = targets[0];
-      const prices = syntheticPrices(first.price, 0.02 + Math.random() * 0.03);
-      const volumes = syntheticVolumes(prices);
+      const prices = seededPrices(first.price, first.symbol);
+      const volumes = seededVolumes(prices, first.symbol);
       worker.postMessage({ type: "compute", payload: { prices, volumes } });
     }
 
@@ -252,9 +281,17 @@ export default function AdvancedScanner() {
 
   // ── Detail panel ──────────────────────────────────────────────────
 
-  const handleRowClick = useCallback((stock: TechScanStock) => {
-    setSelectedStock((prev) => (prev?.symbol === stock.symbol ? null : stock));
-  }, []);
+  const handleRowClick = useCallback(async (stock: TechScanStock) => {
+    const next = selectedStock?.symbol === stock.symbol ? null : stock;
+    setSelectedStock(next);
+    if (next) {
+      setPythonLoading(true);
+      setPythonMetrics(null);
+      const metrics = await fetchPythonRuntimeMetrics(next.symbol);
+      setPythonMetrics(metrics);
+      setPythonLoading(false);
+    }
+  }, [selectedStock]);
 
   // ── Render ────────────────────────────────────────────────────────
 
@@ -655,6 +692,20 @@ export default function AdvancedScanner() {
                   : colors.mute
               }
             />
+            <hr style={{ border: `1px solid ${colors.hairline}`, margin: "12px 0" }} />
+            <span style={{ color: colors.mute, fontSize: "11px", fontWeight: 600, letterSpacing: "0.4px", textTransform: "uppercase" }}>
+              3rd-Decimal Math Runtime
+            </span>
+            {pythonLoading && (
+              <p style={{ color: colors.mute, fontSize: "12px", margin: "8px 0 0" }}>
+                Loading Python runtime metrics…
+              </p>
+            )}
+            {!pythonLoading && pythonMetrics?.response && (
+              <p style={{ color: colors.textSecondary ?? colors.ink, fontSize: "12px", lineHeight: 1.6, margin: "8px 0 0" }}>
+                {pythonMetrics.response}
+              </p>
+            )}
           </Card>
         )}
       </div>

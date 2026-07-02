@@ -84,5 +84,42 @@ export interface ScannerWorkerResult {
   };
 }
 
-export type WorkerMessage = EdgeAiWorkerInput | ScannerWorkerInput;
-export type WorkerResponse = EdgeAiWorkerResult | ScannerWorkerResult;
+// ── Client-Side Indicator Computation (Phase 80) ──────────────────
+
+export interface IndicatorWorkerInput {
+  type: 'compute_indicators';
+  prices: number[];
+  volumes: number[];
+}
+
+export interface IndicatorWorkerResult {
+  type: 'indicator_result';
+  currentPrice: number;
+  sma50: number;
+  sma200: number;
+  rsi14: number;
+  bollingerUpper: number;
+  bollingerLower: number;
+  bollingerMiddle: number;
+  macdLine: number;
+  macdSignal: number;
+  divergencePattern: string;
+  healthometer: number;
+  scannerFlag: string;
+}
+
+// ── Backend REST Fallback (Phase 80) ──────────────────────────────
+
+export interface BackendFallbackInput {
+  type: 'backend_fallback';
+  ticker: string;
+  prompt: string;
+}
+
+export interface BackendFallbackResult {
+  type: 'backend_fallback_result';
+  response: string;
+}
+
+export type WorkerMessage = EdgeAiWorkerInput | ScannerWorkerInput | IndicatorWorkerInput | BackendFallbackInput;
+export type WorkerResponse = EdgeAiWorkerResult | ScannerWorkerResult | IndicatorWorkerResult | BackendFallbackResult;

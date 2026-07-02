@@ -11,6 +11,10 @@ import type {
   EdgeAiWorkerResult,
   ScannerWorkerInput,
   ScannerWorkerResult,
+  IndicatorWorkerInput,
+  IndicatorWorkerResult,
+  BackendFallbackInput,
+  BackendFallbackResult,
   WorkerMessage,
 } from './edgeAiTypes';
 
@@ -65,6 +69,22 @@ self.onmessage = async (event: MessageEvent<WorkerMessage | { type: string; payl
       return;
     }
 
+    if ('type' in input && input.type === 'compute_indicators') {
+      const indicatorInput = input as IndicatorWorkerInput;
+      const result = computeIndicators(indicatorInput.prices, indicatorInput.volumes);
+      // eslint-disable-next-line no-restricted-globals
+      self.postMessage(result);
+      return;
+    }
+
+    if ('type' in input && input.type === 'backend_fallback') {
+      const fbInput = input as BackendFallbackInput;
+      const result = await callBackendAgent(fbInput.ticker, fbInput.prompt);
+      // eslint-disable-next-line no-restricted-globals
+      self.postMessage(result);
+      return;
+    }
+
     if ('type' in input && input.type === 'scan') {
       const result = runScanner(input as ScannerWorkerInput);
       // eslint-disable-next-line no-restricted-globals
@@ -82,6 +102,104 @@ self.onmessage = async (event: MessageEvent<WorkerMessage | { type: string; payl
     self.postMessage({ rawReply: fallback });
   }
 };
+
+/* ── Client-Side Indicator Computation (Phase 80) ─────────────────── */
+
+function computeRSI(prices: number[], period = 14): number {
+  if (prices.length < period + 1) return 50.0;
+  const deltas: number[] = [];
+  for (let i = 1; i < prices.length; i++) {
+    deltas.push(prices[i] - prices[i - 1]);
+  }
+  let avgGain = 0, avgLoss = 0;
+  for (let i = 0; i < period; i++) {
+    if (deltas[i] > 0) avgGain += deltas[i];
+    else avgLoss -= deltas[i];
+  }
+  avgGain /= period;
+  avgLoss /= period;
+  for (let i = period; i < deltas.length; i++) {
+    const gain = deltas[i] > 0 ? deltas[i] : 0;
+    const loss = deltas[i] < 0 ? -deltas[i] : 0;
+    avgGain = (avgGain * (period - 1) + gain) / period;
+    avgLoss = (avgLoss * (period - 1) + loss) / period;
+  }
+  if (avgLoss === 0) return 100.0;
+  const rs = avgGain / avgLoss;
+  return parseFloat((100.0 - 100.0 / (1.0 + rs)).toFixed(3));
+}
+
+function computeSMA(prices: number[], period: number): number {
+  if (prices.length < period) return prices[prices.length - 1] || 0;
+  const slice = prices.slice(-period);
+  return parseFloat((slice.reduce((a, b) => a + b, 0) / period).toFixed(3));
+}
+
+function computeMACD(prices: number[]): { macdLine: number; signal: number } {
+  if (prices.length < 26) return { macdLine: 0, signal: 0 };
+  const ema12 = computeEma(prices, 12);
+  const ema26 = computeEma(prices, 26);
+  const macdLine = ema12 - ema26;
+  const signalPrices = prices.map((_, i, arr) => {
+    const slice = arr.slice(0, i + 1);
+    return computeEma(slice, 12) - computeEma(slice, 26);
+  });
+  const signal = signalPrices.length >= 9
+    ? signalPrices.slice(-9).reduce((a, b) => a + b, 0) / 9
+    : macdLine;
+  return { macdLine: parseFloat(macdLine.toFixed(4)), signal: parseFloat(signal.toFixed(4)) };
+}
+
+function computeIndicators(prices: number[], volumes: number[]): IndicatorWorkerResult {
+  const currentPrice = prices.length > 0 ? prices[prices.length - 1] : 0;
+  const sma50 = computeSMA(prices, 50);
+  const sma200 = computeSMA(prices, 200);
+  const rsi14 = computeRSI(prices, 14);
+  const bands = computeBollingerBands(prices, 20, 2);
+  const macd = computeMACD(prices);
+  const divergence = detectPriceVolumeDivergence(prices, volumes.length === prices.length ? volumes : []);
+
+  let scannerFlag = 'CONSOLIDATION_STATE';
+  let signalStrength = 50;
+  if (currentPrice > bands.upper) { scannerFlag = 'MEAN_REVERSION_SHORTSIDE_ALERT'; signalStrength = 20; }
+  else if (currentPrice < bands.lower) { scannerFlag = 'MEAN_REVERSION_BUYSIDE_ALERT'; signalStrength = 85; }
+  if (divergence === 'BULLISH_ACCUMULATION_DIVERGENCE') { scannerFlag = 'CRITICAL_INSTITUTIONAL_ACCUMULATION'; signalStrength = 95; }
+
+  return {
+    type: 'indicator_result',
+    currentPrice: parseFloat(currentPrice.toFixed(3)),
+    sma50,
+    sma200,
+    rsi14,
+    bollingerUpper: bands.upper,
+    bollingerLower: bands.lower,
+    bollingerMiddle: bands.middle,
+    macdLine: macd.macdLine,
+    macdSignal: macd.signal,
+    divergencePattern: divergence,
+    healthometer: Math.min(Math.max(signalStrength, 10), 100),
+    scannerFlag,
+  };
+}
+
+/* ── Backend REST Fallback (Phase 80) ──────────────────────────────── */
+
+async function callBackendAgent(ticker: string, prompt: string): Promise<BackendFallbackResult> {
+  try {
+    const res = await fetch('/api/v1/chat/agent-interpreter', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ticker, prompt }),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      return { type: 'backend_fallback_result', response: data.response || '' };
+    }
+  } catch {
+    // worker has no access to console — return empty
+  }
+  return { type: 'backend_fallback_result', response: '' };
+}
 
 /* ── Scanner functions (Phase 18) ──────────────────────────────────── */
 
@@ -270,7 +388,7 @@ function generateReply(input: EdgeAiWorkerInput): string {
 }
 
 // Export for testability
-export { runScanner, computeBollingerBands, computeEma, detectPriceVolumeDivergence, generateReply, runWebGpuScanner };
+export { runScanner, computeBollingerBands, computeEma, detectPriceVolumeDivergence, generateReply, runWebGpuScanner, computeIndicators, computeRSI, computeSMA };
 
 /* ── WebGPU-Accelerated Scanner (Phase 30) ──────────────────────────── */
 

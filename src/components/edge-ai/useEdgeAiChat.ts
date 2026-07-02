@@ -95,9 +95,12 @@ export function useEdgeAiChat(context: EdgeAiResearchContext): UseEdgeAiChatRetu
           query,
         };
         const workerResult: any = await StockExWorkerPool.executeTask('chat', workerInput);
-        const rawReply: string = workerResult?.rawReply || '';
+        let rawReply: string = workerResult?.rawReply || '';
 
-        // Apply output guardrails
+        if (!rawReply) {
+          rawReply = await callBackendApi(context.symbol, query);
+        }
+
         const safeLines = sanitizeChatReply(rawReply);
         const safeContent = safeLines.join('\n\n');
 
@@ -129,6 +132,25 @@ export function useEdgeAiChat(context: EdgeAiResearchContext): UseEdgeAiChatRetu
   }, [context.symbol]);
 
   return { messages, status, send, reset };
+}
+
+/* ── Backend API Fallback (Phase 80) ────────────────────────────────── */
+
+async function callBackendApi(ticker: string, prompt: string): Promise<string> {
+  try {
+    const res = await fetch('/api/v1/chat/agent-interpreter', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ticker, prompt }),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      return data.response || '';
+    }
+  } catch {
+    // silent fallback
+  }
+  return '';
 }
 
 

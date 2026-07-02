@@ -647,7 +647,9 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
             {techIndicator === "sma" ? "SMA 20 (dashed) overlaid on price" : techIndicator === "rsi" ? "RSI shown on separate scale tab (coming soon)" : "MACD histogram overlay (coming soon)"}
           </p>
         )}
-      </Card>      {/* ── Healthometer + Score Overview ── */}
+      </Card>      {/* ── Analytical Dashboard Grid ── */}
+      <div className="stock-analytical-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(420px, 1fr))", gap: "20px", alignItems: "start" }}>
+      {/* ── Healthometer + Score Overview ── */}
       <section className="stock-score-grid raycast-slideUp" style={{ animationDelay: "0.1s", animationFillMode: "both", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "16px" }}>
         <Healthometer
           score={stock.scores.health ?? 0}
@@ -1019,6 +1021,8 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
 
       {/* ── Similar Stocks ── */}
       <SimilarStocks />
+
+      </div>{/* ── end analytical-dashboard-grid ── */}
 
       {/* ── Native Ad (Position 7) ── */}
       <NativeAd position={7} />
