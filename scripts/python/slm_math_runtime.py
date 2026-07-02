@@ -105,7 +105,16 @@ def validate_market_snapshot(metrics: dict) -> tuple:
 
 def run_precision_intelligence_kernel(ticker: str):
     raw_symbol = ticker.upper().replace(".NS", "").replace(".BO", "").strip()
-    suffix = ".NS" if ".NS" in ticker.upper() else ".BO" if ".BO" in ticker.upper() else ".NS"
+    has_ns = ".NS" in ticker.upper()
+    has_bo = ".BO" in ticker.upper()
+    if has_ns:
+        suffix = ".NS"
+    elif has_bo:
+        suffix = ".BO"
+    elif raw_symbol.isdigit():
+        suffix = ".BO"
+    else:
+        suffix = ".NS"
     symbol = raw_symbol
     df = pd.DataFrame()
     ratio_row = None
