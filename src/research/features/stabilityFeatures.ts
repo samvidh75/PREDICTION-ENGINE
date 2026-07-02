@@ -1,4 +1,5 @@
 import type { NormalizedFundamentals } from "../normalization/types";
+import { mean } from "@/utils/statisticalUtils";
 
 export interface StabilityFeatures {
   scoreVariability: number | null;
@@ -32,11 +33,8 @@ export function computeStabilityFeatures(
     earningsStability = 50;
   }
 
-  let overallStability: number | null = null;
   const scores = [scoreVariability, earningsStability].filter((s): s is number => s !== null);
-  if (scores.length >= 1) {
-    overallStability = Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
-  }
+  const overallStability = mean(scores);
 
   const present = [qualityScore, growthScore, f.profitGrowth, f.revenueGrowth].filter(v => v !== null).length;
   const confidence = Math.round((present / 4) * 100);

@@ -11,6 +11,7 @@ import type {
   QualityDimension,
 } from "./DataQualityTypes.ts";
 import { toConfidenceTier, toPublicLimitation } from "./DataQualityTypes.ts";
+import { mean } from "@/utils/statisticalUtils.ts";
 
 export class DataQualityScoreProvider {
   /**
@@ -36,7 +37,7 @@ export class DataQualityScoreProvider {
     ];
 
     const scores = allDimensions.map((d) => dimensions[d] ?? 0);
-    const overall = scores.reduce((a, b) => a + b, 0) / scores.length;
+    const overall = mean(scores) ?? 0;
 
     const missingFields = this.collectMissingFields(dimensions, extraMissingFields);
     const tier = toConfidenceTier(overall);

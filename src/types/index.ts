@@ -2,6 +2,7 @@ export interface Fundamentals { symbol: string; [key: string]: unknown; }
 
 /** Clamp a numeric score to the range [0, 100], rounding to integer. */
 export function clampScore(value: number): number {
+  if (!Number.isFinite(value)) return 0;
   return Math.max(0, Math.min(100, Math.round(value)));
 }
 

@@ -1,4 +1,5 @@
 import { clampScore } from '@/types';
+import { mean } from '@/utils/statisticalUtils.ts';
 import { UnifiedFeatureValue, UnifiedFactorScore, UnifiedFactorGroup } from '../types';
 
 export interface FactorGroupDefinition {
@@ -68,7 +69,7 @@ function buildGroupScore(
     ? clampScore(confidences.reduce((a, b) => a * b, 1) / 0.01)
     : 0;
   const value = scores.length > 0
-    ? clampScore(scores.reduce((a, b) => a + b, 0) / scores.length)
+    ? clampScore(mean(scores) ?? 0)
     : null;
 
   return {
@@ -206,7 +207,7 @@ export function scoreMomentumGroup(features: Map<string, UnifiedFeatureValue>): 
     ? clampScore(confidences.reduce((a, b) => a * b, 1) / 0.01)
     : 0;
   const value = scores.length > 0
-    ? clampScore(scores.reduce((a, b) => a + b, 0) / scores.length)
+    ? clampScore(mean(scores) ?? 0)
     : null;
 
   return {
@@ -262,7 +263,7 @@ export function scoreRiskGroup(features: Map<string, UnifiedFeatureValue>): Unif
     ? clampScore(confidences.reduce((a, b) => a * b, 1) / 0.01)
     : 0;
   const value = scores.length > 0
-    ? clampScore(scores.reduce((a, b) => a + b, 0) / scores.length)
+    ? clampScore(mean(scores) ?? 0)
     : null;
 
   return {
