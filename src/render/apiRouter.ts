@@ -1697,4 +1697,8 @@ export default async function registerApiRoutes(server: FastifyInstance) {
   // ── Corporate Insider Disclosure Routes (Phase 52) ──────────
   const { registerInsiderRoutes } = await import("../commercial/api/insiderRoutes.js");
   await registerInsiderRoutes(server);
+
+  // ── Sentiment Feed Routes (Phase 53) ─────────────────────────
+  const { registerSentimentRoutes } = await import("../commercial/api/sentimentRoutes.js");
+  await registerSentimentRoutes(server);
 }

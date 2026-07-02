@@ -56,6 +56,15 @@ self.onmessage = async (event: MessageEvent<WorkerMessage | { type: string; payl
       return;
     }
 
+    // Phase 53: WebGPU sentiment scoring
+    if ('type' in input && input.type === 'compute_gpu_sentiment') {
+      const scores = input.payload.scores as number[];
+      const sentimentIndex = await executeWebGpuSentimentScan(scores);
+      // eslint-disable-next-line no-restricted-globals
+      self.postMessage({ type: 'gpu_sentiment_result', sentimentIndex });
+      return;
+    }
+
     if ('type' in input && input.type === 'scan') {
       const result = runScanner(input as ScannerWorkerInput);
       // eslint-disable-next-line no-restricted-globals
@@ -616,4 +625,75 @@ function computeCpuFallback(prices: number[]): number {
   if (range <= 0) return 50;
   const pos = (current - bands.lower) / range;
   return Math.round(85 - pos * 65);
+}
+
+/**
+ * Phase 53: GPU-accelerated sentiment index scoring via WebGPU WGSL compute shader.
+ * Converts raw text-score vectors into a normalized 10–99 sentiment index.
+ * Falls back to neutral (50) if WebGPU is unavailable.
+ */
+export async function executeWebGpuSentimentScan(textScores: number[]): Promise<number> {
+  if (typeof navigator === 'undefined' || !navigator.gpu) return 50;
+
+  const adapter = await navigator.gpu.requestAdapter();
+  const device = await adapter?.requestDevice();
+  if (!device) return 50;
+
+  const shaderSource = `
+    @group(0) @binding(0) var<storage, read> scores: array<f32>;
+    @group(0) @binding(1) var<storage, read_write> net_score: array<f32>;
+
+    @compute @workgroup_size(1)
+    fn main(@builtin(global_invocation_id) id: vec3<u32>) {
+      var total: f32 = 0.0;
+      for (var i = 0u; i < 5u; i = i + 1u) {
+        total = total + scores[i];
+      }
+      net_score[0] = (total / 5.0) * 100.0;
+    }
+  `;
+
+  const module = device.createShaderModule({ code: shaderSource });
+
+  const inputBuffer = device.createBuffer({
+    size: Float32Array.BYTES_PER_ELEMENT * textScores.length,
+    usage: GPUBufferUsage.STORAGE,
+    mappedAtCreation: true,
+  });
+  new Float32Array(inputBuffer.getMappedRange()).set(textScores);
+  inputBuffer.unmap();
+
+  const outputBuffer = device.createBuffer({
+    size: 4,
+    usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ,
+  });
+
+  const pipeline = device.createComputePipeline({
+    layout: 'auto',
+    compute: { module, entryPoint: 'main' },
+  });
+
+  const bindGroup = device.createBindGroup({
+    layout: pipeline.getBindGroupLayout(0),
+    entries: [
+      { binding: 0, resource: { buffer: inputBuffer } },
+      { binding: 1, resource: { buffer: outputBuffer } },
+    ],
+  });
+
+  const encoder = device.createCommandEncoder();
+  const pass = encoder.beginComputePass();
+  pass.setPipeline(pipeline);
+  pass.setBindGroup(0, bindGroup);
+  pass.dispatchWorkgroups(1);
+  pass.end();
+
+  device.queue.submit([encoder.finish()]);
+  await outputBuffer.mapAsync(GPUMapMode.READ);
+
+  const result = new Float32Array(outputBuffer.getMappedRange());
+  const finalScore = result[0];
+  outputBuffer.unmap();
+
+  return Math.min(Math.max(Math.round(finalScore), 10), 99);
 }
