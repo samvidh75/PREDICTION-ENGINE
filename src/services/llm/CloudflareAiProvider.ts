@@ -4,6 +4,7 @@ export class CloudflareAiProvider {
   private static accountId = process.env.CLOUDFLARE_ACCOUNT_ID || '';
   private static apiToken = process.env.CLOUDFLARE_API_TOKEN || '';
   private static targetModel = '@cf/meta/llama-3-8b-instruct';
+  private static customLoraAdapterId = 'stockex_encyclopedia_slm_active';
 
   public static async generateResponseFallback(
     systemPrompt: string,
@@ -29,6 +30,7 @@ export class CloudflareAiProvider {
             { role: 'system', content: systemPrompt },
             { role: 'user', content: userPrompt },
           ],
+          lora: this.customLoraAdapterId,
           temperature: 0.1,
           max_tokens: 150,
         }),
@@ -36,7 +38,7 @@ export class CloudflareAiProvider {
 
       if (!response.ok) {
         throw new Error(
-          `Cloudflare Serverless Edge API returned status: ${response.status}`,
+          `Cloudflare Edge API returned network error status: ${response.status}`,
         );
       }
 
@@ -44,7 +46,7 @@ export class CloudflareAiProvider {
       return (data.result?.response || '').trim();
     } catch (edgeError: any) {
       await DiscordNotifier.sendErrorAlert(
-        'CLOUDFLARE_SERVERLESS_EDGE_FALLOVER_CRASH',
+        'CLOUDFLARE_ENCYCLOPEDIA_INFERENCE_CRASH',
         edgeError,
       );
       throw edgeError;
