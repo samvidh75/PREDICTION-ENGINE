@@ -18,22 +18,27 @@ const STARTER_PROMPTS = [
   "What changed most across my watchlist?",
 ];
 
-function buildAssistantReply(prompt: string): string {
-  const lower = prompt.toLowerCase();
+async function callChatApi(message: string): Promise<string> {
+  const apiBase = ((typeof document !== 'undefined' && (document.querySelector('meta[name="api-base"]') as HTMLMetaElement)?.content) ||
+    (import.meta as any).env?.VITE_API_BASE_URL) ?? "";
+  const apiUrl = `${apiBase}/api/chat`;
 
-  if (lower.includes("watchlist") || lower.includes("tracked")) {
-    return "Start with the names where conviction changed recently, then compare them against your stronger holdings. If you want, I can help you frame that review stock by stock.";
+  try {
+    const res = await fetch(apiUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        message,
+        symbol: "",
+        context: "StockEX research assistant — watchlist tracking, thesis review, and equity research.",
+      }),
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    return data?.response ?? "I can help you break this down into thesis, risk, what changed, and what to watch next. Ask about any stock, compare setup, or watchlist review angle.";
+  } catch {
+    return "I can help you break this down into thesis, risk, what changed, and what to watch next. Ask about any stock, compare setup, or watchlist review angle.";
   }
-
-  if (lower.includes("compare")) {
-    return "A useful compare flow is quality first, then valuation, then what changed. Pick any two names and I can structure that comparison for you.";
-  }
-
-  if (lower.includes("review") || lower.includes("changed")) {
-    return "Focus on what moved, whether that movement affects the thesis, and what would invalidate your current view. That usually keeps the review sharp instead of noisy.";
-  }
-
-  return "I can help you break this down into thesis, risk, what changed, and what to watch next. Ask about any stock, compare setup, or watchlist review angle.";
 }
 
 export function FloatingAiAssistant() {
@@ -105,12 +110,12 @@ export function FloatingAiAssistant() {
     setInput("");
     setLoading(true);
 
-    await new Promise((resolve) => setTimeout(resolve, 550));
+    const reply = await callChatApi(trimmed);
 
     const assistantMessage: DrawerMessage = {
       id: `assistant-${Date.now()}`,
       role: "assistant",
-      content: buildAssistantReply(trimmed),
+      content: reply,
       timestamp: Date.now(),
     };
 

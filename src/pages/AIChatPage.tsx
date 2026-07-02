@@ -261,7 +261,7 @@ export default function AIChatPage() {
     [activeId],
   );
 
-  // Simulate AI response (production: hook into ExternalLLMProvider)
+  // Generate AI response via the local API
   const generateResponse = useCallback(
     async (userMessage: string) => {
       setLoading(true);
@@ -271,24 +271,44 @@ export default function AIChatPage() {
         "Compiling research context…",
       ];
 
-      // Mock streaming — production will call ExternalLLMProvider
-      await new Promise((r) => setTimeout(r, 1500));
+      const apiBase = (import.meta as any).env?.VITE_API_BASE_URL ?? "";
+      const apiUrl = `${apiBase}/api/chat`;
 
-      const responses: Record<string, string> = {
-        default: `Based on current market data, here's my analysis:\n\n**Market Context**\n• Nifty 50 at 22,450 (+0.8%)\n• IT sector leading with 2.1% gains\n• FII buying ₹1,200 Cr today\n\n**Key Observations**\n• Quality stocks outperforming growth\n• Banking showing mean reversion signals\n• Midcaps seeing increased institutional interest\n\nWould you like me to dive deeper into any specific sector or stock?`,
-      };
+      try {
+        const res = await fetch(apiUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            message: userMessage,
+            symbol: "",
+            context: "General Indian stock market research and analysis.",
+          }),
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        const content = data?.response ?? "I'm unable to process your request right now. Please try again.";
 
-      const aiMsg: Message = {
-        id: `ai-${Date.now()}`,
-        role: "assistant",
-        content: responses.default,
-        timestamp: Date.now(),
-        thinkingSteps,
-        citations: ["NSE India", "SEBI Filings"],
-      };
+        const aiMsg: Message = {
+          id: `ai-${Date.now()}`,
+          role: "assistant",
+          content,
+          timestamp: Date.now(),
+          thinkingSteps,
+          citations: data?.citations?.length ? data.citations : ["NSE India", "SEBI Filings"],
+        };
 
-      setLoading(false);
-      return aiMsg;
+        setLoading(false);
+        return aiMsg;
+      } catch {
+        const aiMsg: Message = {
+          id: `ai-${Date.now()}`,
+          role: "assistant",
+          content: "I'm unable to process your request right now. Please try again.",
+          timestamp: Date.now(),
+        };
+        setLoading(false);
+        return aiMsg;
+      }
     },
     [],
   );
