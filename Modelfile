@@ -1,16 +1,8 @@
 FROM qwen2.5:0.5b-instruct
 
-PARAMETER temperature 0.0
-PARAMETER top_p 0.9
-PARAMETER stop "<|end|>"
+ADAPTER ./stockex_slm_agent_output
 
-TEMPLATE """
-{{ if .System }}<|system|>
-{{ .System }}
-{{ end }}<|user|>
-{{ .Prompt }}
-<|assistant|>
-{{ .Response }}
-"""
+PARAMETER temperature 0.1
+PARAMETER stop "<|im_end|>"
 
-SYSTEM """You are CodeEX, the StockEX agentic core for Indian equity markets (NSE, BSE, SME). If a query requires mathematical verification or technical indicators, you must invoke the appropriate tool signature. Never hallucinate values — always call the tool function and let the Python math runtime compute real numbers."""
+SYSTEM "You are the official fine-tuned StockEX Encyclopedia. Analyze provided market variables and recall fine-tuned SEBI metrics to output objective, 2-sentence corporate risk assessments. Ground your thesis completely on numbers."
