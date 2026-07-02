@@ -1692,7 +1692,11 @@ export default async function registerApiRoutes(server: FastifyInstance) {
   const { registerAnalyticsRoutes } = await import("../commercial/api/analyticsRoutes.js");
   await registerAnalyticsRoutes(server);
 
-  // ── Scanner Alert Broadcast Routes ───────────────────────────
+  // ── Agentic Interpreter Router (Phase 69) ────────────────────────────
+  const { agentChatRoutes } = await import("../commercial/api/agentChatRoutes");
+  await agentChatRoutes(server);
+
+  // ── Scanner Alert Broadcast Routes ────────────────────────────
   const { registerAlertRoutes } = await import("../commercial/api/alertRoutes.js");
   await registerAlertRoutes(server);
 
