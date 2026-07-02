@@ -1,34 +1,36 @@
 #!/usr/bin/env python3
 """
-cloud_train.py — CodeEX Cloud LoRA Fine-Tuning via PEFT + SFTTrainer.
-
-Run this file on a cloud GPU instance (AWS P4/P5, Lambda Labs) to fine-tune
-Qwen2.5-0.5B-Instruct with LoRA on the agentic tool-calling dataset.
+cloud_train.py — Native Qwen2.5-0.5B-Instruct LoRA Fine-Tuning (TRL 1.7.0).
+Trains on the encyclopedia dataset and patches adapter_config.json
+for Cloudflare Workers AI compatibility (model_type: "qwen2").
 
 Usage:
-    pip install torch transformers datasets trl peft accelerate
     python3 scripts/python/cloud_train.py
 """
 
+import os
 import torch
+import json
 from datasets import load_dataset
-from transformers import (
-    AutoModelForCausalLM,
-    AutoTokenizer,
-    TrainingArguments,
-)
+from transformers import AutoModelForCausalLM, AutoTokenizer
 from peft import LoraConfig, get_peft_model
-from trl import SFTTrainer
+from trl import SFTTrainer, SFTConfig
 
 MODEL_ID = "Qwen/Qwen2.5-0.5B-Instruct"
-DATASET_PATH = "cloud_agent_dataset.jsonl"
+DATASET_PATH = "stockex_encyclopedia_dataset.jsonl"
 OUTPUT_DIR = "./stockex_slm_agent_output"
 
 
-def run_cloud_agent_tuning():
-    print("Starting Cloud Fine-Tuning Loop using PEFT/LoRA...")
+def execute_qwen_cloud_finetune():
+    print("Initializing Qwen2.5-0.5B-Instruct Cloud Fine-Tuning Pipeline...")
+
+    if not os.path.exists(DATASET_PATH):
+        print(f"Dataset missing at: {DATASET_PATH}")
+        print("Run 'python3 scripts/python/compile_encyclopedia.py' first.")
+        return
 
     dataset = load_dataset("json", data_files=DATASET_PATH, split="train")
+
     tokenizer = AutoTokenizer.from_pretrained(MODEL_ID, trust_remote_code=True)
     tokenizer.pad_token = tokenizer.eos_token
 
@@ -41,14 +43,14 @@ def run_cloud_agent_tuning():
     lora_config = LoraConfig(
         r=16,
         lora_alpha=32,
-        target_modules=["q_proj", "k_proj", "v_proj", "o_proj"],
+        target_modules=["q_proj", "v_proj"],
         lora_dropout=0.05,
         bias="none",
         task_type="CAUSAL_LM",
     )
     model = get_peft_model(model, lora_config)
 
-    training_args = TrainingArguments(
+    training_args = SFTConfig(
         output_dir=OUTPUT_DIR,
         per_device_train_batch_size=4,
         gradient_accumulation_steps=4,
@@ -58,24 +60,35 @@ def run_cloud_agent_tuning():
         fp16=True,
         logging_steps=10,
         report_to="none",
+        max_length=512,
+        packing=False,
     )
 
     trainer = SFTTrainer(
         model=model,
-        train_dataset=dataset,
         args=training_args,
-        peft_config=lora_config,
-        max_seq_length=512,
-        dataset_text_field="text",
+        train_dataset=dataset,
+        processing_class=tokenizer,
     )
 
-    print("Training model parameter weights across cloud GPU rings...")
+    print("Running parameter convergence matrix calculations across GPU channels...")
     trainer.train()
 
     trainer.model.save_pretrained(OUTPUT_DIR)
     tokenizer.save_pretrained(OUTPUT_DIR)
-    print(f"Fine-tuning finished! Model weights saved to: {OUTPUT_DIR}")
+    print(f"Fine-tuning completed! Model weights compiled inside: {OUTPUT_DIR}")
+
+    config_path = os.path.join(OUTPUT_DIR, "adapter_config.json")
+    if os.path.exists(config_path):
+        with open(config_path, "r", encoding="utf-8") as f:
+            config_meta = json.load(f)
+
+        config_meta["model_type"] = "qwen2"
+
+        with open(config_path, "w", encoding="utf-8") as f:
+            json.dump(config_meta, f, indent=2)
+        print("adapter_config.json patched with model_type: 'qwen2'.")
 
 
 if __name__ == "__main__":
-    run_cloud_agent_tuning()
+    execute_qwen_cloud_finetune()
