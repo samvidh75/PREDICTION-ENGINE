@@ -1,19 +1,24 @@
 import type { CSSProperties } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ArrowRight, CheckCircle2, Cpu, Eye, Radar, ShieldCheck, Sparkles } from "lucide-react";
-import { animation, colors, radius, space, typography } from "../design/tokens";
+import { animation, colors, radius, space } from "../design/tokens";
 
-// ── Raycast design helpers ──────────────────────────────────────────────────
-const h = colors.hairline;             // #1A1A1A
-const ink = colors.ink;                 // #ffffff
-const body = colors.body;               // #a0a0a0
-const mute = colors.mute;               // #707070
-const charcoal = colors.charcoal;       // #c0c0c0
-const stone = colors.stone;             // #404040
-const surf = colors.surface;            // #0D0D0D
-const elevated = colors.surfaceElevated; // #141414
-const accentRed = colors.accentRed;     // #FF6B6B
-const backdrop = colors.backdropMuted;  // rgba(112,112,112,0.12)
+// ── Glassmorphism design helpers ────────────────────────────────────────────
+const glassBorder = `1px solid rgba(255,255,255,0.08)`;
+const glassBorderLight = `1px solid rgba(255,255,255,0.04)`;
+const glassBg = 'rgba(20,20,20,0.55)';        // frosted card surface
+const glassBgLight = 'rgba(255,255,255,0.03)'; // subtle glass fill
+const glassBgIcon = 'rgba(255,255,255,0.05)';  // icon container bg
+const glassAccent = '#818cf8';                 // indigo glass accent for icons
+const ink = '#ffffff';
+const body = '#a0a0a0';
+const mute = '#707070';
+const charcoal = '#c0c0c0';
+const stone = '#404040';
+const accentRed = '#FF6B6B';
+
+// Terminal-style font for the onboarding wizard
+const monoFont = "'SF Mono', 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace";
 
 interface GuidedOnboardingProps {
   onComplete: () => void;
@@ -104,15 +109,13 @@ export default function GuidedOnboarding({ onComplete }: GuidedOnboardingProps) 
     window.scrollTo({ top: 0, left: 0, behavior: "auto" });
   }, [currentStep]);
 
-  const glassBorder = `1px solid ${h}`;
-
   const buttonStyle: CSSProperties = {
     minHeight: "clamp(48px, 8vw, 56px)",
     width: "100%",
     borderRadius: radius.lg,
     border: glassBorder,
-    background: colors.primary,
-    color: colors.onPrimary,
+    background: 'linear-gradient(135deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.04) 100%)',
+    color: ink,
     display: "inline-flex",
     alignItems: "center",
     justifyContent: "center",
@@ -122,15 +125,17 @@ export default function GuidedOnboarding({ onComplete }: GuidedOnboardingProps) 
     fontWeight: 500,
     cursor: "pointer",
     transition: `transform ${animation.standard}`,
-    fontFamily: typography.fontFamily,
+    fontFamily: monoFont,
+    backdropFilter: "blur(8px)",
+    WebkitBackdropFilter: "blur(8px)",
   };
 
   const toggleStyle = (active: boolean): CSSProperties => ({
     width: 40,
     height: 22,
     borderRadius: 11,
-    background: active ? colors.primary : h,
-    border: "none",
+    background: active ? 'rgba(255,255,255,0.85)' : 'rgba(255,255,255,0.08)',
+    border: glassBorderLight,
     cursor: "pointer",
     position: "relative",
     flexShrink: 0,
@@ -140,7 +145,7 @@ export default function GuidedOnboarding({ onComplete }: GuidedOnboardingProps) 
     width: 16,
     height: 16,
     borderRadius: "50%",
-    background: active ? colors.onPrimary : stone,
+    background: active ? '#000000' : stone,
     position: "absolute",
     top: 3,
     left: active ? 21 : 3,
@@ -152,8 +157,10 @@ export default function GuidedOnboarding({ onComplete }: GuidedOnboardingProps) 
       position: "fixed", inset: 0, zIndex: 60,
       display: "flex", alignItems: "center", justifyContent: "center",
       overflow: "hidden",
-      background: colors.backdropGlassmorphic,
-      fontFamily: typography.fontFamily,
+      background: 'rgba(0,0,0,0.65)',
+      backdropFilter: "blur(12px)",
+      WebkitBackdropFilter: "blur(12px)",
+      fontFamily: monoFont,
     }}>
       <section ref={panelRef} style={{
         position: "relative", zIndex: 1,
@@ -161,7 +168,10 @@ export default function GuidedOnboarding({ onComplete }: GuidedOnboardingProps) 
         maxHeight: "min(calc(100dvh - 40px), 920px)",
         borderRadius: radius.lg,
         border: glassBorder,
-        background: surf,
+        background: glassBg,
+        backdropFilter: "blur(24px)",
+        WebkitBackdropFilter: "blur(24px)",
+        boxShadow: 'rgba(255,255,255,0.03) 0px 0px 0px 1px inset, rgba(0,0,0,0.45) 0px 32px 120px',
         boxSizing: "border-box",
         padding: "clamp(16px, 3.5vw, 32px)",
         display: "grid",
@@ -171,12 +181,13 @@ export default function GuidedOnboarding({ onComplete }: GuidedOnboardingProps) 
       }}>
         {/* Header */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: space[3], flexWrap: "wrap" }}>
-          <span style={{ fontSize: 13, color: mute, fontWeight: 500 }}>Welcome to StockEX</span>
+          <span style={{ fontSize: 13, color: body, fontWeight: 500 }}>Welcome to StockEX</span>
           <span style={{
             display: "inline-flex", alignItems: "center", justifyContent: "center",
             minHeight: "30px", padding: `0 ${space[3]}`, borderRadius: radius.full,
-            background: elevated, border: glassBorder,
-            color: charcoal, fontSize: 11, fontWeight: 600,
+            background: glassBgLight, border: glassBorderLight,
+            color: ink, fontSize: 11, fontWeight: 600,
+            backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)",
           }}>
             Step {currentStep} of 5
           </span>
@@ -204,8 +215,8 @@ export default function GuidedOnboarding({ onComplete }: GuidedOnboardingProps) 
             <div key={step} style={{
               height: 4, borderRadius: radius.full,
               background: step <= currentStep
-                ? accentRed
-                : backdrop,
+                ? 'linear-gradient(90deg, rgba(255,107,107,0.92) 0%, rgba(255,255,255,0.72) 100%)'
+                : 'rgba(255,255,255,0.08)',
             }} />
           ))}
         </div>
@@ -216,13 +227,14 @@ export default function GuidedOnboarding({ onComplete }: GuidedOnboardingProps) 
             <div style={{
               display: "grid", gridTemplateColumns: "auto 1fr", gap: space[4], alignItems: "start",
               padding: "clamp(14px, 2.5vw, 20px)", borderRadius: radius.lg,
-              border: glassBorder, background: elevated,
+              border: glassBorder, background: glassBgLight,
+              backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)",
             }}>
               <div style={{
                 width: 40, height: 40, borderRadius: 14,
                 display: "flex", alignItems: "center", justifyContent: "center",
-                background: elevated, border: glassBorder,
-                color: ink, flexShrink: 0,
+                background: glassBgIcon, border: glassBorderLight,
+                color: glassAccent, flexShrink: 0,
               }}>
                 <ShieldCheck size={18} />
               </div>
@@ -239,14 +251,14 @@ export default function GuidedOnboarding({ onComplete }: GuidedOnboardingProps) 
             </div>
 
             <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: space[3] }}>
-              <div style={{ display: "grid", gap: space[2], padding: space[4], borderRadius: radius.lg, background: elevated, border: glassBorder }}>
+              <div style={{ display: "grid", gap: space[2], padding: space[4], borderRadius: radius.lg, background: glassBgLight, border: glassBorder, backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)" }}>
                 <span style={{ fontSize: 10, color: mute, textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 600 }}>
                   What you get
                 </span>
                 <span style={{ fontSize: 15, fontWeight: 500, color: charcoal }}>Local machine scanning</span>
                 <span style={{ fontSize: 12, color: body }}>WebGPU compute shaders for real-time indicators</span>
               </div>
-              <div style={{ display: "grid", gap: space[2], padding: space[4], borderRadius: radius.lg, background: elevated, border: glassBorder }}>
+              <div style={{ display: "grid", gap: space[2], padding: space[4], borderRadius: radius.lg, background: glassBgLight, border: glassBorder, backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)" }}>
                 <span style={{ fontSize: 10, color: mute, textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 600 }}>
                   Why it matters
                 </span>
@@ -267,13 +279,14 @@ export default function GuidedOnboarding({ onComplete }: GuidedOnboardingProps) 
             <div style={{
               display: "grid", gridTemplateColumns: "auto 1fr", gap: space[4], alignItems: "start",
               padding: "clamp(14px, 2.5vw, 20px)", borderRadius: radius.lg,
-              border: glassBorder, background: elevated,
+              border: glassBorder, background: glassBgLight,
+              backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)",
             }}>
               <div style={{
                 width: 40, height: 40, borderRadius: 14,
                 display: "flex", alignItems: "center", justifyContent: "center",
-                background: elevated, border: glassBorder,
-                color: ink, flexShrink: 0,
+                background: glassBgIcon, border: glassBorderLight,
+                color: glassAccent, flexShrink: 0,
               }}>
                 <Cpu size={18} />
               </div>
@@ -290,8 +303,9 @@ export default function GuidedOnboarding({ onComplete }: GuidedOnboardingProps) 
             {/* Bollinger Sensitivity */}
             <div style={{
               padding: space[4], borderRadius: radius.lg,
-              background: elevated, border: glassBorder,
+              background: glassBgLight, border: glassBorder,
               display: "grid", gap: space[3],
+              backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)",
             }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <span style={{ fontSize: 13, fontWeight: 500, color: charcoal }}>Bollinger Band Sensitivity</span>
@@ -305,11 +319,11 @@ export default function GuidedOnboarding({ onComplete }: GuidedOnboardingProps) 
                     style={{
                       flex: 1, padding: `${space[2]} ${space[3]}`, borderRadius: radius.sm,
                       border: glassBorder, cursor: "pointer",
-                      background: config.bollingerSensitivity === level ? colors.primary : "transparent",
-                      color: config.bollingerSensitivity === level ? colors.onPrimary : body,
+                      background: config.bollingerSensitivity === level ? glassAccent : glassBgLight,
+                      color: config.bollingerSensitivity === level ? "#fff" : body,
                       fontSize: 11, fontWeight: config.bollingerSensitivity === level ? 600 : 400,
                       transition: `all ${animation.fast}`,
-                      fontFamily: typography.fontFamily,
+                      fontFamily: monoFont,
                     }}
                   >
                     {level === "low" ? "Wide" : level === "normal" ? "Standard" : "Tight"}
@@ -322,7 +336,8 @@ export default function GuidedOnboarding({ onComplete }: GuidedOnboardingProps) 
             <div style={{
               display: "flex", justifyContent: "space-between", alignItems: "center",
               padding: space[4], borderRadius: radius.lg,
-              background: elevated, border: glassBorder,
+              background: glassBgLight, border: glassBorder,
+              backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)",
             }}>
               <div>
                 <span style={{ fontSize: 13, fontWeight: 500, color: charcoal }}>Volume Divergence Detection</span>
@@ -342,7 +357,8 @@ export default function GuidedOnboarding({ onComplete }: GuidedOnboardingProps) 
             <div style={{
               display: "flex", justifyContent: "space-between", alignItems: "center",
               padding: space[4], borderRadius: radius.lg,
-              background: elevated, border: glassBorder,
+              background: glassBgLight, border: glassBorder,
+              backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)",
             }}>
               <div>
                 <span style={{ fontSize: 13, fontWeight: 500, color: charcoal }}>MACD Trend Signals</span>
@@ -370,13 +386,14 @@ export default function GuidedOnboarding({ onComplete }: GuidedOnboardingProps) 
             <div style={{
               display: "grid", gridTemplateColumns: "auto 1fr", gap: space[4], alignItems: "start",
               padding: "clamp(14px, 2.5vw, 20px)", borderRadius: radius.lg,
-              border: glassBorder, background: elevated,
+              border: glassBorder, background: glassBgLight,
+              backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)",
             }}>
               <div style={{
                 width: 40, height: 40, borderRadius: 14,
                 display: "flex", alignItems: "center", justifyContent: "center",
-                background: elevated, border: glassBorder,
-                color: ink, flexShrink: 0,
+                background: glassBgIcon, border: glassBorderLight,
+                color: glassAccent, flexShrink: 0,
               }}>
                 <Radar size={18} />
               </div>
@@ -395,7 +412,8 @@ export default function GuidedOnboarding({ onComplete }: GuidedOnboardingProps) 
             <div style={{
               display: "grid", gap: space[2],
               padding: space[4], borderRadius: radius.lg,
-              background: surf, border: glassBorder,
+              background: glassBgLight, border: glassBorder,
+              backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)",
             }}>
               {[
                 { label: "WebGPU", value: webgpuStatus === "available" ? "Active" : "Fallback", color: webgpuStatus === "available" ? charcoal : mute },
@@ -421,13 +439,14 @@ export default function GuidedOnboarding({ onComplete }: GuidedOnboardingProps) 
             <div style={{
               display: "grid", gridTemplateColumns: "auto 1fr", gap: space[4], alignItems: "start",
               padding: "clamp(14px, 2.5vw, 20px)", borderRadius: radius.lg,
-              border: glassBorder, background: elevated,
+              border: glassBorder, background: glassBgLight,
+              backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)",
             }}>
               <div style={{
                 width: 40, height: 40, borderRadius: 14,
                 display: "flex", alignItems: "center", justifyContent: "center",
-                background: elevated, border: glassBorder,
-                color: ink, flexShrink: 0,
+                background: glassBgIcon, border: glassBorderLight,
+                color: glassAccent, flexShrink: 0,
               }}>
                 <Eye size={18} />
               </div>
@@ -467,7 +486,8 @@ export default function GuidedOnboarding({ onComplete }: GuidedOnboardingProps) 
                 <div key={item.title} style={{
                   display: "flex", gap: space[3], alignItems: "flex-start",
                   padding: space[3], borderRadius: radius.sm,
-                  background: surf, border: glassBorder,
+                  background: glassBgLight, border: glassBorder,
+                  backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)",
                 }}>
                   <span style={{ fontSize: 16, flexShrink: 0 }}>{item.icon}</span>
                   <div>
@@ -492,13 +512,14 @@ export default function GuidedOnboarding({ onComplete }: GuidedOnboardingProps) 
             <div style={{
               display: "grid", gridTemplateColumns: "auto 1fr", gap: space[4], alignItems: "start",
               padding: "clamp(14px, 2.5vw, 20px)", borderRadius: radius.lg,
-              border: glassBorder, background: elevated,
+              border: glassBorder, background: glassBgLight,
+              backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)",
             }}>
               <div style={{
                 width: 40, height: 40, borderRadius: 14,
                 display: "flex", alignItems: "center", justifyContent: "center",
-                background: elevated, border: glassBorder,
-                color: ink, flexShrink: 0,
+                background: glassBgIcon, border: glassBorderLight,
+                color: glassAccent, flexShrink: 0,
               }}>
                 <Sparkles size={18} />
               </div>
@@ -517,7 +538,7 @@ export default function GuidedOnboarding({ onComplete }: GuidedOnboardingProps) 
                 <span key={symbol} style={{
                   display: "inline-flex", alignItems: "center", justifyContent: "center",
                   minHeight: "34px", padding: `0 ${space[3]}`, borderRadius: radius.full,
-                  border: glassBorder, background: elevated,
+                  border: glassBorder, background: glassBgLight,
                   color: charcoal, fontSize: 12, fontWeight: 600, letterSpacing: "0.04em",
                 }}>
                   {symbol}
@@ -529,7 +550,8 @@ export default function GuidedOnboarding({ onComplete }: GuidedOnboardingProps) 
             <div style={{
               display: "grid", gap: space[2],
               padding: space[4], borderRadius: radius.lg,
-              background: surf, border: glassBorder,
+              background: glassBgLight, border: glassBorder,
+              backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)",
             }}>
               {[
                 { label: "Scanner Engine", value: config.bollingerSensitivity === "normal" ? "Standard" : config.bollingerSensitivity === "high" ? "Tight" : "Wide" },
