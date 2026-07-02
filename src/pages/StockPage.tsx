@@ -32,7 +32,7 @@ import { PriceTargets } from "../components/PriceTargets";
 import { NativeAd } from "../components/NativeAd";
 import SubscriptionBanner from "../components/SubscriptionBanner";
 import { MarketBrainPanel } from "../components/market-brain/MarketBrainPanel";
-import { EdgeAiChatSection } from "../components/edge-ai/EdgeAiChatSection";
+import AdaptiveAiChat from "../components/AdaptiveAiChat";
 import { ResearchAiExplanationPanel } from "../components/ai-orchestrator/ResearchAiExplanationPanel";
 import { formatNumber } from "../services/ui/dataFormatting";
 import { toHealthometerAiContext } from "../components/ai-orchestrator/healthometerAiContext";
@@ -989,9 +989,9 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
       {/* ── Market Brain Panel ── */}
       <MarketBrainPanel symbol={stock.symbol} companyName={stock.companyName} />
 
-      {/* ── Edge AI Research Chat ── */}
+      {/* ── Adaptive AI Chat ── */}
       <div style={{ height: '400px', borderTop: '1px solid #2A2A2A', marginTop: '8px', paddingTop: '8px' }}>
-        <EdgeAiChatSection symbol={stock.symbol} companyName={stock.companyName} />
+        <AdaptiveAiChat ticker={stock.symbol} />
       </div>
 
       {/* ── What Changed ── */}
