@@ -12,7 +12,7 @@
 import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
 import { getPlan } from "../plans";
 import { RazorpayProvider } from "../RazorpayProvider";
-import { verifyFirebaseToken } from "../../config/firebaseAdmin";
+import { requireAuth } from "../../services/auth/authMiddleware.js";
 
 interface CreateCheckoutBody {
   planId: string;
@@ -250,37 +250,4 @@ export async function registerCheckoutRoutes(fastify: FastifyInstance): Promise<
       }
     },
   );
-}
-
-// ── Helper: Firebase auth preHandler ───────────────────────────────────────
-
-async function requireAuth(req: FastifyRequest, reply: FastifyReply) {
-  try {
-    const auth = req.headers?.authorization;
-    if (!auth || !auth.startsWith("Bearer ")) {
-      req.log.warn({ url: req.url }, "Unauthenticated — no Bearer token");
-      if (process.env.NODE_ENV === "production") {
-        return reply.status(401).send({ error: "Authentication required" });
-      }
-      (req as any).uid = null;
-      return;
-    }
-    const token = auth.slice(7);
-    const decoded = await verifyFirebaseToken(token);
-    if (!decoded) {
-      req.log.warn({ url: req.url }, "Invalid Firebase token");
-      if (process.env.NODE_ENV === "production") {
-        return reply.status(401).send({ error: "Authentication required" });
-      }
-      (req as any).uid = null;
-      return;
-    }
-    (req as any).uid = decoded.uid;
-  } catch (err) {
-    req.log.warn({ url: req.url, err }, "Firebase token verification failed");
-    if (process.env.NODE_ENV === "production") {
-      return reply.status(401).send({ error: "Authentication required" });
-    }
-    (req as any).uid = null;
-  }
 }
