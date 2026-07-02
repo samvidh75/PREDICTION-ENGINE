@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { colors, space, radius } from "../design/tokens";
+import { colors, space, radius, typography } from "../design/tokens";
 import { FeatureGate } from "../commercial/FeatureGate";
 import { UpgradePrompt } from "../commercial/UpgradePrompt";
 
@@ -54,7 +54,7 @@ function MetricCard({ label, value, sub, accent }: {
         borderRadius: radius.md,
         padding: space[3],
         border: `1px solid ${colors.hairline}`,
-        fontFamily: "monospace",
+        fontFamily: typography.fontFamily,
         fontSize: 11,
         display: "flex",
         flexDirection: "column",
@@ -85,7 +85,7 @@ function UsageBar({ label, used, allowed }: { label: string; used: number; allow
         display: "flex",
         flexDirection: "column",
         gap: space[1],
-        fontFamily: "monospace",
+        fontFamily: typography.fontFamily,
         fontSize: 10,
       }}
     >
@@ -142,7 +142,7 @@ function DashboardContent() {
 
   if (loading) {
     return (
-      <p style={{ textAlign: "center", color: colors.textTertiary, fontFamily: "monospace", fontSize: 12, padding: space[12] }}>
+      <p style={{ textAlign: "center", color: colors.textTertiary, fontFamily: typography.fontFamily, fontSize: 12, padding: space[12] }}>
         Loading real-time system analytics...
       </p>
     );
@@ -150,7 +150,7 @@ function DashboardContent() {
 
   if (error) {
     return (
-      <p style={{ textAlign: "center", color: colors.danger, fontFamily: "monospace", fontSize: 12, padding: space[8] }}>
+      <p style={{ textAlign: "center", color: colors.danger, fontFamily: typography.fontFamily, fontSize: 12, padding: space[8] }}>
         {error}
       </p>
     );
@@ -182,13 +182,13 @@ function DashboardContent() {
             color: colors.accentBlue,
             letterSpacing: "0.05em",
             textTransform: "uppercase",
-            fontFamily: "monospace",
+            fontFamily: typography.fontFamily,
             margin: 0,
           }}
         >
           Real-Time System Analytics
         </h3>
-        <p style={{ fontSize: 10, color: colors.textTertiary, fontFamily: "monospace", margin: `${space[1]} 0 0 0` }}>
+        <p style={{ fontSize: 10, color: colors.textTertiary, fontFamily: typography.fontFamily, margin: `${space[1]} 0 0 0` }}>
           Live metrics from the StockEX inference &amp; subscription layer
         </p>
       </div>
@@ -226,7 +226,7 @@ function DashboardContent() {
           border: `1px solid ${colors.hairline}`,
         }}
       >
-        <span style={{ color: colors.textTertiary, fontSize: 9, fontFamily: "monospace", textTransform: "uppercase", letterSpacing: "0.08em" }}>
+        <span style={{ color: colors.textTertiary, fontSize: 9, fontFamily: typography.fontFamily, textTransform: "uppercase", letterSpacing: "0.08em" }}>
           Your API Usage
         </span>
         <div style={{ display: "flex", flexDirection: "column", gap: space[2], marginTop: space[2] }}>

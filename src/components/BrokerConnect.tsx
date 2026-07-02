@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { colors, space, radius } from "../design/tokens";
+import { colors, space, radius, typography } from "../design/tokens";
 import { FeatureGate } from "../commercial/FeatureGate";
 import { UpgradePrompt } from "../commercial/UpgradePrompt";
 
@@ -58,7 +58,7 @@ function ConnectionsList({ refreshKey }: { refreshKey: number }) {
 
   if (loading) {
     return (
-      <p style={{ textAlign: "center", color: colors.textTertiary, fontFamily: "monospace", fontSize: 12, padding: space[8] }}>
+      <p style={{ textAlign: "center", color: colors.textTertiary, fontFamily: typography.fontFamily, fontSize: 12, padding: space[8] }}>
         Loading broker connections...
       </p>
     );
@@ -66,7 +66,7 @@ function ConnectionsList({ refreshKey }: { refreshKey: number }) {
 
   if (error) {
     return (
-      <p style={{ textAlign: "center", color: colors.danger, fontFamily: "monospace", fontSize: 12, padding: space[8] }}>
+      <p style={{ textAlign: "center", color: colors.danger, fontFamily: typography.fontFamily, fontSize: 12, padding: space[8] }}>
         {error}
       </p>
     );
@@ -76,7 +76,7 @@ function ConnectionsList({ refreshKey }: { refreshKey: number }) {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: space[3] }}>
-      <span style={{ color: colors.textTertiary, fontSize: 9, fontFamily: "monospace", textTransform: "uppercase", letterSpacing: "0.08em" }}>
+      <span style={{ color: colors.textTertiary, fontSize: 9, fontFamily: typography.fontFamily, textTransform: "uppercase", letterSpacing: "0.08em" }}>
         Connected Accounts
       </span>
       {connections.map((conn) => {
@@ -94,7 +94,7 @@ function ConnectionsList({ refreshKey }: { refreshKey: number }) {
               alignItems: "center",
             }}
           >
-            <div style={{ fontFamily: "monospace", fontSize: 12 }}>
+            <div style={{ fontFamily: typography.fontFamily, fontSize: 12 }}>
               <div style={{ color: colors.textPrimary, fontWeight: 700 }}>{brokerMeta?.name ?? conn.broker}</div>
               <div style={{ color: colors.textTertiary, fontSize: 10, marginTop: 2 }}>
                 {conn.status} &middot; Connected {new Date(conn.created_at).toLocaleDateString("en-IN")}
@@ -109,7 +109,7 @@ function ConnectionsList({ refreshKey }: { refreshKey: number }) {
                 color: colors.marketRed,
                 borderRadius: radius.sm,
                 padding: `${space[1]} ${space[3]}`,
-                fontFamily: "monospace",
+                fontFamily: typography.fontFamily,
                 fontSize: 10,
                 cursor: "pointer",
                 opacity: disconnecting === conn.id ? 0.5 : 1,
@@ -162,10 +162,10 @@ function BrokerConnectContent() {
       }}
     >
       <div>
-        <h3 style={{ fontSize: 13, fontWeight: 900, color: colors.accentBlue, letterSpacing: "0.05em", textTransform: "uppercase", fontFamily: "monospace", margin: 0 }}>
+        <h3 style={{ fontSize: 13, fontWeight: 900, color: colors.accentBlue, letterSpacing: "0.05em", textTransform: "uppercase", fontFamily: typography.fontFamily, margin: 0 }}>
           Broker Connections
         </h3>
-        <p style={{ fontSize: 10, color: colors.textTertiary, fontFamily: "monospace", margin: `${space[1]} 0 0 0` }}>
+        <p style={{ fontSize: 10, color: colors.textTertiary, fontFamily: typography.fontFamily, margin: `${space[1]} 0 0 0` }}>
           Connect your broker account to enable portfolio sync and trade execution
         </p>
       </div>
@@ -173,7 +173,7 @@ function BrokerConnectContent() {
       <ConnectionsList refreshKey={refreshKey} />
 
       <div style={{ display: "flex", flexDirection: "column", gap: space[3] }}>
-        <span style={{ color: colors.textTertiary, fontSize: 9, fontFamily: "monospace", textTransform: "uppercase", letterSpacing: "0.08em" }}>
+        <span style={{ color: colors.textTertiary, fontSize: 9, fontFamily: typography.fontFamily, textTransform: "uppercase", letterSpacing: "0.08em" }}>
           Available Brokers
         </span>
         {KNOWN_BROKERS.map((broker) => (
@@ -189,7 +189,7 @@ function BrokerConnectContent() {
               alignItems: "center",
             }}
           >
-            <div style={{ fontFamily: "monospace", fontSize: 12 }}>
+            <div style={{ fontFamily: typography.fontFamily, fontSize: 12 }}>
               <div style={{ color: colors.textPrimary, fontWeight: 700 }}>{broker.name}</div>
               <div style={{ color: colors.textTertiary, fontSize: 10, marginTop: 2 }}>{broker.description}</div>
             </div>
@@ -202,7 +202,7 @@ function BrokerConnectContent() {
                 color: "#000000",
                 borderRadius: radius.sm,
                 padding: `${space[1]} ${space[3]}`,
-                fontFamily: "monospace",
+                fontFamily: typography.fontFamily,
                 fontSize: 10,
                 fontWeight: 700,
                 cursor: "pointer",

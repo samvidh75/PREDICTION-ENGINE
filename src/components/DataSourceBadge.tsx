@@ -1,4 +1,5 @@
 import React from 'react';
+import { typography } from "../design/tokens";
 
 export default function DataSourceBadge({ isStale }: { isStale?: boolean }) {
   return (
@@ -6,7 +7,7 @@ export default function DataSourceBadge({ isStale }: { isStale?: boolean }) {
       display: 'inline-flex', alignItems: 'center', gap: '8px',
       backgroundColor: '#0D0D0D', border: '1px solid #1A1A1A',
       padding: '6px 12px', borderRadius: '6px',
-      fontFamily: 'monospace', fontSize: '10px'
+      fontFamily: typography.fontFamily, fontSize: '10px'
     }}>
       <span style={{
         height: '6px', width: '6px', borderRadius: '50%',

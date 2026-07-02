@@ -143,12 +143,11 @@ describe('WatchlistPage thesis change integration', () => {
     fireEvent.click(screen.getByText('Load Tracked Stocks'));
 
     await waitFor(() => {
-      expect(screen.getByText('AI explanation')).toBeTruthy();
+      expect(screen.getByText('Research summary')).toBeTruthy();
     });
 
-    expect(screen.getByText('Explains the research context already shown on this page.')).toBeTruthy();
-    expect(screen.getByText('Research context only. Not a recommendation.')).toBeTruthy();
-    expect(screen.getAllByText('Standard explanation is available for this view.').length).toBeGreaterThan(0);
+    expect(screen.getByText('Highlights the main thesis signals already shown on this page.')).toBeTruthy();
+    expect(screen.getAllByText('A standard summary is available for this view.').length).toBeGreaterThan(0);
     expect(screen.getByLabelText('AI research question')).toBeTruthy();
 
     const renderedText = document.body.textContent ?? '';

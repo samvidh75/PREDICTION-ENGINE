@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { colors, space, radius } from "../design/tokens";
+import { colors, space, radius, typography } from "../design/tokens";
 
 interface BrokerConnection {
   id: string;
@@ -87,7 +87,7 @@ export function TradeFromWatchlist({ symbol, exchange = "NSE", currentPrice }: T
         borderRadius: radius.md,
         padding: space[3],
         border: `1px solid ${colors.hairline}`,
-        fontFamily: "monospace",
+        fontFamily: typography.fontFamily,
         fontSize: 12,
         display: "flex",
         flexDirection: "column",
@@ -108,7 +108,7 @@ export function TradeFromWatchlist({ symbol, exchange = "NSE", currentPrice }: T
             border: form.side === "BUY" ? "none" : `1px solid ${colors.hairline}`,
             background: form.side === "BUY" ? colors.marketGreen : "transparent",
             color: form.side === "BUY" ? "#000000" : colors.textTertiary,
-            fontFamily: "monospace",
+            fontFamily: typography.fontFamily,
             fontSize: 11,
             fontWeight: 700,
             cursor: "pointer",
@@ -125,7 +125,7 @@ export function TradeFromWatchlist({ symbol, exchange = "NSE", currentPrice }: T
             border: form.side === "SELL" ? "none" : `1px solid ${colors.hairline}`,
             background: form.side === "SELL" ? colors.marketRed : "transparent",
             color: form.side === "SELL" ? "#000000" : colors.textTertiary,
-            fontFamily: "monospace",
+            fontFamily: typography.fontFamily,
             fontSize: 11,
             fontWeight: 700,
             cursor: "pointer",
@@ -149,7 +149,7 @@ export function TradeFromWatchlist({ symbol, exchange = "NSE", currentPrice }: T
             borderRadius: radius.sm,
             padding: space[1],
             color: colors.textPrimary,
-            fontFamily: "monospace",
+            fontFamily: typography.fontFamily,
             fontSize: 11,
             outline: "none",
           }}
@@ -163,7 +163,7 @@ export function TradeFromWatchlist({ symbol, exchange = "NSE", currentPrice }: T
             borderRadius: radius.sm,
             padding: space[1],
             color: colors.textPrimary,
-            fontFamily: "monospace",
+            fontFamily: typography.fontFamily,
             fontSize: 10,
             outline: "none",
           }}
@@ -188,7 +188,7 @@ export function TradeFromWatchlist({ symbol, exchange = "NSE", currentPrice }: T
               borderRadius: radius.sm,
               padding: space[1],
               color: colors.textPrimary,
-              fontFamily: "monospace",
+              fontFamily: typography.fontFamily,
               fontSize: 11,
               outline: "none",
             }}
@@ -207,7 +207,7 @@ export function TradeFromWatchlist({ symbol, exchange = "NSE", currentPrice }: T
             borderRadius: radius.sm,
             padding: space[1],
             color: colors.textPrimary,
-            fontFamily: "monospace",
+            fontFamily: typography.fontFamily,
             fontSize: 10,
             outline: "none",
           }}
@@ -225,7 +225,7 @@ export function TradeFromWatchlist({ symbol, exchange = "NSE", currentPrice }: T
             color: "#000000",
             borderRadius: radius.sm,
             padding: `${space[1]} ${space[3]}`,
-            fontFamily: "monospace",
+            fontFamily: typography.fontFamily,
             fontSize: 10,
             fontWeight: 700,
             cursor: "pointer",

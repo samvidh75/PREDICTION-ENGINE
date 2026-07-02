@@ -1,7 +1,7 @@
 import type { CSSProperties } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ArrowRight, CheckCircle2, Cpu, Eye, Radar, ShieldCheck, Sparkles } from "lucide-react";
-import { animation, colors, radius, space } from "../design/tokens";
+import { animation, colors, radius, space, typography } from "../design/tokens";
 
 // ── Glassmorphism design helpers ────────────────────────────────────────────
 const glassBorder = `1px solid rgba(255,255,255,0.08)`;
@@ -18,7 +18,7 @@ const stone = '#404040';
 const accentRed = '#FF6B6B';
 
 // Terminal-style font for the onboarding wizard
-const monoFont = "'SF Mono', 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace";
+const monoFont = typography.fontFamily;
 
 interface GuidedOnboardingProps {
   onComplete: () => void;
@@ -181,7 +181,7 @@ export default function GuidedOnboarding({ onComplete }: GuidedOnboardingProps) 
       }}>
         {/* Header */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: space[3], flexWrap: "wrap" }}>
-          <span style={{ fontSize: 13, color: body, fontWeight: 500 }}>Welcome to StockEX</span>
+          <span style={{ fontSize: 13, color: body, fontWeight: 500 }}>Welcome to StockEx</span>
           <span style={{
             display: "inline-flex", alignItems: "center", justifyContent: "center",
             minHeight: "30px", padding: `0 ${space[3]}`, borderRadius: radius.full,
@@ -199,13 +199,13 @@ export default function GuidedOnboarding({ onComplete }: GuidedOnboardingProps) 
             margin: 0, fontSize: "clamp(26px, 5vw, 48px)", lineHeight: 1.02,
             fontWeight: 650, color: ink,
           }}>
-            Your Edge AI terminal.
+            Set up your research workspace.
           </h1>
           <p style={{
             margin: `${space[2]} 0 0 0`, color: body,
             fontSize: "clamp(14px, 2vw, 16px)", lineHeight: 1.55,
           }}>
-            Configure your local intelligence engine and get your workspace ready.
+            Choose how you want to review companies, compare context, and track thesis changes.
           </p>
         </div>
 
@@ -240,12 +240,11 @@ export default function GuidedOnboarding({ onComplete }: GuidedOnboardingProps) 
               </div>
               <div>
                 <h2 style={{ margin: 0, color: ink, fontSize: 16, fontWeight: 500 }}>
-                  Decentralized intelligence, zero data cost
+                  Research stays structured and responsive
                 </h2>
                 <p style={{ margin: `${space[1]} 0 0 0`, color: body, fontSize: 13, lineHeight: 1.5 }}>
-                  StockEX runs analysis on your device — not on central servers.
-                  Your GPU handles Bollinger bands, volume divergences, and order-flow deltas.
-                  No data leaves your browser. No API tokens needed.
+                  StockEx keeps your workspace fast, focused, and consistent as you move from search to review.
+                  The experience is designed to stay lightweight without exposing technical setup details on the surface.
                 </p>
               </div>
             </div>
@@ -255,20 +254,20 @@ export default function GuidedOnboarding({ onComplete }: GuidedOnboardingProps) 
                 <span style={{ fontSize: 10, color: mute, textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 600 }}>
                   What you get
                 </span>
-                <span style={{ fontSize: 15, fontWeight: 500, color: charcoal }}>Local machine scanning</span>
-                <span style={{ fontSize: 12, color: body }}>WebGPU compute shaders for real-time indicators</span>
+                <span style={{ fontSize: 15, fontWeight: 500, color: charcoal }}>Faster stock review</span>
+                <span style={{ fontSize: 12, color: body }}>See key numbers, context, and changes in one place</span>
               </div>
               <div style={{ display: "grid", gap: space[2], padding: space[4], borderRadius: radius.lg, background: glassBgLight, border: glassBorder, backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)" }}>
                 <span style={{ fontSize: 10, color: mute, textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 600 }}>
                   Why it matters
                 </span>
-                <span style={{ fontSize: 15, fontWeight: 500, color: charcoal }}>Zero server costs</span>
-                <span style={{ fontSize: 12, color: body }}>Your GPU does the heavy lifting — we never bill for compute</span>
+                <span style={{ fontSize: 15, fontWeight: 500, color: charcoal }}>Cleaner conviction tracking</span>
+                <span style={{ fontSize: 12, color: body }}>Return to the same names with the same structure every time</span>
               </div>
             </div>
 
             <button onClick={handleNext} style={buttonStyle}>
-              Configure edge AI engine <ArrowRight size={16} />
+              Continue setup <ArrowRight size={16} />
             </button>
           </div>
         )}

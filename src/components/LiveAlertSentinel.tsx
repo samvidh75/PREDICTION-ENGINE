@@ -3,13 +3,14 @@
  *
  * Connects to the event-alert WebSocket gateway, listens for corporate
  * event breakout markers, and renders sliding visual alerts styled to
- * the Raycast design system (monospace, #0D0D0D base, crimson borders).
+ * the Raycast design system (#0D0D0D base, crimson borders).
  *
  * Phase 55 — Zero-cost push, layered over the existing Fastify WebSocket
  * infrastructure instead of expensive third-party web-push services.
  */
 
 import { useEffect, useState } from "react";
+import { typography } from "../design/tokens";
 
 // ── Types ───────────────────────────────────────────────────────────
 
@@ -73,7 +74,7 @@ export default function LiveAlertSentinel() {
     borderRadius: "8px",
     maxWidth: "360px",
     width: "100%",
-    fontFamily: "monospace",
+    fontFamily: typography.fontFamily,
     color: "#f4f4f5",
     boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.9)",
     zIndex: 9999,
@@ -112,7 +113,7 @@ export default function LiveAlertSentinel() {
             color: "#64748b",
             cursor: "pointer",
             fontSize: "12px",
-            fontFamily: "monospace",
+            fontFamily: typography.fontFamily,
           }}
         >
           ✕

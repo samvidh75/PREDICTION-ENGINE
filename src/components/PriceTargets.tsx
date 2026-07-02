@@ -12,7 +12,7 @@
  * Spec ref: Section "Price Targets" — Bull/Base/Bear.
  */
 
-import { Target, TrendingUp, Minus, TrendingDown, Info } from "lucide-react";
+import { Target, TrendingUp, Minus, TrendingDown } from "lucide-react";
 import { colors, radius, animation } from "../design/tokens";
 import { formatNumber } from "../services/ui/dataFormatting";
 import { formatPercent } from "../services/ui/indianNumberFormat";
@@ -103,21 +103,7 @@ export function PriceTargets({ currentPrice = 342.50 }: { currentPrice?: number 
         <h3 style={{ margin: 0, fontSize: "16px", fontWeight: 600, color: colors.textPrimary }}>
           Price Targets
         </h3>
-        <span
-          style={{
-            fontSize: "10px",
-            fontWeight: 600,
-            color: colors.textTertiary,
-            background: colors.surfaceCard,
-            padding: "2px 6px",
-            borderRadius: "999px",
-            textTransform: "uppercase",
-            letterSpacing: "0.04em",
-          }}
-        >
-          AI-Generated
-        </span>
-      </div>
+        </div>
 
       {/* Current price anchor */}
       <div
@@ -214,27 +200,9 @@ export function PriceTargets({ currentPrice = 342.50 }: { currentPrice?: number 
         })}
       </div>
 
-      {/* Disclaimer */}
-      <div
-        style={{
-          marginTop: "14px",
-          padding: "10px 12px",
-          background: colors.surface,
-          borderRadius: radius.sm,
-          display: "flex",
-          alignItems: "flex-start",
-          gap: "8px",
-          fontSize: "11px",
-          color: colors.textTertiary,
-          lineHeight: "1.5",
-        }}
-      >
-        <Info size={12} style={{ flexShrink: 0, marginTop: "2px" }} />
-        <span>
-          Price targets are algorithmic assessments based on financial modeling (DCF, P/E, EV/EBITDA triangulation).
-          These are not recommendations. Actual results may differ materially. Consult a licensed advisor.
-        </span>
-      </div>
+      <p style={{ marginTop: "14px", fontSize: "11px", lineHeight: "1.5", color: colors.textTertiary }}>
+        Modelled scenarios only. Use alongside the rest of the research view.
+      </p>
     </div>
   );
 }

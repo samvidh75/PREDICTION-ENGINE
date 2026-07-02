@@ -131,7 +131,7 @@ export function AlertPreferencesPanel({ userId }: AlertPreferencesPanelProps) {
     padding: `${space[2]} ${space[3]}`,
     color: colors.textPrimary,
     fontSize: 14,
-    fontFamily: "monospace",
+    fontFamily: typography.fontFamily,
     outline: "none",
     boxSizing: "border-box",
   };

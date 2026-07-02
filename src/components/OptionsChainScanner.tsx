@@ -4,7 +4,7 @@
 // Gated behind Pro-tier feature checks.
 
 import { useEffect, useState } from "react";
-import { colors, space, radius } from "../design/tokens";
+import { colors, space, radius, typography } from "../design/tokens";
 import { useEntitlements } from "../commercial/useEntitlements";
 import { FeatureGate } from "../commercial/FeatureGate";
 import OptionGreeksMatrix from "./OptionGreeksMatrix";
@@ -64,7 +64,7 @@ export default function OptionsChainScanner({ ticker }: OptionsChainScannerProps
     border: `1px solid ${colors.charcoal}`,
     borderRadius: radius.lg,
     padding: space[5],
-    fontFamily: "monospace",
+    fontFamily: typography.fontFamily,
     color: colors.textPrimary,
   };
 

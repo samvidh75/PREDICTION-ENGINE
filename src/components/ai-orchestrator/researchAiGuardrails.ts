@@ -126,7 +126,7 @@ export function buildDeterministicFallbackAnswer(context: ResearchAiContext | nu
     lines.push("Review the key risks, evidence, and what to watch before making any decision.");
   }
 
-  const text = sanitizeResearchAiOutput(lines.join(" ")) ?? "Standard explanation is available for this view.";
+  const text = sanitizeResearchAiOutput(lines.join(" ")) ?? "Standard summary is available for this view.";
 
   return {
     ok: true,
@@ -154,7 +154,7 @@ export function applyResponseGuardrails(response: ResearchAiResponse, _context: 
 
 export function fallbackIfEmpty(text: string | null, context: ResearchAiContext): string {
   if (text && text.trim()) return text;
-  return buildDeterministicFallbackAnswer(context).text ?? "Standard explanation is available for this view.";
+  return buildDeterministicFallbackAnswer(context).text ?? "Standard summary is available for this view.";
 }
 
 export function trimConversation(messages: Array<Pick<ResearchAiChatMessage, "role" | "text">>, maxMessages = 10): Array<Pick<ResearchAiChatMessage, "role" | "text">> {

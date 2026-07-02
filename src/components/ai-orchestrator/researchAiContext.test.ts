@@ -24,7 +24,7 @@ describe("researchAiContext", () => {
           risksToReview: ["Demand is worth reviewing."],
           whatToWatch: ["Next result cadence."],
           evidenceReview: { summary: "Required research evidence is available for this view." },
-          methodNote: "Research context only. Not a recommendation.",
+          methodNote: "Summary based on the signals shown on this page.",
           sector: "Technology",
         },
       },

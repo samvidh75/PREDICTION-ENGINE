@@ -4,7 +4,7 @@
 // Pro-tier gated. Uses shared WorkerPool for Greeks computation.
 
 import { useCallback, useEffect, useState } from "react";
-import { colors, space, radius } from "../design/tokens";
+import { colors, space, radius, typography } from "../design/tokens";
 import { StockExWorkerPool } from "./edge-ai/StockExWorkerPool";
 
 interface DashboardMetrics {
@@ -96,7 +96,7 @@ export default function StockExDashboard({ userId, hasProTier }: StockExDashboar
           padding: space[8],
           borderRadius: radius.lg,
           textAlign: "center",
-          fontFamily: "monospace",
+          fontFamily: typography.fontFamily,
         }}
       >
         <span style={{ fontSize: 24 }}>🔒</span>
@@ -134,7 +134,7 @@ export default function StockExDashboard({ userId, hasProTier }: StockExDashboar
 
   if (loading || !metrics) {
     return (
-      <div style={{ textAlign: "center", fontSize: 11, fontFamily: "monospace", color: colors.textTertiary, padding: space[12] }}>
+      <div style={{ textAlign: "center", fontSize: 11, fontFamily: typography.fontFamily, color: colors.textTertiary, padding: space[12] }}>
         Assembling live market intelligence layout blocks...
       </div>
     );
@@ -153,7 +153,7 @@ export default function StockExDashboard({ userId, hasProTier }: StockExDashboar
   const valueStyle: React.CSSProperties = { fontSize: 18, fontWeight: "bold", margin: `${space[2]} 0 0 0` };
 
   return (
-    <div style={{ fontFamily: "monospace", textAlign: "left" }}>
+    <div style={{ fontFamily: typography.fontFamily, textAlign: "left" }}>
       {/* Header */}
       <div
         style={{
@@ -182,7 +182,7 @@ export default function StockExDashboard({ userId, hasProTier }: StockExDashboar
             borderRadius: radius.sm,
             color: colors.textPrimary,
             fontSize: 11,
-            fontFamily: "monospace",
+            fontFamily: typography.fontFamily,
             padding: `${space[2]} ${space[3]}`,
             outline: "none",
           }}

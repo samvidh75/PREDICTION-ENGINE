@@ -106,22 +106,8 @@ export function InsiderActivity() {
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
           <FileText size={16} color={colors.textSecondary} />
           <h3 style={{ margin: 0, fontSize: "16px", fontWeight: 600, color: colors.textPrimary }}>
-            Insider Activity
+            Insider Filings
           </h3>
-          <span
-            style={{
-              fontSize: "10px",
-              fontWeight: 600,
-              color: colors.textTertiary,
-              background: colors.surfaceCard,
-              padding: "2px 6px",
-              borderRadius: radius.full,
-              textTransform: "uppercase",
-              letterSpacing: "0.04em",
-            }}
-          >
-            BSE/NSE
-          </span>
         </div>
         {MOCK_INSIDER_DATA.length > 3 && (
           <button
@@ -254,8 +240,7 @@ export function InsiderActivity() {
         }}
       >
         <Info size={12} />
-        Data sourced from BSE/NSE insider trading disclosures (SEBI PIT Regulations, 2015).
-        Insider transactions do not guarantee price movement.
+        Insider filings are shown as part of the research view.
       </div>
     </div>
   );

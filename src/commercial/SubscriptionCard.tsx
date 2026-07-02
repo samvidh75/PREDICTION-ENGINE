@@ -137,7 +137,7 @@ export function SubscriptionCard({
         <p style={{
           fontSize: 12,
           color: colors.textTertiary,
-          fontFamily: "monospace",
+          fontFamily: typography.fontFamily,
           margin: `${space[1]} 0 0 0`,
         }}>
           ₹{price} / month &middot; Cancel anytime

@@ -30,23 +30,20 @@ export function ResearchAiExplanationPanel({ context }: { context: ResearchAiCon
   const showQuestionBox = !supportsEnhancedStart || runtime.status.status === "ready";
   const helperCopy =
     runtime.status.status === "unsupported"
-      ? "Enhanced explanation is unavailable on this device."
+      ? "Summary view is unavailable on this device."
       : runtime.status.status === "failed"
-        ? "Standard explanation is available for this view."
-        : "Standard explanation is available for this view.";
+        ? "A standard summary is available for this view."
+        : "A standard summary is available for this view.";
 
   return (
     <Panel variant="elevated" style={{ display: "grid", gap: space[4] }}>
-      <Panel.Header icon={<Sparkles size={16} color={colors.primary} />} title="AI explanation" />
+      <Panel.Header icon={<Sparkles size={16} color={colors.primary} />} title="Research summary" />
 
       <Panel.Content style={{ display: "grid", gap: space[3] }}>
         <div style={{ display: "grid", gap: "4px" }}>
           <h3 style={{ margin: 0, color: colors.textPrimary, fontSize: typography.h3.desktop.size, lineHeight: "1.25" }}>
-            Explains the research context already shown on this page.
+            Highlights the main thesis signals already shown on this page.
           </h3>
-          <p style={{ margin: 0, color: colors.textSecondary, fontSize: typography.body.desktop.size, lineHeight: "1.5" }}>
-            Research context only. Not a recommendation.
-          </p>
         </div>
 
         <div
@@ -59,13 +56,13 @@ export function ResearchAiExplanationPanel({ context }: { context: ResearchAiCon
             overflowWrap: "anywhere",
           }}
         >
-          {runtime.explanation ?? deterministicText ?? "Standard explanation is available for this view."}
+          {runtime.explanation ?? deterministicText ?? "Standard summary is available for this view."}
         </div>
 
         {runtime.isStarting || runtime.isGenerating ? (
           <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
             <div style={{ color: colors.textSecondary, fontSize: "13px" }}>
-              {runtime.progress?.message ?? "Preparing enhanced explanation\u2026"}
+              {runtime.progress?.message ?? "Preparing summary\u2026"}
               {runtime.progress?.percent != null ? ` (${runtime.progress.percent}%)` : ""}
             </div>
             <Button
@@ -120,7 +117,7 @@ export function ResearchAiExplanationPanel({ context }: { context: ResearchAiCon
                 }
               }}
             >
-              Start enhanced explanation
+              Start summary
             </Button>
           ) : null}
 

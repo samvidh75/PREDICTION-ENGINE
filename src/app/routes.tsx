@@ -1,8 +1,8 @@
-import { Suspense, lazy } from "react";
+import { Suspense, lazy, type ReactNode } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { AppShell } from "./AppShell";
-import { getBetaConfig } from "../config/beta";
-import { isFeatureEnabled } from "../config/beta";
+import { getBetaConfig, isFeatureEnabled } from "../config/beta";
+import { useAuth } from "../context/AuthContext";
 import { colors, typography } from "../design/tokens";
 
 const HomePage = lazy(() => import("../pages/HomePage"));
@@ -48,48 +48,59 @@ function RouteFallback() {
   );
 }
 
+function WorkspaceRoute({ children }: { children: ReactNode }) {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return <RouteFallback />;
+  }
+
+  if (!user) {
+    return <Navigate to="/about" replace />;
+  }
+
+  return <AppShell>{children}</AppShell>;
+}
+
 export function AppRoutes() {
+  const { user, loading } = useAuth();
   const { enableWaitlistPage } = getBetaConfig();
   const changelogEnabled = isFeatureEnabled("changelog");
 
   return (
-    <AppShell>
-      <Suspense fallback={<RouteFallback />}>
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/scanner" element={<ScannerPage />} />
-          <Route path="/scanner/:preset" element={<ScannerLanding />} />
-          <Route path="/watchlist" element={<WatchlistPage />} />
-          <Route path="/portfolio" element={<PortfolioPage />} />
-          <Route path="/compare" element={<ComparePage />} />
-          <Route path="/track" element={<TrackPage />} />
-          <Route path="/about" element={<AboutPage />} />
-          <Route path="/pricing" element={<PricingPage />} />
-          <Route path="/stock/:symbol/*" element={<StockPage />} />
-          <Route path="/sectors" element={<Sectors />} />
-          <Route path="/sectors/:sectorSlug" element={<SectorResearch />} />
+    <Suspense fallback={<RouteFallback />}>
+      <Routes>
+        <Route path="/" element={loading ? <RouteFallback /> : user ? <WorkspaceRoute><HomePage /></WorkspaceRoute> : <Navigate to="/about" replace />} />
+        <Route path="/about" element={<AboutPage />} />
 
-          <Route path="/trust" element={<Trust />} />
-          <Route path="/invite" element={<Invite />} />
-          <Route path="/share/research/:shareId" element={<SharedResearchSnapshot />} />
-          <Route path="/research/:symbol" element={<CompanyResearchReportPage />} />
-          <Route path="/analyst" element={<AnalystWorkspace />} />
-          <Route path="/chat" element={<AIChatPage />} />
-          <Route path="/relative-strength" element={<RelativeStrengthPage />} />
-          <Route path="/technical-scanner" element={<AdvancedScanner />} />
-          <Route path="/billing/success" element={<BillingSuccessPage />} />
-          <Route path="/billing/cancel" element={<BillingCancelPage />} />
-          <Route path="/ops" element={<OpsDashboard />} />
-          <Route path="/dashboard" element={<DashboardPage />} />
-          {enableWaitlistPage && (
-            <Route path="/waitlist" element={<WaitlistPage />} />
-          )}
-          {changelogEnabled && (
-            <Route path="/changelog" element={<ChangelogPage />} />
-          )}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </Suspense>
-    </AppShell>
+        <Route path="/scanner" element={<WorkspaceRoute><ScannerPage /></WorkspaceRoute>} />
+        <Route path="/scanner/:preset" element={<WorkspaceRoute><ScannerLanding /></WorkspaceRoute>} />
+        <Route path="/watchlist" element={<WorkspaceRoute><WatchlistPage /></WorkspaceRoute>} />
+        <Route path="/portfolio" element={<WorkspaceRoute><PortfolioPage /></WorkspaceRoute>} />
+        <Route path="/compare" element={<WorkspaceRoute><ComparePage /></WorkspaceRoute>} />
+        <Route path="/track" element={<WorkspaceRoute><TrackPage /></WorkspaceRoute>} />
+        <Route path="/pricing" element={<WorkspaceRoute><PricingPage /></WorkspaceRoute>} />
+        <Route path="/stock/:symbol/*" element={<WorkspaceRoute><StockPage /></WorkspaceRoute>} />
+        <Route path="/sectors" element={<WorkspaceRoute><Sectors /></WorkspaceRoute>} />
+        <Route path="/sectors/:sectorSlug" element={<WorkspaceRoute><SectorResearch /></WorkspaceRoute>} />
+        <Route path="/trust" element={<WorkspaceRoute><Trust /></WorkspaceRoute>} />
+        <Route path="/invite" element={<WorkspaceRoute><Invite /></WorkspaceRoute>} />
+        <Route path="/share/research/:shareId" element={<WorkspaceRoute><SharedResearchSnapshot /></WorkspaceRoute>} />
+        <Route path="/research/:symbol" element={<WorkspaceRoute><CompanyResearchReportPage /></WorkspaceRoute>} />
+        <Route path="/analyst" element={<WorkspaceRoute><AnalystWorkspace /></WorkspaceRoute>} />
+        <Route path="/chat" element={<WorkspaceRoute><AIChatPage /></WorkspaceRoute>} />
+        <Route path="/relative-strength" element={<WorkspaceRoute><RelativeStrengthPage /></WorkspaceRoute>} />
+        <Route path="/technical-scanner" element={<WorkspaceRoute><AdvancedScanner /></WorkspaceRoute>} />
+        <Route path="/billing/success" element={<WorkspaceRoute><BillingSuccessPage /></WorkspaceRoute>} />
+        <Route path="/billing/cancel" element={<WorkspaceRoute><BillingCancelPage /></WorkspaceRoute>} />
+        <Route path="/ops" element={<WorkspaceRoute><OpsDashboard /></WorkspaceRoute>} />
+        <Route path="/dashboard" element={<WorkspaceRoute><DashboardPage /></WorkspaceRoute>} />
+
+        {enableWaitlistPage && <Route path="/waitlist" element={<WorkspaceRoute><WaitlistPage /></WorkspaceRoute>} />}
+        {changelogEnabled && <Route path="/changelog" element={<WorkspaceRoute><ChangelogPage /></WorkspaceRoute>} />}
+
+        <Route path="*" element={<Navigate to={user ? "/" : "/about"} replace />} />
+      </Routes>
+    </Suspense>
   );
 }

@@ -3,7 +3,7 @@
 // Displays Delta, Gamma, Theta, Vega for each strike — zero server cost.
 
 import { useEffect, useState } from "react";
-import { colors, space, radius } from "../design/tokens";
+import { colors, space, radius, typography } from "../design/tokens";
 import { StockExWorkerPool } from "./edge-ai/StockExWorkerPool";
 
 interface GreeksRecord {
@@ -68,7 +68,7 @@ export default function OptionGreeksMatrix({
       <div
         style={{
           fontSize: 11,
-          fontFamily: "monospace",
+          fontFamily: typography.fontFamily,
           color: colors.textTertiary,
           textAlign: "center",
           padding: space[4],

@@ -2,13 +2,13 @@
  * InsiderTrackingPanel — SEBI Insider Disclosure Radar Widget.
  *
  * Fetches corporate insider filings from the backend API and renders them
- * in the Raycast design system (dark theme, monospace, hairline borders).
+ * in the Raycast design system (dark theme, hairline borders).
  *
  * Spec ref: Phase 52 — Corporate Actions Vectorizer & Insider Tracking
  */
 
 import { useEffect, useState } from "react";
-import { colors } from "../design/tokens";
+import { colors, typography } from "../design/tokens";
 
 // ── Type Contracts ──────────────────────────────────────────────────
 
@@ -36,7 +36,7 @@ const s: Record<string, React.CSSProperties> = {
     padding: "20px",
     borderRadius: "12px",
     textAlign: "left",
-    fontFamily: "monospace",
+    fontFamily: typography.fontFamily,
     color: "#f4f4f5",
   },
   header: {
@@ -103,14 +103,14 @@ const s: Record<string, React.CSSProperties> = {
   },
   loading: {
     fontSize: "11px",
-    fontFamily: "monospace",
+    fontFamily: typography.fontFamily,
     color: "#64748b",
     textAlign: "center" as const,
     padding: "16px",
   },
   empty: {
     fontSize: "11px",
-    fontFamily: "monospace",
+    fontFamily: typography.fontFamily,
     color: "#4b5563",
     textAlign: "center" as const,
     padding: "16px",
@@ -145,7 +145,7 @@ export default function InsiderTrackingPanel({ ticker }: { ticker: string }) {
   if (loading) {
     return (
       <div style={s.loading}>
-        Parsing qualitative SEBI filings cache...
+        Loading insider filings...
       </div>
     );
   }
@@ -153,7 +153,7 @@ export default function InsiderTrackingPanel({ ticker }: { ticker: string }) {
   if (filings.length === 0) {
     return (
       <div style={s.empty}>
-        No recent insider accumulation filings registered for this asset.
+        No recent insider filings available for this asset.
       </div>
     );
   }
@@ -161,9 +161,9 @@ export default function InsiderTrackingPanel({ ticker }: { ticker: string }) {
   return (
     <div style={s.wrapper}>
       <div style={s.header}>
-        <h3 style={s.title}>🚨 SEBI INSIDER DISCLOSURE RADAR</h3>
+        <h3 style={s.title}>Insider filings</h3>
         <p style={s.subtitle}>
-          Authoritative regulatory share trace logs &bull; 100% Free
+          Regulatory filings snapshot
         </p>
       </div>
 

@@ -43,7 +43,7 @@ def execute_production_finetune():
     lora_config = LoraConfig(
         r=16,
         lora_alpha=32,
-        target_modules=["q_proj", "v_proj", "k_proj", "o_proj"],
+        target_modules=["q_proj", "v_proj"],
         lora_dropout=0.05,
         bias="none",
         task_type="CAUSAL_LM",
@@ -56,7 +56,7 @@ def execute_production_finetune():
         per_device_train_batch_size=4,
         gradient_accumulation_steps=4,
         learning_rate=2e-4,
-        num_train_epochs=3,
+        num_train_epochs=1,
         save_strategy="epoch",
         fp16=True,
         logging_steps=10,

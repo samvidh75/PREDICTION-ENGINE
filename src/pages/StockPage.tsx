@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo, useRef, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowDown, ArrowLeft, ArrowLeftRight, ArrowRight, ArrowUp, BarChart3, Building2, TrendingUp, Activity, Search, ChevronDown, ChevronUp, Download, ExternalLink, Star, Zap } from "lucide-react";
+import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, BarChart3, Building2, TrendingUp, Activity, Search, ChevronDown, ChevronUp, ExternalLink, Zap } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, Line, LineChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts";
 import { Badge } from "../ui/Badge";
@@ -30,11 +30,8 @@ import InsiderTrackingPanel from "../components/InsiderTrackingPanel";
 import SentimentRadar from "../components/SentimentRadar";
 import { PriceTargets } from "../components/PriceTargets";
 import { NativeAd } from "../components/NativeAd";
-import { MarketBrainPanel } from "../components/market-brain/MarketBrainPanel";
-import AdaptiveAiChat from "../components/AdaptiveAiChat";
 import { ResearchAiExplanationPanel } from "../components/ai-orchestrator/ResearchAiExplanationPanel";
 import { formatNumber } from "../services/ui/dataFormatting";
-import { toHealthometerAiContext } from "../components/ai-orchestrator/healthometerAiContext";
 import { toResearchAiContext } from "../components/ai-orchestrator/researchAiContext";
 import {
   enrichResearchContextWithEvents,
@@ -137,8 +134,8 @@ function StickyHeader({ symbol, price, changeAbs, changePercent, trendColor }: {
 // ── Hero Section (centred, massive price) ────────────────────────
 function HeroSection({ stock, isUp, trendColor }: { stock: StockResearchDetail; isUp: boolean; trendColor: string }) {
   const convictionEmoji = stock.confidenceMeter >= 75 ? "🔥" : stock.confidenceMeter >= 60 ? "📈" : stock.confidenceMeter >= 40 ? "👀" : "⚠️";
-  const convictionLabel = stock.confidenceMeter >= 75 ? "HIGH CONVICTION" : stock.confidenceMeter >= 60 ? "WATCH" : stock.confidenceMeter >= 40 ? "NEEDS REVIEW" : "RISK RISING";
-  const convictionColor = stock.confidenceMeter >= 75 ? colors.success : stock.confidenceMeter >= 60 ? colors.warning : stock.confidenceMeter >= 40 ? colors.marketOrange : colors.danger;
+  const convictionLabel = stock.confidenceMeter >= 80 ? "Very Healthy" : stock.confidenceMeter >= 65 ? "Healthy" : stock.confidenceMeter >= 50 ? "Watch" : stock.confidenceMeter >= 35 ? "Needs Review" : "Risk Rising";
+  const convictionColor = stock.confidenceMeter >= 65 ? colors.success : stock.confidenceMeter >= 50 ? colors.warning : stock.confidenceMeter >= 35 ? colors.marketOrange : colors.danger;
   return (
     <section className="stock-hero raycast-slideUp" style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "48px 0 40px", textAlign: "center", position: "relative" }}>
       <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "16px" }}>
@@ -163,7 +160,7 @@ function HeroSection({ stock, isUp, trendColor }: { stock: StockResearchDetail; 
         </div>
       </div>
       <div style={{ fontSize: "13px", color: colors.textSecondary, marginTop: "10px" }}>
-        Conf: {stock.confidenceMeter}% · Market Cap: ₹{formatNumber(Math.round(stock.price.marketCap))} Cr
+        Market Cap: ₹{formatNumber(Math.round(stock.price.marketCap))} Cr
       </div>
     </section>
   );
@@ -386,10 +383,7 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
   const [brokerModalOpen, setBrokerModalOpen] = useState(false);
   const [isBrokerOpen, setIsBrokerOpen] = useState(false);
   const [stickyVisible, setStickyVisible] = useState(false);
-  const [tracked, setTracked] = useState(false);
   const [showFooter, setShowFooter] = useState(true);
-  const [isCompareOpen, setIsCompareOpen] = useState(false);
-  const [isExportOpen, setIsExportOpen] = useState(false);
   const [sectorExpanded, setSectorExpanded] = useState(false);
   const [gpuDelta, setGpuDelta] = useState<{ delta: number; signal: string } | null>(null);
 
@@ -520,17 +514,6 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
     { label: "Momentum", value: stock.scores.momentum ?? 0 },
     { label: "Risk", value: stock.scores.risk ?? 0 },
   ];
-  const healthometerContext = toHealthometerAiContext({
-    symbol: stock.symbol,
-    companyName: stock.companyName,
-    title: "Healthometer",
-    score: stock.scores.health,
-    state: stock.thesis.stance,
-    explanation: [stock.thesis.thesis],
-    factors: factorBadges.map((factor) => `${factor.label}: ${factor.value}/100`),
-    risksToReview: [stock.thesis.bearCase],
-    whatToWatch: [stock.thesis.whatToWatch],
-  });
   const researchContext = toResearchAiContext({
     symbol: stock.symbol,
     companyName: stock.companyName,
@@ -538,16 +521,13 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
     thesis: [stock.thesis.bullCase],
     risksToReview: [stock.thesis.bearCase],
     whatToWatch: [stock.thesis.whatToWatch],
-    methodNote: "Research context only. Not a recommendation.",
+    methodNote: "Summary based on the signals shown on this page.",
   }, "stock");
 
   // Enrich both contexts with real news event evidence for LLM grounding
   const newsEventPack = buildNewsEventPack(stock.symbol, stock.news);
   const enrichedResearchContext = researchContext
     ? (enrichResearchContextWithEvents(researchContext, newsEventPack) ?? researchContext)
-    : null;
-  const enrichedHealthometerContext = healthometerContext
-    ? (enrichResearchContextWithEvents(healthometerContext, newsEventPack, "healthometer") ?? healthometerContext)
     : null;
 
   // Async enrich with full evidence retrieval (filings, corp actions, alerts, results)
@@ -571,10 +551,6 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
   const finalResearchContext: typeof enrichedResearchContext = enrichedResearchContext && retrievalContext
     ? { ...enrichedResearchContext, extraContext: [enrichedResearchContext.extraContext, retrievalContext].filter(Boolean).join('\n') }
     : enrichedResearchContext;
-  const finalHealthometerContext: typeof enrichedHealthometerContext = enrichedHealthometerContext && retrievalContext
-    ? { ...enrichedHealthometerContext, extraContext: [enrichedHealthometerContext.extraContext, retrievalContext].filter(Boolean).join('\n') }
-    : enrichedHealthometerContext;
-
   return (
     <div className="stock-page" style={{ display: "grid", gap: sectionGap }}>
 
@@ -696,17 +672,10 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
               <Badge key={factor.label} value={factor.value} label={factor.label} />
             ))}
           </div>
-          <p style={{ color: colors.textTertiary, fontSize: "11px", marginTop: "12px", lineHeight: "1.5" }}>
-            Timeline drift: {stock.timeline.map((item) => item.health).join(" → ")}
-          </p>
         </Card>
       </section>
 
-      <section
-        className="stock-ai-explainer-grid"
-        style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "24px" }}
-      >
-        <ResearchAiExplanationPanel context={finalHealthometerContext} />
+      <section className="stock-ai-explainer-grid" style={{ display: "grid", gridTemplateColumns: "1fr", gap: "20px" }}>
         <ResearchAiExplanationPanel context={finalResearchContext} />
       </section>
 
@@ -938,13 +907,13 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
 
       {/* ── Research Thesis ── */}
       <Card className="raycast-slideUp" style={{ animationDelay: "0.35s", animationFillMode: "both" }}>
-        <CardLabel>Research thesis</CardLabel>
+        <CardLabel>Pros / cons</CardLabel>
         <div style={{ display: "grid", gap: "12px" }}>
           <Badge value={stock.scores.health ?? 0} label={stock.thesis.stance} />
           <p style={{ color: colors.textSecondary, fontSize: typography.body.desktop.size, lineHeight: "1.6" }}>{stock.thesis.thesis}</p>
-          <p style={{ color: colors.textPrimary, fontSize: typography.body.desktop.size, lineHeight: "1.6" }}><strong>Bull case:</strong> {stock.thesis.bullCase}</p>
-          <p style={{ color: colors.textPrimary, fontSize: typography.body.desktop.size, lineHeight: "1.6" }}><strong>Bear case:</strong> {stock.thesis.bearCase}</p>
-          <p style={{ color: colors.textSecondary, fontSize: typography.body.desktop.size, lineHeight: "1.6" }}><strong>What to watch:</strong> {stock.thesis.whatToWatch}</p>
+          <p style={{ color: colors.textPrimary, fontSize: typography.body.desktop.size, lineHeight: "1.6" }}><strong>Pros:</strong> {stock.thesis.bullCase}</p>
+          <p style={{ color: colors.textPrimary, fontSize: typography.body.desktop.size, lineHeight: "1.6" }}><strong>Cons:</strong> {stock.thesis.bearCase}</p>
+          <p style={{ color: colors.textSecondary, fontSize: typography.body.desktop.size, lineHeight: "1.6" }}><strong>Watch:</strong> {stock.thesis.whatToWatch}</p>
         </div>
       </Card>
 
@@ -981,14 +950,6 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
           </div>
         </Card>
       )}
-
-      {/* ── Market Brain Panel ── */}
-      <MarketBrainPanel symbol={stock.symbol} companyName={stock.companyName} />
-
-      {/* ── Adaptive AI Chat ── */}
-      <div style={{ height: '400px', borderTop: '1px solid #2A2A2A', marginTop: '8px', paddingTop: '8px' }}>
-        <AdaptiveAiChat ticker={stock.symbol} />
-      </div>
 
       {/* ── What Changed ── */}
       <Card className="stock-whatchanged-card raycast-slideUp" style={{ animationDelay: "0.4s", animationFillMode: "both" }}>
@@ -1081,15 +1042,6 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
         opacity: showFooter ? 1 : 0,
         pointerEvents: showFooter ? "auto" : "none",
       }}>
-        <InteractiveButton onClick={() => setTracked(!tracked)} variant={tracked ? "primary" : "secondary"} style={{ minWidth: "100px", justifyContent: "center" }}>
-          <Star size={15} fill={tracked ? colors.warning : "none"} color={tracked ? colors.warning : "currentColor"} /> {tracked ? "Untrack" : "Track"}
-        </InteractiveButton>
-        <InteractiveButton onClick={() => setIsCompareOpen(true)} style={{ minWidth: "100px", justifyContent: "center" }}>
-          <ArrowLeftRight size={15} /> Compare
-        </InteractiveButton>
-        <InteractiveButton onClick={() => setIsExportOpen(true)} style={{ minWidth: "100px", justifyContent: "center" }}>
-          <Download size={15} /> Export
-        </InteractiveButton>
         <InteractiveButton onClick={() => setIsBrokerOpen(true)} variant="primary" style={{ minWidth: "150px", justifyContent: "center" }}>
           <TrendingUp size={15} /> Trade via {selectedBroker ?? "Broker"}
         </InteractiveButton>
@@ -1109,9 +1061,7 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
 
       {/* ── Keyboard Hint ── */}
       <p style={{ textAlign: "center", color: colors.textTertiary, fontSize: "12px", padding: "16px 0 100px", opacity: 0.7 }}>
-        <ArrowUp size={12} style={{ marginRight: "4px" }} />
-        <ArrowDown size={12} style={{ marginRight: "4px" }} />
-        Navigate · <kbd className="raycast-hint">t</kbd> Track · <kbd className="raycast-hint">c</kbd> Compare · <kbd className="raycast-hint">r</kbd> Refresh · <kbd className="raycast-hint">⌘K</kbd> Commands
+        Navigate · <kbd className="raycast-hint">r</kbd> Refresh · <kbd className="raycast-hint">⌘K</kbd> Commands
       </p>
     </div>
   );

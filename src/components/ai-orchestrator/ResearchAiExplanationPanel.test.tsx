@@ -42,9 +42,9 @@ describe("ResearchAiExplanationPanel", () => {
       />,
     );
 
-    expect(screen.getByText("AI explanation")).toBeTruthy();
-    expect(screen.getByText(/Research context only\. Not a recommendation\./i)).toBeTruthy();
-    expect(screen.getByText("Start enhanced explanation")).toBeTruthy();
+    expect(screen.getByText("Research summary")).toBeTruthy();
+    expect(screen.getByText(/Highlights the main thesis signals already shown on this page\./i)).toBeTruthy();
+    expect(screen.getByText("Start summary")).toBeTruthy();
   });
 
   it("starts only after explicit user action", async () => {
@@ -57,7 +57,7 @@ describe("ResearchAiExplanationPanel", () => {
       />,
     );
 
-    fireEvent.click(screen.getByText("Start enhanced explanation"));
+    fireEvent.click(screen.getByText("Start summary"));
     await Promise.resolve();
     expect(runtimeState.canUse).toHaveBeenCalled();
     expect(runtimeState.start).toHaveBeenCalled();

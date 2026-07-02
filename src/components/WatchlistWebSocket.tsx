@@ -6,6 +6,7 @@
 
 import React from "react";
 import { useWatchlistWebSocket } from "../hooks/useWatchlistWebSocket";
+import { typography } from "../design/tokens";
 
 interface WatchlistWebSocketProps {
   /** Maximum tickers to display (default: 20) */
@@ -34,7 +35,7 @@ export default function WatchlistWebSocket({
   };
 
   return (
-    <div className={`bg-slate-950 p-4 rounded-xl border border-slate-800 font-mono text-xs text-left ${className}`}>
+    <div className={`bg-slate-950 p-4 rounded-xl border border-slate-800 text-xs text-left ${className}`} style={{ fontFamily: typography.fontFamily }}>
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">

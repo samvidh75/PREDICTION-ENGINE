@@ -1,6 +1,6 @@
 import Chart from "react-apexcharts";
 import type { ApexOptions } from "apexcharts";
-import { colors, space, radius } from "../design/tokens";
+import { colors, space, radius, typography } from "../design/tokens";
 
 export interface PriceCandle {
   timestamp: number;
@@ -30,7 +30,7 @@ export function CandlestickChart({
         style={{
           textAlign: "center",
           color: colors.textTertiary,
-          fontFamily: "monospace",
+          fontFamily: typography.fontFamily,
           fontSize: 12,
           padding: `${space[16]} 0`,
           border: `1px dashed ${colors.hairline}`,
@@ -89,7 +89,7 @@ export function CandlestickChart({
     xaxis: {
       type: "datetime",
       labels: {
-        style: { colors: "#707070", fontSize: "10px", fontFamily: "monospace" },
+        style: { colors: "#707070", fontSize: "10px", fontFamily: typography.fontFamily },
       },
       axisBorder: { show: false },
       axisTicks: { show: false },
@@ -97,7 +97,7 @@ export function CandlestickChart({
     yaxis: {
       tooltip: { enabled: true },
       labels: {
-        style: { colors: "#707070", fontSize: "10px", fontFamily: "monospace" },
+        style: { colors: "#707070", fontSize: "10px", fontFamily: typography.fontFamily },
       },
     },
     grid: { borderColor: "#1A1A1A", strokeDashArray: 4 },
@@ -138,7 +138,7 @@ export function CandlestickChart({
               fontSize: 12,
               fontWeight: 900,
               color: colors.accentBlue,
-              fontFamily: "monospace",
+              fontFamily: typography.fontFamily,
               textTransform: "uppercase",
               letterSpacing: "0.05em",
               margin: 0,
@@ -150,7 +150,7 @@ export function CandlestickChart({
             style={{
               fontSize: 9,
               color: colors.textTertiary,
-              fontFamily: "monospace",
+              fontFamily: typography.fontFamily,
               margin: `${space[1]} 0 0 0`,
             }}
           >
@@ -162,7 +162,7 @@ export function CandlestickChart({
             fontSize: 10,
             fontWeight: 700,
             color: colors.textTertiary,
-            fontFamily: "monospace",
+            fontFamily: typography.fontFamily,
             background: colors.canvas,
             padding: `${space[1]} ${space[2]}`,
             borderRadius: radius.sm,

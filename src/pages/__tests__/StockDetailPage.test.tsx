@@ -161,7 +161,7 @@ function buildStockPayload() {
 }
 
 describe("StockDetailPage", () => {
-  it("renders explanation panel without breaking healthometer context", async () => {
+  it("renders a single research summary panel without duplicate labels", async () => {
     const stock = buildStockPayload();
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
       ok: true,
@@ -169,7 +169,8 @@ describe("StockDetailPage", () => {
     }));
     renderPage();
 
-    expect(await screen.findAllByText(/AI explanation/i)).toHaveLength(2);
-    expect(screen.getAllByText(/Research context only\. Not a recommendation\./i).length).toBeGreaterThan(0);
+    expect(await screen.findByText(/Research summary/i)).toBeTruthy();
+    expect(screen.queryByText(/AI explanation/i)).toBeNull();
+    expect(screen.queryByText(/Research context only\. Not a recommendation\./i)).toBeNull();
   });
 });

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { colors, space, radius } from "../design/tokens";
+import { colors, space, radius, typography } from "../design/tokens";
 import { FeatureGate } from "../commercial/FeatureGate";
 import { useEntitlements } from "../commercial/useEntitlements";
 import { UpgradePrompt } from "../commercial/UpgradePrompt";
@@ -53,7 +53,7 @@ function PortfolioContent({ userId }: { userId: string }) {
         style={{
           textAlign: "center",
           color: colors.textTertiary,
-          fontFamily: "monospace",
+          fontFamily: typography.fontFamily,
           fontSize: 12,
           padding: space[12],
         }}
@@ -69,7 +69,7 @@ function PortfolioContent({ userId }: { userId: string }) {
         style={{
           textAlign: "center",
           color: colors.danger,
-          fontFamily: "monospace",
+          fontFamily: typography.fontFamily,
           fontSize: 12,
           padding: space[8],
         }}
@@ -104,7 +104,7 @@ function PortfolioContent({ userId }: { userId: string }) {
             color: colors.accentBlue,
             letterSpacing: "0.05em",
             textTransform: "uppercase",
-            fontFamily: "monospace",
+            fontFamily: typography.fontFamily,
             margin: 0,
           }}
         >
@@ -114,7 +114,7 @@ function PortfolioContent({ userId }: { userId: string }) {
           style={{
             fontSize: 10,
             color: colors.textTertiary,
-            fontFamily: "monospace",
+            fontFamily: typography.fontFamily,
             margin: `${space[1]} 0 0 0`,
           }}
         >
@@ -128,7 +128,7 @@ function PortfolioContent({ userId }: { userId: string }) {
           style={{
             textAlign: "center",
             color: colors.textTertiary,
-            fontFamily: "monospace",
+            fontFamily: typography.fontFamily,
             fontSize: 12,
             padding: space[6],
           }}
@@ -152,7 +152,7 @@ function PortfolioContent({ userId }: { userId: string }) {
                   borderRadius: radius.lg,
                   padding: space[3],
                   border: `1px solid ${colors.hairline}`,
-                  fontFamily: "monospace",
+                  fontFamily: typography.fontFamily,
                   fontSize: 12,
                   display: "flex",
                   flexDirection: "column",

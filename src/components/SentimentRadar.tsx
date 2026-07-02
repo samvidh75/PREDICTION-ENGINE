@@ -10,6 +10,7 @@
 
 import { useEffect, useState } from "react";
 import { StockExWorkerPool } from "./edge-ai/StockExWorkerPool";
+import { typography } from "../design/tokens";
 
 // ── Styles ──────────────────────────────────────────────────────────
 
@@ -20,7 +21,7 @@ const s: Record<string, React.CSSProperties> = {
     padding: "20px",
     borderRadius: "12px",
     textAlign: "left",
-    fontFamily: "monospace",
+    fontFamily: typography.fontFamily,
     color: "#f4f4f5",
   },
   header: {
@@ -78,7 +79,7 @@ const s: Record<string, React.CSSProperties> = {
   },
   loading: {
     fontSize: "11px",
-    fontFamily: "monospace",
+    fontFamily: typography.fontFamily,
     color: "#64748b",
     textAlign: "center" as const,
     padding: "16px",

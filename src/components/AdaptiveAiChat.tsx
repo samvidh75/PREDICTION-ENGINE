@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { HardwareProbe, DeviceComputeTier } from './edge-ai/HardwareProbe';
+import { typography } from '../design/tokens';
 
 interface AdaptiveAiChatProps {
   ticker: string;
@@ -61,7 +62,7 @@ export default function AdaptiveAiChat({ ticker }: AdaptiveAiChatProps) {
   };
 
   return (
-    <div style={{ backgroundColor: '#0D0D0D', border: '1px solid #1A1A1A', padding: '20px', borderRadius: '12px', fontFamily: 'monospace', color: '#f4f4f5', textAlign: 'left' }}>
+    <div style={{ backgroundColor: '#0D0D0D', border: '1px solid #1A1A1A', padding: '20px', borderRadius: '12px', fontFamily: typography.fontFamily, color: '#f4f4f5', textAlign: 'left' }}>
       <div style={{ borderBottom: '1px solid #1A1A1A', paddingBottom: '12px', marginBottom: '16px' }}>
         <h3 style={{ fontSize: '12px', fontWeight: '900', color: '#60a5fa', textTransform: 'uppercase', margin: 0 }}>ADAPTIVE SLM CORE</h3>
         <p style={{ fontSize: '9px', color: '#64748b', margin: '2px 0 0 0' }}>{statusMessage}</p>
@@ -73,7 +74,7 @@ export default function AdaptiveAiChat({ ticker }: AdaptiveAiChatProps) {
           value={prompt}
           onChange={(e) => setPrompt(e.target.value)}
           placeholder={`Ask about ${ticker}'s technical setups...`}
-          style={{ flex: 1, backgroundColor: '#000000', border: '1px solid #1A1A1A', borderRadius: '6px', padding: '10px 14px', fontSize: '11px', fontFamily: 'monospace', color: '#f4f4f5', outline: 'none' }}
+          style={{ flex: 1, backgroundColor: '#000000', border: '1px solid #1A1A1A', borderRadius: '6px', padding: '10px 14px', fontSize: '11px', fontFamily: typography.fontFamily, color: '#f4f4f5', outline: 'none' }}
           disabled={loading}
           onKeyPress={(e) => e.key === 'Enter' && handleAdaptiveInferenceCall()}
         />
