@@ -12,6 +12,7 @@
 import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
 import { getPlan } from "../plans";
 import { RazorpayProvider } from "../RazorpayProvider";
+import { verifyFirebaseToken } from "../../config/firebaseAdmin";
 
 interface CreateCheckoutBody {
   planId: string;
@@ -197,4 +198,89 @@ export async function registerCheckoutRoutes(fastify: FastifyInstance): Promise<
       expiresAt: sub.expires_at,
     });
   });
+
+  // ── GET /api/v1/user/session-profile ─────────────────────────
+  // Returns the authenticated user's session info (uid, email, tier).
+  // Used by the frontend useSessionProfile hook.
+  fastify.get(
+    "/api/v1/user/session-profile",
+    { preHandler: [requireAuth] },
+    async (req: FastifyRequest, reply: FastifyReply) => {
+      const uid = (req as any).uid as string;
+
+      try {
+        const { dbAdapter } = await import("../../db/DatabaseAdapter");
+        const result = await dbAdapter.query(
+          `SELECT plan_id, tier, status, current_period_start, current_period_end
+           FROM user_subscriptions
+           WHERE user_id = $1 AND status IN ('active', 'trial', 'past_due')
+           ORDER BY created_at DESC LIMIT 1`,
+          [uid],
+        );
+
+        if (!result.rows.length) {
+          return reply.send({
+            authenticated: true,
+            uid,
+            tier: "free",
+            planId: null,
+            expiresAt: null,
+          });
+        }
+
+        const row = result.rows[0] as {
+          plan_id: string;
+          tier: string;
+          status: string;
+          current_period_start: string;
+          current_period_end: string;
+        };
+
+        return reply.send({
+          authenticated: true,
+          uid,
+          tier: row.tier || "free",
+          planId: row.plan_id,
+          status: row.status,
+          expiresAt: row.current_period_end,
+        });
+      } catch (err) {
+        req.log.error({ err }, "session-profile error");
+        return reply.status(500).send({ error: "Internal error" });
+      }
+    },
+  );
+}
+
+// ── Helper: Firebase auth preHandler ───────────────────────────────────────
+
+async function requireAuth(req: FastifyRequest, reply: FastifyReply) {
+  try {
+    const auth = req.headers?.authorization;
+    if (!auth || !auth.startsWith("Bearer ")) {
+      req.log.warn({ url: req.url }, "Unauthenticated — no Bearer token");
+      if (process.env.NODE_ENV === "production") {
+        return reply.status(401).send({ error: "Authentication required" });
+      }
+      (req as any).uid = null;
+      return;
+    }
+    const token = auth.slice(7);
+    const decoded = await verifyFirebaseToken(token);
+    if (!decoded) {
+      req.log.warn({ url: req.url }, "Invalid Firebase token");
+      if (process.env.NODE_ENV === "production") {
+        return reply.status(401).send({ error: "Authentication required" });
+      }
+      (req as any).uid = null;
+      return;
+    }
+    (req as any).uid = decoded.uid;
+  } catch (err) {
+    req.log.warn({ url: req.url, err }, "Firebase token verification failed");
+    if (process.env.NODE_ENV === "production") {
+      return reply.status(401).send({ error: "Authentication required" });
+    }
+    (req as any).uid = null;
+  }
 }

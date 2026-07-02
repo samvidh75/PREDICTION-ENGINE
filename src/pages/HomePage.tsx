@@ -186,7 +186,7 @@ export default function HomePage() {
       <BrokerStatusBar />
 
       {/* ════════════════ SUBSCRIPTION BANNER ════════════════ */}
-      <SubscriptionBanner currentTier="FREE" />
+      <SubscriptionBanner />
 
       {/* ════════════════ HERO ════════════════ */}
       <section

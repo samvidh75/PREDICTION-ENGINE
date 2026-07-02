@@ -28,6 +28,7 @@ import { FeatureGate } from "../commercial/FeatureGate";
 import { InsiderActivity } from "../components/InsiderActivity";
 import { PriceTargets } from "../components/PriceTargets";
 import { NativeAd } from "../components/NativeAd";
+import SubscriptionBanner from "../components/SubscriptionBanner";
 import { MarketBrainPanel } from "../components/market-brain/MarketBrainPanel";
 import { EdgeAiChatSection } from "../components/edge-ai/EdgeAiChatSection";
 import { ResearchAiExplanationPanel } from "../components/ai-orchestrator/ResearchAiExplanationPanel";
@@ -70,7 +71,6 @@ type StockResearchDetail = {
     quarterly: { revenue: Array<{ period: string; value: number }>; profit: Array<{ period: string; value: number }>; ebitda: Array<{ period: string; value: number }> };
   };
   shareholding: Array<{ period: string; promoter: number; fii: number; dii: number; retail: number; deltas: { promoter: number; fii: number; dii: number; retail: number } }>;
-  shareholdings?: Array<{ period: string; promoter: number; fii: number; dii: number; retail: number; deltas: { promoter: number; fii: number; dii: number; retail: number } }>;
   news: Array<{ headline: string; source: string; time: string; link?: string; publishedAt?: string }>;
   thesis: { thesis: string; bullCase: string; bearCase: string; whatToWatch: string; stance: "High conviction" | "Watch" | "Needs review" | "Risk rising" | "Avoid for now" };
   priceHistory: Record<string, Array<{ label: string; price: number }>>;
@@ -335,7 +335,6 @@ function normalizeStockData(raw: Record<string, any>): StockResearchDetail {
     },
     financials: raw.financials ?? { annual: { revenue: [], profit: [], ebitda: [] }, quarterly: { revenue: [], profit: [], ebitda: [] } },
     shareholding: raw.shareholding ?? [],
-    shareholdings: raw.shareholdings ?? raw.shareholding ?? [],
     news: raw.news ?? [],
     thesis: raw.thesis ?? { thesis: "", bullCase: "", bearCase: "", whatToWatch: "", stance: "Watch" },
     priceHistory: raw.priceHistory ?? {},
@@ -345,8 +344,8 @@ function normalizeStockData(raw: Record<string, any>): StockResearchDetail {
 function buildFallbackStockResponse(symbol: string): {
   stock: StockResearchDetail;
   financialChartData: { period: string; value: number }[];
-  shareholding?: any;
-  shareholdingSeries?: any[];
+  shareholding?: StockResearchDetail["shareholding"][number];
+  shareholdingSeries?: StockResearchDetail["shareholding"];
   period?: string;
 } | null {
   const local = getStockResearch(symbol);
@@ -401,7 +400,7 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
   const trendColor = isUp ? colors.success : colors.danger;
   const shareholdingSeriesArr = Array.isArray(shareholdingSeries) ? shareholdingSeries : [];
   const effectiveShareholding = shareholding ?? shareholdingSeriesArr.find((item) => item.period === period) ?? shareholdingSeriesArr[0];
-  const selectedFinancialSeries = stock.financials[financialPeriod][financialMetric];
+  const selectedFinancialSeries = stock.financials?.[financialPeriod]?.[financialMetric] ?? [];
   const effectiveChartData = financialChartData.length > 0 ? financialChartData : selectedFinancialSeries.map((item) => ({ period: item.period, value: Math.round(item.value) }));
   const newsItems = stock.news.slice(0, 7);
   const filteredNews = newsFilter === "all" ? newsItems : newsItems.filter((n: any) => n.sentiment === newsFilter);
@@ -615,6 +614,9 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
           </div>
         )}
       </div>
+
+      {/* ── Subscription Banner ── */}
+      <SubscriptionBanner />
 
       {/* ── Price Chart ── */}
       <Card className="stock-chart-card raycast-slideUp" style={{ animationDelay: "0.05s", animationFillMode: "both" }}>

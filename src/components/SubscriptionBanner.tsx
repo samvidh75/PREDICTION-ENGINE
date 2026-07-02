@@ -1,7 +1,17 @@
 import React from 'react';
+import { useSessionProfile } from '../commercial/useSessionProfile';
 
-export default function SubscriptionBanner({ currentTier }: { currentTier: string }) {
-  if (currentTier === 'PRO' || currentTier === 'PREMIUM_LENS') return null;
+interface SubscriptionBannerProps {
+  /** Optional override tier. If omitted, fetches from session-profile endpoint. */
+  currentTier?: string;
+}
+
+export default function SubscriptionBanner({ currentTier: propTier }: SubscriptionBannerProps) {
+  const { profile, loading } = useSessionProfile();
+  const effectiveTier = propTier ?? profile?.tier ?? "free";
+
+  if (loading) return null;
+  if (effectiveTier === 'PRO' || effectiveTier === 'PREMIUM_LENS') return null;
 
   return (
     <div style={{
