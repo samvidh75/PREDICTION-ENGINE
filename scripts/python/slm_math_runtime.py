@@ -23,20 +23,29 @@ except ImportError as e:
     sys.exit(1)
 
 DATABASE_URL = os.getenv("DATABASE_URL")
-YAHOO_MIRRORS = [
+YAHOO_MIRROR_HOSTS = [
     "https://query1.finance.yahoo.com/v8/finance/chart/{ticker}?interval=1d&range=1y",
     "https://query2.finance.yahoo.com/v8/finance/chart/{ticker}?interval=1d&range=1y",
 ]
 
 
-def fetch_live_unauthenticated_ticks(symbol: str):
+def fetch_live_unauthenticated_ticks(raw_symbol: str):
     """
     Direct web proxy fallback that pulls unauthenticated candle arrays.
-    Returns real market metrics or None under firewall constraints.
+    CRITICAL: Applies Indian exchange board suffix mapping internally:
+      - All-digit symbols → .BO (BSE)
+      - Alphanumeric symbols → .NS (NSE / SME Emerge)
+    This prevents Yahoo from returning US/global ticker data instead of Indian.
     """
+    symbol = raw_symbol.upper().replace(".NS", "").replace(".BO", "").strip()
+    if symbol.isdigit():
+        yahoo_ticker = f"{symbol}.BO"
+    else:
+        yahoo_ticker = f"{symbol}.NS"
+
     headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
-    for mirror_url in YAHOO_MIRRORS:
-        url = mirror_url.format(ticker=symbol.upper())
+    for mirror_url in YAHOO_MIRROR_HOSTS:
+        url = mirror_url.format(ticker=yahoo_ticker)
         try:
             res = requests.get(url, headers=headers, timeout=7)
             if res.status_code != 200:
@@ -104,18 +113,7 @@ def validate_market_snapshot(metrics: dict) -> tuple:
 
 
 def run_precision_intelligence_kernel(ticker: str):
-    raw_symbol = ticker.upper().replace(".NS", "").replace(".BO", "").strip()
-    has_ns = ".NS" in ticker.upper()
-    has_bo = ".BO" in ticker.upper()
-    if has_ns:
-        suffix = ".NS"
-    elif has_bo:
-        suffix = ".BO"
-    elif raw_symbol.isdigit():
-        suffix = ".BO"
-    else:
-        suffix = ".NS"
-    symbol = raw_symbol
+    symbol = ticker.upper().replace(".NS", "").replace(".BO", "").strip()
     df = pd.DataFrame()
     ratio_row = None
     data_source = "UNKNOWN"
@@ -146,8 +144,9 @@ def run_precision_intelligence_kernel(ticker: str):
             pass
 
     # Step 2: Trigger fallback scraping node if cache lines are empty
+    # fetch_live_unauthenticated_ticks applies .NS/.BO suffix internally
     if df.empty:
-        df, scrape_status = fetch_live_unauthenticated_ticks(symbol + suffix)
+        df, scrape_status = fetch_live_unauthenticated_ticks(symbol)
         if df is not None and not df.empty:
             data_source = scrape_status
 
