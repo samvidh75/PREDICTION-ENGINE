@@ -199,6 +199,7 @@
     "@fastify/helmet": "^13.0.2",
     "@fastify/rate-limit": "^11.1.0",
     "@fastify/websocket": "^11.2.0",
+    "@huggingface/transformers": "^4.2.0",
     "@mlc-ai/web-llm": "^0.2.84",
     "@qdrant/js-client-rest": "^1.18.0",
     "@supabase/supabase-js": "^2.108.2",
