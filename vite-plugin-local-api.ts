@@ -68,12 +68,18 @@ export function localApiPlugin(): Plugin {
             } catch { /* yahoo script failed */ }
 
             if (livePrice) {
-              try {
-                const script = path.resolve(root, 'scripts/fetch-yahoo-fundamentals.cjs');
-                const raw = execSync(`node "${script}" "${symbol}"`, { timeout: 15000, encoding: 'utf-8' });
-                const parsed = JSON.parse(raw.trim());
-                if (parsed.pe || parsed.pb) liveFundamentals = parsed;
-              } catch { /* fundamentals script failed */ }
+              // Fundamentals from snapshot (Yahoo quoteSummary is rate-limited)
+              if (research) {
+                liveFundamentals = {
+                  pe: research.pe ?? null,
+                  pb: research.pb ?? null,
+                  eps: research.eps ?? null,
+                  dividendYield: research.dividendYield ?? null,
+                  roe: research.roe ?? null,
+                  debtToEquity: research.debtToEquity ?? null,
+                  revenueGrowth: research.revenueGrowth ?? null,
+                };
+              }
 
               try {
                 const script = path.resolve(root, 'scripts/fetch-yahoo-history.cjs');
@@ -148,7 +154,7 @@ export function localApiPlugin(): Plugin {
               shareholding: research?.shareholding || null,
               news: liveNews || research?.news || [],
               thesis: research?.thesis || null,
-              dataSources: { price: sourceLabel, fundamentals: liveFundamentals ? 'yahoo_finance' : 'snapshot', history: liveHistory ? 'yahoo_finance' : 'snapshot', news: liveNews ? 'yahoo_finance' : 'snapshot', financials: 'snapshot', shareholding: 'snapshot' },
+              dataSources: { price: sourceLabel, fundamentals: sourceLabel === 'yahoo' ? 'yahoo_finance' : 'snapshot', history: liveHistory ? 'yahoo_finance' : 'snapshot', news: liveNews ? 'yahoo_finance' : 'snapshot', financials: 'snapshot', shareholding: 'snapshot' },
               dcf,
             };
 
