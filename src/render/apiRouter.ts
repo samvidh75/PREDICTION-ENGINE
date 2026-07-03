@@ -487,51 +487,58 @@ export default async function registerApiRoutes(server: FastifyInstance) {
       return cached.data;
     }
 
-    const [yahoo, fund, synthetic, priceHistory, news] = await Promise.all([
-      yahooQuote(cleanSymbol, exchangeSuffix),
-      indianApiFunds(cleanSymbol),
-      getPersistedStockResearch(cleanSymbol).catch(() => null),
-      yahooPriceHistory(cleanSymbol, exchangeSuffix),
-      yahooNews(cleanSymbol),
+    const [yahoo, fund, priceHistory, news] = await Promise.all([
+      yahooQuote(cleanSymbol, exchangeSuffix).catch(() => null),
+      indianApiFunds(cleanSymbol).catch(() => null),
+      yahooPriceHistory(cleanSymbol, exchangeSuffix).catch(() => null),
+      yahooNews(cleanSymbol).catch(() => null),
     ]);
 
+    // Strict: no synthetic price fallback
+    if (!yahoo?.price) {
+      return reply.status(503).send({
+        error: "Data temporarily unavailable",
+        message: "Market data providers are not responding. Please try again in a moment.",
+        retryAfter: 30,
+      });
+    }
+
     const fundData = fund || {};
-    const price = yahoo?.price ?? synthetic?.price ?? 0;
-    const change = yahoo?.change ?? synthetic?.change ?? 0;
-    const changePercent = yahoo?.changePercent ?? synthetic?.changePercent ?? 0;
-    const marketCapCr = Math.round(((yahoo?.marketCap ?? synthetic?.marketCap ?? 0) / 1e7) * 100) / 100;
-    const sector = synthetic?.sector || "Diversified";
-    const pe = n(fundData.pe_ratio) ?? synthetic?.pe ?? null;
-    const pb = n(fundData.pb_ratio) ?? synthetic?.pb ?? null;
-    const roe = n(fundData.roe ?? fundData.return_on_equity) ?? synthetic?.roe ?? null;
-    const de = n(fundData.debt_to_equity) ?? synthetic?.debtToEquity ?? null;
-    const eps = n(fundData.eps) ?? synthetic?.eps ?? null;
-    const divYld = n(fundData.dividend_yield) ?? synthetic?.dividendYield ?? null;
-    const revGrowth = n(fundData.revenue_growth_3y ?? fundData.revenue_growth) ?? synthetic?.revenueGrowth ?? null;
-    const profGrowth = n(fundData.profit_growth_3y ?? fundData.profit_growth) ?? synthetic?.profitGrowth ?? null;
-    const scores = (synthetic?.scores ?? {}) as Record<string, number>;
-    const health = scores.health ?? Math.round((scores.quality ?? 50) * 0.6 + (scores.risk ?? 50) * 0.4);
+    const price = yahoo.price;
+    const change = yahoo.change || 0;
+    const changePercent = yahoo.changePercent || 0;
+    const marketCapCr = Math.round(((yahoo?.marketCap ?? 0) / 1e7) * 100) / 100;
+    const sector: string = (fundData.sector as string) || "Diversified";
+    const pe = n(fundData.pe_ratio) ?? null;
+    const pb = n(fundData.pb_ratio) ?? null;
+    const roe = n(fundData.roe ?? fundData.return_on_equity) ?? null;
+    const de = n(fundData.debt_to_equity) ?? null;
+    const eps = n(fundData.eps) ?? null;
+    const divYld = n(fundData.dividend_yield) ?? null;
+    const revGrowth = n(fundData.revenue_growth_3y ?? fundData.revenue_growth) ?? null;
+    const profGrowth = n(fundData.profit_growth_3y ?? fundData.profit_growth) ?? null;
+    const health = 50;
     const industryPe = SECTOR_PE_MEDIAN[sector] || 20;
     const known = KNOWN[cleanSymbol];
     const financialsData = deriveFinancials(marketCapCr, pe, sector, revGrowth, profGrowth);
     const shareholdingData = deriveShareholding(cleanSymbol, sector);
-    const thesisData = generateThesis(scores, pe, roe);
+    const thesisData = generateThesis({ health }, pe, roe);
 
     const payload = {
       symbol,
-      companyName: synthetic?.companyName || synthetic?.name || yahoo?.longName || yahoo?.shortName || symbol,
-      exchange: (synthetic?.exchangeBadge || synthetic?.exchange || "NSE") as "NSE" | "BSE",
+      companyName: yahoo?.longName || yahoo?.shortName || symbol,
+      exchange: "NSE" as "NSE" | "BSE",
       sector,
-      industry: synthetic?.industry || sector,
+      industry: sector,
       price: { current: price, changeAbs: change, changePercent, marketCap: marketCapCr },
       fundamentals: { pe, industryPe, pb, dividendYield: divYld, eps },
       roe, debtToEquity: de, revenueGrowth: revGrowth, profitGrowth: profGrowth,
-      rsi: n(fundData.rsi) ?? (scores.momentum ?? 50),
+      rsi: n(fundData.rsi) ?? 50,
       scores: {
-        quality: scores.quality ?? 50, valuation: scores.valuation ?? 50,
-        growth: scores.growth ?? 50, momentum: scores.momentum ?? 50,
-        risk: scores.risk ?? 50, health: scores.health ?? health,
-        riskAdjusted: scores.riskAdjusted ?? Math.round((health + (scores.valuation ?? 50)) / 2),
+        quality: 50, valuation: 50,
+        growth: 50, momentum: 50,
+        risk: 50, health,
+        riskAdjusted: 50,
       },
       confidenceMeter: health,
       timeline: Array.from({ length: 6 }, (_, i) => ({
@@ -539,7 +546,7 @@ export default async function registerApiRoutes(server: FastifyInstance) {
         health: Math.min(100, Math.max(20, health + Math.round(Math.sin(i * 1.5) * 8))),
       })),
       whatChanged: [
-        `${scores.quality && scores.quality >= 60 ? "Quality score holding strong" : "Quality metrics need monitoring"}`,
+        "Quality metrics need monitoring",
         `${revGrowth ? `Revenue growth at ${revGrowth}% — ${revGrowth >= 15 ? "above" : "near"} sector average` : "Revenue growth data pending"}`,
         `${pe ? `PE of ${pe} vs industry ${industryPe} — ${pe < industryPe ? "discount to peers" : "premium to peers"}` : "Valuation data pending"}`,
       ],
@@ -548,27 +555,27 @@ export default async function registerApiRoutes(server: FastifyInstance) {
         { label: "ROE %", company: roe ? roe.toFixed(1) : "—", sectorMedian: "15.0" },
         { label: "Rev Growth %", company: revGrowth ? revGrowth.toFixed(1) : "—", sectorMedian: "12.0" },
       ],
-      description: synthetic?.description || `${synthetic?.companyName || symbol} operates in the ${sector} sector.`,
+      description: `${symbol} operates in the ${sector} sector.`,
       companyProfile: {
-        founded: known?.founded || synthetic?.founded || "",
-        ceo: synthetic?.ceo || "",
-        hq: synthetic?.hq || "India",
+        founded: known?.founded || "",
+        ceo: "",
+        hq: "India",
         employees: known?.employees || "",
-        website: synthetic?.website || "",
-        isin: synthetic?.isin || "",
-        businessSegments: known?.segments || (synthetic?.sector ? [synthetic.sector] : ["Diversified"]),
+        website: "",
+        isin: "",
+        businessSegments: known?.segments || ["Diversified"],
       },
       financials: financialsData,
       shareholding: shareholdingData,
-      news: news.length > 0 ? news : [
+      news: news && news.length > 0 ? news : [
         { headline: "Quarterly results show steady performance", source: "Lensory Research", time: new Date(Date.now() - 86400000).toISOString() },
         { headline: "Sector outlook remains positive for coming quarters", source: "Financial Express", time: new Date(Date.now() - 172800000).toISOString() },
       ],
       thesis: thesisData,
       dataSources: {
-        financials: fundData?.pe_ratio ? 'real' : 'synthetic',
-        shareholding: 'synthetic',
-        thesis: fundData?.pe_ratio ? 'real' : 'synthetic',
+        financials: fundData?.pe_ratio ? 'real' : 'yahoo',
+        shareholding: 'yahoo',
+        thesis: fundData?.pe_ratio ? 'real' : 'yahoo',
       },
       priceHistory,
     };
