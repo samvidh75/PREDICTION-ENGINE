@@ -2,7 +2,7 @@
 // from all providers and feeds UnifiedPredictionEngine.
 //
 // DEPLOYMENT NOTE — required env vars:
-//   Vercel (frontend):  VITE_INDIANAPI_KEY (maps to @indianapi-key Vercel secret)
+//   Server-side (Render/Fastify): INDIANAPI_KEY env var
 //   Render/Fastify: INDIANAPI_KEY, UPSTOX_ACCESS_TOKEN
 // Historical price data is fetched via /api/historical/:symbol (backend proxy)
 // to avoid browser CORS blocks on direct Yahoo Finance requests.

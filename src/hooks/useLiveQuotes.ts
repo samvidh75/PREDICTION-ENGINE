@@ -14,7 +14,7 @@ export interface LiveQuote {
   ask: number;
   volume: number;
   timestamp: number;
-  source: 'nse' | 'groww';
+  source: 'indianapi' | 'groww' | 'yahoo';
 }
 
 interface UseLiveQuotesOptions {
@@ -38,20 +38,23 @@ export function useLiveQuotes(
   useEffect(() => {
     if (!enabled || symbols.length === 0) return;
 
+    const getWsBase = () => {
+      if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
+        return `ws://localhost:${window.location.port || '10000'}`;
+      }
+      return 'wss://api.stockstory-india.com';
+    };
+
     const connectWebSocket = () => {
       try {
-        const ws = new WebSocket(
-          `wss://api.stockstory-india.com/api/quotes/ws?symbols=${symbols.join(',')}`
-        );
+        const ws = new WebSocket(`${getWsBase()}/api/quotes/ws`);
 
         ws.onopen = () => {
           console.log('WebSocket connected');
           setIsConnected(true);
           setError(null);
 
-          symbols.forEach(symbol => {
-            ws.send(JSON.stringify({ type: 'subscribe', symbol }));
-          });
+          ws.send(JSON.stringify({ type: 'subscribe', symbols }));
         };
 
         ws.onmessage = (event) => {
@@ -116,13 +119,13 @@ export function useLiveQuotes(
 
   const subscribe = useCallback((symbol: string) => {
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-      wsRef.current.send(JSON.stringify({ type: 'subscribe', symbol }));
+      wsRef.current.send(JSON.stringify({ type: 'subscribe', symbols: [symbol] }));
     }
   }, []);
 
   const unsubscribe = useCallback((symbol: string) => {
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-      wsRef.current.send(JSON.stringify({ type: 'unsubscribe', symbol }));
+      wsRef.current.send(JSON.stringify({ type: 'unsubscribe', symbols: [symbol] }));
     }
   }, []);
 

@@ -2,12 +2,12 @@
  * Local LLM Inference Engine
  *
  * Uses:
- * - ONNX Runtime (WebAssembly backend for inference)
- * - Quantized Gemma-2B model
+ * - ONNX Runtime (WebAssembly backend for inference) — when model file is available
+ * - Deterministic rule-based fallback — when model file is unavailable
  * - RAG grounding (no hallucination)
  *
  * Inference happens 100% on user device.
- * Typical latency: 2-5 seconds per generation
+ * Typical latency: 2-5 seconds per generation (ONNX) or < 10ms (deterministic)
  */
 
 import * as ort from 'onnxruntime-web';
@@ -18,6 +18,18 @@ let tokenizer: any = null;
 export async function initializeModel() {
   if (modelSession) {
     return { session: modelSession, tokenizer };
+  }
+
+  // Check if ONNX model exists before attempting to load
+  try {
+    const headResponse = await fetch('/models/stockstory_gemma_2b_q4.onnx', { method: 'HEAD' });
+    if (!headResponse.ok) {
+      console.warn('ONNX model not found at /models/stockstory_gemma_2b_q4.onnx — using deterministic fallback');
+      return null;
+    }
+  } catch {
+    console.warn('Cannot reach model path — using deterministic fallback');
+    return null;
   }
 
   console.log('Loading quantized Gemma-2B model...');
@@ -40,7 +52,7 @@ export async function initializeModel() {
     return { session: modelSession, tokenizer };
   } catch (err) {
     console.error('Model loading failed:', err);
-    throw err;
+    return null;
   }
 }
 
@@ -114,11 +126,73 @@ What should an investor watch or monitor going forward? List 2-3 specific cataly
   return prompt;
 }
 
+function deterministicExplanation(ragContext: any, promptType: string): string {
+  const { metrics, growth, risk, company } = ragContext;
+
+  const roe = metrics?.roe ?? '—';
+  const de = metrics?.debtToEquity ?? '—';
+  const revGrowth = growth?.revenueCAGR_3y ?? growth?.revenueGrowth_YoY ?? '—';
+  const profitGrowth = growth?.profitCAGR_3y ?? growth?.profitGrowth_YoY ?? '—';
+  const vol = risk?.volatility_30d ?? '—';
+  const sharpe = risk?.sharpeRatio ?? '—';
+
+  switch (promptType) {
+    case 'thesis': {
+      const strengths: string[] = [];
+      if (roe !== '—' && Number(roe) > 15) strengths.push(`strong ROE of ${roe}%`);
+      if (de !== '—' && Number(de) < 1) strengths.push(`low debt-to-equity of ${de}`);
+      if (revGrowth !== '—' && Number(revGrowth) > 10) strengths.push(`revenue growing at ${revGrowth}%`);
+      if (sharpe !== '—' && Number(sharpe) > 1) strengths.push(`attractive risk-adjusted returns (Sharpe ${sharpe})`);
+
+      if (strengths.length > 0) {
+        return `${company?.name || 'This company'} shows ${strengths.join(', ')}. The business model demonstrates competitive advantages worth researching further.`;
+      }
+      return `${company?.name || 'This company'} operates in the ${company?.sector || 'broader'} market with ${roe !== '—' ? `ROE of ${roe}% ` : ''}and ${de !== '—' ? `debt-to-equity of ${de} ` : ''}— metrics that warrant closer analysis against sector peers.`;
+    }
+    case 'bull_case': {
+      const bullPoints: string[] = [];
+      if (revGrowth !== '—' && Number(revGrowth) > 15) bullPoints.push(`Revenue growth of ${revGrowth}% outpaces most peers`);
+      if (roe !== '—' && Number(roe) > 18) bullPoints.push(`Industry-leading ROE of ${roe}% signals durable competitive advantages`);
+      if (sharpe !== '—' && Number(sharpe) > 1.5) bullPoints.push(`Excellent risk-adjusted returns (Sharpe ${sharpe})`);
+      if (profitGrowth !== '—' && Number(profitGrowth) > 15) bullPoints.push(`Profit growth of ${profitGrowth}% shows operating leverage`);
+
+      if (bullPoints.length > 0) return bullPoints.slice(0, 2).join('. ') + '.';
+      return 'Operational improvements and market positioning could drive re-rating.';
+    }
+    case 'bear_case': {
+      const bearPoints: string[] = [];
+      if (de !== '—' && Number(de) > 1.5) bearPoints.push(`Elevated debt-to-equity of ${de} increases financial risk`);
+      if (vol !== '—' && Number(vol) > 35) bearPoints.push(`High volatility (${vol}%) adds uncertainty`);
+      if (roe !== '—' && Number(roe) < 10) bearPoints.push(`Below-par ROE of ${roe}% suggests capital allocation concerns`);
+      if (revGrowth !== '—' && Number(revGrowth) < 5) bearPoints.push(`Slowing revenue growth (${revGrowth}%) could signal headwinds`);
+
+      if (bearPoints.length > 0) return bearPoints.slice(0, 2).join('. ') + '.';
+      return 'Competition and sector headwinds could pressure margins and growth.';
+    }
+    case 'what_to_watch': {
+      const watchPoints: string[] = [];
+      if (revGrowth !== '—') watchPoints.push('Revenue growth trajectory in upcoming quarters');
+      if (de !== '—') watchPoints.push('Debt reduction progress');
+      if (profitGrowth !== '—') watchPoints.push('Margin expansion and operating leverage');
+
+      if (watchPoints.length > 0) return 'Monitor: ' + watchPoints.join(', ') + '.';
+      return 'Track quarterly results for changes in the fundamental trajectory.';
+    }
+    default:
+      return '';
+  }
+}
+
 export async function generateExplanation(
   model: any,
   ragContext: any,
   promptType: string
 ): Promise<string> {
+  // If ONNX model is not loaded, use deterministic fallback
+  if (!model || !modelSession || !tokenizer) {
+    return deterministicExplanation(ragContext, promptType);
+  }
+
   const prompt = buildPrompt(ragContext, promptType);
   const maxTokens = 150;
 
@@ -163,6 +237,6 @@ export async function generateExplanation(
       .substring(0, 250);
   } catch (err) {
     console.error(`Generation failed for ${promptType}:`, err);
-    return `Unable to generate ${promptType} at this time.`;
+    return deterministicExplanation(ragContext, promptType);
   }
 }

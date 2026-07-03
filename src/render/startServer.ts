@@ -21,6 +21,7 @@ import { StockUniverseAdapter } from "../services/data/providers/StockUniverseAd
 import { defaultDataAdapterRegistry } from "../services/data/dataAdapterRegistry.js";
 import { startWebSocketDataProducer } from "../services/market/websocketDataProducer.js";
 import { MetricsCollector } from "../commercial/api/monitoring/MetricsCollector.js";
+import { registerLiveQuotesWs } from "../backend/routes/liveQuotesWs.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -120,6 +121,9 @@ async function bootstrap() {
 
   // ── WebSocket support for live price streaming ────────────────────
   await server.register(websocket);
+
+  // ── Live quote WebSocket (new cascading provider) ──────────────────
+  await registerLiveQuotesWs(server);
 
   // ── Rate limiting — 60 req/min per IP ───────────────────────────────
   await server.register(rateLimit, {
