@@ -171,6 +171,27 @@ export class StockUniverseAdapter implements CompanyMasterAdapter {
     return this.bySymbol.size;
   }
 
+  /**
+   * All loaded universe entries as CompanyMasterRecord-shaped rows, plus the
+   * raw factor scores (quality/valuation/growth/momentum/risk/health). Used
+   * by bulk consumers (e.g. the data warehouse screener) that need to scan
+   * the whole universe rather than look up one symbol at a time.
+   */
+  getAllEntries(): Array<CompanyMasterRecord & { marketCap: number | null; scores?: StockUniverseEntry['scores'] }> {
+    if (!this.loaded) this.load();
+    return Array.from(this.bySymbol.entries()).map(([symbol, entry]) => ({
+      symbol,
+      exchange: entry.exchange ?? 'UNKNOWN',
+      companyName: entry.name || symbol,
+      sector: entry.sector ?? null,
+      industry: entry.industry ?? null,
+      listingDate: entry.listingDate ?? null,
+      marketCapCategory: toDisplayCategory(inferMcapCategory(entry.marketCap)),
+      marketCap: entry.marketCap ?? null,
+      scores: entry.scores,
+    }));
+  }
+
   /** Timestamp from the loaded universe file. */
   get dataGeneratedAt(): string | null {
     return this.generatedAt;

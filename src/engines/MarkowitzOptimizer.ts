@@ -23,6 +23,10 @@ export interface MarkowitzOutput {
   tangencyPortfolio: EfficientFrontierPoint;
 }
 
+const RISK_FREE_RATE = 0.065;
+const MAX_ITERATIONS = 2000;
+const CONVERGENCE_TOL = 1e-9;
+
 export class MarkowitzOptimizer {
   computeEfficientFrontier(
     assets: AssetStats[],
@@ -34,30 +38,29 @@ export class MarkowitzOptimizer {
       return this.singleAssetOutput(assets);
     }
 
+    const mu = assets.map(a => a.expectedReturn);
+    const sigma = covMatrix.matrix;
+    const minVar = this.solveMeanVariance(mu.map(() => 0), sigma, 1);
+    const minVarReturn = this.dot(minVar, mu);
+    const maxRet = Math.max(...mu);
+    const range = maxRet - minVarReturn || 0.01;
+
     const frontier: EfficientFrontierPoint[] = [];
-    const assetMap = new Map(assets.map(a => [a.symbol, a]));
-
-    const maxRet = Math.max(...assets.map(a => a.expectedReturn));
-    const minRet = Math.min(...assets.map(a => a.expectedReturn));
-    const range = maxRet - minRet || 0.01;
-
     for (let i = 0; i < points; i++) {
-      const targetReturn = maxRet - (range * i) / (points - 1);
-      const result = this.optimizeForTarget(assets, covMatrix, targetReturn);
-      if (result) frontier.push(result);
+      const targetReturn = minVarReturn + (range * i) / Math.max(1, points - 1);
+      frontier.push(this.pointForWeights(this.solveTargetReturn(mu, sigma, targetReturn), assets, sigma));
     }
 
     frontier.sort((a, b) => a.volatility - b.volatility);
 
     let maxSharpePortfolio = frontier[0];
     let minVolPortfolio = frontier[0];
-
     for (const point of frontier) {
       if (point.sharpe > maxSharpePortfolio.sharpe) maxSharpePortfolio = point;
       if (point.volatility < minVolPortfolio.volatility) minVolPortfolio = point;
     }
 
-    const tangencyPortfolio = this.computeTangencyPortfolio(assets, covMatrix);
+    const tangencyPortfolio = this.maxSharpeRatioPortfolio(assets, covMatrix);
 
     return {
       efficientFrontier: frontier,
@@ -67,83 +70,116 @@ export class MarkowitzOptimizer {
     };
   }
 
-  private optimizeForTarget(
-    assets: AssetStats[],
-    covMatrix: CovarianceMatrix,
-    targetReturn: number,
-  ): EfficientFrontierPoint | null {
-    const n = assets.length;
-    const equalWeight = 1 / n;
-
-    const rawAllocations = assets.map(a => {
-      const retDiff = a.expectedReturn - targetReturn;
-      const base = equalWeight * (1 + retDiff / Math.max(Math.abs(targetReturn) + 0.01, 0.01));
-      return Math.max(0, base);
-    });
-
-    const totalWeight = rawAllocations.reduce((a, b) => a + b, 0) || n;
-    const allocations: Record<string, number> = {};
-    for (let i = 0; i < n; i++) {
-      allocations[assets[i].symbol] = rawAllocations[i] / totalWeight;
-    }
-
-    const portfolioReturn = assets.reduce(
-      (sum, a) => sum + allocations[a.symbol] * a.expectedReturn, 0,
-    );
-
-    let portfolioVariance = 0;
-    for (let i = 0; i < n; i++) {
-      for (let j = 0; j < n; j++) {
-        const cov = covMatrix.matrix[i]?.[j] ?? 0;
-        portfolioVariance += allocations[assets[i].symbol] * allocations[assets[j].symbol] * cov;
-      }
-    }
-
-    const portfolioVol = Math.sqrt(Math.max(portfolioVariance, 0.0001));
-    const sharpe = portfolioVol > 0 ? (portfolioReturn - 0.065) / portfolioVol : 0;
-
-    return { return: portfolioReturn, volatility: portfolioVol, sharpe, allocations };
-  }
-
-  private computeTangencyPortfolio(
-    assets: AssetStats[],
-    covMatrix: CovarianceMatrix,
-  ): EfficientFrontierPoint {
-    return this.maxSharpeRatioPortfolio(assets, covMatrix);
-  }
-
   private maxSharpeRatioPortfolio(
     assets: AssetStats[],
     covMatrix: CovarianceMatrix,
   ): EfficientFrontierPoint {
-    const n = assets.length;
-    const riskFreeRate = 0.065;
+    const mu = assets.map(a => a.expectedReturn);
+    const sigma = covMatrix.matrix;
+    const excess = mu.map(m => m - RISK_FREE_RATE);
 
-    const excessReturns = assets.map(a => a.expectedReturn - riskFreeRate);
-    const totalExcess = Math.abs(excessReturns.reduce((a, b) => a + b, 0)) || n;
-    const rawWeights = excessReturns.map(e => Math.max(0, e / totalExcess));
-    const totalWeight = rawWeights.reduce((a, b) => a + b, 0) || n;
-
-    const allocations: Record<string, number> = {};
-    for (let i = 0; i < n; i++) {
-      allocations[assets[i].symbol] = rawWeights[i] / totalWeight;
+    // Dense log-spaced grid over risk-aversion lambda; pick the portfolio with the best Sharpe.
+    let best: { weights: number[]; sharpe: number } | null = null;
+    for (let e = -2; e <= 8; e += 0.5) {
+      const lambda = Math.pow(2, e);
+      const weights = this.solveMeanVariance(excess, sigma, lambda);
+      const ret = this.dot(weights, mu);
+      const vol = Math.sqrt(Math.max(this.quadForm(weights, sigma), 1e-16));
+      const sharpe = (ret - RISK_FREE_RATE) / vol;
+      if (!best || sharpe > best.sharpe) best = { weights, sharpe };
     }
-
-    const portfolioReturn = assets.reduce((s, a) => s + allocations[a.symbol] * a.expectedReturn, 0);
-    let variance = 0;
-    for (let i = 0; i < n; i++) {
-      for (let j = 0; j < n; j++) {
-        const cov = covMatrix.matrix[i]?.[j] ?? 0;
-        variance += allocations[assets[i].symbol] * allocations[assets[j].symbol] * cov;
-      }
-    }
-    const vol = Math.sqrt(Math.max(variance, 0.0001));
-    const sharpe = (portfolioReturn - riskFreeRate) / vol;
-
-    return { return: portfolioReturn, volatility: vol, sharpe, allocations };
+    return this.pointForWeights(best!.weights, assets, sigma);
   }
 
-  computeCovarianceMatrix(assets: AssetStats[]): CovarianceMatrix {
+  private pointForWeights(weights: number[], assets: AssetStats[], sigma: number[][]): EfficientFrontierPoint {
+    const mu = assets.map(a => a.expectedReturn);
+    const ret = this.dot(weights, mu);
+    const vol = Math.sqrt(Math.max(0, this.quadForm(weights, sigma)));
+    const sharpe = vol > 0 ? (ret - RISK_FREE_RATE) / vol : 0;
+    const allocations: Record<string, number> = {};
+    assets.forEach((a, i) => { allocations[a.symbol] = weights[i]; });
+    return { return: ret, volatility: vol, sharpe, allocations };
+  }
+
+  /**
+   * Long-only mean-variance solve via projected gradient descent onto the
+   * capped simplex (sum(w)=1, w>=0). Replaces the previous heuristic
+   * (non-convex closed-form guess) with a real convergent optimizer.
+   */
+  private solveMeanVariance(mu: number[], sigma: number[][], lambda: number): number[] {
+    const n = mu.length;
+    let w = this.projectSimplex(new Array(n).fill(1 / n));
+    const sigmaNorm = Math.max(...sigma.map(row => row.reduce((s, v) => s + Math.abs(v), 0)), 1e-12);
+    const step = 1 / (2 * lambda * sigmaNorm);
+
+    for (let iter = 0; iter < MAX_ITERATIONS; iter++) {
+      const grad = this.matVec(sigma, w).map((v, i) => 2 * lambda * v - mu[i]);
+      const next = this.projectSimplex(w.map((wi, i) => wi - step * grad[i]));
+      const change = next.reduce((s, v, i) => s + (v - w[i]) ** 2, 0);
+      w = next;
+      if (change < CONVERGENCE_TOL) break;
+    }
+    return w;
+  }
+
+  private solveTargetReturn(mu: number[], sigma: number[][], targetReturn: number): number[] {
+    const n = mu.length;
+    let w = this.projectSimplex(new Array(n).fill(1 / n));
+    const sigmaNorm = Math.max(...sigma.map(row => row.reduce((s, v) => s + Math.abs(v), 0)), 1e-12);
+    const muNormSq = this.dot(mu, mu);
+    let rho = 100 * Math.max(...sigma.map((row, i) => row[i]), 1e-8);
+
+    for (let round = 0; round < 8; round++) {
+      const step = 1 / (2 * (sigmaNorm + rho * muNormSq) + 1e-12);
+      for (let iter = 0; iter < MAX_ITERATIONS; iter++) {
+        const excess = this.dot(w, mu) - targetReturn;
+        const grad = this.matVec(sigma, w).map((v, i) => 2 * v + 2 * rho * excess * mu[i]);
+        const next = this.projectSimplex(w.map((wi, i) => wi - step * grad[i]));
+        const change = next.reduce((s, v, i) => s + (v - w[i]) ** 2, 0);
+        w = next;
+        if (change < CONVERGENCE_TOL) break;
+      }
+      const returnScale = Math.max(Math.abs(targetReturn), Math.max(...mu.map(Math.abs)), 1e-6);
+      if (Math.abs(this.dot(w, mu) - targetReturn) / returnScale < 1e-3) break;
+      rho *= 10;
+    }
+    return w;
+  }
+
+  /** Euclidean projection onto { w : sum(w) = 1, w >= 0 } via bisection. */
+  private projectSimplex(v: number[]): number[] {
+    const clipSum = (tau: number) => v.reduce((s, vi) => s + Math.max(0, vi - tau), 0);
+    let low = Math.min(...v) - 1;
+    let high = Math.max(...v);
+    for (let i = 0; i < 100; i++) {
+      const mid = (low + high) / 2;
+      if (clipSum(mid) > 1) low = mid;
+      else high = mid;
+    }
+    const tau = (low + high) / 2;
+    return v.map(vi => Math.max(0, vi - tau));
+  }
+
+  private matVec(m: number[][], v: number[]): number[] {
+    return m.map(row => row.reduce((s, mij, j) => s + mij * v[j], 0));
+  }
+
+  private dot(a: number[], b: number[]): number {
+    return a.reduce((s, ai, i) => s + ai * b[i], 0);
+  }
+
+  private quadForm(w: number[], sigma: number[][]): number {
+    return this.dot(w, this.matVec(sigma, w));
+  }
+
+  /**
+   * Historical/assumed covariance from per-asset volatilities and a fixed
+   * cross-asset correlation. Previously used Math.random() here, which made
+   * every call to this "deterministic" optimizer non-reproducible and
+   * untestable for exact values — replaced with a fixed constant so results
+   * are stable given the same inputs.
+   */
+  computeCovarianceMatrix(assets: AssetStats[], assumedCorrelation = 0.4): CovarianceMatrix {
     const n = assets.length;
     const symbols = assets.map(a => a.symbol);
     const matrix: number[][] = [];
@@ -154,8 +190,7 @@ export class MarkowitzOptimizer {
         if (i === j) {
           matrix[i][j] = assets[i].volatility ** 2;
         } else {
-          const corr = 0.3 + Math.random() * 0.2;
-          matrix[i][j] = corr * assets[i].volatility * assets[j].volatility;
+          matrix[i][j] = assumedCorrelation * assets[i].volatility * assets[j].volatility;
         }
       }
     }

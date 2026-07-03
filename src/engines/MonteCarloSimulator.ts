@@ -48,9 +48,14 @@ const DEFAULT_CONFIG: MonteCarloConfig = {
 
 export class MonteCarloSimulator {
   private config: MonteCarloConfig;
+  private rng: () => number;
 
   constructor(config: Partial<MonteCarloConfig> = {}) {
     this.config = { ...DEFAULT_CONFIG, ...config };
+    // Previously `seed` was accepted in config but silently ignored — every
+    // call used raw Math.random(), making "reproducible" runs impossible to
+    // test or replay. Now seeding actually seeds a deterministic PRNG.
+    this.rng = this.config.seed !== undefined ? mulberry32(this.config.seed) : Math.random;
   }
 
   simulate(input: MonteCarloInput): MonteCarloResult {
@@ -164,8 +169,8 @@ export class MonteCarloSimulator {
   }
 
   private normalRandom(): number {
-    const u1 = Math.random();
-    const u2 = Math.random();
+    const u1 = this.rng();
+    const u2 = this.rng();
     return Math.sqrt(-2 * Math.log(u1 + 0.0001)) * Math.cos(2 * Math.PI * u2);
   }
 
@@ -195,6 +200,18 @@ export class MonteCarloSimulator {
     const result = this.simulate(input);
     return result.probabilityOfTarget;
   }
+}
+
+/** Mulberry32 seeded PRNG — fast, deterministic, sufficient for Monte Carlo simulation. */
+function mulberry32(seed: number): () => number {
+  let a = seed >>> 0;
+  return () => {
+    a |= 0;
+    a = (a + 0x6d2b79f5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
 }
 
 export const monteCarloSimulator = new MonteCarloSimulator();

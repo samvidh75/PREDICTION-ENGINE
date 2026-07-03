@@ -38,14 +38,19 @@ function RouteFallback() {
   return (
     <div
       style={{
-        minHeight: "40vh",
+        minHeight: "100vh",
         display: "grid",
         placeItems: "center",
-        color: colors.textSecondary,
-        fontSize: typography.body.desktop.size,
+        color: "#ffffff",
+        fontSize: "18px",
+        fontFamily: "sans-serif",
+        backgroundColor: "#000000",
       }}
     >
-      Loading research…
+      <div style={{ textAlign: "center" }}>
+        <p>Loading research…</p>
+        <p style={{ fontSize: "12px", color: "#a0a0a0", marginTop: "20px" }}>If this takes too long, please reload the page.</p>
+      </div>
     </div>
   );
 }

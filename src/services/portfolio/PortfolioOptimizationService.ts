@@ -1,3 +1,11 @@
+/**
+ * Portfolio optimization input — each holding's expected return and volatility.
+ * Note: this service implements a simple risk-weighted heuristic allocator,
+ * NOT mean-variance optimization. For full Markowitz optimization with
+ * correlation matrices, see src/engines/MarkowitzOptimizer.ts (not yet wired
+ * to a public route, as it requires historical return series + covariance
+ * matrix computation, not just point estimates).
+ */
 export interface PortfolioOptimizationInput {
   symbol: string;
   expectedReturn: number;
@@ -51,6 +59,39 @@ function round(value: number, digits = 4): number {
   return Math.round(value * factor) / factor;
 }
 
+/**
+ * Estimate correlation between two holdings based on sector.
+ * Same sector: assume 0.7 correlation (strong co-movement).
+ * Different sector: assume 0.3 correlation (market-driven co-movement).
+ * Unknown sector: assume 0.3 (conservative).
+ */
+function estimateCorrelation(sectorA: string | null, sectorB: string | null): number {
+  if (!sectorA || !sectorB) return 0.3;
+  return sectorA === sectorB ? 0.7 : 0.3;
+}
+
+/**
+ * Compute portfolio volatility using covariance matrix estimated from
+ * individual volatilities and sector-based correlations. This is still
+ * approximate (real correlations vary daily), but more realistic than
+ * assuming zero correlation.
+ */
+function computePortfolioVolatility(
+  allocations: Array<{ targetWeight: number; volatility: number; sector: string | null }>,
+): number {
+  if (allocations.length === 0) return 0;
+  const n = allocations.length;
+  let variance = 0;
+  for (let i = 0; i < n; i++) {
+    for (let j = 0; j < n; j++) {
+      const corr = i === j ? 1 : estimateCorrelation(allocations[i].sector, allocations[j].sector);
+      const cov = corr * allocations[i].volatility * allocations[j].volatility;
+      variance += allocations[i].targetWeight * allocations[j].targetWeight * cov;
+    }
+  }
+  return Math.sqrt(Math.max(variance, 0));
+}
+
 function normalizeWeight(value: unknown): number | null {
   const parsed = typeof value === 'number' ? value : Number(value);
   if (!Number.isFinite(parsed) || parsed < 0) return null;
@@ -69,8 +110,16 @@ function normalizeVolatility(value: unknown): number | null {
   return parsed;
 }
 
+interface SanitizedHolding {
+  symbol: string;
+  expectedReturn: number;
+  volatility: number;
+  currentWeight: number;
+  sector: string | null;
+}
+
 function sanitizeHoldings(inputs: PortfolioOptimizationInput[]): {
-  holdings: Required<Pick<PortfolioOptimizationInput, 'symbol' | 'expectedReturn' | 'volatility' | 'currentWeight'>> & { sector: string | null }[];
+  holdings: SanitizedHolding[];
   diagnostics: string[];
 } {
   const diagnostics: string[] = [];
@@ -115,7 +164,7 @@ export function optimizePortfolio(inputs: PortfolioOptimizationInput[]): Portfol
   const scored = holdings.map((holding) => ({
     ...holding,
     score: holding.expectedReturn / holding.volatility,
-  }));
+  })) as any;
 
   const positiveScoreSum = scored.reduce((sum, holding) => sum + Math.max(holding.score, 0.01), 0);
   const rawTargets = scored.map((holding) => ({
@@ -128,11 +177,23 @@ export function optimizePortfolio(inputs: PortfolioOptimizationInput[]): Portfol
     targetWeight: Math.min(holding.targetWeight, 0.35),
   }));
   const cappedTotal = capped.reduce((sum, holding) => sum + holding.targetWeight, 0);
-  const allocations = capped
+  const normalized = capped.map((holding) => ({
+    ...holding,
+    targetWeight: holding.targetWeight / cappedTotal,
+  }));
+
+  // Compute portfolio volatility with sector-based correlation estimates
+  // before rounding, so we use precise weights for the calculation
+  const expectedPortfolioVolatility = round(
+    computePortfolioVolatility(normalized as Array<{ targetWeight: number; volatility: number; sector: string | null }>),
+    4,
+  );
+
+  const allocations = normalized
     .map((holding) => ({
       symbol: holding.symbol,
       currentWeight: round(holding.currentWeight, 4),
-      targetWeight: round(holding.targetWeight / cappedTotal, 4),
+      targetWeight: round(holding.targetWeight, 4),
       expectedReturn: round(holding.expectedReturn, 4),
       volatility: round(holding.volatility, 4),
       score: round(holding.score, 4),
@@ -142,10 +203,6 @@ export function optimizePortfolio(inputs: PortfolioOptimizationInput[]): Portfol
 
   const expectedPortfolioReturn = round(
     allocations.reduce((sum, holding) => sum + holding.targetWeight * holding.expectedReturn, 0),
-    4,
-  );
-  const expectedPortfolioVolatility = round(
-    Math.sqrt(allocations.reduce((sum, holding) => sum + (holding.targetWeight ** 2) * (holding.volatility ** 2), 0)),
     4,
   );
 

@@ -19,6 +19,7 @@ const queryClient = new QueryClient({
 
 export default function App() {
   useEffect(() => {
+    console.log('[App] Mounting');
     analytics.init();
     return () => analytics.destroy();
   }, []);

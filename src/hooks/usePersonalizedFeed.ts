@@ -43,23 +43,28 @@ export function usePersonalizedFeed() {
   useEffect(() => {
     let cancelled = false;
     async function load() {
-      const result = await selfLearningEngine.getInsights();
-      if (cancelled) return;
-      setInsights(result);
-      const fromInsights = result.slice(0, 5).map((i) => i.symbol);
-      const lists = await vault.getWatchlists();
-      if (cancelled) return;
-      const seen = new Set(fromInsights);
-      const watchlistSymbols: string[] = [];
-      for (const list of lists) {
-        for (const t of list.tickers) {
-          if (!seen.has(t)) {
-            watchlistSymbols.push(t);
-            seen.add(t);
+      try {
+        const result = await selfLearningEngine.getInsights();
+        if (cancelled) return;
+        setInsights(result);
+        const fromInsights = result.slice(0, 5).map((i) => i.symbol);
+        const lists = await vault.getWatchlists();
+        if (cancelled) return;
+        const seen = new Set(fromInsights);
+        const watchlistSymbols: string[] = [];
+        for (const list of lists) {
+          for (const t of list.tickers) {
+            if (!seen.has(t)) {
+              watchlistSymbols.push(t);
+              seen.add(t);
+            }
           }
         }
+        setTopSymbols([...fromInsights, ...watchlistSymbols].slice(0, 5));
+      } catch (error) {
+        console.error('[usePersonalizedFeed] Error loading feed:', error);
+        setTopSymbols([]);
       }
-      setTopSymbols([...fromInsights, ...watchlistSymbols].slice(0, 5));
     }
     load();
     return () => { cancelled = true; };

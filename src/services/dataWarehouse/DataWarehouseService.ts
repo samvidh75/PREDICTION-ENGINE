@@ -1,3 +1,5 @@
+import { getStockUniverseAdapter } from '../data/providers/StockUniverseAdapter.js';
+
 export interface OLAPQuery {
   measures: string[];
   dimensions: string[];
@@ -35,27 +37,35 @@ export interface MaterializedView {
   lastRefreshed: string | null;
 }
 
+// Previously this service backed every query with generateMockData(), which
+// fabricated 100 stocks using Math.random() for P/E, ROE, revenue growth,
+// debt-to-equity, profit, revenue and volatility — meaning the live
+// /api/analytics/* and /api/screener/* endpoints served entirely fake
+// numbers. Real per-symbol fundamentals (P/E, ROE, debt/equity, etc.) exist
+// in FinancialEngine but only as an expensive per-symbol call — there is no
+// bulk fundamentals dataset to screen 8,500+ stocks against. What *is* real
+// and bulk-available is the bundled stock-universe.json (StockUniverseAdapter):
+// real symbol/sector/market-cap for ~8,500 NSE/BSE names, plus 0-100 factor
+// scores (quality, valuation, growth, momentum, risk, health) computed from
+// real fundamentals+price data at generation time. The metric/dimension
+// catalog below reflects only what is actually real and queryable now.
 export class DataWarehouseService {
   private metrics: DataWarehouseMetric[] = [
-    { name: 'revenue', expression: 'SUM(revenue)', description: 'Total revenue', dataType: 'currency' },
-    { name: 'profit', expression: 'SUM(profit)', description: 'Net profit', dataType: 'currency' },
-    { name: 'market_cap', expression: 'AVG(market_cap)', description: 'Market capitalization', dataType: 'currency' },
-    { name: 'pe_ratio', expression: 'AVG(pe_ratio)', description: 'Price-to-earnings ratio', dataType: 'ratio' },
-    { name: 'roe', expression: 'AVG(roe)', description: 'Return on equity', dataType: 'percentage' },
-    { name: 'debt_to_equity', expression: 'AVG(debt_to_equity)', description: 'Debt-to-equity ratio', dataType: 'ratio' },
-    { name: 'revenue_growth', expression: 'AVG(revenue_growth)', description: 'Revenue growth rate', dataType: 'percentage' },
-    { name: 'profit_growth', expression: 'AVG(profit_growth)', description: 'Profit growth rate', dataType: 'percentage' },
-    { name: 'volume', expression: 'SUM(volume)', description: 'Trading volume', dataType: 'number' },
-    { name: 'volatility', expression: 'AVG(volatility)', description: 'Price volatility', dataType: 'percentage' },
+    { name: 'market_cap', expression: 'market_cap', description: 'Market capitalization (₹ crore)', dataType: 'currency' },
+    { name: 'quality_score', expression: 'quality_score', description: 'Quality factor score (0-100)', dataType: 'number' },
+    { name: 'valuation_score', expression: 'valuation_score', description: 'Valuation factor score (0-100, higher = cheaper)', dataType: 'number' },
+    { name: 'growth_score', expression: 'growth_score', description: 'Growth factor score (0-100)', dataType: 'number' },
+    { name: 'momentum_score', expression: 'momentum_score', description: 'Price momentum factor score (0-100)', dataType: 'number' },
+    { name: 'risk_score', expression: 'risk_score', description: 'Risk factor score (0-100, higher = riskier)', dataType: 'number' },
+    { name: 'health_score', expression: 'health_score', description: 'Financial health factor score (0-100)', dataType: 'number' },
+    { name: 'risk_adjusted_score', expression: 'risk_adjusted_score', description: 'Risk-adjusted composite score (0-100)', dataType: 'number' },
   ];
 
   private dimensions: DataWarehouseDimension[] = [
     { name: 'sector', description: 'Industry sector classification', cardinality: 'low' },
     { name: 'symbol', description: 'Stock ticker symbol', cardinality: 'high' },
-    { name: 'trade_date', description: 'Trading date', cardinality: 'high' },
-    { name: 'market_cap_category', description: 'Large/Mid/Small cap', cardinality: 'low' },
-    { name: 'pe_category', description: 'PE ratio bucket', cardinality: 'low' },
-    { name: 'listing_status', description: 'Active/Delisted status', cardinality: 'low' },
+    { name: 'exchange', description: 'NSE or BSE', cardinality: 'low' },
+    { name: 'market_cap_category', description: 'Large/Mid/Small/Micro cap', cardinality: 'low' },
   ];
 
   private views: MaterializedView[] = [
@@ -94,8 +104,8 @@ export class DataWarehouseService {
   executeQuery(query: OLAPQuery): OLAPResult {
     const startTime = performance.now();
 
-    const mockData = this.generateMockData(query);
-    const filtered = this.applyFilters(mockData, query.filters ?? []);
+    const rows = this.loadUniverseRows();
+    const filtered = this.applyFilters(rows, query.filters ?? []);
     const sorted = this.applySorting(filtered, query.sortBy, query.sortOrder);
     const limited = sorted.slice(0, query.limit ?? 100);
     const grouped: Record<string, unknown>[][] = query.groupBy
@@ -114,7 +124,7 @@ export class DataWarehouseService {
 
   runScreener(filters: OLAPQuery['filters'], sortBy?: string, limit?: number): OLAPResult {
     return this.executeQuery({
-      measures: ['market_cap', 'pe_ratio', 'roe', 'revenue_growth', 'debt_to_equity'],
+      measures: ['market_cap', 'quality_score', 'valuation_score', 'growth_score', 'risk_adjusted_score'],
       dimensions: ['symbol', 'sector'],
       filters,
       sortBy,
@@ -123,7 +133,7 @@ export class DataWarehouseService {
     });
   }
 
-  saveScreener(name: string, query: OLAPQuery): string {
+  saveScreener(name: string, _query: OLAPQuery): string {
     return `${name}_${Date.now()}`;
   }
 
@@ -189,25 +199,37 @@ export class DataWarehouseService {
     return result;
   }
 
-  private generateMockData(_query: OLAPQuery): Record<string, unknown>[] {
-    const sectors = ['Technology', 'Finance', 'Healthcare', 'Energy', 'Consumer', 'Industrial'];
-    const data: Record<string, unknown>[] = [];
-    for (let i = 0; i < 100; i++) {
-      data.push({
-        symbol: `STOCK${i}`,
-        sector: sectors[i % sectors.length],
-        market_cap: 1000 + Math.random() * 500000,
-        pe_ratio: 5 + Math.random() * 50,
-        roe: -10 + Math.random() * 40,
-        revenue_growth: -20 + Math.random() * 60,
-        debt_to_equity: Math.random() * 3,
-        profit: Math.random() * 10000,
-        revenue: Math.random() * 50000,
-        volume: Math.floor(Math.random() * 10000000),
-        volatility: 10 + Math.random() * 40,
-      });
-    }
-    return data;
+  private universeRowsCache: Record<string, unknown>[] | null = null;
+
+  /**
+   * Loads the real bundled stock universe (~8,500 NSE/BSE names) and flattens
+   * each entry's factor scores into queryable columns. Cached in memory since
+   * StockUniverseAdapter itself only reloads the underlying file on demand.
+   */
+  private loadUniverseRows(): Record<string, unknown>[] {
+    if (this.universeRowsCache) return this.universeRowsCache;
+
+    const entries = getStockUniverseAdapter().getAllEntries();
+    this.universeRowsCache = entries.map(entry => ({
+      symbol: entry.symbol,
+      sector: entry.sector ?? 'Unknown',
+      exchange: entry.exchange ?? 'UNKNOWN',
+      market_cap_category: entry.marketCapCategory ?? 'Unknown',
+      market_cap: entry.marketCap ?? 0,
+      quality_score: entry.scores?.quality ?? null,
+      valuation_score: entry.scores?.valuation ?? null,
+      growth_score: entry.scores?.growth ?? null,
+      momentum_score: entry.scores?.momentum ?? null,
+      risk_score: entry.scores?.risk ?? null,
+      health_score: entry.scores?.health ?? null,
+      risk_adjusted_score: entry.scores?.riskAdjusted ?? null,
+    }));
+    return this.universeRowsCache;
+  }
+
+  /** Force a reload from disk on the next query (e.g. after the universe file is refreshed). */
+  invalidateCache(): void {
+    this.universeRowsCache = null;
   }
 }
 

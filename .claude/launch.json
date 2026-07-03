@@ -1,0 +1,75 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "Vite Frontend Dev",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "port": 5174,
+      "description": "React + TypeScript frontend dev server with Vite"
+    },
+    {
+      "name": "Backend Dev Server",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "start:dev"],
+      "port": 4001,
+      "description": "Node.js/TypeScript backend (Fastify) dev server"
+    },
+    {
+      "name": "Docker Compose Full Stack",
+      "runtimeExecutable": "docker-compose",
+      "runtimeArgs": ["-f", "docker-compose.yml", "up", "-d"],
+      "port": 4001,
+      "description": "All services: API (4001), Ollama (11434), Qdrant (6333), Prometheus (9090), Grafana (3001)"
+    },
+    {
+      "name": "Ollama (LLM Inference)",
+      "runtimeExecutable": "docker",
+      "runtimeArgs": ["run", "-d", "--name", "stockstory_ollama", "-p", "11434:11434", "ollama/ollama:latest"],
+      "port": 11434,
+      "description": "Free LLM inference server (replaces OpenAI API)"
+    },
+    {
+      "name": "SGLang (Fast LLM Server)",
+      "runtimeExecutable": "docker-compose",
+      "runtimeArgs": ["-f", "docker-compose.yml", "up", "-d", "sglang"],
+      "port": 8000,
+      "description": "Optimized LLM inference server with optional GPU acceleration"
+    },
+    {
+      "name": "Qdrant (Vector Database)",
+      "runtimeExecutable": "docker",
+      "runtimeArgs": ["run", "-d", "--name", "stockstory_qdrant", "-p", "6333:6333", "-p", "6334:6334", "qdrant/qdrant:latest"],
+      "port": 6333,
+      "description": "Free vector database for embeddings (replaces Pinecone)"
+    },
+    {
+      "name": "PostgreSQL Database",
+      "runtimeExecutable": "docker-compose",
+      "runtimeArgs": ["-f", "docker-compose.yml", "up", "-d", "postgres"],
+      "port": 5432,
+      "description": "PostgreSQL database (internal only, no public port)"
+    },
+    {
+      "name": "Redis Cache",
+      "runtimeExecutable": "docker-compose",
+      "runtimeArgs": ["-f", "docker-compose.yml", "up", "-d", "redis"],
+      "port": 6379,
+      "description": "Redis cache (internal only, no public port)"
+    },
+    {
+      "name": "Prometheus (Metrics)",
+      "runtimeExecutable": "docker-compose",
+      "runtimeArgs": ["-f", "docker-compose.yml", "up", "-d", "prometheus"],
+      "port": 9090,
+      "description": "Prometheus time-series metrics (free DataDog alternative)"
+    },
+    {
+      "name": "Grafana (Dashboards)",
+      "runtimeExecutable": "docker-compose",
+      "runtimeArgs": ["-f", "docker-compose.yml", "up", "-d", "grafana"],
+      "port": 3001,
+      "description": "Grafana dashboards (access at http://localhost:3001, admin/admin)"
+    }
+  ]
+}
