@@ -6,14 +6,67 @@ import { ZerodhaProvider } from '../../../services/brokers/ZerodhaProvider';
 interface BrokerHandler {
   name: string;
   displayName: string;
+  tier: 1 | 2 | 3;
   initiateAuth(redirectUri: string, state: string): Promise<string>;
   exchangeCode(code: string, redirectUri: string): Promise<{ accessToken: string; refreshToken?: string; expiresAt?: number; tokenType?: string; brokerUserId?: string }>;
+}
+
+function makeGenericOAuthHandler(config: {
+  name: string;
+  displayName: string;
+  tier: 1 | 2 | 3;
+  clientIdKey: string;
+  authUrl: string;
+  tokenUrl: string;
+  scope?: string;
+}): BrokerHandler {
+  return {
+    name: config.name,
+    displayName: config.displayName,
+    tier: config.tier,
+    async initiateAuth(redirectUri, state) {
+      const clientId = process.env[config.clientIdKey] || '';
+      const params = new URLSearchParams({
+        client_id: clientId,
+        redirect_uri: redirectUri,
+        response_type: 'code',
+        state,
+      });
+      if (config.scope) params.set('scope', config.scope);
+      return `${config.authUrl}?${params.toString()}`;
+    },
+    async exchangeCode(code, redirectUri) {
+      const clientId = process.env[config.clientIdKey] || '';
+      const clientSecret = process.env[`${config.name.toUpperCase()}_CLIENT_SECRET`] || '';
+      const resp = await fetch(config.tokenUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          code,
+          client_id: clientId,
+          client_secret: clientSecret,
+          redirect_uri: redirectUri,
+          grant_type: 'authorization_code',
+        }).toString(),
+      });
+      if (!resp.ok) throw new Error(`${config.name} token exchange failed: ${resp.status}`);
+      const data: any = await resp.json();
+      return {
+        accessToken: data.access_token,
+        refreshToken: data.refresh_token,
+        expiresAt: data.expires_in ? Date.now() + data.expires_in * 1000 : undefined,
+        tokenType: data.token_type || 'Bearer',
+        brokerUserId: data.user_id || data.account_id || undefined,
+      };
+    },
+  };
 }
 
 function makeZerodhaHandler(): BrokerHandler {
   return {
     name: 'zerodha',
     displayName: 'Zerodha',
+    tier: 1,
     async initiateAuth(redirectUri, state) {
       return new ZerodhaProvider().initiateAuth(redirectUri, state);
     },
@@ -28,6 +81,7 @@ function makeUpstoxHandler(): BrokerHandler {
   return {
     name: 'upstox',
     displayName: 'Upstox',
+    tier: 1,
     async initiateAuth(_redirectUri, state) {
       const pkce = UpstoxOAuth.generatePKCE();
       return UpstoxOAuth.buildAuthUrl({ clientId, redirectUri: _redirectUri, state, codeChallenge: pkce.challenge });
@@ -42,6 +96,36 @@ function makeUpstoxHandler(): BrokerHandler {
 const BROKER_HANDLERS: Record<string, BrokerHandler> = {
   zerodha: makeZerodhaHandler(),
   upstox: makeUpstoxHandler(),
+  groww: makeGenericOAuthHandler({
+    name: 'groww', displayName: 'Groww', tier: 1,
+    clientIdKey: 'GROWW_CLIENT_ID', scope: 'full_access',
+    authUrl: 'https://api.groww.in/oauth/authorize',
+    tokenUrl: 'https://api.groww.in/oauth/token',
+  }),
+  '5paisa': makeGenericOAuthHandler({
+    name: '5paisa', displayName: '5paisa', tier: 2,
+    clientIdKey: 'FIVEPAISA_CLIENT_ID',
+    authUrl: 'https://openapi.5paisa.com/V1/Login',
+    tokenUrl: 'https://openapi.5paisa.com/V1/Login/RequestToken',
+  }),
+  shoonya: makeGenericOAuthHandler({
+    name: 'shoonya', displayName: 'Shoonya', tier: 2,
+    clientIdKey: 'SHOONYA_CLIENT_ID',
+    authUrl: 'https://api.shoonya.com/NorenW/NorenWBridge/Login',
+    tokenUrl: 'https://api.shoonya.com/NorenW/NorenWBridge/Token',
+  }),
+  finvasia: makeGenericOAuthHandler({
+    name: 'finvasia', displayName: 'Finvasia', tier: 2,
+    clientIdKey: 'FINVASIA_CLIENT_ID',
+    authUrl: 'https://auth.finvasia.com/connect/authorize',
+    tokenUrl: 'https://auth.finvasia.com/connect/token',
+  }),
+  angelone: makeGenericOAuthHandler({
+    name: 'angelone', displayName: 'Angel One', tier: 3,
+    clientIdKey: 'ANGELONE_CLIENT_ID',
+    authUrl: 'https://smartapi.angelbroking.com/auth/login',
+    tokenUrl: 'https://smartapi.angelbroking.com/auth/token',
+  }),
 };
 
 export async function registerBrokerAuthRoutes(app: FastifyInstance) {
@@ -165,6 +249,7 @@ export async function registerBrokerAuthRoutes(app: FastifyInstance) {
       brokers: Object.entries(BROKER_HANDLERS).map(([name, h]) => ({
         name,
         displayName: h.displayName,
+        tier: h.tier,
       })),
     });
   });
