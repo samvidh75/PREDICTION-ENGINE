@@ -756,24 +756,31 @@ export default async function registerApiRoutes(server: FastifyInstance) {
     const { cleanSymbol, exchangeSuffix } = parseSymbol(symbol);
 
     try {
-      const [yahoo, fund, synthetic] = await Promise.all([
-        yahooQuote(cleanSymbol, exchangeSuffix),
-        indianApiFunds(cleanSymbol),
-        getPersistedStockResearch(cleanSymbol).catch(() => null),
+      const [yahoo, fund] = await Promise.all([
+        yahooQuote(cleanSymbol, exchangeSuffix).catch(() => null),
+        indianApiFunds(cleanSymbol).catch(() => null),
       ]);
 
+      if (!yahoo?.price) {
+        return reply.status(503).send({
+          error: "Data temporarily unavailable",
+          message: "Market data providers are not responding. Please try again in a moment.",
+          retryAfter: 30,
+        });
+      }
+
       const fundData = fund || {};
-      const price = yahoo?.price ?? synthetic?.price ?? 0;
-      const marketCapCr = Math.round(((yahoo?.marketCap ?? synthetic?.marketCap ?? 0) / 1e7) * 100) / 100;
-      const sector = synthetic?.sector || "Diversified";
+      const price = yahoo.price;
+      const marketCapCr = Math.round(((yahoo.marketCap ?? 0) / 1e7) * 100) / 100;
+      const sector = (fundData.sector as string) || "Diversified";
 
       const metrics: FinancialMetrics = {
-        roe: n(fundData.roe ?? fundData.return_on_equity) ?? synthetic?.roe ?? undefined,
+        roe: n(fundData.roe ?? fundData.return_on_equity) ?? undefined,
         netMargin: n(fundData.net_margin ?? fundData.net_profit_margin) ?? undefined,
         operatingMargin: n(fundData.operating_margin ?? fundData.ebitda_margin) ?? undefined,
-        revenueGrowth: n(fundData.revenue_growth_3y ?? fundData.revenue_growth) ?? synthetic?.revenueGrowth ?? undefined,
+        revenueGrowth: n(fundData.revenue_growth_3y ?? fundData.revenue_growth) ?? undefined,
         epsGrowth: n(fundData.eps_growth_3y ?? fundData.eps_growth) ?? undefined,
-        debtToEquity: n(fundData.debt_to_equity) ?? synthetic?.debtToEquity ?? undefined,
+        debtToEquity: n(fundData.debt_to_equity) ?? undefined,
         interestCoverage: n(fundData.interest_coverage) ?? undefined,
         marketCap: marketCapCr,
         currentRatio: n(fundData.current_ratio) ?? undefined,
@@ -843,26 +850,33 @@ export default async function registerApiRoutes(server: FastifyInstance) {
     const { cleanSymbol, exchangeSuffix } = parseSymbol(symbol);
 
     try {
-      const [yahoo, fund, synthetic, priceHistory] = await Promise.all([
-        yahooQuote(cleanSymbol, exchangeSuffix),
-        indianApiFunds(cleanSymbol),
-        getPersistedStockResearch(cleanSymbol).catch(() => null),
-        yahooPriceHistory(cleanSymbol, exchangeSuffix),
+      const [yahoo, fund, priceHistory] = await Promise.all([
+        yahooQuote(cleanSymbol, exchangeSuffix).catch(() => null),
+        indianApiFunds(cleanSymbol).catch(() => null),
+        yahooPriceHistory(cleanSymbol, exchangeSuffix).catch(() => null),
       ]);
 
+      if (!yahoo?.price) {
+        return reply.status(503).send({
+          error: "Data temporarily unavailable",
+          message: "Market data providers are not responding. Please try again in a moment.",
+          retryAfter: 30,
+        });
+      }
+
       const fundData = fund || {};
-      const price = yahoo?.price ?? synthetic?.price ?? 0;
-      const marketCapCr = Math.round(((yahoo?.marketCap ?? synthetic?.marketCap ?? 0) / 1e7) * 100) / 100;
+      const price = yahoo.price;
+      const marketCapCr = Math.round(((yahoo.marketCap ?? 0) / 1e7) * 100) / 100;
 
       // Compute volatility from price history
-      const dailyFrame = priceHistory["1M"] || priceHistory["3M"] || [];
+      const dailyFrame = (priceHistory || {})["1M"] || (priceHistory || {})["3M"] || [];
       const dailyPrices = dailyFrame.map((p: { price: number }) => p.price).filter((p: number) => p > 0);
       const volatility = dailyPrices.length >= 5
         ? computeVolatility(dailyPrices)
         : undefined;
 
       // Compute 52-week range
-      const yearFrame = priceHistory["1Y"] || [];
+      const yearFrame = (priceHistory || {})["1Y"] || [];
       const yearPrices = yearFrame.map((p: { price: number }) => p.price).filter((p: number) => p > 0);
       let weeklyRange: number | undefined;
       if (yearPrices.length > 1 && price > 0) {
@@ -877,7 +891,7 @@ export default async function registerApiRoutes(server: FastifyInstance) {
         beta: undefined, // Requires market index comparison — not available in basic fetch
         maxDrawdown: undefined,
         weeklyRange,
-        debtToEquity: n(fundData.debt_to_equity) ?? synthetic?.debtToEquity ?? undefined,
+        debtToEquity: n(fundData.debt_to_equity) ?? undefined,
         currentRatio: n(fundData.current_ratio) ?? undefined,
         interestCoverage: n(fundData.interest_coverage) ?? undefined,
         cashReserves: undefined,
@@ -925,19 +939,26 @@ export default async function registerApiRoutes(server: FastifyInstance) {
     const { cleanSymbol, exchangeSuffix } = parseSymbol(symbol);
 
     try {
-      const [yahoo, fund, synthetic] = await Promise.all([
-        yahooQuote(cleanSymbol, exchangeSuffix),
-        indianApiFunds(cleanSymbol),
-        getPersistedStockResearch(cleanSymbol).catch(() => null),
+      const [yahoo, fund] = await Promise.all([
+        yahooQuote(cleanSymbol, exchangeSuffix).catch(() => null),
+        indianApiFunds(cleanSymbol).catch(() => null),
       ]);
 
-      const fundData = fund || {};
-      const price = yahoo?.price ?? synthetic?.price ?? 0;
+      if (!yahoo?.price) {
+        return reply.status(503).send({
+          error: "Data temporarily unavailable",
+          message: "Market data providers are not responding. Please try again in a moment.",
+          retryAfter: 30,
+        });
+      }
 
-      // Build synthetic earnings history from available data
-      const eps = n(fundData.eps) ?? synthetic?.eps ?? 0;
-      const revenueGrowthYoY = n(fundData.revenue_growth_1y ?? fundData.revenue_growth) ?? synthetic?.revenueGrowth ?? 0;
-      const profitGrowth = n(fundData.profit_growth) ?? synthetic?.profitGrowth ?? 0;
+      const fundData = fund || {};
+      const price = yahoo.price;
+
+      // Build earnings history from available data
+      const eps = n(fundData.eps) ?? 0;
+      const revenueGrowthYoY = n(fundData.revenue_growth_1y ?? fundData.revenue_growth) ?? 0;
+      const profitGrowth = n(fundData.profit_growth) ?? 0;
       const netMargin = n(fundData.net_margin ?? fundData.net_profit_margin) ?? undefined;
       const forwardPE = n(fundData.forward_pe ?? fundData.pe_ratio) ?? undefined;
       const peg = n(fundData.peg_ratio) ?? undefined;
@@ -993,10 +1014,9 @@ export default async function registerApiRoutes(server: FastifyInstance) {
     if (!symbol) return reply.status(400).send({ error: "symbol required" });
 
     try {
-      const [yahoo, fund, synthetic] = await Promise.all([
-        yahooQuote(symbol),
-        indianApiFunds(symbol),
-        getPersistedStockResearch(symbol).catch(() => null),
+      const [yahoo, fund] = await Promise.all([
+        yahooQuote(symbol).catch(() => null),
+        indianApiFunds(symbol).catch(() => null),
       ]);
 
       const fundData = fund || {};
@@ -1025,7 +1045,7 @@ export default async function registerApiRoutes(server: FastifyInstance) {
         direction: 'neutral',
       });
 
-      const revenueGrowth = n(fundData.revenue_growth_1y ?? fundData.revenue_growth) ?? synthetic?.revenueGrowth ?? 0;
+      const revenueGrowth = n(fundData.revenue_growth_1y ?? fundData.revenue_growth) ?? 0;
 
       const metrics: EventMetrics = {
         events,
