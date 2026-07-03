@@ -35,7 +35,6 @@ export async function registerLiveQuotesRoute(app: FastifyInstance) {
 
       subscriptions.set(clientId, subscription);
 
-      console.log(`Client ${clientId} connected with symbols:`, initialSymbols);
 
       socket.on('message', (message: string) => {
         try {
@@ -57,7 +56,6 @@ export async function registerLiveQuotesRoute(app: FastifyInstance) {
 
       socket.on('close', () => {
         subscriptions.delete(clientId);
-        console.log(`Client ${clientId} disconnected`);
       });
     }
   );
@@ -118,5 +116,4 @@ async function startQuoteBroadcaster() {
     }
   }, broadcastInterval);
 
-  console.log('Quote broadcaster started (500ms interval)');
 }

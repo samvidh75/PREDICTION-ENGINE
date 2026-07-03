@@ -32,7 +32,6 @@ export async function initializeModel() {
     return null;
   }
 
-  console.log('Loading quantized Gemma-2B model...');
 
   try {
     const modelPath = '/models/stockstory_gemma_2b_q4.onnx';
@@ -48,7 +47,6 @@ export async function initializeModel() {
 
     tokenizer = await loadTokenizer();
 
-    console.log('Model loaded successfully');
     return { session: modelSession, tokenizer };
   } catch (err) {
     console.error('Model loading failed:', err);
@@ -228,7 +226,6 @@ export async function generateExplanation(
 
     const output = tokenizer.decode(generatedTokens.slice(inputIds.length));
 
-    console.log(`Generated ${generatedTokens.length} tokens for ${promptType}`);
 
     return output
       .trim()

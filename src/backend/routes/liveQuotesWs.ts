@@ -63,7 +63,6 @@ export class LiveQuoteServer {
     const clientId = `client_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
     const subscription: ClientSubscription = { ws, symbols: new Set(), isAlive: true };
     this.clients.set(clientId, subscription);
-    console.log(`[WS] Client connected: ${clientId}`);
 
     ws.on('pong', () => { subscription.isAlive = true; });
 
@@ -78,7 +77,6 @@ export class LiveQuoteServer {
 
     ws.on('close', () => {
       this.clients.delete(clientId);
-      console.log(`[WS] Client disconnected: ${clientId}`);
     });
 
     ws.on('error', (err: Error) => {
@@ -96,14 +94,12 @@ export class LiveQuoteServer {
   private handleClientMessage(clientId: string, subscription: ClientSubscription, msg: any) {
     if (msg.type === 'subscribe' && Array.isArray(msg.symbols)) {
       for (const sym of msg.symbols) subscription.symbols.add(sym.toUpperCase());
-      console.log(`[WS] ${clientId} subscribed to ${msg.symbols.join(', ')}`);
       for (const sym of subscription.symbols) {
         const cached = this.quoteCache.get(sym);
         if (cached) subscription.ws.send(JSON.stringify(cached));
       }
     } else if (msg.type === 'unsubscribe' && Array.isArray(msg.symbols)) {
       for (const sym of msg.symbols) subscription.symbols.delete(sym.toUpperCase());
-      console.log(`[WS] ${clientId} unsubscribed from ${msg.symbols.join(', ')}`);
     }
   }
 
@@ -168,7 +164,6 @@ export class LiveQuoteServer {
     this.healthCheckInterval = setInterval(() => {
       for (const [clientId, sub] of this.clients) {
         if (!sub.isAlive) {
-          console.log(`[WS] Terminating dead client: ${clientId}`);
           sub.ws.close();
           this.clients.delete(clientId);
           continue;
@@ -192,7 +187,6 @@ export async function registerLiveQuotesWs(app: FastifyInstance) {
   server.register();
   server.startBroadcast();
   process.on('SIGTERM', () => {
-    console.log('[WS] Shutting down gracefully...');
     server.stopBroadcast();
   });
 }

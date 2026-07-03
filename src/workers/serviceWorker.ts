@@ -87,7 +87,6 @@ async function fetchWithFallback(
 
   const cached = await getCachedData(storeName, symbol);
   if (cached) {
-    console.log(`Using cached ${dataType} for ${symbol}`);
     return cached;
   }
 
@@ -103,7 +102,6 @@ async function fetchWithFallback(
         reject(new Error(error));
       } else {
         await cacheData(storeName as any, symbol, data, ttl);
-        console.log(`Fetched ${dataType} for ${symbol} from ${source}`);
         resolve(data);
       }
 
@@ -139,4 +137,3 @@ self.addEventListener('activate', (event: ExtendableEvent) => {
   event.waitUntil(self.clients.claim());
 });
 
-console.log('Service Worker initialized');

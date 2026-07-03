@@ -11,7 +11,7 @@ export function logEvent(event: string, data: Record<string, unknown>, level: 'i
   } else if (level === 'warn') {
     console.warn(JSON.stringify(entry));
   } else {
-    console.log(JSON.stringify(entry));
+    console.info(JSON.stringify(entry));
   }
 }
 

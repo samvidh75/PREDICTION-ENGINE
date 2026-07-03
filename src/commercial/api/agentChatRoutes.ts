@@ -123,7 +123,6 @@ export async function agentChatRoutes(fastify: FastifyInstance) {
     const symbol = ticker.toUpperCase().replace('.NS', '').replace('.BO', '').trim();
 
     try {
-      console.log(`Invoking precision calculation kernel for: ${symbol}`);
       const { stdout } = await execPromise(`python3 scripts/python/slm_math_runtime.py --ticker ${symbol}`);
       const mathContext = JSON.parse(stdout);
 

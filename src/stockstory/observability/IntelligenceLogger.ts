@@ -54,13 +54,11 @@ export class IntelligenceLogger {
       process.stdout.write(JSON.stringify(entry) + '\n');
     } else {
       const prefix = `[${entry.timestamp.split('T')[1].split('.')[0]}] [${level.toUpperCase().padEnd(5)}] [${this.module}]`;
-      console.log(`${prefix} ${message}`);
 
       if (data && Object.keys(data).length > 0) {
         const sanitized = this.scrub(data);
         for (const [k, v] of Object.entries(sanitized)) {
           const display = typeof v === 'string' && v.length > 150 ? v.slice(0, 150) + '...' : v;
-          console.log(`   ${k}: ${String(display)}`);
         }
       }
     }

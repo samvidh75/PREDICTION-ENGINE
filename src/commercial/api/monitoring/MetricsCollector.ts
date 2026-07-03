@@ -32,7 +32,6 @@ export class MetricsCollector {
     this.heartbeatTimer = setInterval(() => {
       this.recordSystemHeartbeat().catch(console.error);
     }, 60000); // Sample performance metrics every 60 seconds
-    console.log("📈 MetricsCollector telemetry system activated.");
   }
 
   public static stopCollector() {

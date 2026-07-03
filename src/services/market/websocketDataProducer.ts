@@ -52,7 +52,6 @@ async function fetchLatestPrices(): Promise<TickerTick[]> {
 export function startWebSocketDataProducer(broadcastFn: (ticker: string, price: number, changePct: number) => void): void {
   if (producerInterval) return; // already running
 
-  console.log("[ws-producer] Starting WebSocket data producer (poll interval:", POLL_INTERVAL_MS, "ms)");
 
   producerInterval = setInterval(async () => {
     const now = Date.now();
@@ -79,6 +78,5 @@ export function stopWebSocketDataProducer(): void {
   if (producerInterval) {
     clearInterval(producerInterval);
     producerInterval = null;
-    console.log("[ws-producer] Stopped WebSocket data producer");
   }
 }

@@ -75,9 +75,6 @@ export class AsymmetricDataGateway {
       }
 
       // 3. Cache stale or missing — execute free web extraction
-      console.log(
-        `[asymmetric] Cache stale for ${symbol}. Executing anonymous pass-through web sync...`,
-      );
       return await this.executeWebIngestionSync(symbol);
     } catch (error) {
       console.error(

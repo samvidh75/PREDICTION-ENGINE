@@ -261,11 +261,9 @@ async function fetchAggregatedData(
 self.onmessage = async (event: MessageEvent<DataFetchRequest>) => {
   const { symbol, dataType, params } = event.data;
 
-  console.log(`WebGPU Worker: Fetching ${dataType} for ${symbol}`);
 
   const response = await fetchAggregatedData(symbol, dataType);
 
   self.postMessage(response);
 };
 
-console.log('WebGPU Data Worker initialized');

@@ -35,7 +35,6 @@ export default function LiveAlertSentinel() {
     const socket = new WebSocket(wsUrl);
 
     socket.onopen = () => {
-      console.log("📡 LiveAlertSentinel initialized. Subscribing to master core tracking targets...");
       socket.send(
         JSON.stringify({
           type: "subscribe",

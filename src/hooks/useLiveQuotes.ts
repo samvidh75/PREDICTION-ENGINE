@@ -59,7 +59,6 @@ export function useLiveQuotes(
         const ws = new WebSocket(wsUrl);
 
         ws.onopen = () => {
-          console.log('[WS] Connected');
           setIsConnected(true);
 
           ws.send(JSON.stringify({
@@ -73,7 +72,6 @@ export function useLiveQuotes(
             const data = JSON.parse(event.data);
 
             if (data.type === 'connected') {
-              console.log('[WS] Greeting:', data.message);
               return;
             }
 
@@ -114,7 +112,6 @@ export function useLiveQuotes(
         };
 
         ws.onclose = () => {
-          console.log('[WS] Disconnected');
           setIsConnected(false);
 
           reconnectTimeoutRef.current = setTimeout(() => {

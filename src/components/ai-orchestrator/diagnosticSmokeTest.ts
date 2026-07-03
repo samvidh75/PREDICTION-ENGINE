@@ -197,20 +197,13 @@ export function formatSmokeTestResult(result: SmokeTestResult): string {
 }
 
 export async function runSmokeTestFromConsole(): Promise<void> {
-  console.log("%c StockEX Diagnostic Smoke Test", "font-size:18px;font-weight:bold;color:#38bdf8");
-  console.log(` Asset: ${SMOKE_TEST_ASSET}`);
-  console.log(" Running...");
-  console.log("");
 
   const result = await runDiagnosticSmokeTest((phase, status) => {
-    console.log(`  [${phase}] ${status}`);
   });
 
-  console.log(formatSmokeTestResult(result));
 
   if (typeof window !== "undefined") {
     (window as unknown as Record<string, unknown>).__SMOKE_TEST_RESULT = result;
-    console.log(" Result also available at window.__SMOKE_TEST_RESULT");
   }
 }
 

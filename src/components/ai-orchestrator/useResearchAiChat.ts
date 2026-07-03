@@ -118,9 +118,6 @@ export function useResearchAiChat(opts: UseResearchAiChatOptions = {}) {
   }, [opts.controller]);
 
   const emitEvent = useCallback((evt: ChatEvent) => {
-    if (config.debug) {
-      console.debug('[useResearchAiChat] event:', evt);
-    }
     for (const cb of eventListenersRef.current) {
       cb(evt);
     }
