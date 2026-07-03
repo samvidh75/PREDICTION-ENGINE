@@ -55,6 +55,7 @@ export function localApiPlugin(): Plugin {
             let liveFundamentals: any = null;
             let liveHistory: any = null;
             let liveNews: any = null;
+            let liveFinancials: any = null;
             let sourceLabel = 'snapshot';
 
             try {
@@ -108,6 +109,16 @@ export function localApiPlugin(): Plugin {
                   liveNews = JSON.parse(raw2.trim());
                 } catch { /* yahoo news also failed */ }
               }
+
+              // Layer 5: Real financial statements via yfinance Python
+              try {
+                const script = path.resolve(root, 'scripts/fetch-yfinance-financials.cjs');
+                const raw = execSync(`node "${script}" "${symbol}"`, { timeout: 30000, encoding: 'utf-8' });
+                const parsed = JSON.parse(raw.trim());
+                if (parsed.financials?.annual?.revenue?.length || parsed.info?.revenue) {
+                  liveFinancials = parsed.financials;
+                }
+              } catch { /* financials script failed */ }
             }
 
             const useLive = livePrice !== null;
@@ -172,11 +183,12 @@ export function localApiPlugin(): Plugin {
               sectorRelative: research?.sectorRelative ?? null,
               description: research?.description || `${symbol} operates in the ${liveSector} sector.`,
               companyProfile: { founded: research?.founded || '', ceo: '', hq: 'India', employees: research?.employees || '', website: '', isin: '', businessSegments: research?.businessSegments || ['Diversified'] },
-              priceHistory, financials: research?.financials || null,
+              priceHistory,
+              financials: liveFinancials || research?.financials || null,
               shareholding: research?.shareholding || null,
               news: liveNews || research?.news || [],
               thesis: research?.thesis || null,
-              dataSources: { price: sourceLabel, fundamentals: liveFundamentals?.pe ? 'yfinance' : 'snapshot', history: liveHistory ? 'yahoo_finance' : 'snapshot', news: liveNews ? 'yfinance' : 'snapshot', financials: 'yfinance', shareholding: 'snapshot' },
+              dataSources: { price: sourceLabel, fundamentals: liveFundamentals?.pe ? 'yfinance' : 'snapshot', history: liveHistory ? 'yahoo_finance' : 'snapshot', news: liveNews ? 'yfinance' : 'snapshot', financials: liveFinancials?.annual?.revenue?.length ? 'yfinance' : 'snapshot', shareholding: 'snapshot' },
               dcf,
             };
 
