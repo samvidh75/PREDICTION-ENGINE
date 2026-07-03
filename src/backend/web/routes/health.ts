@@ -10,7 +10,7 @@ import { dbAdapter } from '../../../db/DatabaseAdapter';
 import { MigrationRunner } from '../../../db/MigrationRunner';
 import path from 'path';
 
-const healthRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
+export const healthRoutes: FastifyPluginAsync = async (app: FastifyInstance) => {
   // -------------------------------------------------------------------
   // GET /healthz — lightweight liveness probe
   // -------------------------------------------------------------------

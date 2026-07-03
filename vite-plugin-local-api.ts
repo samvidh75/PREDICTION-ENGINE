@@ -56,6 +56,7 @@ export function localApiPlugin(): Plugin {
             let liveHistory: any = null;
             let liveNews: any = null;
             let liveFinancials: any = null;
+            let liveShareholding: any = null;
             let sourceLabel = 'snapshot';
 
             try {
@@ -119,6 +120,16 @@ export function localApiPlugin(): Plugin {
                   liveFinancials = parsed.financials;
                 }
               } catch { /* financials script failed */ }
+
+              // Layer 6: Real shareholding via Screener.in scraper
+              try {
+                const script = path.resolve(root, 'scripts/screener-shareholding.cjs');
+                const raw = execSync(`node "${script}" "${symbol}"`, { timeout: 20000, encoding: 'utf-8' });
+                const parsed = JSON.parse(raw.trim());
+                if (Array.isArray(parsed) && parsed.length > 0 && parsed[0].promoter) {
+                  liveShareholding = parsed;
+                }
+              } catch { /* shareholding script failed */ }
             }
 
             const useLive = livePrice !== null;
@@ -185,10 +196,10 @@ export function localApiPlugin(): Plugin {
               companyProfile: { founded: research?.founded || '', ceo: '', hq: 'India', employees: research?.employees || '', website: '', isin: '', businessSegments: research?.businessSegments || ['Diversified'] },
               priceHistory,
               financials: liveFinancials || research?.financials || null,
-              shareholding: research?.shareholding || null,
+              shareholding: liveShareholding || research?.shareholding || null,
               news: liveNews || research?.news || [],
               thesis: research?.thesis || null,
-              dataSources: { price: sourceLabel, fundamentals: liveFundamentals?.pe ? 'yfinance' : 'snapshot', history: liveHistory ? 'yahoo_finance' : 'snapshot', news: liveNews ? 'yfinance' : 'snapshot', financials: liveFinancials?.annual?.revenue?.length ? 'yfinance' : 'snapshot', shareholding: 'snapshot' },
+              dataSources: { price: sourceLabel, fundamentals: liveFundamentals?.pe ? 'yfinance' : 'snapshot', history: liveHistory ? 'yahoo_finance' : 'snapshot', news: liveNews ? 'yfinance' : 'snapshot', financials: liveFinancials?.annual?.revenue?.length ? 'yfinance' : 'snapshot', shareholding: liveShareholding ? 'screener_in' : 'snapshot' },
               dcf,
             };
 

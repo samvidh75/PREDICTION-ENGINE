@@ -3,8 +3,9 @@ import { earningsSentimentService } from '../../../services/market/EarningsSenti
 
 export async function registerEarningsSentimentRoutes(app: FastifyInstance) {
   app.get('/api/earnings/calendar', async (request, reply) => {
-    const rawSymbols = typeof (request.query as { symbols?: string } | undefined)?.symbols === 'string'
-      ? (request.query as { symbols?: string }).symbols
+    const query = request.query as { symbols?: string } | undefined;
+    const rawSymbols = typeof query?.symbols === 'string'
+      ? query.symbols
       : '';
     const symbols = rawSymbols.split(',').map((symbol) => symbol.trim()).filter(Boolean);
     if (symbols.length === 0) {

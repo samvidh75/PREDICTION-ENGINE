@@ -1,15 +1,16 @@
 import type { FastifyInstance } from 'fastify';
 import type { UserResearchProfile, AlertChangeView, SavedScannerPreset } from '../../../research/contracts/productContracts.js';
-
-type PreHandler = (req: any, reply: any) => Promise<unknown> | unknown;
+import type { AlertStoreItem } from '../../../services/personalization/AlertStore.js';
+type PreHandler = any;
+type StoredAlertLike = AlertChangeView | AlertStoreItem;
 
 export interface PersonalResearchRouteDeps {
   requireAuth: PreHandler;
-  rateLimitFor: (metric: string) => PreHandler;
+  rateLimitFor: (metric: any) => PreHandler;
   getProfile: () => UserResearchProfile;
   saveProfile: (profile: UserResearchProfile) => void;
-  getAlerts: () => AlertChangeView[];
-  getAlertsBySymbol: (symbol: string) => AlertChangeView[];
+  getAlerts: () => StoredAlertLike[];
+  getAlertsBySymbol: (symbol: string) => StoredAlertLike[];
   ingestAlerts: (alerts: AlertChangeView[]) => AlertChangeView[];
   acknowledgeAlert: (id: string) => void;
   removeAlert: (id: string) => void;
@@ -21,7 +22,7 @@ export interface PersonalResearchRouteDeps {
   deletePreset: (id: string) => boolean;
   getThesisHistory: (symbol: string) => unknown[];
   captureThesisSnapshot: (thesis: any) => void;
-  recordAction: (action: string, symbol: string | null, metadata: unknown) => unknown;
+  recordAction: (action: any, symbol?: string | null, metadata?: Record<string, unknown>) => unknown;
   getRecentActions: (limit: number) => unknown[];
   getResearchSuggestions: (watchlistTickers: string[], statusMap: Map<string, string>) => unknown[];
   getLatestThesisMap: () => Map<string, any>;
@@ -31,11 +32,15 @@ export interface PersonalResearchRouteDeps {
 }
 
 export async function registerPersonalResearchRoutes(server: FastifyInstance, deps: PersonalResearchRouteDeps) {
-  const authLimit = { preHandler: [deps.requireAuth, deps.rateLimitFor('api_calls_per_hour')] };
+  const app = server as any;
+  const authLimit: any = { preHandler: [deps.requireAuth, deps.rateLimitFor('api_calls_per_hour')] };
 
-  server.get('/api/research-profile', async () => deps.getProfile());
+  const normalizeAlerts = (items: StoredAlertLike[]): AlertChangeView[] =>
+    items.map((item) => ('alert' in item ? item.alert : item));
 
-  server.put('/api/research-profile', authLimit, async (req, reply) => {
+  app.get('/api/research-profile', async () => deps.getProfile());
+
+  app.put('/api/research-profile', authLimit, async (req: any, reply: any) => {
     try {
       const body = req.body as Partial<UserResearchProfile>;
       if (!body) return reply.status(400).send({ error: 'profile data required' });
@@ -48,14 +53,14 @@ export async function registerPersonalResearchRoutes(server: FastifyInstance, de
     }
   });
 
-  server.get('/api/alerts', async (req) => {
+  app.get('/api/alerts', async (req: any) => {
     const { symbol, limit } = (req.query as any) ?? {};
-    let alerts = symbol ? deps.getAlertsBySymbol(String(symbol)) : deps.getAlerts();
+    let alerts = normalizeAlerts(symbol ? deps.getAlertsBySymbol(String(symbol)) : deps.getAlerts());
     if (limit) alerts = alerts.slice(0, Number(limit));
     return { alerts, count: alerts.length };
   });
 
-  server.post('/api/alerts', authLimit, async (req, reply) => {
+  app.post('/api/alerts', authLimit, async (req: any, reply: any) => {
     try {
       const body = req.body as { alerts: AlertChangeView[] };
       if (!body?.alerts?.length) return reply.status(400).send({ error: 'alerts array required' });
@@ -66,7 +71,7 @@ export async function registerPersonalResearchRoutes(server: FastifyInstance, de
     }
   });
 
-  server.put('/api/alerts/:id', authLimit, async (req, reply) => {
+  app.put('/api/alerts/:id', authLimit, async (req: any, reply: any) => {
     const { id } = req.params as any;
     const { acknowledged, action } = req.body as any;
     if (action === 'remove') {
@@ -80,12 +85,12 @@ export async function registerPersonalResearchRoutes(server: FastifyInstance, de
     return reply.status(400).send({ error: 'acknowledged or action required' });
   });
 
-  server.get('/api/digest', async () => deps.generateDigest());
-  server.get('/api/digest/weekly', async () => deps.generateWeeklyReview());
+  app.get('/api/digest', async () => deps.generateDigest());
+  app.get('/api/digest/weekly', async () => deps.generateWeeklyReview());
 
-  server.get('/api/scanner-presets', async () => ({ presets: deps.getPresets() }));
+  app.get('/api/scanner-presets', async () => ({ presets: deps.getPresets() }));
 
-  server.post('/api/scanner-presets', authLimit, async (req, reply) => {
+  app.post('/api/scanner-presets', authLimit, async (req: any, reply: any) => {
     try {
       const { name, description, filters } = req.body as any;
       if (!name || !filters) return reply.status(400).send({ error: 'name and filters required' });
@@ -95,7 +100,7 @@ export async function registerPersonalResearchRoutes(server: FastifyInstance, de
     }
   });
 
-  server.put('/api/scanner-presets/:id', authLimit, async (req, reply) => {
+  app.put('/api/scanner-presets/:id', authLimit, async (req: any, reply: any) => {
     const { id } = req.params as any;
     const updates = req.body as Partial<SavedScannerPreset>;
     const result = deps.updatePreset(id, updates);
@@ -103,20 +108,20 @@ export async function registerPersonalResearchRoutes(server: FastifyInstance, de
     return result;
   });
 
-  server.delete('/api/scanner-presets/:id', authLimit, async (req, reply) => {
+  app.delete('/api/scanner-presets/:id', authLimit, async (req: any, reply: any) => {
     const { id } = req.params as any;
     const deleted = deps.deletePreset(id);
     if (!deleted) return reply.status(404).send({ error: 'preset not found' });
     return { id, deleted: true };
   });
 
-  server.get('/api/thesis-history/:symbol', async (req) => {
+  app.get('/api/thesis-history/:symbol', async (req: any) => {
     const { symbol } = req.params as any;
     const normalized = String(symbol).toUpperCase();
     return { symbol: normalized, snapshots: deps.getThesisHistory(normalized) };
   });
 
-  server.post('/api/thesis-history', authLimit, async (req, reply) => {
+  app.post('/api/thesis-history', authLimit, async (req: any, reply: any) => {
     try {
       const { thesis } = req.body as any;
       if (!thesis?.symbol) return reply.status(400).send({ error: 'thesis with symbol required' });
@@ -127,7 +132,7 @@ export async function registerPersonalResearchRoutes(server: FastifyInstance, de
     }
   });
 
-  server.post('/api/actions', authLimit, async (req, reply) => {
+  app.post('/api/actions', authLimit, async (req: any, reply: any) => {
     try {
       const { action, symbol, metadata } = req.body as any;
       if (!action) return reply.status(400).send({ error: 'action type required' });
@@ -137,12 +142,12 @@ export async function registerPersonalResearchRoutes(server: FastifyInstance, de
     }
   });
 
-  server.get('/api/actions/recent', async (req) => {
+  app.get('/api/actions/recent', async (req: any) => {
     const { limit } = (req.query as any) ?? {};
     return { actions: deps.getRecentActions(limit ? Number(limit) : 20) };
   });
 
-  server.get('/api/research-suggestions', async (req) => {
+  app.get('/api/research-suggestions', async (req: any) => {
     const { tickers } = (req.query as any) ?? {};
     const watchlistTickers: string[] = tickers
       ? String(tickers).split(',').map((s: string) => s.trim().toUpperCase()).filter(Boolean)
@@ -155,7 +160,7 @@ export async function registerPersonalResearchRoutes(server: FastifyInstance, de
     return { suggestions: deps.getResearchSuggestions(watchlistTickers, statusMap) };
   });
 
-  server.get('/api/watchlist-intelligence', async (req, reply) => {
+  app.get('/api/watchlist-intelligence', async (req: any, reply: any) => {
     try {
       const { tickers, changesOnly } = (req.query as any) ?? {};
       const tickerList: string[] = tickers
@@ -178,8 +183,8 @@ export async function registerPersonalResearchRoutes(server: FastifyInstance, de
     }
   });
 
-  server.get('/api/notification-snapshot', async () => deps.getNotificationSnapshot());
-  server.post('/api/notifications/acknowledge-all', async () => {
+  app.get('/api/notification-snapshot', async () => deps.getNotificationSnapshot());
+  app.post('/api/notifications/acknowledge-all', async () => {
     deps.acknowledgeAll();
     return { acknowledged: true };
   });

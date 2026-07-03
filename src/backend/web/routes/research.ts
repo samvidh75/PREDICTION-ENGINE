@@ -13,9 +13,9 @@
  */
 
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
-import { runEngines } from '../../research/engine/engineRunner';
-import { fetchFundamentals } from '../../research/data/fundamentalsProvider';
-import { queryRAGContext } from '../../research/db/ragQuery';
+import { runEngines } from '../../../research/engine/engineRunner.js';
+import { fetchFundamentals } from '../../../research/data/fundamentalsProvider.js';
+import { queryRAGContext } from '../../../research/db/ragQuery.js';
 import { MasterCompanyRegistry } from '../../../services/data/MasterCompanyRegistry.js';
 
 export async function registerResearchRoutes(app: FastifyInstance) {

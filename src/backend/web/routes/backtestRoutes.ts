@@ -7,7 +7,9 @@ import {
 } from '../../../backtest/PortfolioSimulator.js';
 import type {
   BenchmarkIndex,
+  BenchmarkResult,
   RebalanceFrequency,
+  StrategyResult,
   StrategyType,
 } from '../../../backtest/types.js';
 
@@ -47,6 +49,18 @@ const VALID_STRATEGIES: StrategyType[] = [
 const VALID_REBALANCES: RebalanceFrequency[] = ['WEEKLY', 'MONTHLY', 'QUARTERLY'];
 const VALID_BENCHMARKS: BenchmarkIndex[] = ['NIFTY50', 'NIFTY100', 'NIFTY500', 'EQUAL_WEIGHT_UNIVERSE'];
 
+function isStrategyType(value: unknown): value is StrategyType {
+  return typeof value === 'string' && VALID_STRATEGIES.includes(value as StrategyType);
+}
+
+function isRebalanceFrequency(value: unknown): value is RebalanceFrequency {
+  return typeof value === 'string' && VALID_REBALANCES.includes(value as RebalanceFrequency);
+}
+
+function isBenchmarkIndex(value: unknown): value is BenchmarkIndex {
+  return typeof value === 'string' && VALID_BENCHMARKS.includes(value as BenchmarkIndex);
+}
+
 function isIsoDate(value: unknown): value is string {
   return typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value);
 }
@@ -59,9 +73,9 @@ function parseRunBacktestBody(body: unknown): { ok: true; value: Required<RunBac
   const endDate = payload.endDate ?? '';
   const benchmark = payload.benchmark ?? 'NIFTY500';
 
-  if (!VALID_STRATEGIES.includes(strategy)) return { ok: false, error: 'Invalid strategy' };
-  if (!VALID_REBALANCES.includes(rebalance)) return { ok: false, error: 'Invalid rebalance frequency' };
-  if (!VALID_BENCHMARKS.includes(benchmark)) return { ok: false, error: 'Invalid benchmark' };
+  if (!isStrategyType(strategy)) return { ok: false, error: 'Invalid strategy' };
+  if (!isRebalanceFrequency(rebalance)) return { ok: false, error: 'Invalid rebalance frequency' };
+  if (!isBenchmarkIndex(benchmark)) return { ok: false, error: 'Invalid benchmark' };
   if (!isIsoDate(startDate) || !isIsoDate(endDate)) return { ok: false, error: 'startDate and endDate must be YYYY-MM-DD' };
   if (startDate > endDate) return { ok: false, error: 'startDate must be on or before endDate' };
 
@@ -72,13 +86,17 @@ function parseWalkForwardBody(body: unknown): { ok: true; value: Required<WalkFo
   const payload = (body ?? {}) as WalkForwardBody;
   const startDate = payload.startDate ?? '';
   const endDate = payload.endDate ?? '';
-  const strategies = Array.isArray(payload.strategies) && payload.strategies.length > 0 ? payload.strategies : ['TOP_10', 'TOP_20', 'SECTOR_BALANCED_TOP_20'];
-  const rebalances = Array.isArray(payload.rebalances) && payload.rebalances.length > 0 ? payload.rebalances : ['MONTHLY'];
+  const strategies: StrategyType[] = Array.isArray(payload.strategies) && payload.strategies.length > 0
+    ? payload.strategies
+    : ['TOP_10', 'TOP_20', 'SECTOR_BALANCED_TOP_20'];
+  const rebalances: RebalanceFrequency[] = Array.isArray(payload.rebalances) && payload.rebalances.length > 0
+    ? payload.rebalances
+    : ['MONTHLY'];
 
   if (!isIsoDate(startDate) || !isIsoDate(endDate)) return { ok: false, error: 'startDate and endDate must be YYYY-MM-DD' };
   if (startDate > endDate) return { ok: false, error: 'startDate must be on or before endDate' };
-  if (strategies.some((strategy) => !VALID_STRATEGIES.includes(strategy))) return { ok: false, error: 'Invalid strategy in strategies array' };
-  if (rebalances.some((rebalance) => !VALID_REBALANCES.includes(rebalance))) return { ok: false, error: 'Invalid rebalance in rebalances array' };
+  if (strategies.some((strategy) => !isStrategyType(strategy))) return { ok: false, error: 'Invalid strategy in strategies array' };
+  if (rebalances.some((rebalance) => !isRebalanceFrequency(rebalance))) return { ok: false, error: 'Invalid rebalance in rebalances array' };
 
   return { ok: true, value: { startDate, endDate, strategies, rebalances } };
 }
@@ -115,7 +133,7 @@ export async function registerBacktestRoutes(app: FastifyInstance, deps: Backtes
     }
 
     const { startDate, endDate, strategies, rebalances } = parsed.value;
-    const results = [];
+    const results: StrategyResult[] = [];
     for (const strategy of strategies) {
       for (const rebalance of rebalances) {
         const strategyResult = await deps.simulateStrategy(strategy, rebalance, startDate, endDate);
@@ -123,7 +141,7 @@ export async function registerBacktestRoutes(app: FastifyInstance, deps: Backtes
       }
     }
 
-    const ranked = [...results].sort((a, b) => b.metrics.cagr - a.metrics.cagr);
+    const ranked: StrategyResult[] = [...results].sort((a, b) => b.metrics.cagr - a.metrics.cagr);
 
     return {
       availability: 'real',

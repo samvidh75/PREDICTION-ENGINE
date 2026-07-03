@@ -36,9 +36,9 @@ export async function registerUnifiedAlertsRoutes(app: FastifyInstance) {
       result: alertRuleService.evaluate({
         symbol: body.symbol,
         previousThesisStatus: body.previousThesisStatus ?? null,
-        currentThesisStatus: body.currentThesisStatus ?? 'Track',
+        currentThesisStatus: body.currentThesisStatus ?? 'Tracking begins now',
         previousRiskLevel: body.previousRiskLevel ?? null,
-        currentRiskLevel: body.currentRiskLevel ?? 'Medium',
+        currentRiskLevel: body.currentRiskLevel ?? 'Moderate',
         scoreChange: body.scoreChange ?? null,
         priceChangePercent: body.priceChangePercent ?? null,
         peerBecameMoreAttractive: body.peerBecameMoreAttractive ?? false,

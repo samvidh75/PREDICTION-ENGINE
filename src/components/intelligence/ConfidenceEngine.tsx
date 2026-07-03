@@ -1,4 +1,11 @@
 import { colors, typography } from "../../design/tokens";
+export type { ConfidenceState } from "../../services/intelligence/marketState";
+export type ConfidenceTheme =
+  | "constructive"
+  | "steady"
+  | "balanced"
+  | "watchful"
+  | "defensive";
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
