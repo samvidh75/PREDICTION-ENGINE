@@ -13,6 +13,16 @@
     }
   ],
   "rewrites": [
+    { "source": "/api/stock", "destination": "/api/stock" },
+    { "source": "/api/search", "destination": "/api/search" },
+    { "source": "/api/intelligence/(.*)", "destination": "/api/intelligence" },
+    { "source": "/api/health", "destination": "/api/health" },
     { "source": "/((?!api/).*)", "destination": "/index.html" }
-  ]
+  ],
+  "functions": {
+    "api/*.js": {
+      "memory": 256,
+      "maxDuration": 30
+    }
+  }
 }
