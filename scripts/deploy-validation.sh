@@ -98,7 +98,8 @@ if [ $FAIL -eq 0 ]; then
   echo ""
   echo "  Next steps:"
   echo "    vercel --prod    # Frontend"
-  echo "    railway up       # Backend"
+  echo "    vercel --prod    # Frontend (Vercel)"
+  echo "    pod deploy      # Backend (Render)"
   exit 0
 else
   echo "  ⚠️  $FAIL check(s) failed — review above"
