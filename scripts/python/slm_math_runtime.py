@@ -28,6 +28,14 @@ try:
 except ImportError:
     BeautifulSoup = None
 
+_SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+if _SCRIPT_DIR not in sys.path:
+    sys.path.insert(0, _SCRIPT_DIR)
+try:
+    from sme_ticker_mesh import run_sme_mesh
+except ImportError:
+    run_sme_mesh = None
+
 DATABASE_URL = os.getenv("DATABASE_URL")
 
 GOOGLE_FINANCE_URL = "https://www.google.com/finance/quote/{ticker}:{exchange}"
@@ -203,7 +211,49 @@ def run_precision_intelligence_kernel(ticker: str):
             if not live_price:
                 data_source = "YAHOO_HISTORICAL"
 
-    # Step 4: Fail-fast if no data at all
+    # Step 4: Fallback to Screener.in SME mesh for SME stocks (<50 data points or -SM suffix)
+    # Yahoo often lacks historical data for NSE SME Emerge tickers (SRIVASAVI-SM.NS pattern)
+    if (df.empty or len(df) < 15) and run_sme_mesh is not None:
+        try:
+            sme_result = run_sme_mesh(symbol, include_historical=True)
+        except Exception:
+            sme_result = None
+        if sme_result and sme_result.get("success") and sme_result["metrics"].get("current_price", 0) > 0:
+            sm = sme_result["metrics"]
+            live_price = sm["current_price"]
+            sm_fund = sm.get("fundamentals", {})
+            pe_ratio = sm_fund.get("pe_ratio", 0)
+            market_cap_val = sm_fund.get("market_cap_cr", 0)
+            market_cap_display = f"INR {market_cap_val:.3f} Cr" if market_cap_val else "0.000 Cr"
+            data_source = "SCREENER_IN_FUNDAMENTALS"
+            sma_50 = sm.get("sma_50", live_price)
+            sma_200 = sm.get("sma_200", live_price)
+            rsi_14 = sm.get("rsi_14", 50.0)
+            sector = sm_fund.get("sector", "SME Industrial Materials")
+            if live_price > sma_50 and sma_50 > sma_200:
+                trend_state = "STRONG_BULLISH_CONVERGENCE"
+            elif live_price < sma_50 and sma_50 < sma_200:
+                trend_state = "BEARISH_DOWN_DRIFT"
+            else:
+                trend_state = "CONSOLIDATION_RANGE"
+            compiled_metrics = {
+                "ticker": symbol,
+                "current_price": round(live_price, 3),
+                "sma_50": round(sma_50, 3),
+                "sma_200": round(sma_200, 3),
+                "rsi_14": round(rsi_14, 3),
+                "trend_state": trend_state,
+                "market_cap_display": market_cap_display,
+                "market_cap_value": market_cap_val,
+                "pe_ratio": round(pe_ratio, 3),
+                "debt_to_equity": 0.000,
+                "promoter_pledged_pct": 0.000,
+                "sector": sector,
+                "data_mode": data_source,
+            }
+            return {"success": True, "metrics": compiled_metrics}
+
+    # Step 5: Fail-fast if no data at all
     if df.empty and not live_price:
         return {
             "success": False,
