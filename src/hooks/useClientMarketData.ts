@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { marketDataFetcher } from '../lib/marketDataFetcher';
+import { marketDataFetcher } from '../lib/client/marketDataFetcher';
 
 export interface ClientQuote {
   price: number;

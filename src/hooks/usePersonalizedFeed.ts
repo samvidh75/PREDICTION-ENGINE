@@ -1,13 +1,12 @@
-import { useMemo } from 'react';
-import { selfLearningEngine, LearnedInsight } from '../lib/selfLearningEngine';
-import { vault, EncryptedWatchlist } from '../lib/localStorageVault';
-import { useClientMarketData, ClientQuote } from './useClientMarketData';
+import { useEffect, useMemo, useState } from 'react';
+import { selfLearningEngine, LearnedInsight } from '../lib/client/selfLearningEngine';
+import { vault, EncryptedWatchlist } from '../lib/client/localStorageVault';
 
 export interface FeedItem {
   symbol: string;
   name: string;
   reason: 'top_affinity' | 'watchlist' | 'trending' | 'recent_search';
-  quote: ClientQuote | null;
+  quote: null;
   insight: LearnedInsight | null;
 }
 
@@ -38,13 +37,20 @@ function getCompanyName(symbol: string): string {
 }
 
 export function usePersonalizedFeed() {
-  const insights = useMemo(() => selfLearningEngine.getInsights(), []);
+  const [insights, setInsights] = useState<LearnedInsight[]>([]);
+  const [topSymbols, setTopSymbols] = useState<string[]>([]);
 
-  const topSymbols = useMemo(() => {
-    const fromInsights = insights.slice(0, 5).map((i) => i.symbol);
-    const watchlistSymbols: string[] = [];
-    vault.getWatchlists().then((lists: EncryptedWatchlist[]) => {
+  useEffect(() => {
+    let cancelled = false;
+    async function load() {
+      const result = await selfLearningEngine.getInsights();
+      if (cancelled) return;
+      setInsights(result);
+      const fromInsights = result.slice(0, 5).map((i) => i.symbol);
+      const lists = await vault.getWatchlists();
+      if (cancelled) return;
       const seen = new Set(fromInsights);
+      const watchlistSymbols: string[] = [];
       for (const list of lists) {
         for (const t of list.tickers) {
           if (!seen.has(t)) {
@@ -53,9 +59,11 @@ export function usePersonalizedFeed() {
           }
         }
       }
-    });
-    return [...fromInsights, ...watchlistSymbols].slice(0, 5);
-  }, [insights]);
+      setTopSymbols([...fromInsights, ...watchlistSymbols].slice(0, 5));
+    }
+    load();
+    return () => { cancelled = true; };
+  }, []);
 
   return { insights, topSymbols };
 }

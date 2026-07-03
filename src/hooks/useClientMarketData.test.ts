@@ -2,13 +2,13 @@ import { describe, expect, it, vi, beforeEach } from "vitest";
 import { renderHook, waitFor } from "@testing-library/react";
 import { useClientMarketData } from "./useClientMarketData";
 
-vi.mock("../lib/marketDataFetcher", () => ({
+vi.mock("../lib/client/marketDataFetcher", () => ({
   marketDataFetcher: {
     fetch: vi.fn(),
   },
 }));
 
-import { marketDataFetcher } from "../lib/marketDataFetcher";
+import { marketDataFetcher } from "../lib/client/marketDataFetcher";
 
 const mockFetch = marketDataFetcher.fetch as ReturnType<typeof vi.fn>;
 
