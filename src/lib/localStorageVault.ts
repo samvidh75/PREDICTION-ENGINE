@@ -146,7 +146,8 @@ export class LocalStorageVault {
 
   private encrypt(message: string): string {
     const nonce = nacl.randomBytes(24);
-    const encrypted = nacl.secretbox(new TextEncoder().encode(message), nonce, this.encryptionKey!);
+    const msgBytes = new Uint8Array(new TextEncoder().encode(message));
+    const encrypted = nacl.secretbox(msgBytes, nonce, this.encryptionKey!);
     const combined = new Uint8Array(nonce.length + encrypted.length);
     combined.set(nonce);
     combined.set(encrypted, nonce.length);

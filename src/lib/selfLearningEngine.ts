@@ -50,23 +50,27 @@ class SelfLearningEngine {
         count: 0,
       };
 
-      let baseWeight = s.weight ?? 1;
-      switch (s.type) {
-        case 'save':
-          baseWeight = 5;
-          break;
-        case 'view':
-          baseWeight = 1;
-          break;
-        case 'click':
-          baseWeight = 2;
-          break;
-        case 'search':
-          baseWeight = 3;
-          break;
-        case 'remove':
-          baseWeight = -3;
-          break;
+      let baseWeight = 1;
+      if (s.weight != null) {
+        baseWeight = s.weight;
+      } else {
+        switch (s.type) {
+          case 'save':
+            baseWeight = 5;
+            break;
+          case 'view':
+            baseWeight = 1;
+            break;
+          case 'click':
+            baseWeight = 2;
+            break;
+          case 'search':
+            baseWeight = 3;
+            break;
+          case 'remove':
+            baseWeight = -3;
+            break;
+        }
       }
 
       const halfLives = age / this.affinityDecayHalfLifeMs;

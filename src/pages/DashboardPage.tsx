@@ -3,13 +3,14 @@
 
 import { useMemo } from "react";
 import StockExDashboard from "../components/StockExDashboard";
+import PersonalizedFeed from "../components/PersonalizedFeed";
 import { loadAuthSession } from "../services/auth/sessionStore";
 import { layout } from "../design/tokens";
 
 export default function DashboardPage() {
   const session = useMemo(() => loadAuthSession(), []);
   const userId = session.status === "authenticated" && session.uid ? session.uid : "anonymous";
-  const hasProTier = false; // TODO: check subscription tier from entitlements
+  const hasProTier = false;
 
   return (
     <div
@@ -20,6 +21,7 @@ export default function DashboardPage() {
       }}
     >
       <StockExDashboard userId={userId} hasProTier={hasProTier} />
+      <PersonalizedFeed />
     </div>
   );
 }
