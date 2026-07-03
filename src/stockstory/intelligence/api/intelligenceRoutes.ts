@@ -195,7 +195,7 @@ function buildInput(symbol: string, exchange: IntelligenceInput['exchange'], tra
     sentiment: { overallScore: null, recentHeadlines: null, avgRecentSentiment: null, mentionVolume: null, positiveRatio: null, negativeRatio: null, neutralRatio: null, trending: null, controversyScore: null },
     sector: { name: 'General', sectorStrength: null, sectorMomentum: null, sectorPe: null, sectorAvgGrowth: null, sectorAvgMargin: null },
     risks: { auditorChange: false, relatedPartyTransactions: false, pledgedShares: null, promoterHolding: null, institutionalHolding: null, outstandingWarrants: false, esopDilution: null, litigationRisk: null, governanceScore: null },
-  } as unknown as IntelligenceInput;
+  } as IntelligenceInput;
 }
 
 function llmExplainerName(): string {

@@ -26,6 +26,8 @@ function setCache(reply: FastifyReply, maxAge: number = 300): void {
   reply.header("ETag", `"${Date.now()}"`);
 }
 import type { EarningsMetrics, EventMetrics, FinancialMetrics, NewsMetrics, RAGMetrics, RiskMetrics, SectorMetrics, TechnicalMetrics, ValuationMetrics } from "../services/intelligence/types.js";
+import { dcfValuationService } from "../services/valuation/ValuationService.js";
+import { corporateActionsService } from "../services/corporate-actions/CorporateActionsService.js";
 import intelligenceQualityGate from "./intelligenceQualityGate.js";
 import type { UserResearchProfile, AlertChangeView, SavedScannerPreset, DailyResearchDigest, WatchlistThesisView } from "../research/contracts/productContracts.js";
 import { saveProfile, getProfile, createDefaultProfile } from "../services/personalization/researchProfileStore.js";
@@ -502,12 +504,6 @@ export default async function registerApiRoutes(server: FastifyInstance) {
     dbQuery: (sql, params) => dbAdapter.query(sql, params as any[] | undefined),
   });
   await registerCommercialRoutes(server);
-  await registerIntelligenceMarketRoutes(server, {
-    parseSymbol,
-    yahooQuote,
-    indianApiFunds,
-  });
-
   // ── Network Response Caching Layer ──────────────────────────────
   // Global hook to attach downstream performance caching headers
   server.addHook('onSend', async (request, reply, payload) => {
@@ -600,6 +596,19 @@ export default async function registerApiRoutes(server: FastifyInstance) {
     const shareholdingData = deriveShareholding(cleanSymbol, sector);
     const thesisData = generateThesis({ health }, pe, roe);
 
+    const annualRev = financialsData.annual.revenue || [];
+    const annualProf = financialsData.annual.profit || [];
+    const revenue = annualRev.length > 0 ? annualRev[annualRev.length - 1].value : 5000;
+    const netMargin = (SECTOR_NET_MARGIN[sector] || 0.10);
+    const latestProfit = annualProf.length > 0 ? annualProf[annualProf.length - 1].value : revenue * netMargin;
+    const netDebt = de ? marketCapCr * (de / (1 + de)) : marketCapCr * 0.2;
+    const cashEq = marketCapCr * 0.05;
+    const sharesOut = price > 0 ? (marketCapCr * 10000000) / price : 100000000;
+    const dcf = dcfValuationService.estimateFromFinancials(
+      revenue * 10000000, netMargin, (revGrowth ?? 12) / 100,
+      marketCapCr * 10000000, netDebt * 10000000, cashEq * 10000000, sharesOut, price
+    );
+
     const payload = {
       symbol,
       companyName: gatewayMeta?.companyName || gatewayMeta?.name || symbol,
@@ -647,6 +656,17 @@ export default async function registerApiRoutes(server: FastifyInstance) {
         { headline: "Quarterly results show steady performance", source: "Lensory Research", time: new Date(Date.now() - 86400000).toISOString() },
         { headline: "Sector outlook remains positive for coming quarters", source: "Financial Express", time: new Date(Date.now() - 172800000).toISOString() },
       ],
+      dcf: {
+        fairValuePerShare: dcf.fairValuePerShare,
+        currentPrice: dcf.currentPrice,
+        upside: dcf.upside,
+        assessment: dcf.assessment,
+        impliedReturn: dcf.impliedReturn,
+        enterpriseValue: dcf.enterpriseValue,
+        equityValue: dcf.equityValue,
+        terminalValue: dcf.terminalValue,
+        years: dcf.years,
+      },
       thesis: thesisData,
       dataSources: {
         financials: fundData?.pe_ratio ? 'real' : 'yahoo',
@@ -786,6 +806,65 @@ export default async function registerApiRoutes(server: FastifyInstance) {
 
   // GET /api/research?action=scanner&preset=quality&limit=20
   // (research endpoint with scanner, compare, watchlist, broker — handled here)
+
+  // ── New Feature API Routes ──────────────────────────────────────────
+
+  // GET /api/corporate-actions?symbol=RELIANCE&days=30
+  server.get("/api/corporate-actions", async (req, reply) => {
+    const symbol = String((req.query as any)?.symbol ?? "").toUpperCase().trim();
+    const days = Number((req.query as any)?.days ?? 30);
+    const data = symbol
+      ? corporateActionsService.getActionsBySymbol(symbol)
+      : corporateActionsService.getUpcomingActions(days);
+    return { ok: true, count: data.length, data };
+  });
+
+  // GET /api/insider-trades?symbol=RELIANCE&days=30
+  server.get("/api/insider-trades", async (req, reply) => {
+    const symbol = String((req.query as any)?.symbol ?? "").toUpperCase().trim();
+    const days = Number((req.query as any)?.days ?? 30);
+    const data = symbol
+      ? corporateActionsService.getInsiderTradesBySymbol(symbol)
+      : corporateActionsService.getRecentInsiderTrades(days);
+    return { ok: true, count: data.length, data };
+  });
+
+  // GET /api/bulk-deals?symbol=RELIANCE&days=30
+  server.get("/api/bulk-deals", async (req, reply) => {
+    const symbol = String((req.query as any)?.symbol ?? "").toUpperCase().trim();
+    const days = Number((req.query as any)?.days ?? 30);
+    const data = symbol
+      ? corporateActionsService.getBulkDealsBySymbol(symbol)
+      : corporateActionsService.getRecentBulkDeals(days);
+    return { ok: true, count: data.length, data };
+  });
+
+  // GET /api/valuation/dcf?symbol=RELIANCE&price=2500
+  server.get("/api/valuation/dcf", async (req, reply) => {
+    const symbol = String((req.query as any)?.symbol ?? "").toUpperCase().trim();
+    const price = Number((req.query as any)?.price ?? 0);
+    if (!symbol) return reply.status(400).send({ error: "symbol required" });
+
+    try {
+      const synData = (await getPersistedStockResearch(symbol).catch(() => null) || {}) as any;
+      const revenue = n(synData.revenue) ?? 5000;
+      const netMargin = n(synData.netMargin) ?? 0.10;
+      const revenueGrowth = n(synData.revenueGrowth) ?? 12;
+      const marketCap = n(synData.marketCap) ?? (price * 100000000);
+      const de = n(synData.debtToEquity) ?? 0.5;
+      const netDebt = marketCap * (de / (1 + de));
+      const cashEq = marketCap * 0.05;
+      const sharesOut = price > 0 ? marketCap / price : 100000000;
+
+      const result = dcfValuationService.estimateFromFinancials(
+        revenue * 10000000, netMargin, revenueGrowth / 100,
+        marketCap * 10000000, netDebt * 10000000, cashEq * 10000000, sharesOut, price > 0 ? price : 100
+      );
+      return { ok: true, symbol, dcf: result };
+    } catch (err: any) {
+      return reply.status(502).send({ error: err.message || String(err), symbol });
+    }
+  });
 
   // ── Asymmetric Data Gateway — cached market data ──────────────────────────
 
