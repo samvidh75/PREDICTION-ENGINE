@@ -4,9 +4,11 @@ import glob
 import json
 import os
 import platform
+import shutil
 import sys
 import tempfile
 from datetime import date, datetime, timedelta
+from pathlib import Path
 
 try:
     import pandas as pd
@@ -64,6 +66,9 @@ def bhavcopy_records(day):
 
 
 def index_records():
+    cache_dir = Path.home() / "Library" / "Caches" / "nsehistory-index"
+    if cache_dir.exists():
+        shutil.rmtree(cache_dir, ignore_errors=True)
     today = date.today()
     from_date = today - timedelta(days=30)
     df = index_df(symbol="NIFTY 50", from_date=from_date, to_date=today)

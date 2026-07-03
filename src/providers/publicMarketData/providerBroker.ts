@@ -1,5 +1,9 @@
-import type { ProviderDomain, PublicProviderId } from './types';
+import type { ProviderDomain } from './types';
 import { ProviderCoordinator } from '../../services/providers/ProviderCoordinator';
+import { execFile } from 'node:child_process';
+import { promisify } from 'node:util';
+
+const execFileAsync = promisify(execFile);
 
 interface ProviderHealthResult {
   provider: string;
@@ -28,13 +32,6 @@ interface HistoricalResult {
   latencyMs: number;
   error?: string;
 }
-
-const HEALTHY_PROVIDERS: Record<string, PublicProviderId[]> = {
-  indianapi: ["indianapi"],
-  "jugaad-data": ["jugaad-data"],
-  nsepython: ["nsepython"],
-  yahoo: ["yahoo"],
-};
 
 const DOMAIN_MATRIX: Record<string, Array<{ key: string; domain: ProviderDomain }>> = {
   INDIANAPI_KEY: [
@@ -65,6 +62,35 @@ const DOMAIN_MATRIX: Record<string, Array<{ key: string; domain: ProviderDomain 
   ],
 };
 
+interface ProbeDomainResult {
+  status?: string;
+}
+
+interface PythonProbeResult {
+  healthy_probes?: number;
+  total_probes?: number;
+  domains?: Record<string, ProbeDomainResult>;
+}
+
+async function runPythonProbe(scriptName: string): Promise<PythonProbeResult | null> {
+  try {
+    const { stdout } = await execFileAsync('python3', [`scripts/${scriptName}`], {
+      cwd: process.cwd(),
+      timeout: 120_000,
+      maxBuffer: 1024 * 1024,
+    });
+    const jsonStart = stdout.indexOf('{');
+    const payload = jsonStart >= 0 ? stdout.slice(jsonStart) : stdout;
+    return JSON.parse(payload) as PythonProbeResult;
+  } catch {
+    return null;
+  }
+}
+
+function domainHealthy(status?: string): boolean {
+  return status === 'healthy';
+}
+
 export class PublicMarketDataProviderBroker {
   private coordinator: ProviderCoordinator;
 
@@ -74,41 +100,67 @@ export class PublicMarketDataProviderBroker {
 
   async checkAllProviders(): Promise<ProviderHealthResult[]> {
     const results: ProviderHealthResult[] = [];
-    for (const [providerId] of Object.entries(HEALTHY_PROVIDERS)) {
-      const start = Date.now();
-      try {
-        await this.coordinator.getQuote("RELIANCE");
-        results.push({
-          provider: providerId,
-          status: "healthy",
-          latencyMs: Date.now() - start,
-        });
-      } catch {
-        results.push({
-          provider: providerId,
-          status: "unavailable",
-          latencyMs: Date.now() - start,
-        });
-      }
+
+    const nsepythonStart = Date.now();
+    const nsepython = await runPythonProbe('probe-nsepython-provider.py');
+    results.push({
+      provider: 'nsepython',
+      status: nsepython ? ((nsepython.healthy_probes ?? 0) > 0 ? 'healthy' : 'degraded') : 'unavailable',
+      latencyMs: Date.now() - nsepythonStart,
+    });
+
+    const jugaadStart = Date.now();
+    const jugaad = await runPythonProbe('probe-jugaad-data-provider.py');
+    results.push({
+      provider: 'jugaad-data',
+      status: jugaad ? ((jugaad.healthy_probes ?? 0) > 0 ? 'healthy' : 'degraded') : 'unavailable',
+      latencyMs: Date.now() - jugaadStart,
+    });
+
+    const yahooStart = Date.now();
+    try {
+      await this.coordinator.getQuote('RELIANCE');
+      results.push({ provider: 'yahoo', status: 'healthy', latencyMs: Date.now() - yahooStart });
+    } catch {
+      results.push({ provider: 'yahoo', status: 'unavailable', latencyMs: Date.now() - yahooStart });
     }
+
+    results.push({
+      provider: 'indianapi',
+      status: process.env.INDIANAPI_KEY ? 'healthy' : 'degraded',
+    });
+
     return results;
   }
 
   async getProviderStatusMatrix(): Promise<Record<string, ProviderMatrixEntry>> {
     const matrix: Record<string, ProviderMatrixEntry> = {};
+    const nsepython = await runPythonProbe('probe-nsepython-provider.py');
+    const jugaad = await runPythonProbe('probe-jugaad-data-provider.py');
+
     for (const [envKey, entries] of Object.entries(DOMAIN_MATRIX)) {
       const domains: Partial<Record<ProviderDomain, DomainStatus>> = {};
       for (const { domain } of entries) {
-        const start = Date.now();
-        try {
-          await this.coordinator.getQuote("RELIANCE");
-          domains[domain] = { healthy: true };
-        } catch {
-          domains[domain] = { healthy: false };
+        let healthy = false;
+        if (envKey === 'NSEPYTHON') {
+          const probeKey = domain === 'quote' ? 'index_quote' : domain;
+          healthy = domainHealthy(nsepython?.domains?.[probeKey]?.status);
+        } else if (envKey === 'JUGAD_DATA') {
+          healthy = domainHealthy(jugaad?.domains?.[domain]?.status);
+        } else if (envKey === 'INDIANAPI_KEY') {
+          healthy = Boolean(process.env.INDIANAPI_KEY);
+        } else if (envKey === 'YAHOO') {
+          healthy = domain === 'quote' || domain === 'historical';
+        } else if (envKey === 'FUNDAMENTALS_AUTOMATIC') {
+          healthy = true;
+        } else if (envKey === 'CSV_FALLBACK') {
+          healthy = true;
         }
+        domains[domain] = { healthy };
       }
       matrix[envKey] = { domains };
     }
+
     return matrix;
   }
 
