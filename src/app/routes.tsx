@@ -1,6 +1,7 @@
 import { Suspense, lazy, type ReactNode } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { AppShell } from "./AppShell";
+import { PublicLayout } from "./PublicLayout";
 import { getBetaConfig, isFeatureEnabled } from "../config/beta";
 import { useAuth } from "../context/AuthContext";
 import { colors, typography } from "../design/tokens";
@@ -63,7 +64,7 @@ function WorkspaceRoute({ children }: { children: ReactNode }) {
   }
 
   if (!user) {
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to="/pricing" replace />;
   }
 
   return <AppShell>{children}</AppShell>;
@@ -78,7 +79,7 @@ export function AppRoutes() {
   return (
     <Suspense fallback={<RouteFallback />}>
       <Routes>
-        <Route path="/" element={loading ? <RouteFallback /> : user ? <WorkspaceRoute><HomePage /></WorkspaceRoute> : <Navigate to={publicFallback} replace />} />
+        <Route path="/" element={<Navigate to={publicFallback} replace />} />
         {SHOW_ABOUT_PAGE ? (
           <Route path="/about" element={<AboutPage />} />
         ) : (
@@ -91,11 +92,11 @@ export function AppRoutes() {
         <Route path="/portfolio" element={<WorkspaceRoute><PortfolioPage /></WorkspaceRoute>} />
         <Route path="/compare" element={<WorkspaceRoute><ComparePage /></WorkspaceRoute>} />
         <Route path="/track" element={<WorkspaceRoute><TrackPage /></WorkspaceRoute>} />
-        <Route path="/pricing" element={<WorkspaceRoute><PricingPage /></WorkspaceRoute>} />
+        <Route path="/pricing" element={<Suspense fallback={<RouteFallback />}><PublicLayout><PricingPage /></PublicLayout></Suspense>} />
+        <Route path="/trust" element={<Suspense fallback={<RouteFallback />}><PublicLayout><Trust /></PublicLayout></Suspense>} />
         <Route path="/stock/:symbol/*" element={<WorkspaceRoute><StockPage /></WorkspaceRoute>} />
         <Route path="/sectors" element={<WorkspaceRoute><Sectors /></WorkspaceRoute>} />
         <Route path="/sectors/:sectorSlug" element={<WorkspaceRoute><SectorResearch /></WorkspaceRoute>} />
-        <Route path="/trust" element={<WorkspaceRoute><Trust /></WorkspaceRoute>} />
         <Route path="/invite" element={<WorkspaceRoute><Invite /></WorkspaceRoute>} />
         <Route path="/share/research/:shareId" element={<WorkspaceRoute><SharedResearchSnapshot /></WorkspaceRoute>} />
         <Route path="/research/:symbol" element={<WorkspaceRoute><CompanyResearchReportPage /></WorkspaceRoute>} />
@@ -111,7 +112,7 @@ export function AppRoutes() {
         {enableWaitlistPage && <Route path="/waitlist" element={<WorkspaceRoute><WaitlistPage /></WorkspaceRoute>} />}
         {changelogEnabled && <Route path="/changelog" element={<WorkspaceRoute><ChangelogPage /></WorkspaceRoute>} />}
 
-        <Route path="*" element={<Navigate to={user ? "/" : publicFallback} replace />} />
+        <Route path="*" element={<Navigate to={user ? "/" : "/pricing"} replace />} />
       </Routes>
     </Suspense>
   );

@@ -28,6 +28,7 @@ function setCache(reply: FastifyReply, maxAge: number = 300): void {
 import type { EarningsMetrics, EventMetrics, FinancialMetrics, NewsMetrics, RAGMetrics, RiskMetrics, SectorMetrics, TechnicalMetrics, ValuationMetrics } from "../services/intelligence/types.js";
 import { dcfValuationService } from "../services/valuation/ValuationService.js";
 import { corporateActionsService } from "../services/corporate-actions/CorporateActionsService.js";
+import { directNseProvider } from "../services/providers/DirectNseProvider.js";
 import intelligenceQualityGate from "./intelligenceQualityGate.js";
 import type { UserResearchProfile, AlertChangeView, SavedScannerPreset, DailyResearchDigest, WatchlistThesisView } from "../research/contracts/productContracts.js";
 import { saveProfile, getProfile, createDefaultProfile } from "../services/personalization/researchProfileStore.js";
@@ -557,7 +558,68 @@ export default async function registerApiRoutes(server: FastifyInstance) {
 
     const gatewayMeta = await MarketDataGateway.getCompany(cleanSymbol).catch(() => null);
 
-    if (!gatewayQuote?.price) {
+    // Direct provider fallback chain if primary gateways fail
+    let quote = gatewayQuote;
+    let meta = gatewayMeta;
+    let fundResultSafe = fundResult;
+    let priceHistorySafe = priceHistory;
+    let newsSafe = news;
+
+    if (!quote?.price) {
+      const dirQuote = await directNseProvider.getQuote(cleanSymbol);
+      if (dirQuote.data) {
+        quote = {
+          symbol: cleanSymbol,
+          exchange: 'NSE',
+          price: dirQuote.data.price,
+          change: dirQuote.data.change,
+          changePercent: dirQuote.data.changePercent,
+          volume: dirQuote.data.volume,
+          updatedAt: dirQuote.data.updatedAt,
+          retrievedAt: new Date().toISOString(),
+          source: dirQuote.source === 'nse' ? 'provider' : 'provider',
+          freshness: 'current',
+        };
+      }
+    }
+
+    if (!meta?.companyName) {
+      const dirFin = await directNseProvider.getFinancials(cleanSymbol);
+      if (dirFin.data) {
+        meta = {
+          symbol: cleanSymbol,
+          companyName: cleanSymbol,
+          sector: dirFin.data.netMargin != null ? 'Estimated' : 'Diversified',
+          industry: 'General',
+          exchange: 'NSE',
+          marketCap: dirFin.data.marketCap,
+        } as any;
+        fundResultSafe = {};
+        if (dirFin.data.peRatio) (fundResultSafe as any).pe_ratio = dirFin.data.peRatio;
+        if (dirFin.data.pbRatio) (fundResultSafe as any).pb_ratio = dirFin.data.pbRatio;
+        if (dirFin.data.roe) (fundResultSafe as any).roe = dirFin.data.roe;
+        if (dirFin.data.debtToEquity) (fundResultSafe as any).debt_to_equity = dirFin.data.debtToEquity;
+        if (dirFin.data.eps) (fundResultSafe as any).eps = dirFin.data.eps;
+        if (dirFin.data.dividendYield) (fundResultSafe as any).dividend_yield = dirFin.data.dividendYield;
+        if (dirFin.data.revenueGrowth) (fundResultSafe as any).revenue_growth = dirFin.data.revenueGrowth;
+      }
+    }
+
+    if (!priceHistorySafe) {
+      const dirHist = await directNseProvider.getHistory(cleanSymbol);
+      if (dirHist.data) {
+        priceHistorySafe = dirHist.data;
+      }
+    }
+
+    if (!newsSafe || newsSafe.length === 0) {
+      const dirNews = await directNseProvider.getNews(cleanSymbol);
+      if (dirNews.data) {
+        newsSafe = (dirNews.data as any);
+      }
+    }
+
+    if (!quote?.price) {
       return reply.status(503).send({
         error: "Data temporarily unavailable",
         message: "Market data providers are not responding. Please try again in a moment.",
@@ -566,7 +628,7 @@ export default async function registerApiRoutes(server: FastifyInstance) {
     }
 
     // Merge financials from cache/provider with higher priority for real data
-    const fundData = fundResult || {};
+    const fundData = (fundResultSafe && Object.keys(fundResultSafe).length > 0 ? fundResultSafe : fundResult) || {};
     if (cachedFinancials && !fundData.pe_ratio) {
       fundData.pe_ratio = cachedFinancials.peRatio;
       fundData.pb_ratio = cachedFinancials.pbRatio;
@@ -576,10 +638,10 @@ export default async function registerApiRoutes(server: FastifyInstance) {
       fundData.eps = cachedFinancials.eps;
       fundData.dividend_yield = cachedFinancials.dividendYield;
     }
-    const price = gatewayQuote.price;
-    const change = gatewayQuote.change || 0;
-    const changePercent = gatewayQuote.changePercent || 0;
-    const marketCapCr = Math.round(((gatewayMeta?.marketCap ?? (cachedFinancials?.marketCap ?? 0)) / 1e7) * 100) / 100;
+    const price = quote.price;
+    const change = quote.change || 0;
+    const changePercent = quote.changePercent || 0;
+    const marketCapCr = Math.round(((meta?.marketCap ?? (cachedFinancials?.marketCap ?? 0)) / 1e7) * 100) / 100;
     const sector: string = (fundData.sector as string) || "Diversified";
     const pe = n(fundData.pe_ratio) ?? null;
     const pb = n(fundData.pb_ratio) ?? null;
@@ -589,6 +651,8 @@ export default async function registerApiRoutes(server: FastifyInstance) {
     const divYld = n(fundData.dividend_yield) ?? null;
     const revGrowth = n(fundData.revenue_growth_3y ?? fundData.revenue_growth) ?? null;
     const profGrowth = n(fundData.profit_growth_3y ?? fundData.profit_growth) ?? null;
+    const activeNews = newsSafe && newsSafe.length > 0 ? newsSafe : null;
+    const activePriceHistory = priceHistorySafe;
     const health = 50;
     const industryPe = SECTOR_PE_MEDIAN[sector] || 20;
     const known = KNOWN[cleanSymbol];
@@ -652,7 +716,7 @@ export default async function registerApiRoutes(server: FastifyInstance) {
       },
       financials: financialsData,
       shareholding: shareholdingData,
-      news: news && news.length > 0 ? news : [
+      news: activeNews && activeNews.length > 0 ? activeNews : [
         { headline: "Quarterly results show steady performance", source: "Lensory Research", time: new Date(Date.now() - 86400000).toISOString() },
         { headline: "Sector outlook remains positive for coming quarters", source: "Financial Express", time: new Date(Date.now() - 172800000).toISOString() },
       ],
