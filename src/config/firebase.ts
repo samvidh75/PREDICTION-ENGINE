@@ -86,24 +86,36 @@ export const firebaseConfig = {
 } as const;
 
 // ── Singleton Firebase app ─────────────────────────────────────────────────
-export const firebaseApp: FirebaseApp =
-  getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
+function initFirebase(): FirebaseApp | undefined {
+  try {
+    if (!isFirebaseClientConfigured) {
+      console.warn("[StockEX Firebase] Skipping Firebase init: missing env vars");
+      return undefined;
+    }
+    return getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
+  } catch (e) {
+    console.warn("[StockEX Firebase] Failed to initialize:", e);
+    return undefined;
+  }
+}
+
+export const firebaseApp = initFirebase();
 
 // ── Auth (LOCAL persistence = survives browser refresh) ───────────────────
-export const firebaseAuth: Auth = isFirebaseClientConfigured
+export const firebaseAuth: Auth | undefined = firebaseApp
   ? getAuth(firebaseApp)
-  : (null as unknown as Auth);
+  : undefined;
 
 // Set session persistence to LOCAL so users stay signed in across refreshes.
 // This is async; components relying on auth state must use onAuthStateChanged.
-export const firebasePersistenceReady = isFirebaseClientConfigured
+export const firebasePersistenceReady = firebaseAuth
   ? setPersistence(firebaseAuth, browserLocalPersistence).catch((err) => {
       console.warn("[Firebase] Could not set auth persistence:", err);
     })
   : Promise.resolve();
 
 // ── Firestore ──────────────────────────────────────────────────────────────
-export const firestoreDb: Firestore = getFirestore(firebaseApp);
+export const firestoreDb = firebaseApp ? getFirestore(firebaseApp) : null;
 
 // ── Google OAuth Provider ─────────────────────────────────────────────────
 export const googleAuthProvider = new GoogleAuthProvider();

@@ -281,3 +281,55 @@ def screener_peers(symbol: str) -> list[dict]:
     import json
     p.write_text(json.dumps(peers, default=str))
     return peers
+
+
+def _json_safe(value):
+    if isinstance(value, pd.DataFrame):
+        return value.replace({pd.NA: None}).where(pd.notna(value), None).to_dict(orient="records")
+    if isinstance(value, list):
+        return [_json_safe(v) for v in value]
+    if isinstance(value, dict):
+        return {k: _json_safe(v) for k, v in value.items()}
+    return value
+
+
+def run_cli() -> int:
+    parser = argparse.ArgumentParser(description="Screener.in + BSE filings helper")
+    parser.add_argument("--symbol", default="RELIANCE", help="Indian symbol to fetch")
+    parser.add_argument("--mode", choices=["screener", "bse", "both"], default="both", help="What to fetch")
+    parser.add_argument("--output-dir", default=str(CACHE_DIR / "official"), help="Directory for JSON snapshots")
+    parser.add_argument("--num-filings", type=int, default=10, help="Number of BSE filings to keep")
+    parser.add_argument("--xbrl-url", default="", help="Optional BSE XBRL/PDF URL to download")
+    args = parser.parse_args()
+
+    symbol = args.symbol.upper().strip()
+    output_dir = Path(args.output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    payload: dict[str, object] = {"symbol": symbol, "fetchedAt": datetime.now().isoformat(), "mode": args.mode}
+
+    if args.mode in ("screener", "both"):
+        screener_df = screener_export(symbol)
+        payload["screenerRatios"] = screener_ratios_summary(symbol)
+        payload["screenerTables"] = _json_safe(screener_df) if screener_df is not None else None
+        if screener_df is not None and not screener_df.empty:
+            payload["profitLossRows"] = _json_safe(parse_screener_profit_loss(screener_df))
+            payload["balanceSheetRows"] = _json_safe(parse_screener_balance_sheet(screener_df))
+            payload["ratioRows"] = _json_safe(parse_screener_ratios(screener_df))
+
+    if args.mode in ("bse", "both"):
+        filings = bse_corp_filings(symbol, num_filings=args.num_filings)
+        payload["bseFilings"] = filings
+
+    if args.xbrl_url:
+        downloaded = download_xbrl(args.xbrl_url, output_dir / "xbrl")
+        payload["downloadedXbrlPath"] = str(downloaded) if downloaded else None
+
+    out_path = output_dir / f"{symbol.lower()}_{args.mode}.json"
+    out_path.write_text(json.dumps(payload, indent=2, default=str))
+    print(json.dumps({"symbol": symbol, "mode": args.mode, "output": str(out_path)}, indent=2))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(run_cli())

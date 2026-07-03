@@ -13,5 +13,5 @@ export function getFirebaseAuthClient(): { app: FirebaseApp; auth: Auth } {
   if (!isFirebaseClientConfigured) {
     throw { code: "auth/missing-api-key", message: "Firebase authentication is not configured for this deployment." };
   }
-  return { app: firebaseApp, auth: firebaseAuth };
+  return { app: firebaseApp as FirebaseApp, auth: firebaseAuth as Auth };
 }
