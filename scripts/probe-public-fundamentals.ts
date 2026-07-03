@@ -62,37 +62,31 @@ function runPython(script: string, timeoutSec = 60): string {
 
 function probeNsepythonFinancialResults(symbol: string): ProbeResult {
   const start = Date.now();
-  const script = `
+  try {
+    const output = execSync(`python3 -c "
 import json, sys
 try:
     import nsepython
 except Exception as e:
-    print(json.dumps({"status": "import_failed", "detail": str(e)[:200]}))
+    print(json.dumps({'status': 'import_failed', 'detail': str(e)[:200]}))
     sys.exit(0)
 try:
-    # Try nse_results first
-    r = nsepython.nse_results("${symbol}")
+    r = nsepython.nse_results('${symbol}')
     if isinstance(r, dict) and len(r) > 0:
         keys = list(r.keys())[:30]
         sample = {k: str(r[k])[:80] for k in keys[:8]}
         field_count = len([k for k in r if isinstance(r[k], (int, float)) and not isinstance(r[k], bool)])
-        print(json.dumps({"status": "healthy", "data_type": "dict", "keys": keys, "sample": sample, "field_count": field_count, "total_keys": len(r)}))
+        print(json.dumps({'status': 'healthy', 'data_type': 'dict', 'keys': keys, 'sample': sample, 'field_count': field_count, 'total_keys': len(r)}))
     elif isinstance(r, list) and len(r) > 0:
         first = r[0] if isinstance(r[0], dict) else {}
-        print(json.dumps({"status": "healthy", "data_type": "list", "count": len(r), "first_item_keys": list(first.keys())[:20] if first else []}))
+        print(json.dumps({'status': 'healthy', 'data_type': 'list', 'count': len(r), 'first_item_keys': list(first.keys())[:20] if first else []}))
     elif r is not None:
-        print(json.dumps({"status": "healthy", "data_type": type(r).__name__, "sample": str(r)[:300]}))
+        print(json.dumps({'status': 'healthy', 'data_type': type(r).__name__, 'sample': str(r)[:300]}))
     else:
-        print(json.dumps({"status": "no_data", "detail": "nse_results returned None"}))
+        print(json.dumps({'status': 'no_data', 'detail': 'nse_results returned None'}))
 except Exception as e:
-    print(json.dumps({"status": "endpoint_failed", "detail": str(e)[:200]}))
-`.trim();
-  try {
-    const output = execSync(`python3 -c ${JSON.stringify(script)}`, {
-      encoding: "utf-8",
-      timeout: 30_000,
-      maxBuffer: 1024 * 1024,
-    });
+    print(json.dumps({'status': 'endpoint_failed', 'detail': str(e)[:200]}))
+"`, { encoding: "utf-8", timeout: 30_000, maxBuffer: 1024 * 1024 });
     const parsed = JSON.parse(output.trim());
     return { source: "nsepython.nse_results", ...parsed, elapsedSec: (Date.now() - start) / 1000 };
   } catch (err: unknown) {

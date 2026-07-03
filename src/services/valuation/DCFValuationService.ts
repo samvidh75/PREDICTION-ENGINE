@@ -62,7 +62,7 @@ export class DCFValuationService {
     const pvOfProjectedFCF = cumulativePV;
     const enterpriseValue = pvOfProjectedFCF + pvOfTerminalValue;
     const equityValue = enterpriseValue - input.netDebt + input.cashAndEquivalents;
-    const fairValuePerShare = equityValue / input.sharesOutstanding;
+    const fairValuePerShare = Math.max(0, equityValue / input.sharesOutstanding);
 
     const safePrice = fairValuePerShare * (1 - input.marginOfSafety);
     const upside = ((fairValuePerShare - currentPrice) / currentPrice) * 100;
