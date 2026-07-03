@@ -38,7 +38,7 @@ def clean_ticker(symbol: str) -> str:
 
 
 def fetch_screener_fundamentals(ticker: str) -> dict | None:
-    """Scrape fundamental ratios from Screener.in company page."""
+    """Scrape fundamental ratios, shareholding, and P&L from Screener.in."""
     url = SCREENER_URL.format(ticker=ticker)
     try:
         res = requests.get(url, headers=HEADERS, timeout=10)
@@ -46,6 +46,7 @@ def fetch_screener_fundamentals(ticker: str) -> dict | None:
             return None
         soup = BeautifulSoup(res.text, "html.parser")
         ratios = {"ticker": ticker}
+
         # Company ratios sidebar
         for div in soup.find_all("div", class_="company-ratios"):
             for li in div.find_all("li"):
@@ -58,23 +59,55 @@ def fetch_screener_fundamentals(ticker: str) -> dict | None:
                         ratios[key] = float(raw)
                     except ValueError:
                         ratios[key] = raw
-        # Profit & Loss section for revenue, profit
+
+        # Shareholding pattern section
+        for section in soup.find_all("section"):
+            h2 = section.find("h2")
+            if h2 and "Shareholding" in h2.text:
+                rows = section.find_all("tr")
+                for row in rows:
+                    cells = row.find_all("td")
+                    if len(cells) >= 3:
+                        label = cells[0].text.strip().lower().replace(" ", "_").replace("-", "_")
+                        try:
+                            pct = float(cells[-1].text.strip().replace("%", "").replace(",", ""))
+                            ratios[f"shareholding_{label}"] = pct
+                        except ValueError:
+                            pass
+
+        # Profit & Loss section — extract TTM values
         for section in soup.find_all("section"):
             h2 = section.find("h2")
             if h2 and "Profit & Loss" in h2.text:
-                rows = section.find_all("tr")
-                for row in rows:
-                    cells = row.find_all("th")
-                    if cells and len(cells) > 1 and "latest" in cells[-1].text.lower():
-                        data_cells = row.find_all("td")
-                        if data_cells:
-                            label = cells[0].text.strip().lower().replace(" ", "_")
-                            try:
-                                ratios[f"latest_{label}"] = float(
-                                    data_cells[-1].text.strip().replace(",", "")
-                                )
-                            except ValueError:
-                                pass
+                table = section.find("table")
+                if not table:
+                    continue
+                rows = table.find_all("tr")
+                # Find the latest column index
+                header_row = rows[0] if rows else None
+                if not header_row:
+                    continue
+                th_cells = header_row.find_all("th")
+                latest_idx = None
+                for i, th in enumerate(th_cells):
+                    if "latest" in th.text.strip().lower():
+                        latest_idx = i
+                        break
+                if latest_idx is None and len(th_cells) > 1:
+                    latest_idx = len(th_cells) - 1
+                if latest_idx is None:
+                    continue
+                for row in rows[1:]:
+                    cells = row.find_all("td")
+                    if len(cells) <= latest_idx:
+                        continue
+                    label = cells[0].text.strip().lower().replace(" ", "_").replace("*", "").strip()
+                    try:
+                        val = float(cells[latest_idx].text.strip().replace(",", ""))
+                        ratios[f"ttm_{label}"] = val
+                    except ValueError:
+                        pass
+
         return ratios
     except Exception as e:
         return None
@@ -196,6 +229,23 @@ def run_sme_mesh(ticker: str, include_historical: bool = False) -> dict:
     roe = fundamentals.get("roe", 0)
     face_value = fundamentals.get("face_value", 0)
     dividend_yield = fundamentals.get("dividend_yield", 0)
+    high_low = str(fundamentals.get("high___low", ""))
+    # Normalize keys — Screener.in HTML may embed non-breaking spaces
+    def norm_key(suffix: str) -> float:
+        for k, v in fundamentals.items():
+            if suffix in k.replace("\xa0", "").replace(" ", "_"):
+                try:
+                    return float(v)
+                except (ValueError, TypeError):
+                    pass
+        return 0.0
+
+    promoter_pct = norm_key("promoters")
+    public_pct = norm_key("public")
+    ttm_sales = norm_key("sales")
+    ttm_op_profit = norm_key("operating_profit")
+    ttm_net_profit = norm_key("net_profit")
+    ttm_eps = norm_key("eps_in")
 
     metrics = {
         "ticker": symbol,
@@ -219,7 +269,13 @@ def run_sme_mesh(ticker: str, include_historical: bool = False) -> dict:
             "roe": roe,
             "face_value": face_value,
             "dividend_yield": dividend_yield,
-            "high_52w": fundamentals.get("high_low", ""),
+            "high_52w": high_low,
+            "shareholding_promoter_pct": promoter_pct,
+            "shareholding_public_pct": public_pct,
+            "ttm_sales_cr": ttm_sales,
+            "ttm_operating_profit_cr": ttm_op_profit,
+            "ttm_net_profit_cr": ttm_net_profit,
+            "ttm_eps": ttm_eps,
         },
     }
     return {"success": True, "metrics": metrics}
