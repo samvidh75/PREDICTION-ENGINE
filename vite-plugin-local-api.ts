@@ -98,10 +98,16 @@ export function localApiPlugin(): Plugin {
               } catch { /* history script failed */ }
 
               try {
-                const script = path.resolve(root, 'scripts/fetch-yahoo-news.cjs');
-                const raw = execSync(`node "${script}" "${symbol}"`, { timeout: 10000, encoding: 'utf-8' });
+                const script = path.resolve(root, 'scripts/fetch-yfinance-news.cjs');
+                const raw = execSync(`node "${script}" "${symbol}"`, { timeout: 25000, encoding: 'utf-8' });
                 liveNews = JSON.parse(raw.trim());
-              } catch { /* news script failed */ }
+              } catch { /* yfinance news failed */
+                try {
+                  const script2 = path.resolve(root, 'scripts/fetch-yahoo-news.cjs');
+                  const raw2 = execSync(`node "${script2}" "${symbol}"`, { timeout: 10000, encoding: 'utf-8' });
+                  liveNews = JSON.parse(raw2.trim());
+                } catch { /* yahoo news also failed */ }
+              }
             }
 
             const useLive = livePrice !== null;
@@ -170,7 +176,7 @@ export function localApiPlugin(): Plugin {
               shareholding: research?.shareholding || null,
               news: liveNews || research?.news || [],
               thesis: research?.thesis || null,
-              dataSources: { price: sourceLabel, fundamentals: liveFundamentals?.pe ? 'yfinance' : 'snapshot', history: liveHistory ? 'yahoo_finance' : 'snapshot', news: liveNews ? 'yahoo_finance' : 'snapshot', financials: 'snapshot', shareholding: 'snapshot' },
+              dataSources: { price: sourceLabel, fundamentals: liveFundamentals?.pe ? 'yfinance' : 'snapshot', history: liveHistory ? 'yahoo_finance' : 'snapshot', news: liveNews ? 'yfinance' : 'snapshot', financials: 'yfinance', shareholding: 'snapshot' },
               dcf,
             };
 
