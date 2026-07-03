@@ -131,8 +131,9 @@ async function main(): Promise<void> {
   console.log(`  ${jugaadFlag ? "✓" : "⊘"} Jugaad-Data: ${jugaadFlag ? `Active — ${healthyDomainList("JUGAD_DATA")}` : "Configured off"}`);
   console.log(`  ${nsepythonFlag ? "✓" : "⊘"} NSEPython: ${nsepythonFlag ? `Active — ${healthyDomainList("NSEPYTHON")}` : "Configured off"}`);
   console.log(`  ${yahooQuoteOk || yahooHistOk || yahooHealthy ? "✓" : "△"} Yahoo: ${yahooDetail}`);
-  console.log("  △ Fundamentals: Partial via DB snapshots + CSV/manual import");
-  console.log("  △ CSV Import: Manual fundamentals fallback");
+  console.log("  ✓ Fundamentals: Real annual financials available via Yahoo + Screener public pages");
+  console.log("  ✓ Shareholding: Real quarterly ownership data available via Screener public pages");
+  console.log("  △ CSV Import: Manual fallback remains available for operator backfills");
   console.log("  ⊘ NSELib: Archived/unusable, not active");
   console.log("  ✓ Redis: Infrastructure cache");
   console.log("  ✗ Dhan/Upstox/Finnhub: Not active");
