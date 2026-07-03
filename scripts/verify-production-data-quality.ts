@@ -227,19 +227,6 @@ async function main(): Promise<void> {
     },
   ));
 
-  // NSELib must be archived_unusable, not active
-  results.push(await dqCheck("nselib_archived", "compliance",
-    `${__DQ_FRONTEND}/api/ops/data-coverage`, undefined,
-    (body) => {
-      const provs = (body as any).providers as Record<string, any> || {};
-      const nselib = provs.NSELIB;
-      if (!nselib) return "NSELIB provider missing from status";
-      if (nselib.status !== "archived_unusable") return `NSELIB status=${nselib.status} (expected archived_unusable)`;
-      if (nselib.lifecycle !== "archived") return `NSELIB lifecycle=${nselib.lifecycle} (expected archived)`;
-      return null;
-    },
-  ));
-
   // Active quote provider coverage (IndianAPI or public NSE)
   results.push(await dqCheck("quote_provider_coverage", "coverage",
     `${__DQ_FRONTEND}/api/ops/data-coverage`, undefined,

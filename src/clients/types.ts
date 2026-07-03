@@ -26,7 +26,7 @@ export interface UnifiedQuote {
   changePercent: number; // percentage change
 
   // Additional context
-  source: 'yfinance' | 'nselib' | 'jugasad' | 'screener' | 'cached';
+  source: 'yfinance' | 'jugasad' | 'screener' | 'cached';
   fetched: number; // when this quote was fetched (ms since epoch)
   cached: boolean; // true if from IndexedDB
 }
@@ -47,7 +47,7 @@ export interface QuoteResult {
 export interface BatchQuoteRequest {
   symbols: string[];
   timeout?: number; // ms to wait for responses
-  preferredSources?: ('yfinance' | 'nselib' | 'screener')[];
+  preferredSources?: ('yfinance' | 'jugasad' | 'screener')[];
 }
 
 export interface BatchQuoteResponse {

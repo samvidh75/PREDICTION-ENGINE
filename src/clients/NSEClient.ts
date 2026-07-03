@@ -5,7 +5,6 @@ import { browserCache } from './BrowserCache';
  * NSE client for live Indian stock prices.
  * Primary: jugasad API (if configured)
  * Fallback: screener.in data via ScreenerClient
- * Note: Direct nselib requires CORS proxy (setup your own with NSE FAST API)
  */
 export class NSEClient {
   private readonly baseUrl = process.env.REACT_APP_NSE_PROXY_URL || 'https://api.jugasad.io/nse';
@@ -36,7 +35,7 @@ export class NSEClient {
         error: {
           symbol,
           error: this.lastError.message,
-          source: 'nselib',
+          source: 'jugasad',
           timestamp: Date.now(),
         },
       };
@@ -128,7 +127,7 @@ export class NSEClient {
       askSize: quote.askQty,
       change: (quote.lastPrice || 0) - (quote.previousClose || 0),
       changePercent: quote.pChange || 0,
-      source: 'nselib',
+      source: 'jugasad',
       fetched: Date.now(),
       cached: false,
     };

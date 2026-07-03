@@ -6,11 +6,11 @@ import { browserCache } from './BrowserCache';
 
 /**
  * Aggregates multiple data providers with intelligent fallback.
- * Default order: yfinance (fastest) → nselib (live NSE) → screener.in (fallback)
+ * Default order: yfinance (fastest) → jugasad (live NSE wrapper) → screener.in (fallback)
  * Returns first successful response within timeout.
  */
 export class ProviderAggregator {
-  private readonly defaultPreference = ['yfinance', 'nselib', 'screener'];
+  private readonly defaultPreference = ['yfinance', 'jugasad', 'screener'];
 
   /**
    * Get a quote from the best available provider.
@@ -31,7 +31,7 @@ export class ProviderAggregator {
     // All available providers
     const allProviders = [
       { name: 'yfinance', fetch: () => yfinanceClient.fetchQuote(symbol, false) },
-      { name: 'nselib', fetch: () => nseClient.fetchQuote(symbol, false) },
+      { name: 'jugasad', fetch: () => nseClient.fetchQuote(symbol, false) },
       { name: 'screener', fetch: () => screenerClient.fetchQuote(symbol, false) },
     ];
 

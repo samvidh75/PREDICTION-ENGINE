@@ -97,9 +97,10 @@ async function main(): Promise<void> {
     { label: "Screener.in (company page)", url: `https://www.screener.in/company/${symbol}/` },
     { label: "Screener.in (consolidated)", url: `https://www.screener.in/company/${symbol}/consolidated/` },
     { label: "Screener.in (quarterly)", url: `https://www.screener.in/company/${symbol}/#quarterly` },
-    { label: "Moneycontrol (financials)", url: `https://www.moneycontrol.com/financials/${symbol}/overview` },
-    { label: "Moneycontrol (ratios)", url: `https://www.moneycontrol.com/stocks/company_info/print_main.php?sc_disp=1&sc_id=${symbol}` },
-    { label: "BSE (listed companies)", url: `https://www.bseindia.com/stock-share-name/${symbol}/stock_download.html` },
+    { label: "NSE corporate filings", url: `https://www.nseindia.com/companies-listing/corporate-filings-announcements` },
+    { label: "NSE corporate actions", url: `https://www.nseindia.com/companies-listing/corporate-filings-actions` },
+    { label: "BSE corporate announcements", url: `https://www.bseindia.com/corporates/ann.html` },
+    { label: "RBI DBIE", url: `https://data.rbi.org.in/DBIE/` },
     { label: "NSE (company info)", url: `https://www.nseindia.com/api/quote-equity?symbol=${symbol}` },
   ];
 

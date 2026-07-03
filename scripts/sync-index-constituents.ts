@@ -3,7 +3,7 @@ export {};
  * sync-index-constituents.ts — Sync index constituents from public NSE sources.
  *
  * Gets NIFTY 50, NIFTY NEXT 50, Bank Nifty, and sector index constituents
- * from nsepython. nselib source removed — evaluated and not active.
+ * from nsepython.
  * Dry-run by default. --apply flag to write.
  *
  * Usage:
@@ -55,7 +55,7 @@ function parseArgs(): CliOptions {
 }
 
 function fetchIndexConstituents(_indexName: string): IndexConstituent[] {
-  // NSELib source removed — evaluated and not active. See docs/data/nselib-provider.md
+  // Legacy NSE SDK fallback removed from the active provider set.
   return [];
 }
 

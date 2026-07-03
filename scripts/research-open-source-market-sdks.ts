@@ -3,16 +3,12 @@
  * Runs isolated Python probe scripts and outputs JSON + summary.
  */
 import { execFileSync } from "child_process";
-import * as fs from "fs";
 import * as path from "path";
 
 const PROBES = [
   { name: "jugaad-data", script: "scripts/probe-jugaad-data-provider.py", pkg: "jugaad-data" },
   { name: "nsepython", script: "scripts/probe-nsepython-provider.py", pkg: "nsepython" },
-  { name: "nsetools", script: "scripts/probe-nsetools-provider.py", pkg: "nsetools" },
-  { name: "nselib", script: "scripts/probe-nselib-provider.py", pkg: "nselib", pythonBin: fs.existsSync("/tmp/nselib-probe-env/bin/python") ? "/tmp/nselib-probe-env/bin/python" : "python3" },
   { name: "akshare", script: "scripts/probe-akshare-provider.py", pkg: "akshare" },
-  { name: "nsepy", script: "scripts/probe-nsepy-provider.py", pkg: "nsepy" },
 ];
 
 interface ProbeResult {
@@ -164,14 +160,8 @@ async function main() {
       rows.push(`| ${result.provider} | probe_only | Already configured as optional fallback; domains work but scraping risk |`);
     } else if (result.provider === "nsepython") {
       rows.push(`| ${result.provider} | probe_only | Already configured; limited domain coverage |`);
-    } else if (result.provider === "nsetools") {
-      rows.push(`| ${result.provider} | archive | Legacy NSE scraper; symbol universe works but quote path is broken |`);
-    } else if (result.provider === "nselib") {
-      rows.push(`| ${result.provider} | archive | Package imports, but no usable market-data domains were discovered |`);
     } else if (result.provider === "akshare") {
       rows.push(`| ${result.provider} | future_watch | China-focused; India endpoints unverified |`);
-    } else if (result.provider === "nsepy") {
-      rows.push(`| ${result.provider} | archive | Stale/unmaintained; migrated to nsepython |`);
     } else {
       rows.push(`| ${result.provider} | archive | No usable domains verified |`);
     }

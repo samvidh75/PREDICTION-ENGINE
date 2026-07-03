@@ -52,8 +52,6 @@ function run(): RuntimeReport {
     } catch { report.packages[name] = 'not_installed'; }
   }
 
-  report.packages.nselib = 'archived_unusable';
-
   return report;
 }
 

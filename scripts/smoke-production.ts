@@ -264,17 +264,11 @@ async function main(): Promise<void> {
       }
 
       // Verify domain-level provider entries present
-      const expected = ["YAHOO", "JUGAD_DATA", "NSELIB", "NSEPYTHON", "FUNDAMENTALS_AUTOMATIC", "CSV_FALLBACK"];
+      const expected = ["YAHOO", "JUGAD_DATA", "NSEPYTHON", "FUNDAMENTALS_AUTOMATIC", "CSV_FALLBACK"];
       const missing = expected.filter((k) => !keys.includes(k));
       if (missing.length > 0) {
         results.push({ name: label, status: "warn", detail: `missing providers: ${missing.join(", ")}` });
         continue;
-      }
-
-      // NSELIB must be archived_unusable
-      const nselibEntry = provs.NSELIB;
-      if (nselibEntry && nselibEntry.status !== "archived_unusable") {
-        results.push({ name: label, status: "warn", detail: `NSELIB status=${nselibEntry.status} (expected archived_unusable)` });
       }
 
       results.push({ name: label, status: "ok" });

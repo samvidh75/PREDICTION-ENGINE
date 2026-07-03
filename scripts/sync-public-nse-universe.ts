@@ -2,7 +2,7 @@ export {};
 /**
  * sync-public-nse-universe.ts — Sync NSE universe from public providers.
  *
- * Gets equity list from nsepython. nselib source removed — evaluated and not active.
+ * Gets equity list from nsepython.
  * Upserts into master_security_registry. Dry-run by default.
  *
  * Usage:
@@ -88,7 +88,7 @@ async function main(): Promise<void> {
     script: "sync-public-nse-universe",
     mode: options.apply ? "apply" : "dry-run",
     source: options.source,
-    note: "NSELib source removed — evaluated and not active. See docs/data/nselib-provider.md",
+    note: "Legacy NSE SDK fallback removed from active provider set.",
   }));
 
   let entries: EquityEntry[] = [];

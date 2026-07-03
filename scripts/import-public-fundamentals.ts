@@ -2,7 +2,7 @@ export {};
 /**
  * import-public-fundamentals.ts — Imports financial data from public NSE sources.
  *
- * Sources: nsepython (nse_results, nse_past_results). nselib archived — see docs/data/nselib-provider.md
+ * Sources: nsepython (nse_results, nse_past_results).
  * Normalizes into financial_snapshots table format. Idempotent upsert.
  * Dry-run by default, --apply required to write.
  *
@@ -131,47 +131,6 @@ except Exception:
   }
 }
 
-function fetchFromNselib(symbol: string): NormalizedRow | null {
-  try {
-    const output = execSync(`python3 -c "
-import json, sys
-try:
-    from nselib import capital_market
-    df = capital_market.financial_results_for_equity('${symbol}')
-    if hasattr(df, 'shape') and df.shape[0] > 0:
-        row = df.iloc[-1].to_dict()
-        serialized = {k: str(v)[:100] for k, v in row.items()}
-        print(json.dumps(serialized))
-    else:
-        print('{}')
-except Exception:
-    print('{}')
-"`, { encoding: "utf-8", timeout: 30_000, maxBuffer: 1024 * 1024 });
-    const raw = JSON.parse(output.trim());
-    if (!raw || Object.keys(raw).length === 0) return null;
-    const cols = Object.keys(raw);
-    const periodKey = cols.find((k) => /period|date|year|quarter/i.test(k));
-    return {
-      symbol,
-      periodEndDate: periodKey && raw[periodKey] ? raw[periodKey].slice(0, 10) : new Date().toISOString().slice(0, 10),
-      sourceLabel: "nselib.financial_results_for_equity",
-      sourceUrl: `https://www.nseindia.com/api/result?symbol=${encodeURIComponent(symbol)}`,
-      marketCap: null,
-      peRatio: null,
-      pbRatio: null,
-      eps: finiteOrNull(raw.eps || raw.EPS),
-      roe: finiteOrNull(raw.roe || raw.ROE),
-      debtToEquity: null,
-      revenueGrowth: null,
-      earningsGrowth: null,
-      operatingMargin: null,
-      netMargin: null,
-    };
-  } catch {
-    return null;
-  }
-}
-
 function hasUsefulMetrics(row: NormalizedRow): boolean {
   const metrics = [row.marketCap, row.peRatio, row.pbRatio, row.eps, row.roe, row.debtToEquity, row.revenueGrowth, row.earningsGrowth, row.operatingMargin, row.netMargin];
   return metrics.some((m) => m !== null);
@@ -201,7 +160,6 @@ async function main(): Promise<void> {
     const batchResults = await Promise.all(batch.map(async (symbol) => {
       const row = fetchFromNsepython(symbol);
       const source = row ? "nsepython" : null;
-      // nselib fallback removed — evaluated and not active. See docs/data/nselib-provider.md
       if (!row) {
         return { symbol, status: "skipped", fields: 0, source: null, error: "no data from any source" };
       }
