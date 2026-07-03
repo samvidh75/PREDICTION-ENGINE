@@ -20,9 +20,15 @@ import type {
 
 /* ── Self-registering worker ───────────────────────────────────────── */
 
+let _workerTaskId = 0;
+
 // eslint-disable-next-line no-restricted-globals
-self.onmessage = async (event: MessageEvent<WorkerMessage | { type: string; payload: any }>): Promise<void> => {
-  const input = event.data;
+self.onmessage = async (event: MessageEvent<WorkerMessage | { type: string; payload: any; taskId?: number }>): Promise<void> => {
+  const input = event.data as any;
+  const taskId = input.taskId ?? ++_workerTaskId;
+
+  // Stale ticker guard: if a newer taskId has been dispatched, drop this result
+  const isStale = () => taskId < _workerTaskId;
 
   try {
     // Phase 35: GPU order-flow delta computation
@@ -71,9 +77,40 @@ self.onmessage = async (event: MessageEvent<WorkerMessage | { type: string; payl
 
     if ('type' in input && input.type === 'compute_indicators') {
       const indicatorInput = input as IndicatorWorkerInput;
-      const result = computeIndicators(indicatorInput.prices, indicatorInput.volumes);
+      // f32 coercion for WebGPU alignment
+      const prices = new Float32Array(indicatorInput.prices);
+      const volumes = new Float32Array(indicatorInput.volumes);
+      const result = computeIndicators(Array.from(prices), Array.from(volumes));
+      if (isStale()) return;
       // eslint-disable-next-line no-restricted-globals
       self.postMessage(result);
+      return;
+    }
+
+    if ('type' in input && input.type === 'fetch_proxy_history') {
+      const result = await fetchClientSideHistory(input.payload.ticker, input.payload.rangeDays || 90);
+      if (isStale()) return;
+      // eslint-disable-next-line no-restricted-globals
+      (self as unknown as Worker).postMessage({ type: 'proxy_history_result', payload: result, taskId }, [result.buffer]);
+      return;
+    }
+
+    if ('type' in input && input.type === 'compute_gpu_sma') {
+      const { prices, windowSize } = input.payload as { prices: number[]; windowSize: number };
+      const sma = await runGPUAnalysis(prices, windowSize);
+      if (isStale()) return;
+      const smaBuf = new Float32Array(sma);
+      // eslint-disable-next-line no-restricted-globals
+      (self as unknown as Worker).postMessage({ type: 'gpu_sma_result', payload: smaBuf, taskId }, [smaBuf.buffer]);
+      return;
+    }
+
+    if ('type' in input && input.type === 'compute_rag_context') {
+      const { metrics, query } = input.payload as { metrics: string; query: string };
+      const ragResult = await runLocalRAGContext(metrics, query);
+      if (isStale()) return;
+      // eslint-disable-next-line no-restricted-globals
+      self.postMessage({ type: 'rag_context_result', payload: ragResult, taskId });
       return;
     }
 
@@ -102,6 +139,171 @@ self.onmessage = async (event: MessageEvent<WorkerMessage | { type: string; payl
     self.postMessage({ rawReply: fallback });
   }
 };
+
+/* ── Client-Side CORS Proxy Data Fetch (Phase 80) ─────────────────── */
+
+const PROXY_HOSTS = [
+  'https://api.allorigins.win/raw?url=',
+];
+
+async function fetchClientSideHistory(ticker: string, rangeDays = 90): Promise<Float32Array> {
+  const suffix = /^\d+$/.test(ticker) ? '.BO' : '.NS';
+  const cleanTicker = ticker.replace('.NS', '').replace('.BO', '').trim();
+  const yahooUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${cleanTicker}${suffix}?interval=1d&range=${rangeDays}d`;
+  const target = encodeURIComponent(yahooUrl);
+
+  for (const proxy of PROXY_HOSTS) {
+    try {
+      const res = await fetch(proxy + target);
+      if (!res.ok) continue;
+      const wrapper = await res.json();
+      const data = wrapper.contents ? JSON.parse(wrapper.contents) : wrapper;
+      const quotes = data.chart?.result?.[0]?.indicators?.quote?.[0];
+      if (!quotes?.close) continue;
+      // Zero-fill nulls with previous valid close to prevent false RSI spikes
+      const raw = quotes.close as (number | null)[];
+      const filled: number[] = [];
+      let prev = 0;
+      for (const p of raw) {
+        if (p !== null && p !== undefined) { filled.push(p); prev = p; }
+        else { filled.push(prev || 0); }
+      }
+      return new Float32Array(filled); // f32 coercion for WebGPU alignment
+    } catch {
+      continue;
+    }
+  }
+  return new Float32Array(0);
+}
+
+/* ── WebGPU WGSL SMA Compute Shader (Phase 80) ───────────────────── */
+
+const SMA_WGSL_SHADER = `
+@group(0) @binding(0) var<storage, read> inputPrices: array<f32>;
+@group(0) @binding(1) var<storage, read_write> outputSMA: array<f32>;
+
+struct Params {
+    windowSize: u32,
+    dataLength: u32,
+};
+@group(0) @binding(2) var<uniform> params: Params;
+
+@compute @workgroup_size(64)
+fn main(@builtin(global_invocation_id) id: vec3<u32>) {
+    let index = id.x;
+    if (index >= params.dataLength) { return; }
+    if (index < params.windowSize - 1u) {
+        outputSMA[index] = inputPrices[index];
+        return;
+    }
+    var sum: f32 = 0.0;
+    for (var i: u32 = 0u; i < params.windowSize; i = i + 1u) {
+        sum = sum + inputPrices[index - i];
+    }
+    outputSMA[index] = sum / f32(params.windowSize);
+}
+`;
+
+async function runGPUAnalysis(prices: number[], windowSize = 50): Promise<number[]> {
+  if (typeof navigator === 'undefined' || !navigator.gpu) {
+    return cpuFallbackSMA(prices, windowSize);
+  }
+  try {
+    const adapter = await navigator.gpu.requestAdapter();
+    const device = await adapter?.requestDevice();
+    if (!device) return cpuFallbackSMA(prices, windowSize);
+
+    const floatData = new Float32Array(prices);
+    const byteLen = floatData.byteLength;
+
+    const usage = (GPUBufferUsage as any).STORAGE | (GPUBufferUsage as any).COPY_DST;
+    const inputBuf = device.createBuffer({ size: byteLen, usage });
+    (device.queue as any).writeBuffer(inputBuf, 0, floatData);
+
+    const outputBuf = device.createBuffer({ size: byteLen, usage: (GPUBufferUsage as any).STORAGE | (GPUBufferUsage as any).COPY_SRC });
+
+    const uniformUsage = (GPUBufferUsage as any).UNIFORM | (GPUBufferUsage as any).COPY_DST;
+    const paramBuf = device.createBuffer({ size: 8, usage: uniformUsage });
+    (device.queue as any).writeBuffer(paramBuf, 0, new Uint32Array([windowSize, prices.length]));
+
+    const module = device.createShaderModule({ code: SMA_WGSL_SHADER });
+    const pipeline = device.createComputePipeline({ layout: 'auto', compute: { module, entryPoint: 'main' } });
+
+    const bindGroup = device.createBindGroup({
+      layout: pipeline.getBindGroupLayout(0),
+      entries: [
+        { binding: 0, resource: { buffer: inputBuf } },
+        { binding: 1, resource: { buffer: outputBuf } },
+        { binding: 2, resource: { buffer: paramBuf } },
+      ],
+    });
+
+    const encoder = device.createCommandEncoder();
+    const pass = encoder.beginComputePass();
+    pass.setPipeline(pipeline);
+    pass.setBindGroup(0, bindGroup);
+    pass.dispatchWorkgroups(Math.ceil(prices.length / 64));
+    pass.end();
+
+    const readBuf = device.createBuffer({ size: byteLen, usage: (GPUBufferUsage as any).COPY_DST | (GPUBufferUsage as any).MAP_READ });
+    (encoder as any).copyBufferToBuffer(outputBuf, 0, readBuf, 0, byteLen);
+    device.queue.submit([encoder.finish()]);
+
+    await readBuf.mapAsync(GPUMapMode.READ);
+    const result = new Float32Array(readBuf.getMappedRange().slice());
+    readBuf.unmap();
+    // Explicit GPU buffer destruction to prevent OOM across long sessions
+    inputBuf.destroy();
+    outputBuf.destroy();
+    paramBuf.destroy();
+    readBuf.destroy();
+    device.destroy();
+    return Array.from(result);
+  } catch {
+    return cpuFallbackSMA(prices, windowSize);
+  }
+}
+
+function cpuFallbackSMA(data: number[], window: number): number[] {
+  return data.map((val, idx) => {
+    if (idx < window - 1) return val;
+    const slice = data.slice(idx - window + 1, idx + 1);
+    return slice.reduce((a, b) => a + b, 0) / window;
+  });
+}
+
+/* ── Client-Side RAG Context (Phase 80) ──────────────────────────── */
+
+async function runLocalRAGContext(metrics: string, userQuery: string): Promise<{ context: string; confidence: number }> {
+  const chunks = [
+    metrics,
+    `${metrics.split(',')[0] || ''} — fundamental data from Screener.in or Yahoo Finance.`,
+  ];
+  try {
+    // Attempt on-device embedding via transformers if available
+    const { pipeline: hfPipeline, env } = await import('@huggingface/transformers');
+    if (env.backends?.onnx?.wasm) env.backends.onnx.wasm.numThreads = 4;
+    const embedder = await hfPipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2', { device: 'webgpu' });
+    const queryEmb = await embedder(userQuery, { pooling: 'mean', normalize: true });
+    let bestMatch = chunks[0];
+    let bestScore = -1;
+    for (const chunk of chunks) {
+      const chunkEmb = await embedder(chunk, { pooling: 'mean', normalize: true });
+      const score = cosineSimilarity(queryEmb.data as number[], chunkEmb.data as number[]);
+      if (score > bestScore) { bestScore = score; bestMatch = chunk; }
+    }
+    return { context: bestMatch, confidence: bestScore };
+  } catch {
+    // Fallback: return first chunk with neutral confidence
+    return { context: chunks[0], confidence: 0.5 };
+  }
+}
+
+function cosineSimilarity(a: number[], b: number[]): number {
+  let dot = 0, na = 0, nb = 0;
+  for (let i = 0; i < a.length; i++) { dot += a[i] * b[i]; na += a[i] * a[i]; nb += b[i] * b[i]; }
+  return dot / (Math.sqrt(na) * Math.sqrt(nb));
+}
 
 /* ── Client-Side Indicator Computation (Phase 80) ─────────────────── */
 
