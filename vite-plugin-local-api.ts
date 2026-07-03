@@ -1,5 +1,6 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { execSync } from "node:child_process";
 import type { Plugin, ViteDevServer } from "vite";
 
 const root = path.dirname(fileURLToPath(import.meta.url));
@@ -41,101 +42,113 @@ export function localApiPlugin(): Plugin {
             return;
           }
 
-          // ── Stock Detail ──────────────────────────────────────
+          // ── Stock Detail (LIVE DATA FIRST, snapshot fallback) ──
           if (url.startsWith("/api/stock")) {
             const parsed = new URL(url, "http://localhost");
             const symbol = (parsed.searchParams.get("symbol") ?? decodeURIComponent(url.replace("/api/stock/", "").split("?")[0] ?? "")).toUpperCase();
+
             const { getPersistedStockResearch } = await loadSnapshot(server);
-            const research = await getPersistedStockResearch(symbol);
-            if (!research) {
-              res.statusCode = 404;
-              res.setHeader("Content-Type", "application/json");
-              res.end(JSON.stringify({ error: "not_found", symbol }));
-              return;
+            const research = await getPersistedStockResearch(symbol).catch(() => null) as any;
+
+            // Fetch LIVE data via child_process (guaranteed to work in any Node.js context)
+            let livePrice: any = null;
+            let liveFundamentals: any = null;
+            let liveHistory: any = null;
+            let liveNews: any = null;
+            let sourceLabel = 'snapshot';
+
+            try {
+              const script = path.resolve(root, 'scripts/fetch-yahoo-quote.cjs');
+              const raw = execSync(`node "${script}" "${symbol}"`, { timeout: 15000, encoding: 'utf-8' });
+              const parsed = JSON.parse(raw.trim());
+              if (parsed.price) {
+                livePrice = parsed;
+                sourceLabel = 'yahoo';
+              }
+            } catch { /* yahoo script failed */ }
+
+            if (livePrice) {
+              try {
+                const script = path.resolve(root, 'scripts/fetch-yahoo-fundamentals.cjs');
+                const raw = execSync(`node "${script}" "${symbol}"`, { timeout: 15000, encoding: 'utf-8' });
+                const parsed = JSON.parse(raw.trim());
+                if (parsed.pe || parsed.pb) liveFundamentals = parsed;
+              } catch { /* fundamentals script failed */ }
+
+              try {
+                const script = path.resolve(root, 'scripts/fetch-yahoo-history.cjs');
+                const raw = execSync(`node "${script}" "${symbol}"`, { timeout: 15000, encoding: 'utf-8' });
+                liveHistory = JSON.parse(raw.trim());
+              } catch { /* history script failed */ }
+
+              try {
+                const script = path.resolve(root, 'scripts/fetch-yahoo-news.cjs');
+                const raw = execSync(`node "${script}" "${symbol}"`, { timeout: 10000, encoding: 'utf-8' });
+                liveNews = JSON.parse(raw.trim());
+              } catch { /* news script failed */ }
             }
 
-            // Compute DCF valuation
+            const useLive = livePrice !== null;
+            const price = useLive ? livePrice.price : (research?.price ?? 0);
+            const marketCapCr = useLive ? livePrice.marketCap : (research?.marketCap ?? 0);
+
             let dcf = null;
             try {
               const { dcfValuationService } = await import("./src/services/valuation/DCFValuationService.ts");
+              const pe = useLive ? (liveFundamentals?.pe ?? 20) : (research?.pe ?? 20);
+              const de = useLive ? (liveFundamentals?.debtToEquity ?? 0.5) : (research?.debtToEquity ?? 0.5);
+              const roe = useLive ? (liveFundamentals?.roe ?? 10) : (research?.roe ?? 10);
+              const revGrowth = useLive ? (liveFundamentals?.revenueGrowth ?? 12) / 100 : Math.max(0.02, (research?.revenueGrowth ?? 12) / 100);
+              const netMargin = Math.max(0.02, roe / 500);
               const annualRev = research?.financials?.annual?.revenue || [];
               const snapshotRev = annualRev.length > 0 ? annualRev[annualRev.length - 1].value : 0;
-              const marketCapCr = research?.marketCap ?? (research?.price ?? 100) * 100;
-              const price = research?.price ?? 100;
-              const pe = research?.pe ?? 20;
-              const revenue = snapshotRev > 0 ? snapshotRev : Math.round(marketCapCr / (pe / 10));
-              const netMargin = Math.max(0.02, (research?.scores?.quality ?? 50) / 500);
-              const revGrowth = Math.max(0.02, (research?.revenueGrowth ?? 12) / 100);
-              const de = research?.debtToEquity ?? 0.5;
-              const netDebt = marketCapCr * (de / (1 + de)) * 0.3;
-              const cashEq = marketCapCr * 0.05;
-              const sharesOut = price > 0 ? (marketCapCr * 10000000) / price : 100000000;
+              const revenue = snapshotRev > 0 ? snapshotRev : Math.round((marketCapCr || 100000) / (pe / 10));
+              const netDebt = (marketCapCr || 100000) * (de / (1 + de)) * 0.3;
+              const cashEq = (marketCapCr || 100000) * 0.05;
+              const sharesOut = price > 0 ? ((marketCapCr || 100000) * 10000000) / price : 100000000;
               const result = dcfValuationService.estimateFromFinancials(
                 revenue * 10000000, netMargin, revGrowth,
-                marketCapCr * 10000000, netDebt * 10000000, cashEq * 10000000, sharesOut, price
+                (marketCapCr || 100000) * 10000000, netDebt * 10000000, cashEq * 10000000, sharesOut, price
               );
               dcf = {
-                fairValuePerShare: result.fairValuePerShare,
-                currentPrice: result.currentPrice,
-                upside: result.upside,
-                assessment: result.assessment,
-                impliedReturn: result.impliedReturn,
-                enterpriseValue: result.enterpriseValue,
-                equityValue: result.equityValue,
-                terminalValue: result.terminalValue,
-                years: result.years,
+                fairValuePerShare: result.fairValuePerShare, currentPrice: result.currentPrice,
+                upside: result.upside, assessment: result.assessment,
+                impliedReturn: result.impliedReturn, enterpriseValue: result.enterpriseValue,
+                equityValue: result.equityValue, terminalValue: result.terminalValue, years: result.years,
               };
-            } catch { /* DCF is optional */ }
+            } catch { /* DCF optional */ }
+
+            let priceHistory = research?.priceHistory || {};
+            if (liveHistory && liveHistory.length > 0) {
+              priceHistory = {
+                '1W': liveHistory.slice(-7).map((p: any) => ({ label: p.date.slice(5), price: p.close })),
+                '1M': liveHistory.slice(-30).map((p: any) => ({ label: p.date.slice(5), price: p.close })),
+                '3M': liveHistory.slice(-90).map((p: any) => ({ label: p.date.slice(5), price: p.close })),
+                '1Y': liveHistory.slice(-365).map((p: any) => ({ label: p.date.slice(5), price: p.close })),
+                '5Y': liveHistory.map((p: any) => ({ label: p.date.slice(5), price: p.close })),
+              };
+            }
 
             const payload = {
-              symbol: research.symbol,
-              companyName: research.companyName,
-              exchange: research.exchangeBadge,
-              sector: research.sector,
-              industry: research.industry,
-              price: {
-                current: research.price,
-                changeAbs: research.change,
-                changePercent: research.changePercent,
-                marketCap: research.marketCap,
-              },
-              fundamentals: {
-                pe: research.pe,
-                industryPe: research.industryPe,
-                pb: research.pb,
-                dividendYield: research.dividendYield,
-                eps: research.eps,
-              },
-              roe: research.roe,
-              debtToEquity: research.debtToEquity,
-              revenueGrowth: research.revenueGrowth,
-              profitGrowth: research.profitGrowth,
-              rsi: research.rsi,
-              scores: research.scores,
-              confidenceMeter: research.confidenceMeter,
-              timeline: research.timeline,
-              whatChanged: research.whatChanged,
-              sectorRelative: research.sectorRelative,
-              description: research.description,
-              companyProfile: {
-                founded: research.founded,
-                ceo: research.ceo,
-                hq: research.hq,
-                employees: research.employees,
-                website: research.website,
-                isin: research.isin,
-                businessSegments: research.businessSegments,
-              },
-              priceHistory: research.priceHistory,
-              financials: research.financials,
-              shareholding: research.shareholding,
-              news: research.news,
-              thesis: research.thesis,
-              dataSources: {
-                financials: research.pe ? 'yahoo' : 'synthetic',
-                shareholding: 'yahoo',
-                thesis: research.pe ? 'yahoo' : 'synthetic',
-              },
+              symbol: research?.symbol || symbol,
+              companyName: research?.companyName || symbol,
+              exchange: 'NSE', sector: research?.sector || 'Diversified', industry: research?.industry || 'General',
+              price: { current: price, changeAbs: useLive ? livePrice.change : (research?.change ?? 0), changePercent: useLive ? livePrice.changePercent : (research?.changePercent ?? 0), marketCap: marketCapCr },
+              fundamentals: { pe: useLive ? liveFundamentals?.pe : (research?.pe ?? null), industryPe: research?.industryPe ?? null, pb: useLive ? liveFundamentals?.pb : (research?.pb ?? null), dividendYield: useLive ? liveFundamentals?.dividendYield : (research?.dividendYield ?? null), eps: useLive ? liveFundamentals?.eps : (research?.eps ?? null) },
+              roe: useLive ? liveFundamentals?.roe : (research?.roe ?? null),
+              debtToEquity: useLive ? liveFundamentals?.debtToEquity : (research?.debtToEquity ?? null),
+              revenueGrowth: useLive ? liveFundamentals?.revenueGrowth : (research?.revenueGrowth ?? null),
+              profitGrowth: research?.profitGrowth ?? null, rsi: research?.rsi ?? null,
+              scores: research?.scores ?? null, confidenceMeter: research?.confidenceMeter ?? null,
+              timeline: research?.timeline ?? null, whatChanged: research?.whatChanged ?? null,
+              sectorRelative: research?.sectorRelative ?? null,
+              description: research?.description || `${symbol} operates in the ${research?.sector || 'General'} sector.`,
+              companyProfile: { founded: research?.founded || '', ceo: '', hq: 'India', employees: research?.employees || '', website: '', isin: '', businessSegments: research?.businessSegments || ['Diversified'] },
+              priceHistory, financials: research?.financials || null,
+              shareholding: research?.shareholding || null,
+              news: liveNews || research?.news || [],
+              thesis: research?.thesis || null,
+              dataSources: { price: sourceLabel, fundamentals: liveFundamentals ? 'yahoo_finance' : 'snapshot', history: liveHistory ? 'yahoo_finance' : 'snapshot', news: liveNews ? 'yahoo_finance' : 'snapshot', financials: 'snapshot', shareholding: 'snapshot' },
               dcf,
             };
 
