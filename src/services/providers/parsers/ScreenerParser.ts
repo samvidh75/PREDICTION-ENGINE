@@ -11,29 +11,17 @@ export interface ScreenerParsedResult {
 }
 
 export class ScreenerParser {
-  private static readonly KNOWN_RATIO_ANCHORS: Record<string, string[]> = {
-    'P/E': ['P/E', 'PE', 'P/E Ratio', 'Price to Earnings'],
+  private static readonly RATIO_LABELS: Record<string, string[]> = {
+    'P/E': ['Stock P/E', 'P/E', 'PE', 'P/E Ratio', 'Price to Earnings'],
     'P/B': ['P/B', 'PB', 'P/B Ratio', 'Price to Book'],
-    'Earnings per share': ['Earnings per share', 'EPS', 'EPS (TTM)', 'Earnings Per Share'],
+    'EPS': ['EPS', 'Earnings Per Share', 'Earnings per share'],
     'Dividend Yield': ['Dividend Yield', 'Div Yield', 'Dividend'],
-    'Beta': ['Beta'],
     'Market Cap': ['Market Cap', 'Market Capitalization', 'Mkt Cap'],
-    'Free Float': ['Free Float'],
-    'FCF Yield': ['FCF Yield', 'Free Cash Flow Yield'],
-    'EV/EBITDA': ['EV/EBITDA', 'Enterprise Value/EBITDA'],
-    'ROA': ['ROA', 'Return on Assets', 'Return On Assets'],
     'ROE': ['ROE', 'Return on Equity', 'Return On Equity'],
     'ROCE': ['ROCE', 'Return on Capital Employed'],
-    'ROIC': ['ROIC', 'Return on Invested Capital', 'Return On Invested Capital'],
-    'Debt to Equity': ['Debt to Equity', 'D/E', 'Debt/Equity'],
-    'Current Ratio': ['Current Ratio'],
-    'Revenue Growth': ['Revenue Growth', 'Sales Growth'],
-    'Profit Growth': ['Profit Growth', 'Net Profit Growth'],
-    'EPS Growth': ['EPS Growth'],
-    'FCF Growth': ['FCF Growth'],
-    'Gross Margin': ['Gross Margin', 'Gross Profit Margin'],
-    'Operating Margin': ['Operating Margin', 'Operating Profit Margin'],
-    'Net Margin': ['Net Margin', 'Net Profit Margin'],
+    'Book Value': ['Book Value'],
+    'Face Value': ['Face Value'],
+    'Current Price': ['Current Price'],
   };
 
   private static readonly INDIAN_ISIN = /ISIN[:\s]*(?:<[^>]*>)*\s*([A-Z]{2}[A-Z0-9]{9}\d)/i;
@@ -54,28 +42,40 @@ export class ScreenerParser {
     return raw.replace(/<[^>]*>/g, '').trim();
   }
 
-  private static extractCellValue(html: string, label: string): string | null {
-    const esc = this.escapeRegex(label);
+  private static parseCompanyRatios(html: string): Record<string, string> {
+    const ratios: Record<string, string> = {};
 
-    const patterns = [
-      new RegExp(`<td[^>]*>\\s*${esc}\\s*<\\/td>\\s*<td[^>]*>\\s*([^<]+?)\\s*<\\/td>`, 'i'),
-      new RegExp(`<span[^>]*>\\s*${esc}\\s*<\\/span>\\s*<span[^>]*>\\s*([^<]+?)\\s*<\\/span>`, 'i'),
-      new RegExp(`<th[^>]*>\\s*${esc}\\s*<\\/th>\\s*<td[^>]*>\\s*([^<]+?)\\s*<\\/td>`, 'i'),
-      new RegExp(`<div[^>]*>\\s*${esc}\\s*<\\/div>\\s*<div[^>]*>\\s*([^<]+?)\\s*<\\/div>`, 'i'),
-      new RegExp(`<dt[^>]*>\\s*${esc}\\s*<\\/dt>\\s*<dd[^>]*>\\s*([^<]+?)\\s*<\\/dd>`, 'i'),
-    ];
+    const panelMatch = html.match(/<div[^>]*class="[^"]*company-ratios[^"]*"[^>]*>[\s\S]*?<ul[^>]*>([\s\S]*?)<\/ul>/i);
+    if (!panelMatch) return ratios;
 
-    for (const pattern of patterns) {
-      const m = html.match(pattern);
-      if (m) return this.stripTags(m[1]);
+    const listHtml = panelMatch[1];
+    const itemRegex = /<li[^>]*>([\s\S]*?)<\/li>/gi;
+    let itemMatch: RegExpExecArray | null;
+
+    while ((itemMatch = itemRegex.exec(listHtml)) !== null) {
+      const itemHtml = itemMatch[1];
+      const nameMatch = itemHtml.match(/<span[^>]*class="name"[^>]*>([\s\S]*?)<\/span>/i);
+      if (!nameMatch) continue;
+      const label = this.stripTags(nameMatch[1]);
+
+      const valueMatch = itemHtml.match(/<span[^>]*class="[^"]*value[^"]*"[^>]*>([\s\S]*?)<\/span>/i);
+      if (!valueMatch) continue;
+      const value = this.stripTags(valueMatch[1]);
+
+      for (const [key, aliases] of Object.entries(this.RATIO_LABELS)) {
+        if (aliases.some(a => label.toLowerCase().includes(a.toLowerCase()))) {
+          ratios[key] = value;
+          break;
+        }
+      }
     }
 
-    return null;
+    return ratios;
   }
 
   private static parseTablesToRecords(html: string, matchHeaders: string[]): Array<Record<string, string>> {
     const results: Array<Record<string, string>> = [];
-    const tableRegex = /<table[^>]*>([\s\S]*?)<\/table>/gi;
+    const tableRegex = /<table[^>]*class="[^"]*data-table[^"]*"[^>]*>([\s\S]*?)<\/table>/gi;
     let tableMatch: RegExpExecArray | null;
 
     while ((tableMatch = tableRegex.exec(html)) !== null) {
@@ -127,40 +127,31 @@ export class ScreenerParser {
       ?? '';
     const isin = html.match(ScreenerParser.INDIAN_ISIN)?.[1]?.trim();
 
-    const ratios: Record<string, string> = {};
-    let anchorFound = false;
-
-    for (const [key, aliases] of Object.entries(ScreenerParser.KNOWN_RATIO_ANCHORS)) {
-      for (const alias of aliases) {
-        const value = ScreenerParser.extractCellValue(html, alias);
-        if (value !== null && value !== '') {
-          ratios[key] = value;
-          anchorFound = true;
-          break;
-        }
-      }
-    }
-
-    if (!anchorFound) {
-      throw new Error('PROVIDER_SCHEMA_DRIFT: No known ratio anchors found in Screener.in HTML');
-    }
+    const ratios = ScreenerParser.parseCompanyRatios(html);
+    const hasAnyRatio = Object.keys(ratios).length > 0;
 
     const quarterlyResults = ScreenerParser.parseTablesToRecords(html, ['Quarter', 'Revenue']);
     const profitLoss = ScreenerParser.parseTablesToRecords(html, ['Revenue', 'Profit']);
-    const balanceSheet = ScreenerParser.parseTablesToRecords(html, ['Assets', 'Liabilities', 'Equity']);
+    const balanceSheet = ScreenerParser.parseTablesToRecords(html, ['Assets', 'Liabilities']);
     const cashFlow = ScreenerParser.parseTablesToRecords(html, ['Cash Flow', 'Operations', 'Investing']);
 
-    return {
+    const result: ScreenerParsedResult = {
       companyName,
       sector,
       industry,
-      isin,
+      isin: isin || undefined,
       ratios,
       quarterlyResults,
       profitLoss,
       balanceSheet,
       cashFlow,
     };
+
+    if (!hasAnyRatio) {
+      throw new Error('PROVIDER_SCHEMA_DRIFT: No known ratio anchors found in Screener.in HTML');
+    }
+
+    return result;
   }
 
   parseQuarterlyResults(html: string): Array<Record<string, string>> {
@@ -174,8 +165,6 @@ export class ScreenerParser {
     pledgedPromoterHolding: string | null;
   } {
     const extractPct = (label: string): string | null => {
-      const tableValue = ScreenerParser.extractCellValue(html, label);
-      if (tableValue) return tableValue;
       const esc = ScreenerParser.escapeRegex(label);
       const p = new RegExp(`${esc}[^<]*<[^>]*>([^<]+)`, 'i');
       const m = html.match(p);
