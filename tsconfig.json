@@ -6,7 +6,7 @@
     "noEmit": true,
     "isolatedModules": true,
     "useDefineForClassFields": true,
-    "types": ["vite/client", "vitest/globals"]
+    "types": ["vite/client", "vitest/globals", "@webgpu/types"]
   },
   "include": [
     "src/env-shim.js",
