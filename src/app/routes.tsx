@@ -32,6 +32,11 @@ const BillingSuccessPage = lazy(() => import("../pages/BillingSuccessPage"));
 const BillingCancelPage = lazy(() => import("../pages/BillingCancelPage"));
 const OpsDashboard = lazy(() => import("../pages/OpsDashboard"));
 const DashboardPage = lazy(() => import("../pages/DashboardPage"));
+const OptionsChainPage = lazy(() => import("../pages/OptionsChainPage"));
+const BacktestPage = lazy(() => import("../pages/BacktestPage"));
+const AlertPage = lazy(() => import("../pages/AlertPage"));
+const PortfolioAnalyticsPage = lazy(() => import("../pages/PortfolioAnalyticsPage"));
+const LiveMarketPage = lazy(() => import("../pages/LiveMarketPage"));
 
 const SHOW_ABOUT_PAGE = import.meta.env.VITE_SHOW_ABOUT_PAGE === "true";
 
@@ -108,6 +113,11 @@ export function AppRoutes() {
         <Route path="/billing/cancel" element={<WorkspaceRoute><BillingCancelPage /></WorkspaceRoute>} />
         <Route path="/ops" element={<WorkspaceRoute><OpsDashboard /></WorkspaceRoute>} />
         <Route path="/dashboard" element={<WorkspaceRoute><HomePage /></WorkspaceRoute>} />
+        <Route path="/options-chain" element={<WorkspaceRoute><OptionsChainPage /></WorkspaceRoute>} />
+        <Route path="/backtest" element={<WorkspaceRoute><BacktestPage /></WorkspaceRoute>} />
+        <Route path="/alerts" element={<WorkspaceRoute><AlertPage /></WorkspaceRoute>} />
+        <Route path="/portfolio-analytics" element={<WorkspaceRoute><PortfolioAnalyticsPage /></WorkspaceRoute>} />
+        <Route path="/live-market" element={<WorkspaceRoute><LiveMarketPage /></WorkspaceRoute>} />
 
         {enableWaitlistPage && <Route path="/waitlist" element={<WorkspaceRoute><WaitlistPage /></WorkspaceRoute>} />}
         {changelogEnabled && <Route path="/changelog" element={<WorkspaceRoute><ChangelogPage /></WorkspaceRoute>} />}

@@ -1,0 +1,342 @@
+export type EconomicEventImportance = 'high' | 'medium' | 'low';
+
+export interface EconomicEvent {
+  date: string;
+  time: string;
+  event: string;
+  country: 'IN' | 'US' | 'global';
+  importance: EconomicEventImportance;
+  previous: string;
+  forecast: string;
+  actual: string | null;
+  impact: 'positive' | 'negative' | 'neutral' | null;
+  description: string;
+}
+
+export class EconomicCalendar {
+  private upcomingEvents: EconomicEvent[] = [
+    {
+      date: this.daysFromNow(5),
+      time: '10:00 IST',
+      event: 'RBI Monetary Policy Decision',
+      country: 'IN',
+      importance: 'high',
+      previous: '6.50%',
+      forecast: '6.50%',
+      actual: null,
+      impact: null,
+      description: 'RBI repo rate decision. Markets expect a status quo given the current inflation trajectory.',
+    },
+    {
+      date: this.daysFromNow(12),
+      time: '17:30 IST',
+      event: 'India CPI Inflation (YoY)',
+      country: 'IN',
+      importance: 'high',
+      previous: '4.85%',
+      forecast: '4.90%',
+      actual: null,
+      impact: null,
+      description: 'Consumer Price Index inflation data. Key indicator for RBI policy direction.',
+    },
+    {
+      date: this.daysFromNow(15),
+      time: '12:00 IST',
+      event: 'India GDP Growth Rate (QoQ)',
+      country: 'IN',
+      importance: 'high',
+      previous: '6.2%',
+      forecast: '6.0%',
+      actual: null,
+      impact: null,
+      description: 'Quarterly GDP growth rate. Tracks the expansion pace of the Indian economy.',
+    },
+    {
+      date: this.daysFromNow(3),
+      time: '09:00 IST',
+      event: 'HSBC India Manufacturing PMI',
+      country: 'IN',
+      importance: 'medium',
+      previous: '57.5',
+      forecast: '57.2',
+      actual: null,
+      impact: null,
+      description: 'Manufacturing Purchasing Managers Index. Above 50 indicates expansion.',
+    },
+    {
+      date: this.daysFromNow(7),
+      time: '09:00 IST',
+      event: 'HSBC India Services PMI',
+      country: 'IN',
+      importance: 'medium',
+      previous: '59.0',
+      forecast: '58.5',
+      actual: null,
+      impact: null,
+      description: 'Services Purchasing Managers Index. Key gauge of service sector activity.',
+    },
+    {
+      date: this.daysFromNow(10),
+      time: '16:00 IST',
+      event: 'India Index of Industrial Production (YoY)',
+      country: 'IN',
+      importance: 'medium',
+      previous: '5.0%',
+      forecast: '4.8%',
+      actual: null,
+      impact: null,
+      description: 'IIP measures growth in industrial production across mining, manufacturing, and electricity.',
+    },
+    {
+      date: this.daysFromNow(18),
+      time: '18:00 IST',
+      event: 'India Trade Deficit',
+      country: 'IN',
+      importance: 'medium',
+      previous: '$-18.7B',
+      forecast: '$-19.2B',
+      actual: null,
+      impact: null,
+      description: 'Difference between exports and imports. Widening deficit pressures the rupee.',
+    },
+    {
+      date: this.daysFromNow(20),
+      time: '10:00 IST',
+      event: 'India WPI Inflation (YoY)',
+      country: 'IN',
+      importance: 'medium',
+      previous: '2.10%',
+      forecast: '2.30%',
+      actual: null,
+      impact: null,
+      description: 'Wholesale Price Index inflation. Leading indicator for CPI trends.',
+    },
+    {
+      date: this.daysFromNow(2),
+      time: '20:30 IST',
+      event: 'US Non-Farm Payrolls',
+      country: 'US',
+      importance: 'high',
+      previous: '272K',
+      forecast: '195K',
+      actual: null,
+      impact: null,
+      description: 'US employment data. Influences global risk appetite and FII flows into emerging markets.',
+    },
+    {
+      date: this.daysFromNow(6),
+      time: '20:00 IST',
+      event: 'US CPI Inflation (YoY)',
+      country: 'US',
+      importance: 'high',
+      previous: '3.3%',
+      forecast: '3.2%',
+      actual: null,
+      impact: null,
+      description: 'US inflation reading. Affects Fed rate expectations and USD-INR trajectory.',
+    },
+    {
+      date: this.daysFromNow(4),
+      time: '18:00 IST',
+      event: 'India Fiscal Deficit (YTD)',
+      country: 'IN',
+      importance: 'low',
+      previous: '67.5% of budget',
+      forecast: '69.0% of budget',
+      actual: null,
+      impact: null,
+      description: 'Year-to-date fiscal deficit as percentage of budget estimate.',
+    },
+    {
+      date: this.daysFromNow(14),
+      time: '09:00 IST',
+      event: 'India M3 Money Supply',
+      country: 'IN',
+      importance: 'low',
+      previous: '11.2%',
+      forecast: '11.0%',
+      actual: null,
+      impact: null,
+      description: 'Broad money supply growth. Monitored for liquidity conditions.',
+    },
+    {
+      date: this.daysFromNow(22),
+      time: '10:00 IST',
+      event: 'India Bank Loan Growth',
+      country: 'IN',
+      importance: 'low',
+      previous: '15.3%',
+      forecast: '15.1%',
+      actual: null,
+      impact: null,
+      description: 'Year-over-year growth in bank credit. Indicator of economic activity.',
+    },
+    {
+      date: this.daysFromNow(1),
+      time: '15:30 IST',
+      event: 'India Foreign Exchange Reserves',
+      country: 'IN',
+      importance: 'low',
+      previous: '$652B',
+      forecast: '$655B',
+      actual: null,
+      impact: null,
+      description: 'Weekly RBI forex reserves data. Adequacy cushions INR volatility.',
+    },
+    {
+      date: this.daysFromNow(25),
+      time: '10:00 IST',
+      event: 'India Current Account Deficit (QoQ)',
+      country: 'IN',
+      importance: 'high',
+      previous: '$-8.4B',
+      forecast: '$-9.1B',
+      actual: null,
+      impact: null,
+      description: 'CAD as percentage of GDP. Key external sector vulnerability metric.',
+    },
+  ];
+
+  private recentEvents: EconomicEvent[] = [
+    {
+      date: this.daysAgo(5),
+      time: '10:00 IST',
+      event: 'RBI Monetary Policy Decision',
+      country: 'IN',
+      importance: 'high',
+      previous: '6.50%',
+      forecast: '6.50%',
+      actual: '6.50%',
+      impact: 'neutral',
+      description: 'RBI kept repo rate unchanged at 6.50% with a status quo stance, citing inflation risks.',
+    },
+    {
+      date: this.daysAgo(10),
+      time: '17:30 IST',
+      event: 'India CPI Inflation (YoY)',
+      country: 'IN',
+      importance: 'high',
+      previous: '4.83%',
+      forecast: '4.90%',
+      actual: '4.75%',
+      impact: 'positive',
+      description: 'CPI came in below expectations at 4.75%, driven by cooling vegetable prices. Core inflation remains sticky.',
+    },
+    {
+      date: this.daysAgo(15),
+      time: '09:00 IST',
+      event: 'HSBC India Manufacturing PMI',
+      country: 'IN',
+      importance: 'medium',
+      previous: '58.4',
+      forecast: '58.0',
+      actual: '58.8',
+      impact: 'positive',
+      description: 'Manufacturing PMI rose to 58.8, indicating strong expansion in new orders and output.',
+    },
+    {
+      date: this.daysAgo(20),
+      time: '20:00 IST',
+      event: 'US CPI Inflation (YoY)',
+      country: 'US',
+      importance: 'high',
+      previous: '3.4%',
+      forecast: '3.3%',
+      actual: '3.1%',
+      impact: 'positive',
+      description: 'US inflation cooled more than expected to 3.1%, boosting hopes for early Fed rate cuts.',
+    },
+    {
+      date: this.daysAgo(25),
+      time: '20:30 IST',
+      event: 'US Non-Farm Payrolls',
+      country: 'US',
+      importance: 'high',
+      previous: '248K',
+      forecast: '210K',
+      actual: '272K',
+      impact: 'negative',
+      description: 'NFP came in hot at 272K, reducing probability of near-term Fed rate cuts.',
+    },
+    {
+      date: this.daysAgo(7),
+      time: '10:00 IST',
+      event: 'India GDP Growth Rate (QoQ)',
+      country: 'IN',
+      importance: 'high',
+      previous: '6.1%',
+      forecast: '6.0%',
+      actual: '6.3%',
+      impact: 'positive',
+      description: 'GDP grew 6.3% QoQ, beating estimates. Driven by strong government capex and services demand.',
+    },
+    {
+      date: this.daysAgo(3),
+      time: '18:00 IST',
+      event: 'India Trade Deficit',
+      country: 'IN',
+      importance: 'medium',
+      previous: '$-18.5B',
+      forecast: '$-19.0B',
+      actual: '$-17.9B',
+      impact: 'positive',
+      description: 'Trade deficit narrowed to $17.9B on lower gold imports and steady remittance inflows.',
+    },
+    {
+      date: this.daysAgo(12),
+      time: '12:00 IST',
+      event: 'India Index of Industrial Production (YoY)',
+      country: 'IN',
+      importance: 'medium',
+      previous: '4.9%',
+      forecast: '5.1%',
+      actual: '5.6%',
+      impact: 'positive',
+      description: 'IIP rose to 5.6% driven by manufacturing and electricity generation.',
+    },
+    {
+      date: this.daysAgo(30),
+      time: '10:00 IST',
+      event: 'India WPI Inflation (YoY)',
+      country: 'IN',
+      importance: 'medium',
+      previous: '2.5%',
+      forecast: '2.1%',
+      actual: '2.0%',
+      impact: 'neutral',
+      description: 'WPI eased to 2.0% on softer global commodity prices.',
+    },
+    {
+      date: this.daysAgo(18),
+      time: '09:00 IST',
+      event: 'India Current Account Deficit (QoQ)',
+      country: 'IN',
+      importance: 'high',
+      previous: '$-9.2B',
+      forecast: '$-8.8B',
+      actual: '$-7.6B',
+      impact: 'positive',
+      description: 'CAD narrowed to $7.6B (1.0% of GDP) on robust service exports and lower oil import bill.',
+    },
+  ];
+
+  private daysFromNow(days: number): string {
+    return new Date(Date.now() + days * 86400000).toISOString().split('T')[0];
+  }
+
+  private daysAgo(days: number): string {
+    return new Date(Date.now() - days * 86400000).toISOString().split('T')[0];
+  }
+
+  getUpcomingEvents(days: number = 30): EconomicEvent[] {
+    const cutoff = new Date(Date.now() + days * 86400000);
+    return this.upcomingEvents.filter(e => new Date(e.date) <= cutoff).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  }
+
+  getRecentEvents(days: number = 30): EconomicEvent[] {
+    const cutoff = new Date(Date.now() - days * 86400000);
+    return this.recentEvents.filter(e => new Date(e.date) >= cutoff).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  }
+}
+
+export const economicCalendar = new EconomicCalendar();
