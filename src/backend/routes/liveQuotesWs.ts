@@ -59,7 +59,7 @@ export class LiveQuoteServer {
     });
   }
 
-  private handleNewConnection(ws: WebSocket, req: FastifyRequest) {
+  private handleNewConnection(ws: WebSocket, _req: FastifyRequest) {
     const clientId = `client_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
     const subscription: ClientSubscription = { ws, symbols: new Set(), isAlive: true };
     this.clients.set(clientId, subscription);
@@ -119,6 +119,7 @@ export class LiveQuoteServer {
 
       try {
         const quotes = await this.provider.fetchQuotes(Array.from(allSymbols));
+
         for (const quote of quotes) {
           const update: QuoteUpdate = {
             symbol: quote.symbol,
@@ -132,22 +133,28 @@ export class LiveQuoteServer {
           this.quoteCache.set(quote.symbol, update);
         }
 
+        const serializedQuotes = quotes.map((q, i) => {
+          const upd = this.quoteCache.get(q.symbol);
+          return JSON.stringify({
+            type: 'quote',
+            symbol: q.symbol,
+            price: q.price,
+            bid: q.bid,
+            ask: q.ask,
+            volume: q.volume,
+            timestamp: upd?.timestamp ?? new Date().toISOString(),
+            source: (q as any).source ?? 'yahoo',
+          });
+        });
+
         for (const [clientId, sub] of this.clients) {
           if (!sub.isAlive || sub.symbols.size === 0) continue;
-          for (const quote of quotes) {
-            if (sub.symbols.has(quote.symbol)) {
+          for (let i = 0; i < quotes.length; i++) {
+            if (sub.symbols.has(quotes[i].symbol)) {
               try {
-                sub.ws.send(JSON.stringify({
-                  type: 'quote',
-                  symbol: quote.symbol,
-                  price: quote.price,
-                  bid: quote.bid,
-                  ask: quote.ask,
-                  volume: quote.volume,
-                  timestamp: new Date().toISOString(),
-                  source: quote.source,
-                }));
-              } catch {
+                sub.ws.send(serializedQuotes[i]);
+              } catch (err) {
+                console.error(`[WS] Send failed (${clientId}):`, err);
                 this.clients.delete(clientId);
               }
             }
@@ -161,6 +168,7 @@ export class LiveQuoteServer {
     this.healthCheckInterval = setInterval(() => {
       for (const [clientId, sub] of this.clients) {
         if (!sub.isAlive) {
+          console.log(`[WS] Terminating dead client: ${clientId}`);
           sub.ws.close();
           this.clients.delete(clientId);
           continue;
@@ -183,5 +191,8 @@ export async function registerLiveQuotesWs(app: FastifyInstance) {
   const server = new LiveQuoteServer(app);
   server.register();
   server.startBroadcast();
-  process.on('SIGTERM', () => { server.stopBroadcast(); });
+  process.on('SIGTERM', () => {
+    console.log('[WS] Shutting down gracefully...');
+    server.stopBroadcast();
+  });
 }

@@ -2,7 +2,13 @@
  * React Hook: WebSocket Live Quote Stream
  *
  * Usage:
- * const quotes = useLiveQuotes(['TCS', 'INFY', 'RELIANCE']);
+ *   const { quotes, isConnected, get } = useLiveQuotes(['TCS', 'INFY']);
+ *   const tcs = get('TCS'); // LiveQuote | undefined
+ *
+ * Protocol:
+ *   Client → {"type":"subscribe", "symbols":["TCS","INFY"]}
+ *   Client → {"type":"unsubscribe", "symbols":["RELIANCE"]}
+ *   Server → {"symbol":"TCS", "price":4523.5, "bid":4522.0, "ask":4524.5, "volume":1234567, "timestamp":"..."}
  */
 
 import { useEffect, useState, useCallback, useRef } from 'react';
@@ -13,127 +19,161 @@ export interface LiveQuote {
   bid: number;
   ask: number;
   volume: number;
-  timestamp: number;
-  source: 'indianapi' | 'groww' | 'yahoo';
+  timestamp: string;
+  priceChange?: number;
+  priceChangePercent?: number;
+  source?: string;
 }
 
 interface UseLiveQuotesOptions {
-  enabled?: boolean;
   onError?: (error: Error) => void;
+  autoConnect?: boolean;
+  includeDetails?: boolean;
 }
 
+const wsUrl =
+  typeof window !== 'undefined'
+    ? `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/api/quotes/ws`
+    : '';
+
 export function useLiveQuotes(
-  symbols: string[],
+  symbols: string | string[],
   options: UseLiveQuotesOptions = {}
 ) {
-  const { enabled = true, onError } = options;
+  const { onError, autoConnect = true, includeDetails = false } = options;
 
-  const [quotes, setQuotes] = useState<Record<string, LiveQuote>>({});
+  const [quotes, setQuotes] = useState<Map<string, LiveQuote>>(new Map());
   const [isConnected, setIsConnected] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
   const wsRef = useRef<WebSocket | null>(null);
-  const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastPricesRef = useRef<Map<string, number>>(new Map());
+
+  const symbolArray = Array.isArray(symbols) ? symbols : [symbols];
+  const symbolKey = symbolArray.join(',');
 
   useEffect(() => {
-    if (!enabled || symbols.length === 0) return;
+    if (!autoConnect || !symbolArray.length || !wsUrl) return;
 
-    const getWsBase = () => {
-      if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
-        return `ws://localhost:${window.location.port || '10000'}`;
-      }
-      return 'wss://api.stockstory-india.com';
-    };
-
-    const connectWebSocket = () => {
+    const connect = () => {
       try {
-        const ws = new WebSocket(`${getWsBase()}/api/quotes/ws`);
+        const ws = new WebSocket(wsUrl);
 
         ws.onopen = () => {
-          console.log('WebSocket connected');
+          console.log('[WS] Connected');
           setIsConnected(true);
-          setError(null);
 
-          ws.send(JSON.stringify({ type: 'subscribe', symbols }));
+          ws.send(JSON.stringify({
+            type: 'subscribe',
+            symbols: symbolArray,
+          }));
         };
 
         ws.onmessage = (event) => {
           try {
-            const message = JSON.parse(event.data);
+            const data = JSON.parse(event.data);
 
-            if (message.type === 'quote') {
-              setQuotes(prev => ({
-                ...prev,
-                [message.symbol]: {
-                  symbol: message.symbol,
-                  price: message.price,
-                  bid: message.bid,
-                  ask: message.ask,
-                  volume: message.volume,
-                  timestamp: message.timestamp,
-                  source: message.source
-                }
-              }));
+            if (data.type === 'connected') {
+              console.log('[WS] Greeting:', data.message);
+              return;
+            }
+
+            if (data.symbol) {
+              const prevPrice = lastPricesRef.current.get(data.symbol);
+              const priceChange = prevPrice != null ? data.price - prevPrice : 0;
+              const priceChangePercent = prevPrice != null
+                ? (priceChange / prevPrice) * 100
+                : 0;
+
+              lastPricesRef.current.set(data.symbol, data.price);
+
+              setQuotes((prev) => {
+                const next = new Map(prev);
+                next.set(data.symbol, {
+                  symbol: data.symbol,
+                  price: data.price,
+                  bid: data.bid,
+                  ask: data.ask,
+                  volume: data.volume ?? 0,
+                  timestamp: data.timestamp ?? new Date().toISOString(),
+                  priceChange,
+                  priceChangePercent,
+                  source: data.source,
+                });
+                return next;
+              });
             }
           } catch (err) {
-            console.error('Parse error:', err);
+            console.error('[WS] Parse error:', err);
           }
         };
 
         ws.onerror = () => {
           const errorMsg = 'WebSocket connection error';
           console.error(errorMsg);
-          setError(errorMsg);
           if (onError) onError(new Error(errorMsg));
         };
 
         ws.onclose = () => {
-          console.log('WebSocket disconnected');
+          console.log('[WS] Disconnected');
           setIsConnected(false);
 
           reconnectTimeoutRef.current = setTimeout(() => {
-            connectWebSocket();
-          }, 5000);
+            connect();
+          }, 3000);
         };
 
         wsRef.current = ws;
       } catch (err) {
         const errorMsg = err instanceof Error ? err.message : 'Unknown error';
-        console.error('WebSocket connection failed:', errorMsg);
-        setError(errorMsg);
+        console.error('[WS] Connection failed:', errorMsg);
         if (onError) onError(new Error(errorMsg));
       }
     };
 
-    connectWebSocket();
+    connect();
 
     return () => {
       if (reconnectTimeoutRef.current) {
         clearTimeout(reconnectTimeoutRef.current);
       }
-      if (wsRef.current) {
-        wsRef.current.close();
+      if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+        wsRef.current.send(JSON.stringify({
+          type: 'unsubscribe',
+          symbols: symbolArray,
+        }));
       }
+      wsRef.current?.close();
     };
-  }, [enabled, symbols.join(','), onError]);
+  }, [symbolKey, autoConnect, onError]);
+
+  const get = useCallback((symbol: string): LiveQuote | undefined => {
+    return quotes.get(symbol.toUpperCase());
+  }, [quotes]);
+
+  const getAll = useCallback((): LiveQuote[] => {
+    return Array.from(quotes.values());
+  }, [quotes]);
 
   const subscribe = useCallback((symbol: string) => {
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-      wsRef.current.send(JSON.stringify({ type: 'subscribe', symbols: [symbol] }));
+      wsRef.current.send(JSON.stringify({ type: 'subscribe', symbols: [symbol.toUpperCase()] }));
     }
   }, []);
 
   const unsubscribe = useCallback((symbol: string) => {
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-      wsRef.current.send(JSON.stringify({ type: 'unsubscribe', symbols: [symbol] }));
+      wsRef.current.send(JSON.stringify({ type: 'unsubscribe', symbols: [symbol.toUpperCase()] }));
     }
   }, []);
 
   return {
     quotes,
     isConnected,
-    error,
+    get,
+    getAll,
     subscribe,
-    unsubscribe
+    unsubscribe,
   };
 }
+
+

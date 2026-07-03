@@ -214,6 +214,7 @@
     "firebase": "^11.3.0",
     "firebase-admin": "^14.0.0",
     "framer-motion": "^12.25.1",
+    "idb": "^8.0.3",
     "lru-cache": "^11.3.6",
     "lucide-react": "^0.300.0",
     "ollama": "^0.6.3",

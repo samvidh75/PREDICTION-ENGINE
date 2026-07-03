@@ -169,6 +169,12 @@ export function removeTickerFromWatchlist(listId: string, ticker: string, uid?: 
   }
 }
 
+export function deleteWatchlist(id: string, uid?: string): void {
+  const lists = getWatchlists(uid);
+  const filtered = lists.filter(w => w.id !== id);
+  saveWatchlists(filtered, uid);
+}
+
 export function updateWatchlistOrder(orderedIds: string[], uid?: string): void {
   const lists = getWatchlists(uid);
   lists.forEach(w => {
