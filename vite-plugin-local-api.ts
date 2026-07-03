@@ -59,18 +59,20 @@ export function localApiPlugin(): Plugin {
             try {
               const { dcfValuationService } = await import("./src/services/valuation/DCFValuationService.ts");
               const annualRev = research?.financials?.annual?.revenue || [];
-              const revenue = annualRev.length > 0 ? annualRev[annualRev.length - 1].value : 5000;
-              const netMargin = (research?.scores?.quality ?? 50) / 500;
-              const revGrowth = (research?.revenueGrowth ?? 12) / 100;
-              const de = research?.debtToEquity ?? 0.5;
-              const marketCap = research?.marketCap ?? (research?.price ?? 100) * 100000;
+              const snapshotRev = annualRev.length > 0 ? annualRev[annualRev.length - 1].value : 0;
+              const marketCapCr = research?.marketCap ?? (research?.price ?? 100) * 100;
               const price = research?.price ?? 100;
-              const netDebt = marketCap * (de / (1 + de));
-              const cashEq = marketCap * 0.05;
-              const sharesOut = price > 0 ? marketCap / price : 10000000;
+              const pe = research?.pe ?? 20;
+              const revenue = snapshotRev > 0 ? snapshotRev : Math.round(marketCapCr / (pe / 10));
+              const netMargin = Math.max(0.02, (research?.scores?.quality ?? 50) / 500);
+              const revGrowth = Math.max(0.02, (research?.revenueGrowth ?? 12) / 100);
+              const de = research?.debtToEquity ?? 0.5;
+              const netDebt = marketCapCr * (de / (1 + de)) * 0.3;
+              const cashEq = marketCapCr * 0.05;
+              const sharesOut = price > 0 ? (marketCapCr * 10000000) / price : 100000000;
               const result = dcfValuationService.estimateFromFinancials(
                 revenue * 10000000, netMargin, revGrowth,
-                marketCap * 10000000, netDebt * 10000000, cashEq * 10000000, sharesOut, price
+                marketCapCr * 10000000, netDebt * 10000000, cashEq * 10000000, sharesOut, price
               );
               dcf = {
                 fairValuePerShare: result.fairValuePerShare,
@@ -129,6 +131,11 @@ export function localApiPlugin(): Plugin {
               shareholding: research.shareholding,
               news: research.news,
               thesis: research.thesis,
+              dataSources: {
+                financials: research.pe ? 'yahoo' : 'synthetic',
+                shareholding: 'yahoo',
+                thesis: research.pe ? 'yahoo' : 'synthetic',
+              },
               dcf,
             };
 

@@ -61,8 +61,9 @@ export class DCFValuationService {
 
     const pvOfProjectedFCF = cumulativePV;
     const enterpriseValue = pvOfProjectedFCF + pvOfTerminalValue;
-    const equityValue = enterpriseValue - input.netDebt + input.cashAndEquivalents;
-    const fairValuePerShare = Math.max(0, equityValue / input.sharesOutstanding);
+    const rawEquityValue = enterpriseValue - input.netDebt + input.cashAndEquivalents;
+    const equityValue = Math.max(enterpriseValue * 0.1, rawEquityValue);
+    const fairValuePerShare = Math.max(currentPrice * 0.1, equityValue / input.sharesOutstanding);
 
     const safePrice = fairValuePerShare * (1 - input.marginOfSafety);
     const upside = ((fairValuePerShare - currentPrice) / currentPrice) * 100;
@@ -70,7 +71,8 @@ export class DCFValuationService {
 
     let assessment: DCFOutput['assessment'];
     const ratio = currentPrice / fairValuePerShare;
-    if (ratio <= 0.6) assessment = 'significantly_undervalued';
+    if (!Number.isFinite(ratio)) assessment = 'fairly_valued';
+    else if (ratio <= 0.6) assessment = 'significantly_undervalued';
     else if (ratio <= 0.85) assessment = 'undervalued';
     else if (ratio <= 1.15) assessment = 'fairly_valued';
     else if (ratio <= 1.4) assessment = 'overvalued';
@@ -103,13 +105,16 @@ export class DCFValuationService {
     sharesOutstanding: number,
     currentPrice: number,
   ): DCFOutput {
-    const fcfMargin = netMargin * 0.8;
-    const freeCashFlow = revenue * fcfMargin;
-    const fcfGrowthRate = revenueGrowth * 0.85;
-    const discountRate = 0.12 + (netDebt > 0 ? 0.02 : 0);
+    const fcfMargin = Math.max(0.01, netMargin * 0.8);
+    const freeCashFlow = Math.max(revenue * fcfMargin, revenue * 0.005);
+    const fcfGrowthRate = Math.max(0.01, Math.min(0.5, revenueGrowth * 0.85));
+    const discountRate = 0.12;
     const growthDeclineYears = 10;
     const terminalGrowthRate = 0.04;
     const marginOfSafety = 0.20;
+
+    const estimatedEV = freeCashFlow * 15;
+    const safeNetDebt = Math.min(netDebt, Math.max(0, estimatedEV * 0.6));
 
     return this.compute({
       freeCashFlow,
@@ -117,7 +122,7 @@ export class DCFValuationService {
       growthDeclineYears,
       terminalGrowthRate,
       discountRate,
-      netDebt,
+      netDebt: safeNetDebt,
       sharesOutstanding,
       cashAndEquivalents,
       marginOfSafety,
