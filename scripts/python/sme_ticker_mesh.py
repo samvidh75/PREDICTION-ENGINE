@@ -37,17 +37,53 @@ def clean_ticker(symbol: str) -> str:
     return symbol.upper().replace(".NS", "").replace(".BO", "").replace("-SM", "").strip()
 
 
+def _extract_float(text: str) -> float | None:
+    """Parse a float from text containing ₹, commas, whitespace."""
+    cleaned = text.replace("₹", "").replace(",", "").replace("\xa0", "").strip()
+    try:
+        return float(cleaned)
+    except (ValueError, TypeError):
+        return None
+
+
 def fetch_screener_fundamentals(ticker: str) -> dict | None:
-    """Scrape fundamental ratios, shareholding, and P&L from Screener.in."""
+    """Scrape fundamental ratios, shareholding, and P&L from Screener.in.
+    Uses data-source attribute selectors for precision, with regex fallback."""
     url = SCREENER_URL.format(ticker=ticker)
     try:
         res = requests.get(url, headers=HEADERS, timeout=10)
         if res.status_code != 200:
             return None
-        soup = BeautifulSoup(res.text, "html.parser")
-        ratios = {"ticker": ticker}
+        html = res.text
+        soup = BeautifulSoup(html, "html.parser")
+        ratios: dict = {"ticker": ticker}
 
-        # Company ratios sidebar
+        # ── Precision selectors via data-source attributes ────────────
+        # Live current price
+        price_el = soup.select_one("div.company-price span.number")
+        if price_el:
+            v = _extract_float(price_el.text)
+            if v: ratios["current_price"] = v
+
+        # 52-week High / Low via data-source="highLow"
+        hl_li = soup.select_one('li[data-source="highLow"]')
+        if hl_li:
+            nums = hl_li.find_all("span", class_="number")
+            if len(nums) >= 2:
+                h = _extract_float(nums[0].text)
+                l = _extract_float(nums[1].text)
+                if h: ratios["high_52w"] = h
+                if l: ratios["low_52w"] = l
+
+        # Market Cap via data-source="marketCap"
+        mcap_li = soup.select_one('li[data-source="marketCap"]')
+        if mcap_li:
+            num = mcap_li.find("span", class_="number")
+            if num:
+                v = _extract_float(num.text)
+                if v: ratios["market_cap"] = v
+
+        # ── General company ratios sidebar ────────────────────────────
         for div in soup.find_all("div", class_="company-ratios"):
             for li in div.find_all("li"):
                 name_el = li.find("span", class_="name")
@@ -60,7 +96,30 @@ def fetch_screener_fundamentals(ticker: str) -> dict | None:
                     except ValueError:
                         ratios[key] = raw
 
-        # Shareholding pattern section
+        # ── Regex fallback for values missed by DOM selectors ──────────
+        _rf = _extract_float  # shorthand
+
+        if "current_price" not in ratios:
+            m = __import__("re").search(r'Current Price\s*</span>\s*<span[^>]*class="number"[^>]*>₹?\s*([\d,.]+)', html, __import__("re").I)
+            if m:
+                v = _rf(m.group(1))
+                if v: ratios["current_price"] = v
+
+        if "market_cap" not in ratios:
+            m = __import__("re").search(r'Market Cap\s*</span>\s*<span[^>]*class="number"[^>]*>₹?\s*([\d,.]+)', html, __import__("re").I)
+            if m:
+                v = _rf(m.group(1))
+                if v: ratios["market_cap"] = v
+
+        if "high_52w" not in ratios or "low_52w" not in ratios:
+            m = __import__("re").search(r'High / Low\s*</span>\s*<span[^>]*class="number"[^>]*>₹?\s*([\d,.]+)\s*\/\s*([\d,.]+)', html)
+            if m:
+                h = _rf(m.group(1))
+                l = _rf(m.group(2))
+                if h and "high_52w" not in ratios: ratios["high_52w"] = h
+                if l and "low_52w" not in ratios: ratios["low_52w"] = l
+
+        # ── Shareholding pattern section ──────────────────────────────
         for section in soup.find_all("section"):
             h2 = section.find("h2")
             if h2 and "Shareholding" in h2.text:
@@ -75,7 +134,7 @@ def fetch_screener_fundamentals(ticker: str) -> dict | None:
                         except ValueError:
                             pass
 
-        # Profit & Loss section — extract TTM values
+        # ── Profit & Loss section — TTM values ────────────────────────
         for section in soup.find_all("section"):
             h2 = section.find("h2")
             if h2 and "Profit & Loss" in h2.text:
@@ -83,7 +142,6 @@ def fetch_screener_fundamentals(ticker: str) -> dict | None:
                 if not table:
                     continue
                 rows = table.find_all("tr")
-                # Find the latest column index
                 header_row = rows[0] if rows else None
                 if not header_row:
                     continue
@@ -229,7 +287,23 @@ def run_sme_mesh(ticker: str, include_historical: bool = False) -> dict:
     roe = fundamentals.get("roe", 0)
     face_value = fundamentals.get("face_value", 0)
     dividend_yield = fundamentals.get("dividend_yield", 0)
-    high_low = str(fundamentals.get("high___low", ""))
+    # Parse high/low from combined "78.0/39.0" format
+    high_low_raw = fundamentals.get("high___low", "")
+    high_52w_val = 0.0
+    low_52w_val = 0.0
+    if isinstance(high_low_raw, str) and "/" in high_low_raw:
+        parts = high_low_raw.split("/")
+        try:
+            high_52w_val = float(parts[0].strip())
+            low_52w_val = float(parts[1].strip())
+        except (ValueError, IndexError):
+            pass
+    elif isinstance(high_low_raw, (int, float)):
+        high_52w_val = float(high_low_raw)
+    # Also check separate high_52w / low_52w keys from data-source selectors
+    if fundamentals.get("high_52w"): high_52w_val = float(fundamentals["high_52w"])
+    if fundamentals.get("low_52w"): low_52w_val = float(fundamentals["low_52w"])
+
     # Normalize keys — Screener.in HTML may embed non-breaking spaces
     def norm_key(suffix: str) -> float:
         for k, v in fundamentals.items():
@@ -269,7 +343,8 @@ def run_sme_mesh(ticker: str, include_historical: bool = False) -> dict:
             "roe": roe,
             "face_value": face_value,
             "dividend_yield": dividend_yield,
-            "high_52w": high_low,
+            "high_52w": high_52w_val,
+            "low_52w": low_52w_val,
             "shareholding_promoter_pct": promoter_pct,
             "shareholding_public_pct": public_pct,
             "ttm_sales_cr": ttm_sales,

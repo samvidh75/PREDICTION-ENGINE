@@ -32,6 +32,8 @@ const BillingCancelPage = lazy(() => import("../pages/BillingCancelPage"));
 const OpsDashboard = lazy(() => import("../pages/OpsDashboard"));
 const DashboardPage = lazy(() => import("../pages/DashboardPage"));
 
+const SHOW_ABOUT_PAGE = import.meta.env.VITE_SHOW_ABOUT_PAGE === "true";
+
 function RouteFallback() {
   return (
     <div
@@ -56,7 +58,7 @@ function WorkspaceRoute({ children }: { children: ReactNode }) {
   }
 
   if (!user) {
-    return <Navigate to="/about" replace />;
+    return <Navigate to="/dashboard" replace />;
   }
 
   return <AppShell>{children}</AppShell>;
@@ -66,12 +68,17 @@ export function AppRoutes() {
   const { user, loading } = useAuth();
   const { enableWaitlistPage } = getBetaConfig();
   const changelogEnabled = isFeatureEnabled("changelog");
+  const publicFallback = SHOW_ABOUT_PAGE ? "/about" : "/dashboard";
 
   return (
     <Suspense fallback={<RouteFallback />}>
       <Routes>
-        <Route path="/" element={loading ? <RouteFallback /> : user ? <WorkspaceRoute><HomePage /></WorkspaceRoute> : <Navigate to="/about" replace />} />
-        <Route path="/about" element={<AboutPage />} />
+        <Route path="/" element={loading ? <RouteFallback /> : user ? <WorkspaceRoute><HomePage /></WorkspaceRoute> : <Navigate to={publicFallback} replace />} />
+        {SHOW_ABOUT_PAGE ? (
+          <Route path="/about" element={<AboutPage />} />
+        ) : (
+          <Route path="/about" element={<Navigate to="/dashboard" replace />} />
+        )}
 
         <Route path="/scanner" element={<WorkspaceRoute><ScannerPage /></WorkspaceRoute>} />
         <Route path="/scanner/:preset" element={<WorkspaceRoute><ScannerLanding /></WorkspaceRoute>} />
@@ -94,12 +101,12 @@ export function AppRoutes() {
         <Route path="/billing/success" element={<WorkspaceRoute><BillingSuccessPage /></WorkspaceRoute>} />
         <Route path="/billing/cancel" element={<WorkspaceRoute><BillingCancelPage /></WorkspaceRoute>} />
         <Route path="/ops" element={<WorkspaceRoute><OpsDashboard /></WorkspaceRoute>} />
-        <Route path="/dashboard" element={<WorkspaceRoute><DashboardPage /></WorkspaceRoute>} />
+        <Route path="/dashboard" element={<WorkspaceRoute><HomePage /></WorkspaceRoute>} />
 
         {enableWaitlistPage && <Route path="/waitlist" element={<WorkspaceRoute><WaitlistPage /></WorkspaceRoute>} />}
         {changelogEnabled && <Route path="/changelog" element={<WorkspaceRoute><ChangelogPage /></WorkspaceRoute>} />}
 
-        <Route path="*" element={<Navigate to={user ? "/" : "/about"} replace />} />
+        <Route path="*" element={<Navigate to={user ? "/" : publicFallback} replace />} />
       </Routes>
     </Suspense>
   );
