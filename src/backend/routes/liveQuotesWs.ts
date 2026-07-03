@@ -14,6 +14,7 @@
 import type { FastifyInstance, FastifyRequest } from 'fastify';
 import type WebSocket from 'ws';
 import { QuoteProvider } from './liveQuoteProviders.js';
+import { MarketMicrostructureEngine } from '../../services/market/MarketMicrostructureEngine.js';
 
 interface ClientSubscription {
   ws: WebSocket;
@@ -35,6 +36,7 @@ export class LiveQuoteServer {
   private clients = new Map<string, ClientSubscription>();
   private quoteCache = new Map<string, QuoteUpdate>();
   private provider = new QuoteProvider();
+  private microstructure = new MarketMicrostructureEngine();
   private broadcastInterval: ReturnType<typeof setInterval> | null = null;
   private healthCheckInterval: ReturnType<typeof setInterval> | null = null;
 
@@ -56,6 +58,34 @@ export class LiveQuoteServer {
         clients: this.clients.size,
         uptime: process.uptime(),
       };
+    });
+
+    this.app.get('/api/market/orderbook/L2/:symbol', async (request, reply) => {
+      const symbol = String((request.params as { symbol: string }).symbol ?? '').trim().toUpperCase();
+      if (!symbol) {
+        return reply.status(400).send({ error: 'Symbol is required' });
+      }
+
+      await this.ensureQuoteForSymbol(symbol);
+      const orderBook = this.microstructure.buildOrderBook(symbol);
+      if (!orderBook) {
+        return reply.status(404).send({
+          error: 'No live quote available for symbol',
+          symbol,
+          depthMode: 'derived_from_top_of_book',
+        });
+      }
+      return orderBook;
+    });
+
+    this.app.get('/api/market/microstructure/:symbol/anomaly', async (request, reply) => {
+      const symbol = String((request.params as { symbol: string }).symbol ?? '').trim().toUpperCase();
+      if (!symbol) {
+        return reply.status(400).send({ error: 'Symbol is required' });
+      }
+
+      await this.ensureQuoteForSymbol(symbol);
+      return this.microstructure.buildAnomalySignal(symbol);
     });
   }
 
@@ -127,6 +157,7 @@ export class LiveQuoteServer {
             lastUpdated: Date.now(),
           };
           this.quoteCache.set(quote.symbol, update);
+          this.microstructure.recordQuote(quote, update.lastUpdated);
         }
 
         const serializedQuotes = quotes.map((q, i) => {
@@ -179,6 +210,24 @@ export class LiveQuoteServer {
     if (this.healthCheckInterval) clearInterval(this.healthCheckInterval);
     this.broadcastInterval = null;
     this.healthCheckInterval = null;
+  }
+
+  private async ensureQuoteForSymbol(symbol: string): Promise<void> {
+    if (this.quoteCache.has(symbol)) return;
+    const [quote] = await this.provider.fetchQuotes([symbol]);
+    if (!quote) return;
+
+    const update: QuoteUpdate = {
+      symbol: quote.symbol,
+      price: quote.price,
+      bid: quote.bid,
+      ask: quote.ask,
+      volume: quote.volume,
+      timestamp: new Date().toISOString(),
+      lastUpdated: Date.now(),
+    };
+    this.quoteCache.set(symbol, update);
+    this.microstructure.recordQuote(quote, update.lastUpdated);
   }
 }
 

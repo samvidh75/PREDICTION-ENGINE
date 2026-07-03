@@ -22,6 +22,7 @@ import { defaultDataAdapterRegistry } from "../services/data/dataAdapterRegistry
 import { startWebSocketDataProducer } from "../services/market/websocketDataProducer.js";
 import { MetricsCollector } from "../commercial/api/monitoring/MetricsCollector.js";
 import { registerLiveQuotesWs } from "../backend/routes/liveQuotesWs.js";
+import { registerFeatureRoutes } from "../backend/web/routes/index.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -124,6 +125,7 @@ async function bootstrap() {
 
   // ── Live quote WebSocket (new cascading provider) ──────────────────
   await registerLiveQuotesWs(server);
+  await registerFeatureRoutes(server);
 
   // ── Rate limiting — 60 req/min per IP ───────────────────────────────
   await server.register(rateLimit, {
