@@ -11,6 +11,7 @@ import { GoogleNewsRssProvider } from './GoogleNewsRssProvider';
 import { UpstoxFundamentalsProvider } from './UpstoxFundamentalsProvider';
 import { ScreenerProvider } from './ScreenerProvider';
 import { MoneycontrolFinancialsProvider } from './MoneycontrolFinancialsProvider';
+import { MarketHours } from '../market/MarketHours';
 
 import { ProviderHealthMonitor } from './ProviderHealthMonitor';
 import { DataFlowTracer } from '../audit/DataFlowTracer';
@@ -55,9 +56,30 @@ export class ProviderCoordinator {
     this.healthMonitor = new ProviderHealthMonitor();
     this.tracer = new DataFlowTracer();
 
-    const indianApiFinancials = new IndianApiFinancialProvider();
-    this.circuitBreakers.set(indianApiFinancials, new ProviderCircuitBreaker({ failureThreshold: 3, openTimeoutMs: 60_000 }));
-    this.financialProviders.push(indianApiFinancials);
+    // ── Price/Metadata/History: yfinance → upstox → indianapi (last fallback) ──
+    // yfinance (v8 chart) is best for live prices. Upstox has market quotes.
+    // IndianAPI is the last-resort fallback for everything.
+    const yahoo = new YahooProvider();
+    this.circuitBreakers.set(yahoo, new ProviderCircuitBreaker({ failureThreshold: 3, openTimeoutMs: 60_000 }));
+    this.priceProviders.push(yahoo);
+    this.metadataProviders.push(yahoo);
+    this.historicalProviders.push(yahoo);
+
+    const indian = new IndianMarketProvider();
+    this.circuitBreakers.set(indian, new ProviderCircuitBreaker({ failureThreshold: 3, openTimeoutMs: 60_000 }));
+    this.priceProviders.push(indian);
+    this.metadataProviders.push(indian);
+    this.historicalProviders.push(indian);
+
+    // ── Financials: screener.in → upstox → indianapi (last fallback) ──
+    // Screener.in scrapes the best fundamentals. Upstox (Analytics Token) is
+    // the API-backed fallback. IndianAPI is the absolute last resort.
+    const authorizedConfig = loadAuthorizedProviderConfig();
+    if (authorizedConfig.screener.enabled) {
+      const screener = new ScreenerProvider(authorizedConfig.screener);
+      this.circuitBreakers.set(screener, new ProviderCircuitBreaker({ failureThreshold: 3, openTimeoutMs: 60_000 }));
+      this.financialProviders.push(screener);
+    }
 
     const upstoxFundamentals = new UpstoxFundamentalsProvider(() => {
       if (typeof window !== 'undefined') {
@@ -75,31 +97,17 @@ export class ProviderCoordinator {
     this.circuitBreakers.set(upstoxFundamentals, new ProviderCircuitBreaker({ failureThreshold: 3, openTimeoutMs: 60_000 }));
     this.financialProviders.push(upstoxFundamentals);
 
-    const authorizedConfig = loadAuthorizedProviderConfig();
-    if (authorizedConfig.screener.enabled) {
-      const screener = new ScreenerProvider(authorizedConfig.screener);
-      this.circuitBreakers.set(screener, new ProviderCircuitBreaker({ failureThreshold: 3, openTimeoutMs: 60_000 }));
-      this.financialProviders.push(screener);
-    }
-
     if (authorizedConfig.moneycontrol.enabled) {
       const moneycontrolFinancials = new MoneycontrolFinancialsProvider(authorizedConfig.moneycontrol);
       this.circuitBreakers.set(moneycontrolFinancials, new ProviderCircuitBreaker({ failureThreshold: 3, openTimeoutMs: 60_000 }));
       this.financialProviders.push(moneycontrolFinancials);
     }
 
-    const indian = new IndianMarketProvider();
-    this.circuitBreakers.set(indian, new ProviderCircuitBreaker({ failureThreshold: 3, openTimeoutMs: 60_000 }));
-    this.priceProviders.push(indian);
-    this.metadataProviders.push(indian);
-    this.historicalProviders.push(indian);
+    const indianApiFinancials = new IndianApiFinancialProvider();
+    this.circuitBreakers.set(indianApiFinancials, new ProviderCircuitBreaker({ failureThreshold: 3, openTimeoutMs: 60_000 }));
+    this.financialProviders.push(indianApiFinancials);
 
-    const yahoo = new YahooProvider();
-    this.circuitBreakers.set(yahoo, new ProviderCircuitBreaker({ failureThreshold: 3, openTimeoutMs: 60_000 }));
-    this.priceProviders.push(yahoo);
-    this.metadataProviders.push(yahoo);
-    this.historicalProviders.push(yahoo);
-
+    // ── News ────────────────────────────────────────────────────
     const googleNews = new GoogleNewsRssProvider();
     this.circuitBreakers.set(googleNews, new ProviderCircuitBreaker({ failureThreshold: 3, openTimeoutMs: 60_000 }));
     this.newsProviders.push(googleNews);

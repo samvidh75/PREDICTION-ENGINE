@@ -10,12 +10,12 @@
  *   2. EodDataCacheService  DB  (24h–7d, persistent, shared across users)
  *   3. ProviderCoordinator   (final fallback, quota-budgeted)
  *
- * TTL Policy (EOD-first):
- *   - quotes:       24h (stale after market close, next EOD refresh)
+ * TTL Policy (cache-first):
+ *   - quotes:       60s (live prices change every second; short TTL for freshness)
  *   - profiles:     7d  (company metadata rarely changes)
  *   - financials:   7d  (fundamentals update quarterly)
- *   - history:      7d  (daily OHLCV, one fetch per week is ample for EOD)
- *   - news:         4h  (news is time-sensitive, but cached briefly)
+ *   - history:      7d  (daily OHLCV, stable after market close)
+ *   - news:         1h  (news is time-sensitive, but brief cache reduces provider load)
  */
 
 import { dbAdapter } from '../../db/DatabaseAdapter';
@@ -34,11 +34,11 @@ export type EodTtlMap = Record<EodCacheNamespace, number>;
 // ---------------------------------------------------------------------------
 
 const DEFAULT_TTLS: EodTtlMap = {
-  quote:      86_400_000,  // 24h
-  profile:    604_800_000, // 7d
-  financials: 604_800_000, // 7d
-  history:    604_800_000, // 7d
-  news:       14_400_000,  // 4h
+  quote:      60_000,      // 60s — live prices, short TTL for freshness
+  profile:    604_800_000, // 7d  — company metadata rarely changes
+  financials: 604_800_000, // 7d  — fundamentals update quarterly
+  history:    604_800_000, // 7d  — daily OHLCV, stable after market close
+  news:       3_600_000,   // 1h  — news is time-sensitive, brief cache
 };
 
 // ---------------------------------------------------------------------------

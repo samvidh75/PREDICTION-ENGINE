@@ -1,3 +1,6 @@
+import { config as loadDotEnv } from "dotenv";
+loadDotEnv({ path: ".env.local", quiet: true });
+
 export {};
 /**
  * check-upstox-token.ts
@@ -6,12 +9,14 @@ export {};
  * Does NOT print token value. Does NOT save raw response payload.
  * Exits 0 if valid, non-zero if expired/missing/network error.
  *
+ * Uses LTP market-quote endpoint (works with both OAuth tokens and Analytics Tokens).
+ * Analytics Token does NOT support /user/profile (requires Static IP).
+ *
  * Usage:
  *   npx tsx scripts/check-upstox-token.ts
  *
  * Environment:
- *   UPSTOX_ACCESS_TOKEN  — Upstox OAuth access token
- *   CHECK_TIMEOUT_MS     — per-request timeout in ms (default: 10000)
+ *   UPSTOX_ACCESS_TOKEN  — Upstox access token (OAuth or Analytics Token)
  */
 
 const TIMEOUT = parseInt(process.env.CHECK_TIMEOUT_MS || "10000", 10);
@@ -50,12 +55,13 @@ async function main(): Promise<void> {
   console.log("UPSTOX_TOKEN=present");
   console.log("UPSTOX_STATUS=checking...");
 
-  // Lightweight endpoint to validate the token — GET /user/profile
+  // Use LTP market quote endpoint (works with both OAuth tokens and Analytics Tokens)
+  // Analytics Token does NOT support /user/profile (requires Static IP)
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), TIMEOUT);
 
   try {
-    const response = await fetch(`${UPSTOX_API}/user/profile`, {
+    const response = await fetch(`${UPSTOX_API}/market-quote/ltp?instrument_key=NSE_EQ%7CIEODI0001210`, {
       headers: {
         Authorization: `Bearer ${token}`,
         Accept: "application/json",
@@ -73,7 +79,7 @@ async function main(): Promise<void> {
     } else if (httpStatus === 401) {
       console.log("UPSTOX_STATUS=expired");
       console.log(`UPSTOX_HTTP_STATUS=${httpStatus}`);
-      console.log("SAFE_MESSAGE=Upstox access token is expired. Refresh via Upstox OAuth flow.");
+      console.log("SAFE_MESSAGE=Upstox access token is expired. Generate a new Analytics Token from https://account.upstox.com/developer/apps#analytics");
       process.exit(2);
     } else if (httpStatus === 403) {
       console.log("UPSTOX_STATUS=unauthorized");

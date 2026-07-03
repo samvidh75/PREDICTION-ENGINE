@@ -66,6 +66,7 @@
     "upstox:sandbox-smoke": "tsx scripts/upstox-sandbox-smoke.ts",
     "upstox:market-smoke": "tsx scripts/upstox-market-smoke.ts",
     "upstox:portfolio-smoke": "tsx scripts/upstox-portfolio-smoke.ts",
+    "upstox:renew-token": "tsx scripts/upstox-auto-renew.ts",
     "indianapi:premium:check": "python3 scripts/python/check_indianapi_premium_runtime.py",
     "indianapi:premium:ingest": "python3 scripts/python/ingest_indianapi_premium.py",
     "indianapi:premium:smoke": "tsx scripts/indianapi-premium-smoke.ts",

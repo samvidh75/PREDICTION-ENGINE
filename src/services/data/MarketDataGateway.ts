@@ -1,10 +1,11 @@
 // src/services/data/MarketDataGateway.ts
-import { StockQuote, CompanyMetadata, HistoricalPoint } from './types';
+import { StockQuote, CompanyMetadata, HistoricalPoint, FinancialSnapshot } from './types';
 import { DataCache } from './cache/DataCache';
 import { ProviderCoordinator } from '../providers/ProviderCoordinator';
 import { MetadataProviderCoordinator, EnrichedMetadata } from '../providers/MetadataProviderCoordinator';
 import { NewsItem } from '../providers/NewsProvider';
 import { EodDataCacheService } from '../marketData/EodDataCacheService';
+import { MarketHours } from '../market/MarketHours';
 
 const DEFAULT_TTL = 5 * 60 * 1000; // 5 minutes — in-memory TTL
 
@@ -16,6 +17,9 @@ export class MarketDataGateway {
    *   L1 — In-memory DataCache (fast, per-page-session)
    *   L2 — EodDataCacheService (persistent DB, shared across users)
    *   L3 — ProviderCoordinator fallback → backfill both caches
+   *
+   * Post-market freeze: After ~4 PM IST, quotes are served ONLY from cache.
+   * No provider calls are made unless the cache is empty (cold start).
    */
   public static async getQuote(symbol: string): Promise<StockQuote> {
     const key = `quote_${symbol.toUpperCase()}`;
@@ -27,9 +31,15 @@ export class MarketDataGateway {
     // L2: DB cache (persistent across sessions)
     const dbCached = await EodDataCacheService.get<StockQuote>('quote', symbol);
     if (dbCached) {
-      // Promote to in-memory for faster subsequent reads
       DataCache.set(key, dbCached, DEFAULT_TTL);
       return dbCached;
+    }
+
+    // Post-market freeze: after 4 PM IST, do NOT call providers for quotes.
+    // The last cached values from market hours are served instead.
+    // If cache is cold (first request after deploy), we fall through to provider.
+    if (MarketHours.shouldFreezeQuotes()) {
+      throw new Error(`Market closed: no cached quote for ${symbol}. Try again during market hours.`);
     }
 
     // L3: Provider chain (budgeted, coalesced)
@@ -153,5 +163,31 @@ export class MarketDataGateway {
     await EodDataCacheService.set('news', symbol, data);
 
     return data as NewsItem[];
+  }
+
+  /**
+   * Financial snapshot — L1 memory → L2 DB → provider (cache-first).
+   * Fundamentals change slowly (quarterly), so DB TTL is long (7d).
+   * Even after market close, financials are served from cache. Only on
+   * complete cache miss do we call the provider chain.
+   */
+  public static async getFinancials(symbol: string): Promise<FinancialSnapshot> {
+    const key = `financials_${symbol.toUpperCase()}`;
+
+    const cached = DataCache.get<FinancialSnapshot>(key);
+    if (cached) return cached;
+
+    const dbCached = await EodDataCacheService.get<FinancialSnapshot>('financials', symbol);
+    if (dbCached) {
+      DataCache.set(key, dbCached, DEFAULT_TTL);
+      return dbCached;
+    }
+
+    const data = await this.coordinator.getFinancials(symbol);
+
+    DataCache.set(key, data, DEFAULT_TTL);
+    await EodDataCacheService.set('financials', symbol, data);
+
+    return data;
   }
 }

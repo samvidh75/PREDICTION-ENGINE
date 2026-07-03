@@ -18,6 +18,7 @@ import { sectorEngine } from "../services/intelligence/engines/SectorEngine/inde
 import { ragEngine } from "../services/intelligence/engines/RAGEngine/index.js";
 import { orchestrator } from "../services/intelligence/Orchestrator.js";
 import type { AllEngineInputs } from "../services/intelligence/Orchestrator.js";
+import { MarketDataGateway } from "../services/data/MarketDataGateway.js";
 
 // ── Cache helper ───────────────────────────────────────────────────────
 function setCache(reply: FastifyReply, maxAge: number = 300): void {
@@ -550,15 +551,17 @@ export default async function registerApiRoutes(server: FastifyInstance) {
       return cached.data;
     }
 
-    const [yahoo, fund, priceHistory, news] = await Promise.all([
-      yahooQuote(cleanSymbol, exchangeSuffix).catch(() => null),
+    const [gatewayQuote, fundResult, priceHistory, news, cachedFinancials] = await Promise.all([
+      MarketDataGateway.getQuote(cleanSymbol).catch(() => null),
       indianApiFunds(cleanSymbol).catch(() => null),
-      yahooPriceHistory(cleanSymbol, exchangeSuffix).catch(() => null),
-      yahooNews(cleanSymbol).catch(() => null),
+      MarketDataGateway.getHistory(cleanSymbol).catch(() => null),
+      MarketDataGateway.getNews(cleanSymbol).catch(() => null),
+      MarketDataGateway.getFinancials(cleanSymbol).catch(() => null),
     ]);
 
-    // Strict: no synthetic price fallback
-    if (!yahoo?.price) {
+    const gatewayMeta = await MarketDataGateway.getCompany(cleanSymbol).catch(() => null);
+
+    if (!gatewayQuote?.price) {
       return reply.status(503).send({
         error: "Data temporarily unavailable",
         message: "Market data providers are not responding. Please try again in a moment.",
@@ -566,11 +569,21 @@ export default async function registerApiRoutes(server: FastifyInstance) {
       });
     }
 
-    const fundData = fund || {};
-    const price = yahoo.price;
-    const change = yahoo.change || 0;
-    const changePercent = yahoo.changePercent || 0;
-    const marketCapCr = Math.round(((yahoo?.marketCap ?? 0) / 1e7) * 100) / 100;
+    // Merge financials from cache/provider with higher priority for real data
+    const fundData = fundResult || {};
+    if (cachedFinancials && !fundData.pe_ratio) {
+      fundData.pe_ratio = cachedFinancials.peRatio;
+      fundData.pb_ratio = cachedFinancials.pbRatio;
+      fundData.roe = cachedFinancials.roe;
+      fundData.return_on_equity = cachedFinancials.roe;
+      fundData.debt_to_equity = cachedFinancials.debtToEquity;
+      fundData.eps = cachedFinancials.eps;
+      fundData.dividend_yield = cachedFinancials.dividendYield;
+    }
+    const price = gatewayQuote.price;
+    const change = gatewayQuote.change || 0;
+    const changePercent = gatewayQuote.changePercent || 0;
+    const marketCapCr = Math.round(((gatewayMeta?.marketCap ?? (cachedFinancials?.marketCap ?? 0)) / 1e7) * 100) / 100;
     const sector: string = (fundData.sector as string) || "Diversified";
     const pe = n(fundData.pe_ratio) ?? null;
     const pb = n(fundData.pb_ratio) ?? null;
@@ -589,7 +602,7 @@ export default async function registerApiRoutes(server: FastifyInstance) {
 
     const payload = {
       symbol,
-      companyName: yahoo?.longName || yahoo?.shortName || symbol,
+      companyName: gatewayMeta?.companyName || gatewayMeta?.name || symbol,
       exchange: "NSE" as "NSE" | "BSE",
       sector,
       industry: sector,
