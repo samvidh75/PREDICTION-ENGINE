@@ -64,7 +64,9 @@ def bhavcopy_records(day):
 
 
 def index_records():
-    df = index_df()
+    today = date.today()
+    from_date = today - timedelta(days=30)
+    df = index_df(symbol="NIFTY 50", from_date=from_date, to_date=today)
     return records_from_df(df)
 
 

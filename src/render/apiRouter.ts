@@ -45,6 +45,8 @@ import type { UsageMetric } from "../commercial/UsageLimits.js";
 import { DeterministicResearchProvider } from "../services/ai/DeterministicResearchProvider.js";
 import { dbAdapter } from "../db/DatabaseAdapter.js";
 import { AsymmetricDataGateway } from "../db/AsymmetricDataGateway.js";
+import { execFile } from "node:child_process";
+import { promisify } from "node:util";
 import {
   registerCommercialRoutes,
   registerIntelligenceContextRoutes,
@@ -53,6 +55,8 @@ import {
   registerPersonalResearchRoutes,
   registerPublicEngagementRoutes,
 } from "../backend/web/routes/index.js";
+
+const execFileAsync = promisify(execFile);
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -248,6 +252,191 @@ async function indianApiFunds(symbol: string): Promise<Record<string, unknown>> 
     const data = await r.json();
     return data?.fundamentals ?? data ?? {};
   } catch { return {}; }
+}
+
+function decodeHtmlText(value: string): string {
+  return value
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&#39;/g, "'")
+    .replace(/&quot;/g, '"')
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function parsePercentValue(value: string): number | null {
+  const cleaned = value.replace(/[% ,]/g, "").trim();
+  const parsed = Number.parseFloat(cleaned);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function parseCroreValue(value: string): number | null {
+  const cleaned = value.replace(/[₹,%\s]/g, "").replace(/,/g, "").trim();
+  const parsed = Number.parseFloat(cleaned);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function parseHtmlTable(tableHtml: string): string[][] {
+  const rows: string[][] = [];
+  const rowRegex = /<tr[^>]*>([\s\S]*?)<\/tr>/gi;
+  let rowMatch: RegExpExecArray | null;
+  while ((rowMatch = rowRegex.exec(tableHtml)) !== null) {
+    const cells: string[] = [];
+    const cellRegex = /<t[dh][^>]*>([\s\S]*?)<\/t[dh]>/gi;
+    let cellMatch: RegExpExecArray | null;
+    while ((cellMatch = cellRegex.exec(rowMatch[1])) !== null) {
+      cells.push(decodeHtmlText(cellMatch[1]));
+    }
+    if (cells.length > 0) rows.push(cells);
+  }
+  return rows;
+}
+
+function extractScreenerTableByHeading(html: string, heading: string): string[][] {
+  const escaped = heading.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const match = html.match(new RegExp(`${escaped}[\\s\\S]{0,2500}?<table[^>]*class="data-table[^"]*"[^>]*>([\\s\\S]*?)<\\/table>`, "i"));
+  return match ? parseHtmlTable(match[1]) : [];
+}
+
+function extractScreenerTableByContainer(html: string, containerId: string): string[][] {
+  const escaped = containerId.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const match = html.match(new RegExp(`<div id="${escaped}"[^>]*>[\\s\\S]*?<table[^>]*class="data-table[^"]*"[^>]*>([\\s\\S]*?)<\\/table>`, "i"));
+  return match ? parseHtmlTable(match[1]) : [];
+}
+
+function findRow(rows: string[][], matcher: (label: string) => boolean): string[] | null {
+  for (const row of rows.slice(1)) {
+    const label = row[0] ?? "";
+    if (matcher(label)) return row;
+  }
+  return null;
+}
+
+async function fetchScreenerPage(symbol: string, consolidated = true): Promise<string | null> {
+  const suffix = consolidated ? "/consolidated/" : "/";
+  try {
+    const response = await fetch(`https://www.screener.in/company/${encodeURIComponent(symbol)}${suffix}`, {
+      headers: { "User-Agent": "Mozilla/5.0 Lensory/2.0" },
+      signal: AbortSignal.timeout(8_000),
+    });
+    if (!response.ok) return null;
+    return await response.text();
+  } catch {
+    return null;
+  }
+}
+
+async function loadYFinanceFinancialSeries(symbol: string): Promise<{
+  annual: { revenue: Array<{ period: string; value: number }>; profit: Array<{ period: string; value: number }>; ebitda: Array<{ period: string; value: number }> };
+  quarterly: { revenue: Array<{ period: string; value: number }>; profit: Array<{ period: string; value: number }>; ebitda: Array<{ period: string; value: number }> };
+  dataSource: string;
+} | null> {
+  try {
+    const { stdout } = await execFileAsync("python3", ["scripts/yfinance_financials.py", symbol], {
+      cwd: process.cwd(),
+      timeout: 30_000,
+      maxBuffer: 1024 * 1024,
+    });
+    const parsed = JSON.parse(stdout) as Record<string, any>;
+    const annual = parsed.financials?.annual ?? {};
+    const toCrore = (items: Array<{ period: string; value: number }> = []) =>
+      items.map((item) => ({ period: item.period, value: Math.round((Number(item.value) / 10_000_000) * 100) / 100 }));
+    return {
+      annual: {
+        revenue: toCrore(annual.revenue),
+        profit: toCrore(annual.profit),
+        ebitda: toCrore(annual.ebitda),
+      },
+      quarterly: { revenue: [], profit: [], ebitda: [] },
+      dataSource: "yfinance",
+    };
+  } catch {
+    return null;
+  }
+}
+
+async function loadRealFinancialSeries(symbol: string) {
+  const html = await fetchScreenerPage(symbol, true);
+  if (html) {
+    const annualTable = extractScreenerTableByHeading(html, "Profit & Loss");
+    const quarterlyTable = extractScreenerTableByHeading(html, "Quarterly Results");
+
+    const buildSeries = (rows: string[][]) => {
+      if (rows.length < 2) return null;
+      const periods = rows[0].slice(1);
+      const sales = findRow(rows, (label) => /^sales$/i.test(label));
+      const profit = findRow(rows, (label) => /^net profit$/i.test(label));
+      const ebitda = findRow(rows, (label) => /^operating profit$/i.test(label) || /^ebitda$/i.test(label));
+      if (!sales && !profit && !ebitda) return null;
+
+      const mapMetric = (row: string[] | null) =>
+        periods
+          .map((period, index) => {
+            const value = row ? parseCroreValue(row[index + 1] ?? "") : null;
+            return value === null ? null : { period, value };
+          })
+          .filter((item): item is { period: string; value: number } => item !== null);
+
+      return {
+        revenue: mapMetric(sales),
+        profit: mapMetric(profit),
+        ebitda: mapMetric(ebitda),
+      };
+    };
+
+    const annual = buildSeries(annualTable);
+    const quarterly = buildSeries(quarterlyTable);
+    if (annual && (annual.revenue.length > 0 || annual.profit.length > 0 || annual.ebitda.length > 0)) {
+      return {
+        annual,
+        quarterly: quarterly ?? { revenue: [], profit: [], ebitda: [] },
+        dataSource: "screener",
+      };
+    }
+  }
+
+  return loadYFinanceFinancialSeries(symbol);
+}
+
+async function loadRealShareholdingSeries(symbol: string) {
+  const html = await fetchScreenerPage(symbol, true);
+  if (!html) return null;
+
+  const rows = extractScreenerTableByContainer(html, "quarterly-shp");
+  if (rows.length < 2) return null;
+
+  const periods = rows[0].slice(1);
+  const promoters = findRow(rows, (label) => /^promoters$/i.test(label));
+  const fiis = findRow(rows, (label) => /^fiis$/i.test(label));
+  const diis = findRow(rows, (label) => /^diis$/i.test(label));
+  const publicRow = findRow(rows, (label) => /^public$/i.test(label));
+  if (!promoters && !fiis && !diis && !publicRow) return null;
+
+  const series = periods.map((period, index) => ({
+    period,
+    promoter: parsePercentValue(promoters?.[index + 1] ?? "") ?? 0,
+    fii: parsePercentValue(fiis?.[index + 1] ?? "") ?? 0,
+    dii: parsePercentValue(diis?.[index + 1] ?? "") ?? 0,
+    retail: parsePercentValue(publicRow?.[index + 1] ?? "") ?? 0,
+  })).filter((row) => row.promoter > 0 || row.fii > 0 || row.dii > 0 || row.retail > 0);
+
+  if (series.length === 0) return null;
+
+  return series
+    .map((row, index, arr) => {
+      const prev = arr[index - 1];
+      return {
+        ...row,
+        deltas: {
+          promoter: prev ? Number((row.promoter - prev.promoter).toFixed(2)) : 0,
+          fii: prev ? Number((row.fii - prev.fii).toFixed(2)) : 0,
+          dii: prev ? Number((row.dii - prev.dii).toFixed(2)) : 0,
+          retail: prev ? Number((row.retail - prev.retail).toFixed(2)) : 0,
+        },
+      };
+    })
+    .reverse();
 }
 
 // ── Derive financials ───────────────────────────────────────────────────────
@@ -656,8 +845,10 @@ export default async function registerApiRoutes(server: FastifyInstance) {
     const health = 50;
     const industryPe = SECTOR_PE_MEDIAN[sector] || 20;
     const known = KNOWN[cleanSymbol];
-    const financialsData = deriveFinancials(marketCapCr, pe, sector, revGrowth, profGrowth);
-    const shareholdingData = deriveShareholding(cleanSymbol, sector);
+    const realFinancialsData = await loadRealFinancialSeries(cleanSymbol);
+    const financialsData = realFinancialsData ?? deriveFinancials(marketCapCr, pe, sector, revGrowth, profGrowth);
+    const realShareholdingData = await loadRealShareholdingSeries(cleanSymbol);
+    const shareholdingData = realShareholdingData ?? deriveShareholding(cleanSymbol, sector);
     const thesisData = generateThesis({ health }, pe, roe);
 
     const annualRev = financialsData.annual.revenue || [];
@@ -733,8 +924,8 @@ export default async function registerApiRoutes(server: FastifyInstance) {
       },
       thesis: thesisData,
       dataSources: {
-        financials: fundData?.pe_ratio ? 'real' : 'yahoo',
-        shareholding: 'yahoo',
+        financials: realFinancialsData?.dataSource ?? (fundData?.pe_ratio ? 'real' : 'synthetic'),
+        shareholding: realShareholdingData ? 'screener' : 'synthetic',
         thesis: fundData?.pe_ratio ? 'real' : 'yahoo',
       },
       priceHistory,
