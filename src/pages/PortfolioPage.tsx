@@ -281,6 +281,15 @@ export default function PortfolioPage() {
             <Button variant="secondary" size="sm" onClick={handleBrokerSync} disabled={syncing}>
               <BarChart3 size={14} /> {syncing ? "Syncing..." : "Sync portfolio"}
             </Button>
+            <Button variant="secondary" size="sm" onClick={async () => {
+              try {
+                const res = await fetch('/api/auth/broker/upstox/login', { method: 'POST' });
+                const data = await res.json();
+                if (data.authUrl) window.location.href = data.authUrl;
+              } catch { /* ignore */ }
+            }}>
+              <ExternalLink size={14} /> Connect Upstox
+            </Button>
             <Button variant="primary" size="sm" onClick={() => { setShowAddForm(!showAddForm); setEditSymbol(null); setFormError(""); }}>
               <Plus size={16} /> {showAddForm ? "Cancel" : "Add Holding"}
             </Button>

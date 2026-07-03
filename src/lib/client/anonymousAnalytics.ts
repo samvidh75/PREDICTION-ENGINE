@@ -89,6 +89,19 @@ export class AnonymousAnalytics {
     }
   }
 
+  private flushTimer: ReturnType<typeof setInterval> | null = null;
+
+  init() {
+    this.flushTimer = setInterval(() => this.flush(), 10 * 60 * 1000);
+  }
+
+  destroy() {
+    if (this.flushTimer !== null) {
+      clearInterval(this.flushTimer);
+      this.flushTimer = null;
+    }
+  }
+
   private getPending(): AnalyticsEvent[] {
     const raw = localStorage.getItem(PENDING_KEY);
     return raw ? JSON.parse(raw) : [];
