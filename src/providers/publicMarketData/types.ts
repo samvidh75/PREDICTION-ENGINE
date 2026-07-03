@@ -14,4 +14,5 @@ export type PublicProviderId =
   | "nsepython"
   | "yahoo"
   | "automatic_public"
+  | "rbi_public"
   | "csv_import";

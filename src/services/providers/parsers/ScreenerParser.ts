@@ -42,30 +42,95 @@ export class ScreenerParser {
     return raw.replace(/<[^>]*>/g, '').trim();
   }
 
+  private static decodeHtml(raw: string): string {
+    return raw
+      .replace(/&nbsp;/g, ' ')
+      .replace(/&amp;/g, '&')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, "'");
+  }
+
+  private static parseGenericTableRows(tableHtml: string): string[][] {
+    const rows: string[][] = [];
+    const rowRegex = /<tr[^>]*>([\s\S]*?)<\/tr>/gi;
+    let rowMatch: RegExpExecArray | null;
+
+    while ((rowMatch = rowRegex.exec(tableHtml)) !== null) {
+      const cells: string[] = [];
+      const cellRegex = /<t[dh][^>]*>([\s\S]*?)<\/t[dh]>/gi;
+      let cellMatch: RegExpExecArray | null;
+      while ((cellMatch = cellRegex.exec(rowMatch[1])) !== null) {
+        cells.push(this.decodeHtml(this.stripTags(cellMatch[1])));
+      }
+      if (cells.length > 0) rows.push(cells);
+    }
+
+    return rows;
+  }
+
+  private static findTableNearHeading(html: string, heading: string): string | null {
+    const escaped = this.escapeRegex(heading);
+    const match = html.match(new RegExp(`${escaped}[\\s\\S]{0,5000}?<table[^>]*class="[^"]*data-table[^"]*"[^>]*>([\\s\\S]*?)<\\/table>`, 'i'));
+    return match?.[1] ?? null;
+  }
+
+  private static findRow(rows: string[][], aliases: string[]): string[] | null {
+    for (const row of rows) {
+      const label = (row[0] ?? '').toLowerCase();
+      if (aliases.some((alias) => label.includes(alias.toLowerCase()))) {
+        return row;
+      }
+    }
+    return null;
+  }
+
   private static parseCompanyRatios(html: string): Record<string, string> {
     const ratios: Record<string, string> = {};
 
     const panelMatch = html.match(/<div[^>]*class="[^"]*company-ratios[^"]*"[^>]*>[\s\S]*?<ul[^>]*>([\s\S]*?)<\/ul>/i);
-    if (!panelMatch) return ratios;
+    if (panelMatch) {
+      const listHtml = panelMatch[1];
+      const itemRegex = /<li[^>]*>([\s\S]*?)<\/li>/gi;
+      let itemMatch: RegExpExecArray | null;
 
-    const listHtml = panelMatch[1];
-    const itemRegex = /<li[^>]*>([\s\S]*?)<\/li>/gi;
-    let itemMatch: RegExpExecArray | null;
+      while ((itemMatch = itemRegex.exec(listHtml)) !== null) {
+        const itemHtml = itemMatch[1];
+        const nameMatch = itemHtml.match(/<span[^>]*class="name"[^>]*>([\s\S]*?)<\/span>/i);
+        if (!nameMatch) continue;
+        const label = this.stripTags(nameMatch[1]);
 
-    while ((itemMatch = itemRegex.exec(listHtml)) !== null) {
-      const itemHtml = itemMatch[1];
-      const nameMatch = itemHtml.match(/<span[^>]*class="name"[^>]*>([\s\S]*?)<\/span>/i);
-      if (!nameMatch) continue;
-      const label = this.stripTags(nameMatch[1]);
+        const valueMatch = itemHtml.match(/<span[^>]*class="[^"]*value[^"]*"[^>]*>([\s\S]*?)<\/span>/i);
+        if (!valueMatch) continue;
+        const value = this.stripTags(valueMatch[1]);
 
-      const valueMatch = itemHtml.match(/<span[^>]*class="[^"]*value[^"]*"[^>]*>([\s\S]*?)<\/span>/i);
-      if (!valueMatch) continue;
-      const value = this.stripTags(valueMatch[1]);
+        for (const [key, aliases] of Object.entries(this.RATIO_LABELS)) {
+          if (aliases.some(a => label.toLowerCase().includes(a.toLowerCase()))) {
+            ratios[key] = value;
+            break;
+          }
+        }
+      }
+    }
 
-      for (const [key, aliases] of Object.entries(this.RATIO_LABELS)) {
-        if (aliases.some(a => label.toLowerCase().includes(a.toLowerCase()))) {
-          ratios[key] = value;
-          break;
+    if (Object.keys(ratios).length > 0) {
+      return ratios;
+    }
+
+    const genericTableRegex = /<table[^>]*>([\s\S]*?)<\/table>/gi;
+    let tableMatch: RegExpExecArray | null;
+    while ((tableMatch = genericTableRegex.exec(html)) !== null) {
+      const rows = this.parseGenericTableRows(tableMatch[1]);
+      for (const row of rows) {
+        if (row.length < 2) continue;
+        const label = row[0];
+        const value = row[1];
+        for (const [key, aliases] of Object.entries(this.RATIO_LABELS)) {
+          if (aliases.some((alias) => label.toLowerCase().includes(alias.toLowerCase()))) {
+            ratios[key] = value;
+            break;
+          }
         }
       }
     }
@@ -164,6 +229,42 @@ export class ScreenerParser {
     publicHolding: string | null;
     pledgedPromoterHolding: string | null;
   } {
+    const extractFromRows = (rows: string[][]) => {
+      const promoterRow = ScreenerParser.findRow(rows, ['promoters', 'promoter']);
+      const fiiRow = ScreenerParser.findRow(rows, ['fiis', 'fii']);
+      const diiRow = ScreenerParser.findRow(rows, ['diis', 'dii']);
+      const institutionalRow = ScreenerParser.findRow(rows, ['institutional', 'institutions', 'institutional investors']);
+      const publicRow = ScreenerParser.findRow(rows, ['public']);
+      const pledgedRow = ScreenerParser.findRow(rows, ['pledged']);
+      const firstValue = (row: string[] | null): string | null => {
+        if (!row) return null;
+        return row.slice(1).find((cell) => /\d/.test(cell)) ?? null;
+      };
+      const institutionalParts = [firstValue(institutionalRow), firstValue(fiiRow), firstValue(diiRow)]
+        .filter(Boolean) as string[];
+      return {
+        promoterHolding: firstValue(promoterRow),
+        institutionalHolding: institutionalParts.length > 0 ? institutionalParts.join(' + ') : null,
+        publicHolding: firstValue(publicRow),
+        pledgedPromoterHolding: firstValue(pledgedRow),
+      };
+    };
+
+    const tableHtml = ScreenerParser.findTableNearHeading(html, 'Shareholding Pattern');
+    if (tableHtml) {
+      return extractFromRows(ScreenerParser.parseGenericTableRows(tableHtml).slice(1));
+    }
+
+    const genericTableRegex = /<table[^>]*>([\s\S]*?)<\/table>/gi;
+    let genericMatch: RegExpExecArray | null;
+    while ((genericMatch = genericTableRegex.exec(html)) !== null) {
+      const rows = ScreenerParser.parseGenericTableRows(genericMatch[1]);
+      const parsed = extractFromRows(rows.slice(1));
+      if (parsed.promoterHolding || parsed.institutionalHolding || parsed.publicHolding) {
+        return parsed;
+      }
+    }
+
     const extractPct = (label: string): string | null => {
       const esc = ScreenerParser.escapeRegex(label);
       const p = new RegExp(`${esc}[^<]*<[^>]*>([^<]+)`, 'i');

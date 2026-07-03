@@ -155,6 +155,7 @@
     "backfill:feature-factor-lineage": "tsx scripts/backfill-feature-factor-lineage.ts",
     "research:market-sdks": "tsx scripts/research-open-source-market-sdks.ts",
     "probe:akshare": "python3 scripts/probe-akshare-provider.py",
+    "probe:nsetools": "python3 scripts/probe-nsetools-provider.py",
     "job:maintenance": "tsx scripts/run-production-maintenance-job.ts",
     "job:research-snapshots": "npx tsx scripts/intelligence/run-job.ts generate-research",
     "job:refresh-rankings": "npx tsx scripts/intelligence/run-job.ts refresh-rankings",

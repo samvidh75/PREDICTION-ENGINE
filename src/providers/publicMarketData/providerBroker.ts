@@ -53,12 +53,16 @@ const DOMAIN_MATRIX: Record<string, Array<{ key: string; domain: ProviderDomain 
   YAHOO: [
     { key: "yahoo", domain: "quote" },
     { key: "yahoo", domain: "historical" },
+    { key: "yahoo", domain: "index" },
   ],
   FUNDAMENTALS_AUTOMATIC: [
     { key: "automatic_public", domain: "fundamentals" },
   ],
   CSV_FALLBACK: [
     { key: "csv_import", domain: "fundamentals" },
+  ],
+  RBI_PUBLIC: [
+    { key: "rbi_public", domain: "macro" },
   ],
 };
 
@@ -70,6 +74,10 @@ interface PythonProbeResult {
   healthy_probes?: number;
   total_probes?: number;
   domains?: Record<string, ProbeDomainResult>;
+}
+
+interface RbiMacroProbeResult {
+  healthy: boolean;
 }
 
 async function runPythonProbe(scriptName: string): Promise<PythonProbeResult | null> {
@@ -89,6 +97,26 @@ async function runPythonProbe(scriptName: string): Promise<PythonProbeResult | n
 
 function domainHealthy(status?: string): boolean {
   return status === 'healthy';
+}
+
+async function probeRbiMacro(): Promise<RbiMacroProbeResult> {
+  try {
+    const response = await fetch('https://www.rbi.org.in/Home.aspx', {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; StockStory/1.0; +https://stockstory-india.com)',
+        Accept: 'text/html,application/xhtml+xml',
+      },
+    });
+    if (!response.ok) {
+      return { healthy: false };
+    }
+    const html = await response.text();
+    const hasPolicyRate = /Policy Repo Rate\s*:\s*\d+(?:\.\d+)?%/i.test(html);
+    const hasExchangeRate = /INR\s*\/\s*1\s*USD\s*:\s*\d+(?:\.\d+)?/i.test(html);
+    return { healthy: hasPolicyRate && hasExchangeRate };
+  } catch {
+    return { healthy: false };
+  }
 }
 
 export class PublicMarketDataProviderBroker {
@@ -137,6 +165,7 @@ export class PublicMarketDataProviderBroker {
     const matrix: Record<string, ProviderMatrixEntry> = {};
     const nsepython = await runPythonProbe('probe-nsepython-provider.py');
     const jugaad = await runPythonProbe('probe-jugaad-data-provider.py');
+    const rbiMacro = await probeRbiMacro();
 
     for (const [envKey, entries] of Object.entries(DOMAIN_MATRIX)) {
       const domains: Partial<Record<ProviderDomain, DomainStatus>> = {};
@@ -150,11 +179,13 @@ export class PublicMarketDataProviderBroker {
         } else if (envKey === 'INDIANAPI_KEY') {
           healthy = Boolean(process.env.INDIANAPI_KEY);
         } else if (envKey === 'YAHOO') {
-          healthy = domain === 'quote' || domain === 'historical';
+          healthy = domain === 'quote' || domain === 'historical' || domain === 'index';
         } else if (envKey === 'FUNDAMENTALS_AUTOMATIC') {
           healthy = true;
         } else if (envKey === 'CSV_FALLBACK') {
           healthy = true;
+        } else if (envKey === 'RBI_PUBLIC') {
+          healthy = rbiMacro.healthy;
         }
         domains[domain] = { healthy };
       }

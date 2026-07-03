@@ -66,9 +66,9 @@ async function main(): Promise<void> {
     ["Quote", [["indianapi", "INDIANAPI_KEY.quote"], ["jugaad-data", "JUGAD_DATA.quote"], ["nsepython", "NSEPYTHON.quote"], ["yahoo", "YAHOO.quote"]]],
     ["Historical", [["jugaad-data", "JUGAD_DATA.historical"], ["nsepython", "NSEPYTHON.historical"], ["yahoo", "YAHOO.historical"]]],
     ["Bhavcopy", [["jugaad-data", "JUGAD_DATA.bhavcopy"], ["nsepython", "NSEPYTHON.bhavcopy"]]],
-    ["Index", [["nsepython", "NSEPYTHON.index_quote"], ["jugaad-data", "JUGAD_DATA.index"]]],
+    ["Index", [["nsepython", "NSEPYTHON.index_quote"], ["jugaad-data", "JUGAD_DATA.index"], ["yahoo", "YAHOO.index"]]],
     ["Fundamentals", [["automatic_public", "FUNDAMENTALS_AUTOMATIC.fundamentals"], ["csv_import", "CSV_FALLBACK.fundamentals"]]],
-    ["Macro", [["jugaad-data", "JUGAD_DATA.rbi"]]],
+    ["Macro", [["jugaad-data", "JUGAD_DATA.rbi"], ["rbi-public", "RBI_PUBLIC.macro"]]],
   ];
   for (const [label, providers] of domainRows) {
     const statuses = providers.map(([provider, path]) => {
@@ -118,11 +118,13 @@ async function main(): Promise<void> {
   const yahooQuoteOk = quoteResult.provider === "yahoo" && !!quoteResult.data;
   const yahooHistOk = histResult.provider === "yahoo" && !!histResult.data?.length;
   const yahooHealthy = yahooHealth?.status === "healthy";
+  const upstoxTokenPresent = Boolean(process.env.UPSTOX_ACCESS_TOKEN);
+  const macroHealthy = Boolean(providerMatrix.RBI_PUBLIC?.domains?.macro?.healthy);
   const yahooDetail = yahooQuoteOk || yahooHistOk
     ? `Reachable fallback${yahooQuoteOk ? " quote" : ""}${yahooQuoteOk && yahooHistOk ? " +" : ""}${yahooHistOk ? " historical" : ""}; optional and may be delayed/stale`
     : yahooHealthy
-      ? "Reachable optional fallback; higher-precedence providers served this run"
-    : `Unavailable or blocked${yahooHealth?.status ? ` — ${yahooHealth.status}` : ""}`;
+      ? "Reachable optional fallback for quote, historical, and index coverage"
+      : `Unavailable or blocked${yahooHealth?.status ? ` — ${yahooHealth.status}` : ""}`;
   const healthyDomainList = (key: string) => Object.entries(providerMatrix[key]?.domains ?? {})
     .filter(([, v]) => v.healthy)
     .map(([domain]) => domain)
@@ -136,7 +138,9 @@ async function main(): Promise<void> {
   console.log("  △ CSV Import: Manual fallback remains available for operator backfills");
   console.log("  ⊘ NSELib: Archived/unusable, not active");
   console.log("  ✓ Redis: Infrastructure cache");
-  console.log("  ✗ Dhan/Upstox/Finnhub: Not active");
+  console.log(`  ${macroHealthy ? "✓" : "△"} Macro: ${macroHealthy ? "RBI official public site is reachable for policy-rate and FX context" : "No verified public macro fallback responded in this run"}`);
+  console.log(`  ${upstoxTokenPresent ? "✓" : "△"} Upstox: ${upstoxTokenPresent ? "Credentialed provider is configured in this environment" : "Optional credentialed provider; token not configured here"}`);
+  console.log("  △ Dhan/Finnhub: Optional providers not configured");
   console.log("");
 
   // Ensure we don't exit non-zero for expected states

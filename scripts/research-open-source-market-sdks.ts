@@ -2,13 +2,15 @@
  * SDK Evaluation Harness
  * Runs isolated Python probe scripts and outputs JSON + summary.
  */
-import { execSync } from "child_process";
+import { execFileSync } from "child_process";
 import * as fs from "fs";
 import * as path from "path";
 
 const PROBES = [
   { name: "jugaad-data", script: "scripts/probe-jugaad-data-provider.py", pkg: "jugaad-data" },
   { name: "nsepython", script: "scripts/probe-nsepython-provider.py", pkg: "nsepython" },
+  { name: "nsetools", script: "scripts/probe-nsetools-provider.py", pkg: "nsetools" },
+  { name: "nselib", script: "scripts/probe-nselib-provider.py", pkg: "nselib", pythonBin: fs.existsSync("/tmp/nselib-probe-env/bin/python") ? "/tmp/nselib-probe-env/bin/python" : "python3" },
   { name: "akshare", script: "scripts/probe-akshare-provider.py", pkg: "akshare" },
   { name: "nsepy", script: "scripts/probe-nsepy-provider.py", pkg: "nsepy" },
 ];
@@ -25,18 +27,50 @@ interface ProbeResult {
 }
 
 function runProbe(probe: typeof PROBES[0]): ProbeResult {
+  const scriptPath = path.resolve(probe.script);
+  const env = { ...process.env };
+  const pythonBin = probe.pythonBin || "python3";
+
   try {
-    const scriptPath = path.resolve(probe.script);
-    const env = { ...process.env, PYTHONPATH: process.env.PYTHONPATH || "/Users/samvidhmehta/Library/Python/3.9/lib/python/site-packages" };
-    const out = execSync(`python3 ${scriptPath} 2>/dev/null`, {
+    const out = execFileSync(pythonBin, [scriptPath], {
       encoding: "utf-8",
       timeout: 30_000,
       env,
     });
-    return JSON.parse(out.trim()) as ProbeResult;
+    const parsed = JSON.parse(out.trim()) as Partial<ProbeResult>;
+    return {
+      provider: parsed.provider || (parsed as any).probe || probe.name,
+      packageVersion: parsed.packageVersion || "unknown",
+      pythonVersion: parsed.pythonVersion || (parsed as any).python_version || "unknown",
+      installed: parsed.installed ?? true,
+      error: parsed.error,
+      domains: parsed.domains || {},
+      safeToActivate: parsed.safeToActivate ?? false,
+      warnings: parsed.warnings || [],
+    };
   } catch (e: any) {
-    if (e.stderr?.includes("No module named")) {
-      const missing = e.stderr.match(/No module named '([^']+)'/)?.[1] || "unknown";
+    const stderr = String(e.stderr || "");
+    const stdout = String(e.stdout || "");
+    const combined = `${stdout}\n${stderr}`;
+
+    try {
+      const parsed = JSON.parse(stdout.trim() || stderr.trim()) as Partial<ProbeResult>;
+      return {
+        provider: parsed.provider || probe.name,
+        packageVersion: parsed.packageVersion || "unknown",
+        pythonVersion: parsed.pythonVersion || "unknown",
+        installed: parsed.installed ?? false,
+        error: parsed.error || e.message,
+        domains: parsed.domains || {},
+        safeToActivate: parsed.safeToActivate ?? false,
+        warnings: parsed.warnings || ["Probe execution failed"],
+      };
+    } catch {
+      // fall through
+    }
+
+    if (combined.includes("No module named")) {
+      const missing = combined.match(/No module named '([^']+)'/)?.[1] || "unknown";
       return {
         provider: probe.name,
         packageVersion: "not_installed",
@@ -53,7 +87,7 @@ function runProbe(probe: typeof PROBES[0]): ProbeResult {
       packageVersion: "error",
       pythonVersion: "unknown",
       installed: false,
-      error: e.stderr?.slice(0, 300) || e.message,
+      error: combined.trim().slice(0, 300) || e.message,
       domains: {},
       safeToActivate: false,
       warnings: ["Probe execution failed"],
@@ -123,13 +157,17 @@ async function main() {
       rows.push(`| ${result.provider} | reject | Not installed — ${result.error || "install failed"} |`);
       continue;
     }
-    const allOk = Object.values(result.domains || {}).every((d) => d.status === "ok");
-    if (allOk && result.safeToActivate) {
-      rows.push(`| ${result.provider} | activate | All probed domains returned usable data |`);
+    const healthyCount = Object.values(result.domains || {}).filter((d) => d.status === "healthy").length;
+    if (healthyCount > 0 && result.safeToActivate) {
+      rows.push(`| ${result.provider} | activate | At least one critical domain is healthy and the package is safe to activate |`);
     } else if (result.provider === "jugaad-data") {
       rows.push(`| ${result.provider} | probe_only | Already configured as optional fallback; domains work but scraping risk |`);
     } else if (result.provider === "nsepython") {
       rows.push(`| ${result.provider} | probe_only | Already configured; limited domain coverage |`);
+    } else if (result.provider === "nsetools") {
+      rows.push(`| ${result.provider} | archive | Legacy NSE scraper; symbol universe works but quote path is broken |`);
+    } else if (result.provider === "nselib") {
+      rows.push(`| ${result.provider} | archive | Package imports, but no usable market-data domains were discovered |`);
     } else if (result.provider === "akshare") {
       rows.push(`| ${result.provider} | future_watch | China-focused; India endpoints unverified |`);
     } else if (result.provider === "nsepy") {
@@ -146,7 +184,7 @@ async function main() {
   console.log(report);
 
   // Exit non-zero if any result is not useful
-  const allNonZero = results.filter((r) => r.installed && Object.values(r.domains || {}).some((d) => d.status === "ok"));
+  const allNonZero = results.filter((r) => r.installed && Object.values(r.domains || {}).some((d) => d.status === "healthy"));
   if (allNonZero.length === 0) console.error("\n⚠️  No SDKs returned usable data. Verify Python environment.");
 }
 
