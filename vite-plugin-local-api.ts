@@ -68,8 +68,18 @@ export function localApiPlugin(): Plugin {
             } catch { /* yahoo script failed */ }
 
             if (livePrice) {
-              // Fundamentals from snapshot (Yahoo quoteSummary is rate-limited)
-              if (research) {
+              // Layer 2: Real fundamentals via yfinance Python (most reliable)
+              try {
+                const script = path.resolve(root, 'scripts/fetch-python-fundamentals.cjs');
+                const raw = execSync(`node "${script}" "${symbol}"`, { timeout: 25000, encoding: 'utf-8' });
+                const parsed = JSON.parse(raw.trim());
+                if (parsed.pe || parsed.pb || parsed.roe) {
+                  liveFundamentals = parsed;
+                }
+              } catch { /* fundamentals script failed */ }
+
+              // Fallback: snapshot fundamentals if yfinance failed
+              if (!liveFundamentals && research) {
                 liveFundamentals = {
                   pe: research.pe ?? null,
                   pb: research.pb ?? null,
@@ -106,9 +116,10 @@ export function localApiPlugin(): Plugin {
               const roe = useLive ? (liveFundamentals?.roe ?? 10) : (research?.roe ?? 10);
               const revGrowth = useLive ? (liveFundamentals?.revenueGrowth ?? 12) / 100 : Math.max(0.02, (research?.revenueGrowth ?? 12) / 100);
               const netMargin = Math.max(0.02, roe / 500);
+              const yfinanceRev = liveFundamentals?.revenue ? Math.round(liveFundamentals.revenue / 10000000) : 0;
               const annualRev = research?.financials?.annual?.revenue || [];
               const snapshotRev = annualRev.length > 0 ? annualRev[annualRev.length - 1].value : 0;
-              const revenue = snapshotRev > 0 ? snapshotRev : Math.round((marketCapCr || 100000) / (pe / 10));
+              const revenue = yfinanceRev || snapshotRev || Math.round((marketCapCr || 100000) / (pe / 10));
               const netDebt = (marketCapCr || 100000) * (de / (1 + de)) * 0.3;
               const cashEq = (marketCapCr || 100000) * 0.05;
               const sharesOut = price > 0 ? ((marketCapCr || 100000) * 10000000) / price : 100000000;
@@ -135,26 +146,31 @@ export function localApiPlugin(): Plugin {
               };
             }
 
+            const liveCompanyName = liveFundamentals?.companyName || research?.companyName || symbol;
+            const liveSector = liveFundamentals?.sector || research?.sector || 'Diversified';
+            const liveIndustry = liveFundamentals?.industry || research?.industry || 'General';
             const payload = {
               symbol: research?.symbol || symbol,
-              companyName: research?.companyName || symbol,
-              exchange: 'NSE', sector: research?.sector || 'Diversified', industry: research?.industry || 'General',
-              price: { current: price, changeAbs: useLive ? livePrice.change : (research?.change ?? 0), changePercent: useLive ? livePrice.changePercent : (research?.changePercent ?? 0), marketCap: marketCapCr },
-              fundamentals: { pe: useLive ? liveFundamentals?.pe : (research?.pe ?? null), industryPe: research?.industryPe ?? null, pb: useLive ? liveFundamentals?.pb : (research?.pb ?? null), dividendYield: useLive ? liveFundamentals?.dividendYield : (research?.dividendYield ?? null), eps: useLive ? liveFundamentals?.eps : (research?.eps ?? null) },
-              roe: useLive ? liveFundamentals?.roe : (research?.roe ?? null),
-              debtToEquity: useLive ? liveFundamentals?.debtToEquity : (research?.debtToEquity ?? null),
-              revenueGrowth: useLive ? liveFundamentals?.revenueGrowth : (research?.revenueGrowth ?? null),
-              profitGrowth: research?.profitGrowth ?? null, rsi: research?.rsi ?? null,
+              companyName: liveCompanyName,
+              exchange: 'NSE', sector: liveSector, industry: liveIndustry,
+              price: { current: price, changeAbs: useLive ? livePrice.change : (research?.change ?? 0), changePercent: useLive ? livePrice.changePercent : (research?.changePercent ?? 0), marketCap: marketCapCr || (liveFundamentals?.marketCap ? Math.round(liveFundamentals.marketCap / 10000000 * 100) / 100 : null) },
+              fundamentals: { pe: liveFundamentals?.pe ?? null, industryPe: research?.industryPe ?? null, pb: liveFundamentals?.pb ?? null, dividendYield: liveFundamentals?.dividendYield ?? null, eps: liveFundamentals?.eps ?? null },
+              roe: liveFundamentals?.roe ?? null,
+              debtToEquity: liveFundamentals?.debtToEquity ?? null,
+              revenueGrowth: liveFundamentals?.revenueGrowth ?? null,
+              profitGrowth: liveFundamentals?.profitGrowth ?? null,
+              returnOnAssets: liveFundamentals?.returnOnAssets ?? null,
+              rsi: research?.rsi ?? null,
               scores: research?.scores ?? null, confidenceMeter: research?.confidenceMeter ?? null,
               timeline: research?.timeline ?? null, whatChanged: research?.whatChanged ?? null,
               sectorRelative: research?.sectorRelative ?? null,
-              description: research?.description || `${symbol} operates in the ${research?.sector || 'General'} sector.`,
+              description: research?.description || `${symbol} operates in the ${liveSector} sector.`,
               companyProfile: { founded: research?.founded || '', ceo: '', hq: 'India', employees: research?.employees || '', website: '', isin: '', businessSegments: research?.businessSegments || ['Diversified'] },
               priceHistory, financials: research?.financials || null,
               shareholding: research?.shareholding || null,
               news: liveNews || research?.news || [],
               thesis: research?.thesis || null,
-              dataSources: { price: sourceLabel, fundamentals: sourceLabel === 'yahoo' ? 'yahoo_finance' : 'snapshot', history: liveHistory ? 'yahoo_finance' : 'snapshot', news: liveNews ? 'yahoo_finance' : 'snapshot', financials: 'snapshot', shareholding: 'snapshot' },
+              dataSources: { price: sourceLabel, fundamentals: liveFundamentals?.pe ? 'yfinance' : 'snapshot', history: liveHistory ? 'yahoo_finance' : 'snapshot', news: liveNews ? 'yahoo_finance' : 'snapshot', financials: 'snapshot', shareholding: 'snapshot' },
               dcf,
             };
 
