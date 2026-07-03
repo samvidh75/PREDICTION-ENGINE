@@ -1,7 +1,3 @@
-// src/components/edge-ai/StockExWorkerPool.ts
-// Phase 43 — Centralized Web Worker pool manager with task queueing.
-// Prevents browser resource leaks from multiple per-component workers.
-
 type QueuedTask = {
   type: string;
   payload: any;
@@ -11,38 +7,32 @@ type QueuedTask = {
 
 export class StockExWorkerPool {
   private static workerInstance: Worker | null = null;
+  private static llmWorkerInstance: Worker | null = null;
   private static listeners: Map<string, (data: any) => void> = new Map();
   private static taskQueue: QueuedTask[] = [];
+  private static llmTaskQueue: QueuedTask[] = [];
   private static busy = false;
+  private static llmBusy = false;
 
-  /**
-   * Get or create the singleton Web Worker instance.
-   */
   public static getWorker(): Worker {
     if (!this.workerInstance) {
       this.workerInstance = new Worker(
-        new URL("./edgeAiWorker.ts", import.meta.url),
-        { type: "module" },
+        new URL('./edgeAiWorker.ts', import.meta.url),
+        { type: 'module' },
       );
 
       this.workerInstance.onmessage = (e: MessageEvent) => {
         this.busy = false;
-
-        // Process queued task (Promise-based)
         const msgType = e.data?.type as string | undefined;
         const pendingIdx = this.taskQueue.findIndex((t) => t.type === msgType);
         if (pendingIdx >= 0) {
           const { resolve } = this.taskQueue.splice(pendingIdx, 1)[0];
           resolve(e.data);
         }
-
-        // Also dispatch to registered listeners
         if (msgType) {
           const cb = this.listeners.get(msgType);
           if (cb) cb(e.data);
         }
-
-        // Process next queued task
         this.processNext();
       };
 
@@ -58,6 +48,36 @@ export class StockExWorkerPool {
     return this.workerInstance;
   }
 
+  private static getLlmWorker(): Worker {
+    if (!this.llmWorkerInstance) {
+      this.llmWorkerInstance = new Worker(
+        new URL('../browser-ai/edgeAiLlmWorker.ts', import.meta.url),
+        { type: 'module' },
+      );
+
+      this.llmWorkerInstance.onmessage = (e: MessageEvent) => {
+        this.llmBusy = false;
+        const msgType = e.data?.type as string | undefined;
+        const pendingIdx = this.llmTaskQueue.findIndex((t) => t.type === msgType);
+        if (pendingIdx >= 0) {
+          const { resolve } = this.llmTaskQueue.splice(pendingIdx, 1)[0];
+          resolve(e.data);
+        }
+        this.processNextLlm();
+      };
+
+      this.llmWorkerInstance.onerror = (error) => {
+        this.llmBusy = false;
+        if (this.llmTaskQueue.length > 0) {
+          const { reject } = this.llmTaskQueue.shift()!;
+          reject(new Error(error.message));
+        }
+        this.processNextLlm();
+      };
+    }
+    return this.llmWorkerInstance;
+  }
+
   private static processNext(): void {
     if (this.busy || this.taskQueue.length === 0 || !this.workerInstance) return;
     this.busy = true;
@@ -65,10 +85,13 @@ export class StockExWorkerPool {
     this.workerInstance.postMessage({ type, payload });
   }
 
-  /**
-   * Execute a task via the worker pool with Promise-based queueing.
-   * Tasks are executed sequentially — no worker overload.
-   */
+  private static processNextLlm(): void {
+    if (this.llmBusy || this.llmTaskQueue.length === 0 || !this.llmWorkerInstance) return;
+    this.llmBusy = true;
+    const { type, payload } = this.llmTaskQueue[0];
+    this.llmWorkerInstance.postMessage({ type, payload });
+  }
+
   public static executeTask(type: string, payload: any): Promise<any> {
     return new Promise((resolve, reject) => {
       this.getWorker();
@@ -77,37 +100,39 @@ export class StockExWorkerPool {
     });
   }
 
-  /**
-   * Register a listener for a specific message type from the worker.
-   */
+  public static executeLlmTask(type: string, payload: any): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.getLlmWorker();
+      this.llmTaskQueue.push({ type, payload, resolve, reject });
+      this.processNextLlm();
+    });
+  }
+
   public static on(type: string, callback: (data: any) => void): void {
     this.listeners.set(type, callback);
   }
 
-  /**
-   * Remove a listener.
-   */
   public static off(type: string): void {
     this.listeners.delete(type);
   }
 
-  /**
-   * Dispatch a task to the worker (fire-and-forget).
-   */
   public static dispatch(type: string, payload: any): void {
     this.getWorker().postMessage({ type, payload });
   }
 
-  /**
-   * Terminate the worker and reset state.
-   */
   public static terminate(): void {
     if (this.workerInstance) {
       this.workerInstance.terminate();
       this.workerInstance = null;
     }
+    if (this.llmWorkerInstance) {
+      this.llmWorkerInstance.terminate();
+      this.llmWorkerInstance = null;
+    }
     this.listeners.clear();
     this.taskQueue = [];
+    this.llmTaskQueue = [];
     this.busy = false;
+    this.llmBusy = false;
   }
 }

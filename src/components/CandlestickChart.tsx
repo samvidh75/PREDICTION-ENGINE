@@ -16,6 +16,8 @@ interface CandlestickChartProps {
   candles: PriceCandle[];
   upperBand?: number[];
   lowerBand?: number[];
+  sma50?: number[];
+  sma200?: number[];
 }
 
 export function CandlestickChart({
@@ -23,6 +25,8 @@ export function CandlestickChart({
   candles,
   upperBand,
   lowerBand,
+  sma50,
+  sma200,
 }: CandlestickChartProps) {
   if (!candles || candles.length === 0) {
     return (
@@ -78,6 +82,28 @@ export function CandlestickChart({
     });
   }
 
+  if (sma50 && sma50.length === candles.length) {
+    seriesData.push({
+      name: "SMA-50",
+      type: "line",
+      data: candles.map((c, i) => ({
+        x: new Date(c.timestamp * 1000),
+        y: sma50[i],
+      })),
+    });
+  }
+
+  if (sma200 && sma200.length === candles.length) {
+    seriesData.push({
+      name: "SMA-200",
+      type: "line",
+      data: candles.map((c, i) => ({
+        x: new Date(c.timestamp * 1000),
+        y: sma200[i],
+      })),
+    });
+  }
+
   const chartOptions: ApexOptions = {
     chart: {
       id: "stockstory-main-chart",
@@ -110,8 +136,16 @@ export function CandlestickChart({
         wick: { useFillColor: true },
       },
     },
-    stroke: { width: [1, 1, 1], curve: "smooth", dashArray: [0, 4, 4] },
-    colors: ["#57c1ff", "#FF3B30", "#34C759"],
+    stroke: {
+      width: Array(seriesData.length).fill(1) as number[],
+      curve: "smooth" as const,
+      dashArray: seriesData.map((s) => {
+        if (s.name === "SMA-50" || s.name === "SMA-200") return 0;
+        if (s.name === "Upper Band" || s.name === "Lower Band") return 4;
+        return 0;
+      }),
+    },
+    colors: ["#57c1ff", "#FF3B30", "#34C759", "#FF9800", "#E91E63"],
     legend: { show: false },
   };
 

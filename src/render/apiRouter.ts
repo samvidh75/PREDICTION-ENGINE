@@ -225,7 +225,7 @@ async function yahooNews(symbol: string): Promise<{ headline: string; source: st
 }
 
 async function indianApiFunds(symbol: string): Promise<Record<string, unknown>> {
-  const key = process.env.INDIANAPI_KEY || process.env.VITE_INDIANAPI_KEY;
+  const key = process.env.INDIANAPI_KEY;
   if (!key) return {};
   try {
     const r = await fetch(`https://stock.indianapi.in/stock_fundamentals?name=${encodeURIComponent(symbol)}`, {
@@ -274,7 +274,7 @@ function deriveFinancials(marketCapCr: number, pe: number | null, sector: string
     quarterly.ebitda.push({ period: label, value: ebitda });
     qm -= 3; if (qm <= 0) { qm = 12; qy--; }
   }
-  return { annual, quarterly };
+  return { annual, quarterly, dataSource: 'synthetic' as const };
 }
 
 function deriveShareholding(symbol: string, sector: string) {
@@ -322,6 +322,7 @@ function generateThesis(scores: Record<string, number | null>, pe: number | null
       bullCase: `${roe ? `Industry-leading ROE of ${roe}% suggests durable competitive advantages. ` : ""}Continued reinvestment should compound shareholder value.`,
       bearCase: `Premium valuation ${pe ? `(PE: ${pe})` : ""} leaves limited margin of safety. Sector headwinds could trigger multiple compression.`,
       whatToWatch: "Monitor quarterly revenue growth trajectory and margin trends. Key risk: regulatory changes and competitive intensity.",
+      dataSource: 'synthetic' as const,
     };
   }
   if (avg >= 50) {
@@ -331,6 +332,7 @@ function generateThesis(scores: Record<string, number | null>, pe: number | null
       bullCase: `${g >= 50 ? "Growth catalysts could re-rate the stock." : "Operational improvements could unlock value."} ${v >= 55 ? "Current valuation offers reasonable entry." : ""}`,
       bearCase: `Inconsistent metrics suggest elevated uncertainty. ${r < 50 ? "Risk management and capital allocation need scrutiny." : ""}`,
       whatToWatch: "Track quarterly results for operational leverage. Changes in institutional holding could signal conviction shifts.",
+      dataSource: 'synthetic' as const,
     };
   }
   return {
@@ -339,6 +341,7 @@ function generateThesis(scores: Record<string, number | null>, pe: number | null
     bullCase: "Turnaround potential if management executes on cost optimization. Sector tailwinds could provide near-term relief.",
     bearCase: `Fundamental weaknesses in quality (${q}/100) and elevated risk (${r}/100) create downside risk.`,
     whatToWatch: "Wait for two consecutive quarters of improving metrics before reconsidering. Monitor debt levels.",
+    dataSource: 'synthetic' as const,
   };
 }
 
@@ -562,6 +565,11 @@ export default async function registerApiRoutes(server: FastifyInstance) {
         { headline: "Sector outlook remains positive for coming quarters", source: "Financial Express", time: new Date(Date.now() - 172800000).toISOString() },
       ],
       thesis: thesisData,
+      dataSources: {
+        financials: fundData?.pe_ratio ? 'real' : 'synthetic',
+        shareholding: 'synthetic',
+        thesis: fundData?.pe_ratio ? 'real' : 'synthetic',
+      },
       priceHistory,
     };
 
@@ -1715,6 +1723,10 @@ export default async function registerApiRoutes(server: FastifyInstance) {
   // ── Portfolio Sync Routes ────────────────────────────────────
   const { registerPortfolioSyncRoutes } = await import("../commercial/api/portfolioSyncRoutes.js");
   await registerPortfolioSyncRoutes(server);
+
+  // ── Portfolio Precision Routes (Phase 76/77) ────────────────
+  const { registerPortfolioPrecisionRoutes } = await import("../commercial/api/portfolioPrecisionRoutes.js");
+  await registerPortfolioPrecisionRoutes(server);
 
   // ── Ops / Admin Telemetry Routes ─────────────────────────────
   const { registerOpsRoutes } = await import("../commercial/api/opsRoutes.js");

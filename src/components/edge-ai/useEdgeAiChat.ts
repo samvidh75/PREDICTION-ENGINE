@@ -9,16 +9,14 @@ import { sanitizeChatReply } from './edgeAiOutputGuardrails';
 import { formatNumber } from "../../services/ui/dataFormatting";
 import { StockExWorkerPool } from './StockExWorkerPool';
 
-/* ── Hook return type ──────────────────────────────────────────────── */
-
 interface UseEdgeAiChatReturn {
   messages: EdgeAiChatMessage[];
   status: EdgeAiWorkerStatus;
   send: (query: string) => void;
   reset: () => void;
+  initializeLlm: () => Promise<void>;
+  llmReady: boolean;
 }
-
-/* ── Helpers ───────────────────────────────────────────────────────── */
 
 let _messageCounter = 0;
 function nextId(): string {
@@ -26,8 +24,10 @@ function nextId(): string {
   return `chat-${_messageCounter}-${Date.now()}`;
 }
 
+let llmInitialized = false;
+
 function buildSystemPrompt(context: EdgeAiResearchContext): string {
-  return [
+  const lines = [
     `You are a research assistant analysing ${context.companyName} (${context.symbol}).`,
     'Your role is to help the user understand the research, not to make predictions.',
     '',
@@ -43,7 +43,7 @@ function buildSystemPrompt(context: EdgeAiResearchContext): string {
     ...context.narrative,
     '',
     `Sector: ${context.sector}`,
-    `Current price: ₹${formatNumber(context.currentPrice)} (${(context.changePercent ?? 0) >= 0 ? '+' : ''}${context.changePercent != null ? context.changePercent.toFixed(2) : '0.00'}%)`,
+    `Current price: \u20b9${formatNumber(context.currentPrice)} (${(context.changePercent ?? 0) >= 0 ? '+' : ''}${context.changePercent != null ? context.changePercent.toFixed(2) : '0.00'}%)`,
     '',
     'Risks flagged:',
     ...(context.risksToReview.length > 0
@@ -54,19 +54,18 @@ function buildSystemPrompt(context: EdgeAiResearchContext): string {
     ...(context.whatToWatch.length > 0
       ? context.whatToWatch.map((w) => `- ${w}`)
       : ['- Nothing specific']),
-  ].join('\n');
+  ];
+  return lines.join('\n');
 }
-
-/* ── Hook ──────────────────────────────────────────────────────────── */
 
 export function useEdgeAiChat(context: EdgeAiResearchContext): UseEdgeAiChatReturn {
   const [messages, setMessages] = useState<EdgeAiChatMessage[]>([]);
   const [status, setStatus] = useState<EdgeAiWorkerStatus>(
     context.symbol ? 'ready' : 'uninitialised',
   );
+  const [llmReady, setLlmReady] = useState(false);
   const systemPromptRef = useRef(buildSystemPrompt(context));
 
-  // Rebuild system prompt if context changes
   useEffect(() => {
     systemPromptRef.current = buildSystemPrompt(context);
     if (context.symbol) {
@@ -74,11 +73,45 @@ export function useEdgeAiChat(context: EdgeAiResearchContext): UseEdgeAiChatRetu
     }
   }, [context]);
 
+  const initializeLlm = useCallback(async () => {
+    if (llmInitialized) {
+      setLlmReady(true);
+      return;
+    }
+    setStatus('processing');
+    try {
+      const result = await StockExWorkerPool.executeLlmTask('INITIALIZE_BROWSER_LLM', {});
+      if (result?.type === 'INITIALIZED_SUCCESS') {
+        llmInitialized = true;
+        setLlmReady(true);
+        setStatus('ready');
+      } else {
+        setStatus('ready');
+      }
+    } catch {
+      setStatus('ready');
+    }
+  }, []);
+
+  const generateWithLlm = useCallback(async (query: string): Promise<string> => {
+    try {
+      const result = await StockExWorkerPool.executeLlmTask('GENERATE_ON_GPU', {
+        systemPrompt: systemPromptRef.current,
+        userPrompt: query,
+      });
+      if (result?.type === 'GENERATION_COMPLETE' && result.response) {
+        return result.response;
+      }
+    } catch {
+      // LLM failed, fall through
+    }
+    return '';
+  }, []);
+
   const send = useCallback(
     async (query: string) => {
       if (!query.trim() || status === 'processing') return;
 
-      // Add user message
       const userMessage: EdgeAiChatMessage = {
         id: nextId(),
         role: 'user',
@@ -89,13 +122,21 @@ export function useEdgeAiChat(context: EdgeAiResearchContext): UseEdgeAiChatRetu
       setStatus('processing');
 
       try {
-        const workerInput: EdgeAiWorkerInput = {
-          context,
-          history: [...messages.map((m) => ({ role: m.role, content: m.content })), userMessage],
-          query,
-        };
-        const workerResult: any = await StockExWorkerPool.executeTask('chat', workerInput);
-        let rawReply: string = workerResult?.rawReply || '';
+        let rawReply = '';
+
+        if (llmReady) {
+          rawReply = await generateWithLlm(query);
+        }
+
+        if (!rawReply) {
+          const workerInput: EdgeAiWorkerInput = {
+            context,
+            history: [...messages.map((m) => ({ role: m.role, content: m.content })), userMessage],
+            query,
+          };
+          const workerResult: any = await StockExWorkerPool.executeTask('chat', workerInput);
+          rawReply = workerResult?.rawReply || '';
+        }
 
         if (!rawReply) {
           rawReply = await callBackendApi(context.symbol, query);
@@ -123,7 +164,7 @@ export function useEdgeAiChat(context: EdgeAiResearchContext): UseEdgeAiChatRetu
         setStatus('ready');
       }
     },
-    [messages, status, context],
+    [messages, status, context, llmReady, generateWithLlm],
   );
 
   const reset = useCallback(() => {
@@ -131,7 +172,7 @@ export function useEdgeAiChat(context: EdgeAiResearchContext): UseEdgeAiChatRetu
     setStatus(context.symbol ? 'ready' : 'uninitialised');
   }, [context.symbol]);
 
-  return { messages, status, send, reset };
+  return { messages, status, send, reset, initializeLlm, llmReady };
 }
 
 /* ── Backend API Fallback (Phase 80) ────────────────────────────────── */
