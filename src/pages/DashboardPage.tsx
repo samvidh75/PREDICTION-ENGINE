@@ -11,7 +11,8 @@ export default function DashboardPage() {
   try {
     const session = useMemo(() => loadAuthSession(), []);
     const userId = session.status === "authenticated" && session.uid ? session.uid : "anonymous";
-    const hasProTier = false;
+    // For now: authenticated users get pro tier, anonymous users get free tier
+    const hasProTier = session.status === "authenticated";
 
     return (
       <div
