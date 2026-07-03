@@ -34,10 +34,10 @@ export class LocalStorageVault {
     let keyStr = localStorage.getItem(`${this.KEY_PREFIX}encryption_key`);
     if (!keyStr) {
       const key = nacl.randomBytes(32);
-      keyStr = Buffer.from(key).toString('base64');
+      keyStr = this.bytesToBase64(key);
       localStorage.setItem(`${this.KEY_PREFIX}encryption_key`, keyStr);
     }
-    this.encryptionKey = Buffer.from(keyStr, 'base64');
+    this.encryptionKey = this.base64ToBytes(keyStr);
   }
 
   async saveWatchlist(name: string, tickers: string[]): Promise<string> {
@@ -134,17 +134,36 @@ export class LocalStorageVault {
     const nonce = nacl.randomBytes(24);
     const msgBytes = new TextEncoder().encode(message);
     const encrypted = nacl.secretbox(msgBytes, nonce, this.encryptionKey!);
-    const combined = Buffer.concat([Buffer.from(nonce), Buffer.from(encrypted)]);
-    return combined.toString('base64');
+    const combined = new Uint8Array(nonce.length + encrypted.length);
+    combined.set(nonce);
+    combined.set(encrypted, nonce.length);
+    return this.bytesToBase64(combined);
   }
 
   private decrypt(ciphertext: string): string {
-    const combined = Buffer.from(ciphertext, 'base64');
+    const combined = this.base64ToBytes(ciphertext);
     const nonce = combined.subarray(0, 24);
     const encrypted = combined.subarray(24);
     const decrypted = nacl.secretbox.open(encrypted, nonce, this.encryptionKey!);
     if (!decrypted) throw new Error('Decryption failed');
     return new TextDecoder().decode(decrypted);
+  }
+
+  private bytesToBase64(bytes: Uint8Array): string {
+    let binary = '';
+    for (let i = 0; i < bytes.length; i++) {
+      binary += String.fromCharCode(bytes[i]);
+    }
+    return btoa(binary);
+  }
+
+  private base64ToBytes(base64: string): Uint8Array {
+    const binary = atob(base64);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) {
+      bytes[i] = binary.charCodeAt(i);
+    }
+    return bytes;
   }
 }
 
