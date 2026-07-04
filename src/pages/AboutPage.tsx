@@ -3,75 +3,206 @@ import {
   ArrowRight,
   BarChart3,
   Brain,
-  CheckCircle2,
-  LineChart,
+  CandlestickChart,
+  ChevronRight,
+  LockKeyhole,
+  Radar,
   Search,
   ShieldCheck,
+  Sparkles,
 } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
-import { colors, layout, radius, space, typography } from "../design/tokens";
 
-type FeatureCard = {
-  title: string;
-  body: string;
-  icon: LucideIcon;
-};
+type ExchangeHealth = "Healthy" | "Stable" | "Weakening";
 
-type StatCard = {
+type ExchangeCard = {
   label: string;
   value: string;
-  body: string;
+  move: string;
+  health: ExchangeHealth;
 };
 
-const featureCards: FeatureCard[] = [
+type FeatureTimelineCard = {
+  id: string;
+  eyebrow: string;
+  title: string;
+  body: string;
+  rangeProgress: number;
+  rangeLabels: [string, string, string];
+  columns: number[];
+};
+
+const exchangeCards: ExchangeCard[] = [
+  { label: "NSE Nifty 50", value: "24,842.10", move: "+0.84%", health: "Healthy" },
+  { label: "BSE Sensex", value: "81,486.21", move: "+0.61%", health: "Stable" },
+  { label: "SME Index", value: "4,936.48", move: "-0.28%", health: "Weakening" },
+];
+
+const featureTimelineCards: FeatureTimelineCard[] = [
   {
-    title: "Research",
-    body: "Company pages keep fundamentals, market context, and evidence in one view so investors can review faster.",
-    icon: Search,
+    id: "practice-terminal",
+    eyebrow: "Practice Terminal",
+    title: "A disciplined review surface for repeat company work.",
+    body: "Healthometer layers, factor groupings, and company context stay close together so investors can review a name without bouncing between disconnected views.",
+    rangeProgress: 63,
+    rangeLabels: ["52W Low", "Current Vector", "52W High"],
+    columns: [36, 48, 54, 72, 82],
   },
   {
-    title: "Thesis",
-    body: "We organize what changed, why it matters, and what deserves a second look before conviction increases.",
-    icon: Brain,
+    id: "market-stories",
+    eyebrow: "Market Stories",
+    title: "Structured narratives that explain what changed and why it matters.",
+    body: "The story layer turns movements, updates, and market shifts into readable institutional language instead of fragmented alerts or commentary noise.",
+    rangeProgress: 51,
+    rangeLabels: ["Range Floor", "Story Position", "Range Ceiling"],
+    columns: [30, 42, 58, 61, 74],
   },
   {
-    title: "Compare",
-    body: "Peer and sector views make it easier to compare quality, valuation, and momentum without losing context.",
-    icon: BarChart3,
-  },
-  {
-    title: "Risk",
-    body: "Debt, drawdown, freshness, and volatility signals stay visible so the downside case is part of the workflow.",
-    icon: ShieldCheck,
+    id: "intelligence-scanners",
+    eyebrow: "Intelligence Scanners",
+    title: "Discovery tools built for deeper review, not shallow ranking theatre.",
+    body: "Scanner outputs guide investors toward names worth comparing across NSE, BSE, and SME corridors before conviction is formed.",
+    rangeProgress: 72,
+    rangeLabels: ["Weakening", "Screened Set", "Healthy"],
+    columns: [26, 40, 56, 68, 80],
   },
 ];
 
-const statCards: StatCard[] = [
-  {
-    label: "Coverage",
-    value: "1,500+",
-    body: "Indian equities organized for discovery, review, and tracking.",
-  },
-  {
-    label: "Methodology",
-    value: "150+",
-    body: "Factor families across quality, valuation, momentum, and risk.",
-  },
-  {
-    label: "Workflow",
-    value: "Research-first",
-    body: "Designed for Review, Compare, Track, and thesis follow-through.",
-  },
-];
+function HealthPill({ health }: { health: ExchangeHealth }) {
+  const palette =
+    health === "Healthy"
+      ? { bg: "rgba(16, 185, 129, 0.10)", border: "rgba(16, 185, 129, 0.22)", text: "#059669" }
+      : health === "Stable"
+        ? { bg: "rgba(37, 99, 235, 0.08)", border: "rgba(37, 99, 235, 0.18)", text: "#2563eb" }
+        : { bg: "rgba(245, 158, 11, 0.10)", border: "rgba(245, 158, 11, 0.20)", text: "#d97706" };
 
-const methodSteps = [
-  "Live market data stays separate from explanatory research language.",
-  "Signals are presented as context for review, not execution prompts.",
-  "Peer comparison, risk, and thesis changes are surfaced together.",
-  "Users can move from search into deeper company review without breaking context.",
-];
+  return (
+    <span
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "5px 10px",
+        borderRadius: 999,
+        background: palette.bg,
+        border: `1px solid ${palette.border}`,
+        color: palette.text,
+        fontSize: 11,
+        fontWeight: 600,
+        letterSpacing: "0.05em",
+        textTransform: "uppercase",
+        whiteSpace: "nowrap",
+      }}
+    >
+      {health}
+    </span>
+  );
+}
 
-function NavButton({
+function RangeBar({
+  progress,
+  labels,
+}: {
+  progress: number;
+  labels: [string, string, string];
+}) {
+  return (
+    <div style={{ display: "grid", gap: 10 }}>
+      <div
+        style={{
+          position: "relative",
+          height: 10,
+          borderRadius: 999,
+          background: "linear-gradient(90deg, rgba(6,182,212,0.10), rgba(109,40,217,0.12))",
+          border: "1px solid rgba(148, 163, 184, 0.22)",
+          overflow: "hidden",
+        }}
+      >
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background:
+              "linear-gradient(90deg, rgba(6,182,212,0.42) 0%, rgba(109,40,217,0.38) 100%)",
+            clipPath: `inset(0 ${100 - progress}% 0 0)`,
+          }}
+        />
+        <div
+          style={{
+            position: "absolute",
+            left: `${progress}%`,
+            top: "50%",
+            width: 18,
+            height: 18,
+            marginLeft: -9,
+            marginTop: -9,
+            borderRadius: 999,
+            background: "#ffffff",
+            border: "2px solid rgba(109, 40, 217, 0.35)",
+            boxShadow: "0 6px 20px rgba(109, 40, 217, 0.18)",
+          }}
+        />
+      </div>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          gap: 8,
+          color: "#64748b",
+          fontSize: 12,
+          lineHeight: 1.4,
+        }}
+      >
+        <span>{labels[0]}</span>
+        <span>{labels[1]}</span>
+        <span>{labels[2]}</span>
+      </div>
+    </div>
+  );
+}
+
+function Histogram({ columns }: { columns: number[] }) {
+  const labels = ["3M", "6M", "9M", "3Y", "5Y"];
+  return (
+    <div style={{ display: "grid", gap: 12 }}>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(5, minmax(0, 1fr))",
+          gap: 12,
+          alignItems: "end",
+          height: 124,
+        }}
+      >
+        {columns.map((value, index) => (
+          <div key={`${labels[index]}-${value}`} style={{ display: "grid", justifyItems: "center", gap: 8 }}>
+            <div
+              style={{
+                width: "100%",
+                maxWidth: 38,
+                height: `${value}px`,
+                borderRadius: "10px 10px 4px 4px",
+                background:
+                  index === columns.length - 1
+                    ? "linear-gradient(180deg, rgba(6,182,212,0.85), rgba(109,40,217,0.78))"
+                    : "linear-gradient(180deg, rgba(226,232,240,0.95), rgba(203,213,225,0.95))",
+                boxShadow:
+                  index === columns.length - 1
+                    ? "0 8px 20px rgba(109,40,217,0.14)"
+                    : "0 4px 14px rgba(15,23,42,0.06)",
+              }}
+            />
+            <span style={{ color: "#64748b", fontSize: 11, fontWeight: 500 }}>{labels[index]}</span>
+          </div>
+        ))}
+      </div>
+      <div style={{ color: "#64748b", fontSize: 13, lineHeight: 1.6 }}>
+        Historical performance matrix spanning 3M, 6M, 9M, 3Y, and 5Y horizons.
+      </div>
+    </div>
+  );
+}
+
+function NavLink({
   label,
   active = false,
   onClick,
@@ -83,17 +214,18 @@ function NavButton({
   return (
     <button
       onClick={onClick}
+      aria-current={active ? "page" : undefined}
       style={{
-        padding: "8px 14px",
-        borderRadius: radius.md,
         border: "none",
         background: "transparent",
-        color: active ? colors.textPrimary : colors.textSecondary,
-        cursor: "pointer",
+        color: active ? "#0f172a" : "#475569",
         fontSize: 13,
-        fontWeight: 500,
+        fontWeight: 600,
+        letterSpacing: "0.02em",
+        padding: "8px 10px",
+        borderRadius: 10,
+        cursor: "pointer",
       }}
-      aria-current={active ? "page" : undefined}
     >
       {label}
     </button>
@@ -107,53 +239,92 @@ export default function AboutPage() {
     <div
       style={{
         minHeight: "100vh",
-        background: colors.canvas,
-        color: colors.textPrimary,
-        fontFamily: typography.fontFamily,
+        background:
+          "radial-gradient(circle at top left, rgba(6,182,212,0.06), transparent 26%), radial-gradient(circle at top right, rgba(109,40,217,0.07), transparent 24%), #ffffff",
+        color: "#0f172a",
+        fontFamily: "\"Inter\", -apple-system, BlinkMacSystemFont, \"SF Pro Display\", \"Segoe UI\", sans-serif",
       }}
     >
       <style>{`
         .about-shell {
-          max-width: ${layout.contentMaxWidth};
+          width: min(1180px, calc(100% - 32px));
           margin: 0 auto;
-          padding: 0 ${layout.pagePaddingDesktop};
         }
 
-        .about-card {
-          background: ${colors.surface};
-          border: 1px solid ${colors.border};
-          border-radius: ${radius.lg};
+        .about-glass-card {
+          background: linear-gradient(180deg, rgba(248,250,252,0.96), rgba(255,255,255,0.96));
+          border: 1px solid rgba(226,232,240,0.88);
+          border-radius: 24px;
+          box-shadow: 0 8px 30px rgba(15,23,42,0.04);
+          backdrop-filter: blur(16px);
+          -webkit-backdrop-filter: blur(16px);
         }
 
-        .about-feature-grid,
-        .about-stat-grid {
+        .about-hover-lift {
+          transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease;
+          will-change: transform;
+        }
+
+        .about-hover-lift:hover {
+          transform: scale(1.01) translateY(-2px);
+          box-shadow: 0 18px 40px rgba(15,23,42,0.08);
+          border-color: rgba(203,213,225,0.95);
+        }
+
+        .about-hero-grid {
           display: grid;
-          gap: ${space[4]};
+          grid-template-columns: minmax(0, 1fr) minmax(340px, 0.92fr);
+          gap: 28px;
+          align-items: stretch;
+        }
+
+        .about-exchange-grid,
+        .about-feature-grid {
+          display: grid;
+          gap: 14px;
+        }
+
+        .about-exchange-grid {
+          grid-template-columns: 1fr;
         }
 
         .about-feature-grid {
           grid-template-columns: repeat(2, minmax(0, 1fr));
         }
 
-        .about-stat-grid {
-          grid-template-columns: repeat(3, minmax(0, 1fr));
-        }
-
-        .about-method-grid {
+        .about-timeline {
           display: grid;
-          grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
-          gap: ${space[6]};
-          align-items: start;
+          gap: 22px;
         }
 
-        .about-fade {
-          animation: aboutFade 280ms ease-out;
+        .about-timeline-card {
+          display: grid;
+          grid-template-columns: minmax(0, 0.95fr) minmax(320px, 0.85fr);
+          gap: 22px;
+          padding: 26px;
+          align-items: center;
         }
 
-        @keyframes aboutFade {
+        .about-timeline-card:nth-child(2n) {
+          grid-template-columns: minmax(320px, 0.85fr) minmax(0, 0.95fr);
+        }
+
+        .about-timeline-card:nth-child(2n) .about-copy {
+          order: 2;
+        }
+
+        .about-timeline-card:nth-child(2n) .about-visual {
+          order: 1;
+        }
+
+        .about-reveal {
+          animation: aboutReveal 360ms ease-out;
+        }
+
+        @keyframes aboutReveal {
           from {
             opacity: 0;
-            transform: translateY(8px);
+            transform: translateY(10px);
           }
           to {
             opacity: 1;
@@ -161,22 +332,28 @@ export default function AboutPage() {
           }
         }
 
-        @media (max-width: 900px) {
+        @media (max-width: 960px) {
+          .about-hero-grid,
           .about-feature-grid,
-          .about-stat-grid,
-          .about-method-grid {
+          .about-timeline-card,
+          .about-timeline-card:nth-child(2n) {
             grid-template-columns: 1fr;
+          }
+
+          .about-timeline-card:nth-child(2n) .about-copy,
+          .about-timeline-card:nth-child(2n) .about-visual {
+            order: initial;
           }
         }
 
-        @media (max-width: 640px) {
+        @media (max-width: 720px) {
           .about-shell {
-            padding: 0 16px;
+            width: min(100% - 24px, 1180px);
           }
 
           .about-nav {
-            padding-left: 16px !important;
-            padding-right: 16px !important;
+            padding-left: 12px !important;
+            padding-right: 12px !important;
           }
 
           .about-nav-links {
@@ -184,12 +361,18 @@ export default function AboutPage() {
           }
 
           .about-hero-title {
-            font-size: 40px !important;
+            font-size: 42px !important;
+            line-height: 1.02 !important;
           }
 
           .about-section {
-            padding-top: 40px !important;
-            padding-bottom: 40px !important;
+            padding-top: 42px !important;
+            padding-bottom: 42px !important;
+          }
+
+          .about-health-overlay {
+            position: static !important;
+            margin-top: 18px;
           }
         }
       `}</style>
@@ -197,306 +380,508 @@ export default function AboutPage() {
       <header
         className="about-nav"
         style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          padding: "16px 24px",
-          borderBottom: `1px solid ${colors.hairlineSoft}`,
-          position: "sticky",
+          position: "fixed",
           top: 0,
-          zIndex: 100,
-          background: colors.backdropGlassmorphic,
-          backdropFilter: "blur(12px)",
-          WebkitBackdropFilter: "blur(12px)",
+          left: 0,
+          right: 0,
+          zIndex: 50,
+          background: "#ffffff",
+          borderBottom: "1px solid rgba(241,245,249,1)",
         }}
       >
-        <button
-          onClick={() => navigate("/dashboard")}
+        <div
+          className="about-shell"
           style={{
-            display: "flex",
+            display: "grid",
+            gridTemplateColumns: "auto 1fr auto",
+            gap: 18,
             alignItems: "center",
-            gap: 8,
-            textDecoration: "none",
-            color: colors.textPrimary,
-            background: "transparent",
-            border: "none",
-            padding: 0,
-            cursor: "pointer",
-            height: "auto",
+            minHeight: 76,
           }}
-          aria-label="StockStory India home"
         >
-          <div
+          <button
+            onClick={() => navigate("/dashboard")}
             style={{
-              width: 32,
-              height: 32,
-              borderRadius: 8,
-              background: `linear-gradient(135deg, ${colors.heroStripeStart}, ${colors.heroStripeEnd})`,
-              display: "flex",
+              display: "inline-flex",
               alignItems: "center",
-              justifyContent: "center",
-              fontSize: 16,
-              fontWeight: 700,
-              color: colors.onDark,
-              flex: "0 0 auto",
+              gap: 10,
+              padding: 0,
+              background: "transparent",
+              border: "none",
+              color: "#0f172a",
+              cursor: "pointer",
+              height: "auto",
             }}
+            aria-label="StockStory India"
           >
-            S
-          </div>
-          <span style={{ fontWeight: 600, fontSize: 16 }}>StockStory India</span>
-        </button>
+            <strong style={{ fontSize: 16, fontWeight: 700, letterSpacing: "0.1em" }}>STOCKSTORY</strong>
+            <span
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "4px 8px",
+                borderRadius: 999,
+                border: "1px solid rgba(226,232,240,1)",
+                color: "#475569",
+                fontSize: 11,
+                fontWeight: 600,
+                fontFamily: "\"SFMono-Regular\", ui-monospace, monospace",
+                letterSpacing: "0.08em",
+              }}
+            >
+              INDIA
+            </span>
+          </button>
 
-        <nav className="about-nav-links" style={{ display: "flex", gap: 8, alignItems: "center" }}>
-          <NavButton label="Pricing" onClick={() => navigate("/pricing")} />
-          <NavButton label="Trust" onClick={() => navigate("/trust")} />
-          <NavButton label="About" active onClick={() => navigate("/about")} />
-        </nav>
+          <nav
+            className="about-nav-links"
+            style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}
+          >
+            <NavLink label="Markets" onClick={() => navigate("/dashboard")} />
+            <NavLink label="Stories" onClick={() => navigate("/stock-story")} />
+            <NavLink label="Deep Analysis" active onClick={() => navigate("/about")} />
+          </nav>
 
-        <button
-          onClick={() => navigate("/dashboard")}
-          style={{
-            padding: "8px 16px",
-            borderRadius: radius.md,
-            border: "none",
-            background: colors.primary,
-            color: colors.onPrimary,
-            cursor: "pointer",
-            fontSize: 14,
-            fontWeight: 600,
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 8,
-          }}
-        >
-          Open research
-          <ArrowRight size={14} aria-hidden="true" />
-        </button>
-      </header>
-
-      <main className="about-shell about-fade" style={{ paddingTop: 40, paddingBottom: 64 }}>
-        <section
-          className="about-section"
-          style={{
-            paddingTop: 24,
-            paddingBottom: 56,
-            borderBottom: `1px solid ${colors.border}`,
-          }}
-        >
-          <div
+          <button
+            onClick={() => navigate("/dashboard")}
             style={{
               display: "inline-flex",
               alignItems: "center",
               gap: 8,
-              padding: "6px 12px",
-              borderRadius: radius.full,
-              border: `1px solid ${colors.accentRedSoft}`,
-              background: colors.accentRedSoft,
-              color: colors.accentRed,
-              fontSize: 12,
-              fontWeight: 600,
-              marginBottom: 20,
+              border: "none",
+              borderRadius: 14,
+              background: "#0f172a",
+              color: "#ffffff",
+              padding: "12px 16px",
+              fontSize: 13,
+              fontWeight: 700,
+              letterSpacing: "0.06em",
+              cursor: "pointer",
             }}
           >
-            About StockStory India
-          </div>
+            INITIALIZE SESSION
+            <ArrowRight size={14} aria-hidden="true" />
+          </button>
+        </div>
+      </header>
 
-          <h1
-            className="about-hero-title"
-            style={{
-              margin: "0 0 16px",
-              fontSize: 56,
-              lineHeight: 1.1,
-              fontWeight: 600,
-              maxWidth: 760,
-              letterSpacing: 0,
-            }}
-          >
-            Research Indian stocks with a clearer workflow.
-          </h1>
+      <main className="about-shell about-reveal" style={{ paddingTop: 112, paddingBottom: 72 }}>
+        <section className="about-section" style={{ paddingTop: 24, paddingBottom: 62 }}>
+          <div className="about-hero-grid">
+            <div style={{ display: "grid", alignContent: "start", gap: 18 }}>
+              <div
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 8,
+                  width: "fit-content",
+                  padding: "8px 12px",
+                  borderRadius: 999,
+                  background: "rgba(255,255,255,0.9)",
+                  border: "1px solid rgba(226,232,240,0.88)",
+                  boxShadow: "0 8px 30px rgba(15,23,42,0.04)",
+                  color: "#0f172a",
+                  fontSize: 12,
+                  fontWeight: 600,
+                }}
+              >
+                <Sparkles size={14} color="#6d28d9" aria-hidden="true" />
+                Public Experience Layer
+              </div>
 
-          <p
-            style={{
-              margin: "0 0 24px",
-              maxWidth: 720,
-              color: colors.textSecondary,
-              fontSize: 18,
-              lineHeight: 1.6,
-            }}
-          >
-            StockStory India is a research platform for investors who want company review, thesis tracking, risk
-            context, and peer comparison in one place instead of scattered across separate tools.
-          </p>
+              <h1
+                className="about-hero-title"
+                style={{
+                  margin: 0,
+                  fontSize: 72,
+                  lineHeight: 0.96,
+                  fontWeight: 700,
+                  letterSpacing: "-0.03em",
+                  maxWidth: 760,
+                }}
+              >
+                Indian markets are mapping a resilient narrative.
+              </h1>
 
-          <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-            <button
-              onClick={() => navigate("/dashboard")}
-              style={{
-                padding: "10px 18px",
-                borderRadius: radius.md,
-                border: "none",
-                background: colors.primary,
-                color: colors.onPrimary,
-                fontSize: 14,
-                fontWeight: 600,
-                cursor: "pointer",
-              }}
-            >
-              Start research
-            </button>
-            <button
-              onClick={() => navigate("/trust")}
-              style={{
-                padding: "10px 18px",
-                borderRadius: radius.md,
-                border: `1px solid ${colors.border}`,
-                background: "transparent",
-                color: colors.textPrimary,
-                fontSize: 14,
-                fontWeight: 500,
-                cursor: "pointer",
-              }}
-            >
-              Review trust notes
-            </button>
+              <p
+                style={{
+                  margin: 0,
+                  maxWidth: 690,
+                  color: "#475569",
+                  fontSize: 18,
+                  lineHeight: 1.75,
+                }}
+              >
+                StockStory India frames NSE, BSE, and SME market behavior through clear, institutional research
+                surfaces that help investors review structure, compare quality, and track Healthometer changes.
+              </p>
+
+              <div style={{ display: "flex", gap: 12, flexWrap: "wrap", paddingTop: 4 }}>
+                <button
+                  onClick={() => navigate("/dashboard")}
+                  style={{
+                    border: "none",
+                    borderRadius: 14,
+                    background: "#0f172a",
+                    color: "#ffffff",
+                    padding: "12px 18px",
+                    fontSize: 14,
+                    fontWeight: 700,
+                    cursor: "pointer",
+                  }}
+                >
+                  Start Research
+                </button>
+                <button
+                  onClick={() => navigate("/trust")}
+                  style={{
+                    borderRadius: 14,
+                    border: "1px solid rgba(226,232,240,1)",
+                    background: "rgba(255,255,255,0.86)",
+                    color: "#0f172a",
+                    padding: "12px 18px",
+                    fontSize: 14,
+                    fontWeight: 600,
+                    cursor: "pointer",
+                  }}
+                >
+                  Review Methodology
+                </button>
+              </div>
+            </div>
+
+            <div className="about-glass-card about-hover-lift" style={{ padding: 20 }}>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "flex-start",
+                  justifyContent: "space-between",
+                  gap: 12,
+                  marginBottom: 18,
+                }}
+              >
+                <div>
+                  <div style={{ color: "#64748b", fontSize: 12, marginBottom: 8 }}>Volumetric Exchange Grid</div>
+                  <h2 style={{ margin: 0, fontSize: 22, fontWeight: 700 }}>Macro Core Environment</h2>
+                </div>
+                <div
+                  style={{
+                    width: 38,
+                    height: 38,
+                    borderRadius: 14,
+                    background:
+                      "linear-gradient(135deg, rgba(6,182,212,0.10), rgba(109,40,217,0.12))",
+                    border: "1px solid rgba(226,232,240,0.88)",
+                    display: "grid",
+                    placeItems: "center",
+                  }}
+                >
+                  <Radar size={18} color="#6d28d9" aria-hidden="true" />
+                </div>
+              </div>
+
+              <div className="about-exchange-grid">
+                {exchangeCards.map((card) => (
+                  <article
+                    key={card.label}
+                    className="about-glass-card about-hover-lift"
+                    style={{ padding: 16, borderRadius: 18 }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        gap: 10,
+                        marginBottom: 10,
+                      }}
+                    >
+                      <span style={{ color: "#64748b", fontSize: 12 }}>{card.label}</span>
+                      <HealthPill health={card.health} />
+                    </div>
+                    <div style={{ fontSize: 28, fontWeight: 700, marginBottom: 8 }}>{card.value}</div>
+                    <div
+                      style={{
+                        color: card.move.startsWith("-") ? "#d97706" : "#0891b2",
+                        fontSize: 13,
+                        fontWeight: 700,
+                        letterSpacing: "0.02em",
+                      }}
+                    >
+                      {card.move}
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </div>
           </div>
         </section>
 
-        <section className="about-section" style={{ paddingTop: 56, paddingBottom: 56 }}>
-          <div style={{ marginBottom: 24 }}>
-            <h2 style={{ margin: "0 0 8px", fontSize: 24, fontWeight: 600 }}>What the platform is built to do</h2>
-            <p style={{ margin: 0, color: colors.textSecondary, fontSize: 16, lineHeight: 1.6, maxWidth: 720 }}>
-              The product language is simple by design: Research, Thesis, Compare, Track, Review, and Risk.
-            </p>
-          </div>
-
+        <section className="about-section" style={{ paddingTop: 0, paddingBottom: 62 }}>
           <div className="about-feature-grid">
-            {featureCards.map((card) => {
-              const Icon = card.icon;
+            {[
+              {
+                title: "Research",
+                body: "Company review surfaces keep factors, freshness, and historical structure aligned in one frame.",
+                icon: Search,
+              },
+              {
+                title: "Thesis",
+                body: "What changed and why it matters are attached to the same story instead of scattered into commentary.",
+                icon: Brain,
+              },
+              {
+                title: "Compare",
+                body: "Peer-level comparisons help investors see quality and valuation distinctions without flattening nuance.",
+                icon: BarChart3,
+              },
+              {
+                title: "Risk",
+                body: "Healthometer changes and structural pressure stay visible before conviction deepens.",
+                icon: ShieldCheck,
+              },
+            ].map((item) => {
+              const Icon = item.icon;
               return (
-                <article key={card.title} className="about-card" style={{ padding: 24 }}>
+                <article key={item.title} className="about-glass-card about-hover-lift" style={{ padding: 22 }}>
                   <div
                     style={{
-                      width: 40,
-                      height: 40,
-                      borderRadius: radius.md,
-                      background: colors.fill,
+                      width: 42,
+                      height: 42,
+                      borderRadius: 14,
+                      background:
+                        "linear-gradient(135deg, rgba(6,182,212,0.10), rgba(109,40,217,0.10))",
+                      border: "1px solid rgba(226,232,240,0.88)",
                       display: "grid",
                       placeItems: "center",
                       marginBottom: 16,
                     }}
                   >
-                    <Icon size={18} color={colors.accentRed} aria-hidden="true" />
+                    <Icon size={18} color="#6d28d9" aria-hidden="true" />
                   </div>
-                  <h3 style={{ margin: "0 0 8px", fontSize: 18, fontWeight: 600 }}>{card.title}</h3>
-                  <p style={{ margin: 0, color: colors.textSecondary, fontSize: 14, lineHeight: 1.7 }}>{card.body}</p>
+                  <h3 style={{ margin: "0 0 8px", fontSize: 20, fontWeight: 700 }}>{item.title}</h3>
+                  <p style={{ margin: 0, color: "#475569", fontSize: 14, lineHeight: 1.75 }}>{item.body}</p>
                 </article>
               );
             })}
           </div>
         </section>
 
-        <section className="about-section" style={{ paddingTop: 0, paddingBottom: 56 }}>
-          <div className="about-method-grid">
-            <div>
-              <h2 style={{ margin: "0 0 12px", fontSize: 24, fontWeight: 600 }}>How we think about methodology</h2>
-              <p style={{ margin: "0 0 20px", color: colors.textSecondary, fontSize: 16, lineHeight: 1.7 }}>
-                StockStory India is designed to help investors review evidence cleanly. We keep data, interpretation,
-                and risk signals legible so the thesis can evolve with less noise.
-              </p>
-              <div style={{ display: "grid", gap: 12 }}>
-                {methodSteps.map((step) => (
-                  <div key={step} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
-                    <CheckCircle2 size={16} color={colors.accentRed} style={{ marginTop: 3, flex: "0 0 auto" }} />
-                    <span style={{ color: colors.textSecondary, fontSize: 15, lineHeight: 1.6 }}>{step}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
+        <section className="about-section" style={{ paddingTop: 0, paddingBottom: 62 }}>
+          <div className="about-glass-card about-hover-lift" style={{ padding: 26, position: "relative", overflow: "hidden" }}>
+            <div
+              style={{
+                position: "absolute",
+                inset: 0,
+                background:
+                  "radial-gradient(circle at top right, rgba(6,182,212,0.10), transparent 24%), radial-gradient(circle at bottom left, rgba(109,40,217,0.08), transparent 24%)",
+                pointerEvents: "none",
+              }}
+            />
 
-            <aside className="about-card" style={{ padding: 24 }}>
-              <div style={{ color: colors.textTertiary, fontSize: 12, marginBottom: 8 }}>Research snapshot</div>
-              <h3 style={{ margin: "0 0 18px", fontSize: 20, fontWeight: 600 }}>INFY review surface</h3>
-              <div style={{ marginBottom: 18 }}>
+            <div style={{ position: "relative", display: "grid", gap: 22 }}>
+              <div style={{ maxWidth: 760 }}>
+                <div style={{ color: "#64748b", fontSize: 12, marginBottom: 8 }}>Healthometer Showcase</div>
+                <h2 style={{ margin: "0 0 10px", fontSize: 30, fontWeight: 700 }}>
+                  A structural telemetry gauge previewing 150 simulated parameter checks.
+                </h2>
+                <p style={{ margin: 0, color: "#475569", fontSize: 16, lineHeight: 1.75 }}>
+                  The Healthometer subsystem gives investors a clear read on a company profile through deterministic,
+                  multi-parameter structure rather than shallow labels.
+                </p>
+              </div>
+
+              <div className="about-glass-card" style={{ padding: 22, position: "relative", overflow: "hidden" }}>
                 <div
                   style={{
                     display: "flex",
+                    alignItems: "flex-start",
                     justifyContent: "space-between",
-                    color: colors.textSecondary,
-                    fontSize: 13,
-                    marginBottom: 8,
+                    gap: 12,
+                    marginBottom: 18,
                   }}
                 >
-                  <span>Structural health</span>
-                  <span>78 / 100</span>
+                  <div>
+                    <div style={{ color: "#64748b", fontSize: 12, marginBottom: 8 }}>Structural Health Index</div>
+                    <h3 style={{ margin: 0, fontSize: 22, fontWeight: 700 }}>Premier Mainboard Research Matrix</h3>
+                  </div>
+                  <HealthPill health="Healthy" />
                 </div>
-                <div
-                  style={{
-                    width: "100%",
-                    height: 8,
-                    borderRadius: radius.full,
-                    background: colors.fill,
-                    overflow: "hidden",
-                  }}
-                >
+
+                <div style={{ display: "grid", gap: 10, marginBottom: 18 }}>
                   <div
                     style={{
-                      width: "78%",
-                      height: "100%",
-                      background: colors.primary,
+                      display: "flex",
+                      justifyContent: "space-between",
+                      gap: 12,
+                      color: "#64748b",
+                      fontSize: 13,
                     }}
-                  />
+                  >
+                    <span>Parameter Tracking Progression</span>
+                    <span>117 / 150 signals aligned</span>
+                  </div>
+                  <div
+                    style={{
+                      height: 12,
+                      borderRadius: 999,
+                      background:
+                        "linear-gradient(90deg, rgba(6,182,212,0.08), rgba(109,40,217,0.08))",
+                      border: "1px solid rgba(226,232,240,0.9)",
+                      overflow: "hidden",
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: "78%",
+                        height: "100%",
+                        background:
+                          "linear-gradient(90deg, rgba(6,182,212,0.92), rgba(109,40,217,0.82))",
+                        boxShadow: "0 0 24px rgba(109,40,217,0.18)",
+                      }}
+                    />
+                  </div>
+                </div>
+
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
+                    gap: 14,
+                    paddingBottom: 90,
+                  }}
+                >
+                  {[
+                    ["Coverage", "NSE / BSE / SME"],
+                    ["Health", "Healthy"],
+                    ["Freshness", "API verified"],
+                    ["Vectors", "150 tracked"],
+                  ].map(([label, value]) => (
+                    <div key={label}>
+                      <div style={{ color: "#64748b", fontSize: 11, marginBottom: 6 }}>{label}</div>
+                      <div style={{ color: "#0f172a", fontSize: 14, fontWeight: 700, lineHeight: 1.5 }}>{value}</div>
+                    </div>
+                  ))}
+                </div>
+
+                <div
+                  className="about-health-overlay"
+                  style={{
+                    position: "absolute",
+                    left: 18,
+                    right: 18,
+                    bottom: 18,
+                    padding: 16,
+                    borderRadius: 18,
+                    background: "rgba(255,255,255,0.92)",
+                    border: "1px solid rgba(226,232,240,0.95)",
+                    boxShadow: "0 12px 24px rgba(15,23,42,0.06)",
+                    display: "grid",
+                    gap: 10,
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, color: "#0f172a", fontSize: 13, fontWeight: 700 }}>
+                    <LockKeyhole size={15} color="#6d28d9" aria-hidden="true" />
+                    Premium Breakdown Layer
+                  </div>
+                  <div style={{ color: "#475569", fontSize: 14, lineHeight: 1.6 }}>
+                    Upgrade Horizon Premium to Unlock 150-Parameter Breakdown
+                  </div>
+                  <button
+                    onClick={() => navigate("/pricing")}
+                    style={{
+                      width: "fit-content",
+                      border: "none",
+                      borderRadius: 14,
+                      background: "#0f172a",
+                      color: "#ffffff",
+                      padding: "10px 14px",
+                      fontSize: 13,
+                      fontWeight: 700,
+                      cursor: "pointer",
+                    }}
+                  >
+                    Review Premium Access
+                  </button>
                 </div>
               </div>
-              <div style={{ display: "grid", gap: 10 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 10, color: colors.textSecondary, fontSize: 14 }}>
-                  <LineChart size={15} color={colors.accentRed} />
-                  <span>Quality, valuation, momentum, and risk in one view</span>
-                </div>
-                <div style={{ display: "flex", alignItems: "center", gap: 10, color: colors.textSecondary, fontSize: 14 }}>
-                  <BarChart3 size={15} color={colors.accentRed} />
-                  <span>Peer comparison stays attached to the thesis</span>
-                </div>
-                <div style={{ display: "flex", alignItems: "center", gap: 10, color: colors.textSecondary, fontSize: 14 }}>
-                  <ShieldCheck size={15} color={colors.accentRed} />
-                  <span>Risk context remains visible during review</span>
-                </div>
-              </div>
-            </aside>
+            </div>
           </div>
         </section>
 
-        <section className="about-section" style={{ paddingTop: 0, paddingBottom: 32 }}>
-          <div style={{ marginBottom: 24 }}>
-            <h2 style={{ margin: "0 0 8px", fontSize: 24, fontWeight: 600 }}>What this means in practice</h2>
-            <p style={{ margin: 0, color: colors.textSecondary, fontSize: 16, lineHeight: 1.6, maxWidth: 700 }}>
-              The goal is a calmer research desk, not a louder terminal. Search quickly, review deeply, and keep the
-              company story intact as new information arrives.
+        <section className="about-section" style={{ paddingTop: 0, paddingBottom: 44 }}>
+          <div style={{ marginBottom: 20 }}>
+            <div style={{ color: "#64748b", fontSize: 12, marginBottom: 8 }}>About & Feature Timeline</div>
+            <h2 style={{ margin: "0 0 10px", fontSize: 30, fontWeight: 700 }}>
+              A modular storybook layout showing how deep analysis moves through the product.
+            </h2>
+            <p style={{ margin: 0, color: "#475569", fontSize: 16, lineHeight: 1.75, maxWidth: 780 }}>
+              Each pillar combines analytical copy with range graphics and performance matrices to make the public
+              experience feel like a preview of the actual operating system.
             </p>
           </div>
 
-          <div className="about-stat-grid">
-            {statCards.map((card) => (
-              <article key={card.label} className="about-card" style={{ padding: 24 }}>
-                <div style={{ color: colors.textTertiary, fontSize: 12, marginBottom: 12 }}>{card.label}</div>
-                <div style={{ fontSize: 28, fontWeight: 600, marginBottom: 10 }}>{card.value}</div>
-                <p style={{ margin: 0, color: colors.textSecondary, fontSize: 14, lineHeight: 1.7 }}>{card.body}</p>
+          <div className="about-timeline">
+            {featureTimelineCards.map((card) => (
+              <article key={card.id} className="about-glass-card about-hover-lift about-timeline-card">
+                <div className="about-copy" style={{ display: "grid", gap: 12 }}>
+                  <div
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 8,
+                      width: "fit-content",
+                      padding: "7px 12px",
+                      borderRadius: 999,
+                      background: "rgba(248,250,252,0.92)",
+                      border: "1px solid rgba(226,232,240,0.9)",
+                      color: "#475569",
+                      fontSize: 12,
+                      fontWeight: 600,
+                    }}
+                  >
+                    <CandlestickChart size={14} color="#06b6d4" aria-hidden="true" />
+                    {card.eyebrow}
+                  </div>
+
+                  <h3 style={{ margin: 0, fontSize: 24, fontWeight: 700, lineHeight: 1.2 }}>{card.title}</h3>
+                  <p style={{ margin: 0, color: "#475569", fontSize: 15, lineHeight: 1.8 }}>{card.body}</p>
+                  <button
+                    onClick={() => navigate("/dashboard")}
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 8,
+                      width: "fit-content",
+                      border: "none",
+                      padding: 0,
+                      background: "transparent",
+                      color: "#0f172a",
+                      fontSize: 14,
+                      fontWeight: 700,
+                      cursor: "pointer",
+                    }}
+                  >
+                    Explore This Surface
+                    <ChevronRight size={15} aria-hidden="true" />
+                  </button>
+                </div>
+
+                <div className="about-visual about-glass-card" style={{ padding: 18, borderRadius: 20 }}>
+                  <div style={{ display: "grid", gap: 18 }}>
+                    <div>
+                      <div style={{ color: "#64748b", fontSize: 11, marginBottom: 10 }}>52-week range parameters</div>
+                      <RangeBar progress={card.rangeProgress} labels={card.rangeLabels} />
+                    </div>
+                    <Histogram columns={card.columns} />
+                  </div>
+                </div>
               </article>
             ))}
           </div>
         </section>
       </main>
-
-      <footer
-        style={{
-          padding: "24px",
-          borderTop: `1px solid ${colors.hairlineSoft}`,
-          textAlign: "center",
-          fontSize: 12,
-          color: colors.textTertiary,
-        }}
-      >
-        StockStory India — Research platform for Indian equities. Not investment advice.
-      </footer>
     </div>
   );
 }

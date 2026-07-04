@@ -26,6 +26,8 @@ export interface NewsItem {
 class NewsService {
   private updateInterval: NodeJS.Timeout | null = null;
   private isInitialized = false;
+  private retryCount: Record<string, number> = {};
+  private maxRetries = 3;
 
   async initialize(): Promise<void> {
     if (this.isInitialized) return;
@@ -69,10 +71,28 @@ class NewsService {
     const cached = await cacheManager.get<NewsItem[]>(cacheKey);
     if (cached) return cached;
 
-    // Fetch from multiple sources
-    const news = await this.aggregateNews(symbol);
+    // Fetch from multiple sources with retry logic
+    let news: NewsItem[] = [];
+    let attempt = 0;
 
-    // Cache for 2 hours
+    while (attempt < this.maxRetries) {
+      try {
+        news = await this.aggregateNews(symbol);
+        this.retryCount[symbol] = 0; // Reset on success
+        break;
+      } catch (error) {
+        attempt++;
+        this.retryCount[symbol] = attempt;
+        console.warn(`[News Service] Fetch attempt ${attempt}/${this.maxRetries} failed for ${symbol}:`, error);
+
+        if (attempt < this.maxRetries) {
+          // Exponential backoff: 1s, 2s, 4s
+          await new Promise(resolve => setTimeout(resolve, Math.pow(2, attempt - 1) * 1000));
+        }
+      }
+    }
+
+    // Cache for 2 hours even if empty (to avoid constant retries)
     await cacheManager.set(cacheKey, news, CACHE_TTL.NEWS);
 
     return news;

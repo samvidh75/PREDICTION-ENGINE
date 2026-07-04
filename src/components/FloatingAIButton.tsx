@@ -6,7 +6,7 @@
 
 import { useState } from 'react';
 import { colors } from '../design/tokens';
-import { advancedMarketAI } from '../services/ai/AdvancedMarketAI';
+import { stockExAI } from '../services/ai/StockExAI';
 
 export default function FloatingAIButton() {
   const [isOpen, setIsOpen] = useState(false);
@@ -23,8 +23,8 @@ export default function FloatingAIButton() {
     setIsLoading(true);
 
     try {
-      // Use ChatGPT-like market AI
-      const aiResponse = await advancedMarketAI.chat(userMessage);
+      // Use StockEx AI - ChatGPT of Indian stock market
+      const aiResponse = await stockExAI.chat(userMessage);
       setMessages((prev) => [...prev, { role: 'assistant', content: aiResponse.response }]);
     } catch (error) {
       setMessages((prev) => [
@@ -108,13 +108,15 @@ export default function FloatingAIButton() {
               >
                 <div style={{ fontWeight: '600', marginBottom: '8px' }}>🤖 StockEx AI</div>
                 <div style={{ fontSize: '12px', opacity: 0.8, marginBottom: '12px' }}>
-                  ChatGPT-like market intelligence with real stock analysis
+                  ChatGPT of Indian Stock Market - Deep Analysis Included
                 </div>
                 <div style={{ fontSize: '11px', opacity: 0.7, display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                  <span>📊 "Best stocks to buy today"</span>
-                  <span>📈 "Analyze HDFC" or "Analyze TCS"</span>
-                  <span>🎓 "What is P/E ratio?"</span>
-                  <span>💡 "Market update" or "Research"</span>
+                  <span>📊 "Best tech stocks now"</span>
+                  <span>📈 "Analyze HDFC" - Deep dive</span>
+                  <span>💼 "Portfolio analysis"</span>
+                  <span>📈 "Technical INFY"</span>
+                  <span>🎓 "Explain P/E ratio"</span>
+                  <span>💡 "Market update"</span>
                 </div>
               </div>
             )}

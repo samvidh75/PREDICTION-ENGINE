@@ -38,8 +38,33 @@ export default function NewsSection({ symbol }: NewsSectionProps) {
       setLastUpdated(new Date());
     } catch (error) {
       console.error('Error loading news:', error);
+      setNews([]);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const trackAffiliateClick = (item: NewsItem) => {
+    if (item.isSponsored && item.affiliateLink) {
+      // Track in analytics
+      console.log('[Monetization] Affiliate click:', {
+        source: item.source,
+        link: item.affiliateLink,
+        timestamp: new Date().toISOString(),
+        stock: symbol
+      });
+
+      // Send to analytics endpoint if available
+      fetch('/api/analytics/affiliate-click', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          source: item.source,
+          affiliateLink: item.affiliateLink,
+          stock: symbol,
+          timestamp: Date.now()
+        })
+      }).catch(() => {}); // Silent fail if endpoint not available
     }
   };
 
@@ -48,7 +73,7 @@ export default function NewsSection({ symbol }: NewsSectionProps) {
       background: colors.surface,
       border: `1px solid ${colors.border}`,
       borderRadius: '8px',
-      padding: '16px',
+      padding: 'clamp(12px, 3vw, 16px)',
       marginTop: '16px'
     }}>
       {/* Header */}
@@ -107,7 +132,7 @@ export default function NewsSection({ symbol }: NewsSectionProps) {
           </div>
         ) : (
           news.map((item) => (
-            <NewsCard key={item.id} item={item} />
+            <NewsCard key={item.id} item={item} onAffiliateClick={() => trackAffiliateClick(item)} />
           ))
         )}
       </div>
@@ -115,27 +140,33 @@ export default function NewsSection({ symbol }: NewsSectionProps) {
   );
 }
 
-function NewsCard({ item }: { item: NewsItem }) {
+function NewsCard({ item, onAffiliateClick }: { item: NewsItem; onAffiliateClick: () => void }) {
   const sentimentColor = item.sentiment === 'positive' ? '#22c55e' :
     item.sentiment === 'negative' ? '#ef4444' : colors.textSecondary;
 
   const sentimentEmoji = item.sentiment === 'positive' ? '📈' :
     item.sentiment === 'negative' ? '📉' : '📊';
 
+  const handleClick = () => {
+    onAffiliateClick();
+  };
+
   return (
     <a
-      href={item.url}
+      href={item.url || '#'}
       target="_blank"
       rel="noopener noreferrer"
+      onClick={handleClick}
       style={{
         display: 'block',
         background: colors.canvas,
         border: `1px solid ${colors.border}`,
         borderRadius: '6px',
-        padding: '12px',
+        padding: 'clamp(8px, 2vw, 12px)',
         textDecoration: 'none',
         cursor: 'pointer',
         transition: 'all 0.2s',
+        minHeight: 0
       }}
       onMouseEnter={(e) => {
         e.currentTarget.style.borderColor = colors.primary || '#3b82f6';
@@ -162,7 +193,7 @@ function NewsCard({ item }: { item: NewsItem }) {
         )}
         <div style={{ flex: 1 }}>
           <div style={{
-            fontSize: '13px',
+            fontSize: 'clamp(11px, 2.5vw, 13px)',
             fontWeight: '600',
             color: colors.textPrimary,
             marginBottom: '2px',
@@ -171,7 +202,7 @@ function NewsCard({ item }: { item: NewsItem }) {
             {item.title}
           </div>
           <div style={{
-            fontSize: '12px',
+            fontSize: 'clamp(10px, 2vw, 12px)',
             color: colors.textSecondary,
             lineHeight: '1.4'
           }}>
