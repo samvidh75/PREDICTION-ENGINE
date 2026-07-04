@@ -67,8 +67,8 @@ export class GenerateWatchlistAlertsJob implements IngestionJob {
   async run(options: JobOptions): Promise<JobResult> {
     const startedAt = new Date().toISOString();
     const errors: string[] = [];
-    let successCount = 0;
-    let failureCount = 0;
+    const successCount = 0;
+    const failureCount = 0;
 
     // This job typically runs with current and previous snapshots provided
     // by the calling script. Without data it's a no-op.

@@ -161,7 +161,7 @@ export function AnimatedNumber({
     return () => {
       if (animationRef.current) cancelAnimationFrame(animationRef.current);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [value, decimals, duration]);
 
   return (

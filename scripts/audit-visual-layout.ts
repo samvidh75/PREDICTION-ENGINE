@@ -194,7 +194,7 @@ async function main() {
     try {
       const res = await fetch(baseUrl);
       if (res.ok) break;
-    } catch {}
+    } catch { /* ignore — server not ready yet, keep polling */ }
     await new Promise((resolve) => setTimeout(resolve, 500));
   }
 

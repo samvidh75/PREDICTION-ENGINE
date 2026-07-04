@@ -149,7 +149,7 @@ ${Object.entries(finCoverage).map(([f, p]) => `| ${f} | ${p} |`).join('\n')}
     try {
       const dr = await pool.query(`SELECT MIN(trade_date) AS mn, MAX(trade_date) AS mx FROM daily_prices`);
       dateRange = `${(dr.rows as any)[0]?.mn || '?'} → ${(dr.rows as any)[0]?.mx || '?'}`;
-    } catch {}
+    } catch { /* ignore — keep default dateRange */ }
   }
   R('05-YahooCoverage.md', `# TRACK-37 AGENT 5: Yahoo Coverage
 **Generated:** ${new Date().toISOString()}
@@ -180,7 +180,7 @@ ${Object.entries(finCoverage).map(([f, p]) => `| ${f} | ${p} |`).join('\n')}
   // AGENT 8: Feature Generation
   let featSymbols = 0;
   if (tableCounts.feature_snapshots > 0) {
-    try { featSymbols = Number(((await pool.query(`SELECT COUNT(DISTINCT symbol) AS c FROM feature_snapshots`)).rows as any)[0]?.c || 0); } catch {}
+    try { featSymbols = Number(((await pool.query(`SELECT COUNT(DISTINCT symbol) AS c FROM feature_snapshots`)).rows as any)[0]?.c || 0); } catch { /* ignore — featSymbols stays 0 */ }
   }
   R('08-FeatureGeneration.md', `# TRACK-37 AGENT 8: Feature Generation
 **Generated:** ${new Date().toISOString()}
@@ -192,7 +192,7 @@ ${Object.entries(finCoverage).map(([f, p]) => `| ${f} | ${p} |`).join('\n')}
   // AGENT 9: Factor Generation
   let factSymbols = 0;
   if (tableCounts.factor_snapshots > 0) {
-    try { factSymbols = Number(((await pool.query(`SELECT COUNT(DISTINCT symbol) AS c FROM factor_snapshots`)).rows as any)[0]?.c || 0); } catch {}
+    try { factSymbols = Number(((await pool.query(`SELECT COUNT(DISTINCT symbol) AS c FROM factor_snapshots`)).rows as any)[0]?.c || 0); } catch { /* ignore — factSymbols stays 0 */ }
   }
   R('09-FactorGeneration.md', `# TRACK-37 AGENT 9: Factor Generation
 **Generated:** ${new Date().toISOString()}
@@ -291,10 +291,10 @@ ${testSymbols.map(s => {
                    Number(row.sector_strength_factor||0), Number(row.confidence_score||50), h, 'track37']
                 );
                 created++;
-              } catch {}
+              } catch { /* ignore — skip row that violates constraints */ }
             }
           }
-        } catch {}
+        } catch { /* ignore — skip seed errors for individual batches */ }
       }
       const final = await pool.query(`SELECT COUNT(*) AS c FROM prediction_registry`);
       predCount = Number((final.rows as any)[0]?.c || 0);
@@ -330,7 +330,7 @@ const components = [
 
   const verifiedComponents = components.filter(c => c.verified).length;
 
-  let classification = 'INFRASTRUCTURE_BLOCKED';
+  let classification: string;
   if (!results.agent1?.reachable) classification = 'INFRASTRUCTURE_BLOCKED';
   else if (tableCounts.daily_prices === 0 && tableCounts.factor_snapshots === 0) classification = 'DATA_BLOCKED';
   else if (verifiedComponents >= 8) classification = 'PRODUCTION_READY';

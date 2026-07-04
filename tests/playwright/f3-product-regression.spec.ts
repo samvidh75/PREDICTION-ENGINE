@@ -162,7 +162,7 @@ async function assertNoRenderGarbage(page: import("@playwright/test").Page): Pro
 
 async function dismissWelcomeIfVisible(page: import("@playwright/test").Page): Promise<void> {
   await page.evaluate(() => {
-    try { window.localStorage.setItem("stockstory_feature_welcome_v1", "seen"); } catch {}
+    try { window.localStorage.setItem("stockstory_feature_welcome_v1", "seen"); } catch { /* ignore — localStorage may fail in CI */ }
   }).catch(() => {});
   const close = page.getByRole("button", { name: /close feature introduction/i });
   if (await close.isVisible().catch(() => false)) {

@@ -22,7 +22,7 @@ import type {
 
 let _workerTaskId = 0;
 
-// eslint-disable-next-line no-restricted-globals
+ 
 self.onmessage = async (event: MessageEvent<WorkerMessage | { type: string; payload: any; taskId?: number }>): Promise<void> => {
   const input = event.data as any;
   const taskId = input.taskId ?? ++_workerTaskId;
@@ -38,10 +38,10 @@ self.onmessage = async (event: MessageEvent<WorkerMessage | { type: string; payl
           input.payload.callVols as number[],
           input.payload.putVols as number[],
         );
-        // eslint-disable-next-line no-restricted-globals
+         
         self.postMessage({ type: 'gpu_order_flow_result', payload: res });
       } catch {
-        // eslint-disable-next-line no-restricted-globals
+         
         self.postMessage({
           type: 'gpu_order_flow_result',
           payload: { delta: 0, signal: 'CPU_FALLBACK_ACTIVE' },
@@ -61,7 +61,7 @@ self.onmessage = async (event: MessageEvent<WorkerMessage | { type: string; payl
         isCall: item.isCall,
         greeks: computeClientOptionGreeks(spot, item.strike, 30, 0.07, item.iv, item.isCall),
       }));
-      // eslint-disable-next-line no-restricted-globals
+       
       self.postMessage({ type: 'greeks_bulk_result', results });
       return;
     }
@@ -70,7 +70,7 @@ self.onmessage = async (event: MessageEvent<WorkerMessage | { type: string; payl
     if ('type' in input && input.type === 'compute_gpu_sentiment') {
       const scores = input.payload.scores as number[];
       const sentimentIndex = await executeWebGpuSentimentScan(scores);
-      // eslint-disable-next-line no-restricted-globals
+       
       self.postMessage({ type: 'gpu_sentiment_result', sentimentIndex });
       return;
     }
@@ -82,7 +82,7 @@ self.onmessage = async (event: MessageEvent<WorkerMessage | { type: string; payl
       const volumes = new Float32Array(indicatorInput.volumes);
       const result = computeIndicators(Array.from(prices), Array.from(volumes));
       if (isStale()) return;
-      // eslint-disable-next-line no-restricted-globals
+       
       self.postMessage(result);
       return;
     }
@@ -90,7 +90,7 @@ self.onmessage = async (event: MessageEvent<WorkerMessage | { type: string; payl
     if ('type' in input && input.type === 'fetch_proxy_history') {
       const result = await fetchClientSideHistory(input.payload.ticker, input.payload.rangeDays || 90);
       if (isStale()) return;
-      // eslint-disable-next-line no-restricted-globals
+       
       (self as unknown as Worker).postMessage({ type: 'proxy_history_result', payload: result, taskId }, [result.buffer]);
       return;
     }
@@ -100,7 +100,7 @@ self.onmessage = async (event: MessageEvent<WorkerMessage | { type: string; payl
       const sma = await runGPUAnalysis(prices, windowSize);
       if (isStale()) return;
       const smaBuf = new Float32Array(sma);
-      // eslint-disable-next-line no-restricted-globals
+       
       (self as unknown as Worker).postMessage({ type: 'gpu_sma_result', payload: smaBuf, taskId }, [smaBuf.buffer]);
       return;
     }
@@ -109,7 +109,7 @@ self.onmessage = async (event: MessageEvent<WorkerMessage | { type: string; payl
       const { metrics, query } = input.payload as { metrics: string; query: string };
       const ragResult = await runLocalRAGContext(metrics, query);
       if (isStale()) return;
-      // eslint-disable-next-line no-restricted-globals
+       
       self.postMessage({ type: 'rag_context_result', payload: ragResult, taskId });
       return;
     }
@@ -117,25 +117,25 @@ self.onmessage = async (event: MessageEvent<WorkerMessage | { type: string; payl
     if ('type' in input && input.type === 'backend_fallback') {
       const fbInput = input as BackendFallbackInput;
       const result = await callBackendAgent(fbInput.ticker, fbInput.prompt);
-      // eslint-disable-next-line no-restricted-globals
+       
       self.postMessage(result);
       return;
     }
 
     if ('type' in input && input.type === 'scan') {
       const result = runScanner(input as ScannerWorkerInput);
-      // eslint-disable-next-line no-restricted-globals
+       
       self.postMessage(result);
     } else {
       const chatInput = input as EdgeAiWorkerInput;
       const rawReply = generateReply(chatInput);
       const result: EdgeAiWorkerResult = { rawReply };
-      // eslint-disable-next-line no-restricted-globals
+       
       self.postMessage(result);
     }
   } catch (err) {
     const fallback = err instanceof Error ? err.message : 'Unknown worker error';
-    // eslint-disable-next-line no-restricted-globals
+     
     self.postMessage({ rawReply: fallback });
   }
 };

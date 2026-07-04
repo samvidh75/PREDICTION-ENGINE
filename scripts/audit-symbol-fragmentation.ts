@@ -81,7 +81,7 @@ for (const table of tables) {
             if (table === 'symbols') {
               try {
                 db.prepare(`DELETE FROM symbols WHERE ${symbolColumn} = ?`).run(variant);
-              } catch {}
+              } catch { /* ignore — variant may already be gone */ }
             }
           }
         }
@@ -119,7 +119,7 @@ for (const table of tables) {
     } else {
       console.log(`  ${table}: ✓ Clean (${symbols.length} unique)`);
     }
-  } catch {}
+  } catch { /* ignore — continue audit even if table fails */ }
 }
 
 console.log(`\n  Total rows merged: ${totalMergeCount}`);

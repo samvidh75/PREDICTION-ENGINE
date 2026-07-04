@@ -42,7 +42,7 @@ async function checkA11y(path: string): Promise<A11yResult> {
     result.hasSkipLink = /skip\s*(to|link|content|nav)/i.test(text);
     const checks = [result.hasLang, result.hasTitle];
     result.passed = checks.filter(Boolean).length >= 2;
-  } catch {}
+    } catch { /* ignore — safe defaults on parse failure */ }
   return result;
 }
 

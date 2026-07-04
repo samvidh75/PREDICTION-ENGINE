@@ -52,7 +52,7 @@ export class CorporateActionsTracker {
 
   getByDateRange(from: string, to: string): CorporateAction[] {
     const results: CorporateAction[] = [];
-    let current = new Date(from);
+    const current = new Date(from);
     const end = new Date(to);
 
     while (current <= end) {

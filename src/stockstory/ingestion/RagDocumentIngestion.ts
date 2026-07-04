@@ -63,8 +63,8 @@ export class RagDocumentIngestion implements IngestionJob {
   async run(options: JobOptions): Promise<JobResult> {
     const startedAt = new Date().toISOString();
     const errors: string[] = [];
-    let successCount = 0;
-    let failureCount = 0;
+    const successCount = 0;
+    const failureCount = 0;
 
     // This job processes documents passed via options or externally.
     // It's typically called from the CLI script with a document to ingest.
