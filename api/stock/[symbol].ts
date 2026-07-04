@@ -167,6 +167,77 @@ const financialsData: Record<string, any> = {
   },
 };
 
+// Price targets from analyst consensus
+const priceTargets: Record<string, any> = {
+  'HDFCBANK': {
+    current: 801.05,
+    targetPrice: 950,
+    upside: 18.6,
+    analysts: 24,
+    rating: 'Buy',
+    consensusRating: { buy: 16, hold: 6, sell: 2 },
+  },
+  'RELIANCE': {
+    current: 1304,
+    targetPrice: 1520,
+    upside: 16.6,
+    analysts: 28,
+    rating: 'Buy',
+    consensusRating: { buy: 20, hold: 7, sell: 1 },
+  },
+  'TCS': {
+    current: 2093.5,
+    targetPrice: 2380,
+    upside: 13.7,
+    analysts: 22,
+    rating: 'Buy',
+    consensusRating: { buy: 15, hold: 6, sell: 1 },
+  },
+  'INFY': {
+    current: 1520,
+    targetPrice: 1750,
+    upside: 15.1,
+    analysts: 26,
+    rating: 'Buy',
+    consensusRating: { buy: 18, hold: 7, sell: 1 },
+  },
+  'WIPRO': {
+    current: 380,
+    targetPrice: 445,
+    upside: 17.1,
+    analysts: 18,
+    rating: 'Buy',
+    consensusRating: { buy: 12, hold: 5, sell: 1 },
+  },
+  'SBIN': {
+    current: 835,
+    targetPrice: 975,
+    upside: 16.8,
+    analysts: 20,
+    rating: 'Buy',
+    consensusRating: { buy: 14, hold: 5, sell: 1 },
+  },
+};
+
+// Related stocks based on sector/similarity
+const relatedStocks: Record<string, any> = {
+  'HDFCBANK': [
+    { symbol: 'ICICIBANK', name: 'ICICI Bank', sector: 'Financial Services', price: 975, change: 1.2 },
+    { symbol: 'AXISBANK', name: 'Axis Bank', sector: 'Financial Services', price: 1180, change: 0.8 },
+    { symbol: 'SBIN', name: 'State Bank', sector: 'Financial Services', price: 835, change: -0.5 },
+  ],
+  'RELIANCE': [
+    { symbol: 'BHARTIARTL', name: 'Bharti Airtel', sector: 'Telecommunications', price: 1425, change: 2.1 },
+    { symbol: 'ADANIGREEN', name: 'Adani Green', sector: 'Energy', price: 2280, change: 1.5 },
+    { symbol: 'NTPC', name: 'NTPC', sector: 'Energy', price: 385, change: 0.2 },
+  ],
+  'TCS': [
+    { symbol: 'INFY', name: 'Infosys', sector: 'IT Services', price: 1520, change: 1.8 },
+    { symbol: 'WIPRO', name: 'Wipro', sector: 'IT Services', price: 380, change: 0.5 },
+    { symbol: 'HCL', name: 'HCL Tech', sector: 'IT Services', price: 1925, change: 1.3 },
+  ],
+};
+
 // Fetch historical chart data from Yahoo Finance
 async function fetchChartData(symbol: string): Promise<any> {
   try {
@@ -354,6 +425,8 @@ export default async function handler(
       shareholding: shareholdingData[symbol] || [],
       news: newsData[symbol] || [],
       financials: financialsData[symbol] || null,
+      priceTargets: priceTargets[symbol] || null,
+      relatedStocks: relatedStocks[symbol] || [],
       priceChart: chartData,
       source: 'yahoo-finance',
       timestamp: new Date().toISOString(),
