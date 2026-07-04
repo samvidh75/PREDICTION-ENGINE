@@ -56,7 +56,7 @@ function evaluateCase(evalCase: EvalCase): EvalResult {
   const requiredConceptsFound: string[] = [];
   const missingRequiredConcepts: string[] = [];
 
-  let allOutputText = '';
+  let allOutputText: string;
 
   try {
     if (evalCase.taskType === 'generate_thesis') {

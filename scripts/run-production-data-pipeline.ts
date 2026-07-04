@@ -161,12 +161,12 @@ class ProductionPipeline {
       console.log('[DRY-RUN] No writes will be performed.');
     }
 
-    let overallStatus: 'success' | 'partial' | 'failure' = 'success';
-    let overallError: string | undefined;
+    let overallStatus: 'success' | 'partial' | 'failure';
+    const overallError: string | undefined = undefined;
 
     try {
-    const runAll = !this.opts.quotesOnly && !this.opts.financialsOnly && !this.opts.featuresOnly &&
-      !this.opts.factorsOnly && !this.opts.predictionsOnly && !this.opts.signalsOnly && !this.opts.historical;
+      const runAll = !this.opts.quotesOnly && !this.opts.financialsOnly && !this.opts.featuresOnly &&
+        !this.opts.factorsOnly && !this.opts.predictionsOnly && !this.opts.signalsOnly && !this.opts.historical;
 
       // Stage 1: Historical backfill (if requested)
       if (this.opts.historical) {
@@ -238,8 +238,6 @@ class ProductionPipeline {
       }
     } catch (err: any) {
       console.error(`Pipeline failed: ${err.message}`);
-      overallStatus = 'failure';
-      overallError = err.message;
       await this.stagePipelineHealth({
         runId,
         startedAt,

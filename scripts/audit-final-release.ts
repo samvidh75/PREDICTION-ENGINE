@@ -33,7 +33,7 @@ const CHECKS: AuditCheck[] = [
 
 function runCheck(check: AuditCheck): { name: string; passed: boolean; output: string } {
   let exitCode = 0;
-  let output = "";
+  let output: string;
   try {
     output = execSync(check.command, { encoding: "utf-8" as const, timeout: 60000, shell: "/bin/sh" }).toString();
   } catch (err: any) {

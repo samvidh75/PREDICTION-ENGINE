@@ -14,7 +14,7 @@ async function checkRedis(): Promise<void> {
 
   const client = createClient({ url });
   let connected = false;
-  let errorClass = "";
+  let errorClass: string;
 
   const timeout = setTimeout(() => {
     if (!connected) {

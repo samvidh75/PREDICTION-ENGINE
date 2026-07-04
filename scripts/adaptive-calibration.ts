@@ -270,7 +270,7 @@ for (const sectorT of TARGET_SECTORS) {
   const totalClamped = clamped.reduce((s, a) => s + a.clampedCorr, 0);
 
   let weights: SectorWeights;
-  let justification = '';
+  let justification: string;
 
   if (totalClamped < 0.001) {
     // All factors have zero/negative correlation — use flat weights
@@ -780,7 +780,7 @@ const overallImprovement = specImprovements + spreadImprovements;
 const totalComparisons = specRows.length + spreadRows.length;
 const improvementRate = overallImprovement / totalComparisons;
 
-let recommendation = '';
+let recommendation: string;
 if (improvementRate > 0.55) {
   recommendation = '✅ **YES — replace current weights with adaptive weights.** Adaptive calibration improves predictive power in ' + (improvementRate * 100).toFixed(0) + '% of comparisons and increases Monte Carlo stability. The data supports sector-specific calibration.';
 } else if (improvementRate > 0.48) {

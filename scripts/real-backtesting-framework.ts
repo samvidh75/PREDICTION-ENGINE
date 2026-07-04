@@ -600,7 +600,7 @@ for (const lookback of SNAPSHOT_LOOKBACKS) {
       const pearson = varF > 0 && varR > 0 ? cov / Math.sqrt(varF * varR) : null;
       const spearman = spearmanRank(pairs.map(p => p.factorVal), pairs.map(p => p.ret));
 
-      let interpretation = '';
+      let interpretation: string;
       if (pearson !== null) {
         if (pearson > 0.3) interpretation = 'Strong positive predictor';
         else if (pearson > 0.15) interpretation = 'Moderate positive predictor';

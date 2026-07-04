@@ -37,7 +37,7 @@ interface HealthResult {
 async function main(): Promise<void> {
   console.log('=== NSEPython Provider Probe ===\n');
 
-  let pythonVersion = 'unknown';
+  let pythonVersion: string;
   try {
     pythonVersion = execSync('python3 --version 2>&1', { encoding: 'utf-8' }).trim();
   } catch {

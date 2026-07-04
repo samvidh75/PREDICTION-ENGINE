@@ -55,7 +55,8 @@ async function fetchHtml(url: string): Promise<string> {
 }
 
 function extractBundleUrl(homeHtml: string): string {
-  const jsMatches = [...homeHtml.matchAll(/<script[^>]+src=\"([^\"]+)\"/g)].map((m) => m[1]);
+  // eslint-disable-next-line no-useless-escape
+  const jsMatches = [...homeHtml.matchAll(/<script[^>]+src="([^"]+)"/g)].map((m) => m[1]);
   const mainJs = jsMatches.find((src) => src.includes('main.'));
   if (!mainJs) throw new Error('Could not locate DBIE main bundle');
   return `https://data.rbi.org.in/DBIE/${mainJs}`;
@@ -242,7 +243,7 @@ async function main() {
   await ensureSchema();
   mkdirSync(outputDir, { recursive: true });
 
-  let currentRates: SeriesRow[] = [];
+  let currentRates: SeriesRow[];
 
   for (const url of urls) {
     const snapshot = url.includes('BankrateCRRandSLRChanges')
