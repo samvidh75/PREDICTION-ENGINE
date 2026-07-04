@@ -11,6 +11,7 @@ import {
   ShieldCheck,
   Sparkles,
 } from "lucide-react";
+import { colors, layout, typography } from "../design/tokens";
 
 type ExchangeHealth = "Healthy" | "Stable" | "Weakening";
 
@@ -70,10 +71,10 @@ const featureTimelineCards: FeatureTimelineCard[] = [
 function HealthPill({ health }: { health: ExchangeHealth }) {
   const palette =
     health === "Healthy"
-      ? { bg: "rgba(16, 185, 129, 0.10)", border: "rgba(16, 185, 129, 0.22)", text: "#059669" }
+      ? { bg: colors.marketGreenSoft, border: "rgba(52,199,89,0.22)", text: colors.marketGreen }
       : health === "Stable"
-        ? { bg: "rgba(37, 99, 235, 0.08)", border: "rgba(37, 99, 235, 0.18)", text: "#2563eb" }
-        : { bg: "rgba(245, 158, 11, 0.10)", border: "rgba(245, 158, 11, 0.20)", text: "#d97706" };
+        ? { bg: colors.backdropMuted, border: colors.hairlineStrong, text: colors.charcoal }
+        : { bg: colors.marketOrangeSoft, border: "rgba(255,149,0,0.20)", text: colors.marketOrange };
 
   return (
     <span
@@ -112,8 +113,8 @@ function RangeBar({
           position: "relative",
           height: 10,
           borderRadius: 999,
-          background: "linear-gradient(90deg, rgba(6,182,212,0.10), rgba(109,40,217,0.12))",
-          border: "1px solid rgba(148, 163, 184, 0.22)",
+          background: `linear-gradient(90deg, ${colors.surfaceElevated}, ${colors.surfaceCard})`,
+          border: `1px solid ${colors.border}`,
           overflow: "hidden",
         }}
       >
@@ -121,8 +122,7 @@ function RangeBar({
           style={{
             position: "absolute",
             inset: 0,
-            background:
-              "linear-gradient(90deg, rgba(6,182,212,0.42) 0%, rgba(109,40,217,0.38) 100%)",
+            background: `linear-gradient(90deg, ${colors.accentRed} 0%, ${colors.accentRed} 100%)`,
             clipPath: `inset(0 ${100 - progress}% 0 0)`,
           }}
         />
@@ -136,9 +136,9 @@ function RangeBar({
             marginLeft: -9,
             marginTop: -9,
             borderRadius: 999,
-            background: "#ffffff",
-            border: "2px solid rgba(109, 40, 217, 0.35)",
-            boxShadow: "0 6px 20px rgba(109, 40, 217, 0.18)",
+            background: colors.primary,
+            border: `2px solid ${colors.canvas}`,
+            boxShadow: "none",
           }}
         />
       </div>
@@ -147,7 +147,7 @@ function RangeBar({
           display: "flex",
           justifyContent: "space-between",
           gap: 8,
-          color: "#64748b",
+          color: colors.textTertiary,
           fontSize: 12,
           lineHeight: 1.4,
         }}
@@ -183,19 +183,16 @@ function Histogram({ columns }: { columns: number[] }) {
                 borderRadius: "10px 10px 4px 4px",
                 background:
                   index === columns.length - 1
-                    ? "linear-gradient(180deg, rgba(6,182,212,0.85), rgba(109,40,217,0.78))"
-                    : "linear-gradient(180deg, rgba(226,232,240,0.95), rgba(203,213,225,0.95))",
-                boxShadow:
-                  index === columns.length - 1
-                    ? "0 8px 20px rgba(109,40,217,0.14)"
-                    : "0 4px 14px rgba(15,23,42,0.06)",
+                    ? `linear-gradient(180deg, ${colors.primary}, ${colors.primaryPressed})`
+                    : `linear-gradient(180deg, ${colors.surfaceCard}, ${colors.surfaceElevated})`,
+                boxShadow: "none",
               }}
             />
-            <span style={{ color: "#64748b", fontSize: 11, fontWeight: 500 }}>{labels[index]}</span>
+            <span style={{ color: colors.textTertiary, fontSize: 11, fontWeight: 500 }}>{labels[index]}</span>
           </div>
         ))}
       </div>
-      <div style={{ color: "#64748b", fontSize: 13, lineHeight: 1.6 }}>
+      <div style={{ color: colors.textSecondary, fontSize: 13, lineHeight: 1.6 }}>
         Historical performance matrix spanning 3M, 6M, 9M, 3Y, and 5Y horizons.
       </div>
     </div>
@@ -218,7 +215,7 @@ function NavLink({
       style={{
         border: "none",
         background: "transparent",
-        color: active ? "#0f172a" : "#475569",
+        color: active ? colors.textPrimary : colors.textSecondary,
         fontSize: 13,
         fontWeight: 600,
         letterSpacing: "0.02em",
@@ -239,25 +236,22 @@ export default function AboutPage() {
     <div
       style={{
         minHeight: "100vh",
-        background:
-          "radial-gradient(circle at top left, rgba(6,182,212,0.06), transparent 26%), radial-gradient(circle at top right, rgba(109,40,217,0.07), transparent 24%), #ffffff",
-        color: "#0f172a",
-        fontFamily: "\"Inter\", -apple-system, BlinkMacSystemFont, \"SF Pro Display\", \"Segoe UI\", sans-serif",
+        background: colors.canvas,
+        color: colors.textPrimary,
+        fontFamily: typography.fontFamily,
       }}
     >
       <style>{`
         .about-shell {
-          width: min(1180px, calc(100% - 32px));
+          width: min(${layout.contentMaxWidth}, calc(100% - 32px));
           margin: 0 auto;
         }
 
         .about-glass-card {
-          background: linear-gradient(180deg, rgba(248,250,252,0.96), rgba(255,255,255,0.96));
-          border: 1px solid rgba(226,232,240,0.88);
+          background: linear-gradient(180deg, ${colors.surface}, ${colors.surface});
+          border: 1px solid ${colors.border};
           border-radius: 24px;
-          box-shadow: 0 8px 30px rgba(15,23,42,0.04);
-          backdrop-filter: blur(16px);
-          -webkit-backdrop-filter: blur(16px);
+          box-shadow: none;
         }
 
         .about-hover-lift {
@@ -267,8 +261,8 @@ export default function AboutPage() {
 
         .about-hover-lift:hover {
           transform: scale(1.01) translateY(-2px);
-          box-shadow: 0 18px 40px rgba(15,23,42,0.08);
-          border-color: rgba(203,213,225,0.95);
+          box-shadow: none;
+          border-color: ${colors.hairlineStrong};
         }
 
         .about-hero-grid {
@@ -385,8 +379,8 @@ export default function AboutPage() {
           left: 0,
           right: 0,
           zIndex: 50,
-          background: "#ffffff",
-          borderBottom: "1px solid rgba(241,245,249,1)",
+          background: colors.canvas,
+          borderBottom: `1px solid ${colors.hairlineSoft}`,
         }}
       >
         <div
@@ -408,7 +402,7 @@ export default function AboutPage() {
               padding: 0,
               background: "transparent",
               border: "none",
-              color: "#0f172a",
+              color: colors.textPrimary,
               cursor: "pointer",
               height: "auto",
             }}
@@ -422,8 +416,8 @@ export default function AboutPage() {
                 justifyContent: "center",
                 padding: "4px 8px",
                 borderRadius: 999,
-                border: "1px solid rgba(226,232,240,1)",
-                color: "#475569",
+                border: `1px solid ${colors.border}`,
+                color: colors.textSecondary,
                 fontSize: 11,
                 fontWeight: 600,
                 fontFamily: "\"SFMono-Regular\", ui-monospace, monospace",
@@ -451,8 +445,8 @@ export default function AboutPage() {
               gap: 8,
               border: "none",
               borderRadius: 14,
-              background: "#0f172a",
-              color: "#ffffff",
+              background: colors.primary,
+              color: colors.onPrimary,
               padding: "12px 16px",
               fontSize: 13,
               fontWeight: 700,
@@ -475,18 +469,18 @@ export default function AboutPage() {
                   display: "inline-flex",
                   alignItems: "center",
                   gap: 8,
-                  width: "fit-content",
-                  padding: "8px 12px",
-                  borderRadius: 999,
-                  background: "rgba(255,255,255,0.9)",
-                  border: "1px solid rgba(226,232,240,0.88)",
-                  boxShadow: "0 8px 30px rgba(15,23,42,0.04)",
-                  color: "#0f172a",
-                  fontSize: 12,
-                  fontWeight: 600,
-                }}
-              >
-                <Sparkles size={14} color="#6d28d9" aria-hidden="true" />
+                width: "fit-content",
+                padding: "8px 12px",
+                borderRadius: 999,
+                background: colors.surfaceElevated,
+                border: `1px solid ${colors.border}`,
+                boxShadow: "none",
+                color: colors.textPrimary,
+                fontSize: 12,
+                fontWeight: 600,
+              }}
+            >
+                <Sparkles size={14} color={colors.accentRed} aria-hidden="true" />
                 Public Experience Layer
               </div>
 
@@ -499,6 +493,8 @@ export default function AboutPage() {
                   fontWeight: 700,
                   letterSpacing: "-0.03em",
                   maxWidth: 760,
+                  color: colors.textPrimary,
+                  textShadow: "none",
                 }}
               >
                 Indian markets are mapping a resilient narrative.
@@ -508,7 +504,7 @@ export default function AboutPage() {
                 style={{
                   margin: 0,
                   maxWidth: 690,
-                  color: "#475569",
+                  color: colors.textSecondary,
                   fontSize: 18,
                   lineHeight: 1.75,
                 }}
@@ -523,12 +519,13 @@ export default function AboutPage() {
                   style={{
                     border: "none",
                     borderRadius: 14,
-                    background: "#0f172a",
-                    color: "#ffffff",
+                    background: colors.primary,
+                    color: colors.onPrimary,
                     padding: "12px 18px",
                     fontSize: 14,
                     fontWeight: 700,
                     cursor: "pointer",
+                    boxShadow: "none",
                   }}
                 >
                   Start Research
@@ -537,13 +534,14 @@ export default function AboutPage() {
                   onClick={() => navigate("/trust")}
                   style={{
                     borderRadius: 14,
-                    border: "1px solid rgba(226,232,240,1)",
-                    background: "rgba(255,255,255,0.86)",
-                    color: "#0f172a",
+                    border: `1px solid ${colors.border}`,
+                    background: colors.surface,
+                    color: colors.textPrimary,
                     padding: "12px 18px",
                     fontSize: 14,
                     fontWeight: 600,
                     cursor: "pointer",
+                    boxShadow: "none",
                   }}
                 >
                   Review Methodology
@@ -562,7 +560,7 @@ export default function AboutPage() {
                 }}
               >
                 <div>
-                  <div style={{ color: "#64748b", fontSize: 12, marginBottom: 8 }}>Volumetric Exchange Grid</div>
+                  <div style={{ color: colors.textTertiary, fontSize: 12, marginBottom: 8 }}>Volumetric Exchange Grid</div>
                   <h2 style={{ margin: 0, fontSize: 22, fontWeight: 700 }}>Macro Core Environment</h2>
                 </div>
                 <div
@@ -570,14 +568,13 @@ export default function AboutPage() {
                     width: 38,
                     height: 38,
                     borderRadius: 14,
-                    background:
-                      "linear-gradient(135deg, rgba(6,182,212,0.10), rgba(109,40,217,0.12))",
-                    border: "1px solid rgba(226,232,240,0.88)",
+                    background: colors.surfaceElevated,
+                    border: `1px solid ${colors.border}`,
                     display: "grid",
                     placeItems: "center",
                   }}
                 >
-                  <Radar size={18} color="#6d28d9" aria-hidden="true" />
+                  <Radar size={18} color={colors.accentRed} aria-hidden="true" />
                 </div>
               </div>
 
@@ -597,13 +594,13 @@ export default function AboutPage() {
                         marginBottom: 10,
                       }}
                     >
-                      <span style={{ color: "#64748b", fontSize: 12 }}>{card.label}</span>
+                      <span style={{ color: colors.textTertiary, fontSize: 12 }}>{card.label}</span>
                       <HealthPill health={card.health} />
                     </div>
                     <div style={{ fontSize: 28, fontWeight: 700, marginBottom: 8 }}>{card.value}</div>
                     <div
                       style={{
-                        color: card.move.startsWith("-") ? "#d97706" : "#0891b2",
+                        color: card.move.startsWith("-") ? colors.marketOrange : colors.marketGreen,
                         fontSize: 13,
                         fontWeight: 700,
                         letterSpacing: "0.02em",
@@ -650,18 +647,17 @@ export default function AboutPage() {
                       width: 42,
                       height: 42,
                       borderRadius: 14,
-                      background:
-                        "linear-gradient(135deg, rgba(6,182,212,0.10), rgba(109,40,217,0.10))",
-                      border: "1px solid rgba(226,232,240,0.88)",
+                      background: colors.surfaceElevated,
+                      border: `1px solid ${colors.border}`,
                       display: "grid",
                       placeItems: "center",
                       marginBottom: 16,
                     }}
                   >
-                    <Icon size={18} color="#6d28d9" aria-hidden="true" />
+                    <Icon size={18} color={colors.accentRed} aria-hidden="true" />
                   </div>
                   <h3 style={{ margin: "0 0 8px", fontSize: 20, fontWeight: 700 }}>{item.title}</h3>
-                  <p style={{ margin: 0, color: "#475569", fontSize: 14, lineHeight: 1.75 }}>{item.body}</p>
+                  <p style={{ margin: 0, color: colors.textSecondary, fontSize: 14, lineHeight: 1.75 }}>{item.body}</p>
                 </article>
               );
             })}
@@ -674,19 +670,19 @@ export default function AboutPage() {
               style={{
                 position: "absolute",
                 inset: 0,
-                background:
-                  "radial-gradient(circle at top right, rgba(6,182,212,0.10), transparent 24%), radial-gradient(circle at bottom left, rgba(109,40,217,0.08), transparent 24%)",
-                pointerEvents: "none",
-              }}
-            />
+                  background:
+                    `radial-gradient(circle at top right, ${colors.accentRedSoft}, transparent 24%), radial-gradient(circle at bottom left, rgba(255,107,107,0.04), transparent 24%)`,
+                  pointerEvents: "none",
+                }}
+              />
 
             <div style={{ position: "relative", display: "grid", gap: 22 }}>
               <div style={{ maxWidth: 760 }}>
-                <div style={{ color: "#64748b", fontSize: 12, marginBottom: 8 }}>Healthometer Showcase</div>
+                <div style={{ color: colors.textTertiary, fontSize: 12, marginBottom: 8 }}>Healthometer Showcase</div>
                 <h2 style={{ margin: "0 0 10px", fontSize: 30, fontWeight: 700 }}>
                   A structural telemetry gauge previewing 150 simulated parameter checks.
                 </h2>
-                <p style={{ margin: 0, color: "#475569", fontSize: 16, lineHeight: 1.75 }}>
+                <p style={{ margin: 0, color: colors.textSecondary, fontSize: 16, lineHeight: 1.75 }}>
                   The Healthometer subsystem gives investors a clear read on a company profile through deterministic,
                   multi-parameter structure rather than shallow labels.
                 </p>
@@ -703,7 +699,7 @@ export default function AboutPage() {
                   }}
                 >
                   <div>
-                    <div style={{ color: "#64748b", fontSize: 12, marginBottom: 8 }}>Structural Health Index</div>
+                    <div style={{ color: colors.textTertiary, fontSize: 12, marginBottom: 8 }}>Structural Health Index</div>
                     <h3 style={{ margin: 0, fontSize: 22, fontWeight: 700 }}>Premier Mainboard Research Matrix</h3>
                   </div>
                   <HealthPill health="Healthy" />
@@ -715,7 +711,7 @@ export default function AboutPage() {
                       display: "flex",
                       justifyContent: "space-between",
                       gap: 12,
-                      color: "#64748b",
+                      color: colors.textTertiary,
                       fontSize: 13,
                     }}
                   >
@@ -726,9 +722,8 @@ export default function AboutPage() {
                     style={{
                       height: 12,
                       borderRadius: 999,
-                      background:
-                        "linear-gradient(90deg, rgba(6,182,212,0.08), rgba(109,40,217,0.08))",
-                      border: "1px solid rgba(226,232,240,0.9)",
+                      background: `linear-gradient(90deg, ${colors.surfaceElevated}, ${colors.surfaceCard})`,
+                      border: `1px solid ${colors.border}`,
                       overflow: "hidden",
                     }}
                   >
@@ -736,9 +731,8 @@ export default function AboutPage() {
                       style={{
                         width: "78%",
                         height: "100%",
-                        background:
-                          "linear-gradient(90deg, rgba(6,182,212,0.92), rgba(109,40,217,0.82))",
-                        boxShadow: "0 0 24px rgba(109,40,217,0.18)",
+                        background: `linear-gradient(90deg, ${colors.accentRed}, ${colors.accentRed})`,
+                        boxShadow: "none",
                       }}
                     />
                   </div>
@@ -759,8 +753,8 @@ export default function AboutPage() {
                     ["Vectors", "150 tracked"],
                   ].map(([label, value]) => (
                     <div key={label}>
-                      <div style={{ color: "#64748b", fontSize: 11, marginBottom: 6 }}>{label}</div>
-                      <div style={{ color: "#0f172a", fontSize: 14, fontWeight: 700, lineHeight: 1.5 }}>{value}</div>
+                      <div style={{ color: colors.textTertiary, fontSize: 11, marginBottom: 6 }}>{label}</div>
+                      <div style={{ color: colors.textPrimary, fontSize: 14, fontWeight: 700, lineHeight: 1.5 }}>{value}</div>
                     </div>
                   ))}
                 </div>
@@ -774,18 +768,18 @@ export default function AboutPage() {
                     bottom: 18,
                     padding: 16,
                     borderRadius: 18,
-                    background: "rgba(255,255,255,0.92)",
-                    border: "1px solid rgba(226,232,240,0.95)",
-                    boxShadow: "0 12px 24px rgba(15,23,42,0.06)",
+                    background: colors.surfaceElevated,
+                    border: `1px solid ${colors.hairlineStrong}`,
+                    boxShadow: "none",
                     display: "grid",
                     gap: 10,
                   }}
                 >
-                  <div style={{ display: "flex", alignItems: "center", gap: 8, color: "#0f172a", fontSize: 13, fontWeight: 700 }}>
-                    <LockKeyhole size={15} color="#6d28d9" aria-hidden="true" />
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, color: colors.textPrimary, fontSize: 13, fontWeight: 700 }}>
+                    <LockKeyhole size={15} color={colors.accentRed} aria-hidden="true" />
                     Premium Breakdown Layer
                   </div>
-                  <div style={{ color: "#475569", fontSize: 14, lineHeight: 1.6 }}>
+                  <div style={{ color: colors.textSecondary, fontSize: 14, lineHeight: 1.6 }}>
                     Upgrade Horizon Premium to Unlock 150-Parameter Breakdown
                   </div>
                   <button
@@ -794,8 +788,8 @@ export default function AboutPage() {
                       width: "fit-content",
                       border: "none",
                       borderRadius: 14,
-                      background: "#0f172a",
-                      color: "#ffffff",
+                      background: colors.primary,
+                      color: colors.onPrimary,
                       padding: "10px 14px",
                       fontSize: 13,
                       fontWeight: 700,
@@ -812,11 +806,11 @@ export default function AboutPage() {
 
         <section className="about-section" style={{ paddingTop: 0, paddingBottom: 44 }}>
           <div style={{ marginBottom: 20 }}>
-            <div style={{ color: "#64748b", fontSize: 12, marginBottom: 8 }}>About & Feature Timeline</div>
+            <div style={{ color: colors.textTertiary, fontSize: 12, marginBottom: 8 }}>About & Feature Timeline</div>
             <h2 style={{ margin: "0 0 10px", fontSize: 30, fontWeight: 700 }}>
               A modular storybook layout showing how deep analysis moves through the product.
             </h2>
-            <p style={{ margin: 0, color: "#475569", fontSize: 16, lineHeight: 1.75, maxWidth: 780 }}>
+            <p style={{ margin: 0, color: colors.textSecondary, fontSize: 16, lineHeight: 1.75, maxWidth: 780 }}>
               Each pillar combines analytical copy with range graphics and performance matrices to make the public
               experience feel like a preview of the actual operating system.
             </p>
@@ -834,19 +828,19 @@ export default function AboutPage() {
                       width: "fit-content",
                       padding: "7px 12px",
                       borderRadius: 999,
-                      background: "rgba(248,250,252,0.92)",
-                      border: "1px solid rgba(226,232,240,0.9)",
-                      color: "#475569",
+                      background: colors.surfaceElevated,
+                      border: `1px solid ${colors.border}`,
+                      color: colors.textSecondary,
                       fontSize: 12,
                       fontWeight: 600,
                     }}
                   >
-                    <CandlestickChart size={14} color="#06b6d4" aria-hidden="true" />
+                    <CandlestickChart size={14} color={colors.accentRed} aria-hidden="true" />
                     {card.eyebrow}
                   </div>
 
                   <h3 style={{ margin: 0, fontSize: 24, fontWeight: 700, lineHeight: 1.2 }}>{card.title}</h3>
-                  <p style={{ margin: 0, color: "#475569", fontSize: 15, lineHeight: 1.8 }}>{card.body}</p>
+                  <p style={{ margin: 0, color: colors.textSecondary, fontSize: 15, lineHeight: 1.8 }}>{card.body}</p>
                   <button
                     onClick={() => navigate("/dashboard")}
                     style={{
@@ -857,7 +851,7 @@ export default function AboutPage() {
                       border: "none",
                       padding: 0,
                       background: "transparent",
-                      color: "#0f172a",
+                      color: colors.textPrimary,
                       fontSize: 14,
                       fontWeight: 700,
                       cursor: "pointer",
@@ -871,7 +865,7 @@ export default function AboutPage() {
                 <div className="about-visual about-glass-card" style={{ padding: 18, borderRadius: 20 }}>
                   <div style={{ display: "grid", gap: 18 }}>
                     <div>
-                      <div style={{ color: "#64748b", fontSize: 11, marginBottom: 10 }}>52-week range parameters</div>
+                      <div style={{ color: colors.textTertiary, fontSize: 11, marginBottom: 10 }}>52-week range parameters</div>
                       <RangeBar progress={card.rangeProgress} labels={card.rangeLabels} />
                     </div>
                     <Histogram columns={card.columns} />
