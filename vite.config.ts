@@ -49,18 +49,41 @@ export default defineConfig(({ mode }) => {
       outDir: "dist/public",
       emptyOutDir: true,
       sourcemap: false,
+      minify: "esbuild",
       rollupOptions: {
         output: {
           // Split vendor chunks for better caching
           manualChunks(id) {
+            // React core
             if (id.includes("node_modules/react") || id.includes("node_modules/react-dom")) {
               return "react";
             }
+            // React Router
+            if (id.includes("node_modules/react-router")) {
+              return "react-router";
+            }
+            // React Query (data fetching)
+            if (id.includes("node_modules/@tanstack/react-query")) {
+              return "react-query";
+            }
+            // Animation library
             if (id.includes("node_modules/framer-motion")) {
               return "framer";
             }
+            // Firebase (heavy, load only when needed)
             if (id.includes("node_modules/firebase")) {
               return "firebase";
+            }
+            // Charting libraries (lazy loaded for stock pages)
+            if (id.includes("node_modules/apexcharts") ||
+                id.includes("node_modules/react-apexcharts") ||
+                id.includes("node_modules/recharts") ||
+                id.includes("node_modules/lightweight-charts")) {
+              return "charts";
+            }
+            // UI Icons
+            if (id.includes("node_modules/lucide-react")) {
+              return "icons";
             }
             return undefined;
           },

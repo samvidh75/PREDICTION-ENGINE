@@ -2,7 +2,7 @@ import { useEffect, useState, useMemo, useRef, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Building2, TrendingUp, ChevronDown, ChevronUp, ExternalLink } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, Line, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts";
+import { LazyAreaChart, LazyBarChart, Area, Bar, CartesianGrid, Cell, Line, ResponsiveContainer, XAxis, YAxis, Tooltip } from "../components/DynamicChart";
 import { Badge } from "../ui/Badge";
 import { Button } from "../ui/Button";
 import { Card, CardLabel } from "../ui/Card";
@@ -412,7 +412,6 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
     isin: "—",
     businessSegments: [],
   };
-  const sectorComparisons = stock.sectorComparison ?? [];
   const sectorRelativeItems = stock.sectorRelative ?? [];
 
   // Sector relative lookup for metric subtitles
@@ -591,12 +590,26 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
       <Card className="stock-chart-card raycast-slideUp" style={{ animationDelay: "0.05s", animationFillMode: "both" }}>
         <div className="stock-chart-toolbar" style={{ display: "flex", gap: "8px", marginBottom: "16px", flexWrap: "wrap", alignItems: "center" }}>
           <div style={{ display: "flex", gap: "4px", background: colors.fill, borderRadius: radius.full, padding: "2px" }}>
-            <button onClick={() => setChartType("line")} style={{ padding: "6px 14px", borderRadius: radius.full, border: "none", cursor: "pointer", fontSize: "12px", fontWeight: 500, background: chartType === "line" ? colors.primary : "transparent", color: chartType === "line" ? colors.onPrimary : colors.textSecondary }}>Line</button>
-            <button onClick={() => setChartType("candle")} style={{ padding: "6px 14px", borderRadius: radius.full, border: "none", cursor: "pointer", fontSize: "12px", fontWeight: 500, background: chartType === "candle" ? colors.primary : "transparent", color: chartType === "candle" ? colors.onPrimary : colors.textSecondary }}>Candle</button>
+            <button
+              aria-label="Show line chart"
+              onClick={() => setChartType("line")}
+              style={{ padding: "6px 14px", borderRadius: radius.full, border: "none", cursor: "pointer", fontSize: "12px", fontWeight: 500, background: chartType === "line" ? colors.primary : "transparent", color: chartType === "line" ? colors.onPrimary : colors.textSecondary }}>
+              Line
+            </button>
+            <button
+              aria-label="Show candlestick chart"
+              onClick={() => setChartType("candle")}
+              style={{ padding: "6px 14px", borderRadius: radius.full, border: "none", cursor: "pointer", fontSize: "12px", fontWeight: 500, background: chartType === "candle" ? colors.primary : "transparent", color: chartType === "candle" ? colors.onPrimary : colors.textSecondary }}>
+              Candle
+            </button>
           </div>
           <div style={{ display: "flex", gap: "4px", marginLeft: "auto" }}>
             {(["none", "sma", "rsi", "macd"] as const).map((ind) => (
-              <button key={ind} onClick={() => setTechIndicator(ind === techIndicator ? "none" : ind)} style={{ padding: "6px 12px", borderRadius: radius.md, border: `1px solid ${techIndicator === ind ? colors.primary : colors.border}`, cursor: "pointer", fontSize: "11px", fontWeight: 500, background: techIndicator === ind ? `${colors.primary}20` : "transparent", color: techIndicator === ind ? colors.primary : colors.textSecondary }}>
+              <button
+                key={ind}
+                aria-label={`Toggle ${ind === "none" ? "technical indicators off" : ind.toUpperCase() + " technical indicator"}`}
+                onClick={() => setTechIndicator(ind === techIndicator ? "none" : ind)}
+                style={{ padding: "6px 12px", borderRadius: radius.md, border: `1px solid ${techIndicator === ind ? colors.primary : colors.border}`, cursor: "pointer", fontSize: "11px", fontWeight: 500, background: techIndicator === ind ? `${colors.primary}20` : "transparent", color: techIndicator === ind ? colors.primary : colors.textSecondary }}>
                 {ind === "none" ? "Off" : ind.toUpperCase()}
               </button>
             ))}
@@ -610,7 +623,7 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
         <div style={{ width: "100%", height: "300px" }}>
           <ResponsiveContainer>
             {chartType === "line" ? (
-              <AreaChart data={stock.priceHistory[timeframe]}>
+              <LazyAreaChart data={stock.priceHistory[timeframe]}>
                 <defs>
                   <linearGradient id="trendFill" x1="0" x2="0" y1="0" y2="1">
                     <stop offset="0%" stopColor={trendColor} stopOpacity="0.2" />
@@ -625,14 +638,14 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
                 {techIndicator === "sma" && (
                   <Line dataKey="price" stroke={colors.warning} strokeWidth={1.5} strokeDasharray="6 3" dot={false} name="SMA 20" />
                 )}
-              </AreaChart>
+              </LazyAreaChart>
             ) : (
-              <BarChart data={(stock.priceHistory?.[timeframe] ?? []).map((d: any) => ({ ...d, high: d.price * 1.02, low: d.price * 0.98, open: d.price * 0.99, close: d.price * 1.01 }))}>
+              <LazyBarChart data={(stock.priceHistory?.[timeframe] ?? []).map((d: any) => ({ ...d, high: d.price * 1.02, low: d.price * 0.98, open: d.price * 0.99, close: d.price * 1.01 }))}>
                 <CartesianGrid vertical={false} stroke={colors.border} />
                 <XAxis dataKey="label" stroke={colors.textSecondary} tick={{ fontSize: 11 }} />
                 <YAxis stroke={colors.textSecondary} domain={["auto", "auto"]} tick={{ fontSize: 11 }} />
                 <Bar dataKey="close" fill={trendColor} radius={[2, 2, 0, 0]} />
-              </BarChart>
+              </LazyBarChart>
             )}
           </ResponsiveContainer>
         </div>
@@ -751,7 +764,10 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
             <Button variant={financialMetric === "ebitda" ? "primary" : "secondary"} onClick={() => setFinancialMetric("ebitda")}>EBITDA</Button>
             <Button variant={financialPeriod === "annual" ? "primary" : "secondary"} onClick={() => setFinancialPeriod("annual")}>Annual</Button>
             <Button variant={financialPeriod === "quarterly" ? "primary" : "secondary"} onClick={() => setFinancialPeriod("quarterly")}>Quarterly</Button>
-            <button onClick={() => setShowFinancialTable(!showFinancialTable)} style={{ padding: "6px 12px", borderRadius: radius.md, border: `1px solid ${colors.border}`, cursor: "pointer", fontSize: "12px", background: showFinancialTable ? colors.primary : "transparent", color: showFinancialTable ? colors.onPrimary : colors.textSecondary }}>
+            <button
+              aria-label={`Switch to ${showFinancialTable ? "chart" : "table"} view for financials`}
+              onClick={() => setShowFinancialTable(!showFinancialTable)}
+              style={{ padding: "6px 12px", borderRadius: radius.md, border: `1px solid ${colors.border}`, cursor: "pointer", fontSize: "12px", background: showFinancialTable ? colors.primary : "transparent", color: showFinancialTable ? colors.onPrimary : colors.textSecondary }}>
               {showFinancialTable ? "Chart" : "Table"}
             </button>
           </div>
@@ -784,14 +800,14 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
         ) : (
           <div style={{ width: "100%", height: "280px" }}>
             <ResponsiveContainer>
-              <BarChart data={effectiveChartData}>
+              <LazyBarChart data={effectiveChartData}>
                 <CartesianGrid vertical={false} stroke={colors.border} />
                 <XAxis dataKey="period" stroke={colors.textSecondary} tick={{ fontSize: 11 }} />
                 <YAxis stroke={colors.textSecondary} tick={{ fontSize: 11 }} />
                 <Bar dataKey="value" radius={[6, 6, 0, 0]}>
                   {effectiveChartData.map((entry) => (<Cell key={entry.period} fill={colors.primary} />))}
                 </Bar>
-              </BarChart>
+              </LazyBarChart>
             </ResponsiveContainer>
           </div>
         )}
@@ -837,7 +853,11 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
           <CardLabel>Latest news</CardLabel>
           <div className="stock-news-filters" style={{ display: "flex", gap: "4px", padding: "2px", background: colors.fill, borderRadius: radius.full }}>
             {(["all", "positive", "negative"] as const).map((f) => (
-              <button key={f} onClick={() => setNewsFilter(f)} style={{ padding: "4px 14px", borderRadius: radius.full, border: "none", cursor: "pointer", fontSize: "12px", fontWeight: 500, background: newsFilter === f ? colors.primary : "transparent", color: newsFilter === f ? colors.onPrimary : colors.textSecondary, textTransform: "capitalize" }}>
+              <button
+                key={f}
+                aria-label={`Filter news by ${f}`}
+                onClick={() => setNewsFilter(f)}
+                style={{ padding: "4px 14px", borderRadius: radius.full, border: "none", cursor: "pointer", fontSize: "12px", fontWeight: 500, background: newsFilter === f ? colors.primary : "transparent", color: newsFilter === f ? colors.onPrimary : colors.textSecondary, textTransform: "capitalize" }}>
                 {f === "all" ? "All" : f === "positive" ? "Positive" : "Negative"}
               </button>
             ))}
