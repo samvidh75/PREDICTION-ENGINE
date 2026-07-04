@@ -102,6 +102,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
           {/* More Menu */}
           <button
+            aria-label="Toggle more features menu"
             onClick={() => setMoreMenuOpen(!moreMenuOpen)}
             style={{
               width: '100%',

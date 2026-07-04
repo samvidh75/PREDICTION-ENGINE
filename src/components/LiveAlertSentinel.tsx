@@ -32,32 +32,50 @@ export default function LiveAlertSentinel() {
     const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
     const wsUrl = `${protocol}//${window.location.host}/ws/v1/event-alerts`;
 
-    const socket = new WebSocket(wsUrl);
+    let socket: WebSocket | null = null;
 
-    socket.onopen = () => {
-      socket.send(
-        JSON.stringify({
-          type: "subscribe",
-          tickers: ["RELIANCE", "TCS", "SBIN", "INFY", "HDFCBANK"],
-        }),
-      );
-    };
+    try {
+      socket = new WebSocket(wsUrl);
 
-    socket.onmessage = (event) => {
-      try {
-        const payload = JSON.parse(event.data);
-        if (payload.type === "event_alert_push") {
-          setActiveAlert(payload);
-          // Automatically dismiss after 7 seconds
-          setTimeout(() => setActiveAlert(null), 7000);
+      socket.onopen = () => {
+        if (socket?.readyState === WebSocket.OPEN) {
+          socket.send(
+            JSON.stringify({
+              type: "subscribe",
+              tickers: ["RELIANCE", "TCS", "SBIN", "INFY", "HDFCBANK"],
+            }),
+          );
         }
-      } catch {
-        // Suppress parsing variances quietly across network channels
-      }
-    };
+      };
+
+      socket.onmessage = (event) => {
+        try {
+          const payload = JSON.parse(event.data);
+          if (payload.type === "event_alert_push") {
+            setActiveAlert(payload);
+            // Automatically dismiss after 7 seconds
+            setTimeout(() => setActiveAlert(null), 7000);
+          }
+        } catch {
+          // Suppress parsing variances quietly across network channels
+        }
+      };
+
+      socket.onerror = () => {
+        // Suppress WebSocket connection errors silently (non-critical feature)
+      };
+
+      socket.onclose = () => {
+        socket = null;
+      };
+    } catch {
+      // WebSocket not available or endpoint unreachable; feature degrades gracefully
+    }
 
     return () => {
-      socket.close(); // Prevent socket connection leaks on component unmount
+      if (socket?.readyState === WebSocket.OPEN) {
+        socket.close(); // Prevent socket connection leaks on component unmount
+      }
     };
   }, []);
 

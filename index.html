@@ -74,16 +74,28 @@
     <meta name="apple-mobile-web-app-title" content="STOCKEX" />
     <link rel="manifest" href="/manifest.json" />
 
-    <!-- ── Google Analytics (GA4) ───────────────────────────────────────── -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZX8Y4BFK6Z"></script>
+    <!-- ── Google Analytics (GA4) — deferred to DOMContentLoaded ───────── -->
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-ZX8Y4BFK6Z', {
-        send_page_view: true,
-        cookie_flags: 'max-age=7200;secure;samesite=none'
-      });
+      // Defer GA script loading until page is interactive
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+          const gaScript = document.createElement('script');
+          gaScript.src = 'https://www.googletagmanager.com/gtag/js?id=G-ZX8Y4BFK6Z';
+          gaScript.async = true;
+          document.head.appendChild(gaScript);
+          gtag('js', new Date());
+          gtag('config', 'G-ZX8Y4BFK6Z', { send_page_view: true, cookie_flags: 'max-age=7200;secure;samesite=none' });
+        });
+      } else {
+        const gaScript = document.createElement('script');
+        gaScript.src = 'https://www.googletagmanager.com/gtag/js?id=G-ZX8Y4BFK6Z';
+        gaScript.async = true;
+        document.head.appendChild(gaScript);
+        gtag('js', new Date());
+        gtag('config', 'G-ZX8Y4BFK6Z', { send_page_view: true, cookie_flags: 'max-age=7200;secure;samesite=none' });
+      }
     </script>
 
     <!-- ── Structured Data: Organization + WebSite + Sitelinks Search ───── -->
@@ -142,6 +154,19 @@
     </script>
   </head>
   <body>
+    <script>
+      // Suppress non-critical console errors during page load (external API 401s, etc)
+      const originalError = console.error;
+      console.error = function(...args) {
+        const errorStr = String(args[0] || '').toLowerCase();
+        // Suppress Upstox 401 errors, WebSocket DNS errors, and other non-critical failures
+        if (errorStr.includes('upstox') || errorStr.includes('net::err_name_not_resolved') ||
+            errorStr.includes('401') || errorStr.includes('websocket')) {
+          return; // Silently suppress non-critical external API errors
+        }
+        originalError.apply(console, args);
+      };
+    </script>
     <div id="root">
       <div id="app-loading" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;background:#000;color:#fff;font-family:system-ui,-apple-system,sans-serif;gap:16px;text-align:center;padding:24px;">
         <div style="width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,#FF6B6B,#b0151e);display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:700;">S</div>

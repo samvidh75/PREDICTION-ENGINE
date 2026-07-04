@@ -17,7 +17,7 @@ export const colors = {
   ink:            '#ffffff',   // Primary headlines on pure black canvas (contrast 21:1)
   body:           '#a0a0a0',   // Default paragraph / inline-link color (contrast 8:1)
   charcoal:       '#c0c0c0',   // Brighter body where ink reads too soft
-  mute:           '#707070',   // Metadata, footer links, secondary captions
+  mute:           '#999999',   // Metadata, footer links, secondary captions (WCAG AA: 4.5:1)
   ash:            '#585858',   // Disabled text, lowest emphasis
   stone:          '#404040',   // Least-emphasis caption / disabled icon
   onDark:         '#ffffff',   // Interactive-state primary text (button label, focused tab)
