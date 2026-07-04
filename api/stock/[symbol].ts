@@ -22,6 +22,37 @@ const fallbackFundamentals: Record<string, any> = {
   'ICICIBANK': { pe: 16.8, pb: 2.2, eps: 48.92, dividendYield: 2.1, roe: 15.2, high52w: 950, low52w: 620, debtToEquity: 9.2, marketCap: 450000 },
 };
 
+// Fetch historical chart data from Yahoo Finance
+async function fetchChartData(symbol: string): Promise<any> {
+  try {
+    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}.NS?range=1y&interval=1d`;
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+        'Accept': 'application/json',
+      },
+      signal: AbortSignal.timeout(8000),
+    });
+
+    if (!response.ok) return [];
+
+    const data = await response.json() as any;
+    const timestamps = data?.chart?.result?.[0]?.timestamp || [];
+    const closes = data?.chart?.result?.[0]?.indicators?.quote?.[0]?.close || [];
+
+    return timestamps
+      .map((ts: number, idx: number) => ({
+        date: new Date(ts * 1000).toISOString().split('T')[0],
+        price: closes[idx] ?? 0,
+      }))
+      .filter((item: any) => item.price > 0)
+      .slice(-52); // Return last 52 weeks
+  } catch (error) {
+    console.error(`Failed to fetch chart data for ${symbol}:`, error);
+    return [];
+  }
+}
+
 // Fetch real stock price from Yahoo Finance
 async function fetchYahooPrice(symbol: string): Promise<any> {
   try {
@@ -117,14 +148,17 @@ export default async function handler(
   }
 
   try {
-    // Fetch real price data from Yahoo Finance
-    const priceData = await fetchYahooPrice(symbol);
+    // Fetch price and chart data in parallel
+    const [priceData, chartData] = await Promise.all([
+      fetchYahooPrice(symbol),
+      fetchChartData(symbol),
+    ]);
 
     if (!priceData) {
       return res.status(404).json({ error: 'Stock not found', symbol });
     }
 
-    // Fetch fundamentals in parallel
+    // Fetch fundamentals
     const fundamentalsData = await fetchFundamentals(symbol);
 
     // Return data in format compatible with normalizeStockData
@@ -167,6 +201,7 @@ export default async function handler(
         health: 50,
         riskAdjusted: null,
       },
+      priceChart: chartData,
       source: 'yahoo-finance',
       timestamp: new Date().toISOString(),
     };
