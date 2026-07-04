@@ -2,8 +2,11 @@ import { useEffect, useState, useRef } from 'react';
 import { chatHistoryStorage, type ChatMessage } from '../../utils/chatHistoryStorage';
 import { buildAIContext, type MarketContext } from '../../utils/aiContextBuilder';
 import { liveMarketDataService } from '../../utils/liveMarketDataService';
+import { buildPortfolioContext, enhanceSystemPromptWithPortfolio, type PortfolioContext } from '../../utils/portfolioContextBuilder';
 import ModelSelector from './ModelSelector';
 import VoiceInput from './VoiceInput';
+import PortfolioManager from './PortfolioManager';
+import type { Portfolio } from '../../utils/portfolioStorage';
 
 interface BrowserAiChatProps {
   ticker: string;
@@ -24,6 +27,8 @@ export default function BrowserAiChat({ ticker }: BrowserAiChatProps) {
   const [marketData, setMarketData] = useState<MarketContext>({ ticker });
   const [currentModel, setCurrentModel] = useState<'qwen-0.5b' | 'qwen-7b'>('qwen-0.5b');
   const [isSwitchingModel, setIsSwitchingModel] = useState(false);
+  const [portfolio, setPortfolio] = useState<Portfolio | null>(null);
+  const [portfolioContext, setPortfolioContext] = useState<PortfolioContext | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -80,11 +85,27 @@ export default function BrowserAiChat({ ticker }: BrowserAiChatProps) {
     // Get initial market context
     liveMarketDataService.getMarketContext(ticker).then(setMarketData);
 
+    // Load portfolio context
+    const loadPortfolioContext = async () => {
+      const context = await buildPortfolioContext('default');
+      setPortfolioContext(context);
+    };
+    loadPortfolioContext();
+
     return () => {
       llmWorker.terminate();
       unsubscribe();
     };
   }, [ticker]);
+
+  // Reload portfolio context when portfolio changes
+  useEffect(() => {
+    const loadPortfolioContext = async () => {
+      const context = await buildPortfolioContext('default');
+      setPortfolioContext(context);
+    };
+    loadPortfolioContext();
+  }, [portfolio]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -134,6 +155,11 @@ export default function BrowserAiChat({ ticker }: BrowserAiChatProps) {
 
     // Build context with history and market data
     const aiContext = buildAIContext(userQuery, ticker, messages, marketData);
+
+    // Enhance with portfolio context if available
+    if (portfolioContext?.hasPortfolio) {
+      aiContext.systemPrompt = enhanceSystemPromptWithPortfolio(aiContext.systemPrompt, portfolioContext);
+    }
 
     // Send to worker
     worker.postMessage({
@@ -202,6 +228,10 @@ export default function BrowserAiChat({ ticker }: BrowserAiChatProps) {
 
       {isReady && (
         <ModelSelector currentModel={currentModel} onModelChange={handleModelChange} isLoading={isSwitchingModel} />
+      )}
+
+      {isReady && (
+        <PortfolioManager onPortfolioChange={setPortfolio} />
       )}
 
       {isReady && (
