@@ -177,6 +177,7 @@ function expandUniverse(base: BaseStockCandidate[]): BaseStockCandidate[] {
 function buildBaseUniverse(): BaseStockCandidate[] {
   const merged = new Map<string, BaseStockCandidate>();
 
+  // First add all stocks from generate500Stocks
   for (const stock of generate500Stocks()) {
     merged.set(stock.symbol.toUpperCase(), {
       ...stock,
@@ -184,14 +185,22 @@ function buildBaseUniverse(): BaseStockCandidate[] {
     });
   }
 
+  // Then merge fundamentals from STOCK_UNIVERSE, overwriting base stocks to ensure correct data
   for (const stock of STOCK_UNIVERSE) {
     const symbol = stock.symbol.toUpperCase();
-    if (!merged.has(symbol)) {
+    const existing = merged.get(symbol);
+    if (existing) {
+      // Merge fundamentals into existing stock
       merged.set(symbol, {
-        symbol: stock.symbol,
-        name: stock.name,
-        sector: stock.sector,
-        industry: stock.industry,
+        ...existing,
+        ...stock,
+        symbol: existing.symbol,
+        exchange: existing.exchange ?? "NSE",
+      });
+    } else {
+      // Add new stock from STOCK_UNIVERSE
+      merged.set(symbol, {
+        ...stock,
         exchange: "NSE",
       });
     }
@@ -203,7 +212,14 @@ function buildBaseUniverse(): BaseStockCandidate[] {
 const fundamentalsBySymbol = new Map<string, StockFundamentals>(STOCK_UNIVERSE.map((stock) => [stock.symbol.toUpperCase(), stock]));
 
 function buildSummary(stock: BaseStockCandidate): StockResearchSummary {
-  const known = fundamentalsBySymbol.get(stock.symbol.toUpperCase());
+  const symbol = stock.symbol.toUpperCase();
+
+  // Ensure major stocks use real data from STOCK_UNIVERSE
+  let known = fundamentalsBySymbol.get(symbol);
+  if (!known && symbol in fundamentalsBySymbol) {
+    known = fundamentalsBySymbol.get(symbol);
+  }
+
   const price = known?.price ?? seeded(`${stock.symbol}:price`, 120, 4200, 2);
   const change = known?.change ?? seeded(`${stock.symbol}:change`, -48, 52, 2);
   const changePercent = known?.changePercent ?? round((change / Math.max(price - change, 1)) * 100, 2);

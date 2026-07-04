@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthProvider } from "./context/AuthContext";
 import { AppRoutes } from "./app/routes";
 import { ScrollToTop } from "./app/ScrollToTop";
+import { CommandPalette } from "./components/CommandPalette";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -69,6 +70,7 @@ export default function App() {
           <ScrollToTop />
           {LiveAlertSentinel ? <LiveAlertSentinel /> : null}
           {FloatingAIButton ? <FloatingAIButton /> : null}
+          <CommandPalette />
           <AppRoutes />
         </BrowserRouter>
       </AuthProvider>
