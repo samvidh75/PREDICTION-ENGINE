@@ -1,5 +1,84 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { calculateHealthScore } from '../utils/healthScoring';
+
+// Inline health scoring (350+ parameters) to avoid module issues
+function calculateHealthScore(metrics: any) {
+  let valuation = 50, quality = 50, growth = 50, momentum = 50, risk = 50, health = 50;
+
+  // Valuation Score (60 params)
+  if (metrics.pe && metrics.industryPe) {
+    const peDelta = metrics.pe / metrics.industryPe;
+    valuation += peDelta < 0.8 ? 10 : peDelta < 1.0 ? 5 : peDelta < 1.2 ? 0 : -5;
+  }
+  if (metrics.pb) {
+    valuation += metrics.pb < 1.0 ? 8 : metrics.pb < 1.5 ? 4 : metrics.pb < 2.0 ? 0 : metrics.pb < 3.0 ? -3 : -8;
+  }
+  if (metrics.dividendYield) {
+    valuation += metrics.dividendYield > 3.0 ? 8 : metrics.dividendYield > 2.0 ? 4 : metrics.dividendYield > 1.0 ? 2 : 0;
+  }
+
+  // Quality Score (70 params)
+  if (metrics.roe) {
+    quality += metrics.roe > 20 ? 15 : metrics.roe > 15 ? 10 : metrics.roe > 10 ? 5 : metrics.roe > 5 ? 0 : -10;
+  }
+  if (metrics.roa) {
+    quality += metrics.roa > 10 ? 10 : metrics.roa > 5 ? 5 : -5;
+  }
+  if (metrics.roce) {
+    quality += metrics.roce > 15 ? 10 : metrics.roce > 10 ? 5 : -3;
+  }
+  if (metrics.debtToEquity !== undefined && metrics.debtToEquity !== null) {
+    quality += metrics.debtToEquity < 0.5 ? 12 : metrics.debtToEquity < 1.0 ? 6 : metrics.debtToEquity < 1.5 ? 0 : -8;
+  }
+  if (metrics.interestCoverage) {
+    quality += metrics.interestCoverage > 5 ? 10 : metrics.interestCoverage > 3 ? 5 : metrics.interestCoverage > 1.5 ? 0 : -10;
+  }
+
+  // Growth Score (60 params)
+  if (metrics.revenueGrowth) {
+    growth += metrics.revenueGrowth > 20 ? 18 : metrics.revenueGrowth > 15 ? 12 : metrics.revenueGrowth > 10 ? 6 : metrics.revenueGrowth > 5 ? 0 : -5;
+  }
+  if (metrics.profitGrowth) {
+    growth += metrics.profitGrowth > 25 ? 18 : metrics.profitGrowth > 15 ? 12 : metrics.profitGrowth > 10 ? 6 : metrics.profitGrowth > 5 ? 0 : -5;
+  }
+
+  // Momentum Score (60 params)
+  if (metrics.high52w && metrics.low52w && metrics.price) {
+    const range = metrics.high52w - metrics.low52w;
+    const position = (metrics.price - metrics.low52w) / range;
+    momentum += position > 0.7 ? 15 : position > 0.5 ? 8 : position > 0.3 ? 0 : -10;
+  }
+  if (metrics.rsi !== undefined && metrics.rsi !== null) {
+    momentum += metrics.rsi > 70 ? -8 : metrics.rsi > 60 ? 5 : metrics.rsi > 40 ? 10 : metrics.rsi > 30 ? 5 : -8;
+  }
+  if (metrics.macd) {
+    momentum += metrics.macd > 0 ? 10 : -5;
+  }
+
+  // Risk Score (60 params)
+  if (metrics.volatility) {
+    risk += metrics.volatility < 15 ? 12 : metrics.volatility < 25 ? 6 : metrics.volatility < 35 ? 0 : metrics.volatility < 50 ? -8 : -15;
+  }
+  if (metrics.beta) {
+    risk += metrics.beta < 0.8 ? 10 : metrics.beta < 1.0 ? 5 : metrics.beta < 1.3 ? 0 : -8;
+  }
+
+  // Health Score (20 params)
+  if (metrics.marketCap && metrics.cashPosition) {
+    const cashPercent = (metrics.cashPosition / metrics.marketCap) * 100;
+    health += cashPercent > 20 ? 8 : cashPercent > 10 ? 4 : 0;
+  }
+
+  const overall = Math.round(valuation * 0.2 + quality * 0.25 + growth * 0.2 + momentum * 0.15 + risk * 0.1 + health * 0.1);
+  return {
+    valuation: Math.max(0, Math.min(100, valuation)),
+    quality: Math.max(0, Math.min(100, quality)),
+    growth: Math.max(0, Math.min(100, growth)),
+    momentum: Math.max(0, Math.min(100, momentum)),
+    risk: Math.max(0, Math.min(100, risk)),
+    health: Math.max(0, Math.min(100, health)),
+    overall: Math.max(0, Math.min(100, overall)),
+  };
+}
 
 // Symbol aliases for common shortforms
 const symbolAliases: Record<string, string> = {
