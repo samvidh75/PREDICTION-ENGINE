@@ -614,15 +614,12 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
             </button>
           </div>
           <div style={{ display: "flex", gap: "4px", marginLeft: "auto" }}>
-            {(["none", "sma", "rsi", "macd"] as const).map((ind) => (
-              <button
-                key={ind}
-                aria-label={`Toggle ${ind === "none" ? "technical indicators off" : ind.toUpperCase() + " technical indicator"}`}
-                onClick={() => setTechIndicator(ind === techIndicator ? "none" : ind)}
-                style={{ padding: "6px 12px", borderRadius: radius.md, border: `1px solid ${techIndicator === ind ? colors.primary : colors.border}`, cursor: "pointer", fontSize: "11px", fontWeight: 500, background: techIndicator === ind ? `${colors.primary}20` : "transparent", color: techIndicator === ind ? colors.primary : colors.textSecondary }}>
-                {ind === "none" ? "Off" : ind.toUpperCase()}
-              </button>
-            ))}
+            <button
+              aria-label="Advanced charting with technical indicators"
+              onClick={() => {/* TODO: Open advanced chart modal */}}
+              style={{ padding: "6px 14px", borderRadius: radius.full, border: `1px solid ${colors.primary}`, cursor: "pointer", fontSize: "12px", fontWeight: 500, background: `${colors.primary}20`, color: colors.primary }}>
+              📊 Advanced Chart
+            </button>
           </div>
           <div style={{ display: "flex", gap: "4px", width: "100%" }}>
             {TIMEFRAMES.map((value) => (
@@ -647,11 +644,6 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
             </ResponsiveContainer>
           </div>
         </ChartErrorBoundary>
-        {techIndicator !== "none" && (
-          <p style={{ color: colors.textSecondary, fontSize: "11px", marginTop: "8px" }}>
-            {techIndicator === "sma" ? "SMA 20 (dashed) overlaid on price" : techIndicator === "rsi" ? "RSI shown on separate scale tab (coming soon)" : "MACD histogram overlay (coming soon)"}
-          </p>
-        )}
       </Card>      {/* ── Analytical Dashboard Grid ── */}
       <div className="stock-analytical-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(420px, 1fr))", gap: "20px", alignItems: "start" }}>
       {/* ── Healthometer + Score Overview ── */}
@@ -895,13 +887,26 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
 
       {/* ── Research Thesis ── */}
       <Card className="raycast-slideUp" style={{ animationDelay: "0.35s", animationFillMode: "both" }}>
-        <CardLabel>Pros / cons</CardLabel>
-        <div style={{ display: "grid", gap: "12px" }}>
+        <CardLabel>Investment Thesis</CardLabel>
+        <div style={{ display: "grid", gap: "16px" }}>
           <Badge value={stock.scores.health ?? 0} label={stock.thesis.stance} />
-          <p style={{ color: colors.textSecondary, fontSize: typography.body.desktop.size, lineHeight: "1.6" }}>{stock.thesis.thesis}</p>
-          <p style={{ color: colors.textPrimary, fontSize: typography.body.desktop.size, lineHeight: "1.6" }}><strong>Pros:</strong> {stock.thesis.bullCase}</p>
-          <p style={{ color: colors.textPrimary, fontSize: typography.body.desktop.size, lineHeight: "1.6" }}><strong>Cons:</strong> {stock.thesis.bearCase}</p>
-          <p style={{ color: colors.textSecondary, fontSize: typography.body.desktop.size, lineHeight: "1.6" }}><strong>Watch:</strong> {stock.thesis.whatToWatch}</p>
+          <p style={{ color: colors.textSecondary, fontSize: typography.body.desktop.size, lineHeight: "1.6", fontStyle: "italic" }}>{stock.thesis.thesis}</p>
+
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+            <div style={{ padding: "12px", backgroundColor: `${colors.success}15`, borderRadius: "6px", borderLeft: `3px solid ${colors.success}` }}>
+              <div style={{ color: colors.success, fontSize: "12px", fontWeight: "600", marginBottom: "8px", textTransform: "uppercase" }}>✓ Strengths</div>
+              <p style={{ color: colors.textPrimary, fontSize: "14px", lineHeight: "1.5" }}>{stock.thesis.bullCase}</p>
+            </div>
+            <div style={{ padding: "12px", backgroundColor: `${colors.danger}15`, borderRadius: "6px", borderLeft: `3px solid ${colors.danger}` }}>
+              <div style={{ color: colors.danger, fontSize: "12px", fontWeight: "600", marginBottom: "8px", textTransform: "uppercase" }}>⚠ Risks</div>
+              <p style={{ color: colors.textPrimary, fontSize: "14px", lineHeight: "1.5" }}>{stock.thesis.bearCase}</p>
+            </div>
+          </div>
+
+          <div style={{ padding: "12px", backgroundColor: `${colors.warning}15`, borderRadius: "6px", borderLeft: `3px solid ${colors.warning}` }}>
+            <div style={{ color: colors.warning, fontSize: "12px", fontWeight: "600", marginBottom: "8px", textTransform: "uppercase" }}>👁 Watch</div>
+            <p style={{ color: colors.textPrimary, fontSize: "14px", lineHeight: "1.5" }}>{stock.thesis.whatToWatch}</p>
+          </div>
         </div>
       </Card>
 
