@@ -154,5 +154,39 @@ export async function registerAIRoutes(server: FastifyInstance) {
     }
   });
 
-  server.log.info('AI routes registered: /api/ai/status, /api/ai/analyze, /api/ai/chat');
+  // Speech-to-text transcription endpoint (fallback)
+  server.post<{ Body: { audio: string; language?: string; duration?: number } }>(
+    '/api/transcribe',
+    async (request, reply) => {
+      const { audio, language = 'en-IN' } = request.body;
+
+      if (!audio) {
+        return reply.status(400).send({ error: 'Missing audio data' });
+      }
+
+      try {
+        // For now, return placeholder transcription
+        // In production, this would call a real speech-to-text service
+        // like Google Cloud Speech-to-Text, Azure Speech, or local Whisper
+
+        // Placeholder: use audio length as confidence metric
+        const audioBytes = Buffer.from(audio.split(',')[1] || '', 'base64').length;
+        const confidence = Math.min(0.95, 0.5 + (audioBytes / 10000) * 0.45);
+
+        return reply.send({
+          text: 'Speech transcription service coming soon - please use text input for now',
+          confidence,
+          language,
+          duration: request.body.duration || 0,
+        });
+      } catch (error) {
+        server.log.error(error);
+        return reply.status(500).send({
+          error: 'Transcription failed',
+        });
+      }
+    },
+  );
+
+  server.log.info('AI routes registered: /api/ai/status, /api/ai/analyze, /api/ai/chat, /api/transcribe');
 }
