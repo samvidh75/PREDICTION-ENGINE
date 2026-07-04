@@ -9,6 +9,7 @@ import VoiceInput from './VoiceInput';
 import PortfolioManager from './PortfolioManager';
 import NewsPanel from './NewsPanel';
 import PortfolioCharts from './PortfolioCharts';
+import PortfolioAnalytics from './PortfolioAnalytics';
 import type { Portfolio } from '../../utils/portfolioStorage';
 
 interface BrowserAiChatProps {
@@ -252,6 +253,10 @@ export default function BrowserAiChat({ ticker }: BrowserAiChatProps) {
 
       {isReady && portfolio && portfolio.holdings.length > 0 && (
         <PortfolioCharts />
+      )}
+
+      {isReady && portfolio && portfolio.holdings.length > 0 && (
+        <PortfolioAnalytics />
       )}
 
       {isReady && portfolio && portfolio.holdings.length > 0 && (
