@@ -40,6 +40,7 @@ const LiveMarketPage = lazy(() => import("../pages/LiveMarketPage"));
 const StockDetailPage = lazy(() => import("../pages/StockDetailPage"));
 const PortfolioDetailPage = lazy(() => import("../pages/PortfolioDetailPage"));
 const StockStoryPage = lazy(() => import("../pages/StockStoryPage"));
+const AITestPage = lazy(() => import("../pages/AITestPage"));
 
 const SHOW_ABOUT_PAGE = import.meta.env.VITE_SHOW_ABOUT_PAGE === "true";
 
@@ -116,6 +117,7 @@ export function AppRoutes() {
         <Route path="/options-chain" element={<Suspense fallback={<RouteFallback />}><PublicLayout><OptionsChainPage /></PublicLayout></Suspense>} />
         <Route path="/backtest" element={<Suspense fallback={<RouteFallback />}><PublicLayout><BacktestPage /></PublicLayout></Suspense>} />
         <Route path="/live-market" element={<Suspense fallback={<RouteFallback />}><PublicLayout><LiveMarketPage /></PublicLayout></Suspense>} />
+        <Route path="/ai-test" element={<Suspense fallback={<RouteFallback />}><WorkspaceRoute><AITestPage /></WorkspaceRoute></Suspense>} />
         <Route path="/alerts" element={<WorkspaceRoute><AlertPage /></WorkspaceRoute>} />
         <Route path="/portfolio" element={<WorkspaceRoute><PortfolioPage /></WorkspaceRoute>} />
         <Route path="/portfolio-analytics" element={<WorkspaceRoute><PortfolioAnalyticsPage /></WorkspaceRoute>} />

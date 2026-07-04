@@ -80,7 +80,7 @@ class LocalLLMService {
       const prompt = this.buildAnalysisPrompt(symbol, metrics, query);
 
       // Use text generation pipeline
-      const { pipeline } = transformers;
+      const pipeline = (transformers as any).pipeline;
       const generator = await pipeline('text-generation', this.currentModel);
 
       const result = await generator(prompt, {
@@ -89,9 +89,8 @@ class LocalLLMService {
         top_p: options?.topP || 0.9
       });
 
-      const text = typeof result[0].generated_text === 'string'
-        ? result[0].generated_text
-        : result[0].generated_text;
+      const resultText = result[0]?.generated_text || result.generated_text || '';
+      const text = typeof resultText === 'string' ? resultText : String(resultText);
 
       const tokensGenerated = text.split(/\s+/).length - prompt.split(/\s+/).length;
       const timeMs = Date.now() - startTime;
@@ -118,14 +117,14 @@ class LocalLLMService {
     }
 
     try {
-      const { pipeline } = transformers;
+      const pipeline = (transformers as any).pipeline;
       const classifier = await pipeline('sentiment-analysis');
 
       const result = await classifier(newsText.substring(0, 512)); // Limit to 512 chars
 
       return {
-        label: result[0].label,
-        score: result[0].score
+        label: (result[0] || result)?.label || 'NEUTRAL',
+        score: (result[0] || result)?.score || 0.5
       };
     } catch (error) {
       console.error('[LocalLLM] Sentiment analysis failed:', error);
@@ -144,15 +143,15 @@ class LocalLLMService {
     }
 
     try {
-      const { pipeline } = transformers;
+      const pipeline = (transformers as any).pipeline;
       const qa = await pipeline('question-answering');
 
-      const result = await qa({
+      const result = await qa(
         question,
-        context: context.substring(0, 1024) // Limit context
-      });
+        context.substring(0, 1024) // Limit context
+      );
 
-      return result.answer;
+      return (result[0] || result)?.answer || 'Unable to answer question with current context.';
     } catch (error) {
       console.error('[LocalLLM] QA failed:', error);
       return 'Unable to answer question with current context.';
@@ -199,7 +198,7 @@ class LocalLLMService {
     }
 
     try {
-      const { pipeline } = transformers;
+      const pipeline = (transformers as any).pipeline;
       const summarizer = await pipeline('summarization');
 
       const result = await summarizer(text.substring(0, 1024), {
@@ -207,7 +206,7 @@ class LocalLLMService {
         min_length: Math.floor(maxLength / 2)
       });
 
-      return result[0].summary_text;
+      return (result[0] || result)?.summary_text || text.substring(0, maxLength);
     } catch (error) {
       console.error('[LocalLLM] Summarization failed:', error);
       return text.substring(0, maxLength);

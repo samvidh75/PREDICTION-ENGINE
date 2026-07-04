@@ -10,11 +10,21 @@ import { useEffect, useState } from 'react';
 import { X, Sparkles, TrendingUp, Zap } from 'lucide-react';
 import { colors } from '../design/tokens';
 
+interface PlanTier {
+  name: string;
+  price: number;
+  billing: string;
+  features: string[];
+  cta: string;
+  highlight?: boolean;
+}
+
 interface UpgradeModalProps {
   isOpen: boolean;
   onClose: () => void;
   reason?: 'feature-limit' | 'advanced-analysis' | 'alerts' | 'portfolio' | 'export';
   onUpgrade?: () => void;
+  showPricingComparison?: boolean;
 }
 
 export default function UpgradeModal({ isOpen, onClose, reason = 'advanced-analysis', onUpgrade }: UpgradeModalProps) {
@@ -64,6 +74,31 @@ export default function UpgradeModal({ isOpen, onClose, reason = 'advanced-analy
   };
 
   const content = reasons[reason];
+
+  const pricingTiers: PlanTier[] = [
+    {
+      name: 'Free',
+      price: 0,
+      billing: 'Forever',
+      features: ['Basic analysis', 'News feed', 'Watchlist', 'Community scanner'],
+      cta: 'Current Plan'
+    },
+    {
+      name: 'Premium',
+      price: 299,
+      billing: '/month, cancel anytime',
+      features: ['Advanced AI analysis', 'Real-time alerts', 'Portfolio optimization', 'Export reports', 'Priority support'],
+      cta: 'Start Free Trial',
+      highlight: true
+    },
+    {
+      name: 'Pro',
+      price: 699,
+      billing: '/month, annual discount',
+      features: ['Everything in Premium', 'API access', 'Custom models', 'White-label', 'Dedicated support'],
+      cta: 'Contact Sales'
+    }
+  ];
 
   return (
     <div
