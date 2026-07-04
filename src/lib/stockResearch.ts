@@ -709,6 +709,15 @@ const symbolAliases: Record<string, string> = {
   "BOB": "BANKBARODA",
 };
 
+// Real company profile data for major stocks
+const companyProfiles: Record<string, { founded: string; ceo: string; hq: string; employees: string; website: string }> = {
+  "TCS": { founded: "1974", ceo: "K Krithivasan", hq: "Mumbai", employees: "614,000", website: "www.tcs.com" },
+  "INFY": { founded: "1981", ceo: "Salil Parekh", hq: "Bengaluru", employees: "345,000", website: "www.infosys.com" },
+  "RELIANCE": { founded: "1973", ceo: "Mukesh Ambani", hq: "Mumbai", employees: "450,000", website: "www.ril.com" },
+  "SBIN": { founded: "1806", ceo: "Dinesh Khara", hq: "Mumbai", employees: "245,000", website: "www.sbi.co.in" },
+  "HDFCBANK": { founded: "1994", ceo: "Sashidhar Jagdishan", hq: "Mumbai", employees: "315,000", website: "www.hdfcbank.com" },
+};
+
 export function getStockResearch(symbol: string): StockResearchDetail | null {
   const resolvedSymbol = symbolAliases[symbol.toUpperCase()] || symbol;
   const summary = mergedUniverse.find((stock) => stock.symbol.toUpperCase() === resolvedSymbol.toUpperCase());
@@ -730,15 +739,23 @@ export function getStockResearch(symbol: string): StockResearchDetail | null {
     82,
   );
 
-  return {
-    ...summary,
-    companyName: summary.name,
-    exchangeBadge: summary.exchange === "BSE" ? "BSE" : "NSE",
+  const profile = companyProfiles[summary.symbol.toUpperCase()] || {
     founded: `${1980 + (hash(`${summary.symbol}:founded`) % 35)}`,
     ceo: "Management team",
     hq: "India",
     employees: `${Math.round(seeded(`${summary.symbol}:employees`, 1800, 82000, 0)).toLocaleString("en-IN")}`,
     website: `www.${summary.symbol.toLowerCase()}.com`,
+  };
+
+  return {
+    ...summary,
+    companyName: summary.name,
+    exchangeBadge: summary.exchange === "BSE" ? "BSE" : "NSE",
+    founded: profile.founded,
+    ceo: profile.ceo,
+    hq: profile.hq,
+    employees: profile.employees,
+    website: profile.website,
     isin: `INE${String(hash(summary.symbol)).padStart(9, "0").slice(0, 9)}0`,
     sector: normalizedSector,
     industry: normalizedIndustry,

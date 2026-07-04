@@ -2,7 +2,7 @@ import { useEffect, useState, useMemo, useRef, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Building2, TrendingUp, ChevronDown, ChevronUp, ExternalLink } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
-import { LazyBarChart, Bar, CartesianGrid, Cell, ResponsiveContainer, XAxis, YAxis } from "../components/DynamicChart";
+import { LazyBarChart, LazyLineChart, Bar, CartesianGrid, Cell, ResponsiveContainer, XAxis, YAxis, Line, Tooltip } from "../components/DynamicChart";
 import { Badge } from "../ui/Badge";
 import { Button } from "../ui/Button";
 import { Card, CardLabel } from "../ui/Card";
@@ -11,6 +11,7 @@ import { useResponsiveValue } from "../ui/responsive";
 import { PriceFlash } from "../ui/PriceFlash";
 import { BrokerHandoffModal } from "../components/BrokerHandoffModal";
 import { ThesisHistory } from "../components/ThesisHistory";
+import { ChartErrorBoundary } from "../components/ChartErrorBoundary";
 import { listAvailableBrokers } from "../commercial/BrokerHandoffService";
 import { fallbackAnalysis, generateStockAnalysis } from "../services/llm/AIAnalysisService";
 import type { AIAnalysis } from "../services/llm/AIAnalysisService";
@@ -377,6 +378,7 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
   const heroRef = useRef<HTMLDivElement>(null);
   const [ai, setAi] = useState<AIAnalysis | null>(null);
   const [aiLoading, setAiLoading] = useState(false);
+  const [aiError, setAiError] = useState<string | null>(null);
   const [timeframe, setTimeframe] = useState<(typeof TIMEFRAMES)[number]>("1Y");
   const [chartType, setChartType] = useState<"line" | "candle">("line");
   const [techIndicator, setTechIndicator] = useState<"none" | "sma" | "rsi" | "macd">("none");
@@ -431,9 +433,17 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
       growth: stock.scores.growth ?? 50, risk: stock.scores.risk ?? 50, technical: stock.scores.momentum ?? 50,
     };
     setAiLoading(true);
+    setAiError(null);
     generateStockAnalysis(stock.symbol, stock.companyName, stock.price.current, scores, stock.thesis?.thesis)
-      .then((result) => { if (!cancelled) { setAi(result); setAiLoading(false); } })
-      .catch(() => { if (!cancelled) { setAi(fallbackAnalysis(scores)); setAiLoading(false); } });
+      .then((result) => { if (!cancelled) { setAi(result); setAiError(null); setAiLoading(false); } })
+      .catch((err) => {
+        if (!cancelled) {
+          console.error('AI analysis error:', err);
+          setAi(fallbackAnalysis(scores));
+          setAiError('AI analysis unavailable - showing fallback analysis');
+          setAiLoading(false);
+        }
+      });
     return () => { cancelled = true; };
   }, [stock.symbol]);
 
@@ -620,33 +630,23 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
             ))}
           </div>
         </div>
-        <div style={{ width: "100%", padding: "16px", backgroundColor: colors.card, borderRadius: "8px", border: `1px solid ${colors.border}` }}>
-          <div style={{ overflowX: "auto" }}>
-            <table style={{ width: "100%", fontSize: "12px", borderCollapse: "collapse" }}>
-              <thead>
-                <tr style={{ borderBottom: `1px solid ${colors.border}` }}>
-                  <th style={{ padding: "8px", textAlign: "left", color: colors.textSecondary }}>Date</th>
-                  <th style={{ padding: "8px", textAlign: "right", color: colors.textSecondary }}>Price</th>
-                  <th style={{ padding: "8px", textAlign: "right", color: colors.textSecondary }}>Change</th>
-                </tr>
-              </thead>
-              <tbody>
-                {(stock.priceHistory[timeframe] ?? []).slice(-10).reverse().map((row: any, idx: number) => {
-                  const prev = (stock.priceHistory[timeframe] ?? [])[Math.max(0, (stock.priceHistory[timeframe] ?? []).length - 11 - idx)];
-                  const change = prev ? row.price - prev.price : 0;
-                  const changePercent = prev ? ((change / prev.price) * 100).toFixed(2) : "0.00";
-                  return (
-                    <tr key={idx} style={{ borderBottom: `1px solid ${colors.border}` }}>
-                      <td style={{ padding: "8px", color: colors.textPrimary }}>{row.label}</td>
-                      <td style={{ padding: "8px", textAlign: "right", color: colors.textPrimary }}>₹{row.price.toFixed(2)}</td>
-                      <td style={{ padding: "8px", textAlign: "right", color: change >= 0 ? colors.success : colors.danger }}>{change >= 0 ? "+" : ""}{change.toFixed(2)} ({changePercent}%)</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+        <ChartErrorBoundary>
+          <div style={{ width: "100%", height: "300px", backgroundColor: colors.card, borderRadius: "8px", border: `1px solid ${colors.border}` }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <LazyLineChart data={stock.priceHistory[timeframe] ?? []}>
+                <CartesianGrid strokeDasharray="3 3" stroke={colors.border} vertical={false} />
+                <XAxis dataKey="label" tick={{ fontSize: 12, fill: colors.textSecondary }} />
+                <YAxis tick={{ fontSize: 12, fill: colors.textSecondary }} />
+                <Tooltip
+                  contentStyle={{ backgroundColor: colors.card, border: `1px solid ${colors.border}`, borderRadius: "6px" }}
+                  labelStyle={{ color: colors.textPrimary }}
+                  formatter={(value: any) => `₹${value.toFixed(2)}`}
+                />
+                <Line type="monotone" dataKey="price" stroke={colors.primary} dot={false} strokeWidth={2} isAnimationActive={false} />
+              </LazyLineChart>
+            </ResponsiveContainer>
           </div>
-        </div>
+        </ChartErrorBoundary>
         {techIndicator !== "none" && (
           <p style={{ color: colors.textSecondary, fontSize: "11px", marginTop: "8px" }}>
             {techIndicator === "sma" ? "SMA 20 (dashed) overlaid on price" : techIndicator === "rsi" ? "RSI shown on separate scale tab (coming soon)" : "MACD histogram overlay (coming soon)"}
@@ -770,53 +770,23 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
             </button>
           </div>
         </div>
-        {showFinancialTable ? (
-          <div style={{ overflowX: "auto" }}>
-            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "14px" }}>
-              <thead>
-                <tr style={{ borderBottom: `1px solid ${colors.border}` }}>
-                  <th style={{ textAlign: "left", padding: "8px", color: colors.textSecondary }}>Period</th>
-                  <th style={{ textAlign: "right", padding: "8px", color: colors.textSecondary }}>{financialMetric === "revenue" ? "Revenue" : financialMetric === "profit" ? "Profit" : "EBITDA"} (₹ Cr)</th>
-                  <th style={{ textAlign: "right", padding: "8px", color: colors.textSecondary }}>YoY Growth</th>
-                </tr>
-              </thead>
-              <tbody>
-                {effectiveChartData.map((entry, idx) => {
-                  const prev = effectiveChartData[idx + 1];
-                  const growth = prev ? formatDecimal(((entry.value - prev.value) / prev.value) * 100, 1) : null;
-                  return (
-                    <tr key={entry.period} style={{ borderBottom: `1px solid ${colors.border}` }}>
-                      <td style={{ padding: "8px", color: colors.textPrimary }}>{entry.period}</td>
-                      <td style={{ padding: "8px", textAlign: "right", color: colors.textPrimary }}>{formatNumber(entry.value)}</td>
-                      <td style={{ padding: "8px", textAlign: "right", color: growth != null && parseFloat(growth) >= 0 ? colors.success : colors.danger }}>{growth != null ? `${parseFloat(growth) >= 0 ? "+" : ""}${growth}%` : "—"}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+        <ChartErrorBoundary>
+          <div style={{ width: "100%", height: "300px", backgroundColor: colors.card, borderRadius: "8px", border: `1px solid ${colors.border}` }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <LazyBarChart data={effectiveChartData}>
+                <CartesianGrid strokeDasharray="3 3" stroke={colors.border} vertical={false} />
+                <XAxis dataKey="period" tick={{ fontSize: 12, fill: colors.textSecondary }} />
+                <YAxis tick={{ fontSize: 12, fill: colors.textSecondary }} />
+                <Tooltip
+                  contentStyle={{ backgroundColor: colors.card, border: `1px solid ${colors.border}`, borderRadius: "6px" }}
+                  labelStyle={{ color: colors.textPrimary }}
+                  formatter={(value: any) => `₹${value.toLocaleString()} Cr`}
+                />
+                <Bar dataKey="value" fill={colors.primary} isAnimationActive={false} />
+              </LazyBarChart>
+            </ResponsiveContainer>
           </div>
-        ) : (
-          <div style={{ width: "100%", padding: "16px", backgroundColor: colors.card, borderRadius: "8px", border: `1px solid ${colors.border}` }}>
-            <div style={{ overflowX: "auto" }}>
-              <table style={{ width: "100%", fontSize: "12px", borderCollapse: "collapse" }}>
-                <thead>
-                  <tr style={{ borderBottom: `1px solid ${colors.border}` }}>
-                    <th style={{ padding: "8px", textAlign: "left", color: colors.textSecondary }}>Period</th>
-                    <th style={{ padding: "8px", textAlign: "right", color: colors.textSecondary }}>Value (₹ Cr)</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {effectiveChartData.map((entry, idx) => (
-                    <tr key={idx} style={{ borderBottom: `1px solid ${colors.border}` }}>
-                      <td style={{ padding: "8px", color: colors.textPrimary }}>{entry.period}</td>
-                      <td style={{ padding: "8px", textAlign: "right", color: colors.textPrimary }}>{entry.value.toLocaleString()}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
+        </ChartErrorBoundary>
         <p style={{ color: colors.textSecondary, fontSize: "12px", marginTop: "12px" }}>All values in ₹ Cr</p>
       </Card>
 
@@ -945,6 +915,17 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
           <div style={{ display: "flex", alignItems: "center", gap: "10px", padding: "16px 0" }}>
             <div className="raycast-spinner" style={{ width: "16px", height: "16px", border: `2px solid ${colors.border}`, borderTopColor: colors.primary, borderRadius: "50%" }} />
             <span style={{ color: colors.textSecondary, fontSize: "14px" }}>Generating AI analysis…</span>
+          </div>
+        </Card>
+      )}
+      {aiError && (
+        <Card className="stock-panel-card raycast-slideUp" style={{ borderLeft: `3px solid ${colors.warning}` }}>
+          <div style={{ display: "flex", alignItems: "flex-start", gap: "12px" }}>
+            <span style={{ color: colors.warning, fontSize: "18px", marginTop: "2px" }}>⚠️</span>
+            <div style={{ display: "grid", gap: "4px", flex: 1 }}>
+              <div style={{ color: colors.warning, fontSize: "13px", fontWeight: "600" }}>AI Analysis Error</div>
+              <div style={{ color: colors.textSecondary, fontSize: "13px" }}>{aiError}</div>
+            </div>
           </div>
         </Card>
       )}

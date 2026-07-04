@@ -46,6 +46,7 @@ class UpstoxPriceService {
   private isConnecting = false;
   private accessToken: string = '';
   private authFailed = false; // Track auth failures to avoid 401 spam
+  private inFlightRequests = new Map<string, Promise<PriceUpdate | null>>(); // Deduplicate concurrent requests
 
   constructor() {
     this.accessToken = ENV.UPSTOX_ACCESS_TOKEN;
@@ -208,6 +209,27 @@ class UpstoxPriceService {
    * Fetch price using REST API as fallback
    */
   async fetchPrice(symbol: string): Promise<PriceUpdate | null> {
+    // Return in-flight request if already fetching
+    if (this.inFlightRequests.has(symbol)) {
+      return await this.inFlightRequests.get(symbol)!;
+    }
+
+    // Create new request and store in-flight promise
+    const requestPromise = this.fetchPriceInternal(symbol);
+    this.inFlightRequests.set(symbol, requestPromise);
+
+    try {
+      return await requestPromise;
+    } finally {
+      // Clean up after request completes
+      this.inFlightRequests.delete(symbol);
+    }
+  }
+
+  /**
+   * Internal fetch implementation
+   */
+  private async fetchPriceInternal(symbol: string): Promise<PriceUpdate | null> {
     // Try cache first
     const cached = await cacheManager.get<PriceUpdate>(CACHE_KEYS.PRICE(symbol));
     if (cached) {
@@ -247,21 +269,24 @@ class UpstoxPriceService {
         return update;
       }
     } catch (error) {
-      console.warn(`[Upstox] REST API fallback failed for ${symbol}:`, error);
+      // Silently suppress 401 errors to reduce console spam
+      if (!(error instanceof Error) || !error.message.includes('401')) {
+        console.warn(`[Upstox] REST API fallback failed for ${symbol}:`, error);
+      }
     }
 
     // Try AlphaVantage API
     try {
       return await this.fetchFromAlphaVantage(symbol);
     } catch (error) {
-      console.warn(`[Upstox] AlphaVantage fallback failed for ${symbol}:`, error);
+      // Silently suppress non-critical errors
     }
 
     // Try Yahoo Finance API
     try {
       return await this.fetchFromYahooFinance(symbol);
     } catch (error) {
-      console.warn(`[Upstox] Yahoo Finance fallback failed for ${symbol}:`, error);
+      // Silently suppress non-critical errors
     }
 
     return null;
