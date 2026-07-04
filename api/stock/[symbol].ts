@@ -1,5 +1,14 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 
+// Symbol aliases for common shortforms
+const symbolAliases: Record<string, string> = {
+  "HDFC": "HDFCBANK",
+  "ICICI": "ICICIBANK",
+  "AXIS": "AXISBANK",
+  "KOTAK": "KOTAKBANK",
+  "INDUSIND": "INDUSINDBK",
+};
+
 // Fetch real stock price from Yahoo Finance
 async function fetchYahooPrice(symbol: string): Promise<any> {
   try {
@@ -78,7 +87,10 @@ export default async function handler(
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const symbol = (req.query.symbol as string || '').toUpperCase().trim();
+  let symbol = (req.query.symbol as string || '').toUpperCase().trim();
+
+  // Resolve symbol aliases
+  symbol = symbolAliases[symbol] || symbol;
 
   if (!symbol) {
     return res.status(400).json({ error: 'Symbol required' });

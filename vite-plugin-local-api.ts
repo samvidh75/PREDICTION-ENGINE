@@ -6,6 +6,15 @@ import type { Plugin, ViteDevServer } from "vite";
 const root = path.dirname(fileURLToPath(import.meta.url));
 const snapshotModule = path.resolve(root, "src/lib/stockResearchSnapshot.ts");
 
+// Symbol aliases for common shortforms
+const symbolAliases: Record<string, string> = {
+  "HDFC": "HDFCBANK",
+  "ICICI": "ICICIBANK",
+  "AXIS": "AXISBANK",
+  "KOTAK": "KOTAKBANK",
+  "INDUSIND": "INDUSINDBK",
+};
+
 async function loadSnapshot(server: ViteDevServer) {
   return server.ssrLoadModule(snapshotModule) as Promise<typeof import("./src/lib/stockResearchSnapshot")>;
 }
@@ -45,7 +54,10 @@ export function localApiPlugin(): Plugin {
           // ── Stock Detail (LIVE DATA FIRST, snapshot fallback) ──
           if (url.startsWith("/api/stock")) {
             const parsed = new URL(url, "http://localhost");
-            const symbol = (parsed.searchParams.get("symbol") ?? decodeURIComponent(url.replace("/api/stock/", "").split("?")[0] ?? "")).toUpperCase();
+            let symbol = (parsed.searchParams.get("symbol") ?? decodeURIComponent(url.replace("/api/stock/", "").split("?")[0] ?? "")).toUpperCase();
+
+            // Resolve symbol aliases
+            symbol = symbolAliases[symbol] || symbol;
 
             const { getPersistedStockResearch } = await loadSnapshot(server);
             const research = await getPersistedStockResearch(symbol).catch(() => null) as any;
