@@ -1,8 +1,8 @@
 import { useEffect, useState, useMemo, useRef, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, BarChart3, Building2, TrendingUp, Activity, Search, ChevronDown, ChevronUp, ExternalLink, Zap } from "lucide-react";
+import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Building2, TrendingUp, ChevronDown, ChevronUp, ExternalLink } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, Line, LineChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts";
+import { Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, Line, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts";
 import { Badge } from "../ui/Badge";
 import { Button } from "../ui/Button";
 import { Card, CardLabel } from "../ui/Card";
@@ -12,14 +12,12 @@ import { PriceFlash } from "../ui/PriceFlash";
 import { BrokerHandoffModal } from "../components/BrokerHandoffModal";
 import { ThesisHistory } from "../components/ThesisHistory";
 import { listAvailableBrokers } from "../commercial/BrokerHandoffService";
-import type { BrokerEntry } from "../commercial/BrokerRegistry";
 import { fallbackAnalysis, generateStockAnalysis } from "../services/llm/AIAnalysisService";
 import type { AIAnalysis } from "../services/llm/AIAnalysisService";
-import { colors, typography, radius, animation, shadows } from "../design/tokens";
-import { InteractiveButton, MetricCard, ExpandingPanel, HoverCard } from "../ui/MicroInteractions";
+import { colors, typography, radius, shadows } from "../design/tokens";
+import { InteractiveButton, MetricCard } from "../ui/MicroInteractions";
 import { useSeo } from "../frontend/seo/useSeo";
 import { buildCompanySeo } from "../frontend/seo/companySeo";
-import { PriceTargets } from "../components/PriceTargets";
 import { NativeAd } from "../components/NativeAd";
 import { formatNumber } from "../services/ui/dataFormatting";
 import { toResearchAiContext } from "../components/ai-orchestrator/researchAiContext";
@@ -27,11 +25,11 @@ import {
   enrichResearchContextWithEvents,
   buildNewsEventPack,
 } from "../components/ai-orchestrator/eventEvidenceAiContext";
-import { buildEvidenceRetrievalContext, buildEvidenceRetrievalAggregate } from "../systems/market-brain/evidenceRetrievalOrchestrator";
+import { buildEvidenceRetrievalAggregate } from "../systems/market-brain/evidenceRetrievalOrchestrator";
 import { compressEventEvidencePack } from "../systems/market-brain/eventEvidencePack";
 import type { EvidenceRetrievalAggregate } from "../research/contracts/evidenceRetrievalContracts";
 import { EvidenceSummaryPanel } from "../ui/EvidenceSummaryPanel";
-import { getStockResearch, type StockResearchDetail as LocalStockResearchDetail } from "../lib/stockResearch";
+import { getStockResearch } from "../lib/stockResearch";
 
 type StockResearchDetail = {
   symbol: string;
@@ -386,11 +384,9 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
   const [showFinancialTable, setShowFinancialTable] = useState(false);
   const [financialMetric, setFinancialMetric] = useState<FinancialMetric>("revenue");
   const [financialPeriod, setFinancialPeriod] = useState<FinancialPeriod>("annual");
-  const [brokerModalOpen, setBrokerModalOpen] = useState(false);
   const [isBrokerOpen, setIsBrokerOpen] = useState(false);
   const [stickyVisible, setStickyVisible] = useState(false);
   const [showFooter, setShowFooter] = useState(true);
-  const [sectorExpanded, setSectorExpanded] = useState(false);
   const [gpuDelta, setGpuDelta] = useState<{ delta: number; signal: string } | null>(null);
 
   const [period, setPeriod] = useState(initialPeriod);
