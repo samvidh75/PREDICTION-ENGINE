@@ -23,6 +23,7 @@ import { startWebSocketDataProducer } from "../services/market/websocketDataProd
 import { MetricsCollector } from "../commercial/api/monitoring/MetricsCollector.js";
 import { registerLiveQuotesWs } from "../backend/routes/liveQuotesWs.js";
 import { registerFeatureRoutes } from "../backend/web/routes/index.js";
+import { registerAIRoutes } from "./aiRoutes.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -315,6 +316,58 @@ async function bootstrap() {
   // Start WebSocket data producer — polls Postgres and broadcasts price ticks
   startWebSocketDataProducer(broadcastTickerTick);
 
+  // ── WebSocket: Event alerts (corporate actions, breakouts, etc) ──────
+  const alertConnections = new Set<any>();
+
+  server.get("/ws/v1/event-alerts", { websocket: true }, (socket) => {
+    alertConnections.add(socket);
+    server.log.info(`[alerts-ws] Client connected. Pool size: ${alertConnections.size}`);
+
+    socket.on("message", (raw: string) => {
+      try {
+        const msg = JSON.parse(raw);
+        if (msg.type === "subscribe" && Array.isArray(msg.tickers)) {
+          (socket as any).subscribedAlerts = new Set(msg.tickers.map((t: string) => t.toUpperCase()));
+          server.log.info(`[alerts-ws] Client subscribed to alerts for ${msg.tickers.length} tickers`);
+        }
+      } catch {
+        // ignore malformed messages
+      }
+    });
+
+    socket.on("close", () => {
+      alertConnections.delete(socket);
+      server.log.info(`[alerts-ws] Client disconnected. Pool size: ${alertConnections.size}`);
+    });
+
+    socket.on("error", () => {
+      alertConnections.delete(socket);
+    });
+
+    // Send initial connection confirmation
+    socket.send(JSON.stringify({ type: "connected", message: "Event alerts stream active" }));
+  });
+
+  // Broadcast alert to subscribed clients
+  function broadcastAlert(ticker: string, message: string, alertType: string) {
+    const upper = ticker.toUpperCase();
+    const payload = JSON.stringify({
+      type: "event_alert_push",
+      ticker: upper,
+      message,
+      alertType,
+      timestamp: Date.now(),
+    });
+    for (const conn of alertConnections) {
+      const subs = (conn as any).subscribedAlerts as Set<string> | undefined;
+      if (subs && subs.size > 0 && !subs.has(upper)) continue; // skip unsubscribed
+      try { conn.send(payload); } catch { alertConnections.delete(conn); }
+    }
+  }
+
+  // Attach broadcast function to server
+  (server as any).broadcastAlert = broadcastAlert;
+
   server.get("/version", async () => {
     const { readdirSync } = await import("fs");
     const distPath = join(process.cwd(), "dist", "public");
@@ -416,6 +469,9 @@ async function bootstrap() {
 
   // ── API routes: /api/stock, /api/search ────────────────────────────
   await registerApiRoutes(server);
+
+  // ── AI Inference routes: /api/ai/analyze, /api/ai/chat, /api/ai/status
+  await registerAIRoutes(server);
 
   // ── Static file serving ─────────────────────────────────────────
   const distPath = join(process.cwd(), "dist", "public");

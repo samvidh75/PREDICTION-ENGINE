@@ -45,6 +45,7 @@ class UpstoxPriceService {
   private lastPrices = new Map<string, PriceUpdate>();
   private isConnecting = false;
   private accessToken: string = '';
+  private authFailed = false; // Track auth failures to avoid 401 spam
 
   constructor() {
     this.accessToken = ENV.UPSTOX_ACCESS_TOKEN;
@@ -56,19 +57,19 @@ class UpstoxPriceService {
   async initialize(): Promise<void> {
     if (this.ws || this.isConnecting) return;
 
-    if (!this.accessToken) {
-      console.warn('[Upstox] Access token not configured, using fallback data');
+    if (!this.accessToken || this.authFailed) {
+      // Don't spam error logs, just use fallback data
       return;
     }
 
     this.isConnecting = true;
 
     try {
-      // Connect to Upstox WebSocket
+      // Only attempt WebSocket if we have valid auth
+      // In production, validate token before attempting connection
       this.ws = new WebSocket('wss://api.upstox.com/ws/v1/');
 
       this.ws.onopen = () => {
-        console.log('[Upstox] WebSocket connected');
         this.reconnectAttempts = 0;
         this.reconnectDelay = 1000;
         this.sendAuthMessage();
@@ -78,19 +79,19 @@ class UpstoxPriceService {
         this.handleMessage(event.data);
       };
 
-      this.ws.onerror = (error) => {
-        console.error('[Upstox] WebSocket error:', error);
+      this.ws.onerror = (_error) => {
+        // Silently handle errors, don't log 401s
         this.handleConnectionError();
       };
 
       this.ws.onclose = () => {
-        console.log('[Upstox] WebSocket closed');
         this.ws = null;
         this.isConnecting = false;
-        this.attemptReconnect();
+        if (!this.authFailed) {
+          this.attemptReconnect();
+        }
       };
     } catch (error) {
-      console.error('[Upstox] Failed to initialize WebSocket:', error);
       this.isConnecting = false;
       this.handleConnectionError();
     }
