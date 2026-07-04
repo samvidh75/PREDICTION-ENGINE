@@ -13,6 +13,7 @@ import PortfolioAnalytics from './PortfolioAnalytics';
 import AlertCenter from './AlertCenter';
 import TaxPlanner from './TaxPlanner';
 import DividendTracker from './DividendTracker';
+import AdvancedChartingPanel from './AdvancedChartingPanel';
 import type { Portfolio } from '../../utils/portfolioStorage';
 
 interface BrowserAiChatProps {
@@ -272,6 +273,10 @@ export default function BrowserAiChat({ ticker }: BrowserAiChatProps) {
 
       {isReady && portfolio && portfolio.holdings.length > 0 && (
         <DividendTracker />
+      )}
+
+      {isReady && portfolio && portfolio.holdings.length > 0 && (
+        <AdvancedChartingPanel />
       )}
 
       {isReady && portfolio && portfolio.holdings.length > 0 && (

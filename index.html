@@ -6,7 +6,7 @@
 
     <!-- ── Security Headers ─────────────────────────────────────────────── -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https:; script-src 'self' https://www.googletagmanager.com https://www.google-analytics.com 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' https: data:; connect-src 'self' https: wss:; frame-ancestors 'none'; upgrade-insecure-requests;" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https:; script-src 'self' https://www.googletagmanager.com https://www.google-analytics.com 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' https: data:; connect-src 'self' https: wss:; frame-ancestors 'none'; upgrade-insecure-requests;" />
     <meta http-equiv="Strict-Transport-Security" content="max-age=31536000; includeSubDomains" />
     <meta http-equiv="X-Frame-Options" content="DENY" />
     <meta http-equiv="X-Content-Type-Options" content="nosniff" />
@@ -25,15 +25,7 @@
     <meta name="google-site-verification" content="WnKlTQpoqijYSd0gZeEU9fczCAZZddxpfuI4jYYzCEc" />
 
     <!-- ── Analytics ────────────────────────────────────────────────────── -->
-    <link rel="preconnect" href="https://www.googletagmanager.com" />
-    <link rel="preconnect" href="https://www.google-analytics.com" />
     <link rel="dns-prefetch" href="https://www.google-analytics.com" />
-
-    <!-- ── Fonts (Inter — primary typography per DESIGN.md) ─────────────── -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'" />
-    <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" /></noscript>
 
     <!-- ── Favicon / Icons (critical for Google search snippet) ─────────── -->
     <link rel="icon" href="/favicon.ico?v=20260705" type="image/x-icon" />
@@ -75,27 +67,34 @@
     <meta name="apple-mobile-web-app-title" content="STOCKEX" />
     <link rel="manifest" href="/manifest.json" />
 
-    <!-- ── Google Analytics (GA4) — deferred to DOMContentLoaded ───────── -->
+    <!-- ── Google Analytics (GA4) — deferred until after load/idle ─────── -->
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
-      // Defer GA script loading until page is interactive
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', () => {
-          const gaScript = document.createElement('script');
-          gaScript.src = 'https://www.googletagmanager.com/gtag/js?id=G-ZX8Y4BFK6Z';
-          gaScript.async = true;
-          document.head.appendChild(gaScript);
-          gtag('js', new Date());
-          gtag('config', 'G-ZX8Y4BFK6Z', { send_page_view: true, cookie_flags: 'max-age=7200;secure;samesite=none' });
-        });
-      } else {
+
+      function loadAnalytics() {
+        if (window.__stockexGaLoaded) return;
+        window.__stockexGaLoaded = true;
         const gaScript = document.createElement('script');
         gaScript.src = 'https://www.googletagmanager.com/gtag/js?id=G-ZX8Y4BFK6Z';
         gaScript.async = true;
         document.head.appendChild(gaScript);
         gtag('js', new Date());
         gtag('config', 'G-ZX8Y4BFK6Z', { send_page_view: true, cookie_flags: 'max-age=7200;secure;samesite=none' });
+      }
+
+      function deferAnalytics() {
+        if ('requestIdleCallback' in window) {
+          window.requestIdleCallback(loadAnalytics, { timeout: 4000 });
+          return;
+        }
+        window.setTimeout(loadAnalytics, 2500);
+      }
+
+      if (document.readyState === 'complete') {
+        deferAnalytics();
+      } else {
+        window.addEventListener('load', deferAnalytics, { once: true });
       }
     </script>
 

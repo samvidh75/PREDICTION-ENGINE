@@ -2,9 +2,6 @@
    BASELINE — Reset + Raycast dark canvas defaults
    ============================================================================ */
 
-/* INTER FONT — loaded with ss03 stylistic set */
-@import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,100..900&display=swap');
-
 /* RESET */
 *,
 *::before,
@@ -23,9 +20,8 @@ html {
 body {
   width: 100%;
   height: 100%;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Segoe UI', Roboto, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   font-feature-settings: "calt", "kern", "liga", "ss03";
-  font-optical-sizing: auto;
   font-size: 16px;
   line-height: 1.6;
   color: #a0a0a0;

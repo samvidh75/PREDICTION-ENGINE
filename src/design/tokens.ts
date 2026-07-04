@@ -88,7 +88,7 @@ export const colors = {
 
 // TYPOGRAPHY — Inter with Apple-style fallbacks and ss03 stylistic set
 export const typography = {
-  fontFamily: '\'Inter\', -apple-system, BlinkMacSystemFont, \'SF Pro Display\', \'SF Pro Text\', \'Segoe UI\', Roboto, sans-serif',
+  fontFamily: '-apple-system, BlinkMacSystemFont, \'SF Pro Display\', \'SF Pro Text\', \'Segoe UI\', Roboto, Helvetica, Arial, sans-serif',
   fontFeature: '"calt", "kern", "liga", "ss03"',
 
   displayXl: { size: '64px', weight: 600, line: '1.1', track: '0' },

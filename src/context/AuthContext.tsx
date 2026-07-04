@@ -18,8 +18,8 @@
  */
 
 import React, { createContext, useContext, useEffect, useState, type ReactNode } from "react";
-import { authService, type AuthUser } from "../services/auth/authService";
-import { browserLLM } from "../services/ai/BrowserLLM";
+import type { AuthUser } from "../services/auth/authService";
+import { loadAuthSession } from "../services/auth/sessionStore";
 
 // ── Context shape ──────────────────────────────────────────────────────────
 
@@ -38,28 +38,74 @@ const AuthContext = createContext<AuthContextValue>({
 // ── Provider ───────────────────────────────────────────────────────────────
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<AuthUser | null>(null);
-  const [loading, setLoading] = useState(true);
+  const initialSession = loadAuthSession();
+  const [user, setUser] = useState<AuthUser | null>(
+    initialSession.status === "authenticated"
+      ? {
+          uid: initialSession.uid ?? "",
+          email: initialSession.email,
+          displayName: initialSession.displayName,
+          provider: initialSession.provider ?? "email",
+          isNewUser: false,
+        }
+      : null,
+  );
+  const [loading, setLoading] = useState(initialSession.status === "authenticated");
 
   useEffect(() => {
-    try {
-      const unsub = authService.subscribeSession((authUser) => {
-        setUser(authUser);
-        setLoading(false);
+    let unsub: (() => void) | undefined;
+    let cancelled = false;
 
-        // Trigger LLM model loading in background when user logs in (40-50s window)
-        if (authUser && !browserLLM.isReady()) {
-          console.log("[AuthProvider] Starting LLM model download...");
-          browserLLM.loadModel().then((success) => {
-            if (success) {
-              console.log("[AuthProvider] LLM model loaded successfully");
-            } else {
-              console.warn("[AuthProvider] LLM model load failed, will use server fallback");
-            }
+    const runWhenIdle = (task: () => void, timeout = 3000) => {
+      if (typeof window === "undefined") return;
+      if ("requestIdleCallback" in window) {
+        const id = window.requestIdleCallback(task, { timeout });
+        return () => window.cancelIdleCallback(id);
+      }
+      const id = globalThis.setTimeout(task, timeout);
+      return () => globalThis.clearTimeout(id);
+    };
+
+    try {
+      const cancelAuthBoot = runWhenIdle(() => {
+        void import("../services/auth/authService")
+          .then(({ authService }) => {
+            if (cancelled) return;
+
+            unsub = authService.subscribeSession((authUser) => {
+              setUser(authUser);
+              setLoading(false);
+
+              if (!authUser) return;
+
+              void import("../services/ai/BrowserLLM").then(({ browserLLM }) => {
+                if (cancelled || browserLLM.isReady()) return;
+                console.log("[AuthProvider] Starting LLM model download...");
+                void browserLLM.loadModel().then((success) => {
+                  if (success) {
+                    console.log("[AuthProvider] LLM model loaded successfully");
+                  } else {
+                    console.warn("[AuthProvider] LLM model load failed, will use server fallback");
+                  }
+                });
+              });
+            });
+          })
+          .catch((err: unknown) => {
+            const msg =
+              err && typeof err === "object" && "message" in err
+                ? (err as { message: string }).message
+                : "Firebase auth unavailable";
+            console.warn("[AuthProvider] Failed to bootstrap auth session:", msg);
+            setLoading(false);
           });
-        }
-      });
-      return unsub;
+      }, 2500);
+
+      return () => {
+        cancelled = true;
+        cancelAuthBoot?.();
+        unsub?.();
+      };
     } catch (err: unknown) {
       const msg =
         err && typeof err === "object" && "message" in err
