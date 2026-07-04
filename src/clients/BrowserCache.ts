@@ -11,16 +11,20 @@ const DEFAULT_CONFIG: CacheConfig = {
 /**
  * Browser-side IndexedDB cache for quotes.
  * Enables offline operation and reduces API calls.
- * No server sync — purely local persistent storage.
+ * Cross-tab sync via localStorage events.
  */
 export class BrowserCache {
   private db: IDBDatabase | null = null;
   private config: CacheConfig;
   private initPromise: Promise<void>;
+  private syncListeners: Map<string, (quote: any) => void> = new Map();
+  private cacheVersion = 0;
+  private readonly SYNC_KEY = 'prediction-engine:cache-sync';
 
   constructor(config: Partial<CacheConfig> = {}) {
     this.config = { ...DEFAULT_CONFIG, ...config };
     this.initPromise = this.init();
+    this.setupCrossTabSync();
   }
 
   /**
@@ -95,8 +99,50 @@ export class BrowserCache {
   }
 
   /**
+   * Setup cross-tab sync via storage events.
+   * When another tab updates cache, this tab receives the update.
+   */
+  private setupCrossTabSync() {
+    if (typeof window === 'undefined') return;
+
+    window.addEventListener('storage', (event) => {
+      if (event.key === this.SYNC_KEY && event.newValue) {
+        try {
+          const data = JSON.parse(event.newValue);
+          const { quote, version } = data;
+
+          // Only process if version is newer (prevent infinite loops)
+          if (version > this.cacheVersion) {
+            this.cacheVersion = version;
+            this.set(quote).catch((err) =>
+              console.error('[BrowserCache] Cross-tab sync failed:', err),
+            );
+
+            // Notify sync listeners
+            const callback = this.syncListeners.get(quote.symbol);
+            if (callback) {
+              callback(quote);
+            }
+          }
+        } catch (error) {
+          console.error('[BrowserCache] Failed to parse sync event:', error);
+        }
+      }
+    });
+  }
+
+  /**
+   * Subscribe to cache updates from other tabs.
+   */
+  onSyncUpdate(symbol: string, callback: (quote: any) => void) {
+    this.syncListeners.set(symbol, callback);
+    return () => this.syncListeners.delete(symbol);
+  }
+
+  /**
    * Store a quote in cache with appropriate TTL.
    * TTL is based on quote type (price: 5min, fundamental: 1hr, technical: 1d).
+   * Emits sync event for other tabs.
    */
   async set(quote: UnifiedQuote, ttlMs?: number): Promise<void> {
     await this.initPromise;
@@ -110,7 +156,23 @@ export class BrowserCache {
       const store = tx.objectStore(STORE_NAME);
       const request = store.put(cached);
 
-      request.onsuccess = () => resolve();
+      request.onsuccess = () => {
+        // Emit sync event for other tabs
+        this.cacheVersion++;
+        try {
+          localStorage.setItem(
+            this.SYNC_KEY,
+            JSON.stringify({
+              quote,
+              version: this.cacheVersion,
+              timestamp: Date.now(),
+            }),
+          );
+        } catch (err) {
+          console.error('[BrowserCache] Failed to emit sync event:', err);
+        }
+        resolve();
+      };
       request.onerror = () => reject(request.error);
     });
   }

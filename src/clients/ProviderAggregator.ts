@@ -3,6 +3,20 @@ import { yfinanceClient } from './YFinanceClient';
 import { nseClient } from './NSEClient';
 import { screenerClient } from './ScreenerClient';
 import { browserCache } from './BrowserCache';
+import { providerHealthMonitor } from '../services/health/ProviderHealthMonitor';
+
+export interface PriceValidation {
+  symbol: string;
+  price: number; // median
+  providers: {
+    yfinance?: number;
+    jugasad?: number;
+    screener?: number;
+  };
+  outliers: Array<{ provider: string; price: number; deviation: number }>;
+  confidence: number; // 0-100
+  timestamp: number;
+}
 
 /**
  * Aggregates multiple data providers with intelligent fallback.
@@ -45,6 +59,7 @@ export class ProviderAggregator {
     // Try each provider with timeout
     for (const provider of sortedProviders) {
       try {
+        const startTime = Date.now();
         const result = await Promise.race([
           provider.fetch(),
           new Promise((_resolve, reject) =>
@@ -53,10 +68,17 @@ export class ProviderAggregator {
         ]) as { success: boolean; quote?: UnifiedQuote; error?: string };
 
         if (result.success && result.quote) {
+          const responseTime = Date.now() - startTime;
+          providerHealthMonitor.recordSuccess(
+            provider.name as any,
+            responseTime,
+          );
           return result.quote;
         }
       } catch {
-        // Continue to next provider on error or timeout
+        providerHealthMonitor.recordFailure(
+          provider.name as any,
+        );
       }
     }
 
@@ -105,19 +127,92 @@ export class ProviderAggregator {
   }
 
   /**
+   * Validate a price by fetching from all 3 providers and comparing.
+   * Returns median price + provider breakdown + outliers.
+   */
+  async validatePrice(symbol: string): Promise<PriceValidation> {
+    const providers = [
+      { name: 'yfinance', client: yfinanceClient },
+      { name: 'jugasad', client: nseClient },
+      { name: 'screener', client: screenerClient },
+    ];
+
+    const priceMap: { [key: string]: number } = {};
+    const responseTimes: number[] = [];
+
+    // Fetch from all providers in parallel
+    await Promise.allSettled(
+      providers.map(async (p) => {
+        const startTime = Date.now();
+        const result = await p.client.fetchQuote(symbol, false);
+        const responseTime = Date.now() - startTime;
+        responseTimes.push(responseTime);
+
+        if (result.success && result.quote?.price) {
+          priceMap[p.name] = result.quote.price;
+          providerHealthMonitor.recordSuccess(
+            p.name as any,
+            responseTime,
+          );
+        } else {
+          providerHealthMonitor.recordFailure(
+            p.name as any,
+          );
+        }
+      }),
+    );
+
+    // Calculate median price
+    const prices = Object.values(priceMap).sort((a, b) => a - b);
+    const median =
+      prices.length === 0
+        ? 0
+        : prices.length % 2 === 0
+          ? (prices[prices.length / 2 - 1] + prices[prices.length / 2]) / 2
+          : prices[Math.floor(prices.length / 2)];
+
+    // Find outliers (> 1% away from median)
+    const outliers: Array<{ provider: string; price: number; deviation: number }> = [];
+    for (const [provider, price] of Object.entries(priceMap)) {
+      const deviation = Math.abs(price - median) / median;
+      if (deviation > 0.01) {
+        outliers.push({
+          provider,
+          price,
+          deviation: Math.round(deviation * 10000) / 100, // as percentage
+        });
+      }
+    }
+
+    // Calculate confidence (0-100)
+    const confidence =
+      prices.length === 3 ? 100 : prices.length === 2 ? 85 : prices.length === 1 ? 60 : 0;
+
+    return {
+      symbol,
+      price: Math.round(median * 100) / 100,
+      providers: {
+        yfinance: priceMap['yfinance'],
+        jugasad: priceMap['jugasad'],
+        screener: priceMap['screener'],
+      },
+      outliers,
+      confidence,
+      timestamp: Date.now(),
+    };
+  }
+
+  /**
    * Smart cache validation: if we have 2+ providers disagreeing on price,
    * flag it and use median.
    */
   async validateAndMedianPrice(symbols: string[]): Promise<Map<string, number>> {
     const priceMap = new Map<string, number>();
 
-    // TODO: Implement multi-provider comparison
-    // For now, just return first available
-
     for (const symbol of symbols) {
-      const quote = await this.getQuote(symbol);
-      if (quote) {
-        priceMap.set(symbol, quote.price);
+      const validation = await this.validatePrice(symbol);
+      if (validation.price > 0) {
+        priceMap.set(symbol, validation.price);
       }
     }
 

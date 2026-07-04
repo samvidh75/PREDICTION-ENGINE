@@ -6,6 +6,8 @@ import StockExDashboard from "../components/StockExDashboard";
 import PersonalizedFeed from "../components/PersonalizedFeed";
 import { EnhancedScreener } from "../components/EnhancedScreener";
 import Watchlist from "../components/Watchlist";
+import ProviderHealthIndicator from "../components/ProviderHealthIndicator";
+import TrendingStocksWidget from "../components/TrendingStocksWidget";
 import { loadAuthSession } from "../services/auth/sessionStore";
 import { layout } from "../design/tokens";
 
@@ -25,7 +27,9 @@ export default function DashboardPage() {
         }}
       >
         <StockExDashboard userId={userId} hasProTier={hasProTier} />
+        <ProviderHealthIndicator />
         <Watchlist />
+        <TrendingStocksWidget />
         <EnhancedScreener />
         <PersonalizedFeed />
       </div>
