@@ -39,6 +39,7 @@ const PortfolioAnalyticsPage = lazy(() => import("../pages/PortfolioAnalyticsPag
 const LiveMarketPage = lazy(() => import("../pages/LiveMarketPage"));
 const StockDetailPage = lazy(() => import("../pages/StockDetailPage"));
 const PortfolioDetailPage = lazy(() => import("../pages/PortfolioDetailPage"));
+const StockStoryPage = lazy(() => import("../pages/StockStoryPage"));
 
 const SHOW_ABOUT_PAGE = import.meta.env.VITE_SHOW_ABOUT_PAGE === "true";
 
@@ -93,6 +94,7 @@ export function AppRoutes() {
           <Route path="/about" element={<Navigate to="/dashboard" replace />} />
         )}
 
+        <Route path="/stock-story" element={<Suspense fallback={<RouteFallback />}><PublicLayout><StockStoryPage /></PublicLayout></Suspense>} />
         <Route path="/pricing" element={<Suspense fallback={<RouteFallback />}><PublicLayout><PricingPage /></PublicLayout></Suspense>} />
         <Route path="/trust" element={<Suspense fallback={<RouteFallback />}><PublicLayout><Trust /></PublicLayout></Suspense>} />
         <Route path="/dashboard" element={<Suspense fallback={<RouteFallback />}><PublicLayout><HomePage /></PublicLayout></Suspense>} />

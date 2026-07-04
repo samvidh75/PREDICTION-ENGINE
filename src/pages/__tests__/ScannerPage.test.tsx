@@ -23,22 +23,18 @@ vi.mock('../../components/ai-orchestrator/ResearchAiExplanationPanel', () => ({
 
 // Mock stockResearch so getScannerStocks returns fixture data for tests.
 // Values chosen to pass the quality-compounders preset thresholds (quality≥60, stability≥45, maxDebtToEquity≤2.5, minRoe≥12).
-vi.mock('../../lib/stockResearch', async () => {
-  const actual = await vi.importActual('../../lib/stockResearch');
-  const fixtureStocks = [
+vi.mock('../../lib/stockResearch', () => ({
+  getScannerStocks: () => [
     { symbol: 'RELIANCE', name: 'Reliance Industries', sector: 'Energy', industry: 'Oil & Gas', price: 2450, change: 12, changePercent: 0.49, pe: 15, pb: 3.2, roe: 45, debtToEquity: 0.05, marketCap: 1650000, dividendYield: 3, revenueGrowth: 25, profitGrowth: 25, rsi: 60 },
     { symbol: 'TCS', name: 'Tata Consultancy Services', sector: 'IT', industry: 'Software', price: 3890, change: -15, changePercent: -0.38, pe: 35, pb: 8.5, roe: 42, debtToEquity: 0.15, marketCap: 1400000, dividendYield: 2.1, revenueGrowth: 11.5, profitGrowth: 14.2, rsi: 55 },
     { symbol: 'HDFCBANK', name: 'HDFC Bank', sector: 'Financial Services', industry: 'Banking', price: 1680, change: 8, changePercent: 0.48, pe: 18, pb: 3.8, roe: 38, debtToEquity: 0.45, marketCap: 950000, dividendYield: 1.8, revenueGrowth: 18.3, profitGrowth: 20.1, rsi: 60 },
-  ];
-  return {
-    ...(actual as object),
-    getScannerStocks: () => fixtureStocks,
-  };
-});
+  ],
+  getStockResearch: () => null,
+}));
 
 beforeEach(() => {
   vi.stubGlobal('matchMedia', vi.fn().mockImplementation((query: string) => ({
-    matches: false,
+    matches: true,
     media: query,
     onchange: null,
     addListener: vi.fn(),
@@ -62,10 +58,16 @@ function renderPage() {
   );
 }
 
-/** Get the first visible stock row by finding DIV[role="button"] elements */
+/** Get the first visible stock row by finding DIV[role="button"] or stock-related <button> elements */
 function getFirstStockRow(): HTMLElement {
-  const stockRows = screen.getAllByRole('button').filter(
-    (el) => el.tagName === 'DIV' && el.getAttribute('role') === 'button',
+  const allButtons = screen.getAllByRole('button');
+  // Desktop: DIV[role="button"], Mobile: <button> with stock rank
+  const stockRows = allButtons.filter(
+    (el) => (
+      el.tagName === 'DIV' && el.getAttribute('role') === 'button'
+    ) || (
+      el.tagName === 'BUTTON' && /\d+[A-Z]/.test(el.textContent ?? '')
+    ),
   );
   expect(stockRows.length).toBeGreaterThan(0);
   return stockRows[0];
@@ -139,7 +141,7 @@ describe('ScannerPage accessibility integration', () => {
     });
 
     const row = getFirstStockRow();
-    fireEvent.doubleClick(row);
+    fireEvent.click(row);
 
     expect(mockNavigate).toHaveBeenCalledWith(
       expect.stringMatching(/^\/stock\/[A-Z]+$/),

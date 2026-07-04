@@ -38,9 +38,9 @@ describe('PortfolioPage', () => {
     expect(screen.getByText('Add Holding Manually')).toBeTruthy();
   });
 
-  it('renders disclaimer', async () => {
+  it('renders disclaimer', () => {
     render(<PortfolioPage />);
-    expect(await screen.findByText(/Not a broker account/i, {}, { timeout: 3000 })).toBeTruthy();
+    expect(screen.getByText(/Not a broker account/i)).toBeTruthy();
   });
 
   it('navigation works — Go to Watchlist', () => {

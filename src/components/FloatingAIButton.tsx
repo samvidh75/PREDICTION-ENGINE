@@ -1,17 +1,24 @@
 /**
  * Floating AI Button
  * Appears on every page in bottom-right corner
- * Launches offline Stockex LLM chat
+ * Launches offline Stockex LLM chat with browser-based inference
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { colors } from '../design/tokens';
+import { browserLLM } from '../services/ai/BrowserLLM';
 
 export default function FloatingAIButton() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Array<{ role: 'user' | 'assistant'; content: string }>>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [llmReady, setLlmReady] = useState(false);
+
+  useEffect(() => {
+    // Initialize LLM on component mount
+    browserLLM.initialize().then(setLlmReady);
+  }, []);
 
   const handleSend = async () => {
     if (!input.trim()) return;
@@ -22,7 +29,17 @@ export default function FloatingAIButton() {
     setIsLoading(true);
 
     try {
-      // Simulate LLM response (would be replaced with actual offline LLM)
+      // Try browser LLM first
+      if (llmReady) {
+        const response = await browserLLM.generateResponse(userMessage);
+        if (response) {
+          setMessages((prev) => [...prev, { role: 'assistant', content: response.text }]);
+          setIsLoading(false);
+          return;
+        }
+      }
+
+      // Fallback to server
       const response = await fetch('/api/ai/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -37,7 +54,7 @@ export default function FloatingAIButton() {
           ...prev,
           {
             role: 'assistant',
-            content: 'Unable to connect. Please try again.',
+            content: 'Unable to generate response. Please try again.',
           },
         ]);
       }
@@ -46,7 +63,7 @@ export default function FloatingAIButton() {
         ...prev,
         {
           role: 'assistant',
-          content: 'Error connecting to AI. Offline mode not available.',
+          content: 'Error generating response. Powered by StockEx AI.',
         },
       ]);
     } finally {
@@ -120,7 +137,10 @@ export default function FloatingAIButton() {
                   fontSize: '14px',
                 }}
               >
-                Ask about stocks, analysis, or trends. Powered by StockEx LLM.
+                Ask about stocks, P/E, ROE, debt ratios, valuations.
+                <div style={{ fontSize: '12px', marginTop: '8px', opacity: 0.7 }}>
+                  🤖 {llmReady ? 'AI Ready - Running on browser' : 'Loading AI...'}
+                </div>
               </div>
             )}
             {messages.map((msg, idx) => (

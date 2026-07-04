@@ -252,7 +252,7 @@ export default function PortfolioPage() {
             </Button>
           </div>
           <p style={{ color: colors.body, fontSize: "12px", margin: "32px 0 0 0", fontStyle: "italic", opacity: 0.6 }}>
-            Portfolio research context only.
+            Not a broker account. Portfolio research context only.
           </p>
         </Card>
       </div>
@@ -394,7 +394,7 @@ export default function PortfolioPage() {
               </Button>
             </div>
             <p style={{ color: colors.body, fontSize: "12px", margin: "32px 0 0 0", fontStyle: "italic", opacity: 0.6 }}>
-              Portfolio research context only. Not a broker account.
+              Portfolio research context only.
             </p>
           </Card>
         </StaggerContainer>
