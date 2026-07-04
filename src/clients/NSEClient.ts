@@ -7,7 +7,7 @@ import { browserCache } from './BrowserCache';
  * Fallback: screener.in data via ScreenerClient
  */
 export class NSEClient {
-  private readonly baseUrl = process.env.REACT_APP_NSE_PROXY_URL || 'https://api.jugasad.io/nse';
+  private readonly baseUrl = (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_NSE_PROXY_URL) || 'https://api.jugasad.io/nse';
   private lastError: Error | null = null;
 
   /**

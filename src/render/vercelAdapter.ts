@@ -48,7 +48,7 @@ export function adaptVercelHandler(handler: VercelHandler) {
         method: fastifyReq.method,
         url: fastifyReq.url,
         body: fastifyReq.body,
-        cookies: fastifyReq.cookies as Record<string, string> ?? {},
+        cookies: (fastifyReq as any).cookies as Record<string, string> ?? {},
       };
 
       let responded = false;
@@ -77,7 +77,7 @@ export function adaptVercelHandler(handler: VercelHandler) {
         redirect(code: number, url: string) {
           if (responded) return;
           responded = true;
-          fastifyReply.redirect(code, url);
+          fastifyReply.redirect(url, code);
           resolve();
         },
         getHeader(key: string) {

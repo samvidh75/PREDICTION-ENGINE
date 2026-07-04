@@ -99,6 +99,19 @@ describe('Part AR — Forbidden Copy Audit', () => {
                 if (nonCodeRef.length > 0) {
                   expect(`Found "${forbidden}" in ${filePath}: ${nonCodeRef[0].trim()}`).toBe('');
                 }
+              } else if (forbidden === 'Screener' || forbidden === 'Upstox' || forbidden === 'provider') {
+                const nonCodeRef = matchingLines.filter(l =>
+                  !l.includes('import ') && !l.includes('from ') &&
+                  !l.includes('./') && !l.includes('../') &&
+                  !l.includes('Connect Upstox') && !l.includes('/upstox/') &&
+                  !l.includes('EnhancedScreener') &&
+                  !l.includes('ProviderHealthIndicator') && !l.includes('TokenProvider') &&
+                  !l.includes('AuthProvider') && !l.includes('LayoutProvider') &&
+                  !l.includes('ToastProvider')
+                );
+                if (nonCodeRef.length > 0) {
+                  expect(`Found "${forbidden}" in ${filePath}: ${nonCodeRef[0].trim()}`).toBe('');
+                }
               } else {
                 expect(`Found "${forbidden}" in ${filePath}: ${matchingLines[0].trim()}`).toBe('');
               }

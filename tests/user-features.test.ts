@@ -5,17 +5,82 @@
 
 import { describe, test, expect, vi, beforeEach } from 'vitest';
 
+const mockStore = new Map<string, Map<string, unknown>>();
+const indexData = new Map<string, Array<{ key: string; value: unknown }>>();
+
+function getStore(name: string): Map<string, unknown> {
+  if (!mockStore.has(name)) mockStore.set(name, new Map());
+  return mockStore.get(name)!;
+}
+
+const INDEX_FIELD_MAP: Record<string, string> = {
+  'by-symbol': 'symbol',
+  'by-date': 'entryDate',
+  'by-position-id': 'positionId',
+};
+
+function wrapStore(name: string) {
+  const idx = (indexName: string) => {
+    const entries = Array.from(getStore(name).entries()).map(([k, v]) => ({ key: k, value: v }));
+    const field = INDEX_FIELD_MAP[indexName] || indexName.replace('by-', '');
+    return {
+      getAll: async (query: string) =>
+        entries
+          .filter((e) => (e.value as Record<string, unknown>)[field] === query)
+          .map((e) => e.value),
+    };
+  };
+  return {
+    get: vi.fn(async (key: string) => getStore(name).get(key)),
+    getAll: vi.fn(async () => Array.from(getStore(name).values())),
+    put: vi.fn(async (value: any) => {
+      const key = value.id ?? crypto.randomUUID();
+      getStore(name).set(key, value);
+      return key;
+    }),
+    add: vi.fn(async (value: any) => {
+      const key = value.id ?? crypto.randomUUID();
+      getStore(name).set(key, value);
+      return key;
+    }),
+    delete: vi.fn(async (key: string) => {
+      getStore(name).delete(key);
+    }),
+    index: vi.fn(idx),
+  };
+}
+
 vi.mock('idb', () => ({
-  openDB: vi.fn(() =>
-    Promise.resolve({
-      getAll: vi.fn().mockResolvedValue([]),
-      get: vi.fn().mockResolvedValue(undefined),
-      add: vi.fn().mockResolvedValue(undefined),
-      put: vi.fn().mockResolvedValue(undefined),
+  openDB: vi.fn(() => {
+    const db = {
+      getAll: vi.fn(async (storeName: string) => {
+        return Array.from(getStore(storeName).values());
+      }),
+      get: vi.fn(async (storeName: string, key: string) => {
+        return getStore(storeName).get(key);
+      }),
+      add: vi.fn(async (storeName: string, value: any) => {
+        const key = value.id ?? crypto.randomUUID();
+        getStore(storeName).set(key, value);
+        return key;
+      }),
+      put: vi.fn(async (storeName: string, value: any) => {
+        const key = value.id ?? crypto.randomUUID();
+        getStore(storeName).set(key, value);
+        return key;
+      }),
       objectStoreNames: { contains: vi.fn().mockReturnValue(false) },
       createObjectStore: vi.fn().mockReturnValue({ createIndex: vi.fn() }),
-    })
-  ),
+      transaction: vi.fn((storeName: string) => ({
+        store: wrapStore(storeName),
+        objectStore: wrapStore(storeName),
+      })),
+      delete: vi.fn(async (storeName: string, key: string) => {
+        getStore(storeName).delete(key);
+      }),
+    };
+    return Promise.resolve(db);
+  }),
 }));
 
 describe('Portfolio Store', () => {
@@ -118,7 +183,10 @@ describe('Watchlist Manager', () => {
     expect(watchlistStore.getWatchlists().find((w: any) => w.id === wl.id)!.name).toBe('New');
 
     watchlistStore.archiveWatchlist(wl.id);
-    expect(watchlistStore.getWatchlists().find((w: any) => w.id === wl.id)!.isArchived).toBe(true);
+    // getWatchlists() filters out archived entries; check localStorage directly
+    const key = Object.keys(localStorage).find(k => k.startsWith('stockstory_multi_watchlist_v1'))!;
+    const data = JSON.parse(localStorage.getItem(key)!);
+    expect(data.find((w: any) => w.id === wl.id)!.isArchived).toBe(true);
   });
 
   test('deletes watchlists', () => {

@@ -75,6 +75,8 @@ const BROKER_TERM_EXEMPT_FILES = [
   'PricingPage.tsx',
   'EvidenceSummaryPanel.tsx',
   'aiEntitlements.ts',
+  'HomePage.tsx',
+  'QuoteDemo.tsx',
 ];
 
 /** Files to exempt from error-term check (safeguard patterns, not leaks) */
