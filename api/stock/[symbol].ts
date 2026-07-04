@@ -162,60 +162,42 @@ const fallbackFundamentals: Record<string, any> = {
 
 // Company profile data from screener.in
 const companyProfiles: Record<string, any> = {
-  'HDFCBANK': {
-    name: 'HDFC Bank Limited',
-    sector: 'Financial Services',
-    industry: 'Banks',
-    founded: '1994',
-    website: 'https://www.hdfcbank.com',
-    description: 'HDFC Bank is India\'s largest private sector bank with a strong retail customer base. Known for its digital banking capabilities and extensive branch network across India.',
-    headquarters: 'Mumbai, India',
-  },
-  'RELIANCE': {
-    name: 'Reliance Industries Limited',
-    sector: 'Energy',
-    industry: 'Oil & Gas',
-    founded: '1957',
-    website: 'https://www.ril.com',
-    description: 'Reliance Industries is a multinational conglomerate engaged in petrochemicals, oil and gas exploration, telecommunications, and retail businesses. Major player in Indian energy sector.',
-    headquarters: 'Mumbai, India',
-  },
-  'TCS': {
-    name: 'Tata Consultancy Services Limited',
-    sector: 'Information Technology',
-    industry: 'IT Services',
-    founded: '1968',
-    website: 'https://www.tcs.com',
-    description: 'TCS is a global IT services and consulting company providing digital and IT services to clients worldwide. Strong presence in enterprise solutions and digital transformation.',
-    headquarters: 'Mumbai, India',
-  },
-  'INFY': {
-    name: 'Infosys Limited',
-    sector: 'Information Technology',
-    industry: 'IT Services',
-    founded: '1981',
-    website: 'https://www.infosys.com',
-    description: 'Infosys is a global leader in next-generation digital services and consulting. Provides IT, consulting, and outsourcing services to enterprises worldwide.',
-    headquarters: 'Bengaluru, India',
-  },
-  'WIPRO': {
-    name: 'Wipro Limited',
-    sector: 'Information Technology',
-    industry: 'IT Services',
-    founded: '1980',
-    website: 'https://www.wipro.com',
-    description: 'Wipro is a global IT services company providing consulting, technology services, and business process services to enterprises globally.',
-    headquarters: 'Bengaluru, India',
-  },
-  'SBIN': {
-    name: 'State Bank of India',
-    sector: 'Financial Services',
-    industry: 'Banks',
-    founded: '1955',
-    website: 'https://www.sbi.co.in',
-    description: 'SBI is India\'s largest government-owned bank with the widest branch network. Provides comprehensive banking and financial services across India.',
-    headquarters: 'Mumbai, India',
-  },
+  // Banking
+  'HDFCBANK': { name: 'HDFC Bank Limited', sector: 'Financial Services', industry: 'Banks', founded: '1994', website: 'https://www.hdfcbank.com', description: 'India\'s largest private sector bank with strong retail base and digital capabilities.', headquarters: 'Mumbai, India' },
+  'ICICIBANK': { name: 'ICICI Bank Limited', sector: 'Financial Services', industry: 'Banks', founded: '1994', website: 'https://www.icicibank.com', description: 'Leading private bank providing banking, insurance and financial services.', headquarters: 'Mumbai, India' },
+  'SBIN': { name: 'State Bank of India', sector: 'Financial Services', industry: 'Banks', founded: '1955', website: 'https://www.sbi.co.in', description: 'India\'s largest government-owned bank with widest branch network.', headquarters: 'Mumbai, India' },
+  'AXISBANK': { name: 'Axis Bank Limited', sector: 'Financial Services', industry: 'Banks', founded: '1994', website: 'https://www.axisbank.com', description: 'Private sector bank focused on retail and corporate banking.', headquarters: 'Mumbai, India' },
+  'KOTAK': { name: 'Kotak Mahindra Bank Limited', sector: 'Financial Services', industry: 'Banks', founded: '1985', website: 'https://www.kotak.com', description: 'Diversified financial services company with strong banking operations.', headquarters: 'Mumbai, India' },
+
+  // IT Services
+  'TCS': { name: 'Tata Consultancy Services Limited', sector: 'Information Technology', industry: 'IT Services', founded: '1968', website: 'https://www.tcs.com', description: 'Global IT services leader with strong enterprise solutions.', headquarters: 'Mumbai, India' },
+  'INFY': { name: 'Infosys Limited', sector: 'Information Technology', industry: 'IT Services', founded: '1981', website: 'https://www.infosys.com', description: 'Global leader in digital services and consulting.', headquarters: 'Bengaluru, India' },
+  'WIPRO': { name: 'Wipro Limited', sector: 'Information Technology', industry: 'IT Services', founded: '1980', website: 'https://www.wipro.com', description: 'Global IT services provider with strong consulting capabilities.', headquarters: 'Bengaluru, India' },
+  'HCL': { name: 'HCL Technologies Limited', sector: 'Information Technology', industry: 'IT Services', founded: '1976', website: 'https://www.hcl.com', description: 'Global technology and IT services company.', headquarters: 'Noida, India' },
+
+  // FMCG
+  'NESTLEIND': { name: 'Nestlé India Limited', sector: 'Consumer Goods', industry: 'FMCG', founded: '1959', website: 'https://www.nestle.in', description: 'Leading FMCG company with strong portfolio of food and beverage brands.', headquarters: 'Mumbai, India' },
+  'BRITANNIA': { name: 'Britannia Industries Limited', sector: 'Consumer Goods', industry: 'FMCG', founded: '1892', website: 'https://www.britannia.co.in', description: 'Major FMCG player in biscuits, breads, and dairy categories.', headquarters: 'Kolkata, India' },
+  'COLPAL': { name: 'Colgate-Palmolive (India) Limited', sector: 'Consumer Goods', industry: 'FMCG', founded: '1937', website: 'https://www.colgate.co.in', description: 'Leader in oral care and personal hygiene products.', headquarters: 'Mumbai, India' },
+
+  // Pharma
+  'DRREDDY': { name: 'Dr. Reddy\'s Laboratories Limited', sector: 'Pharmaceuticals', industry: 'Pharma', founded: '1984', website: 'https://www.drreddys.com', description: 'Global pharmaceutical company with strong generics portfolio.', headquarters: 'Hyderabad, India' },
+  'SUNPHARMA': { name: 'Sun Pharmaceutical Industries Limited', sector: 'Pharmaceuticals', industry: 'Pharma', founded: '1983', website: 'https://www.sunpharma.com', description: 'Leading global specialty and generic pharmaceutical company.', headquarters: 'Mumbai, India' },
+  'CIPLA': { name: 'Cipla Limited', sector: 'Pharmaceuticals', industry: 'Pharma', founded: '1935', website: 'https://www.cipla.com', description: 'Global pharmaceutical company with strong respiratory therapy focus.', headquarters: 'Mumbai, India' },
+
+  // Metals & Mining
+  'TATASTEEL': { name: 'Tata Steel Limited', sector: 'Metals & Mining', industry: 'Steel', founded: '1907', website: 'https://www.tatasteel.com', description: 'Global steel company with operations across India and international markets.', headquarters: 'Jamshedpur, India' },
+  'VEDANTAHOLD': { name: 'Vedanta Limited', sector: 'Metals & Mining', industry: 'Mining & Metals', founded: '1979', website: 'https://www.vedantaresources.com', description: 'Diversified mining company producing oil, copper, zinc, and aluminum.', headquarters: 'London, UK' },
+  'HINDALCO': { name: 'Hindalco Industries Limited', sector: 'Metals & Mining', industry: 'Aluminum', founded: '1958', website: 'https://www.hindalco.com', description: 'Leading aluminum and copper producer in India.', headquarters: 'Mumbai, India' },
+
+  // Automobile & Auto Ancillary
+  'MARUTI': { name: 'Maruti Suzuki India Limited', sector: 'Automobiles', industry: 'Auto', founded: '1981', website: 'https://www.marutisuzuki.com', description: 'Leading passenger vehicle manufacturer in India.', headquarters: 'New Delhi, India' },
+  'EICHERMOT': { name: 'Eicher Motors Limited', sector: 'Automobiles', industry: 'Auto & Motorcycles', founded: '1982', website: 'https://www.eichermotors.com', description: 'Two-wheeler and commercial vehicle manufacturer.', headquarters: 'Bangalore, India' },
+
+  // Energy & Infrastructure
+  'ADANIGREEN': { name: 'Adani Green Energy Limited', sector: 'Energy', industry: 'Renewable Energy', founded: '2012', website: 'https://www.adanigreen.net', description: 'Leading renewable energy company focused on solar and wind power.', headquarters: 'Ahmedabad, India' },
+  'NTPC': { name: 'NTPC Limited', sector: 'Energy', industry: 'Power Generation', founded: '1975', website: 'https://www.ntpc.co.in', description: 'India\'s largest power generator with diverse fuel mix.', headquarters: 'New Delhi, India' },
+  'RELIANCE': { name: 'Reliance Industries Limited', sector: 'Energy', industry: 'Oil & Gas', founded: '1957', website: 'https://www.ril.com', description: 'Multinational conglomerate in petrochemicals, energy, and retail.', headquarters: 'Mumbai, India' },
 };
 
 // Shareholding data (quarterly updates)
