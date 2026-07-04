@@ -5,7 +5,6 @@ import { AuthProvider } from "./context/AuthContext";
 import { AppRoutes } from "./app/routes";
 import { ScrollToTop } from "./app/ScrollToTop";
 import LiveAlertSentinel from "./components/LiveAlertSentinel";
-import CommandPalette from "./components/CommandPalette";
 import FloatingAIButton from "./components/FloatingAIButton";
 import { analytics } from "./lib/client/anonymousAnalytics";
 
@@ -33,8 +32,6 @@ export default function App() {
           <ScrollToTop />
           {/* Persistent global event broker notification sentinel */}
           <LiveAlertSentinel />
-          {/* Raycast-style command palette */}
-          <CommandPalette />
           {/* Floating AI button */}
           <FloatingAIButton />
           <AppRoutes />
