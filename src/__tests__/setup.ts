@@ -19,6 +19,7 @@ process.env.SUPABASE_URL = 'http://localhost:54321';
 process.env.SUPABASE_KEY = 'test-key';
 
 // Global test utilities
+/* eslint-disable @typescript-eslint/no-namespace */
 declare global {
   namespace jest {
     interface Matchers<R> {
@@ -27,6 +28,7 @@ declare global {
     }
   }
 }
+/* eslint-enable @typescript-eslint/no-namespace */
 
 expect.extend({
   toBeWithinRange(received: number, floor: number, ceiling: number) {

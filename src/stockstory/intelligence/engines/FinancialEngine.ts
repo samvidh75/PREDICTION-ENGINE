@@ -226,7 +226,7 @@ export class FinancialEngine {
     else if (leverage.normalised >= 50) parts.push('manageable leverage');
     else parts.push('elevated financial leverage');
 
-    let summary = '';
+    let summary: string;
     if (score >= 80) summary = 'Financial fundamentals are excellent.';
     else if (score >= 65) summary = 'Financial fundamentals are solid.';
     else if (score >= 45) summary = 'Financial fundamentals are mixed.';

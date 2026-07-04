@@ -77,7 +77,7 @@ export class EventEngine {
     // Upcoming earnings
     if (e.nextEarningsDate) {
       const days = this.daysUntil(e.nextEarningsDate);
-      let expectedImpact: 'high' | 'medium' | 'low' = 'medium';
+      let expectedImpact: 'high' | 'medium' | 'low';
       if (days !== null && days <= 14) expectedImpact = 'high';
       else if (days !== null && days <= 45) expectedImpact = 'medium';
       else expectedImpact = 'low';

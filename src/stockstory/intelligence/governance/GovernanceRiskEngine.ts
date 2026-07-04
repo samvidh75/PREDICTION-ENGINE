@@ -153,7 +153,7 @@ export class GovernanceRiskEngine {
 
   private assessAudit(r: IntelligenceInput['risks']): AuditGovernance {
     let score = 60;
-    let assessment = '';
+    let assessment: string;
     const auditorChange = r?.auditorChange ?? false;
 
     if (auditorChange) {

@@ -81,7 +81,7 @@ export class EarningsQualityEngine {
     }
 
     let score = 40;
-    let assessment = '';
+    let assessment: string;
 
     if (fcfToNI !== null && fcfToNI > 0.8) { score = 85; assessment = 'Strong cash conversion — earnings backed by cash flows.'; }
     else if (fcfToNI !== null && fcfToNI > 0.5) { score = 65; assessment = 'Adequate cash conversion — earnings reasonably backed by cash.'; }

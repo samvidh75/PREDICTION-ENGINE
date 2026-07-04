@@ -5,14 +5,14 @@ import { DeterministicResearchProvider } from './DeterministicResearchProvider';
 
 let _instance: AIProvider | null = null;
 
-export function getAIProvider(): AIProvider {
+export async function getAIProvider(): Promise<AIProvider> {
   if (_instance) return _instance;
 
   const localAiEnabled = process.env.LOCAL_AI_ENABLED === 'true';
   const hasLocalUrl = !!(process.env.OLLAMA_URL || process.env.SGLANG_URL);
 
   if (localAiEnabled && hasLocalUrl) {
-    const { LocalOllamaProvider } = require('./LocalOllamaProvider');
+    const { LocalOllamaProvider } = await import('./LocalOllamaProvider');
     _instance = new CachedAIProvider(new LocalOllamaProvider());
     // Using LocalOllamaProvider (LOCAL_AI_ENABLED=true)
   } else {

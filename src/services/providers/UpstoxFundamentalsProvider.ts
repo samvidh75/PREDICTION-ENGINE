@@ -230,7 +230,7 @@ export class UpstoxFundamentalsProvider implements FinancialProvider {
       });
     } catch (error: any) {
       if (error?.name === 'AbortError') {
-        throw new Error(`UpstoxFundamentals: request timed out after ${REQUEST_TIMEOUT_MS}ms`);
+        throw new Error(`UpstoxFundamentals: request timed out after ${REQUEST_TIMEOUT_MS}ms`, { cause: error });
       }
       throw error;
     } finally {

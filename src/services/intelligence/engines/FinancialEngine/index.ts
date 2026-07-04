@@ -326,7 +326,7 @@ export class FinancialEngine {
       parts.push(`${marketCap.level.replace('_', ' ')} stability`);
     }
 
-    let overall = '';
+    let overall: string;
     if (score >= 80) {
       overall = 'Fundamentals are excellent.';
     } else if (score >= 65) {

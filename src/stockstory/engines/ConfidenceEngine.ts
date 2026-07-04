@@ -83,7 +83,7 @@ export class ConfidenceEngine {
     ).length;
 
     // ── 3. Signal Agreement ─────────────────────────────────────────
-    let signalAgreement = 50;
+    let signalAgreement: number;
     if (crossEngineScores) {
       const scores = [
         crossEngineScores.growth,

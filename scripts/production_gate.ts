@@ -5,6 +5,8 @@
  * Output: PASS or FAIL with reasons.
  * Run: npx tsx scripts/production_gate.ts
  */
+import fs from 'fs';
+import path from 'path';
 import pool from '../src/db/index';
 
 interface GateCheck {
@@ -117,8 +119,7 @@ async function runAllChecks(): Promise<GateCheck[]> {
 
   // 8. Frontend build
   try {
-    const fs = require('fs');
-    const distExists = fs.existsSync(require('path').join(__dirname, '..', 'dist', 'index.html'));
+    const distExists = fs.existsSync(path.join(__dirname, '..', 'dist', 'index.html'));
     if (distExists) {
       checks.push({ name: 'Frontend Build', status: 'PASS', detail: 'dist/ directory exists' });
     } else {

@@ -93,7 +93,7 @@ export class DocumentParser {
     return content
       .replace(/\r\n/g, '\n') // Normalize line endings
       .replace(/\r/g, '\n')
-      .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, '') // Remove control chars
+      .split('').filter(c => { const code = c.charCodeAt(0); return code >= 32 || code === 9 || code === 10 || code === 13; }).join('') // Remove control chars
       .replace(/\t/g, ' ') // Replace tabs with spaces
       .replace(/  +/g, ' ') // Collapse multiple spaces
       .replace(/\n{3,}/g, '\n\n') // Collapse excessive blank lines

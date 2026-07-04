@@ -49,7 +49,7 @@ export class ValuationEngine {
     if (pe === null || pe === undefined || pe <= 0) {
       return { raw: pe, points: 10, normalised: 40 }; // neutral
     }
-    let points = 0;
+    let points: number;
     if (pe < 10) points = 25;       // undervalued
     else if (pe < 15) points = 22;
     else if (pe < 20) points = 18;
@@ -66,7 +66,7 @@ export class ValuationEngine {
     if (pb === null || pb === undefined || pb <= 0) {
       return { raw: pb, points: 10, normalised: 50 };
     }
-    let points = 0;
+    let points: number;
     if (pb < 1.0) points = 20;
     else if (pb < 1.5) points = 18;
     else if (pb < 2.5) points = 14;
@@ -82,7 +82,7 @@ export class ValuationEngine {
     if (ev === null || ev === undefined || ev <= 0) {
       return { raw: ev, points: 10, normalised: 50 };
     }
-    let points = 0;
+    let points: number;
     if (ev < 6) points = 20;
     else if (ev < 10) points = 17;
     else if (ev < 14) points = 13;
@@ -98,7 +98,7 @@ export class ValuationEngine {
     if (yield_ === null || yield_ === undefined) {
       return { raw: yield_, points: 8, normalised: 40 };
     }
-    let points = 0;
+    let points: number;
     if (yield_ >= 6) points = 20;
     else if (yield_ >= 4) points = 17;
     else if (yield_ >= 2) points = 13;
@@ -113,7 +113,7 @@ export class ValuationEngine {
     if (dy === null || dy === undefined || dy <= 0) {
       return { raw: dy, points: 0, normalised: 0 };
     }
-    let points = 0;
+    let points: number;
     if (dy >= 3) points = 15;
     else if (dy >= 2) points = 12;
     else if (dy >= 1) points = 8;

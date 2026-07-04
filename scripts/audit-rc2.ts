@@ -148,7 +148,7 @@ async function main(): Promise<void> {
       const res = await fetch(`${API_BASE}/healthz`);
       const data = await res.json();
       console.log(data.ok ? "PASS" : "FAIL");
-      data.ok ? inlinePass++ : inlineFail++;
+      if (data.ok) inlinePass++; else inlineFail++;
     } catch {
       console.log("FAIL");
       inlineFail++;
@@ -159,7 +159,7 @@ async function main(): Promise<void> {
       const res = await fetch(`${API_BASE}/stockstory-mark.svg`);
       const type = res.headers.get("content-type") || "";
       console.log(type.includes("svg") ? "PASS" : `FAIL: ${type}`);
-      type.includes("svg") ? inlinePass++ : inlineFail++;
+      if (type.includes("svg")) inlinePass++; else inlineFail++;
     } catch {
       console.log("FAIL");
       inlineFail++;

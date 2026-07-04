@@ -197,8 +197,8 @@ export class NLScannerEngine {
       const actual = this.getFieldValue(input, filter.field);
       if (actual === null) continue;
 
-      let matched = false;
-      let detail = '';
+      let matched: boolean;
+      let detail: string;
 
       switch (filter.operator) {
         case 'gt':

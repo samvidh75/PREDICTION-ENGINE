@@ -375,7 +375,7 @@ export function buildMarketAnomalyEvidencePack(input: MarketAnomalyInput): Marke
     anomalyType = stockSpecificDivergence >= 1.5 ? 'Stock-specific move' : 'Market-aligned move';
   }
 
-  let severity: AnomalySeverity = 'Needs review';
+  let severity: AnomalySeverity;
   const absMove = priceMovePct == null ? 0 : Math.abs(priceMovePct);
   if (evidence.length === 0) {
     severity = 'Needs review';

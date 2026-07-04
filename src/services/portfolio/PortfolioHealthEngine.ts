@@ -37,7 +37,7 @@ export class PortfolioHealthEngine {
 
     score = Math.max(10, Math.min(100, score));
 
-    let status: PortfolioHealthState = "Healthy";
+    let status: PortfolioHealthState;
     if (score >= 90) status = "Excellent";
     else if (score >= 80) status = "Strong";
     else if (score >= 65) status = "Healthy";

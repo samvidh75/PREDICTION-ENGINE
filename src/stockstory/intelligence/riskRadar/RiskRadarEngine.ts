@@ -308,7 +308,7 @@ export class RiskRadarEngine {
 
     const highPriorityCount = (breakdown.critical || 0) + (breakdown.high || 0);
 
-    let posture: RiskOverview['posture'] = 'low_risk';
+    let posture: RiskOverview['posture'];
     if (highPriorityCount >= 3) posture = 'elevated_risk';
     else if (highPriorityCount >= 1) posture = 'moderate_risk';
     else if (dims.every(d => d.score < 20)) posture = 'low_risk';

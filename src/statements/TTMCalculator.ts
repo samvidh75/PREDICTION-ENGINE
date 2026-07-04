@@ -110,7 +110,7 @@ export class TTMCalculator {
     const latestShares = quarters[0]?.shares_outstanding ?? null;
 
     // TTM EPS = TTM Net Income / Shares Outstanding
-    let ttmEps: number | null = null;
+    let ttmEps: number | null;
     if (ttmNetIncome !== null && latestShares !== null && latestShares > 0) {
       ttmEps = ttmNetIncome / latestShares;
     } else {

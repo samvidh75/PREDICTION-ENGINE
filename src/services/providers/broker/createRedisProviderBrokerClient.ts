@@ -29,7 +29,7 @@ export async function createRedisProviderBrokerClient(redisUrl: string): Promise
     ]);
   } catch (error) {
     try { if (client.isOpen) await client.quit(); } catch {/* silent */}
-    throw new Error(`Provider broker Redis unavailable: ${safeRedisError(error)}`);
+    throw new Error(`Provider broker Redis unavailable: ${safeRedisError(error)}`, { cause: error });
   }
 
   return {

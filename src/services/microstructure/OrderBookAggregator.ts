@@ -6,7 +6,7 @@ export class OrderBookAggregator extends EventEmitter {
   private snapshots: Map<string, OrderBookSnapshot> = new Map();
   private providerClients: Map<string, any> = new Map();
   private subscriptions: Map<string, Set<string>> = new Map(); // ticker -> providers
-  private updateCallbacks: Map<string, Function[]> = new Map();
+  private updateCallbacks: Map<string, ((...args: unknown[]) => void)[]> = new Map();
 
   constructor(private config: ProviderConfig[]) {
     super();
@@ -200,7 +200,7 @@ export class OrderBookAggregator extends EventEmitter {
     return this.snapshots.get(ticker);
   }
 
-  onUpdate(ticker: string, callback: Function): void {
+  onUpdate(ticker: string, callback: (...args: unknown[]) => void): void {
     if (!this.updateCallbacks.has(ticker)) {
       this.updateCallbacks.set(ticker, []);
     }

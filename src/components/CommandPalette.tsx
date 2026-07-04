@@ -7,6 +7,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { colors } from '../design/tokens';
+import { fuzzySearchStocks } from '../utils/fuzzySearch';
 
 interface PaletteItem {
   id: string;
@@ -22,7 +23,7 @@ interface CommandPaletteProps {
   onClose?: () => void;
 }
 
-export default function CommandPalette({ isOpen = false, onClose }: CommandPaletteProps) {
+export default function CommandPalette({ isOpen = false }: CommandPaletteProps) {
   const [open, setOpen] = useState(isOpen);
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -64,18 +65,37 @@ export default function CommandPalette({ isOpen = false, onClose }: CommandPalet
     const newItems: PaletteItem[] = [];
 
     if (query.trim()) {
-      newItems.push({
-        id: 'search',
-        label: `Search: ${query.toUpperCase()}`,
-        description: 'Press Enter to search',
-        icon: '🔍',
-        action: () => {
-          navigate(`/stock/${query.toUpperCase()}`);
-          addToHistory(query.toUpperCase());
-          setOpen(false);
-        },
-        category: 'search',
-      });
+      const fuzzyMatches = fuzzySearchStocks(query);
+
+      if (fuzzyMatches.length > 0) {
+        fuzzyMatches.forEach((match) => {
+          newItems.push({
+            id: `stock-${match.symbol}`,
+            label: match.symbol,
+            description: match.name,
+            icon: '📈',
+            action: () => {
+              navigate(`/stock/${match.symbol}`);
+              addToHistory(match.symbol);
+              setOpen(false);
+            },
+            category: 'search',
+          });
+        });
+      } else {
+        newItems.push({
+          id: 'search',
+          label: `Search: ${query.toUpperCase()}`,
+          description: 'Press Enter to search',
+          icon: '🔍',
+          action: () => {
+            navigate(`/stock/${query.toUpperCase()}`);
+            addToHistory(query.toUpperCase());
+            setOpen(false);
+          },
+          category: 'search',
+        });
+      }
     } else {
       newItems.push(
         {

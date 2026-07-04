@@ -197,7 +197,7 @@ export class CatalystEngine {
       .filter(c => c.expectedImpact !== 'unknown')
       .sort((a, b) => (b.magnitude === 'high' ? 3 : 1) * b.probability - (a.magnitude === 'high' ? 3 : 1) * a.probability)[0] ?? null;
 
-    let assessment = '';
+    let assessment: string;
     if (netScore > 20) assessment = 'Catalyst outlook is constructive. Multiple positive events on the horizon.';
     else if (netScore > 0) assessment = 'Catalyst outlook is mildly constructive.';
     else if (netScore === 0) assessment = 'No clear catalyst bias detected.';

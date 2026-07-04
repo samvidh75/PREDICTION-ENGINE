@@ -48,7 +48,7 @@ export function compareCompanies(companies: CompareInput[]): CompareResultView {
     factorComparison.push({ factor, winner, explanation });
   }
 
-  let recommendation: string | null = null;
+  let recommendation: string | null;
   const bestCompany = companyViews.reduce((best, curr) => {
     const currScore = Object.values(curr.scores).filter((s): s is number => s !== null).reduce((a, b) => a + b, 0);
     const bestScore = Object.values(best.scores).filter((s): s is number => s !== null).reduce((a, b) => a + b, 0);

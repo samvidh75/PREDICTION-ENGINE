@@ -44,7 +44,8 @@ function parseArgs() {
 
 async function lineageBackfillDryRun(limit: number, symbols: string[] | null): Promise<JobResult> {
   const startedAt = new Date().toISOString();
-  let scanned = 0, matched = 0, unmatched = 0, errors = 0;
+  let scanned = 0, matched = 0, unmatched = 0;
+  const errors = 0;
 
   for (const table of ["feature_snapshots", "factor_snapshots"]) {
     let sql = `SELECT fs.symbol, fs.trade_date FROM ${table} fs WHERE fs.source_provider IS NULL ORDER BY fs.trade_date DESC`;

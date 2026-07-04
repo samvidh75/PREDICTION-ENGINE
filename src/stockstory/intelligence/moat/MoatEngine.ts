@@ -173,7 +173,7 @@ export class MoatEngine {
     s: IntelligenceInput['sector'],
   ): PowerAssessment {
     let score = 30;
-    let desc = '';
+    let desc: string;
 
     // High gross margins mean low direct costs = low supplier power
     if (f.grossMargin !== null && f.grossMargin > 50) { score += 20; desc = 'High gross margins suggest low supplier power.'; }
@@ -198,7 +198,7 @@ export class MoatEngine {
 
   private assessBuyerPower(f: IntelligenceInput['financials']): PowerAssessment {
     let score = 30;
-    let desc = '';
+    let desc: string;
 
     if (f.operatingMargin !== null && f.operatingMargin > 25) {
       score += 20;

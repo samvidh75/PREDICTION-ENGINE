@@ -51,12 +51,9 @@ interface FeatureAuditRow {
   impactLevel: string;
 }
 
-function loadFeatureRegistry(): FeatureRegistryEntry[] {
-  // We read the compiled JS or parse the TS source directly
-  // Since we're in a ts-node script, we can import it
+async function loadFeatureRegistry(): Promise<FeatureRegistryEntry[]> {
   try {
-    // Try direct import
-    const mod = require('../src/prediction-engine/features/FeatureRegistry');
+    const mod = await import('../src/prediction-engine/features/FeatureRegistry');
     if (mod.FEATURE_REGISTRY) return mod.FEATURE_REGISTRY as FeatureRegistryEntry[];
   } catch {
     // fallback
@@ -97,7 +94,7 @@ async function findTestFilesForFeature(featureId: string, baseDir: string): Prom
 
 async function main() {
   const baseDir = path.resolve(__dirname, '..');
-  const registry = loadFeatureRegistry();
+  const registry = await loadFeatureRegistry();
 
   if (registry.length === 0) {
     console.error('Could not load FEATURE_REGISTRY. Ensure the module exports it.');

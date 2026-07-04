@@ -71,7 +71,6 @@ export function buildCompanyResearch(input: CompanyResearchInput): CompanyResear
   let valuationScore: number | null = null;
   let growthScore: number | null = null;
   let riskScore: number | null = null;
-  let momentumScore: number | null = null;
   let stabilityScore: number | null = null;
   let roaScore: number | null = null;
   let dividendYieldScore: number | null = null;
@@ -102,7 +101,7 @@ export function buildCompanyResearch(input: CompanyResearchInput): CompanyResear
   }
 
   const mf = computeMomentumFeatures(input.candles, input.relativeStrength);
-  momentumScore = mf.overallMomentum;
+  const momentumScore = mf.overallMomentum;
 
   const conviction = computeResearchConviction({
     quality: qualityScore, valuation: valuationScore,

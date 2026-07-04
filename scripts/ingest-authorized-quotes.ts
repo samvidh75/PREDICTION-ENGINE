@@ -1,4 +1,5 @@
 import 'dotenv/config';
+import fs from 'node:fs';
 import { dbAdapter } from '../src/db/DatabaseAdapter';
 import { loadAuthorizedProviderConfig, authorizeProviderIngestion } from '../src/services/providers/authorization/ProviderAuthorization';
 import type { AuthorizationGateResult } from '../src/services/providers/authorization/types';
@@ -50,7 +51,6 @@ function parseArgs(argv: string[]): CliOptions {
   if (symbolArg) {
     symbols = symbolArg.split(',').map(s => s.trim().toUpperCase()).filter(Boolean);
   } else if (symbolFile) {
-    const fs = require('node:fs');
     const content = fs.readFileSync(symbolFile, 'utf-8');
     symbols = content.split('\n').map(s => s.trim().toUpperCase()).filter(Boolean);
   }

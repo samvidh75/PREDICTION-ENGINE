@@ -74,7 +74,7 @@ export class FiiDiiTracker {
     const trend: 'bullish' | 'bearish' | 'neutral' =
       fiiTrend === 'bullish' || diiOffset ? 'bullish' : fiiTrend === 'bearish' ? 'bearish' : 'neutral';
 
-    let interpretation = '';
+    let interpretation: string;
     if (month.fiiNet > 0 && month.diiNet > 0) {
       interpretation = 'Both FII and DII are net buyers, indicating strong broad-based confidence in Indian equities.';
     } else if (month.fiiNet > 0 && month.diiNet < 0) {

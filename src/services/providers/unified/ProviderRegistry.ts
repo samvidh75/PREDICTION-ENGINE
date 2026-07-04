@@ -80,7 +80,7 @@ export class ProviderRegistry {
       };
     } catch (err) {
       // Fallback to Trendlyne (quote not available, will throw)
-      throw new Error(`All quote providers failed for ${symbol}: ${err instanceof Error ? err.message : String(err)}`);
+      throw new Error(`All quote providers failed for ${symbol}: ${err instanceof Error ? err.message : String(err)}`, { cause: err });
     }
   }
 

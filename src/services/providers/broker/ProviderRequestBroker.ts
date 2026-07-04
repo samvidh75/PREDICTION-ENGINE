@@ -202,7 +202,6 @@ export class ProviderRequestBroker {
           const brokerErr = err as any;
           if (callStarted) {
             this.quota.recordCallEnd(provider);
-            callStarted = false;
           }
           const statusClass = this.statusClassForError(brokerErr);
           const result = this.makeResult<T>(provider, operation, symbol, startTime, null, statusClass, 'miss', false, attempt, brokerErr, options.runId);
@@ -227,13 +226,11 @@ export class ProviderRequestBroker {
         if (error.retryable && attempt < BACKOFF_CONFIG.maxRetries) {
           if (callStarted) {
             this.quota.recordCallEnd(provider);
-            callStarted = false;
           }
           await this.backoff(attempt);
         } else {
           if (callStarted) {
             this.quota.recordCallEnd(provider);
-            callStarted = false;
           }
           break;
         }
