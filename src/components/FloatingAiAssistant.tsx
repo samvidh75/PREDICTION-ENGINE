@@ -2,6 +2,7 @@ import type { CSSProperties } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { MessageSquare, Send, Sparkles, User, X } from "lucide-react";
 import { animation, colors, radius, space, typography } from "../design/tokens";
+import { simpleChat } from "../services/ai/SimpleChat";
 
 type DrawerMessage = {
   id: string;
@@ -13,30 +14,18 @@ type DrawerMessage = {
 const STORAGE_KEY = "stockex-floating-ai";
 
 const STARTER_PROMPTS = [
-  "Summarize what I should watch in my current list",
-  "Which tracked stocks need deeper review first?",
-  "What changed most across my watchlist?",
+  "Analyze RELIANCE",
+  "What's market update?",
+  "Compare TCS vs INFY",
 ];
 
 async function callChatApi(message: string): Promise<string> {
-  const isProduction = window.location.hostname === "www.stockstory-india.com" || window.location.hostname === "stockstory-india.com";
-  const apiUrl = isProduction ? "https://stockstory-api.onrender.com/api/chat" : "/api/chat";
-
   try {
-    const res = await fetch(apiUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        message,
-        symbol: "",
-        context: "StockEX research assistant — watchlist tracking, thesis review, and equity research.",
-      }),
-    });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = await res.json();
-    return data?.response ?? "I can help you break this down into thesis, risk, what changed, and what to watch next. Ask about any stock, compare setup, or watchlist review angle.";
-  } catch {
-    return "I can help you break this down into thesis, risk, what changed, and what to watch next. Ask about any stock, compare setup, or watchlist review angle.";
+    // Use simple chat for all responses
+    return await simpleChat(message);
+  } catch (error) {
+    console.error('Chat error:', error);
+    return "I can help you analyze stocks and market trends. What would you like to know?";
   }
 }
 
@@ -390,26 +379,26 @@ const assistantBubbleStyle: CSSProperties = {
 };
 
 const userBubbleStyle: CSSProperties = {
-  background: "linear-gradient(180deg, rgba(255,107,107,0.15) 0%, rgba(255,107,107,0.08) 100%)",
-  border: `1px solid ${colors.accentRedSoft}`,
+  background: "linear-gradient(135deg, rgba(255,107,107,0.2) 0%, rgba(255,107,107,0.1) 100%)",
+  border: `1px solid rgba(255,107,107,0.4)`,
 };
 
 const messageMetaStyle: CSSProperties = {
   display: "flex",
   alignItems: "center",
   gap: 6,
-  color: colors.textTertiary,
+  color: colors.textSecondary,
   fontSize: 11,
-  textTransform: "uppercase",
-  letterSpacing: "0.06em",
+  fontWeight: 500,
 };
 
 const messageTextStyle: CSSProperties = {
   margin: 0,
-  color: colors.textPrimary,
+  color: "#ffffff",
   fontSize: 14,
   lineHeight: 1.6,
   whiteSpace: "pre-wrap",
+  wordWrap: "break-word",
 };
 
 const composerShellStyle: CSSProperties = {

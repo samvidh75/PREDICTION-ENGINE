@@ -19,15 +19,6 @@ import { colors, typography, radius, animation, shadows } from "../design/tokens
 import { InteractiveButton, MetricCard, ExpandingPanel, HoverCard } from "../ui/MicroInteractions";
 import { useSeo } from "../frontend/seo/useSeo";
 import { buildCompanySeo } from "../frontend/seo/companySeo";
-import { CompanyAnalystSection } from "../components/analyst/CompanyAnalystSection";
-import { SimilarStocks } from "../components/SimilarStocks";
-import { OptionsFlow } from "../components/OptionsFlow";
-import OptionsChainScanner from "../components/OptionsChainScanner";
-import { StockExWorkerPool } from "../components/edge-ai/StockExWorkerPool";
-import { FeatureGate } from "../commercial/FeatureGate";
-import { InsiderActivity } from "../components/InsiderActivity";
-import InsiderTrackingPanel from "../components/InsiderTrackingPanel";
-import SentimentRadar from "../components/SentimentRadar";
 import { PriceTargets } from "../components/PriceTargets";
 import { NativeAd } from "../components/NativeAd";
 import { formatNumber } from "../services/ui/dataFormatting";
@@ -471,15 +462,7 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
           .filter((s: any) => s.option_type === "PE")
           .map((s: any) => Number(s.open_interest));
 
-        StockExWorkerPool.on("gpu_order_flow_result", (response: any) => {
-          if (!cancelled) setGpuDelta(response.payload);
-          StockExWorkerPool.off("gpu_order_flow_result");
-        });
-
-        StockExWorkerPool.dispatch("compute_gpu_order_flow", {
-          callVols: callVols.length > 0 ? callVols : [1000],
-          putVols: putVols.length > 0 ? putVols : [1000],
-        });
+        // GPU order flow disabled (synthetic data)
       } catch {
         // Graceful degradation
       }
@@ -487,7 +470,6 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
 
     return () => {
       cancelled = true;
-      StockExWorkerPool.off("gpu_order_flow_result");
     };
   }, [stock.symbol]);
 
@@ -964,72 +946,7 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
         </Card>
       )}
 
-      {/* ── What Changed ── */}
-      <Card className="stock-whatchanged-card raycast-slideUp" style={{ animationDelay: "0.4s", animationFillMode: "both" }}>
-        <CardLabel>What changed</CardLabel>
-        <div style={{ display: "grid", gap: "12px" }}>
-          {stock.whatChanged.map((item, i) => (
-            <p key={item} className={`raycast-slideUp raycast-stagger-${i + 1}`} style={{ color: colors.textSecondary, fontSize: typography.body.desktop.size, lineHeight: "1.6" }}>{item}</p>
-          ))}
-        </div>
-      </Card>
-      {/* ── Sector Relative View ── */}
-      <div style={{ cursor: "pointer" }} onClick={() => setSectorExpanded(!sectorExpanded)}>
-        <CardLabel>Sector Relative View {sectorExpanded ? "▲" : "▼"}</CardLabel>
-      </div>
-      <ExpandingPanel isOpen={sectorExpanded}>
-        <div style={{ display: "grid", gap: "16px" }}>
-          {sectorComparisons.map((cmp, i) => (
-            <div key={i} style={{ display: "grid", gap: "6px" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", gap: "12px" }}>
-                <span style={{ fontSize: "13px", color: colors.textPrimary }}>
-                  {cmp.company}
-                  {cmp.company === stock.companyName && (<span style={{ color: colors.primary, marginLeft: "4px" }}>•</span>)}
-                </span>
-                <span style={{ fontSize: "13px", fontWeight: 600, color: colors.textPrimary }}>{cmp.value}</span>
-              </div>
-              <div style={{ height: "6px", background: colors.fill, borderRadius: radius.full, overflow: "hidden" }}>
-                <div style={{
-                  width: `${cmp.percentile}%`,
-                  height: "100%",
-                  borderRadius: radius.full,
-                  background: cmp.percentile >= 80 ? colors.success : cmp.percentile >= 50 ? colors.warning : colors.danger,
-                }} />
-              </div>
-              <span style={{ fontSize: "11px", color: colors.textTertiary }}>{cmp.metric}</span>
-            </div>
-          ))}
-        </div>
-      </ExpandingPanel>
-
-      {/* ── Company Analyst Section ── */}
-      <CompanyAnalystSection symbol={stock.symbol} />
-
-      {/* ── Native Ad (Position 3) ── */}
-      <NativeAd position={3} />
-
-      {/* ── Price Targets ── */}
-      <PriceTargets currentPrice={stock.price.current} />
-
-      {/* ── Options Flow ── */}
-      <OptionsFlow />
-
-      {/* ── F&O Options Chain Scanner (Phase 35) ── */}
-      <FeatureGate feature="api_access">
-        <OptionsChainScanner ticker={stock.symbol} />
-      </FeatureGate>
-
-      {/* ── SEBI Insider Disclosure Radar (Phase 52) ── */}
-      <InsiderTrackingPanel ticker={stock.symbol} />
-
-      {/* ── Machine-Readable Sentiment Radar (Phase 53) ── */}
-      <SentimentRadar ticker={stock.symbol} />
-
-      {/* ── Insider Activity ── */}
-      <InsiderActivity />
-
-      {/* ── Similar Stocks ── */}
-      <SimilarStocks />
+      {/* Removed: "What changed", Sector Relative View, Analyst Section, Options Flow, Insider Activity, Similar Stocks (all synthetic) */}
 
       </div>{/* ── end analytical-dashboard-grid ── */}
 
@@ -1089,7 +1006,10 @@ export default function StockPage() {
   useSeo(seoMeta);
 
   useEffect(() => {
-    window.scrollTo(0, 0);
+    // Instant scroll to top - no animation
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
   }, [symbol]);
 
   const [inView, setInView] = useState(false);
