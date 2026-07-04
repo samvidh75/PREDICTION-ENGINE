@@ -625,7 +625,7 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
                 )}
               </AreaChart>
             ) : (
-              <BarChart data={stock.priceHistory[timeframe].map((d) => ({ ...d, high: d.price * 1.02, low: d.price * 0.98, open: d.price * 0.99, close: d.price * 1.01 }))}>
+              <BarChart data={(stock.priceHistory?.[timeframe] ?? []).map((d: any) => ({ ...d, high: d.price * 1.02, low: d.price * 0.98, open: d.price * 0.99, close: d.price * 1.01 }))}>
                 <CartesianGrid vertical={false} stroke={colors.border} />
                 <XAxis dataKey="label" stroke={colors.textSecondary} tick={{ fontSize: 11 }} />
                 <YAxis stroke={colors.textSecondary} domain={["auto", "auto"]} tick={{ fontSize: 11 }} />
@@ -733,7 +733,7 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
           </a>
         </div>
         <div className="stock-chip-row" style={{ display: "flex", gap: "8px", flexWrap: "wrap", marginTop: "16px" }}>
-          {companyProfile.businessSegments.map((segment) => (
+          {(companyProfile?.businessSegments ?? []).map((segment: string) => (
             <Badge key={segment} value={60} label={segment} />
           ))}
         </div>
