@@ -198,7 +198,7 @@ class StockDataAggregator {
           eps: parseFloat(data.eps) || 0,
           dividendYield: parseFloat(data.divYield) || 0,
         },
-      };
+      } as Partial<CompleteStockData>;
     } catch (error) {
       console.error(`BSE fetch failed for ${symbol}:`, error);
       return {};
@@ -228,7 +228,7 @@ class StockDataAggregator {
           low: parseFloat(data.priceInfo?.intraDayHighLow?.low) || 0,
           volume: parseInt(data.priceInfo?.totalTradedVolume) || 0,
         },
-      };
+      } as Partial<CompleteStockData>;
     } catch (error) {
       console.error(`NSE fetch failed for ${symbol}:`, error);
       return {};
@@ -250,7 +250,7 @@ class StockDataAggregator {
           revenueGrowth1y: 12.5,
           earningsGrowth1y: 18.3,
         },
-      };
+      } as Partial<CompleteStockData>;
     } catch (error) {
       console.error(`Screener fetch failed for ${symbol}:`, error);
       return {};
