@@ -76,10 +76,19 @@ export class ScreenerParser {
     return match?.[1] ?? null;
   }
 
+  private static matchesAlias(label: string, alias: string): boolean {
+    const a = alias.toLowerCase();
+    const l = label.toLowerCase();
+    if (a.length <= 3) {
+      return new RegExp(`\\b${a.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i').test(l);
+    }
+    return l.includes(a);
+  }
+
   private static findRow(rows: string[][], aliases: string[]): string[] | null {
     for (const row of rows) {
       const label = (row[0] ?? '').toLowerCase();
-      if (aliases.some((alias) => label.includes(alias.toLowerCase()))) {
+      if (aliases.some((alias) => this.matchesAlias(label, alias))) {
         return row;
       }
     }
@@ -106,7 +115,7 @@ export class ScreenerParser {
         const value = this.stripTags(valueMatch[1]);
 
         for (const [key, aliases] of Object.entries(this.RATIO_LABELS)) {
-          if (aliases.some(a => label.toLowerCase().includes(a.toLowerCase()))) {
+          if (aliases.some(a => this.matchesAlias(label, a))) {
             ratios[key] = value;
             break;
           }
@@ -127,7 +136,7 @@ export class ScreenerParser {
         const label = row[0];
         const value = row[1];
         for (const [key, aliases] of Object.entries(this.RATIO_LABELS)) {
-          if (aliases.some((alias) => label.toLowerCase().includes(alias.toLowerCase()))) {
+          if (aliases.some((alias) => this.matchesAlias(label, alias))) {
             ratios[key] = value;
             break;
           }

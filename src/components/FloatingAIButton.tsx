@@ -186,7 +186,7 @@ export default function FloatingAIButton() {
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && handleSend()}
+              onKeyDown={(e) => e.key === 'Enter' && handleSend()}
               placeholder="Ask something..."
               style={{
                 flex: 1,
