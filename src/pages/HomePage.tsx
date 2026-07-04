@@ -16,7 +16,7 @@ import { scanByPreset } from "../services/scanner/presets";
 import { getAlerts } from "../services/personalization/AlertStore";
 import OnboardingWizard from "../components/GuidedOnboarding";
 import { loadFirstDashboardFlag, dismissFirstDashboardOverlay, markFirstDashboardPending } from "../services/onboarding/onboardingFirstRunMemory";
-import WatchlistWebSocket from "../components/WatchlistWebSocket";
+import LivePriceFeed from "../components/LivePriceFeed";
 import DataSourceBadge from "../components/DataSourceBadge";
 import type { EnhancedScanType } from "../services/scanner/presets";
 import type { AlertStoreItem } from "../services/personalization/AlertStore";
@@ -456,7 +456,7 @@ export default function HomePage() {
               <Zap size={15} /> Live Price Feed
             </h2>
           </div>
-          <WatchlistWebSocket maxDisplay={10} watchlistTickers={["RELIANCE", "TCS", "INFY", "HDFCBANK", "SBIN"]} />
+          <LivePriceFeed maxDisplay={10} watchlistTickers={["RELIANCE", "TCS", "INFY", "HDFCBANK", "SBIN"]} />
         </section>
 
         {/* Recent alerts */}

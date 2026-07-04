@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
-import { Home, Search, Star, LayoutGrid, Shield, MessageCircle, TrendingUp } from "lucide-react";
+import { Home, Search, Star, LayoutGrid, Shield, MessageCircle, TrendingUp, ChevronDown } from "lucide-react";
 import { NavLink, Link, useNavigate } from "react-router-dom";
 import { colors, typography, space, radius, layout, components, shadows, animation } from "../design/tokens";
 import { BrandMark } from "../components/BrandMark";
@@ -29,6 +29,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
   const [helpOpen, setHelpOpen] = useState(false);
   const [showFeedbackFab, setShowFeedbackFab] = useState(() => document.body.dataset.onboardingActive !== "true");
+  const [moreMenuOpen, setMoreMenuOpen] = useState(false);
 
   useKeyboardShortcuts({
     handlers: {
@@ -87,7 +88,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             Resources
           </p>
           <nav style={navStackStyle} aria-label="Resources">
-            {SECONDARY_NAV.map((item) => (
+            {SECONDARY_NAV.slice(0, 2).map((item) => (
               <NavLink
                 key={item.to}
                 to={item.to}
@@ -98,6 +99,56 @@ export function AppShell({ children }: { children: ReactNode }) {
               </NavLink>
             ))}
           </nav>
+
+          {/* More Menu */}
+          <button
+            onClick={() => setMoreMenuOpen(!moreMenuOpen)}
+            style={{
+              width: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: space[2],
+              padding: `${space[2]} ${space[3]}`,
+              marginTop: space[2],
+              borderRadius: `${radius.md}`,
+              border: 'none',
+              background: moreMenuOpen ? `rgba(255,255,255,0.08)` : 'transparent',
+              color: colors.textSecondary,
+              fontSize: typography.body.desktop.size,
+              fontWeight: 500,
+              cursor: 'pointer',
+              transition: `all ${animation.standard}`,
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = `rgba(255,255,255,0.08)`;
+              e.currentTarget.style.color = colors.textPrimary;
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = moreMenuOpen ? `rgba(255,255,255,0.08)` : 'transparent';
+              e.currentTarget.style.color = colors.textSecondary;
+            }}
+          >
+            <span>More Features</span>
+            <ChevronDown size={16} style={{ transform: moreMenuOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: `transform ${animation.standard}` }} />
+          </button>
+
+          {/* More Menu Items */}
+          {moreMenuOpen && (
+            <nav style={{ ...navStackStyle, marginTop: space[2] }} aria-label="More">
+              {SECONDARY_NAV.slice(2).map((item) => (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  className={({ isActive }) => `nav-link${isActive ? " is-active" : ""}`}
+                  onClick={() => setMoreMenuOpen(false)}
+                >
+                  <item.icon size={20} strokeWidth={1.75} />
+                  <span>{item.label}</span>
+                </NavLink>
+              ))}
+            </nav>
+          )}
         </div>
         <div style={{
           marginTop: "auto",

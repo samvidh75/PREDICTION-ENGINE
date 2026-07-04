@@ -1,4 +1,4 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 export function PublicLayout({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
@@ -11,18 +11,17 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
         position: 'sticky', top: 0, zIndex: 100, background: 'rgba(0,0,0,0.8)',
         backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
       }}>
-        <Link to="/pricing" style={{ display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none', color: '#fff' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }} onClick={() => navigate('/')}>
           <div style={{
             width: '32px', height: '32px', borderRadius: '8px',
             background: 'linear-gradient(135deg, #FF6B6B, #b0151e)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: '16px', fontWeight: 700,
+            fontSize: '16px', fontWeight: 700, color: '#fff'
           }}>S</div>
-          <span style={{ fontWeight: 600, fontSize: '16px' }}>StockEx</span>
-        </Link>
+          <span style={{ fontWeight: 600, fontSize: '16px', color: '#fff' }}>StockEx</span>
+        </div>
         <nav style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-          <button onClick={() => navigate('/pricing')} style={{ padding: '8px 14px', borderRadius: '8px', border: 'none', background: 'transparent', color: '#a0a0a0', cursor: 'pointer', fontSize: '13px' }}>Pricing</button>
-          <button onClick={() => navigate('/trust')} style={{ padding: '8px 14px', borderRadius: '8px', border: 'none', background: 'transparent', color: '#a0a0a0', cursor: 'pointer', fontSize: '13px' }}>Trust</button>
+          {/* Empty - removed pricing and trust buttons */}
         </nav>
       </header>
       <main>{children}</main>
