@@ -37,6 +37,7 @@ const BacktestPage = lazy(() => import("../pages/BacktestPage"));
 const AlertPage = lazy(() => import("../pages/AlertPage"));
 const PortfolioAnalyticsPage = lazy(() => import("../pages/PortfolioAnalyticsPage"));
 const LiveMarketPage = lazy(() => import("../pages/LiveMarketPage"));
+const StockDetailPage = lazy(() => import("../pages/StockDetailPage"));
 
 const SHOW_ABOUT_PAGE = import.meta.env.VITE_SHOW_ABOUT_PAGE === "true";
 
@@ -97,6 +98,7 @@ export function AppRoutes() {
         <Route path="/scanner" element={<Suspense fallback={<RouteFallback />}><PublicLayout><ScannerPage /></PublicLayout></Suspense>} />
         <Route path="/scanner/:preset" element={<Suspense fallback={<RouteFallback />}><PublicLayout><ScannerLanding /></PublicLayout></Suspense>} />
         <Route path="/stock/:symbol/*" element={<Suspense fallback={<RouteFallback />}><PublicLayout><StockPage /></PublicLayout></Suspense>} />
+        <Route path="/stock-detail/:symbol" element={<Suspense fallback={<RouteFallback />}><PublicLayout><StockDetailPage /></PublicLayout></Suspense>} />
         <Route path="/compare" element={<Suspense fallback={<RouteFallback />}><PublicLayout><ComparePage /></PublicLayout></Suspense>} />
         <Route path="/sectors" element={<Suspense fallback={<RouteFallback />}><PublicLayout><Sectors /></PublicLayout></Suspense>} />
         <Route path="/sectors/:sectorSlug" element={<Suspense fallback={<RouteFallback />}><PublicLayout><SectorResearch /></PublicLayout></Suspense>} />
