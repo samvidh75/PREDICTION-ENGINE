@@ -26,7 +26,7 @@ export interface UnifiedQuote {
   changePercent: number; // percentage change
 
   // Additional context
-  source: 'yfinance' | 'jugasad' | 'screener' | 'cached';
+  source: 'yfinance' | 'jugasad' | 'screener' | 'bse' | 'cached';
   fetched: number; // when this quote was fetched (ms since epoch)
   cached: boolean; // true if from IndexedDB
 }

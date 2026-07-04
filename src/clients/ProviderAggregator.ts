@@ -2,6 +2,7 @@ import type { UnifiedQuote, BatchQuoteRequest, BatchQuoteResponse } from './type
 import { yfinanceClient } from './YFinanceClient';
 import { nseClient } from './NSEClient';
 import { screenerClient } from './ScreenerClient';
+import { bseClient } from './BSEClient';
 import { browserCache } from './BrowserCache';
 import { providerHealthMonitor } from '../services/health/ProviderHealthMonitor';
 
@@ -43,9 +44,11 @@ export class ProviderAggregator {
     }
 
     // All available providers
+    // Order: NSE first (most common), then BSE, then international
     const allProviders = [
-      { name: 'yfinance', fetch: () => yfinanceClient.fetchQuote(symbol, false) },
       { name: 'jugasad', fetch: () => nseClient.fetchQuote(symbol, false) },
+      { name: 'bse', fetch: () => bseClient.fetchQuote(symbol) },
+      { name: 'yfinance', fetch: () => yfinanceClient.fetchQuote(symbol, false) },
       { name: 'screener', fetch: () => screenerClient.fetchQuote(symbol, false) },
     ];
 
