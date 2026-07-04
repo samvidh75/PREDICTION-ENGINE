@@ -1,6 +1,6 @@
 FROM qwen2.5:0.5b-instruct
 
-ADAPTER ./stockex_slm_agent_output
+ADAPTER stockex_slm_agent_output
 
 PARAMETER temperature 0.1
 PARAMETER stop "<|im_end|>"
