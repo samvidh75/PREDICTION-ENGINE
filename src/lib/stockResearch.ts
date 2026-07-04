@@ -608,6 +608,15 @@ export function searchStocks(query: string, limit = 20): StockResearchSummary[] 
   const normalized = query.trim().toLowerCase();
   if (!normalized) return [];
 
+  // If query matches an alias, prioritize that stock
+  let aliasedStock: StockResearchSummary | undefined;
+  for (const [alias, actualSymbol] of Object.entries(symbolAliases)) {
+    if (alias.toLowerCase() === normalized) {
+      aliasedStock = mergedUniverse.find((stock) => stock.symbol.toUpperCase() === actualSymbol.toUpperCase());
+      break;
+    }
+  }
+
   const ranked = mergedUniverse
     .filter((stock) => !isPlaceholderCompanyIdentity(stock))
     .map((stock) => {
@@ -645,6 +654,13 @@ export function searchStocks(query: string, limit = 20): StockResearchSummary[] 
 
   const seen = new Set<string>();
   const results: StockResearchSummary[] = [];
+
+  // Add aliased stock first if found (highest priority for exact alias match)
+  if (aliasedStock) {
+    results.push(aliasedStock);
+    seen.add(aliasedStock.symbol.toUpperCase());
+  }
+
   for (const item of ranked) {
     const key = item.stock.symbol.toUpperCase();
     if (seen.has(key)) continue;
@@ -681,8 +697,21 @@ export function getScannerStocks(scanType: "quality" | "value" | "momentum" | "s
     );
 }
 
+// Symbol aliases for common shortforms (e.g., user types "HDFC" → search for "HDFCBANK")
+const symbolAliases: Record<string, string> = {
+  "HDFC": "HDFCBANK",
+  "ICICI": "ICICIBANK",
+  "AXIS": "AXISBANK",
+  "KOTAK": "KOTAKBANK",
+  "INDUSIND": "INDUSINDBK",
+  "SBIN": "SBIN",
+  "PNB": "PNBHOUSING",
+  "BOB": "BANKBARODA",
+};
+
 export function getStockResearch(symbol: string): StockResearchDetail | null {
-  const summary = mergedUniverse.find((stock) => stock.symbol.toUpperCase() === symbol.toUpperCase());
+  const resolvedSymbol = symbolAliases[symbol.toUpperCase()] || symbol;
+  const summary = mergedUniverse.find((stock) => stock.symbol.toUpperCase() === resolvedSymbol.toUpperCase());
   if (!summary) return null;
   const normalizedSector = normalizeCategory(summary.sector, "Uncategorized");
   const normalizedIndustry = normalizeCategory(summary.industry, "Uncategorized");
