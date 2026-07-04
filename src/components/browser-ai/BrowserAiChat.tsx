@@ -10,6 +10,7 @@ import PortfolioManager from './PortfolioManager';
 import NewsPanel from './NewsPanel';
 import PortfolioCharts from './PortfolioCharts';
 import PortfolioAnalytics from './PortfolioAnalytics';
+import AlertCenter from './AlertCenter';
 import type { Portfolio } from '../../utils/portfolioStorage';
 
 interface BrowserAiChatProps {
@@ -249,6 +250,10 @@ export default function BrowserAiChat({ ticker }: BrowserAiChatProps) {
 
       {isReady && (
         <PortfolioManager onPortfolioChange={setPortfolio} />
+      )}
+
+      {isReady && portfolio && portfolio.holdings.length > 0 && (
+        <AlertCenter />
       )}
 
       {isReady && portfolio && portfolio.holdings.length > 0 && (
