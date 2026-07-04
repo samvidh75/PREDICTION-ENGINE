@@ -16,10 +16,10 @@ export interface FinancialRiskResult {
 }
 
 export function scoreFinancialRisk(metrics: RiskMetrics): FinancialRiskResult {
-  let leverageScore = 0;
-  let liquidityScore = 0;
-  let coverageScore = 0;
-  let cashScore = 0;
+  let leverageScore: number;
+  let liquidityScore: number;
+  let coverageScore: number;
+  let cashScore: number;
   const reasons: string[] = [];
 
   // ---- DEBT TO EQUITY (0-8 pts) ----

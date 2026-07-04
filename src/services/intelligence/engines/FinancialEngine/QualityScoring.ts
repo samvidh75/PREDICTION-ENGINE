@@ -32,7 +32,7 @@ export class QualityScoring {
     let totalScore = 0;
 
     // ===== ROE SCORING (0-15 points) =====
-    let roeScore = 0;
+    let roeScore: number;
 
     if (!metrics.roe && metrics.roe !== 0) {
       details.push('ROE: Not available (-0 pts)');
@@ -66,7 +66,7 @@ export class QualityScoring {
     totalScore += roeScore;
 
     // ===== OPERATING MARGIN SCORING (0-10 points) =====
-    let operatingMarginScore = 0;
+    let operatingMarginScore: number;
 
     if (!metrics.operatingMargin && metrics.operatingMargin !== 0) {
       details.push('Operating Margin: Not available (-0 pts)');
@@ -100,7 +100,7 @@ export class QualityScoring {
     totalScore += operatingMarginScore;
 
     // ===== NET MARGIN SCORING (0-10 points) =====
-    let netMarginScore = 0;
+    let netMarginScore: number;
 
     if (!metrics.netMargin && metrics.netMargin !== 0) {
       details.push('Net Margin: Not available (-0 pts)');

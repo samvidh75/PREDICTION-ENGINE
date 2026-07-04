@@ -28,7 +28,7 @@ export class GrowthScoring {
     let totalScore = 0;
 
     // ===== REVENUE GROWTH SCORING (0-12 points) =====
-    let revenueScore = 0;
+    let revenueScore: number;
 
     if (!metrics.revenueGrowth && metrics.revenueGrowth !== 0) {
       details.push('Revenue Growth: Not available (-0 pts)');
@@ -65,7 +65,7 @@ export class GrowthScoring {
     totalScore += revenueScore;
 
     // ===== EPS GROWTH SCORING (0-13 points) =====
-    let epsScore = 0;
+    let epsScore: number;
 
     if (!metrics.epsGrowth && metrics.epsGrowth !== 0) {
       details.push('EPS Growth: Not available (-0 pts)');

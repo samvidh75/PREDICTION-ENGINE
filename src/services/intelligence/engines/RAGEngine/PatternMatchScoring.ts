@@ -44,7 +44,7 @@ export function scorePatternMatch(patterns: PatternRecord[]): PatternMatchResult
   else similarityScore = 1;
 
   // Breadth bonus: having multiple diverse patterns
-  let breadthBonus = 0;
+  let breadthBonus: number;
   if (matchCount >= 4) breadthBonus = 5;
   else if (matchCount >= 2) breadthBonus = 3;
   else breadthBonus = 1;

@@ -18,10 +18,10 @@ export interface TailRiskResult {
 }
 
 export function scoreTailRisk(metrics: RiskMetrics): TailRiskResult {
-  let regulatoryScore = 0;
-  let litigationScore = 0;
-  let obsolescenceScore = 0;
-  let disruptionScore = 0;
+  let regulatoryScore: number;
+  let litigationScore: number;
+  let obsolescenceScore: number;
+  let disruptionScore: number;
   const reasons: string[] = [];
 
   // ---- REGULATORY / POLITICAL RISK (0-4 pts) — inverted ----

@@ -45,7 +45,7 @@ function scoreMovingAverages(metrics: TechnicalMetrics): { score: number; note: 
 }
 
 function scorePricePosition(metrics: TechnicalMetrics): { score: number; note: string } {
-  let score = 0;
+  let score: number;
   const notes: string[] = [];
 
   // Short term (1M, 3M) vs medium term (6M, 1Y) alignment

@@ -86,7 +86,7 @@ export class ConsistencyScoring {
         history.slice(-Math.floor(history.length / 2)).reduce((s, h) => s + h.epsYoY, 0) /
         Math.floor(history.length / 2);
 
-      let epsGrowthTrend: 'accelerating' | 'decelerating' | 'stable' = 'stable';
+      let epsGrowthTrend: 'accelerating' | 'decelerating' | 'stable';
       if (lateGrowth > earlyGrowth + 3) {
         epsGrowthTrend = 'accelerating';
         totalScore += 7;

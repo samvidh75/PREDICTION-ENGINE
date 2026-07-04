@@ -3,7 +3,7 @@ import { ValuationStatus } from '../../types/stock';
 export class ValuationEngine {
   public static calculateValuation(peRatio: number): { score: number; status: ValuationStatus } {
     // Valuation evaluation proxy based on standard trailing P/E bounds
-    let score = 50; // baseline
+    let score: number;
 
     if (peRatio <= 0) {
       return { score: 0, status: 'overvalued' };

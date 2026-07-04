@@ -16,9 +16,9 @@ export interface DownsideRiskResult {
 }
 
 export function scoreDownsideRisk(metrics: RiskMetrics): DownsideRiskResult {
-  let scenarioScore = 0;
-  let sharpeScore = 0;
-  let varScore = 0;
+  let scenarioScore: number;
+  let sharpeScore: number;
+  let varScore: number;
   const reasons: string[] = [];
 
   // ---- SCENARIO: PROFITABLE AT -20% REVENUE (0-10 pts) ----

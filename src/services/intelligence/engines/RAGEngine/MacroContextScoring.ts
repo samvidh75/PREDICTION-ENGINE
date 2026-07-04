@@ -46,7 +46,7 @@ export function scoreMacroContext(signals: MacroSignal[], sectorPhase?: string):
   else baseScore = 1;
 
   // Signal richness bonus
-  let richnessBonus = 0;
+  let richnessBonus: number;
   if (signalCount >= 6) richnessBonus = 3;
   else if (signalCount >= 3) richnessBonus = 2;
   else richnessBonus = 1;

@@ -6,6 +6,7 @@ import { AppRoutes } from "./app/routes";
 import { ScrollToTop } from "./app/ScrollToTop";
 import LiveAlertSentinel from "./components/LiveAlertSentinel";
 import CommandPalette from "./components/CommandPalette";
+import FloatingAIButton from "./components/FloatingAIButton";
 import { analytics } from "./lib/client/anonymousAnalytics";
 
 const queryClient = new QueryClient({
@@ -34,6 +35,8 @@ export default function App() {
           <LiveAlertSentinel />
           {/* Raycast-style command palette */}
           <CommandPalette />
+          {/* Floating AI button */}
+          <FloatingAIButton />
           <AppRoutes />
         </BrowserRouter>
       </AuthProvider>

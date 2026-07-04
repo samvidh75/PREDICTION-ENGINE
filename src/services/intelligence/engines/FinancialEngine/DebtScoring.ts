@@ -24,7 +24,7 @@ export class DebtScoring {
     interestCoverage?: number;
   }): DebtResult {
     const deDetails: string[] = [];
-    let score = 0;
+    let score: number;
 
     // ===== DEBT-TO-EQUITY SCORING =====
     if (!metrics.debtToEquity && metrics.debtToEquity !== 0) {

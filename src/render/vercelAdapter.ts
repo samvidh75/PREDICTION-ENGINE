@@ -1,4 +1,3 @@
-// @ts-nocheck — Not actively used (native apiRouter replaces Vercel proxy)
 /**
  * Adapter: converts Vercel serverless handler exports to Fastify route handlers.
  *

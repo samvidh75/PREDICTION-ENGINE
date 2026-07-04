@@ -51,7 +51,7 @@ export function scoreKnowledgeCoverage(items: KnowledgeItem[]): KnowledgeCoverag
 
   // Type diversity bonus
   const types = new Set(validItems.map(i => i.type));
-  let diversityBonus = 0;
+  let diversityBonus: number;
   if (types.size >= 3) diversityBonus = 3;
   else if (types.size >= 2) diversityBonus = 2;
   else diversityBonus = 0;

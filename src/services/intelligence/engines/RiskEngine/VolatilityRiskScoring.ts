@@ -15,8 +15,8 @@ export interface VolatilityRiskResult {
 }
 
 export function scoreVolatilityRisk(metrics: RiskMetrics): VolatilityRiskResult {
-  let sigmaScore = 0;
-  let betaScore = 0;
+  let sigmaScore: number;
+  let betaScore: number;
   let drawdownScore = 0;
   const reasons: string[] = [];
 

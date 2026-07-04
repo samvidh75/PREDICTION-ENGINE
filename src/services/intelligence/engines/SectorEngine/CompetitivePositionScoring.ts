@@ -22,8 +22,8 @@ export function scoreCompetitivePosition(params: {
   const details: string[] = [];
   const { marketCapRank, sectorPeerCount, brandStrength, customerStickiness } = params;
 
-  let score = 10;
-  let level: CompetitivePositionResult['level'] = 'unknown';
+  let score: number;
+  let level: CompetitivePositionResult['level'];
 
   const hasRank = marketCapRank != null && sectorPeerCount != null && sectorPeerCount > 0;
   const hasBrand = brandStrength != null;
@@ -38,10 +38,10 @@ export function scoreCompetitivePosition(params: {
   let rankScore = 10;
   if (hasRank) {
     const rankPct = marketCapRank! / sectorPeerCount!;
-    if (rankPct <= 0.1) { rankScore = 18; level = 'market_leader'; }
-    else if (rankPct <= 0.25) { rankScore = 15; level = 'top_tier'; }
-    else if (rankPct <= 0.5) { rankScore = 11; level = 'mid_tier'; }
-    else { rankScore = 5; level = 'small_player'; }
+    if (rankPct <= 0.1) { rankScore = 18; }
+    else if (rankPct <= 0.25) { rankScore = 15; }
+    else if (rankPct <= 0.5) { rankScore = 11; }
+    else { rankScore = 5; }
   }
 
   // Score from brand strength

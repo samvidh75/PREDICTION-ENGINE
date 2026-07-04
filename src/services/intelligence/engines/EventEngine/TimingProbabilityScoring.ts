@@ -15,7 +15,7 @@ interface TimingResult {
 export class TimingProbabilityScoring {
   analyze(metrics: Partial<EventMetrics>): TimingResult {
     const details: string[] = [];
-    let totalScore = 0;
+    let totalScore: number;
     let daysToCatalyst = 999;
 
     const now = new Date();

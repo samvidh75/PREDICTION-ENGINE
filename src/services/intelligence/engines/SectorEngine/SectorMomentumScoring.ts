@@ -24,8 +24,8 @@ export function scoreSectorMomentum(params: {
   const { sectorReturn1M, sectorReturn3M, relativeStrength,
           analystUpgrades, analystDowngrades } = params;
 
-  let score = 10; // Default neutral
-  let level: SectorMomentumResult['level'] = 'unknown';
+  let score: number;
+  let level: SectorMomentumResult['level'];
 
   const hasReturnData = sectorReturn1M != null || sectorReturn3M != null;
   const hasRsData = relativeStrength != null;
@@ -37,7 +37,7 @@ export function scoreSectorMomentum(params: {
   }
 
   // Score from returns
-  let returnScore = 10;
+  let returnScore: number;
   const ret1M = sectorReturn1M ?? 0;
   const ret3M = sectorReturn3M ?? 0;
   const compositeReturn = ret1M * 0.4 + ret3M * 0.6;

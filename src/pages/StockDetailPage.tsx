@@ -24,7 +24,7 @@ export default function StockDetailPage() {
 
   if (!symbol) {
     return (
-      <div style={{ padding: '40px', color: colors.textPrimary }}>
+      <div style={{ padding: '16px', color: colors.textPrimary }}>
         <p>Symbol not provided</p>
       </div>
     );
@@ -32,7 +32,7 @@ export default function StockDetailPage() {
 
   if (loading) {
     return (
-      <div style={{ padding: '40px', color: colors.textPrimary }}>
+      <div style={{ padding: '16px', color: colors.textPrimary }}>
         <p>Loading quote for {symbol}...</p>
       </div>
     );
@@ -40,9 +40,9 @@ export default function StockDetailPage() {
 
   if (error) {
     return (
-      <div style={{ padding: '40px', color: colors.textPrimary }}>
+      <div style={{ padding: '16px', color: colors.textPrimary }}>
         <p style={{ color: '#ff4444' }}>Error: {error.message}</p>
-        <button onClick={() => window.location.reload()} style={{ marginTop: '20px', padding: '10px 20px' }}>
+        <button onClick={() => window.location.reload()} style={{ marginTop: '12px', padding: '8px 16px' }}>
           Refresh
         </button>
       </div>
@@ -51,7 +51,7 @@ export default function StockDetailPage() {
 
   if (!quote) {
     return (
-      <div style={{ padding: '40px', color: colors.textPrimary }}>
+      <div style={{ padding: '16px', color: colors.textPrimary }}>
         <p>No data available for {symbol}</p>
       </div>
     );
@@ -66,32 +66,35 @@ export default function StockDetailPage() {
     <div style={{
       maxWidth: '1200px',
       margin: '0 auto',
-      padding: '40px 24px',
+      padding: '16px',
       color: colors.textPrimary,
       fontFamily: 'system-ui, -apple-system, sans-serif'
     }}>
-      <div style={{ marginBottom: '40px' }}>
-        <h1 style={{ margin: '0 0 8px 0', fontSize: '32px', fontWeight: '700' }}>
+      {/* Header */}
+      <div style={{ marginBottom: '20px' }}>
+        <h1 style={{ margin: '0 0 4px 0', fontSize: 'clamp(24px, 6vw, 36px)', fontWeight: '700' }}>
           {quote.symbol || symbol}
         </h1>
-        <p style={{ margin: '0', color: colors.textSecondary, fontSize: '14px' }}>
+        <p style={{ margin: '0', color: colors.textSecondary, fontSize: '12px' }}>
           {quote.source && `From ${quote.source}`}
           {quote.cached && ' (cached)'}
         </p>
       </div>
 
+      {/* Price Card */}
       <div style={{
         backgroundColor: colors.surface,
-        borderRadius: '8px',
-        padding: '24px',
-        marginBottom: '24px'
+        borderRadius: '12px',
+        padding: '16px',
+        marginBottom: '16px',
+        border: `1px solid ${colors.border}`
       }}>
-        <div style={{ marginBottom: '24px' }}>
-          <div style={{ fontSize: '48px', fontWeight: '700', marginBottom: '8px' }}>
+        <div style={{ marginBottom: '16px' }}>
+          <div style={{ fontSize: 'clamp(32px, 10vw, 56px)', fontWeight: '700', marginBottom: '8px', lineHeight: '1' }}>
             ₹{displayPrice}
           </div>
           <div style={{
-            fontSize: '20px',
+            fontSize: 'clamp(16px, 4vw, 24px)',
             fontWeight: '600',
             color: changeColor
           }}>
@@ -99,51 +102,52 @@ export default function StockDetailPage() {
           </div>
         </div>
 
+        {/* Stats Grid */}
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(2, 1fr)',
-          gap: '20px',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
+          gap: '12px',
           borderTop: `1px solid ${colors.border}`,
-          paddingTop: '20px'
+          paddingTop: '16px'
         }}>
           <div>
-            <p style={{ margin: '0 0 4px 0', color: colors.textSecondary, fontSize: '12px' }}>
+            <p style={{ margin: '0 0 4px 0', color: colors.textSecondary, fontSize: '11px', textTransform: 'uppercase' }}>
               VOLUME
             </p>
-            <p style={{ margin: '0', fontSize: '16px', fontWeight: '600' }}>
+            <p style={{ margin: '0', fontSize: '14px', fontWeight: '600' }}>
               {displayVolume}M
             </p>
           </div>
 
           {quote.bid && quote.ask && (
             <div>
-              <p style={{ margin: '0 0 4px 0', color: colors.textSecondary, fontSize: '12px' }}>
-                BID-ASK SPREAD
+              <p style={{ margin: '0 0 4px 0', color: colors.textSecondary, fontSize: '11px', textTransform: 'uppercase' }}>
+                BID-ASK
               </p>
-              <p style={{ margin: '0', fontSize: '14px' }}>
-                ₹{quote.bid.toFixed(2)} - ₹{quote.ask.toFixed(2)}
+              <p style={{ margin: '0', fontSize: '12px', fontWeight: '600' }}>
+                ₹{quote.bid.toFixed(0)} - {quote.ask.toFixed(0)}
               </p>
             </div>
           )}
 
           {quote.high && (
             <div>
-              <p style={{ margin: '0 0 4px 0', color: colors.textSecondary, fontSize: '12px' }}>
-                52-WEEK HIGH
+              <p style={{ margin: '0 0 4px 0', color: colors.textSecondary, fontSize: '11px', textTransform: 'uppercase' }}>
+                HIGH
               </p>
-              <p style={{ margin: '0', fontSize: '16px', fontWeight: '600' }}>
-                ₹{quote.high.toFixed(2)}
+              <p style={{ margin: '0', fontSize: '14px', fontWeight: '600' }}>
+                ₹{quote.high.toFixed(0)}
               </p>
             </div>
           )}
 
           {quote.low && (
             <div>
-              <p style={{ margin: '0 0 4px 0', color: colors.textSecondary, fontSize: '12px' }}>
-                52-WEEK LOW
+              <p style={{ margin: '0 0 4px 0', color: colors.textSecondary, fontSize: '11px', textTransform: 'uppercase' }}>
+                LOW
               </p>
-              <p style={{ margin: '0', fontSize: '16px', fontWeight: '600' }}>
-                ₹{quote.low.toFixed(2)}
+              <p style={{ margin: '0', fontSize: '14px', fontWeight: '600' }}>
+                ₹{quote.low.toFixed(0)}
               </p>
             </div>
           )}
@@ -151,16 +155,23 @@ export default function StockDetailPage() {
       </div>
 
       {/* Chart Section */}
-      <div style={{ marginBottom: '24px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-          <h2 style={{ margin: '0', fontSize: '20px', fontWeight: '600' }}>Price Chart</h2>
-          <div style={{ display: 'flex', gap: '8px' }}>
+      <div style={{ marginBottom: '16px' }}>
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '12px',
+          flexWrap: 'wrap',
+          gap: '8px'
+        }}>
+          <h2 style={{ margin: '0', fontSize: 'clamp(16px, 5vw, 20px)', fontWeight: '600' }}>Price Chart</h2>
+          <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
             {(['1D', '5D', '1M', '3M', '1Y'] as const).map((tf) => (
               <button
                 key={tf}
                 onClick={() => setTimeframe(tf)}
                 style={{
-                  padding: '8px 12px',
+                  padding: '6px 10px',
                   backgroundColor: timeframe === tf ? (colors.primary || '#3b82f6') : colors.canvas,
                   color: timeframe === tf ? '#fff' : colors.textSecondary,
                   border: `1px solid ${colors.border}`,
@@ -168,7 +179,8 @@ export default function StockDetailPage() {
                   fontSize: '12px',
                   fontWeight: '600',
                   cursor: 'pointer',
-                  transition: 'all 0.2s'
+                  transition: 'all 0.2s',
+                  whiteSpace: 'nowrap'
                 }}
               >
                 {tf}
@@ -181,10 +193,14 @@ export default function StockDetailPage() {
           <div style={{
             backgroundColor: colors.surface,
             borderRadius: '8px',
-            padding: '40px',
+            padding: '24px',
             textAlign: 'center',
             color: colors.textSecondary,
-            border: `1px solid ${colors.border}`
+            border: `1px solid ${colors.border}`,
+            minHeight: '200px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
           }}>
             Loading chart...
           </div>
@@ -193,7 +209,7 @@ export default function StockDetailPage() {
             symbol={symbol || ''}
             ohlcData={ohlcData || []}
             timeframe={timeframe}
-            height={400}
+            height={Math.max(300, Math.min(500, window.innerHeight / 2))}
           />
         )}
       </div>
@@ -201,14 +217,15 @@ export default function StockDetailPage() {
       <button
         onClick={() => window.location.reload()}
         style={{
-          padding: '12px 24px',
+          padding: '10px 20px',
           backgroundColor: colors.primary || '#3b82f6',
           color: '#fff',
           border: 'none',
           borderRadius: '6px',
           fontSize: '14px',
           fontWeight: '600',
-          cursor: 'pointer'
+          cursor: 'pointer',
+          width: '100%'
         }}
       >
         Refresh Quote

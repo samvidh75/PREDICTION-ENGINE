@@ -25,7 +25,7 @@ export class StabilityEngine {
 
     score = Math.max(10, Math.min(100, score));
 
-    let status: DNAStatus = "Stable";
+    let status: DNAStatus;
     if (score >= 85) status = "Very Strong";
     else if (score >= 70) status = "Strong";
     else if (score >= 50) status = "Stable";

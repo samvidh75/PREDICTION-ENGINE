@@ -17,10 +17,10 @@ export interface BusinessRiskResult {
 }
 
 export function scoreBusinessRisk(metrics: RiskMetrics): BusinessRiskResult {
-  let concentrationScore = 0;
-  let predictabilityScore = 0;
-  let moatScore = 0;
-  let executionScore = 0;
+  let concentrationScore: number;
+  let predictabilityScore: number;
+  let moatScore: number;
+  let executionScore: number;
   const reasons: string[] = [];
 
   // ---- CUSTOMER CONCENTRATION (0-5 pts) ----

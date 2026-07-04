@@ -24,7 +24,7 @@ export class RiskEngine {
     score = Math.max(10, Math.min(100, score));
 
     // Convert high score to standard status where low risk = Very Strong, high risk = Weak
-    let status: DNAStatus = "Stable";
+    let status: DNAStatus;
     if (score <= 25) status = "Very Strong";      // Safe
     else if (score <= 45) status = "Strong";      // Moderate
     else if (score <= 65) status = "Stable";      // High
