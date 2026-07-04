@@ -103,3 +103,7 @@ stockstory-demo
 __pycache__/
 data/chroma_db/
 data/training_dataset/
+stockex_merged_model/
+*.safetensors
+*.pt
+checkpoint-*/
