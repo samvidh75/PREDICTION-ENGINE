@@ -159,6 +159,17 @@ import { LazyAreaChart, LazyBarChart } from "../components/DynamicChart";
 
 ---
 
+## Phase 4: A11y & Build Config Quick Wins (Jul 4, 2026)
+
+| Item | Change | Impact |
+|---|---|---|
+| `.sr-only` class | Added in `src/styles/utilities.css` | Screen readers can announce hidden-but-relevant elements |
+| `prefers-reduced-motion` | Added in `src/styles/baseline.css` | Respects OS a11y setting — disables all animations |
+| `chunkSizeWarningLimit: 1000` | Set in `vite.config.ts` (was default 500) | Suppresses false positive on 737kB charts chunk |
+| `audit:lighthouse` scripts | Added to `package.json` | One-command verification via `npm run audit:lighthouse:mobile` |
+
+---
+
 ## 📈 Bundle Analysis Results
 
 ```

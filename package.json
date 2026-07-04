@@ -152,6 +152,8 @@
     "smoke:static-assets": "tsx scripts/smoke-static-assets.ts",
     "audit:responsive-ui": "tsx scripts/audit-responsive-ui.ts",
     "audit:accessibility-smoke": "tsx scripts/audit-accessibility-smoke.ts",
+    "audit:lighthouse": "npx lighthouse https://stockstory-india.com --view --preset=desktop --output-path=reports/lighthouse-report.html",
+    "audit:lighthouse:mobile": "npx lighthouse https://stockstory-india.com --view --preset=perf --output-path=reports/lighthouse-mobile-report.html",
     "audit:visual-layout": "tsx scripts/audit-visual-layout.ts",
     "eval:ai:local": "tsx scripts/run-ai-eval.ts",
     "backfill:feature-factor-lineage": "tsx scripts/backfill-feature-factor-lineage.ts",
