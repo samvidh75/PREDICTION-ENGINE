@@ -1,13 +1,25 @@
 import { useParams } from "react-router-dom";
+import { useState } from "react";
 import { useQuote } from "../hooks/useQuote";
+import { useOHLCData } from "../hooks/useOHLCData";
+import StockChart from "../components/StockChart";
 import { colors } from "../design/tokens";
 
 export default function StockDetailPage() {
   const { symbol } = useParams<{ symbol: string }>();
+  const [timeframe, setTimeframe] = useState<'1D' | '5D' | '1M' | '3M' | '1Y'>('1M');
+
   const { quote, loading, error } = useQuote({
     symbol: symbol || '',
     refreshInterval: 5000,
     enabled: !!symbol
+  });
+
+  const { data: ohlcData, loading: chartLoading } = useOHLCData({
+    symbol: symbol || '',
+    timeframe,
+    enabled: !!symbol,
+    refreshInterval: 60000
   });
 
   if (!symbol) {
@@ -52,7 +64,7 @@ export default function StockDetailPage() {
 
   return (
     <div style={{
-      maxWidth: '800px',
+      maxWidth: '1200px',
       margin: '0 auto',
       padding: '40px 24px',
       color: colors.textPrimary,
@@ -136,6 +148,54 @@ export default function StockDetailPage() {
             </div>
           )}
         </div>
+      </div>
+
+      {/* Chart Section */}
+      <div style={{ marginBottom: '24px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+          <h2 style={{ margin: '0', fontSize: '20px', fontWeight: '600' }}>Price Chart</h2>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            {(['1D', '5D', '1M', '3M', '1Y'] as const).map((tf) => (
+              <button
+                key={tf}
+                onClick={() => setTimeframe(tf)}
+                style={{
+                  padding: '8px 12px',
+                  backgroundColor: timeframe === tf ? (colors.primary || '#3b82f6') : colors.canvas,
+                  color: timeframe === tf ? '#fff' : colors.textSecondary,
+                  border: `1px solid ${colors.border}`,
+                  borderRadius: '4px',
+                  fontSize: '12px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s'
+                }}
+              >
+                {tf}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {chartLoading ? (
+          <div style={{
+            backgroundColor: colors.surface,
+            borderRadius: '8px',
+            padding: '40px',
+            textAlign: 'center',
+            color: colors.textSecondary,
+            border: `1px solid ${colors.border}`
+          }}>
+            Loading chart...
+          </div>
+        ) : (
+          <StockChart
+            symbol={symbol || ''}
+            ohlcData={ohlcData || []}
+            timeframe={timeframe}
+            height={400}
+          />
+        )}
       </div>
 
       <button

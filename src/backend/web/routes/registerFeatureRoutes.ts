@@ -10,6 +10,7 @@ import { registerEarningsRoutes } from './earningsRoutes.js';
 import { registerDataWarehouseRoutes } from './dataWarehouseRoutes.js';
 import { registerMarketDepthRoutes } from './marketDepthRoutes.js';
 import { registerAlertsRoutes } from './alertsRoutes.js';
+import { registerOHLCRoutes } from './ohlcRoutes.js';
 
 export async function registerFeatureRoutes(server: FastifyInstance) {
   await registerBacktestRoutes(server);
@@ -23,4 +24,5 @@ export async function registerFeatureRoutes(server: FastifyInstance) {
   await registerDataWarehouseRoutes(server);
   await registerMarketDepthRoutes(server);
   await registerAlertsRoutes(server);
+  await registerOHLCRoutes(server);
 }

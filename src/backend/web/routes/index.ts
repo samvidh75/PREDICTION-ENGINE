@@ -2,6 +2,7 @@ export { registerBacktestRoutes } from './backtestRoutes.js';
 export { registerCommercialRoutes } from './registerCommercialRoutes.js';
 export { registerEarningsSentimentRoutes } from './earningsSentimentRoutes.js';
 export { healthRoutes as registerHealthRoutes } from './health.js';
+export { registerOHLCRoutes } from './ohlcRoutes.js';
 export { registerIntelligenceContextRoutes } from './intelligenceContextRoutes.js';
 export { registerIntelligenceCoreRoutes } from './intelligenceCoreRoutes.js';
 export { registerIntelligenceMarketRoutes } from './intelligenceMarketRoutes.js';
