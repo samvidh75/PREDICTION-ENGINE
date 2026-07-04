@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import { chatHistoryStorage, type ChatMessage } from '../../utils/chatHistoryStorage';
 import { buildAIContext, type MarketContext } from '../../utils/aiContextBuilder';
 import { liveMarketDataService } from '../../utils/liveMarketDataService';
+import ModelSelector from './ModelSelector';
 
 interface BrowserAiChatProps {
   ticker: string;
@@ -20,6 +21,8 @@ export default function BrowserAiChat({ ticker }: BrowserAiChatProps) {
   const [loading, setLoading] = useState(false);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [marketData, setMarketData] = useState<MarketContext>({ ticker });
+  const [currentModel, setCurrentModel] = useState<'qwen-0.5b' | 'qwen-7b'>('qwen-0.5b');
+  const [isSwitchingModel, setIsSwitchingModel] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -29,14 +32,25 @@ export default function BrowserAiChat({ ticker }: BrowserAiChatProps) {
     );
 
     llmWorker.onmessage = (e: MessageEvent) => {
-      const { type, message, response: slmOut, error } = e.data;
+      const { type, message, response: slmOut, error, model, modelInfo } = e.data;
 
       if (type === 'STATUS_UPDATE') setStatus(message);
       if (type === 'INITIALIZED_SUCCESS') {
-        setStatus('✅ WebGPU Ready. Fine-tuned model loaded.');
+        setStatus(`✅ ${modelInfo.modelId === 'qwen-7b' ? '🧠 Powerful' : '⚡ Fast'} model ready`);
+        setCurrentModel(modelInfo.modelId);
         setIsReady(true);
+        setIsSwitchingModel(false);
       }
       if (type === 'INITIALIZATION_FAILED') setStatus(`❌ Error: ${error}`);
+      if (type === 'MODEL_SWITCHED') {
+        setCurrentModel(model);
+        setIsSwitchingModel(false);
+        setStatus(`✅ Switched to ${model === 'qwen-7b' ? 'powerful' : 'fast'} model`);
+      }
+      if (type === 'SWITCH_FAILED') {
+        setIsSwitchingModel(false);
+        setStatus(`❌ Switch failed: ${error}`);
+      }
       if (type === 'GENERATION_COMPLETE') {
         handleResponseReceived(slmOut);
         setLoading(false);
@@ -143,6 +157,16 @@ export default function BrowserAiChat({ ticker }: BrowserAiChatProps) {
     }
   };
 
+  const handleModelChange = async (modelId: 'qwen-0.5b' | 'qwen-7b') => {
+    if (isSwitchingModel || !worker || !isReady) return;
+
+    setIsSwitchingModel(true);
+    worker.postMessage({
+      type: 'SWITCH_MODEL',
+      payload: { targetModel: modelId },
+    });
+  };
+
   const clearHistory = async () => {
     if (!sessionId) return;
     await chatHistoryStorage.deleteSession(sessionId);
@@ -169,6 +193,10 @@ export default function BrowserAiChat({ ticker }: BrowserAiChatProps) {
         <button onClick={wakeUpLocalEngine} style={{ marginBottom: '12px', padding: '8px 16px', cursor: 'pointer' }}>
           🚀 Load Local AI
         </button>
+      )}
+
+      {isReady && (
+        <ModelSelector currentModel={currentModel} onModelChange={handleModelChange} isLoading={isSwitchingModel} />
       )}
 
       {isReady && (

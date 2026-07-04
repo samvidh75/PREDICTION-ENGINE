@@ -1,11 +1,13 @@
-// src/components/browser-ai/edgeAiLlmWorkerFineTuned.ts
-// Enhanced WebGPU Worker with LoRA Adapter + Encyclopedia Placeholder Resolution
+// Enhanced WebGPU Worker supporting Qwen0.5B and Qwen7B models
+// Auto-switches based on device capability with fallback chain
 
 interface WorkerState {
   modelInstance: any;
   tokenizerInstance: any;
-  workerStatus: string;
+  workerStatus: 'idle' | 'loading' | 'ready' | 'failed';
   adapterLoaded: boolean;
+  currentModel: 'qwen-0.5b' | 'qwen-7b';
+  isQuantized: boolean;
 }
 
 const state: WorkerState = {
@@ -13,6 +15,8 @@ const state: WorkerState = {
   tokenizerInstance: null,
   workerStatus: 'idle',
   adapterLoaded: false,
+  currentModel: 'qwen-0.5b',
+  isQuantized: true,
 };
 
 const AUDIT_MAP: Record<string, string> = {
@@ -46,53 +50,145 @@ function resolvePlaceholders(template: string, data: Record<string, any>): strin
   return result;
 }
 
+/**
+ * Load model with automatic fallback chain
+ */
+async function loadModelWithFallback(
+  targetModel: 'qwen-0.5b' | 'qwen-7b',
+  AutoModelForCausalLM: any,
+  AutoTokenizer: any,
+): Promise<string> {
+  const models = {
+    'qwen-7b': {
+      repo: 'Qwen/Qwen2.5-7B-Instruct',
+      desc: 'powerful',
+    },
+    'qwen-0.5b': {
+      repo: 'samvidhh/Qwen2.5-0.5B-stockmarket-encyclopedia',
+      desc: 'fast',
+    },
+  };
+
+  const modelConfig = models[targetModel];
+
+  (self as any).postMessage({
+    type: 'STATUS_UPDATE',
+    message: `Loading ${modelConfig.desc} model (${targetModel})...`,
+  });
+
+  try {
+    // Check device memory for 7B
+    if (targetModel === 'qwen-7b') {
+      const deviceMemory = (navigator as any).deviceMemory || 8;
+      if (deviceMemory < 6) {
+        throw new Error(`Need 6GB RAM for Qwen7B, device has ${deviceMemory}GB. Falling back to 0.5B`);
+      }
+    }
+
+    // Load tokenizer
+    state.tokenizerInstance = await AutoTokenizer.from_pretrained(modelConfig.repo);
+
+    // Load model with progress
+    const startTime = Date.now();
+    state.modelInstance = await AutoModelForCausalLM.from_pretrained(modelConfig.repo, {
+      device: 'webgpu',
+      dtype: 'q4',
+      progress_callback: (progress: { loaded: number; total: number }) => {
+        const pct = Math.round((progress.loaded / progress.total) * 100);
+        (self as any).postMessage({
+          type: 'STATUS_UPDATE',
+          message: `Loading... ${pct}% (${Math.round(progress.loaded / 1024 / 1024)}MB)`,
+        });
+      },
+    });
+
+    const loadTime = Date.now() - startTime;
+    state.currentModel = targetModel;
+    state.workerStatus = 'ready';
+
+    (self as any).postMessage({
+      type: 'STATUS_UPDATE',
+      message: `✅ ${modelConfig.desc} model ready (${Math.round(loadTime / 1000)}s)`,
+    });
+
+    return modelConfig.repo;
+  } catch (error) {
+    (self as any).postMessage({
+      type: 'STATUS_UPDATE',
+      message: `⚠️ ${targetModel} failed. Trying fallback...`,
+    });
+
+    if (targetModel === 'qwen-7b') {
+      return loadModelWithFallback('qwen-0.5b', AutoModelForCausalLM, AutoTokenizer);
+    }
+
+    throw error;
+  }
+}
+
 (self as any).onmessage = async (e: { data: any }) => {
   const { type, payload } = e.data;
 
   if (type === 'INITIALIZE_BROWSER_LLM') {
     try {
+      state.workerStatus = 'loading';
       (self as any).postMessage({ type: 'STATUS_UPDATE', message: 'Initializing WebGPU engine...' });
 
       const { AutoTokenizer, AutoModelForCausalLM } = await import('@huggingface/transformers');
 
-      let modelId = 'onnx-community/Qwen2.5-0.5B-Instruct';
-
-      // Fine-tuned model now available on HuggingFace Hub
-      const finetuneModelId = 'samvidhh/Qwen2.5-0.5B-stockmarket-encyclopedia';
-
-      try {
-        // Attempt to load fine-tuned model
-        // This will fail if model not yet uploaded, but we'll catch it
-        const testLoad = await fetch(`https://huggingface.co/${finetuneModelId}/resolve/main/config.json`, {
-          method: 'HEAD',
-          mode: 'no-cors'
-        });
-
-        if (testLoad.ok || testLoad.status === 0) {
-          modelId = finetuneModelId;
-          (self as any).postMessage({ type: 'STATUS_UPDATE', message: 'Loading fine-tuned model from HuggingFace...' });
-          state.adapterLoaded = true;
+      // Auto-detect best model for device
+      let targetModel: 'qwen-0.5b' | 'qwen-7b' = 'qwen-0.5b';
+      if (payload?.preferLarge) {
+        targetModel = 'qwen-7b';
+      } else {
+        const deviceMemory = (navigator as any).deviceMemory || 8;
+        if (deviceMemory >= 8) {
+          targetModel = 'qwen-7b';
+          (self as any).postMessage({
+            type: 'STATUS_UPDATE',
+            message: '💡 High-memory device detected. Attempting Qwen7B (powerful model)...',
+          });
         }
-      } catch {
-        // Model not available, use base
-        (self as any).postMessage({ type: 'STATUS_UPDATE', message: 'Loading base model (fine-tuned not available)' });
       }
 
-      state.tokenizerInstance = await AutoTokenizer.from_pretrained(modelId);
-      state.modelInstance = await AutoModelForCausalLM.from_pretrained(modelId, {
-        device: 'webgpu',
-        dtype: 'fp16',
-      });
-      state.workerStatus = 'ready';
+      await loadModelWithFallback(targetModel, AutoModelForCausalLM, AutoTokenizer);
 
       (self as any).postMessage({
         type: 'INITIALIZED_SUCCESS',
-        modelInfo: { modelId, device: 'webgpu', ready: true, adapterLoaded: state.adapterLoaded },
+        modelInfo: {
+          modelId: state.currentModel,
+          device: 'webgpu',
+          ready: true,
+          adapterLoaded: state.adapterLoaded,
+          quantized: state.isQuantized,
+        },
       });
     } catch (error) {
       state.workerStatus = 'failed';
       (self as any).postMessage({
         type: 'INITIALIZATION_FAILED',
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
+    }
+    return;
+  }
+
+  if (type === 'SWITCH_MODEL') {
+    try {
+      const { targetModel } = payload;
+      state.workerStatus = 'loading';
+
+      const { AutoTokenizer, AutoModelForCausalLM } = await import('@huggingface/transformers');
+      await loadModelWithFallback(targetModel, AutoModelForCausalLM, AutoTokenizer);
+
+      (self as any).postMessage({
+        type: 'MODEL_SWITCHED',
+        model: state.currentModel,
+      });
+    } catch (error) {
+      state.workerStatus = 'failed';
+      (self as any).postMessage({
+        type: 'SWITCH_FAILED',
         error: error instanceof Error ? error.message : 'Unknown error',
       });
     }
