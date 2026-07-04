@@ -717,7 +717,6 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
           <Stat label="HQ" value={companyProfile.hq} />
           <Stat label="Employees" value={companyProfile.employees} />
           <Stat label="Exchange" value={stock.exchange} />
-          <Stat label="ISIN" value={companyProfile.isin} />
           <Stat label="Sector" value={stock.sector} />
           <Stat label="Industry" value={stock.industry} />
           <Stat label="Listed on" value="BSE, NSE" />
