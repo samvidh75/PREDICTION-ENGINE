@@ -235,9 +235,9 @@ export default function BrowserAiChat({ ticker }: BrowserAiChatProps) {
         <small style={{ color: '#666' }}>{status}</small>
       </div>
 
-      {marketData.currentPrice && (
+      {marketData.currentPrice && typeof marketData.currentPrice === 'number' && (
         <div style={{ fontSize: '12px', color: '#666', marginBottom: '12px', padding: '8px', backgroundColor: '#f5f5f5', borderRadius: '4px' }}>
-          📊 {ticker} @ ₹{marketData.currentPrice.toFixed(2)}{marketData.changePercent && ` (${marketData.changePercent > 0 ? '↑' : '↓'}${Math.abs(marketData.changePercent).toFixed(2)}%)`}
+          📊 {ticker} @ ₹{marketData.currentPrice.toFixed(2)}{marketData.changePercent && typeof marketData.changePercent === 'number' && ` (${marketData.changePercent > 0 ? '↑' : '↓'}${Math.abs(marketData.changePercent).toFixed(2)}%)`}
         </div>
       )}
 

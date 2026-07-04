@@ -119,7 +119,9 @@ class LiveMarketDataService {
 
         ws.onopen = () => {
           // Subscribe to this ticker
-          ws!.send(JSON.stringify({ action: 'subscribe', ticker }));
+          if (ws && ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({ action: 'subscribe', ticker }));
+          }
           reconnectAttempts = 0;
         };
 
@@ -162,8 +164,10 @@ class LiveMarketDataService {
 
     // Return unsubscribe function
     return () => {
-      if (ws) {
+      if (ws && ws.readyState === WebSocket.OPEN) {
         ws.send(JSON.stringify({ action: 'unsubscribe', ticker }));
+        ws.close();
+      } else if (ws) {
         ws.close();
       }
     };

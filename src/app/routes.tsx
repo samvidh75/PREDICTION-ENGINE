@@ -41,6 +41,8 @@ const StockDetailPage = lazy(() => import("../pages/StockDetailPage"));
 const PortfolioDetailPage = lazy(() => import("../pages/PortfolioDetailPage"));
 const StockStoryPage = lazy(() => import("../pages/StockStoryPage"));
 const AITestPage = lazy(() => import("../pages/AITestPage"));
+const BrowserAITestPage = lazy(() => import("../pages/BrowserAITestPage"));
+const ComponentTestPage = lazy(() => import("../pages/ComponentTestPage"));
 
 const SHOW_ABOUT_PAGE = import.meta.env.VITE_SHOW_ABOUT_PAGE === "true";
 
@@ -115,6 +117,8 @@ export function AppRoutes() {
         <Route path="/technical-scanner" element={<Suspense fallback={<RouteFallback />}><PublicLayout><AdvancedScanner /></PublicLayout></Suspense>} />
         <Route path="/track" element={<Suspense fallback={<RouteFallback />}><PublicLayout><TrackPage /></PublicLayout></Suspense>} />
         <Route path="/options-chain" element={<Suspense fallback={<RouteFallback />}><PublicLayout><OptionsChainPage /></PublicLayout></Suspense>} />
+        <Route path="/browser-ai-test" element={<Suspense fallback={<RouteFallback />}><PublicLayout><BrowserAITestPage /></PublicLayout></Suspense>} />
+        <Route path="/component-test" element={<Suspense fallback={<RouteFallback />}><PublicLayout><ComponentTestPage /></PublicLayout></Suspense>} />
         <Route path="/backtest" element={<Suspense fallback={<RouteFallback />}><PublicLayout><BacktestPage /></PublicLayout></Suspense>} />
         <Route path="/live-market" element={<Suspense fallback={<RouteFallback />}><PublicLayout><LiveMarketPage /></PublicLayout></Suspense>} />
         <Route path="/ai-test" element={<Suspense fallback={<RouteFallback />}><WorkspaceRoute><AITestPage /></WorkspaceRoute></Suspense>} />
