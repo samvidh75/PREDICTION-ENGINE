@@ -3,6 +3,7 @@ import { chatHistoryStorage, type ChatMessage } from '../../utils/chatHistorySto
 import { buildAIContext, type MarketContext } from '../../utils/aiContextBuilder';
 import { liveMarketDataService } from '../../utils/liveMarketDataService';
 import ModelSelector from './ModelSelector';
+import VoiceInput from './VoiceInput';
 
 interface BrowserAiChatProps {
   ticker: string;
@@ -167,6 +168,10 @@ export default function BrowserAiChat({ ticker }: BrowserAiChatProps) {
     });
   };
 
+  const handleVoiceInput = (transcript: string) => {
+    setPrompt(transcript);
+  };
+
   const clearHistory = async () => {
     if (!sessionId) return;
     await chatHistoryStorage.deleteSession(sessionId);
@@ -233,13 +238,13 @@ export default function BrowserAiChat({ ticker }: BrowserAiChatProps) {
             <div ref={messagesEndRef} />
           </div>
 
-          <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
+          <div style={{ display: 'flex', gap: '8px', marginBottom: '8px', alignItems: 'flex-end' }}>
             <input
               type="text"
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && executeBrowserInference()}
-              placeholder="Ask about P/E, ROE, debt..."
+              placeholder="Ask about P/E, ROE, debt... or use 🎤"
               disabled={loading}
               style={{
                 flex: 1,
@@ -249,6 +254,7 @@ export default function BrowserAiChat({ ticker }: BrowserAiChatProps) {
                 fontSize: '14px',
               }}
             />
+            <VoiceInput onTranscript={handleVoiceInput} disabled={loading} />
             <button onClick={executeBrowserInference} disabled={loading} style={{ padding: '8px 16px', cursor: 'pointer' }}>
               {loading ? '⏳' : '→'}
             </button>
