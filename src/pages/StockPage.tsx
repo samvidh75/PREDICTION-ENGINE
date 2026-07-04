@@ -296,14 +296,32 @@ function StockError({ symbol }: { symbol: string }) {
 
 /** Normalize both API and local fallback data to StockPage's StockResearchDetail shape */
 function normalizeStockData(raw: Record<string, any>): StockResearchDetail {
+  // Map price field if it's flat vs nested
+  const priceData = raw.price
+    ? typeof raw.price === 'object' ? raw.price : { current: raw.price, changeAbs: 0, changePercent: 0, marketCap: 0 }
+    : { current: 0, changeAbs: 0, changePercent: 0, marketCap: raw.marketCap ?? 0 };
+
   return {
     symbol: raw.symbol ?? "",
-    companyName: raw.companyName ?? "",
+    companyName: raw.companyName ?? raw.name ?? "",
     exchange: raw.exchange ?? "NSE",
     sector: raw.sector ?? "",
     industry: raw.industry ?? "",
-    price: raw.price ?? { current: 0, changeAbs: 0, changePercent: 0, marketCap: 0 },
-    fundamentals: raw.fundamentals ?? { pe: null, industryPe: null, pb: null, dividendYield: null, eps: null },
+    price: {
+      current: priceData.current ?? raw.price ?? 0,
+      changeAbs: priceData.changeAbs ?? raw.change ?? 0,
+      changePercent: priceData.changePercent ?? raw.changePercent ?? 0,
+      marketCap: priceData.marketCap ?? raw.marketCap ?? 0,
+    },
+    fundamentals: {
+      pe: raw.fundamentals?.pe ?? raw.pe ?? null,
+      industryPe: raw.fundamentals?.industryPe ?? raw.industryPe ?? null,
+      pb: raw.fundamentals?.pb ?? raw.pb ?? null,
+      dividendYield: raw.fundamentals?.dividendYield ?? raw.dividendYield ?? null,
+      eps: raw.fundamentals?.eps ?? raw.eps ?? null,
+      high52w: raw.fundamentals?.high52w ?? raw.high52w ?? null,
+      low52w: raw.fundamentals?.low52w ?? raw.low52w ?? null,
+    },
     roe: raw.roe ?? null,
     debtToEquity: raw.debtToEquity ?? null,
     revenueGrowth: raw.revenueGrowth ?? null,
@@ -314,7 +332,6 @@ function normalizeStockData(raw: Record<string, any>): StockResearchDetail {
     timeline: raw.timeline ?? [],
     whatChanged: raw.whatChanged ?? [],
     sectorRelative: raw.sectorRelative ?? [],
-    // Map sectorRelative → sectorComparison when missing
     sectorComparison: raw.sectorComparison ?? (raw.sectorRelative ?? []).map((item: any) => ({
       company: item.company,
       value: item.sectorMedian ?? item.value ?? "",
@@ -322,7 +339,6 @@ function normalizeStockData(raw: Record<string, any>): StockResearchDetail {
       metric: item.label ?? item.metric ?? "",
     })),
     description: raw.description ?? "",
-    // Handle flat → nested companyProfile
     companyProfile: raw.companyProfile ?? {
       founded: raw.founded ?? "",
       ceo: raw.ceo ?? "",
@@ -1078,6 +1094,11 @@ export default function StockPage() {
   const { symbol } = useParams<{ symbol: string }>();
   const seoMeta = useMemo(() => symbol ? buildCompanySeo(symbol, undefined, undefined) : null, [symbol]);
   useSeo(seoMeta);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [symbol]);
+
   const [inView, setInView] = useState(false);
   const ref = useCallback((node: HTMLDivElement | null) => {
     if (node) {

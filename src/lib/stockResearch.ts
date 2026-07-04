@@ -572,22 +572,72 @@ export function listAllStockResearch(): StockResearchSummary[] {
   return mergedUniverse.filter((stock) => !isPlaceholderCompanyIdentity(stock));
 }
 
+// Levenshtein distance for fuzzy matching (handles typos)
+function levenshteinDistance(a: string, b: string): number {
+  const m = a.length, n = b.length;
+  const dp: number[][] = Array.from({ length: m + 1 }, () => Array(n + 1).fill(0));
+
+  for (let i = 0; i <= m; i++) dp[i][0] = i;
+  for (let j = 0; j <= n; j++) dp[0][j] = j;
+
+  for (let i = 1; i <= m; i++) {
+    for (let j = 1; j <= n; j++) {
+      if (a[i - 1] === b[j - 1]) {
+        dp[i][j] = dp[i - 1][j - 1];
+      } else {
+        dp[i][j] = 1 + Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]);
+      }
+    }
+  }
+  return dp[m][n];
+}
+
+// Calculate fuzzy match score (0-100, higher is better)
+function fuzzyScore(target: string, query: string): number {
+  if (target === query) return 100;
+  if (target.startsWith(query)) return 90;
+  if (target.includes(query)) return 70;
+
+  const distance = levenshteinDistance(target, query);
+  const maxLen = Math.max(target.length, query.length);
+  const similarity = Math.max(0, 100 - (distance * 100) / maxLen);
+  return Math.round(similarity);
+}
+
 export function searchStocks(query: string, limit = 20): StockResearchSummary[] {
   const normalized = query.trim().toLowerCase();
   if (!normalized) return [];
+
   const ranked = mergedUniverse
     .filter((stock) => !isPlaceholderCompanyIdentity(stock))
     .map((stock) => {
       let rank = 0;
       const symbol = stock.symbol.toLowerCase();
       const name = stock.name.toLowerCase();
+
+      // Exact match
       if (symbol === normalized) rank += 1000;
+      else if (name === normalized) rank += 950;
+      // Prefix match
       else if (symbol.startsWith(normalized)) rank += 800;
+      else if (name.startsWith(normalized)) rank += 750;
+      // Substring match
       else if (symbol.includes(normalized)) rank += 500;
-      if (name.startsWith(normalized)) rank += 350;
-      else if (name.includes(normalized)) rank += 240;
+      else if (name.includes(normalized)) rank += 450;
+      // Fuzzy match for typos
+      else {
+        const symbolFuzzy = fuzzyScore(symbol, normalized);
+        const nameFuzzy = fuzzyScore(name, normalized);
+        if (symbolFuzzy > 70) rank += symbolFuzzy * 3;
+        if (nameFuzzy > 70) rank += nameFuzzy * 2.5;
+      }
+
+      // Sector bonus
       if (stock.sector.toLowerCase().includes(normalized)) rank += 120;
+
+      // NSE bonus (more liquidity)
       if (stock.exchange === "NSE") rank += 50;
+
       return { stock, rank };
     })
     .filter((item) => item.rank > 0)
