@@ -3,12 +3,13 @@
  * Tests WebSocket streaming, EOD sync, and universe expansion
  */
 
-import { describe, test, expect, jest, beforeAll, afterAll } from '@jest/globals';
+import { describe, test, expect, vi, beforeAll, afterAll } from 'vitest';
 import WebSocket from 'ws';
 import pg from 'pg';
 
 const WS_URL = process.env.WS_TEST_URL || 'ws://localhost:10000/api/quotes/ws';
 const DB_URL = process.env.DATABASE_URL;
+const hasWS = !!process.env.WS_TEST_URL;
 
 describe('Data Pipeline', () => {
   let db: pg.Client | null = null;
@@ -24,7 +25,7 @@ describe('Data Pipeline', () => {
     if (db) await db.end();
   });
 
-  test('WebSocket connects and streams quotes', async () => {
+  test.skipIf(!hasWS)('WebSocket connects and streams quotes', async () => {
     const ws = new WebSocket(WS_URL);
 
     const quotePromise = new Promise<any>((resolve) => {
@@ -55,7 +56,7 @@ describe('Data Pipeline', () => {
     ws.close();
   }, 15000);
 
-  test('WebSocket broadcasts quote with type field', async () => {
+  test.skipIf(!hasWS)('WebSocket broadcasts quote with type field', async () => {
     const ws = new WebSocket(WS_URL);
 
     const msgPromise = new Promise<any>((resolve) => {

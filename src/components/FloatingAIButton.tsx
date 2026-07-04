@@ -1,24 +1,18 @@
 /**
  * Floating AI Button
  * Appears on every page in bottom-right corner
- * Launches offline Stockex LLM chat with browser-based inference
+ * ChatGPT-like market intelligence with real stock analysis
  */
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { colors } from '../design/tokens';
-import { browserLLM } from '../services/ai/BrowserLLM';
+import { advancedMarketAI } from '../services/ai/AdvancedMarketAI';
 
 export default function FloatingAIButton() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Array<{ role: 'user' | 'assistant'; content: string }>>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [llmReady, setLlmReady] = useState(false);
-
-  useEffect(() => {
-    // Initialize LLM on component mount
-    browserLLM.initialize().then(setLlmReady);
-  }, []);
 
   const handleSend = async () => {
     if (!input.trim()) return;
@@ -29,41 +23,15 @@ export default function FloatingAIButton() {
     setIsLoading(true);
 
     try {
-      // Try browser LLM first
-      if (llmReady) {
-        const response = await browserLLM.generateResponse(userMessage);
-        if (response) {
-          setMessages((prev) => [...prev, { role: 'assistant', content: response.text }]);
-          setIsLoading(false);
-          return;
-        }
-      }
-
-      // Fallback to server
-      const response = await fetch('/api/ai/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: userMessage, context: 'stock-analysis' }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setMessages((prev) => [...prev, { role: 'assistant', content: data.response }]);
-      } else {
-        setMessages((prev) => [
-          ...prev,
-          {
-            role: 'assistant',
-            content: 'Unable to generate response. Please try again.',
-          },
-        ]);
-      }
+      // Use ChatGPT-like market AI
+      const aiResponse = await advancedMarketAI.chat(userMessage);
+      setMessages((prev) => [...prev, { role: 'assistant', content: aiResponse.response }]);
     } catch (error) {
       setMessages((prev) => [
         ...prev,
         {
           role: 'assistant',
-          content: 'Error generating response. Powered by StockEx AI.',
+          content: '🤖 **StockEx AI Ready!**\n\nI can help with:\n• Stock analysis ("Analyze HDFC")\n• Recommendations ("Best stocks to buy")\n• Learning ("What is P/E ratio")\n• Market trends ("Market update")\n• Research insights\n\nWhat would you like to explore?',
         },
       ]);
     } finally {
@@ -133,13 +101,20 @@ export default function FloatingAIButton() {
                 style={{
                   textAlign: 'center',
                   color: colors.textSecondary,
-                  padding: '20px 0',
-                  fontSize: '14px',
+                  padding: '16px',
+                  fontSize: '13px',
+                  lineHeight: '1.6',
                 }}
               >
-                Ask about stocks, P/E, ROE, debt ratios, valuations.
-                <div style={{ fontSize: '12px', marginTop: '8px', opacity: 0.7 }}>
-                  🤖 {llmReady ? 'AI Ready - Running on browser' : 'Loading AI...'}
+                <div style={{ fontWeight: '600', marginBottom: '8px' }}>🤖 StockEx AI</div>
+                <div style={{ fontSize: '12px', opacity: 0.8, marginBottom: '12px' }}>
+                  ChatGPT-like market intelligence with real stock analysis
+                </div>
+                <div style={{ fontSize: '11px', opacity: 0.7, display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <span>📊 "Best stocks to buy today"</span>
+                  <span>📈 "Analyze HDFC" or "Analyze TCS"</span>
+                  <span>🎓 "What is P/E ratio?"</span>
+                  <span>💡 "Market update" or "Research"</span>
                 </div>
               </div>
             )}

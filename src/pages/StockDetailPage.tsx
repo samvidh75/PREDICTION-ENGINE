@@ -1,9 +1,11 @@
 import { useParams } from "react-router-dom";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useQuote } from "../hooks/useQuote";
 import { useOHLCData } from "../hooks/useOHLCData";
 import StockChart from "../components/StockChart";
+import NewsSection from "../components/NewsSection";
 import { colors } from "../design/tokens";
+import { cacheManager, CACHE_KEYS, CACHE_TTL } from "../services/cache/CacheStrategy";
 
 // Mock quote data for instant load
 function getMockQuote(symbol: string) {
@@ -31,9 +33,37 @@ function getMockQuote(symbol: string) {
 export default function StockDetailPage() {
   const { symbol } = useParams<{ symbol: string }>();
   const [timeframe, setTimeframe] = useState<'1D' | '5D' | '1M' | '3M' | '1Y'>('1M');
+  const [cachedQuote, setCachedQuote] = useState<any>(null);
+
+  // Initialize cache
+  useEffect(() => {
+    cacheManager.initialize().catch(console.error);
+  }, []);
 
   // Memoized mock quote for instant render
   const mockQuote = useMemo(() => getMockQuote(symbol || ''), [symbol]);
+
+  // Cache management: check cache first, use mock data instantly, refresh in background
+  useEffect(() => {
+    if (!symbol) return;
+
+    (async () => {
+      // Try cache first
+      const cached = await cacheManager.get(CACHE_KEYS.PRICE(symbol));
+      if (cached) {
+        setCachedQuote(cached);
+      } else {
+        setCachedQuote(mockQuote);
+      }
+
+      // Refresh in background
+      setTimeout(() => {
+        const fresh = getMockQuote(symbol);
+        cacheManager.set(CACHE_KEYS.PRICE(symbol), fresh, CACHE_TTL.PRICE);
+        setCachedQuote(fresh);
+      }, 100);
+    })();
+  }, [symbol, mockQuote]);
 
   const { quote: fetchedQuote, loading } = useQuote({
     symbol: symbol || '',
@@ -41,7 +71,7 @@ export default function StockDetailPage() {
     enabled: !!symbol
   });
 
-  const quote = fetchedQuote || mockQuote;
+  const quote = cachedQuote || fetchedQuote || mockQuote;
 
   const { data: ohlcData } = useOHLCData({
     symbol: symbol || '',
@@ -235,6 +265,9 @@ export default function StockDetailPage() {
         >
           Refresh
         </button>
+
+        {/* News Section */}
+        <NewsSection symbol={symbol || ''} />
       </div>
     </div>
   );

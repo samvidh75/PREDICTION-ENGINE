@@ -7,7 +7,12 @@ vi.mock('../../../db/DatabaseAdapter', () => ({
 }));
 
 vi.mock('child_process', () => ({
-  exec: Object.assign(vi.fn(), { [Symbol.for('util.promisify.custom')]: undefined }),
+  exec: Object.assign(
+    vi.fn((cmd: any, cb: any) => {
+      if (typeof cb === 'function') cb(null, { stdout: JSON.stringify({ success: true, metrics: {} }), stderr: '' });
+    }),
+    { [Symbol.for('util.promisify.custom')]: undefined },
+  ),
 }));
 
 describe('registerPortfolioPrecisionRoutes handler', () => {
@@ -26,9 +31,11 @@ describe('registerPortfolioPrecisionRoutes handler', () => {
     const { registerPortfolioPrecisionRoutes } = await import('../portfolioPrecisionRoutes');
     const reply = { send: vi.fn(), status: vi.fn().mockReturnThis() };
     const req = { params: { userId: 'test-user' }, log: { error: vi.fn() } };
-    const fastify = { get: vi.fn((_: string, h: any) => h(req, reply)) };
+    let handlerPromise: Promise<any>;
+    const fastify = { get: vi.fn((_: string, h: any) => { handlerPromise = h(req, reply); }) };
 
     await registerPortfolioPrecisionRoutes(fastify as any);
+    await handlerPromise!;
     expect(reply.status).not.toHaveBeenCalledWith(500);
   });
 
@@ -43,9 +50,11 @@ describe('registerPortfolioPrecisionRoutes handler', () => {
     const { registerPortfolioPrecisionRoutes } = await import('../portfolioPrecisionRoutes');
     const reply = { send: vi.fn(), status: vi.fn().mockReturnThis() };
     const req = { params: { userId: 'test-user' }, log: { error: vi.fn() } };
-    const fastify = { get: vi.fn((_: string, h: any) => h(req, reply)) };
+    let handlerPromise: Promise<any>;
+    const fastify = { get: vi.fn((_: string, h: any) => { handlerPromise = h(req, reply); }) };
 
     await registerPortfolioPrecisionRoutes(fastify as any);
+    await handlerPromise!;
     expect(reply.status).not.toHaveBeenCalledWith(500);
   });
 
@@ -55,9 +64,11 @@ describe('registerPortfolioPrecisionRoutes handler', () => {
     const { registerPortfolioPrecisionRoutes } = await import('../portfolioPrecisionRoutes');
     const reply = { send: vi.fn(), status: vi.fn().mockReturnThis() };
     const req = { params: { userId: 'test-user' }, log: { error: vi.fn() } };
-    const fastify = { get: vi.fn((_: string, h: any) => h(req, reply)) };
+    let handlerPromise: Promise<any>;
+    const fastify = { get: vi.fn((_: string, h: any) => { handlerPromise = h(req, reply); }) };
 
     await registerPortfolioPrecisionRoutes(fastify as any);
+    await handlerPromise!;
     expect(reply.status).toHaveBeenCalledWith(500);
   });
 });

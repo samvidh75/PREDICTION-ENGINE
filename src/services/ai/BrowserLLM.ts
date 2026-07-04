@@ -13,7 +13,10 @@
  * Fallback: If model fails to load, uses knowledge base + server API
  */
 
-import { compressModel, decompressModel, formatFileSize } from './ModelCompression';
+import { compressModel, formatFileSize } from './ModelCompression';
+import { modelStreamer, ProgressCallback } from './ModelStreaming';
+import { modelVersionManager, MODEL_VERSIONS } from './ModelVersioning';
+import { modelAnalytics } from './ModelAnalytics';
 
 export interface LLMConfig {
   modelUrl: string;
@@ -256,6 +259,107 @@ class BrowserLLM {
 
   getModelSize(): string {
     return '50-70MB (ONNX)';
+  }
+
+  async loadModelWithStreaming(onProgress?: ProgressCallback): Promise<boolean> {
+    try {
+      const startTime = Date.now();
+
+      // Initialize analytics
+      await modelAnalytics.initialize();
+
+      // Use streaming downloader
+      const modelData = await modelStreamer.downloadWithStreaming(
+        MODEL_CONFIG.modelUrl,
+        onProgress
+      );
+
+      // Compress model
+      const compressed = await compressModel(modelData);
+      console.log(`[LLM] Compression: ${formatFileSize(modelData.byteLength)} → ${formatFileSize(compressed.byteLength)}`);
+
+      // Cache compressed model
+      await this.cacheModel(MODEL_CONFIG.modelName, compressed);
+
+      const loadTime = Date.now() - startTime;
+
+      // Record analytics
+      await modelAnalytics.recordLoadEvent({
+        timestamp: Date.now(),
+        status: 'success',
+        loadTimeMs: loadTime,
+        modelSize: modelData.byteLength,
+        compressedSize: compressed.byteLength,
+        downloadSpeed: (modelData.byteLength / 1024 / 1024) / (loadTime / 1000),
+      });
+
+      this.modelLoaded = true;
+      return true;
+    } catch (error) {
+      console.error('[LLM] Streaming load failed:', error);
+
+      await modelAnalytics.recordLoadEvent({
+        timestamp: Date.now(),
+        status: 'failure',
+        loadTimeMs: 0,
+        modelSize: 0,
+        compressedSize: 0,
+        downloadSpeed: 0,
+        errorMessage: String(error),
+      });
+
+      return false;
+    }
+  }
+
+  async initializeVersionManager(): Promise<void> {
+    try {
+      await modelVersionManager.initialize();
+
+      // Save current model versions if not already saved
+      for (const version of MODEL_VERSIONS) {
+        const existing = await modelVersionManager.getVersion(version.version);
+        if (!existing) {
+          await modelVersionManager.saveVersion(version);
+        }
+      }
+
+      console.log('[LLM] Model versioning system initialized');
+    } catch (error) {
+      console.error('[LLM] Version manager init failed:', error);
+    }
+  }
+
+  async getLatestModelVersion() {
+    try {
+      const metadata = await modelVersionManager.getMetadata('stockex-small-v1');
+      return metadata.currentVersion;
+    } catch (error) {
+      console.error('[LLM] Failed to get model version:', error);
+      return 'unknown';
+    }
+  }
+
+  async checkForModelUpdate(): Promise<boolean> {
+    try {
+      const latest = MODEL_VERSIONS[0]; // Latest is first
+      const current = await modelVersionManager.getVersion(MODEL_CONFIG.modelName);
+
+      if (!current) return true; // No version installed
+
+      return modelVersionManager.shouldUpdate(current, latest);
+    } catch (error) {
+      console.error('[LLM] Update check failed:', error);
+      return false;
+    }
+  }
+
+  getAnalytics() {
+    return modelAnalytics.getSnapshot();
+  }
+
+  printAnalyticsReport(): void {
+    modelAnalytics.printReport();
   }
 }
 
