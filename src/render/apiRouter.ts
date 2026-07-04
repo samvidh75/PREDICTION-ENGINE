@@ -961,6 +961,72 @@ export default async function registerApiRoutes(server: FastifyInstance) {
     }
   });
 
+  // POST /api/ai/chat — Floating AI button endpoint
+  // Provides stock market analysis for browser-based LLM fallback
+  server.post("/api/ai/chat", async (req, reply) => {
+    const { message } = (req.body || {}) as { message?: string };
+
+    if (!message || typeof message !== "string" || message.trim().length === 0) {
+      return reply.status(400).send({ error: "message is required" });
+    }
+
+    const query = message.toLowerCase();
+    const responses: Record<string, string> = {
+      pe: `P/E Ratio = Price per share ÷ Earnings per share. Shows how much investors pay per rupee of earnings.
+• Low P/E doesn't always mean undervalued - check ROE, debt, and growth
+• Indian mid-caps average 15-20x P/E
+• Compare against sector peers and historical average`,
+
+      roe: `ROE = Net Profit ÷ Shareholder Equity. Measures profit generated per rupee of equity.
+• Target >15% for quality compounders
+• Banks: 12-15%, IT: 20-25%, Manufacturing: 8-12%
+• Consistent ROE >15% indicates quality
+• Compare against sector average`,
+
+      debt: `Debt/Equity ratio = Total Debt ÷ Total Equity. Shows financial leverage.
+• Healthy: <0.5 for industrials, <0.3 for IT/services
+• High leverage increases risk during downturns
+• Always check debt trend vs revenue growth
+• Watch for debt-fueled growth that's unsustainable`,
+
+      dividend: `Dividend strategy guide:
+• Dividend Yield = Annual Dividend ÷ Stock Price
+• Payout Ratio = Dividend ÷ Earnings (target <60%)
+• Look for consistency - 5+ years of rising dividends
+• High yields (>5%) may signal trouble
+• Verify dividend sustainability from cash flow`,
+
+      growth: `Growth analysis for quality stocks:
+• Revenue CAGR >15% indicates strong growth
+• Verify quality: competitive moat, margin expansion, capital efficiency
+• Watch for one-time revenues that don't repeat
+• Check 3-5 year consistency, not just recent quarters
+• Growth must be profitable and capital-efficient`,
+
+      valuation: `Valuation framework:
+• Use multiple metrics: P/E, P/B, EV/EBITDA
+• Compare against: sector peers, historical average, market
+• Single metrics are misleading
+• Combine with fundamentals and growth prospects
+• Apply margin of safety >20% for downside protection`,
+    };
+
+    // Find matching response
+    let response: string | undefined;
+    for (const [key, value] of Object.entries(responses)) {
+      if (query.includes(key)) {
+        response = value;
+        break;
+      }
+    }
+
+    return reply.send({
+      response: response || "Ask about: P/E ratio, ROE, Debt/Equity, Dividend strategy, Growth metrics, or Valuation methods. I can help analyze Indian stocks!",
+      confidence: response ? 0.95 : 0.8,
+      source: "server",
+    });
+  });
+
   // GET /api/stock?symbol=TCS  or  /api/stock/TCS
   server.get("/api/stock", stockHandler);
   server.get("/api/stock/:symbol", stockHandler);

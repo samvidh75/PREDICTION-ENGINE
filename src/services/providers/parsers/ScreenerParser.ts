@@ -14,11 +14,26 @@ export class ScreenerParser {
   private static readonly RATIO_LABELS: Record<string, string[]> = {
     'P/E': ['Stock P/E', 'P/E', 'PE', 'P/E Ratio', 'Price to Earnings'],
     'P/B': ['P/B', 'PB', 'P/B Ratio', 'Price to Book'],
-    'EPS': ['EPS', 'Earnings Per Share', 'Earnings per share'],
+    'Earnings per share': ['EPS', 'Earnings Per Share', 'Earnings per share'],
     'Dividend Yield': ['Dividend Yield', 'Div Yield', 'Dividend'],
+    'Beta': ['Beta'],
     'Market Cap': ['Market Cap', 'Market Capitalization', 'Mkt Cap'],
+    'Free Float': ['Free Float'],
+    'FCF Yield': ['FCF Yield'],
+    'EV/EBITDA': ['EV/EBITDA', 'Ev/Ebitda'],
+    'ROA': ['ROA'],
     'ROE': ['ROE', 'Return on Equity', 'Return On Equity'],
+    'ROIC': ['ROIC'],
     'ROCE': ['ROCE', 'Return on Capital Employed'],
+    'Debt to Equity': ['Debt to Equity'],
+    'Current Ratio': ['Current Ratio'],
+    'Revenue Growth': ['Revenue Growth'],
+    'Profit Growth': ['Profit Growth'],
+    'EPS Growth': ['EPS Growth'],
+    'FCF Growth': ['FCF Growth'],
+    'Gross Margin': ['Gross Margin'],
+    'Operating Margin': ['Operating Margin'],
+    'Net Margin': ['Net Margin'],
     'Book Value': ['Book Value'],
     'Face Value': ['Face Value'],
     'Current Price': ['Current Price'],
@@ -80,7 +95,7 @@ export class ScreenerParser {
     const a = alias.toLowerCase();
     const l = label.toLowerCase();
     if (a.length <= 3) {
-      return new RegExp(`\\b${a.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i').test(l);
+      return new RegExp(`^${a.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i').test(l);
     }
     return l.includes(a);
   }

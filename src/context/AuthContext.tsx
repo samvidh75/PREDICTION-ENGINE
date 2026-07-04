@@ -19,6 +19,7 @@
 
 import React, { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { authService, type AuthUser } from "../services/auth/authService";
+import { browserLLM } from "../services/ai/BrowserLLM";
 
 // ── Context shape ──────────────────────────────────────────────────────────
 
@@ -45,6 +46,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const unsub = authService.subscribeSession((authUser) => {
         setUser(authUser);
         setLoading(false);
+
+        // Trigger LLM model loading in background when user logs in (40-50s window)
+        if (authUser && !browserLLM.isReady()) {
+          console.log("[AuthProvider] Starting LLM model download...");
+          browserLLM.loadModel().then((success) => {
+            if (success) {
+              console.log("[AuthProvider] LLM model loaded successfully");
+            } else {
+              console.warn("[AuthProvider] LLM model load failed, will use server fallback");
+            }
+          });
+        }
       });
       return unsub;
     } catch (err: unknown) {
