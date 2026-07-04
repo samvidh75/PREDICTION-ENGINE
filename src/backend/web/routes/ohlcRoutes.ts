@@ -5,47 +5,7 @@
 
 import { FastifyInstance } from 'fastify';
 import { providerAggregator } from '../../../clients/ProviderAggregator';
-import type { OHLC } from '../../../components/StockChart';
-
-/**
- * Generate mock OHLC data from historical quotes
- * In production, this would fetch from a time-series database
- */
-function generateMockOHLCData(basePrice: number, days: number = 30): OHLC[] {
-  const data: OHLC[] = [];
-  const now = Date.now();
-  const dayMs = 86400000; // 24 hours
-
-  for (let i = days; i >= 0; i--) {
-    const timestamp = new Date(now - i * dayMs);
-    const dateStr = timestamp.toISOString().split('T')[0];
-
-    // Simulate realistic price movements
-    const volatility = 0.02 + Math.random() * 0.03;
-    const trend = Math.sin(i / days) * 0.05;
-    const random = (Math.random() - 0.5) * volatility;
-    const dayChange = trend + random;
-
-    const open = basePrice * (1 + dayChange * 0.3);
-    const close = basePrice * (1 + dayChange);
-    const high = Math.max(open, close) * (1 + Math.abs(Math.random() * 0.01));
-    const low = Math.min(open, close) * (1 - Math.abs(Math.random() * 0.01));
-    const volume = Math.floor(1000000 + Math.random() * 5000000);
-
-    data.push({
-      time: dateStr,
-      open: Math.round(open * 100) / 100,
-      high: Math.round(high * 100) / 100,
-      low: Math.round(low * 100) / 100,
-      close: Math.round(close * 100) / 100,
-      volume,
-    });
-
-    basePrice = close;
-  }
-
-  return data;
-}
+import { historicalDataAggregator } from '../../../services/data/HistoricalDataAggregator';
 
 export async function registerOHLCRoutes(app: FastifyInstance) {
   /**
@@ -80,7 +40,7 @@ export async function registerOHLCRoutes(app: FastifyInstance) {
         };
 
         const days = daysMap[timeframe] || 30;
-        const ohlcData = generateMockOHLCData(quote.price, days);
+        const ohlcData = await historicalDataAggregator.fetchOHLCData(symbol, days);
 
         return reply.send({
           symbol,
@@ -123,13 +83,13 @@ export async function registerOHLCRoutes(app: FastifyInstance) {
 
         const days = daysMap[timeframe] || 30;
 
-        // Fetch quotes for all symbols in parallel
+        // Fetch OHLC data for all symbols in parallel
         const results = await Promise.allSettled(
           symbols.map(async (sym) => {
             const quote = await providerAggregator.getQuote(sym);
             if (!quote) return null;
 
-            const ohlcData = generateMockOHLCData(quote.price, days);
+            const ohlcData = await historicalDataAggregator.fetchOHLCData(sym, days);
             return {
               symbol: sym,
               timeframe,
