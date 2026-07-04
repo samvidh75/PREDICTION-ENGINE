@@ -140,7 +140,7 @@ export function calculateAdvancedIndicators(
   };
 }
 
-function calculateIchimoku(closes: number[], highs: number[], lows: number[]) {
+function calculateIchimoku(closes: number[], highs: number[], lows: number[]): AdvancedIndicators['ichimoku'] {
   const tenkanSen = (Math.max(...highs.slice(-9)) + Math.min(...lows.slice(-9))) / 2;
   const kijunSen = (Math.max(...highs.slice(-26)) + Math.min(...lows.slice(-26))) / 2;
   const senkouSpanA = (tenkanSen + kijunSen) / 2;
@@ -220,9 +220,9 @@ function calculateMomentum(closes: number[]) {
   return { roc, kama, rvi, tsi, kdj };
 }
 
-function calculateTrend(closes: number[], highs: number[], lows: number[]) {
+function calculateTrend(closes: number[], highs: number[], lows: number[]): AdvancedIndicators['trend'] {
   const psar = calculatePSAR(highs, lows);
-  const trend = closes[closes.length - 1] > psar.value ? "uptrend" : "downtrend";
+  const trend: "uptrend" | "downtrend" = closes[closes.length - 1] > psar.value ? "uptrend" : "downtrend";
   const supertrend = calculateSupertrend(highs, lows, closes);
   const linReg = calculateLinearRegression(closes);
   const hma = calculateHMA(closes, 9);
@@ -277,7 +277,7 @@ function detectDivergence(closes: number[], volumes: number[]) {
   };
 }
 
-function analyzeOrderFlow(closes: number[], highs: number[], lows: number[], volumes: number[]) {
+function analyzeOrderFlow(closes: number[], highs: number[], lows: number[], _volumes: number[]): AdvancedIndicators['orderFlow'] {
   const profileHigh = Math.max(...highs.slice(-20));
   const profileLow = Math.min(...lows.slice(-20));
   const poc = (profileHigh + profileLow) / 2;
@@ -285,7 +285,7 @@ function analyzeOrderFlow(closes: number[], highs: number[], lows: number[], vol
   return {
     profileHigh,
     profileLow,
-    valueArea: {
+    valuedArea: {
       high: profileHigh * 0.95,
       low: profileLow * 1.05,
     },
@@ -303,26 +303,28 @@ function analyzeElliotWave(closes: number[]) {
   };
 }
 
-function generateMLSignals(closes: number[], highs: number[], lows: number[], volumes: number[]) {
+function generateMLSignals(closes: number[], _highs: number[], _lows: number[], _volumes: number[]): AdvancedIndicators['mlSignals'] {
   // Simple ML signal based on multiple indicators
   const rsi = calculateRSI(closes, 14);
   const macd = calculateMACD(closes);
   const trend = closes[closes.length - 1] > calculateSMA(closes, 50)[0] ? 1 : -1;
 
   const score = (rsi - 50) + (macd.macd > 0 ? 20 : -20) + trend * 10;
+  const trendValue: "bullish" | "bearish" | "neutral" = score > 20 ? "bullish" : score < -20 ? "bearish" : "neutral";
+  const strengthValue: "very strong" | "strong" | "moderate" | "weak" =
+    Math.abs(score) > 50
+      ? "very strong"
+      : Math.abs(score) > 30
+        ? "strong"
+        : Math.abs(score) > 15
+          ? "moderate"
+          : "weak";
 
   return {
     predictionScore: Math.max(-100, Math.min(100, score)),
     confidence: 65 + Math.random() * 20,
-    trend: score > 20 ? "bullish" : score < -20 ? "bearish" : "neutral",
-    strength:
-      Math.abs(score) > 50
-        ? "very strong"
-        : Math.abs(score) > 30
-          ? "strong"
-          : Math.abs(score) > 15
-            ? "moderate"
-            : "weak",
+    trend: trendValue,
+    strength: strengthValue,
   };
 }
 
