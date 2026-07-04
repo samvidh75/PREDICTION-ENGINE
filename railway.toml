@@ -1,0 +1,44 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Railway Configuration for StockEx Deployment
+# ─────────────────────────────────────────────────────────────────────────────
+
+[build]
+builder = "dockerfile"
+dockerfile = "Dockerfile"
+
+[deploy]
+startCommand = "npx tsx src/render/startServer.ts"
+restartPolicyType = "on-failure"
+restartPolicyMaxRetries = 5
+port = 4001
+numReplicas = 1
+memoryLimit = "2Gi"
+cpuLimit = "2000m"
+
+[env]
+NODE_ENV = "production"
+PORT = "4001"
+OLLAMA_URL = "${{ OLLAMA_SERVICE_URL }}"
+OLLAMA_MODEL = "qwen2.5:0.5b"
+
+[services.backend]
+name = "StockEx API"
+build.dockerfile = "Dockerfile"
+deploy.port = 4001
+deploy.memoryLimit = "2Gi"
+
+[services.llm]
+name = "StockEx LLM"
+build.dockerfile = "Dockerfile.llm"
+deploy.port = 11434
+deploy.memoryLimit = "4Gi"
+deploy.cpuLimit = "4000m"
+
+# Service networking
+[services.backend.env]
+OLLAMA_URL = "${{ services.llm.RAILWAY_PRIVATE_URL }}"
+OLLAMA_PORT = "11434"
+
+# Volumes for persistent model cache
+[services.llm.volumes]
+"/root/.ollama" = "ollama_models"
