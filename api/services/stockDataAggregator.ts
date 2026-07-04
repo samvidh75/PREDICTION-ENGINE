@@ -423,14 +423,19 @@ class StockDataAggregator {
     source: Partial<CompleteStockData>
   ) {
     for (const key in source) {
+      const sourceValue = source[key as keyof CompleteStockData];
       if (key === "price" || key === "technicals" || key === "fundamentals") {
-        target[key as keyof CompleteStockData] = {
-          ...target[key as keyof CompleteStockData],
-          ...source[key as keyof CompleteStockData],
-        };
-      } else if (!target[key as keyof CompleteStockData]) {
-        target[key as keyof CompleteStockData] =
-          source[key as keyof CompleteStockData];
+        const targetValue = target[key as keyof CompleteStockData];
+        if (typeof targetValue === "object" && typeof sourceValue === "object") {
+          (target[key as keyof CompleteStockData] as any) = {
+            ...targetValue,
+            ...sourceValue,
+          };
+        } else if (sourceValue) {
+          (target[key as keyof CompleteStockData] as any) = sourceValue;
+        }
+      } else if (!target[key as keyof CompleteStockData] && sourceValue) {
+        (target[key as keyof CompleteStockData] as any) = sourceValue;
       }
     }
   }
