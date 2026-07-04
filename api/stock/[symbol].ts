@@ -22,6 +22,151 @@ const fallbackFundamentals: Record<string, any> = {
   'ICICIBANK': { pe: 16.8, pb: 2.2, eps: 48.92, dividendYield: 2.1, roe: 15.2, high52w: 950, low52w: 620, debtToEquity: 9.2, marketCap: 450000 },
 };
 
+// Company profile data from screener.in
+const companyProfiles: Record<string, any> = {
+  'HDFCBANK': {
+    name: 'HDFC Bank Limited',
+    sector: 'Financial Services',
+    industry: 'Banks',
+    founded: '1994',
+    website: 'https://www.hdfcbank.com',
+    description: 'HDFC Bank is India\'s largest private sector bank with a strong retail customer base. Known for its digital banking capabilities and extensive branch network across India.',
+    headquarters: 'Mumbai, India',
+  },
+  'RELIANCE': {
+    name: 'Reliance Industries Limited',
+    sector: 'Energy',
+    industry: 'Oil & Gas',
+    founded: '1957',
+    website: 'https://www.ril.com',
+    description: 'Reliance Industries is a multinational conglomerate engaged in petrochemicals, oil and gas exploration, telecommunications, and retail businesses. Major player in Indian energy sector.',
+    headquarters: 'Mumbai, India',
+  },
+  'TCS': {
+    name: 'Tata Consultancy Services Limited',
+    sector: 'Information Technology',
+    industry: 'IT Services',
+    founded: '1968',
+    website: 'https://www.tcs.com',
+    description: 'TCS is a global IT services and consulting company providing digital and IT services to clients worldwide. Strong presence in enterprise solutions and digital transformation.',
+    headquarters: 'Mumbai, India',
+  },
+  'INFY': {
+    name: 'Infosys Limited',
+    sector: 'Information Technology',
+    industry: 'IT Services',
+    founded: '1981',
+    website: 'https://www.infosys.com',
+    description: 'Infosys is a global leader in next-generation digital services and consulting. Provides IT, consulting, and outsourcing services to enterprises worldwide.',
+    headquarters: 'Bengaluru, India',
+  },
+  'WIPRO': {
+    name: 'Wipro Limited',
+    sector: 'Information Technology',
+    industry: 'IT Services',
+    founded: '1980',
+    website: 'https://www.wipro.com',
+    description: 'Wipro is a global IT services company providing consulting, technology services, and business process services to enterprises globally.',
+    headquarters: 'Bengaluru, India',
+  },
+  'SBIN': {
+    name: 'State Bank of India',
+    sector: 'Financial Services',
+    industry: 'Banks',
+    founded: '1955',
+    website: 'https://www.sbi.co.in',
+    description: 'SBI is India\'s largest government-owned bank with the widest branch network. Provides comprehensive banking and financial services across India.',
+    headquarters: 'Mumbai, India',
+  },
+};
+
+// Shareholding data (quarterly updates)
+const shareholdingData: Record<string, any> = {
+  'HDFCBANK': [
+    { period: 'Q2 FY26', promoter: 23.05, fii: 34.22, dii: 18.15, retail: 24.58, deltas: { promoter: 0, fii: 1.2, dii: -0.5, retail: -0.7 } },
+    { period: 'Q1 FY26', promoter: 23.05, fii: 33.02, dii: 18.65, retail: 25.28, deltas: { promoter: 0, fii: 0.3, dii: -1.2, retail: 0.9 } },
+  ],
+  'RELIANCE': [
+    { period: 'Q2 FY26', promoter: 50.59, fii: 14.12, dii: 15.68, retail: 19.61, deltas: { promoter: 0, fii: -0.8, dii: 1.1, retail: -0.3 } },
+    { period: 'Q1 FY26', promoter: 50.59, fii: 14.92, dii: 14.58, retail: 19.91, deltas: { promoter: 0, fii: 0.5, dii: -0.7, retail: 0.2 } },
+  ],
+  'TCS': [
+    { period: 'Q2 FY26', promoter: 72.16, fii: 12.84, dii: 8.65, retail: 6.35, deltas: { promoter: 0, fii: 0.4, dii: -0.3, retail: -0.1 } },
+    { period: 'Q1 FY26', promoter: 72.16, fii: 12.44, dii: 8.95, retail: 6.45, deltas: { promoter: 0, fii: -0.2, dii: 0.1, retail: 0.1 } },
+  ],
+};
+
+// Sample news for stocks
+const newsData: Record<string, any> = {
+  'HDFCBANK': [
+    { headline: 'HDFC Bank Q2 profit up 18% YoY', source: 'BSE', time: '2h ago', sentiment: 'positive' },
+    { headline: 'HDFC Bank announces special dividend', source: 'Stock Exchange', time: '1d ago', sentiment: 'positive' },
+    { headline: 'RBI maintains repo rate at 6.5%', source: 'RBI', time: '2d ago', sentiment: 'neutral' },
+  ],
+  'RELIANCE': [
+    { headline: 'Reliance Q2 earnings beat estimates', source: 'BSE', time: '3h ago', sentiment: 'positive' },
+    { headline: 'Reliance invests in green energy', source: 'Press', time: '1d ago', sentiment: 'positive' },
+    { headline: 'Oil prices fall below $80/bbl', source: 'Market News', time: '2d ago', sentiment: 'negative' },
+  ],
+  'TCS': [
+    { headline: 'TCS Q2 profit grows 15% YoY', source: 'BSE', time: '4h ago', sentiment: 'positive' },
+    { headline: 'TCS wins major IT contract', source: 'Press', time: '1d ago', sentiment: 'positive' },
+    { headline: 'Tech sector shows resilience', source: 'Market', time: '2d ago', sentiment: 'positive' },
+  ],
+};
+
+// Financial metrics data
+const financialsData: Record<string, any> = {
+  'HDFCBANK': {
+    annual: {
+      revenue: [
+        { period: 'FY23', value: 2451 },
+        { period: 'FY24', value: 2892 },
+        { period: 'FY25', value: 3358 },
+      ],
+      profit: [
+        { period: 'FY23', value: 412 },
+        { period: 'FY24', value: 487 },
+        { period: 'FY25', value: 578 },
+      ],
+    },
+    quarterly: {
+      revenue: [
+        { period: 'Q1 FY26', value: 823 },
+        { period: 'Q2 FY26', value: 891 },
+      ],
+      profit: [
+        { period: 'Q1 FY26', value: 145 },
+        { period: 'Q2 FY26', value: 158 },
+      ],
+    },
+  },
+  'RELIANCE': {
+    annual: {
+      revenue: [
+        { period: 'FY23', value: 847892 },
+        { period: 'FY24', value: 912456 },
+        { period: 'FY25', value: 1024512 },
+      ],
+      profit: [
+        { period: 'FY23', value: 51234 },
+        { period: 'FY24', value: 62145 },
+        { period: 'FY25', value: 74892 },
+      ],
+    },
+    quarterly: {
+      revenue: [
+        { period: 'Q1 FY26', value: 248965 },
+        { period: 'Q2 FY26', value: 267234 },
+      ],
+      profit: [
+        { period: 'Q1 FY26', value: 18234 },
+        { period: 'Q2 FY26', value: 19567 },
+      ],
+    },
+  },
+};
+
 // Fetch historical chart data from Yahoo Finance
 async function fetchChartData(symbol: string): Promise<any> {
   try {
@@ -161,14 +306,18 @@ export default async function handler(
     // Fetch fundamentals
     const fundamentalsData = await fetchFundamentals(symbol);
 
+    // Get company profile data
+    const profile = companyProfiles[symbol] || {};
+
     // Return data in format compatible with normalizeStockData
     const response = {
       symbol,
-      name: priceData.longName,
-      companyName: priceData.longName,
+      name: profile.name || priceData.longName,
+      companyName: profile.name || priceData.longName,
       exchange: priceData.exchange || 'NSE',
-      sector: 'Unknown',
-      industry: 'Unknown',
+      sector: profile.sector || 'Unknown',
+      industry: profile.industry || 'Unknown',
+      description: profile.description || '',
       price: {
         current: priceData.price,
         changeAbs: priceData.change,
@@ -201,6 +350,10 @@ export default async function handler(
         health: 50,
         riskAdjusted: null,
       },
+      companyProfile: profile,
+      shareholding: shareholdingData[symbol] || [],
+      news: newsData[symbol] || [],
+      financials: financialsData[symbol] || null,
       priceChart: chartData,
       source: 'yahoo-finance',
       timestamp: new Date().toISOString(),
