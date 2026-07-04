@@ -3,9 +3,11 @@ import { chatHistoryStorage, type ChatMessage } from '../../utils/chatHistorySto
 import { buildAIContext, type MarketContext } from '../../utils/aiContextBuilder';
 import { liveMarketDataService } from '../../utils/liveMarketDataService';
 import { buildPortfolioContext, enhanceSystemPromptWithPortfolio, type PortfolioContext } from '../../utils/portfolioContextBuilder';
+import { buildNewsContextForTicker, enhanceSystemPromptWithNews, type EnhancedNewsContext } from '../../utils/newsContextBuilder';
 import ModelSelector from './ModelSelector';
 import VoiceInput from './VoiceInput';
 import PortfolioManager from './PortfolioManager';
+import NewsPanel from './NewsPanel';
 import type { Portfolio } from '../../utils/portfolioStorage';
 
 interface BrowserAiChatProps {
@@ -29,6 +31,7 @@ export default function BrowserAiChat({ ticker }: BrowserAiChatProps) {
   const [isSwitchingModel, setIsSwitchingModel] = useState(false);
   const [portfolio, setPortfolio] = useState<Portfolio | null>(null);
   const [portfolioContext, setPortfolioContext] = useState<PortfolioContext | null>(null);
+  const [newsContexts, setNewsContexts] = useState<EnhancedNewsContext[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -91,6 +94,13 @@ export default function BrowserAiChat({ ticker }: BrowserAiChatProps) {
       setPortfolioContext(context);
     };
     loadPortfolioContext();
+
+    // Load news context for ticker
+    const loadNewsContext = async () => {
+      const newsCtx = await buildNewsContextForTicker(ticker);
+      setNewsContexts([newsCtx]);
+    };
+    loadNewsContext();
 
     return () => {
       llmWorker.terminate();
@@ -159,6 +169,11 @@ export default function BrowserAiChat({ ticker }: BrowserAiChatProps) {
     // Enhance with portfolio context if available
     if (portfolioContext?.hasPortfolio) {
       aiContext.systemPrompt = enhanceSystemPromptWithPortfolio(aiContext.systemPrompt, portfolioContext);
+    }
+
+    // Enhance with news context if available
+    if (newsContexts.length > 0 && newsContexts[0].newsHeadlines.length > 0) {
+      aiContext.systemPrompt = enhanceSystemPromptWithNews(aiContext.systemPrompt, newsContexts);
     }
 
     // Send to worker
@@ -232,6 +247,10 @@ export default function BrowserAiChat({ ticker }: BrowserAiChatProps) {
 
       {isReady && (
         <PortfolioManager onPortfolioChange={setPortfolio} />
+      )}
+
+      {isReady && portfolio && portfolio.holdings.length > 0 && (
+        <NewsPanel tickers={portfolio.holdings.map((h) => h.ticker)} />
       )}
 
       {isReady && (
