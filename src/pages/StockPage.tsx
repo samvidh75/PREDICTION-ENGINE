@@ -339,7 +339,7 @@ function normalizeStockData(raw: Record<string, any>): StockResearchDetail {
     shareholding: raw.shareholding ?? [],
     news: raw.news ?? [],
     thesis: raw.thesis ?? { thesis: "", bullCase: "", bearCase: "", whatToWatch: "", stance: "Watch" },
-    priceHistory: raw.priceHistory ?? {},
+    priceHistory: raw.priceHistory ?? raw.priceChart ?? {},
   };
 }
 
