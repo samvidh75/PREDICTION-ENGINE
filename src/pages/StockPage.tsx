@@ -398,9 +398,9 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
   const shareholdingSeriesArr = Array.isArray(shareholdingSeries) ? shareholdingSeries : [];
   const effectiveShareholding = shareholding ?? shareholdingSeriesArr.find((item) => item.period === period) ?? shareholdingSeriesArr[0];
   const selectedFinancialSeries = stock.financials?.[financialPeriod]?.[financialMetric] ?? [];
-  const effectiveChartData = financialChartData.length > 0 ? financialChartData : selectedFinancialSeries.map((item) => ({ period: item.period, value: Math.round(item.value) }));
-  const newsItems = stock.news.slice(0, 7);
-  const filteredNews = newsFilter === "all" ? newsItems : newsItems.filter((n: any) => n.sentiment === newsFilter);
+  const effectiveChartData = (financialChartData?.length ?? 0) > 0 ? financialChartData : (selectedFinancialSeries ?? []).map((item: any) => ({ period: item?.period || "N/A", value: Math.round(item?.value || 0) }));
+  const newsItems = (stock.news ?? []).slice(0, 7);
+  const filteredNews = newsFilter === "all" ? newsItems : (newsItems ?? []).filter((n: any) => n?.sentiment === newsFilter);
   const disclaimer = "StockEX research updates are shown with the page footer.";
   const fundamentals = stock.fundamentals ?? {};
   const companyProfile = stock.companyProfile ?? {
@@ -493,10 +493,12 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
     { type: "ad" as const, id: "ad1", data: { icon: "📈", title: "Track your portfolio like a pro", subtitle: "Get timely alerts and expert analysis", cta: "Try StockEX Pro →" } },
     { type: "ad" as const, id: "ad2", data: { icon: "🎯", title: "AI-powered stock screening", subtitle: "Find the next multi-bagger before the crowd", cta: "Start free trial →" } },
   ];
-  const newsFeedWithAds = filteredNews.reduce<Array<{ type: "news" | "ad"; id: string; data: any }>>((acc, item, idx) => {
-    acc.push({ type: "news", id: `n-${idx}`, data: item });
-    if (idx === 2) acc.push(nativeAdSlots[0]);
-    if (idx === 6) acc.push(nativeAdSlots[1]);
+  const newsFeedWithAds = (filteredNews ?? []).reduce<Array<{ type: "news" | "ad"; id: string; data: any }>>((acc, item, idx) => {
+    if (item) {
+      acc.push({ type: "news", id: `n-${idx}`, data: item });
+      if (idx === 2) acc.push(nativeAdSlots[0]);
+      if (idx === 6) acc.push(nativeAdSlots[1]);
+    }
     return acc;
   }, []);
 
