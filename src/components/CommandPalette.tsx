@@ -1,661 +1,193 @@
 /**
- * Command Palette — Full Raycast Design Spec
- *
- * Cmd+K global search: stocks, commands, live market data, AI questions.
- * Keyboard-first navigation with staggered spring animations.
- *
- * Design spec: PART 1-10 of COMMAND PALETTE DESIGN document
- * Background: #0D0D0D, border: #2A2A2A, radius: 12px
- * Scale animation: 0.95→1 on open, 1→0.95 on close (0.3s spring)
+ * Command Palette / Quick Search
+ * Raycast-style command interface for stock search and quick actions
+ * Keyboard: Cmd+K to open, Esc to close, Arrow keys to navigate
  */
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import type { ScanPresetDefinition } from '../services/scanner/presets';
-import { colors, typography, radius, animation, shadows } from '../design/tokens';
+import { colors } from '../design/tokens';
 
-/* ─── Types ─────────────────────────────────────────────────────────── */
-
-export interface PaletteAction {
+interface PaletteItem {
   id: string;
   label: string;
-  description?: string;
-  icon?: string;
-  category: 'page' | 'preset' | 'command' | 'market' | 'ai' | 'recent';
+  description: string;
+  icon: string;
   action: () => void;
-  metadata?: string;     // shortcut hint or "live" label
-  subtitle?: string;     // secondary text below title
+  category: 'search' | 'action' | 'history';
 }
 
 interface CommandPaletteProps {
-  presets?: (Pick<ScanPresetDefinition, 'id' | 'label' | 'description'> & { icon?: string })[];
-  open: boolean;
-  onClose: () => void;
+  isOpen?: boolean;
+  onClose?: () => void;
 }
 
-interface MarketData {
-  nifty: { value: number; change: number; changePct: string };
-  topGainer: { symbol: string; change: string };
-  sentiment: { bullish: number; bearish: number; neutral: number };
-}
-
-/* ─── Helpers ────────────────────────────────────────────────────────── */
-
-const RECENT_KEY = 'stockstory_recent_searches';
-const MAX_RECENT = 8;
-
-function getRecent(): { label: string; id: string }[] {
-  try {
-    return JSON.parse(localStorage.getItem(RECENT_KEY) || '[]');
-  } catch { return []; }
-}
-
-function saveRecent(item: { label: string; id: string }) {
-  const recent = getRecent().filter((r) => r.id !== item.id);
-  recent.unshift(item);
-  localStorage.setItem(RECENT_KEY, JSON.stringify(recent.slice(0, MAX_RECENT)));
-}
-
-function fuzzyScore(query: string, label: string, description = ''): number {
-  const haystack = (label + ' ' + description).toLowerCase();
-  const q = query.toLowerCase();
-  if (haystack.includes(q)) return q.length * 2;
-  let qi = 0;
-  for (let i = 0; i < haystack.length && qi < q.length; i++) {
-    if (haystack[i] === q[qi]) qi++;
-  }
-  return qi === q.length ? q.length : 0;
-}
-
-const QUESTION_WORDS = ['what', 'which', 'is', 'are', 'best', 'top', 'how', 'why', 'should', 'can', 'tell', 'show', 'find', 'search', 'compare', 'vs', 'versus', 'better', 'good', 'bad', 'undervalued', 'overvalued', 'buy', 'sell', 'hold'];
-
-function isAIQuery(q: string): boolean {
-  const words = q.trim().split(/\s+/);
-  if (words.length >= 4) return true;
-  const lower = q.toLowerCase();
-  return QUESTION_WORDS.some((w) => lower.includes(w)) && words.length >= 2;
-}
-
-/* ─── Mock Market Data (replace with real API) ──────────────────────── */
-
-const MOCK_MARKET: MarketData = {
-  nifty: { value: 25432.50, change: 308.75, changePct: '+1.23%' },
-  topGainer: { symbol: 'INFY', change: '+5.2%' },
-  sentiment: { bullish: 67, bearish: 18, neutral: 15 },
-};
-
-/* ─── Component ──────────────────────────────────────────────────────── */
-
-export function CommandPalette({ presets = [], open, onClose }: CommandPaletteProps) {
-  const navigate = useNavigate();
-  const inputRef = useRef<HTMLInputElement>(null);
-  const listRef = useRef<HTMLDivElement>(null);
+export default function CommandPalette({ isOpen = false, onClose }: CommandPaletteProps) {
+  const [open, setOpen] = useState(isOpen);
   const [query, setQuery] = useState('');
-  const [selectedIdx, setSelectedIdx] = useState(0);
-  const [visible, setVisible] = useState(false);          // controls scale animation
-  const [closing, setClosing] = useState(false);          // triggers close animation
-  const [market, setMarket] = useState<MarketData>(MOCK_MARKET);
-  const [aiLoading, setAiLoading] = useState(false);
-  const [aiResponse, setAiResponse] = useState<string | null>(null);
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [items, setItems] = useState<PaletteItem[]>([]);
+  const [searchHistory, setSearchHistory] = useState<string[]>(() => {
+    try {
+      return JSON.parse(localStorage.getItem('stockSearchHistory') || '[]');
+    } catch {
+      return [];
+    }
+  });
 
-  /* ── Open/close animation ── */
+  const inputRef = useRef<HTMLInputElement>(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setOpen(true);
+      }
+      if (e.key === 'Escape') {
+        setOpen(false);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   useEffect(() => {
     if (open) {
-      setVisible(true);
-      setClosing(false);
-      setQuery('');
-      setSelectedIdx(0);
-      setAiResponse(null);
-      setAiLoading(false);
-      // Focus with a micro-delay so the DOM is painted
-      requestAnimationFrame(() => inputRef.current?.focus());
-    } else {
-      setVisible(false);
+      setTimeout(() => inputRef.current?.focus(), 0);
+      setSelectedIndex(0);
     }
   }, [open]);
 
-  const triggerClose = useCallback(() => {
-    setClosing(true);
-    setTimeout(() => onClose(), 200);
-  }, [onClose]);
-
-  /* ── Simulated live market updates ── */
   useEffect(() => {
-    if (!open) return;
-    const interval = setInterval(() => {
-      setMarket((prev) => ({
-        ...prev,
-        nifty: {
-          ...prev.nifty,
-          value: prev.nifty.value + (Math.random() - 0.5) * 20,
-          changePct: (prev.nifty.change > 0 ? '+' : '') + (Math.random() * 2 - 0.5).toFixed(2) + '%',
-        },
-        topGainer: {
-          symbol: ['INFY', 'TCS', 'RELIANCE', 'HDFCBANK'][Math.floor(Math.random() * 4)],
-          change: (Math.random() > 0.3 ? '+' : '-') + (Math.random() * 8).toFixed(1) + '%',
-        },
-      }));
-    }, 30000);
-    return () => clearInterval(interval);
-  }, [open]);
+    const newItems: PaletteItem[] = [];
 
-  /* ── Build action list ── */
-  const actions: PaletteAction[] = useMemo(() => {
-    const result: PaletteAction[] = [];
-
-    // Recent searches
-    for (const r of getRecent()) {
-      result.push({
-        id: `recent-${r.id}`,
-        label: r.label,
-        icon: '🕐',
-        category: 'recent',
-        action: () => { navigate(`/stock/${r.id}`); saveRecent(r); },
-        metadata: 'cmd',
+    if (query.trim()) {
+      newItems.push({
+        id: 'search',
+        label: `Search: ${query.toUpperCase()}`,
+        description: 'Press Enter to search',
+        icon: '🔍',
+        action: () => {
+          navigate(`/stock/${query.toUpperCase()}`);
+          addToHistory(query.toUpperCase());
+          setOpen(false);
+        },
+        category: 'search',
       });
-    }
+    } else {
+      newItems.push(
+        {
+          id: 'trending',
+          label: 'Trending Stocks',
+          description: 'View trending stocks today',
+          icon: '📈',
+          action: () => {
+            navigate('/screener?filter=trending');
+            setOpen(false);
+          },
+          category: 'action',
+        },
+        {
+          id: 'gainers',
+          label: 'Top Gainers',
+          description: 'Best performing stocks',
+          icon: '🟢',
+          action: () => {
+            navigate('/screener?filter=gainers');
+            setOpen(false);
+          },
+          category: 'action',
+        },
+        {
+          id: 'losers',
+          label: 'Top Losers',
+          description: 'Worst performing stocks',
+          icon: '🔴',
+          action: () => {
+            navigate('/screener?filter=losers');
+            setOpen(false);
+          },
+          category: 'action',
+        }
+      );
 
-    // Commands
-    result.push(
-      { id: 'cmd-new', label: 'New Research', icon: '🔬', category: 'command', action: () => navigate('/scanner'), metadata: '⌘N', subtitle: 'Open stock scanner' },
-      { id: 'cmd-compare', label: 'Compare Stocks', icon: '⚖️', category: 'command', action: () => navigate('/compare'), metadata: '⌘C', subtitle: 'Side-by-side analysis' },
-      { id: 'cmd-tracker', label: 'View Tracker', icon: '📈', category: 'command', action: () => navigate('/watchlist'), metadata: '⌘T', subtitle: 'Your portfolio insights' },
-      { id: 'cmd-export', label: 'Export Data', icon: '📤', category: 'command', action: () => {}, metadata: '⌘E', subtitle: 'CSV, PDF, or share' },
-    );
+      if (searchHistory.length > 0) {
+        newItems.push({
+          id: 'divider-history',
+          label: 'Recent Searches',
+          description: '',
+          icon: '⏱️',
+          action: () => {},
+          category: 'history',
+        });
 
-    // Scanner presets
-    if (presets.length) {
-      for (const p of presets) {
-        result.push({
-          id: `preset-${p.id}`,
-          label: p.label,
-          description: p.description,
-          icon: p.icon ?? '📋',
-          category: 'preset',
-          action: () => navigate(`/scanner?preset=${p.id}`),
+        searchHistory.slice(0, 5).forEach((symbol) => {
+          newItems.push({
+            id: `history-${symbol}`,
+            label: symbol,
+            description: 'View quote',
+            icon: '📝',
+            action: () => {
+              navigate(`/stock/${symbol}`);
+              setOpen(false);
+            },
+            category: 'history',
+          });
         });
       }
     }
 
-    // Pages
-    result.push(
-      { id: 'page-scanner', label: 'Scanner', icon: '🔍', category: 'page', action: () => navigate('/scanner'), metadata: 'G S' },
-      { id: 'page-technical-scanner', label: 'Technical Scanner', icon: '📊', category: 'page', action: () => navigate('/technical-scanner'), metadata: 'G T' },
-      { id: 'page-watchlist', label: 'Watchlist', icon: '⭐', category: 'page', action: () => navigate('/watchlist'), metadata: 'G W' },
-      { id: 'page-sectors', label: 'Sectors', icon: '📊', category: 'page', action: () => navigate('/sectors'), metadata: 'G E' },
-      { id: 'page-trust', label: 'Trust & Safety', icon: '🛡️', category: 'page', action: () => navigate('/trust') },
-    );
+    setItems(newItems);
+  }, [query, searchHistory, navigate]);
 
-    return result;
-  }, [presets, navigate]);
-
-  /* ── Market data items ── */
-  const marketItems: PaletteAction[] = useMemo(() => [
-    {
-      id: 'market-nifty',
-      label: `Nifty 50: ${market.nifty.value.toLocaleString('en-IN', { maximumFractionDigits: 2 })}`,
-      description: `${market.nifty.change > 0 ? '↑' : '↓'} ${market.nifty.changePct}`,
-      icon: '📊',
-      category: 'market',
-      action: () => {},
-      metadata: 'live',
-    },
-    {
-      id: 'market-gainer',
-      label: `Top Gainer: ${market.topGainer.symbol}`,
-      description: `${market.topGainer.change}`,
-      icon: '🚀',
-      category: 'market',
-      action: () => {},
-      metadata: 'live',
-    },
-    {
-      id: 'market-sentiment',
-      label: `Market Sentiment: ${market.sentiment.bullish}% Bullish`,
-      description: `${market.sentiment.bearish}% Bearish · ${market.sentiment.neutral}% Neutral`,
-      icon: '📉',
-      category: 'market',
-      action: () => {},
-      metadata: 'live',
-    },
-  ], [market]);
-
-  /* ── AI suggestion ── */
-  const aiItem: PaletteAction | null = useMemo(() => {
-    if (!query.trim() || !isAIQuery(query)) return null;
-    return {
-      id: 'ai-ask',
-      label: `Ask AI: ${query.length > 60 ? query.slice(0, 57) + '...' : query}`,
-      description: 'AI will analyze and answer',
-      icon: '✨',
-      category: 'ai',
-      action: async () => {
-        setAiLoading(true);
-        setAiResponse(null);
-        // Simulated AI response (replace with real Claude API)
-        await new Promise((r) => setTimeout(r, 1200));
-        setAiLoading(false);
-        setAiResponse(`📊 **Market Analysis: "${query}"**\n\nBased on current data, here's what I found:\n\n• Nifty 50 is at ${market.nifty.value.toLocaleString('en-IN')} (${market.nifty.changePct})\n• Market sentiment is ${market.sentiment.bullish}% bullish\n• Top sectors: IT, Banking, Pharma\n\nFor more detailed analysis, try refining your question with specific stocks or sectors.`);
-      },
-      metadata: 'Ask AI',
-    };
-  }, [query, market]);
-
-  /* ── Filtered results ── */
-  const allItems = useMemo(() => {
-    if (!query.trim()) return actions;
-    const scored = actions
-      .map((act) => ({ act, score: fuzzyScore(query, act.label, act.description ?? '') }))
-      .filter((x) => x.score > 0)
-      .sort((a, b) => b.score - a.score || a.act.label.localeCompare(b.act.label));
-    return scored.map((x) => x.act);
-  }, [query, actions]);
-
-  /* ── Reset index on results change ── */
-  useEffect(() => setSelectedIdx(0), [allItems.length]);
-
-  const resultsWithAI = useMemo(() => {
-    const r = [...allItems];
-    if (aiItem) r.push(aiItem);
-    return r;
-  }, [allItems, aiItem]);
-
-  /* ── Keyboard ── */
-  const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (e.key === 'Escape') { triggerClose(); return; }
-      if (e.key === 'ArrowDown' || (e.key === 'Tab' && !e.shiftKey)) {
-        e.preventDefault();
-        setSelectedIdx((i) => Math.min(i + 1, resultsWithAI.length - 1));
-        return;
-      }
-      if (e.key === 'ArrowUp' || (e.key === 'Tab' && e.shiftKey)) {
-        e.preventDefault();
-        setSelectedIdx((i) => Math.max(i - 1, 0));
-        return;
-      }
-      if (e.key === 'Enter' && resultsWithAI[selectedIdx]) {
-        e.preventDefault();
-        const item = resultsWithAI[selectedIdx];
-        if (item.category === 'recent' || item.id.startsWith('recent-')) {
-          saveRecent({ label: item.label, id: item.id.replace('recent-', '') });
-        }
-        item.action();
-        if (item.category !== 'ai') triggerClose();
-      }
-    },
-    [triggerClose, resultsWithAI, selectedIdx],
-  );
-
-  /* ── Click handler ── */
-  const handleClick = useCallback(
-    (item: PaletteAction) => {
-      if (item.category === 'recent' || item.id.startsWith('recent-')) {
-        saveRecent({ label: item.label, id: item.id.replace('recent-', '') });
-      }
-      item.action();
-      if (item.category !== 'ai') triggerClose();
-    },
-    [triggerClose],
-  );
-
-  /* ── Category grouping for display ── */
-  const categoryOrder = ['recent', 'command', 'preset', 'page', 'market', 'ai'] as const;
-  const categoryLabels: Record<string, string> = {
-    recent: 'Recent Searches',
-    command: 'Commands',
-    preset: 'Scanner Presets',
-    page: 'Pages',
-    market: 'Markets',
-    ai: 'AI',
+  const addToHistory = (symbol: string) => {
+    const newHistory = [symbol, ...searchHistory.filter((s) => s !== symbol)].slice(0, 10);
+    setSearchHistory(newHistory);
+    try {
+      localStorage.setItem('stockSearchHistory', JSON.stringify(newHistory));
+    } catch {
+      // localStorage error
+    }
   };
 
-  /* ── Separated display: normal results + market always visible ── */
-  const groupedSections = useMemo(() => {
-    const sections: { cat: string; label: string; items: PaletteAction[] }[] = [];
-    for (const cat of categoryOrder) {
-      let items: PaletteAction[];
-      if (cat === 'market') {
-        items = marketItems; // always show market
-      } else if (cat === 'ai') {
-        items = aiItem ? [aiItem] : [];
-      } else {
-        items = resultsWithAI.filter((r) => r.category === cat);
-      }
-      if (items.length) {
-        sections.push({ cat, label: categoryLabels[cat] ?? cat, items });
-      }
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault();
+        setSelectedIndex((i) => (i + 1) % items.length);
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        setSelectedIndex((i) => (i - 1 + items.length) % items.length);
+        break;
+      case 'Enter':
+        e.preventDefault();
+        items[selectedIndex]?.action();
+        break;
     }
-    return sections;
-  }, [resultsWithAI, marketItems, aiItem]);
+  };
 
-  // Don't render at all when not open and not animating
-  if (!open && !closing) return null;
-
-  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+  if (!open) return null;
 
   return (
-    <div
-      style={{
-        position: 'fixed', inset: 0, zIndex: 9998,
-        background: closing ? colors.backdropClear : colors.backdropModal,
-        backdropFilter: closing ? 'blur(0px)' : 'blur(10px)',
-        WebkitBackdropFilter: closing ? 'blur(0px)' : 'blur(10px)',
-        display: 'flex', alignItems: isMobile ? 'flex-end' : 'flex-start',
-        justifyContent: 'center',
-        paddingTop: isMobile ? 0 : '12vh',
-        paddingBottom: isMobile ? '16px' : 0,
-        transition: `background ${animation.slow}, backdrop-filter ${animation.slow}`,
-      }}
-      onClick={triggerClose}
-    >
-      <div
-        onClick={(e) => e.stopPropagation()}
-        style={{
-          background: colors.surface,
-          borderRadius: isMobile ? '12px 12px 0 0' : '12px',
-          width: isMobile ? 'calc(100vw - 16px)' : 'min(90vw, 600px)',
-          maxWidth: 600,
-          border: `1px solid ${colors.hairline}`,
-          boxShadow: shadows.elevated,
-          overflow: 'hidden',
-          display: 'flex', flexDirection: 'column',
-          maxHeight: isMobile ? '80vh' : 'min(70vh, 640px)',
-          fontFamily: typography.fontFamily,
-          transform: visible && !closing ? 'scale(1)' : 'scale(0.95)',
-          opacity: visible && !closing ? 1 : 0,
-          transition: `transform ${animation.slow}, opacity 0.2s ease`,
-        }}
-      >
-        {/* ── Zone 1: Search Input ── */}
-        <div style={{
-          height: 48, display: 'flex', alignItems: 'center',
-          padding: '0 16px', gap: 12,
-          borderBottom: `1px solid ${colors.hairline}`,
-          background: colors.page,
-        }}>
-          <span style={{ fontSize: 16, color: colors.body, flexShrink: 0 }}>🔍</span>
-          <input
-            ref={inputRef}
-            placeholder="Search stocks, commands, insights…"
-            value={query}
-            onChange={(e) => { setQuery(e.target.value); setAiResponse(null); }}
-            onKeyDown={handleKeyDown}
-            style={{
-              flex: 1, border: 'none', outline: 'none',
-              fontSize: isMobile ? 16 : 15, fontWeight: 400,
-              background: 'transparent', color: colors.textPrimary,
-              fontFamily: typography.fontFamily,
-              minWidth: 0,
-            }}
-          />
-          {aiItem && (
-            <span style={{
-              fontSize: 13, fontWeight: 400, color: colors.body,
-              whiteSpace: 'nowrap', flexShrink: 0,
-            }}>
-              Ask AI <kbd style={{
-                background: colors.surfaceCard, border: `1px solid ${colors.hairline}`,
-                borderRadius: 4, padding: '1px 5px', fontSize: 11,
-                fontFamily: 'inherit', color: colors.body,
-              }}>Tab</kbd>
-            </span>
-          )}
+    <>
+      <div style={{position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 999}} onClick={() => setOpen(false)} />
+      <div style={{position: 'fixed', top: '10%', left: '50%', transform: 'translateX(-50%)', width: 'min(600px, 90vw)', maxHeight: '70vh', backgroundColor: colors.surface, borderRadius: '12px', boxShadow: '0 20px 60px rgba(0,0,0,0.3)', zIndex: 1000, display: 'flex', flexDirection: 'column', overflow: 'hidden'}}>
+        <div style={{padding: '16px', borderBottom: `1px solid ${colors.border}`}}>
+          <input ref={inputRef} type="text" placeholder="Search stocks... (⌘K)" value={query} onChange={(e) => setQuery(e.target.value)} onKeyDown={handleKeyDown} style={{width: '100%', backgroundColor: colors.canvas, color: colors.textPrimary, border: 'none', padding: '12px 16px', fontSize: '16px', fontFamily: 'monospace', borderRadius: '8px', outline: 'none'}} />
         </div>
-
-        {/* ── Zone 2: Suggestions ── */}
-        <div ref={listRef} style={{ overflowY: 'auto', flex: 1, padding: '8px 0' }}>
-          {/* AI Response */}
-          {aiResponse && (
-            <div style={{
-              margin: '0 12px 8px', padding: 12,
-              background: colors.surfaceElevated, borderRadius: 8,
-              fontSize: 13, lineHeight: '1.6', color: colors.charcoal,
-              border: `1px solid ${colors.hairline}`,
-              whiteSpace: 'pre-wrap',
-            }}>
-              {aiResponse}
-            </div>
-          )}
-
-          {/* AI Loading */}
-          {aiLoading && (
-            <div style={{
-              margin: '0 12px 8px', padding: 12,
-              background: colors.surfaceElevated, borderRadius: 8,
-              display: 'flex', alignItems: 'center', gap: 10,
-              fontSize: 13, color: colors.textSecondary,
-            }}>
-              <span className="raycast-spinner" style={{
-                display: 'inline-block', width: 14, height: 14,
-                border: `2px solid ${colors.hairline}`, borderTopColor: colors.accentRed,
-                borderRadius: '50%',
-              }} />
-              Analyzing your question…
-            </div>
-          )}
-
-          {/* Empty state */}
-          {groupedSections.length === 0 && !aiLoading && !aiResponse && (
-            <div style={{ padding: '24px 16px', textAlign: 'center' }}>
-              <p style={{ fontSize: 14, color: colors.textTertiary, margin: '0 0 16px' }}>
-                {query.trim() ? `No matching results for "${query}"` : 'Type to search or ask a question'}
-              </p>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                {[
-                  { label: 'Popular: Top movers today', q: 'top movers today' },
-                  { label: 'Popular: High conviction stocks', q: 'high conviction stocks' },
-                  { label: 'Popular: Best dividend stocks', q: 'best dividend stocks' },
-                ].map((suggestion) => (
-                  <button
-                    key={suggestion.q}
-                    onClick={() => {
-                      setQuery(suggestion.q);
-                      inputRef.current?.focus();
-                    }}
-                    style={{
-                      background: colors.surfaceElevated, border: `1px solid ${colors.hairline}`,
-                      borderRadius: 8, padding: '8px 12px',
-                      color: colors.textSecondary, fontSize: 13,
-                      cursor: 'pointer', textAlign: 'left',
-                      fontFamily: typography.fontFamily,
-                      transition: `background 0.15s ease`,
-                    }}
-                    onMouseEnter={(e) => (e.currentTarget.style.background = colors.surfaceCard)}
-                    onMouseLeave={(e) => (e.currentTarget.style.background = colors.surfaceElevated)}
-                  >
-                    {suggestion.label}
-                  </button>
-                ))}
-                {!isAIQuery(query) && query.trim() && (
-                  <button
-                    onClick={() => {
-                      setQuery(`What stocks ${query.trim()}?`);
-                      inputRef.current?.focus();
-                    }}
-                    style={{
-                      background: 'transparent', border: `1px dashed ${colors.hairline}`,
-                      borderRadius: 8, padding: '8px 12px',
-                      color: colors.accentRed, fontSize: 13,
-                      cursor: 'pointer', textAlign: 'left',
-                      fontFamily: typography.fontFamily,
-                    }}
-                  >
-                    ✨ Ask AI: "What stocks {query.trim()}?"
-                  </button>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* Sections */}
-          {groupedSections.map((section, sectionIdx) => (
-            <div key={section.cat}>
-              {/* Section header */}
-              <p style={{
-                fontSize: 11, fontWeight: 600, color: colors.textTertiary,
-                textTransform: 'uppercase', letterSpacing: '0.05em',
-                padding: '12px 16px 4px', margin: 0,
-              }}>
-                {section.label}
-              </p>
-
-              {section.items.map((item, itemIdx) => {
-                // Find global index for selection tracking
-                const globalIdx = resultsWithAI.indexOf(item);
-                const isSelected = selectedIdx === globalIdx;
-
-                return (
-                  <button
-                    key={item.id}
-                    onClick={() => handleClick(item)}
-                    onMouseEnter={() => setSelectedIdx(globalIdx)}
-                    style={{
-                      display: 'flex', alignItems: 'flex-start', gap: 12,
-                      width: '100%', padding: isMobile ? '10px 16px' : '8px 16px',
-                      minHeight: isMobile ? 56 : 48,
-                      border: 'none',
-                      background: isSelected ? colors.surfaceCard : 'transparent',
-                      cursor: 'pointer', textAlign: 'left',
-                      color: colors.textPrimary,
-                      fontFamily: typography.fontFamily,
-                      transition: `background 0.1s ease`,
-                      outline: isSelected ? `2px solid ${colors.accentRed}` : 'none',
-                      outlineOffset: '-2px',
-                      animation: visible && !closing ? `fadeIn 0.3s var(--ease-raycast) forwards` : 'none',
-                      animationDelay: `${sectionIdx * 0.03 + itemIdx * 0.02}s`,
-                      opacity: 0,
-                    }}
-                  >
-                    {/* Icon */}
-                    <span style={{
-                      fontSize: 16, width: 24, textAlign: 'center',
-                      flexShrink: 0, marginTop: 2,
-                      color: item.category === 'command' ? colors.accentBlue
-                           : item.category === 'market' ? colors.marketGreen
-                           : item.category === 'ai' ? colors.accentRed
-                           : item.category === 'recent' ? colors.body
-                           : colors.textSecondary,
-                    }}>
-                      {item.icon}
-                    </span>
-
-                    {/* Title + subtitle */}
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <span style={{
-                        fontWeight: 400, fontSize: 15, display: 'block',
-                        color: colors.textPrimary, lineHeight: '1.4',
-                      }}>
-                        {item.label}
-                      </span>
-                      {(item.description || item.subtitle) && (
-                        <span style={{
-                          fontSize: 13, color: colors.body,
-                          display: 'block', whiteSpace: 'nowrap',
-                          overflow: 'hidden', textOverflow: 'ellipsis',
-                          lineHeight: '1.3',
-                        }}>
-                          {item.description || item.subtitle}
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Right: metadata + arrow */}
-                    <div style={{
-                      display: 'flex', alignItems: 'center', gap: 8,
-                      flexShrink: 0, marginTop: 2,
-                    }}>
-                      {item.metadata && (
-                        <span style={{
-                          fontSize: 12, color:
-                            item.metadata === 'live' ? colors.marketGreen
-                            : item.metadata === 'Ask AI' ? colors.accentRed
-                            : colors.body,
-                          display: 'flex', alignItems: 'center', gap: 4,
-                        }}>
-                          {item.metadata === 'live' && (
-                            <span className="raycast-badgeImproving" style={{
-                              display: 'inline-block', width: 5, height: 5,
-                              borderRadius: '50%', background: colors.marketGreen,
-                            }} />
-                          )}
-                          {item.metadata}
-                        </span>
-                      )}
-                      <span style={{
-                        fontSize: 14, color: isSelected ? colors.textPrimary : colors.body,
-                        opacity: isSelected ? 1 : 0,
-                        transition: 'opacity 0.15s ease',
-                      }}>
-                        →
-                      </span>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          ))}
+        <div style={{flex: 1, overflowY: 'auto'}}>
+          {items.length === 0 ? (
+            <div style={{padding: '32px 16px', textAlign: 'center', color: colors.textSecondary}}>No results</div>
+          ) : items.map((item, idx) => {
+            const isSelected = idx === selectedIndex;
+            if (item.id === 'divider-history') return <div key={item.id} style={{padding: '12px 16px 4px', fontSize: '12px', fontWeight: '600', color: colors.textTertiary, textTransform: 'uppercase'}}>{item.label}</div>;
+            return <button key={item.id} onClick={() => item.action()} style={{width: '100%', padding: '12px 16px', backgroundColor: isSelected ? colors.primary : colors.surface, color: isSelected ? '#fff' : colors.textPrimary, border: 'none', textAlign: 'left', cursor: 'pointer', fontSize: '14px'}}><div style={{display: 'flex', gap: '12px'}}><span>{item.icon}</span><div><div>{item.label}</div><div style={{fontSize: '12px', opacity: 0.6}}>{item.description}</div></div></div></button>;
+          })}
         </div>
-
-        {/* ── Zone 3: Footer ── */}
-        {!isMobile && (
-          <div style={{
-            display: 'flex', gap: 8, padding: '12px 16px',
-            borderTop: `1px solid ${colors.hairline}`,
-            background: colors.page,
-          }}>
-            {[
-              { label: 'Open', hint: '↵', action: () => { resultsWithAI[selectedIdx]?.action(); triggerClose(); } },
-              { label: 'Actions', hint: '⌘K', action: () => {} },
-              { label: 'Help', hint: '?', action: () => window.dispatchEvent(new KeyboardEvent('keydown', { key: '?' })) },
-            ].map((btn) => (
-              <button
-                key={btn.label}
-                onClick={btn.action}
-                style={{
-                  flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  gap: 8, height: 36,
-                  background: colors.primary, border: 'none',
-                  borderRadius: 6, padding: '8px 16px',
-                  fontSize: 14, fontWeight: 500, fontFamily: typography.fontFamily,
-                  color: colors.page, cursor: 'pointer',
-                  transition: `background 0.15s ease, transform 0.1s ease`,
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.background = colors.primaryPressed)}
-                onMouseLeave={(e) => (e.currentTarget.style.background = colors.primary)}
-                onMouseDown={(e) => (e.currentTarget.style.transform = 'scale(0.98)')}
-                onMouseUp={(e) => (e.currentTarget.style.transform = 'scale(1)')}
-              >
-                {btn.label}
-                <span style={{ fontSize: 11, color: colors.textTertiary, fontWeight: 400 }}>{btn.hint}</span>
-              </button>
-            ))}
-          </div>
-        )}
-
-        {/* Mobile footer: vertical stack */}
-        {isMobile && (
-          <div style={{
-            display: 'flex', flexDirection: 'column', gap: 8,
-            padding: '12px 16px',
-            borderTop: `1px solid ${colors.hairline}`,
-            background: colors.page,
-          }}>
-            <button
-              onClick={() => { resultsWithAI[selectedIdx]?.action(); triggerClose(); }}
-              style={{
-                width: '100%', height: 48,
-                background: colors.primary, border: 'none',
-                borderRadius: 8, fontSize: 16, fontWeight: 500,
-                fontFamily: typography.fontFamily,
-                color: colors.page, cursor: 'pointer',
-              }}
-            >
-              Open
-            </button>
-          </div>
-        )}
       </div>
-    </div>
+    </>
   );
 }

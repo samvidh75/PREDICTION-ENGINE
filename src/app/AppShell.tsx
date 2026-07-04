@@ -1,13 +1,11 @@
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
-import { Home, Search, Star, LayoutGrid, Shield, MessageSquareText, MessageCircle, TrendingUp } from "lucide-react";
+import { Home, Search, Star, LayoutGrid, Shield, MessageCircle, TrendingUp } from "lucide-react";
 import { NavLink, Link, useNavigate } from "react-router-dom";
 import { colors, typography, space, radius, layout, components, shadows, animation } from "../design/tokens";
 import { BrandMark } from "../components/BrandMark";
 import { ResearchProfileModal } from "../components/ResearchProfileModal";
-import { CommandPalette } from "../components/CommandPalette";
 import { useKeyboardShortcuts, KeyboardHelpOverlay } from "../hooks/useKeyboardShortcuts";
-import { SCAN_PRESETS } from "../services/scanner/presets";
 import { FloatingAiAssistant } from "../components/FloatingAiAssistant";
 
 const NAV = [
@@ -29,21 +27,8 @@ const SECONDARY_NAV = [
 
 export function AppShell({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
-  const [paletteOpen, setPaletteOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
   const [showFeedbackFab, setShowFeedbackFab] = useState(() => document.body.dataset.onboardingActive !== "true");
-
-  // Cmd+K / Ctrl+K to open palette
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-        e.preventDefault();
-        setPaletteOpen((prev) => !prev);
-      }
-    };
-    window.addEventListener('keydown', handler);
-    return () => window.removeEventListener('keydown', handler);
-  }, []);
 
   useKeyboardShortcuts({
     handlers: {
@@ -52,7 +37,6 @@ export function AppShell({ children }: { children: ReactNode }) {
       'toggle-track': () => navigate('/watchlist'),
       'escape': () => {
         setHelpOpen(false);
-        setPaletteOpen(false);
       },
     },
   });
@@ -185,18 +169,6 @@ export function AppShell({ children }: { children: ReactNode }) {
           </p>
         </footer>
       </main>
-
-      {/* COMMAND PALETTE */}
-      <CommandPalette
-        presets={SCAN_PRESETS.map((p) => ({
-          id: p.id,
-          label: p.label,
-          description: p.description,
-          icon: p.icon,
-        }))}
-        open={paletteOpen}
-        onClose={() => setPaletteOpen(false)}
-      />
 
       {/* KEYBOARD HELP */}
       <KeyboardHelpOverlay open={helpOpen} onClose={() => setHelpOpen(false)} />

@@ -5,6 +5,7 @@ import { AuthProvider } from "./context/AuthContext";
 import { AppRoutes } from "./app/routes";
 import { ScrollToTop } from "./app/ScrollToTop";
 import LiveAlertSentinel from "./components/LiveAlertSentinel";
+import CommandPalette from "./components/CommandPalette";
 import { analytics } from "./lib/client/anonymousAnalytics";
 
 const queryClient = new QueryClient({
@@ -31,6 +32,8 @@ export default function App() {
           <ScrollToTop />
           {/* Persistent global event broker notification sentinel */}
           <LiveAlertSentinel />
+          {/* Raycast-style command palette */}
+          <CommandPalette />
           <AppRoutes />
         </BrowserRouter>
       </AuthProvider>
