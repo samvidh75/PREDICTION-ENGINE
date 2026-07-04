@@ -13,6 +13,7 @@ export default function FloatingAIButton() {
   const [messages, setMessages] = useState<Array<{ role: 'user' | 'assistant'; content: string }>>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isHovering, setIsHovering] = useState(false);
 
   const handleSend = async () => {
     if (!input.trim()) return;
@@ -25,13 +26,19 @@ export default function FloatingAIButton() {
     try {
       // Use StockEx AI - ChatGPT of Indian stock market
       const aiResponse = await stockExAI.chat(userMessage);
-      setMessages((prev) => [...prev, { role: 'assistant', content: aiResponse.response }]);
+      if (aiResponse && aiResponse.response) {
+        setMessages((prev) => [...prev, { role: 'assistant', content: aiResponse.response }]);
+      } else {
+        throw new Error('Empty response from AI');
+      }
     } catch (error) {
+      console.error('[StockEx AI] Error:', error);
+      const errorMsg = error instanceof Error ? error.message : 'Unknown error';
       setMessages((prev) => [
         ...prev,
         {
           role: 'assistant',
-          content: '🤖 **StockEx AI Ready!**\n\nI can help with:\n• Stock analysis ("Analyze HDFC")\n• Recommendations ("Best stocks to buy")\n• Learning ("What is P/E ratio")\n• Market trends ("Market update")\n• Research insights\n\nWhat would you like to explore?',
+          content: `⚠️ **Oops!**\n\nHad trouble with that request (${errorMsg}).\n\n💡 Try asking:\n• "Analyze HDFC"\n• "Best stocks now"\n• "Explain P/E ratio"\n• "Market update"`,
         },
       ]);
     } finally {
@@ -199,32 +206,53 @@ export default function FloatingAIButton() {
       )}
 
       {/* Floating Button */}
+      <style>{`
+        @keyframes pulse-premium {
+          0%, 100% { box-shadow: 0 8px 24px rgba(59, 130, 246, 0.35), 0 0 0 0 rgba(59, 130, 246, 0.4); }
+          50% { box-shadow: 0 8px 24px rgba(59, 130, 246, 0.25), 0 0 0 8px rgba(59, 130, 246, 0); }
+        }
+        .stockex-ai-button {
+          animation: pulse-premium 2s infinite;
+        }
+      `}</style>
       <button
         onClick={() => setIsOpen(!isOpen)}
+        onMouseEnter={() => setIsHovering(true)}
+        onMouseLeave={() => setIsHovering(false)}
+        className={isOpen ? '' : 'stockex-ai-button'}
         style={{
           position: 'fixed',
           bottom: '16px',
           right: '16px',
-          width: '56px',
-          height: '56px',
+          width: '64px',
+          height: '64px',
           borderRadius: '50%',
-          backgroundColor: colors.primary || '#3b82f6',
+          background: isOpen
+            ? colors.primary || '#3b82f6'
+            : `linear-gradient(135deg, ${colors.primary || '#3b82f6'} 0%, #2563eb 100%)`,
           color: '#fff',
-          border: 'none',
-          fontSize: '24px',
+          border: '2px solid rgba(255,255,255,0.2)',
+          fontSize: '28px',
           cursor: 'pointer',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+          boxShadow: isHovering
+            ? '0 12px 32px rgba(59, 130, 246, 0.4), 0 0 20px rgba(59, 130, 246, 0.2)'
+            : '0 8px 24px rgba(59, 130, 246, 0.3)',
           zIndex: 998,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          transition: 'transform 0.2s',
+          transition: 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
+          transform: isHovering ? 'scale(1.15)' : 'scale(1)',
+          backdropFilter: 'blur(10px)',
         }}
-        onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.1)')}
-        onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
-        title="Ask StockEx AI"
+        title="StockEx AI - Ask about stocks"
       >
-        {isOpen ? '✕' : '💬'}
+        <span style={{
+          fontSize: '24px',
+          filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))',
+        }}>
+          {isOpen ? '✕' : '✨'}
+        </span>
       </button>
     </>
   );

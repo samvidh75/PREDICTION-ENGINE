@@ -195,7 +195,7 @@ class StockExAI {
   /**
    * Recommendation Handler - With reasoning
    */
-  private async handleRecommendation(_userMessage: string): Promise<AIResponse> {
+  private async handleRecommendation(userMessage: string): Promise<AIResponse> {
     const stocks = ['HDFC', 'INFY', 'TCS', 'RELIANCE', 'MARUTI'];
     const recommendations = stocks.map(symbol => {
       const data = generateEnhancedMockData(symbol);
@@ -482,7 +482,7 @@ Mix of low-debt growth stocks
   /**
    * Market Update Handler
    */
-  private async handleMarketUpdate(_userMessage: string): Promise<AIResponse> {
+  private async handleMarketUpdate(userMessage: string): Promise<AIResponse> {
     const response = `📈 **Market Intelligence Update**\n\n` +
       `**Indices Today**
 • Nifty 50: 24,850 (↑1.2% YTD)
@@ -533,7 +533,7 @@ Mix of low-debt growth stocks
   /**
    * Research Handler
    */
-  private async handleResearch(_userMessage: string): Promise<AIResponse> {
+  private async handleResearch(userMessage: string): Promise<AIResponse> {
     const response = `🔬 **Deep Market Research**\n\n` +
       `**Sector Analysis Framework**
 
