@@ -11,12 +11,14 @@ const symbolAliases: Record<string, string> = {
 
 // Fallback fundamental data for major Indian stocks (from screener.in data)
 const fallbackFundamentals: Record<string, any> = {
-  'HDFCBANK': { pe: 17.89, pb: 2.1, eps: 44.78, dividendYield: 1.62, roe: 16.1, high52w: 2580, low52w: 1800 },
-  'RELIANCE': { pe: 24.5, pb: 2.8, eps: 53.24, dividendYield: 2.1, roe: 12.5, high52w: 3500, low52w: 2400 },
-  'TCS': { pe: 21.5, pb: 5.2, eps: 97.35, dividendYield: 2.3, roe: 18.2, high52w: 4200, low52w: 2800 },
-  'INFY': { pe: 22.1, pb: 3.5, eps: 47.29, dividendYield: 1.8, roe: 15.8, high52w: 1800, low52w: 1100 },
-  'WIPRO': { pe: 19.3, pb: 1.9, eps: 9.15, dividendYield: 2.6, roe: 11.2, high52w: 450, low52w: 220 },
-  'SBIN': { pe: 12.8, pb: 0.9, eps: 81.25, dividendYield: 5.2, roe: 15.5, high52w: 1200, low52w: 750 },
+  'HDFCBANK': { pe: 17.89, pb: 2.1, eps: 44.78, dividendYield: 1.62, roe: 16.1, high52w: 2580, low52w: 1800, debtToEquity: 1.2 },
+  'RELIANCE': { pe: 24.5, pb: 2.8, eps: 53.24, dividendYield: 2.1, roe: 12.5, high52w: 3500, low52w: 2400, debtToEquity: 0.8 },
+  'TCS': { pe: 21.5, pb: 5.2, eps: 97.35, dividendYield: 2.3, roe: 18.2, high52w: 4200, low52w: 2800, debtToEquity: 0.4 },
+  'INFY': { pe: 22.1, pb: 3.5, eps: 47.29, dividendYield: 1.8, roe: 15.8, high52w: 1800, low52w: 1100, debtToEquity: 0.5 },
+  'WIPRO': { pe: 19.3, pb: 1.9, eps: 9.15, dividendYield: 2.6, roe: 11.2, high52w: 450, low52w: 220, debtToEquity: 0.6 },
+  'SBIN': { pe: 12.8, pb: 0.9, eps: 81.25, dividendYield: 5.2, roe: 15.5, high52w: 1200, low52w: 750, debtToEquity: 10.5 },
+  'AXISBANK': { pe: 15.2, pb: 1.8, eps: 52.15, dividendYield: 2.8, roe: 14.5, high52w: 1180, low52w: 720, debtToEquity: 8.9 },
+  'ICICIBANK': { pe: 16.8, pb: 2.2, eps: 48.92, dividendYield: 2.1, roe: 15.2, high52w: 950, low52w: 620, debtToEquity: 9.2 },
 };
 
 // Fetch real stock price from Yahoo Finance
@@ -144,6 +146,8 @@ export default async function handler(
       dividendYield: fundamentalsData?.dividendYield ?? null,
       roe: fundamentalsData?.roe ?? null,
       debtToEquity: fundamentalsData?.debtToEquity ?? null,
+      high52w: fundamentalsData?.high52w ?? null,
+      low52w: fundamentalsData?.low52w ?? null,
       industryPe: null,
       revenueGrowth: null,
       profitGrowth: null,
