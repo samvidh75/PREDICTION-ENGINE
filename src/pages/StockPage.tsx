@@ -2,7 +2,7 @@ import { useEffect, useState, useMemo, useRef, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Building2, TrendingUp, ChevronDown, ChevronUp, ExternalLink } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
-import { LazyAreaChart, LazyBarChart, Area, Bar, CartesianGrid, Cell, Line, ResponsiveContainer, XAxis, YAxis, Tooltip } from "../components/DynamicChart";
+import { LazyBarChart, Bar, CartesianGrid, Cell, ResponsiveContainer, XAxis, YAxis } from "../components/DynamicChart";
 import { Badge } from "../ui/Badge";
 import { Button } from "../ui/Button";
 import { Card, CardLabel } from "../ui/Card";
@@ -620,34 +620,32 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
             ))}
           </div>
         </div>
-        <div style={{ width: "100%", height: "300px" }}>
-          <ResponsiveContainer>
-            {chartType === "line" ? (
-              <LazyAreaChart data={stock.priceHistory[timeframe]}>
-                <defs>
-                  <linearGradient id="trendFill" x1="0" x2="0" y1="0" y2="1">
-                    <stop offset="0%" stopColor={trendColor} stopOpacity="0.2" />
-                    <stop offset="100%" stopColor={trendColor} stopOpacity="0" />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid vertical={false} stroke={colors.border} strokeDasharray="4 4" />
-                <XAxis dataKey="label" stroke={colors.textSecondary} tick={{ fontSize: 11 }} />
-                <YAxis stroke={colors.textSecondary} domain={["auto", "auto"]} tick={{ fontSize: 11 }} />
-                <Tooltip contentStyle={{ background: colors.card, border: `1px solid ${colors.border}`, borderRadius: "8px", color: colors.textPrimary }} />
-                <Area dataKey="price" stroke={trendColor} fill="url(#trendFill)" strokeWidth={2} dot={false} />
-                {techIndicator === "sma" && (
-                  <Line dataKey="price" stroke={colors.warning} strokeWidth={1.5} strokeDasharray="6 3" dot={false} name="SMA 20" />
-                )}
-              </LazyAreaChart>
-            ) : (
-              <LazyBarChart data={(stock.priceHistory?.[timeframe] ?? []).map((d: any) => ({ ...d, high: d.price * 1.02, low: d.price * 0.98, open: d.price * 0.99, close: d.price * 1.01 }))}>
-                <CartesianGrid vertical={false} stroke={colors.border} />
-                <XAxis dataKey="label" stroke={colors.textSecondary} tick={{ fontSize: 11 }} />
-                <YAxis stroke={colors.textSecondary} domain={["auto", "auto"]} tick={{ fontSize: 11 }} />
-                <Bar dataKey="close" fill={trendColor} radius={[2, 2, 0, 0]} />
-              </LazyBarChart>
-            )}
-          </ResponsiveContainer>
+        <div style={{ width: "100%", padding: "16px", backgroundColor: colors.card, borderRadius: "8px", border: `1px solid ${colors.border}` }}>
+          <div style={{ overflowX: "auto" }}>
+            <table style={{ width: "100%", fontSize: "12px", borderCollapse: "collapse" }}>
+              <thead>
+                <tr style={{ borderBottom: `1px solid ${colors.border}` }}>
+                  <th style={{ padding: "8px", textAlign: "left", color: colors.textSecondary }}>Date</th>
+                  <th style={{ padding: "8px", textAlign: "right", color: colors.textSecondary }}>Price</th>
+                  <th style={{ padding: "8px", textAlign: "right", color: colors.textSecondary }}>Change</th>
+                </tr>
+              </thead>
+              <tbody>
+                {(stock.priceHistory[timeframe] ?? []).slice(-10).reverse().map((row: any, idx: number) => {
+                  const prev = (stock.priceHistory[timeframe] ?? [])[Math.max(0, (stock.priceHistory[timeframe] ?? []).length - 11 - idx)];
+                  const change = prev ? row.price - prev.price : 0;
+                  const changePercent = prev ? ((change / prev.price) * 100).toFixed(2) : "0.00";
+                  return (
+                    <tr key={idx} style={{ borderBottom: `1px solid ${colors.border}` }}>
+                      <td style={{ padding: "8px", color: colors.textPrimary }}>{row.label}</td>
+                      <td style={{ padding: "8px", textAlign: "right", color: colors.textPrimary }}>₹{row.price.toFixed(2)}</td>
+                      <td style={{ padding: "8px", textAlign: "right", color: change >= 0 ? colors.success : colors.danger }}>{change >= 0 ? "+" : ""}{change.toFixed(2)} ({changePercent}%)</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         </div>
         {techIndicator !== "none" && (
           <p style={{ color: colors.textSecondary, fontSize: "11px", marginTop: "8px" }}>
@@ -798,17 +796,25 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
             </table>
           </div>
         ) : (
-          <div style={{ width: "100%", height: "280px" }}>
-            <ResponsiveContainer>
-              <LazyBarChart data={effectiveChartData}>
-                <CartesianGrid vertical={false} stroke={colors.border} />
-                <XAxis dataKey="period" stroke={colors.textSecondary} tick={{ fontSize: 11 }} />
-                <YAxis stroke={colors.textSecondary} tick={{ fontSize: 11 }} />
-                <Bar dataKey="value" radius={[6, 6, 0, 0]}>
-                  {effectiveChartData.map((entry) => (<Cell key={entry.period} fill={colors.primary} />))}
-                </Bar>
-              </LazyBarChart>
-            </ResponsiveContainer>
+          <div style={{ width: "100%", padding: "16px", backgroundColor: colors.card, borderRadius: "8px", border: `1px solid ${colors.border}` }}>
+            <div style={{ overflowX: "auto" }}>
+              <table style={{ width: "100%", fontSize: "12px", borderCollapse: "collapse" }}>
+                <thead>
+                  <tr style={{ borderBottom: `1px solid ${colors.border}` }}>
+                    <th style={{ padding: "8px", textAlign: "left", color: colors.textSecondary }}>Period</th>
+                    <th style={{ padding: "8px", textAlign: "right", color: colors.textSecondary }}>Value (₹ Cr)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {effectiveChartData.map((entry, idx) => (
+                    <tr key={idx} style={{ borderBottom: `1px solid ${colors.border}` }}>
+                      <td style={{ padding: "8px", color: colors.textPrimary }}>{entry.period}</td>
+                      <td style={{ padding: "8px", textAlign: "right", color: colors.textPrimary }}>{entry.value.toLocaleString()}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
         <p style={{ color: colors.textSecondary, fontSize: "12px", marginTop: "12px" }}>All values in ₹ Cr</p>
