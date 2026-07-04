@@ -393,7 +393,7 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
   const availableBrokers = listAvailableBrokers();
   const selectedBroker = availableBrokers[0]?.name ?? null;
   const sectionGap = useResponsiveValue("48px", "80px");
-  const isUp = stock.price.changeAbs >= 0;
+  const isUp = (stock?.price?.changeAbs ?? 0) >= 0;
   const trendColor = isUp ? colors.success : colors.danger;
   const shareholdingSeriesArr = Array.isArray(shareholdingSeries) ? shareholdingSeries : [];
   const effectiveShareholding = shareholding ?? shareholdingSeriesArr.find((item) => item.period === period) ?? shareholdingSeriesArr[0];
