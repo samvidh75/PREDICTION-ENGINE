@@ -57,9 +57,8 @@ function resolvePlaceholders(template: string, data: Record<string, any>): strin
 
       let modelId = 'onnx-community/Qwen2.5-0.5B-Instruct';
 
-      // Try to load fine-tuned model from HuggingFace Hub
-      // Update this ID after uploading the trained adapter to HF
-      const finetuneModelId = 'stockex/Qwen2.5-0.5B-stockmarket-encyclopedia';
+      // Fine-tuned model now available on HuggingFace Hub
+      const finetuneModelId = 'samvidhh/Qwen2.5-0.5B-stockmarket-encyclopedia';
 
       try {
         // Attempt to load fine-tuned model
