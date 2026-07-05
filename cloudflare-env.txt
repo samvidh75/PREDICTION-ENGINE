@@ -1,0 +1,52 @@
+# Cloudflare Pages Environment Variables
+# Copy ALL of these into Cloudflare Pages → Settings → Variables and secrets → Add
+# You can paste the entire file content - Cloudflare supports bulk .env import
+
+# ── Domain & Routing ──
+VITE_APP_DOMAIN=stockstory-india.com
+VITE_API_DOMAIN=www.stockstory-india.com
+VITE_APP_ORIGIN=https://stockstory-india.com
+VITE_API_BASE_URL=https://stockstory-api.onrender.com
+
+# ── Firebase Auth ──
+VITE_FIREBASE_API_KEY=AIzaSyCOlke_L6Si3KEuqQxDIG9ZUUf4R4RcId8
+VITE_FIREBASE_AUTH_DOMAIN=stockstory-india.firebaseapp.com
+VITE_FIREBASE_PROJECT_ID=stockstory-india
+VITE_FIREBASE_STORAGE_BUCKET=stockstory-india.firebasestorage.app
+VITE_FIREBASE_MESSAGING_SENDER_ID=1050723709235
+VITE_FIREBASE_APP_ID=1:1050723709235:web:f33512721e75102b2c8e46
+
+# ── Google Auth ──
+VITE_GOOGLE_CLIENT_ID=220040399044-p983i5ba82sltju4k9dn9141kksr1rhc.apps.googleusercontent.com
+
+# ── Upstox Broker ──
+VITE_UPSTOX_CLIENT_ID=a16839aa-ef23-4d8d-acf2-e3f900327331
+VITE_UPSTOX_REDIRECT_URI=
+
+# ── Feature Flags ──
+VITE_SHOW_ABOUT_PAGE=false
+VITE_LOCAL_API=false
+VITE_BETA_MODE=closed
+VITE_SCREENER_ENABLED=true
+VITE_WAITLIST_ENABLED=true
+VITE_WAITLIST_API_URL=/api/waitlist
+VITE_FEEDBACK_ENABLED=true
+VITE_FEEDBACK_API_URL=/api/feedback
+VITE_CHANGELOG_ENABLED=true
+VITE_USER_INTERVIEW_SIGNUP_ENABLED=true
+VITE_ANALYTICS_ENABLED=true
+VITE_PRIVACY_CONSENT_REQUIRED=true
+VITE_DEBUG_MODE=false
+VITE_LOCAL_LLM_ENABLED=true
+
+# ── Public PostHog ──
+VITE_PUBLIC_POSTHOG_HOST=https://app.posthog.com
+
+# ── API Keys (set in Vercel - copy your values) ──
+VITE_GROQ_API_KEY=
+VITE_INDIANAPI_KEY=
+VITE_SUPABASE_URL=
+VITE_SUPABASE_ANON_KEY=
+VITE_RAZORPAY_KEY_ID=
+VITE_NEWS_API_KEY=demo
+VITE_ALPHAVANTAGE_KEY=demo

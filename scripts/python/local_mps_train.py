@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-local_mps_train.py — Fast LoRA fine-tuning for StockEX.
+local_mps_train.py — Optimized LoRA fine-tuning for StockEX on MPS.
 Usage: python3 scripts/python/local_mps_train.py
 """
 
@@ -11,12 +11,12 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 from peft import LoraConfig, get_peft_model
 from trl import SFTConfig, SFTTrainer
 
-DATASET_PATH = "stockex_encyclopedia_dataset.jsonl"
+DATASET_PATH = "qwen_05b_training.jsonl"
 MODEL_ID = "Qwen/Qwen2.5-0.5B-Instruct"
-OUTPUT_DIR = "./stockex_slm_agent_output"
+OUTPUT_DIR = "./stockex_50k_finetuned"
 
 print("=" * 60)
-print("StockEX Fast Fine-Tuning")
+print("StockEX Optimized Fine-Tuning (MPS)")
 print("=" * 60)
 
 if not os.path.exists(DATASET_PATH):
@@ -32,16 +32,19 @@ print("\nLoading tokenizer...")
 tokenizer = AutoTokenizer.from_pretrained(MODEL_ID, trust_remote_code=True)
 tokenizer.pad_token = tokenizer.eos_token
 
-print("Loading model (float32 on CPU)...")
+device = "mps" if torch.backends.mps.is_available() else "cpu"
+torch_dtype = torch.float16 if device == "mps" else torch.float32
+print(f"Loading model ({'float16' if device == 'mps' else 'float32'} on {device.upper()})...")
 model = AutoModelForCausalLM.from_pretrained(
     MODEL_ID,
-    torch_dtype=torch.float32,
-    device_map="cpu",
+    torch_dtype=torch_dtype,
+    device_map=None,
     use_cache=False,
     low_cpu_mem_usage=True,
 )
+model = model.to(device)
 
-model.gradient_checkpointing_enable()
+# No gradient checkpointing — small model fits MPS memory without it, runs faster
 
 print("\nConfiguring LoRA...")
 lora_config = LoraConfig(
@@ -75,12 +78,12 @@ print(f"Formatted: {dataset[0]['text'][:100]}...")
 print("\nStarting training...")
 sft_config = SFTConfig(
     output_dir=OUTPUT_DIR,
-    max_length=512,
-    per_device_train_batch_size=4,
-    gradient_accumulation_steps=2,
+    max_length=768,
+    per_device_train_batch_size=8,
+    gradient_accumulation_steps=8,
     dataloader_pin_memory=False,
-    dataloader_num_workers=4,
-    learning_rate=1e-4,
+    dataloader_num_workers=2,
+    learning_rate=2e-5,
     num_train_epochs=3,
     warmup_ratio=0.1,
     weight_decay=0.01,
@@ -90,7 +93,7 @@ sft_config = SFTConfig(
     bf16=False,
     report_to="none",
     save_total_limit=1,
-    dataset_num_proc=4,
+    dataset_num_proc=2,
     dataset_text_field="text",
     shuffle_dataset=True,
     remove_unused_columns=True,
@@ -125,10 +128,10 @@ if os.path.exists(config_path):
     print("adapter_config.json patched with model_type=qwen2")
 
 zip_path = "/tmp/stockex_slm_agent_output.zip"
-with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zf:
+with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as f:
     for fpath in glob.glob(os.path.join(OUTPUT_DIR, "**", "*"), recursive=True):
         if os.path.isfile(fpath):
-            zf.write(fpath, os.path.relpath(fpath, OUTPUT_DIR))
+            f.write(fpath, os.path.relpath(fpath, OUTPUT_DIR))
 
 print(f"\nCreated: {zip_path}")
 print(f"Size: {os.path.getsize(zip_path) / 1024 / 1024:.1f} MB")
