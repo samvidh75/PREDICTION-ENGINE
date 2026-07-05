@@ -11,6 +11,7 @@ import SmartModelSelector, { useSmartModelSelection } from './browser-ai/SmartMo
 import { smartWorkerManager } from './browser-ai/SmartWorkerManager';
 import { responseCache } from '../utils/responseCache';
 import { conversationContext } from '../utils/conversationContext';
+import { portfolioAIContext } from '../utils/portfolioAIContext';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -117,11 +118,20 @@ export default function SmartFloatingAIButton() {
       // Analyze complexity and determine best model
       const analysis = modelRouter.analyzeComplexity(userMessage);
 
-      // Build enhanced prompt with conversation context
+      // Build enhanced prompt with conversation context + portfolio context
+      let enhancedPrompt = userMessage;
+
+      // Add portfolio context if it's a portfolio-related question
+      const isPortfolioQuestion = portfolioAIContext.isPortfolioQuestion(userMessage);
+      if (isPortfolioQuestion) {
+        enhancedPrompt = await portfolioAIContext.buildPortfolioAwarePrompt(enhancedPrompt);
+      }
+
+      // Add conversation context for follow-ups
       const isFollowUp = conversationContext.isFollowUp(userMessage);
-      const enhancedPrompt = isFollowUp
-        ? conversationContext.buildEnhancedPrompt(userMessage)
-        : userMessage;
+      if (isFollowUp) {
+        enhancedPrompt = conversationContext.buildEnhancedPrompt(enhancedPrompt);
+      }
 
       if (analysis.tier === 'tier3-groq-api') {
         // Check cache first before calling Groq API
