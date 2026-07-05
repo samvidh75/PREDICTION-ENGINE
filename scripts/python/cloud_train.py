@@ -17,7 +17,7 @@ from peft import LoraConfig, get_peft_model
 from trl import SFTConfig, SFTTrainer
 
 MODEL_ID = "Qwen/Qwen2.5-0.5B-Instruct"
-DATASET_PATH = "stockex_encyclopedia_dataset.jsonl"
+DATASET_PATH = "stockex_combined_dataset.jsonl"
 OUTPUT_DIR = "./stockex_slm_agent_output"
 
 

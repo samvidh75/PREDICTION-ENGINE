@@ -18,7 +18,7 @@
     "build:all": "npm run build && npm run build:backend",
     "render:build": "npm run compile:backend && vite build",
     "render:start": "node dist/render/startServer.js",
-    "compile:backend": "tsc -p tsconfig.backend.json && node scripts/fix-esm-imports.js",
+    "compile:backend": "tsc -p tsconfig.backend.json && tsc-alias -p tsconfig.backend.json && node scripts/fix-esm-imports.js",
     "start": "node dist/render/startServer.js",
     "start:dev": "tsx src/render/startServer.ts",
     "migrate": "tsx src/db/migrate.ts",
@@ -279,6 +279,7 @@
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.10",
     "ts-jest": "^29.4.11",
+    "tsc-alias": "^1.9.0",
     "tsx": "^4.22.1",
     "typescript-eslint": "^8.61.0",
     "vitest": "^4.1.8"
