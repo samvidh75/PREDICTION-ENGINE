@@ -1,11 +1,5 @@
 #!/bin/bash
-# Vercel install script — ensures native binaries are installed
+# Vercel install script
 set -e
-
-# Install all deps (including optional)
-npm install --legacy-peer-deps
-
-# Explicitly install Linux native binaries needed by Vite/rolldown
-npm install @rolldown/binding-linux-x64-gnu@latest --no-save --ignore-scripts 2>/dev/null || true
-
+npm install
 echo "Install complete"
