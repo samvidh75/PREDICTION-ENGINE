@@ -27,7 +27,7 @@ services:
     buildCommand: npm ci --include=dev && npm run render:build
     startCommand: npm run render:start
     healthCheckPath: /healthz
-    autoDeploy: true
+    autoDeploy: false
 
     envVars:
       # ── Runtime ────────────────────────────────────────────────────────
