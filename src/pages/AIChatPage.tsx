@@ -271,8 +271,8 @@ export default function AIChatPage() {
         "Compiling research context…",
       ];
 
-      const isProduction = window.location.hostname === "www.stockstory-india.com" || window.location.hostname === "stockstory-india.com";
-      const apiUrl = isProduction ? "https://stockstory-api.onrender.com/api/chat" : "/api/chat";
+      const apiBase = import.meta.env.VITE_API_BASE_URL || (window.location.hostname.includes("stockstory-india.com") ? "/api" : "/api");
+      const apiUrl = `${apiBase}/chat`;
 
       try {
         const res = await fetch(apiUrl, {

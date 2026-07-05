@@ -1,0 +1,46 @@
+# StockStory India — Caddy Reverse Proxy (Auto SSL)
+# Replace with your actual domain.
+
+api.stockstory-india.com {
+    reverse_proxy api:4001
+
+    header /healthz {
+        Access-Control-Allow-Origin *
+        Access-Control-Allow-Methods "GET, OPTIONS"
+    }
+
+    header /api/* {
+        Access-Control-Allow-Origin "https://stockstory-india.com"
+        Access-Control-Allow-Credentials true
+        Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+        Access-Control-Allow-Headers "Content-Type, Authorization, Cookie"
+    }
+
+    # Security headers
+    header {
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "DENY"
+        X-XSS-Protection "1; mode=block"
+        Referrer-Policy "strict-origin-when-cross-origin"
+        Permissions-Policy "camera=(), microphone=(), geolocation=()"
+    }
+
+    # Rate limiting
+    rate_limit {
+        zone api_zone {
+            key {remote_host}
+            events 100
+            window 1m
+        }
+    }
+
+    log {
+        output file /var/log/caddy/api.log
+        format json
+    }
+}
+
+# Redirect www to bare domain (optional)
+www.stockstory-india.com {
+    redir https://stockstory-india.com{uri} permanent
+}
