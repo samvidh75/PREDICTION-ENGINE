@@ -1,6 +1,7 @@
 import { useEffect, useState, type ComponentType } from "react";
 import { BrowserRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { SpeedInsights } from "@vercel/speed-insights/react";
 import { AuthProvider } from "./context/AuthContext";
 import { AppRoutes } from "./app/routes";
 import { ScrollToTop } from "./app/ScrollToTop";
@@ -72,6 +73,7 @@ export default function App() {
           {FloatingAIButton ? <FloatingAIButton /> : null}
           <CommandPalette />
           <AppRoutes />
+          <SpeedInsights />
         </BrowserRouter>
       </AuthProvider>
     </QueryClientProvider>
