@@ -2,7 +2,7 @@
   "version": 2,
   "buildCommand": "npm run build:vercel",
   "outputDirectory": "dist/public",
-  "installCommand": "npm ci --legacy-peer-deps",
+  "installCommand": "npm install --legacy-peer-deps --prefer-offline",
   "framework": "vite",
   "headers": [
     {
