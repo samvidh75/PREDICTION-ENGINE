@@ -1,0 +1,20 @@
+# StockStory India — Cloudflare Pages Headers
+# Mirrors the security headers from vercel.json
+
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+  X-Content-Type-Options: nosniff
+
+/index.html
+  Cache-Control: public, max-age=300, s-maxage=600
+  X-Content-Type-Options: nosniff
+
+/*
+  Content-Security-Policy: default-src 'self' https:; script-src 'self' https://www.googletagmanager.com https://www.google-analytics.com 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' https: data:; connect-src 'self' https: wss:; frame-ancestors 'none'; upgrade-insecure-requests;
+  Cross-Origin-Opener-Policy: same-origin
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  X-XSS-Protection: 1; mode=block
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: geolocation=(), microphone=(), camera=()
+  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
