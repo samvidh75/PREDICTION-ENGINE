@@ -27,10 +27,10 @@ export default function LiveAlertSentinel() {
   const [activeAlert, setActiveAlert] = useState<ActivePushAlert | null>(null);
 
   useEffect(() => {
-    // Build WebSocket URL relative to the current host (same pattern as
-    // useWatchlistWebSocket), falling back to a local dev endpoint.
-    const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-    const wsUrl = `${protocol}//${window.location.host}/ws/v1/event-alerts`;
+    // Build WebSocket URL — use VITE_WS_URL if set, otherwise fall back to current host
+    const wsUrl = (import.meta as any).env?.VITE_WS_URL
+      ? `${(import.meta as any).env.VITE_WS_URL}/ws/v1/event-alerts`
+      : `${window.location.protocol === "https:" ? "wss:" : "ws:"}//${window.location.host}/ws/v1/event-alerts`;
 
     let socket: WebSocket | null = null;
 

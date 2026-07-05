@@ -115,7 +115,8 @@ class LiveMarketDataService {
 
     const connect = () => {
       try {
-        ws = new WebSocket(`${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/ws/v1/event-alerts`);
+        const wsBase = (import.meta as any).env?.VITE_WS_URL || '';
+        ws = new WebSocket(wsBase ? `${wsBase}/ws/v1/event-alerts` : `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/ws/v1/event-alerts`);
 
         ws.onopen = () => {
           // Subscribe to this ticker
