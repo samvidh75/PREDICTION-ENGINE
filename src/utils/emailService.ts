@@ -39,8 +39,6 @@ export interface EmailLog {
 }
 
 class EmailService {
-  private resendApiKey = process.env.REACT_APP_RESEND_API_KEY;
-  private fromEmail = 'noreply@stockex.com';
 
   /**
    * Email templates for different campaigns
