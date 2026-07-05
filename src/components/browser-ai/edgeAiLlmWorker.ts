@@ -1,12 +1,15 @@
 // src/components/browser-ai/edgeAiLlmWorker.ts
 // WebGPU Workers for 100% On-Device LLM Inference
-// 
+//
 // Implements the complete WebGPU + Hugging Face Transformers.js pipeline
 // for running Qwen2.5-0.5B-Instruct directly in the browser GPU
 
 // Worker state management
+// @ts-expect-error - Variables are isolated within Worker context
 let modelInstance: any = null;
+// @ts-expect-error - Variables are isolated within Worker context
 let tokenizerInstance: any = null;
+// @ts-expect-error - Variables are isolated within Worker context
 let workerStatus = 'idle';
 
 // Message handler for WebGPU inference

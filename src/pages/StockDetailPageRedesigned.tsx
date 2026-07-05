@@ -8,7 +8,7 @@ import { useParams } from 'react-router-dom';
 import { useState, useMemo, useEffect } from 'react';
 import { useOHLCData } from '../hooks/useOHLCData';
 import StockChart from '../components/StockChart';
-import FloatingAIButton from '../components/FloatingAIButton';
+import SmartFloatingAIButton from '../components/SmartFloatingAIButton';
 import { colors } from '../design/tokens';
 import { cacheManager, CACHE_KEYS, CACHE_TTL } from '../services/cache/CacheStrategy';
 import { PriceSkeleton, HealthometerSkeleton, ChartSkeleton, MetricsSkeleton, NewsSkeleton } from '../components/SkeletonLoader';
@@ -334,7 +334,7 @@ function DesktopLayout({ quote, symbol, timeframe, setTimeframe, ohlcData, chang
           </div>
         </div>
       </div>
-      <FloatingAIButton />
+      <SmartFloatingAIButton />
     </div>
   );
 }
@@ -489,7 +489,7 @@ function MobileLayout({ quote, symbol, timeframe, setTimeframe, ohlcData, change
           </div>
         </div>
       </div>
-      <FloatingAIButton />
+      <SmartFloatingAIButton />
     </div>
   );
 }

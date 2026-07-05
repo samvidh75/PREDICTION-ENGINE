@@ -47,7 +47,7 @@ export default function App() {
     const cancelGlobalUiBoot = runWhenIdle(() => {
       void Promise.all([
         import("./components/LiveAlertSentinel"),
-        import("./components/FloatingAIButton"),
+        import("./components/SmartFloatingAIButton"),
       ]).then(([liveAlertModule, floatingAiModule]) => {
         if (cancelled) return;
         setLiveAlertSentinel(() => liveAlertModule.default);
