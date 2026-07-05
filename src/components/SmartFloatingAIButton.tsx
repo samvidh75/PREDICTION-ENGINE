@@ -9,11 +9,15 @@ import { colors } from '../design/tokens';
 import { modelRouter, type ModelTier } from '../utils/modelRouter';
 import SmartModelSelector, { useSmartModelSelection } from './browser-ai/SmartModelSelector';
 import { smartWorkerManager } from './browser-ai/SmartWorkerManager';
+import { responseCache } from '../utils/responseCache';
+import { conversationContext } from '../utils/conversationContext';
 
 interface Message {
   role: 'user' | 'assistant';
   content: string;
   modelUsed?: ModelTier;
+  rating?: 'helpful' | 'not-helpful' | null;
+  messageId?: string;
 }
 
 export default function SmartFloatingAIButton() {
@@ -41,24 +45,60 @@ export default function SmartFloatingAIButton() {
 
   const handleWorkerMessage = (data: any) => {
     if (data.type === 'GENERATION_COMPLETE') {
+      const response = data.response;
+      // Add to conversation context for follow-ups
+      conversationContext.addMessage('assistant', response);
+
       setMessages((prev) => [
         ...prev,
         {
           role: 'assistant',
-          content: data.response,
+          content: response,
           modelUsed: smartWorkerManager.getActiveTier(),
+          messageId: `msg_${Date.now()}_${Math.random()}`,
+          rating: null,
         },
       ]);
       setIsLoading(false);
     } else if (data.type === 'GENERATION_FAILED') {
+      const errorMsg = `❌ Error: ${data.error}. Using Tier 1 model...`;
+      conversationContext.addMessage('assistant', errorMsg);
+
       setMessages((prev) => [
         ...prev,
         {
           role: 'assistant',
-          content: `❌ Error: ${data.error}. Using Tier 1 model...`,
+          content: errorMsg,
+          messageId: `msg_${Date.now()}_${Math.random()}`,
+          rating: null,
         },
       ]);
       setIsLoading(false);
+    }
+  };
+
+  const handleRating = (messageId: string, rating: 'helpful' | 'not-helpful') => {
+    setMessages((prev) =>
+      prev.map((msg) =>
+        msg.messageId === messageId ? { ...msg, rating } : msg
+      )
+    );
+
+    // Log rating to backend
+    const message = messages.find((m) => m.messageId === messageId);
+    if (message) {
+      fetch('/api/log-rating', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messageId,
+          question: messages[messages.findIndex((m) => m.messageId === messageId) - 1]?.content,
+          response: message.content,
+          modelUsed: message.modelUsed,
+          rating,
+          timestamp: new Date().toISOString(),
+        }),
+      }).catch((err) => console.error('[Rating Log Error]', err));
     }
   };
 
@@ -70,31 +110,62 @@ export default function SmartFloatingAIButton() {
     setMessages((prev) => [...prev, { role: 'user', content: userMessage }]);
     setIsLoading(true);
 
+    // Add to conversation context
+    conversationContext.addMessage('user', userMessage);
+
     try {
       // Analyze complexity and determine best model
       const analysis = modelRouter.analyzeComplexity(userMessage);
 
+      // Build enhanced prompt with conversation context
+      const isFollowUp = conversationContext.isFollowUp(userMessage);
+      const enhancedPrompt = isFollowUp
+        ? conversationContext.buildEnhancedPrompt(userMessage)
+        : userMessage;
+
       if (analysis.tier === 'tier3-groq-api') {
-        // Use Groq API for complex questions
-        await handleGroqRequest(userMessage);
+        // Check cache first before calling Groq API
+        const cachedResponse = await responseCache.getIfSimilar(userMessage);
+        if (cachedResponse) {
+          const cachedMsg = `${cachedResponse.response}\n\n_📦 Cached response (similar question: "${cachedResponse.question}")_`;
+          conversationContext.addMessage('assistant', cachedMsg);
+
+          setMessages((prev) => [
+            ...prev,
+            {
+              role: 'assistant',
+              content: cachedMsg,
+              modelUsed: analysis.tier,
+              messageId: `msg_${Date.now()}_${Math.random()}`,
+              rating: null,
+            },
+          ]);
+          setIsLoading(false);
+        } else {
+          // No cache hit, call Groq API with context
+          await handleGroqRequest(enhancedPrompt);
+        }
       } else {
-        // Use local models (0.5B or 1B)
+        // Use local models (0.5B or 1B) with context-aware prompt
         await smartWorkerManager.switchModel(userMessage);
         smartWorkerManager.sendMessage({
           type: 'GENERATE_ON_GPU',
           payload: {
             systemPrompt: 'You are a professional stock market analyst specializing in Indian stocks. Provide clear, actionable insights for stock market questions. Focus on fundamentals, technical patterns, and practical recommendations.',
-            userPrompt: userMessage,
+            userPrompt: enhancedPrompt,
           },
         });
       }
     } catch (error) {
       console.error('[Smart AI Error]', error);
+      const errorMsg = `⚠️ Error: ${error instanceof Error ? error.message : 'Unknown error'}. Try again or ask a simpler question.`;
+      conversationContext.addMessage('assistant', errorMsg);
+
       setMessages((prev) => [
         ...prev,
         {
           role: 'assistant',
-          content: `⚠️ Error: ${error instanceof Error ? error.message : 'Unknown error'}. Try again or ask a simpler question.`,
+          content: errorMsg,
         },
       ]);
       setIsLoading(false);
@@ -103,8 +174,6 @@ export default function SmartFloatingAIButton() {
 
   const handleGroqRequest = async (userMessage: string) => {
     try {
-      // TODO: Implement Groq API call
-      // This will be a fetch to your backend /api/groq endpoint
       const response = await fetch('/api/groq', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -114,12 +183,19 @@ export default function SmartFloatingAIButton() {
       if (!response.ok) throw new Error(`API error: ${response.status}`);
 
       const data = await response.json();
+      const responseText = data.response;
+
+      // Cache the response for future similar questions
+      await responseCache.set(userMessage, responseText, 'tier3-groq-api');
+
       setMessages((prev) => [
         ...prev,
         {
           role: 'assistant',
-          content: data.response,
+          content: responseText,
           modelUsed: 'tier3-groq-api',
+          messageId: `msg_${Date.now()}_${Math.random()}`,
+          rating: null,
         },
       ]);
     } catch (error) {
@@ -149,13 +225,27 @@ export default function SmartFloatingAIButton() {
         <div className="ai-chat-window">
           <div className="ai-header">
             <h3>StockEx AI Assistant</h3>
-            <button
-              className="close-btn"
-              onClick={() => setIsOpen(false)}
-              aria-label="Close chat"
-            >
-              ✕
-            </button>
+            <div className="ai-header-actions">
+              {messages.length > 2 && (
+                <button
+                  className="clear-btn"
+                  onClick={() => {
+                    setMessages([]);
+                    conversationContext.clear();
+                  }}
+                  title="Clear conversation history"
+                >
+                  🔄
+                </button>
+              )}
+              <button
+                className="close-btn"
+                onClick={() => setIsOpen(false)}
+                aria-label="Close chat"
+              >
+                ✕
+              </button>
+            </div>
           </div>
 
           {/* Status indicator */}
@@ -191,6 +281,24 @@ export default function SmartFloatingAIButton() {
                       </span>
                     )}
                   </div>
+                  {msg.role === 'assistant' && msg.messageId && (
+                    <div className="message-feedback">
+                      <button
+                        className={`feedback-btn ${msg.rating === 'helpful' ? 'active' : ''}`}
+                        onClick={() => handleRating(msg.messageId!, 'helpful')}
+                        title="Helpful"
+                      >
+                        👍
+                      </button>
+                      <button
+                        className={`feedback-btn ${msg.rating === 'not-helpful' ? 'active' : ''}`}
+                        onClick={() => handleRating(msg.messageId!, 'not-helpful')}
+                        title="Not helpful"
+                      >
+                        👎
+                      </button>
+                    </div>
+                  )}
                 </div>
               ))
             )}
@@ -322,6 +430,27 @@ export default function SmartFloatingAIButton() {
           font-weight: 600;
         }
 
+        .ai-header-actions {
+          display: flex;
+          gap: 8px;
+          align-items: center;
+        }
+
+        .clear-btn {
+          background: rgba(255, 255, 255, 0.2);
+          border: 1px solid rgba(255, 255, 255, 0.3);
+          color: white;
+          cursor: pointer;
+          font-size: 14px;
+          padding: 4px 8px;
+          border-radius: 4px;
+          transition: all 0.2s;
+        }
+
+        .clear-btn:hover {
+          background: rgba(255, 255, 255, 0.3);
+        }
+
         .close-btn {
           background: none;
           border: none;
@@ -428,6 +557,36 @@ export default function SmartFloatingAIButton() {
           opacity: 0.7;
           display: block;
           margin-top: 4px;
+        }
+
+        .message-feedback {
+          display: flex;
+          gap: 8px;
+          margin-top: 6px;
+          padding-top: 6px;
+          border-top: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .feedback-btn {
+          background: none;
+          border: 1px solid transparent;
+          font-size: 14px;
+          cursor: pointer;
+          padding: 4px 8px;
+          border-radius: 4px;
+          transition: all 0.2s;
+          opacity: 0.6;
+        }
+
+        .feedback-btn:hover {
+          opacity: 1;
+          background: rgba(0, 0, 0, 0.05);
+        }
+
+        .feedback-btn.active {
+          opacity: 1;
+          background: rgba(102, 126, 234, 0.1);
+          border-color: #667eea;
         }
 
         .loading-dots::after {
