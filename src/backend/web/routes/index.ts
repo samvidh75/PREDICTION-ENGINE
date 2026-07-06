@@ -1,3 +1,4 @@
+export { registerAIModelsRoutes } from './aiModelsRoutes.js';
 export { registerBacktestRoutes } from './backtestRoutes.js';
 export { registerCommercialRoutes } from './registerCommercialRoutes.js';
 export { registerEarningsSentimentRoutes } from './earningsSentimentRoutes.js';
