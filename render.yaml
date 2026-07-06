@@ -27,7 +27,7 @@ services:
     buildCommand: npm ci --include=dev && npm run render:build
     startCommand: npm run render:start
     healthCheckPath: /healthz
-    autoDeploy: false
+    autoDeploy: true
 
     envVars:
       # ── Runtime ────────────────────────────────────────────────────────
@@ -75,7 +75,11 @@ services:
       - key: REDIS_URL
         sync: false
 
-      # ── LLM / AI (deterministic fallback on Render — no external API keys needed) ─
+      # ── LLM / AI (specialized trained models) ──────────────────────────
+      - key: MODELS_PATH
+        value: /app/models
+      - key: AUTO_GUARDIAN_ENABLED
+        value: "true"
       - key: SGLANG_URL
         sync: false
       - key: OLLAMA_URL
