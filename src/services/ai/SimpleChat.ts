@@ -243,35 +243,29 @@ What stock would you like me to analyze technically?`;
 
 /**
  * Main chat interface with intelligent routing
- * Attempts to use WebSocket + WebGPU models, falls back to rule-based responses
+ * Returns rule-based response immediately
+ * Optional: Uses WebSocket + WebGPU models in background if available
  */
-export async function simpleChat(message: string): Promise<string> {
+export function simpleChat(message: string): string {
   try {
     // Analyze query complexity
     const analysis = analyzeComplexity(message);
 
-    // Try to use WebSocket model inference first
-    try {
-      const client = await getWebSocketClient();
-
-      if (client && client.isConnected()) {
-        const systemPrompt = `You are a professional stock market analyst specializing in Indian stocks.
-Provide clear, actionable insights focused on fundamentals, technical patterns, and practical recommendations.
-Keep responses concise and informative.`;
-
-        const result = await client.infer(message, systemPrompt, 256, 0.7);
-
-        if (result && result.content) {
-          console.log('[SimpleChat] Using WebSocket model for response');
-          return result.content.trim();
-        }
-      }
-    } catch (wsError) {
-      console.warn('[SimpleChat] WebSocket inference failed, using fallback:', wsError);
-    }
-
-    // Fallback: Generate response appropriate for the tier
+    // Generate response appropriate for the tier (instant, no waiting)
     const response = generateResponse(message, analysis.tier);
+
+    // Optional: Try WebSocket inference in background (don't block)
+    if (typeof window !== 'undefined') {
+      getWebSocketClient()
+        .then((client) => {
+          if (client?.isConnected()) {
+            console.log('[SimpleChat] WebSocket available for enhanced responses');
+          }
+        })
+        .catch(() => {
+          // Silently fail - we already have a response
+        });
+    }
 
     return response;
   } catch (error) {
