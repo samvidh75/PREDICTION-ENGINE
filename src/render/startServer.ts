@@ -24,6 +24,7 @@ import { MetricsCollector } from "../commercial/api/monitoring/MetricsCollector.
 import { registerLiveQuotesWs } from "../backend/routes/liveQuotesWs.js";
 import { registerFeatureRoutes } from "../backend/web/routes/index.js";
 import { registerAIRoutes } from "./aiRoutes.js";
+import { registerModelInferenceRoutes } from "../services/ai/ModelInferenceServer.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -472,6 +473,14 @@ async function bootstrap() {
 
   // ── AI Inference routes: /api/ai/analyze, /api/ai/chat, /api/ai/status
   await registerAIRoutes(server);
+
+  // ── WebGPU + WebSocket Model Inference routes: /ws/ai, /api/ai/models
+  try {
+    registerModelInferenceRoutes(server);
+    console.log('[Server] Model inference routes registered (WebSocket + WebGPU)');
+  } catch (error) {
+    console.warn('[Server] Model inference routes setup failed (non-critical):', error);
+  }
 
   // ── Static file serving ─────────────────────────────────────────
   const distPath = join(process.cwd(), "dist", "public");

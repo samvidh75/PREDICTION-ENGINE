@@ -1,10 +1,31 @@
 /**
- * Simple Chat Service - Intelligent LLM Model Routing
+ * Simple Chat Service - Intelligent LLM Model Routing with WebSocket
  * Routes questions to optimal model tier based on complexity analysis
+ * Uses WebSocket + WebGPU for local model inference, with Groq fallback
  * Tier 1: Qwen 0.5B (simple Q&A, definitions, 0-40 complexity)
  * Tier 2: Qwen 1B (comparisons, analysis, 40-75 complexity)
  * Tier 3: Groq API (complex analysis, deep research, 75-100 complexity)
  */
+
+let wsClient: any = null;
+
+async function getWebSocketClient() {
+  if (wsClient) return wsClient;
+
+  try {
+    const { getWebSocketClient: getWsClient } = await import('./WebSocketModelClient.js');
+    wsClient = getWsClient();
+
+    if (!wsClient.isConnected()) {
+      await wsClient.connect();
+    }
+
+    return wsClient;
+  } catch (error) {
+    console.warn('[SimpleChat] WebSocket client not available:', error);
+    return null;
+  }
+}
 
 interface ComplexityAnalysis {
   score: number; // 0-100
@@ -222,13 +243,34 @@ What stock would you like me to analyze technically?`;
 
 /**
  * Main chat interface with intelligent routing
+ * Attempts to use WebSocket + WebGPU models, falls back to rule-based responses
  */
 export async function simpleChat(message: string): Promise<string> {
   try {
     // Analyze query complexity
     const analysis = analyzeComplexity(message);
 
-    // Generate response appropriate for the tier
+    // Try to use WebSocket model inference first
+    try {
+      const client = await getWebSocketClient();
+
+      if (client && client.isConnected()) {
+        const systemPrompt = `You are a professional stock market analyst specializing in Indian stocks.
+Provide clear, actionable insights focused on fundamentals, technical patterns, and practical recommendations.
+Keep responses concise and informative.`;
+
+        const result = await client.infer(message, systemPrompt, 256, 0.7);
+
+        if (result && result.content) {
+          console.log('[SimpleChat] Using WebSocket model for response');
+          return result.content.trim();
+        }
+      }
+    } catch (wsError) {
+      console.warn('[SimpleChat] WebSocket inference failed, using fallback:', wsError);
+    }
+
+    // Fallback: Generate response appropriate for the tier
     const response = generateResponse(message, analysis.tier);
 
     return response;
