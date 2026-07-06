@@ -2,7 +2,8 @@ import { useEffect, useState, useMemo, useRef, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Building2, TrendingUp, ChevronDown, ChevronUp, ExternalLink } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
-import { LazyBarChart, LazyLineChart, Bar, CartesianGrid, Cell, ResponsiveContainer, XAxis, YAxis, Line, Tooltip } from "../components/DynamicChart";
+import { LazyBarChart, Bar, CartesianGrid, ResponsiveContainer, XAxis, YAxis, Tooltip } from "../components/DynamicChart";
+import StockChart from "../components/StockChart";
 import { Badge } from "../ui/Badge";
 import { Button } from "../ui/Button";
 import { Card, CardLabel } from "../ui/Card";
@@ -60,7 +61,7 @@ type StockResearchDetail = {
   shareholding: Array<{ period: string; promoter: number; fii: number; dii: number; retail: number; deltas: { promoter: number; fii: number; dii: number; retail: number } }>;
   news: Array<{ headline: string; source: string; time: string; link?: string; publishedAt?: string }>;
   thesis: { thesis: string; bullCase: string; bearCase: string; whatToWatch: string; stance: "High conviction" | "Watch" | "Needs review" | "Risk rising" | "Avoid for now" };
-  priceHistory: Record<string, Array<{ label: string; price: number }>>;
+  priceHistory: Record<string, Array<{ label?: string; price?: number; time?: string; open?: number; high?: number; low?: number; close?: number; volume?: number }>>;
 };
 
 const TIMEFRAMES = ["1W", "1M", "3M", "1Y", "5Y"] as const;
@@ -68,6 +69,67 @@ const FINANCIAL_METRICS = ["revenue", "profit", "ebitda"] as const;
 const FINANCIAL_PERIODS = ["annual", "quarterly"] as const;
 type FinancialMetric = (typeof FINANCIAL_METRICS)[number];
 type FinancialPeriod = (typeof FINANCIAL_PERIODS)[number];
+
+// API returns priceHistory with the same timeframe keys
+function getApiTimeframe(uiTimeframe: string): string {
+  return uiTimeframe; // API keys match UI keys exactly ('1W', '1M', '3M', '1Y', '5Y')
+}
+
+// Transform price history data to OHLC format for StockChart
+function transformToOHLC(priceData: any[]): any[] {
+  if (!priceData || !Array.isArray(priceData)) return [];
+
+  return priceData.map((item, index) => {
+    // Handle different date formats
+    let timeValue = item.time || item.date || item.label;
+
+    // Convert to YYYY-MM-DD format
+    if (typeof timeValue === 'string' && timeValue.match(/^\d{4}-\d{2}-\d{2}$/)) {
+      // Already in YYYY-MM-DD format
+      // No change needed
+    } else if (typeof timeValue === 'string' && timeValue.match(/^\d{2}-\d{2}$/)) {
+      // Format like "07-07" (MM-DD) - construct full date for current year
+      const today = new Date();
+      const [month, day] = timeValue.split('-');
+      const year = today.getFullYear();
+      timeValue = `${year}-${month}-${day}`;
+    } else if (typeof timeValue === 'number') {
+      // Unix timestamp - convert to YYYY-MM-DD
+      const date = new Date(timeValue * 1000);
+      timeValue = date.toISOString().split('T')[0];
+    } else if (!timeValue) {
+      // No time value - generate one based on index (counting backward from today)
+      const date = new Date();
+      date.setDate(date.getDate() - (priceData.length - 1 - index));
+      timeValue = date.toISOString().split('T')[0];
+    } else {
+      // Fallback - try to parse as date
+      try {
+        const date = new Date(timeValue);
+        if (!isNaN(date.getTime())) {
+          timeValue = date.toISOString().split('T')[0];
+        }
+      } catch (e) {
+        // If all else fails, generate a date
+        const date = new Date();
+        date.setDate(date.getDate() - (priceData.length - 1 - index));
+        timeValue = date.toISOString().split('T')[0];
+      }
+    }
+
+    return {
+      time: timeValue,
+      open: item.open ?? item.price ?? 0,
+      high: item.high ?? item.price ?? 0,
+      low: item.low ?? item.price ?? 0,
+      close: item.close ?? item.price ?? 0,
+      volume: item.volume ?? 0
+    };
+  }).sort((a, b) => {
+    // Sort by time in ascending order (required by Lightweight Charts)
+    return new Date(a.time).getTime() - new Date(b.time).getTime();
+  });
+}
 
 function formatNewsTime(value?: string): string {
   if (!value) return "";
@@ -628,20 +690,14 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
           </div>
         </div>
         <ChartErrorBoundary>
-          <div style={{ width: "100%", height: "300px", backgroundColor: colors.card, borderRadius: "8px", border: `1px solid ${colors.border}` }}>
-            <ResponsiveContainer width="100%" height="100%">
-              <LazyLineChart data={stock.priceHistory[timeframe] ?? []}>
-                <CartesianGrid strokeDasharray="3 3" stroke={colors.border} vertical={false} />
-                <XAxis dataKey="label" tick={{ fontSize: 12, fill: colors.textSecondary }} />
-                <YAxis tick={{ fontSize: 12, fill: colors.textSecondary }} />
-                <Tooltip
-                  contentStyle={{ backgroundColor: colors.card, border: `1px solid ${colors.border}`, borderRadius: "6px" }}
-                  labelStyle={{ color: colors.textPrimary }}
-                  formatter={(value: any) => `₹${value.toFixed(2)}`}
-                />
-                <Line type="monotone" dataKey="price" stroke={colors.primary} dot={false} strokeWidth={2} isAnimationActive={false} />
-              </LazyLineChart>
-            </ResponsiveContainer>
+          <div style={{ width: "100%", height: "500px", backgroundColor: colors.card, borderRadius: "8px", border: `1px solid ${colors.border}`, overflow: "hidden" }}>
+            <StockChart
+              symbol={stock.symbol}
+              ohlcData={transformToOHLC(stock.priceHistory?.[getApiTimeframe(timeframe)] ?? [])}
+              timeframe={timeframe as any}
+              showIndicators={true}
+              height={480}
+            />
           </div>
         </ChartErrorBoundary>
       </Card>      {/* ── Analytical Dashboard Grid ── */}
