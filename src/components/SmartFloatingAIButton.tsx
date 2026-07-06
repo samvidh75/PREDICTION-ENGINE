@@ -5,9 +5,7 @@
  */
 
 import { useState, useRef, useEffect } from 'react';
-import { colors } from '../design/tokens';
 import { modelRouter, type ModelTier } from '../utils/modelRouter';
-import SmartModelSelector, { useSmartModelSelection } from './browser-ai/SmartModelSelector';
 import { smartWorkerManager } from './browser-ai/SmartWorkerManager';
 import { responseCache } from '../utils/responseCache';
 import { conversationContext } from '../utils/conversationContext';
@@ -29,7 +27,6 @@ export default function SmartFloatingAIButton() {
   const [isHovering, setIsHovering] = useState(false);
   const [status, setStatus] = useState('⚡ Ready');
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const { complexity } = useSmartModelSelection(input);
 
   useEffect(() => {
     smartWorkerManager.onStatus(setStatus);
@@ -258,38 +255,23 @@ export default function SmartFloatingAIButton() {
             </div>
           </div>
 
-          {/* Status indicator */}
-          <div className="ai-status">
+          {/* Status indicator - hidden for cleaner UI */}
+          <div className="ai-status" style={{ display: 'none' }}>
             <span className="status-indicator">{status}</span>
-            {complexity && (
-              <span className="complexity-badge">
-                Complexity: {complexity.score.toFixed(0)}/100
-              </span>
-            )}
           </div>
 
           {/* Messages */}
           <div className="ai-messages">
             {messages.length === 0 ? (
               <div className="ai-welcome">
-                <h4>Welcome to StockEx AI! 👋</h4>
-                <p>Ask me anything about stocks:</p>
-                <ul>
-                  <li>📚 "What is P/E ratio?" (Fast)</li>
-                  <li>📊 "Compare HDFC vs ICICI" (Balanced)</li>
-                  <li>🔥 "Analyze earnings report" (Deep)</li>
-                </ul>
+                <h4>StockEx AI 👋</h4>
+                <p>Ask about stocks, markets, and investment analysis. I'll help with everything from basics to deep research.</p>
               </div>
             ) : (
               messages.map((msg, idx) => (
                 <div key={idx} className={`ai-message ai-message-${msg.role}`}>
                   <div className="message-content">
                     {msg.content}
-                    {msg.modelUsed && (
-                      <span className="message-model">
-                        {modelRouter.getModelConfig(msg.modelUsed).displayName}
-                      </span>
-                    )}
                   </div>
                   {msg.role === 'assistant' && msg.messageId && (
                     <div className="message-feedback">
@@ -324,7 +306,6 @@ export default function SmartFloatingAIButton() {
 
           {/* Input area */}
           <div className="ai-input-area">
-            {complexity && <SmartModelSelector userQuestion={input} isLoading={isLoading} />}
             <div className="ai-input-group">
               <input
                 type="text"
@@ -350,23 +331,25 @@ export default function SmartFloatingAIButton() {
       <style>{`
         .smart-floating-ai-button {
           position: fixed;
-          bottom: 20px;
-          right: 20px;
+          bottom: 24px;
+          right: 24px;
           z-index: 1000;
-          font-family: system-ui, -apple-system, sans-serif;
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
 
         .ai-button {
-          width: 60px;
-          height: 60px;
-          border-radius: 50%;
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          border: none;
-          color: white;
-          font-size: 24px;
+          width: 48px;
+          height: 48px;
+          border-radius: 16px;
+          background: linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.04) 100%);
+          border: 1px solid rgba(255,255,255,0.06);
+          color: #ffffff;
+          font-size: 20px;
           cursor: pointer;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-          transition: all 0.3s ease;
+          box-shadow: 0 0 0 1px rgba(255,255,255,0.03) inset, 0 18px 40px rgba(0,0,0,0.28);
+          backdrop-filter: blur(18px);
+          -webkit-backdrop-filter: blur(18px);
+          transition: all 0.2s ease;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -374,8 +357,9 @@ export default function SmartFloatingAIButton() {
         }
 
         .ai-button:hover {
-          transform: scale(1.1);
-          box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+          transform: scale(1.08);
+          background: linear-gradient(180deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.06) 100%);
+          border-color: rgba(255,255,255,0.08);
         }
 
         .ai-icon {
@@ -390,14 +374,16 @@ export default function SmartFloatingAIButton() {
 
         .ai-label {
           position: absolute;
-          right: 70px;
-          background: rgba(0, 0, 0, 0.8);
-          color: white;
+          right: 60px;
+          background: rgba(0,0,0,0.6);
+          color: #ffffff;
           padding: 6px 12px;
-          border-radius: 4px;
+          border-radius: 8px;
           font-size: 12px;
           white-space: nowrap;
           animation: slideIn 0.2s ease;
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
         }
 
         @keyframes slideIn {
@@ -407,13 +393,16 @@ export default function SmartFloatingAIButton() {
 
         .ai-chat-window {
           position: absolute;
-          bottom: 80px;
+          bottom: 70px;
           right: 0;
-          width: 400px;
-          height: 500px;
-          background: white;
-          border-radius: 12px;
-          box-shadow: 0 5px 40px rgba(0, 0, 0, 0.16);
+          width: min(420px, calc(100vw - 24px));
+          height: 520px;
+          background: linear-gradient(180deg, rgba(18,18,18,0.92) 0%, rgba(8,8,8,0.96) 100%);
+          border-radius: 20px;
+          border: 1px solid rgba(255,255,255,0.03);
+          box-shadow: 0 0 0 1px rgba(255,255,255,0.03) inset, 0 36px 100px rgba(0,0,0,0.45);
+          backdrop-filter: blur(24px);
+          -webkit-backdrop-filter: blur(24px);
           display: flex;
           flex-direction: column;
           overflow: hidden;
@@ -427,8 +416,7 @@ export default function SmartFloatingAIButton() {
 
         .ai-header {
           padding: 16px;
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          color: white;
+          border-bottom: 1px solid rgba(255,255,255,0.06);
           display: flex;
           justify-content: space-between;
           align-items: center;
@@ -436,8 +424,9 @@ export default function SmartFloatingAIButton() {
 
         .ai-header h3 {
           margin: 0;
-          font-size: 16px;
+          font-size: 15px;
           font-weight: 600;
+          color: #ffffff;
         }
 
         .ai-header-actions {
@@ -447,54 +436,57 @@ export default function SmartFloatingAIButton() {
         }
 
         .clear-btn {
-          background: rgba(255, 255, 255, 0.2);
-          border: 1px solid rgba(255, 255, 255, 0.3);
-          color: white;
+          background: rgba(255, 255, 255, 0.04);
+          border: 1px solid rgba(255, 255, 255, 0.06);
+          color: #a0a0a0;
           cursor: pointer;
           font-size: 14px;
-          padding: 4px 8px;
-          border-radius: 4px;
+          padding: 6px 8px;
+          border-radius: 8px;
           transition: all 0.2s;
         }
 
         .clear-btn:hover {
-          background: rgba(255, 255, 255, 0.3);
+          background: rgba(255, 255, 255, 0.08);
+          color: #ffffff;
         }
 
         .close-btn {
           background: none;
           border: none;
-          color: white;
+          color: #a0a0a0;
           cursor: pointer;
-          font-size: 18px;
+          font-size: 16px;
           padding: 0;
           width: 24px;
           height: 24px;
           display: flex;
           align-items: center;
           justify-content: center;
+          transition: color 0.2s;
+        }
+
+        .close-btn:hover {
+          color: #ffffff;
         }
 
         .ai-status {
           padding: 8px 16px;
-          background: rgba(0, 0, 0, 0.02);
-          border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+          background: rgba(255, 255, 255, 0.02);
+          border-bottom: 1px solid rgba(255, 255, 255, 0.03);
           font-size: 11px;
+          color: #999999;
           display: flex;
           gap: 12px;
           align-items: center;
         }
 
         .status-indicator {
-          color: #666;
+          color: #999999;
         }
 
         .complexity-badge {
-          background: rgba(102, 126, 234, 0.1);
-          color: #667eea;
-          padding: 2px 8px;
-          border-radius: 3px;
-          margin-left: auto;
+          display: none;
         }
 
         .ai-messages {
@@ -506,15 +498,33 @@ export default function SmartFloatingAIButton() {
           gap: 12px;
         }
 
+        .ai-messages::-webkit-scrollbar {
+          width: 6px;
+        }
+
+        .ai-messages::-webkit-scrollbar-track {
+          background: transparent;
+        }
+
+        .ai-messages::-webkit-scrollbar-thumb {
+          background: rgba(255, 255, 255, 0.1);
+          border-radius: 3px;
+        }
+
+        .ai-messages::-webkit-scrollbar-thumb:hover {
+          background: rgba(255, 255, 255, 0.15);
+        }
+
         .ai-welcome {
           text-align: center;
-          color: #666;
+          color: #a0a0a0;
           padding: 20px;
         }
 
         .ai-welcome h4 {
           margin: 0 0 8px 0;
           font-size: 14px;
+          color: #ffffff;
         }
 
         .ai-welcome ul {
@@ -526,6 +536,7 @@ export default function SmartFloatingAIButton() {
 
         .ai-welcome li {
           margin: 4px 0;
+          color: #a0a0a0;
         }
 
         .ai-message {
@@ -547,26 +558,26 @@ export default function SmartFloatingAIButton() {
         }
 
         .message-content {
-          background: #f0f0f0;
+          background: rgba(255,255,255,0.04);
+          border: 1px solid rgba(255,255,255,0.06);
           padding: 12px;
-          border-radius: 8px;
-          max-width: 80%;
+          border-radius: 12px;
+          max-width: 85%;
           word-wrap: break-word;
           font-size: 13px;
-          line-height: 1.4;
+          line-height: 1.5;
           position: relative;
+          color: #ffffff;
         }
 
         .ai-message-user .message-content {
-          background: #667eea;
-          color: white;
+          background: linear-gradient(135deg, rgba(255,107,107,0.2) 0%, rgba(255,107,107,0.1) 100%);
+          border-color: rgba(255,107,107,0.4);
+          color: #ffffff;
         }
 
         .message-model {
-          font-size: 10px;
-          opacity: 0.7;
-          display: block;
-          margin-top: 4px;
+          display: none;
         }
 
         .message-feedback {
@@ -574,7 +585,7 @@ export default function SmartFloatingAIButton() {
           gap: 8px;
           margin-top: 6px;
           padding-top: 6px;
-          border-top: 1px solid rgba(0, 0, 0, 0.05);
+          border-top: 1px solid rgba(255,255,255,0.03);
         }
 
         .feedback-btn {
@@ -585,23 +596,26 @@ export default function SmartFloatingAIButton() {
           padding: 4px 8px;
           border-radius: 4px;
           transition: all 0.2s;
-          opacity: 0.6;
+          opacity: 0.5;
+          color: #a0a0a0;
         }
 
         .feedback-btn:hover {
-          opacity: 1;
-          background: rgba(0, 0, 0, 0.05);
+          opacity: 0.8;
+          background: rgba(255, 255, 255, 0.04);
         }
 
         .feedback-btn.active {
           opacity: 1;
-          background: rgba(102, 126, 234, 0.1);
-          border-color: #667eea;
+          background: rgba(255,107,107,0.15);
+          border-color: rgba(255,107,107,0.4);
+          color: #ffffff;
         }
 
         .loading-dots::after {
           content: '.';
           animation: dots 1.5s steps(3, end) infinite;
+          color: #a0a0a0;
         }
 
         @keyframes dots {
@@ -612,8 +626,8 @@ export default function SmartFloatingAIButton() {
 
         .ai-input-area {
           padding: 12px;
-          border-top: 1px solid rgba(0, 0, 0, 0.1);
-          background: white;
+          border-top: 1px solid rgba(255,255,255,0.06);
+          background: transparent;
         }
 
         .ai-input-group {
@@ -623,42 +637,55 @@ export default function SmartFloatingAIButton() {
 
         .ai-input {
           flex: 1;
-          border: 1px solid #ddd;
-          border-radius: 6px;
-          padding: 10px;
+          border: 1px solid rgba(255,255,255,0.06);
+          background: rgba(255,255,255,0.03);
+          border-radius: 8px;
+          padding: 10px 12px;
           font-size: 13px;
           font-family: inherit;
+          color: #ffffff;
+          transition: all 0.2s;
+        }
+
+        .ai-input::placeholder {
+          color: #585858;
         }
 
         .ai-input:focus {
           outline: none;
-          border-color: #667eea;
-          box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+          border-color: rgba(255,255,255,0.12);
+          background: rgba(255,255,255,0.05);
         }
 
         .ai-input:disabled {
-          background: #f5f5f5;
+          background: rgba(255,255,255,0.02);
           cursor: not-allowed;
+          opacity: 0.5;
         }
 
         .ai-send-btn {
           width: 36px;
           height: 36px;
           border: none;
-          background: #667eea;
-          color: white;
-          border-radius: 6px;
+          background: linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.04) 100%);
+          border: 1px solid rgba(255,255,255,0.06);
+          color: #ffffff;
+          border-radius: 8px;
           cursor: pointer;
           font-size: 16px;
           transition: all 0.2s;
+          display: flex;
+          align-items: center;
+          justify-content: center;
         }
 
         .ai-send-btn:hover:not(:disabled) {
-          background: #764ba2;
+          background: linear-gradient(180deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.06) 100%);
+          border-color: rgba(255,255,255,0.08);
         }
 
         .ai-send-btn:disabled {
-          background: #ccc;
+          opacity: 0.4;
           cursor: not-allowed;
         }
 
