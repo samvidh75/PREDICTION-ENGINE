@@ -2,7 +2,7 @@
  * Stock Universe Adapter
  *
  * Reads the bundled stock-universe.json to serve CompanyMasterAdapter lookups.
- * Provides Indian equity metadata — symbols, names, sectors, market cap categories —
+ * Provides PSE equity metadata — symbols, names, sectors, market cap categories —
  * from the curated universe bundle shipped with the application.
  *
  * No external API calls are made; the file is read once and cached in memory.
@@ -51,7 +51,7 @@ interface StockUniverseFile {
   entries: StockUniverseEntry[];
 }
 
-// ─── Market cap thresholds (in crores) matching IndianEquityUniverseBuilder ───
+// ─── Market cap thresholds (in crores) matching PSEUniverseBuilder ───
 
 type MarketCapCategory = 'large' | 'mid' | 'small' | 'micro' | 'unknown';
 

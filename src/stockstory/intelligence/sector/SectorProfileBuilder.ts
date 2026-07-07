@@ -1,7 +1,7 @@
 /**
  * Sector Profile Builder
  *
- * Builds a SectorIntelligenceProfile from sector data and Indian market context.
+ * Builds a SectorIntelligenceProfile from sector data and Philippine market context.
  * Provides sector-level intelligence for the company thesis engine.
  */
 

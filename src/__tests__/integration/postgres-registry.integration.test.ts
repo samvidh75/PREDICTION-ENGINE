@@ -99,7 +99,7 @@ describe('PostgreSQL prediction_registry integration', () => {
     );
 
     const actualColumns = res.rows.map(r => String(r.column_name));
-    for (const col of CANONICAL_COLUMNS) {
+    for (const col of CANONICAL_COLU) {
       expect(actualColumns).toContain(col);
     }
   });

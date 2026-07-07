@@ -115,7 +115,7 @@ export class IntelligenceService {
     question: string,
     context: string
   ): Promise<string> {
-    const prompt = `You are a financial analyst expert in Indian stocks.
+    const prompt = `You are a financial analyst expert in Philippine stocks.
 
 Stock: ${symbol}
 Context:
@@ -289,7 +289,7 @@ Generate a recommendation. Return JSON:
   }
 
   private buildComparisonPrompt(stocks: StockData[]): string {
-    return `Compare these Indian stocks:
+    return `Compare these Philippine stocks:
 
 ${stocks
   .map(

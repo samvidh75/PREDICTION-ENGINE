@@ -18,14 +18,14 @@ export interface HandoffPayload {
   researchSummary: string;
   /** Deep‑link or URL to open on the broker's side */
   handoffUrl: string;
-  /** SEBI compliance notice */
+  /** PSE compliance notice */
   disclaimer: string;
   /** ISO timestamp of handoff */
   timestamp: string;
 }
 
 const SEBI_DISCLAIMER =
-  'Lensory is not a SEBI-registered investment advisor. All research is for educational ' +
+  'Lensory is not a PSE-listed investment advisor. All research is for educational ' +
   'and informational purposes only. Trade execution occurs solely on the broker platform. ' +
   'Past performance does not guarantee future results. Consult your financial advisor before trading.';
 

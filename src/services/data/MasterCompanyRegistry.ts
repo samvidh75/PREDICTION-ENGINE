@@ -1,5 +1,5 @@
 /**
- * MasterCompanyRegistry — The single source of truth for Indian market company metadata.
+ * MasterCompanyRegistry — The single source of truth for Philippine market company metadata.
  *
  * This is a hardcoded registry of verified Indian companies. It serves as the fallback
  * when live providers (Yahoo, IndianMarket) return incomplete or garbage data.
@@ -17,7 +17,7 @@
  *   - isin: ISIN identifier (IN + 10 characters)
  *   - bseCode: BSE numeric code (for BSE-listed companies)
  *   - nseSymbol: NSE ticker symbol
- *   - currency: Always INR for Indian market
+ *   - currency: Always INR for Philippine market
  *   - website: Company website URL
  */
 

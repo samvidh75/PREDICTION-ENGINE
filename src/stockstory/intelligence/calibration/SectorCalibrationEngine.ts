@@ -1,7 +1,7 @@
 /**
  * Sector Calibration Engine
  * Phase 6 — Adjusts scoring weights, PE/PB ranges, and key metrics
- * per sector to match Indian market realities.
+ * per sector to match Philippine market realities.
  */
 import { DEFAULT_CALIBRATION, type CalibrationConfig, type SectorCalibration } from './CalibrationTypes';
 

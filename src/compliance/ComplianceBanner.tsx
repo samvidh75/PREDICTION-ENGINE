@@ -6,7 +6,7 @@ export const ComplianceBanner: React.FC = () => {
       <strong>Research Platform:</strong> Scores, rankings, and observations are model outputs based on historical data. 
       This is not investment advice. No buy/sell recommendations. 
       Past performance does not guarantee future results. 
-      Consult a SEBI-registered investment adviser before investing.
+      Consult a PSE-listed investment adviser before investing.
     </div>
   );
 };

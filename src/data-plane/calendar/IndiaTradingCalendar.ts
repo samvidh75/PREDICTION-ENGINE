@@ -1,8 +1,8 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// Phase 21A — India trading calendar
+// Phase 21A — PSE trading calendar
 //
 // Pure server-side logic for determining trading days, holidays, and
-// market-open status for Indian equity markets (NSE + BSE).
+// market-open status for PSE equity markets (NSE + BSE).
 //
 // NSE and BSE share the same holiday calendar (secular holidays).
 // Trading hours: Mon–Fri 09:15–15:30 IST (UTC+05:30).
@@ -63,7 +63,7 @@ function isWeekend(date: Date): boolean {
 // Public API
 // ---------------------------------------------------------------------------
 
-export class IndiaTradingCalendar {
+export class PSETradingCalendar {
   private readonly holidaysSet: Set<string>;
 
   constructor(additionalHolidays?: readonly string[]) {
@@ -95,7 +95,7 @@ export class IndiaTradingCalendar {
 
   // ---- Queries ---------------------------------------------------------
 
-  /** Is `date` a trading day for Indian markets? */
+  /** Is `date` a trading day for Philippine markets? */
   isTradingDay(date: Date = new Date()): boolean {
     const ds = toDateStr(date);
     return !isWeekend(date) && !this.holidaysSet.has(ds);
@@ -162,11 +162,11 @@ export class IndiaTradingCalendar {
 }
 
 // ---------------------------------------------------------------------------
-// Time-of-day check for Indian market hours
+// Time-of-day check for Philippine market hours
 // ---------------------------------------------------------------------------
 
 /**
- * Check whether the current time falls within Indian equity market hours
+ * Check whether the current time falls within PSE equity market hours
  * (09:15–15:30 IST).  Uses UTC math (IST = UTC+05:30).
  */
 export function isMarketHour(now: Date = new Date()): boolean {
@@ -182,4 +182,4 @@ export function isMarketHour(now: Date = new Date()): boolean {
 // Singleton
 // ---------------------------------------------------------------------------
 
-export const indiaTradingCalendar = new IndiaTradingCalendar();
+export const indiaTradingCalendar = new PSETradingCalendar();

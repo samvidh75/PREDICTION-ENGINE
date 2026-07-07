@@ -8,7 +8,7 @@ import {
   renderDataQualityReport,
 } from '../reporting/DataQualityReportBuilder';
 import { buildSymbolMasterFixture } from '../fixtures/symbol-master';
-import { IndiaTradingCalendar } from '../calendar/IndiaTradingCalendar';
+import { PSETradingCalendar } from '../calendar/PSETradingCalendar';
 import type { IndianEodCandle } from '../eod/IndianEodCandle';
 
 function makeCandle(overrides?: Partial<IndianEodCandle>): IndianEodCandle {
@@ -80,13 +80,13 @@ describe('buildEodQualitySummary', () => {
 
 describe('buildCalendarCoverageSummary', () => {
   it('counts holidays', () => {
-    const calendar = new IndiaTradingCalendar();
+    const calendar = new PSETradingCalendar();
     const result = buildCalendarCoverageSummary(calendar);
     expect(result.holidays).toBeGreaterThan(0);
   });
 
   it('checks weekend consistency', () => {
-    const calendar = new IndiaTradingCalendar();
+    const calendar = new PSETradingCalendar();
     const result = buildCalendarCoverageSummary(calendar);
     expect(result.weekendSkipsCorrect).toBe(true);
   });
@@ -95,12 +95,12 @@ describe('buildCalendarCoverageSummary', () => {
 describe('buildUniverseOverlapSummary', () => {
   it('reports sizes by universe', () => {
     const symbols = buildSymbolMasterFixture();
-    const universes = new Map<string, IndianEquitySymbol[]>();
-    universes.set('nifty_50', symbols.filter(s => s.marketCapCategory === 'large'));
+    const universes = new Map<string, PSESymbol[]>();
+    universes.set('pse-index_50', symbols.filter(s => s.marketCapCategory === 'large'));
     universes.set('mid_cap', symbols.filter(s => s.marketCapCategory === 'mid'));
 
     const result = buildUniverseOverlapSummary(universes);
-    expect(result.sizeByUniverse.nifty_50).toBeGreaterThan(0);
+    expect(result.sizeByUniverse.pse-index_50).toBeGreaterThan(0);
     expect(result.sizeByUniverse.mid_cap).toBeGreaterThan(0);
   });
 
@@ -108,7 +108,7 @@ describe('buildUniverseOverlapSummary', () => {
     const symbols = buildSymbolMasterFixture();
     const allActive = symbols;
     const nse = symbols.filter(s => s.exchange === 'NSE');
-    const universes = new Map<string, IndianEquitySymbol[]>();
+    const universes = new Map<string, PSESymbol[]>();
     universes.set('all', allActive);
     universes.set('nse', nse);
 
@@ -130,8 +130,8 @@ describe('buildFullDataQualityReport', () => {
   it('generates a full report with all sections', () => {
     const symbols = buildSymbolMasterFixture();
     const candles = [makeCandle()];
-    const calendar = new IndiaTradingCalendar();
-    const universes = new Map<string, IndianEquitySymbol[]>();
+    const calendar = new PSETradingCalendar();
+    const universes = new Map<string, PSESymbol[]>();
     universes.set('test', symbols);
 
     const report = buildFullDataQualityReport(symbols, candles, calendar, universes);

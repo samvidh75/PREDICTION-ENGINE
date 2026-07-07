@@ -56,7 +56,7 @@ async function generateAnalysis(ticker: string, query: string): Promise<string> 
   }
 
   if (queryLower.includes('buy') || queryLower.includes('should i invest')) {
-    return `I cannot provide personalized investment advice. However, for ${ticker}, consider analyzing: (1) P/E ratio vs industry average, (2) ROE and profitability trends, (3) debt levels, (4) dividend history, (5) competitive position in the sector. Consult a SEBI-registered advisor for personalized recommendations.`;
+    return `I cannot provide personalized investment advice. However, for ${ticker}, consider analyzing: (1) P/E ratio vs industry average, (2) ROE and profitability trends, (3) debt levels, (4) dividend history, (5) competitive position in the sector. Consult a PSE-listed advisor for personalized recommendations.`;
   }
 
   if (queryLower.includes('roe') || queryLower.includes('return on equity')) {
@@ -68,7 +68,7 @@ async function generateAnalysis(ticker: string, query: string): Promise<string> 
   }
 
   // Default response
-  return `For ${ticker}, I recommend analyzing fundamental metrics (P/E, ROE, growth), technical indicators (moving averages, RSI), and macro factors (interest rates, sector trends). Consider consulting SEBI-registered advisors for investment decisions. Disclaimer: This is educational content, not financial advice.`;
+  return `For ${ticker}, I recommend analyzing fundamental metrics (P/E, ROE, growth), technical indicators (moving averages, RSI), and macro factors (interest rates, sector trends). Consider consulting PSE-listed advisors for investment decisions. Disclaimer: This is educational content, not financial advice.`;
 }
 
 export async function registerAIRoutes(server: FastifyInstance) {

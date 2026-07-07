@@ -55,7 +55,7 @@ function parseRssItems(xml: string): NewsItem[] {
 
 export class GoogleNewsRssProvider implements NewsProvider {
   async getNews(symbol: string): Promise<NewsItem[]> {
-    const clean = symbol.replace(/\.(NS|BO)$/i, "").trim().toUpperCase();
+    const clean = symbol.replace(/\.(NS)$/i, "").trim().toUpperCase();
     const query = `${clean} stock`;
     const url = `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=en-IN&gl=IN&ceid=IN:en`;
 

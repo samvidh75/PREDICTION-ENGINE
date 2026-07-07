@@ -1,11 +1,11 @@
 export type {
-  IndianUniverseDefinition,
-  IndianUniverseKind,
+  PSEUniverseDefinition,
+  PSEUniverseKind,
   UniverseBuilderOptions,
-} from './IndianUniverseKinds';
+} from './PSEUniverseKinds';
 
 export {
   UNIVERSE_REGISTRY,
   buildUniverse,
   getUniverseInfo,
-} from './IndianUniverseKinds';
+} from './PSEUniverseKinds';

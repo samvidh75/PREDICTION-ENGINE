@@ -15,7 +15,7 @@ export interface DataEvidence {
   /** Stable evidence ID (see EvidenceIdFactory). */
   id: string;
 
-  /** NSE symbol the evidence relates to. */
+  /** PSE symbol the evidence relates to. */
   symbol: string;
 
   /** Field or metric name (e.g. "revenue", "pe_ratio"). */

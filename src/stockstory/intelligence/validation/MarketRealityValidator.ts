@@ -2,7 +2,7 @@
  * Market Reality Validator
  * Phase 3 — Validates that intelligence outputs reference real symbols,
  * correct market caps, valid sectors, and survive a reality check against
- * the known universe of Indian equities.
+ * the known universe of Philippine equities.
  */
 import { BaseValidator } from './IntelligenceValidationRunner';
 import type {
@@ -10,7 +10,7 @@ import type {
 } from './IntelligenceValidationTypes';
 
 /**
- * Known Indian equity universe — built from BSE/NSE master list.
+ * Known PSE equity universe — built from BSE/NSE master list.
  * In production, loaded from a DB table or CSV; hardcoded here for initial validation.
  */
 const KNOWN_NSE_SYMBOLS = new Set<string>([

@@ -67,7 +67,7 @@ export class LocalOllamaProvider implements AIProvider {
 
   async chat(symbol: string, question: string, context: string): Promise<string> {
     return this.withFallback(async () => {
-      return this.generateText(`You are a financial analyst expert in Indian stocks.\n\nStock: ${symbol}\nContext:\n${context}\n\nUser Question: ${question}\n\nProvide a clear, informative answer.`, 1000, 0.5);
+      return this.generateText(`You are a financial analyst expert in Philippine stocks.\n\nStock: ${symbol}\nContext:\n${context}\n\nUser Question: ${question}\n\nProvide a clear, informative answer.`, 1000, 0.5);
     }, () => this.fallback.chat(symbol, question, context));
   }
 

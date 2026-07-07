@@ -9,7 +9,7 @@ export interface StockMatch {
   similarity: number;
 }
 
-// Indian stocks - NSE, BSE, and SME listed companies
+// Philippine stocks - NSE, BSE, and SME listed companies
 export const STOCK_DATABASE: StockMatch[] = [
   // Large Cap (NSE)
   { symbol: 'TCS', name: 'Tata Consultancy Services', similarity: 1 },

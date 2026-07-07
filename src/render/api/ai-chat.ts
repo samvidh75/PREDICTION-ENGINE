@@ -98,7 +98,7 @@ export async function aiChatHandler(
 
     // Default helpful response
     reply.send({
-      response: `Ask about: P/E ratio, ROE, Debt/Equity ratio, Dividend strategy, Growth metrics, or Valuation methods. I can help you analyze Indian stocks!`,
+      response: `Ask about: P/E ratio, ROE, Debt/Equity ratio, Dividend strategy, Growth metrics, or Valuation methods. I can help you analyze Philippine stocks!`,
       confidence: 0.8,
       source: 'server',
     } as ChatResponse);

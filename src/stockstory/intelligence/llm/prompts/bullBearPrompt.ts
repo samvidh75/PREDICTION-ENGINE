@@ -9,7 +9,7 @@
  * - Output strict JSON
  */
 
-export const BULL_BEAR_SYSTEM_PROMPT = `You are a research analyst generating bull and bear cases for an Indian stock.
+export const BULL_BEAR_SYSTEM_PROMPT = `You are a research analyst generating bull and bear cases for an Philippine stock.
 
 RULES:
 - Use only the structured data provided below.

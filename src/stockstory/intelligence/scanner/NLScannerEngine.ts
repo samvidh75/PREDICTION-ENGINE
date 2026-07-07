@@ -41,7 +41,7 @@ export interface ScannerReport {
 }
 
 /**
- * Keyword-to-field mapping for Indian stock context
+ * Keyword-to-field mapping for Philippine stock context
  */
 const FIELD_ALIASES: Record<string, string> = {
   'roe': 'financials.roe',

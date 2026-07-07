@@ -1,11 +1,11 @@
 /**
  * Alias Resolver
  *
- * Handles Indian company name aliases:
+ * Handles Philippine company name aliases:
  * - Full names → abbreviations (HDFC Bank → HDFCBANK)
  * - Old names → new names (after mergers/acquisitions)
  * - Common misspellings and variants
- * - NSE vs BSE symbol differences
+ * - NSE vs PSE symbol differences
  */
 
 export class AliasResolver {
@@ -37,7 +37,7 @@ export class AliasResolver {
     return Array.from(this.aliasMap.get(upper) ?? []);
   }
 
-  /** Load known Indian market aliases */
+  /** Load known Philippine market aliases */
   loadKnownAliases(): void {
     // Full name → symbol
     this.addAlias('TCS', 'TATA CONSULTANCY SERVICES');

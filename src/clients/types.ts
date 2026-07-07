@@ -4,7 +4,7 @@
  */
 export interface UnifiedQuote {
   symbol: string;
-  exchange: 'NSE' | 'BSE' | 'NASDAQ' | 'NYSE';
+  exchange: 'PSE' | 'NASDAQ' | 'NYSE';
   timestamp: number; // ms since epoch
 
   // Price data
@@ -26,7 +26,7 @@ export interface UnifiedQuote {
   changePercent: number; // percentage change
 
   // Additional context
-  source: 'yfinance' | 'jugasad' | 'screener' | 'bse' | 'cached';
+  source: 'yfinance' | 'pse' | 'screener' | 'cached';
   fetched: number; // when this quote was fetched (ms since epoch)
   cached: boolean; // true if from IndexedDB
 }

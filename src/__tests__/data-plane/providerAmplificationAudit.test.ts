@@ -120,8 +120,8 @@ describe('Provider-call amplification audit', () => {
       // Check for provider patterns in each file
       for (const filePath of files) {
         const relativePath = path.relative(PROJECT_ROOT, filePath);
-        const providerHits = checkFileForPatterns(filePath, PROVIDER_PATTERNS);
-        const loopHits = checkFileForPatterns(filePath, LOOP_PATTERNS);
+        const providerHits = checkFileForPatterns(filePath, PROVIDER_PATTE);
+        const loopHits = checkFileForPatterns(filePath, LOOP_PATTE);
         const allHits = [...providerHits, ...loopHits];
 
         if (allHits.length > 0) {
@@ -140,11 +140,11 @@ describe('Provider-call amplification audit', () => {
       // Summary check
       it('completes provider amplification scan', () => {
         const totalProviderHits = files.reduce((sum, f) => {
-          const h = checkFileForPatterns(f, PROVIDER_PATTERNS);
+          const h = checkFileForPatterns(f, PROVIDER_PATTE);
           return sum + h.length;
         }, 0);
         const totalLoopHits = files.reduce((sum, f) => {
-          const h = checkFileForPatterns(f, LOOP_PATTERNS);
+          const h = checkFileForPatterns(f, LOOP_PATTE);
           return sum + h.length;
         }, 0);
 

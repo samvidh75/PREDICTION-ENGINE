@@ -5,7 +5,7 @@ import { finitePeRatio, rangeProximity } from "./dnaInputs";
 
 export class StabilityEngine {
   public static evaluate(stock: RegisteredStock): { score: number; status: DNAStatus } {
-    let score = 75; // Stability starts robust by default for our Indian Universe
+    let score = 75; // Stability starts robust by default for our PSE Universe
 
     // Lower PE frequently maps to stable, defensive legacy firms
     const pe = finitePeRatio(stock);

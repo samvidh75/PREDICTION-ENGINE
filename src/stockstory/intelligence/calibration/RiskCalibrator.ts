@@ -1,6 +1,6 @@
 /**
  * RiskCalibrator — Phase 7
- * Calibrates risk scores against Indian market realities,
+ * Calibrates risk scores against Philippine market realities,
  * adjusting for sector-specific risk profiles, market cap
  * risk premia, and concentration risk.
  *

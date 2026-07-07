@@ -106,14 +106,14 @@ export class YahooProvider implements PriceProvider, MetadataProvider, Historica
 
   private normalizeSymbol(symbol: string): string {
     // If already suffixed with .NS or .BO, keep it.
-    if (/\.(NS|BO)$/i.test(symbol)) return symbol.toUpperCase();
-    // Operational lookup default for the Indian equity universe. Displayed
+    if (/\.(NS)$/i.test(symbol)) return symbol.toUpperCase();
+    // Operational lookup default for the PSE equity universe. Displayed
     // exchange still comes from provider evidence or this resolved ticker.
     return `${symbol.toUpperCase()}.NS`;
   }
 
   private async fetchJson(operation: 'quote' | 'metadata' | 'history', symbol: string, params: Record<string, unknown>, url: string): Promise<any> {
-    const clean = symbol.replace(/\.(NS|BO)$/i, '').trim().toUpperCase();
+    const clean = symbol.replace(/\.(NS)$/i, '').trim().toUpperCase();
     const result = await (await getSharedProviderRequestBroker()).execute('yahoo', operation, clean, params, async () => {
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
@@ -163,7 +163,7 @@ export class YahooProvider implements PriceProvider, MetadataProvider, Historica
     if (!meta) throw new Error(`Yahoo: no quote data for ${symbol}`);
 
     return {
-      symbol: symbol.replace(/\.(NS|BO)$/i, '').toUpperCase(),
+      symbol: symbol.replace(/\.(NS)$/i, '').toUpperCase(),
       exchange: normalizeYahooExchange(meta.exchangeName ?? meta.fullExchangeName, ticker) ?? 'Data unavailable',
       price: meta.regularMarketPrice ?? 0,
       change: (meta.regularMarketPrice ?? 0) - (meta.chartPreviousClose ?? 0),
@@ -185,7 +185,7 @@ export class YahooProvider implements PriceProvider, MetadataProvider, Historica
       const data = await this.fetchJson('metadata', symbol, { ticker, range: '1d', interval: '1m' }, url);
       const meta = data?.chart?.result?.[0]?.meta ?? {};
       return {
-        symbol: symbol.replace(/\.(NS|BO)$/i, '').toUpperCase(),
+        symbol: symbol.replace(/\.(NS)$/i, '').toUpperCase(),
         companyName: meta.longName || meta.shortName || symbol,
         sector: '',
         industry: '',
@@ -231,7 +231,7 @@ export class YahooProvider implements PriceProvider, MetadataProvider, Historica
 
   // ── Financials (v8 chart API only — fundamentals NOT available) ──
   async getFinancials(symbol: string): Promise<YahooFinancials> {
-    const cleanSym = symbol.replace(/\.(NS|BO)$/i, '').toUpperCase();
+    const cleanSym = symbol.replace(/\.(NS)$/i, '').toUpperCase();
 
     // Get 2Y historical data for beta derivation
     let beta: number | undefined;

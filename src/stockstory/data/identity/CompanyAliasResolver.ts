@@ -1,6 +1,6 @@
 /**
  * CompanyAliasResolver — resolves alternative identifiers to the canonical
- * NSE symbol, and manages known alias mappings.
+ * PSE symbol, and manages known alias mappings.
  *
  * Rules:
  *  - Does NOT merge unrelated companies.
@@ -19,7 +19,7 @@ export interface AliasEntry {
   /** The alias value (e.g. "RELIANCE.NS", "500325", "INE002A01018"). */
   value: string;
 
-  /** The canonical NSE symbol this alias points to. */
+  /** The canonical PSE symbol this alias points to. */
   canonicalSymbol: string;
 
   /** What kind of alias this is. */
@@ -74,7 +74,7 @@ export class CompanyAliasResolver {
   // -------------------------------------------------------------------
 
   /**
-   * Resolve an alias (or raw symbol) to its canonical NSE symbol.
+   * Resolve an alias (or raw symbol) to its canonical PSE symbol.
    * Returns null if unresolvable.
    */
   toCanonical(input: string): string | null {
@@ -89,7 +89,7 @@ export class CompanyAliasResolver {
       if (fromNormalised) return fromNormalised;
     }
 
-    // 3. If the normalised form itself looks like a valid NSE symbol, use it
+    // 3. If the normalised form itself looks like a valid PSE symbol, use it
     if (isValidSymbol(normalised)) {
       return normalised;
     }

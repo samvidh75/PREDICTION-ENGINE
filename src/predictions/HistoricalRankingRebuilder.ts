@@ -133,7 +133,7 @@ export class HistoricalRankingRebuilder {
         ORDER BY symbol, trade_date DESC
       ),
       Benchmarks AS (
-        SELECT close AS nifty50 FROM daily_prices
+        SELECT close AS pse-index50 FROM daily_prices
         WHERE symbol IN ('NIFTY 50', 'NIFTY50', '^NSEI', 'NSEI')
           AND trade_date <= $1
         ORDER BY trade_date DESC
@@ -147,7 +147,7 @@ export class HistoricalRankingRebuilder {
         COALESCE(ls.confidence_score, 50) as confidence_score,
         COALESCE(ls.confidence_level, 'Medium') as confidence_level,
         COALESCE(lp.close, 0) as close_price,
-        (SELECT nifty50 FROM Benchmarks) as benchmark_level
+        (SELECT pse-index50 FROM Benchmarks) as benchmark_level
       FROM LatestSnapshots ls
       LEFT JOIN LatestPrices lp ON ls.symbol = lp.symbol
       WHERE ls.factor_score IS NOT NULL

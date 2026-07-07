@@ -30,7 +30,7 @@ describe('marketBrainGuardrails', () => {
   });
 
   it('keeps evidence domains stable for frontend and backend normalization', () => {
-    expect(MARKET_BRAIN_EVIDENCE_DOMAINS).toEqual([
+    expect(MARKET_BRAIN_EVIDENCE_DOMA).toEqual([
       'instrument_master',
       'prices',
       'fundamentals',
@@ -43,7 +43,7 @@ describe('marketBrainGuardrails', () => {
       'ownership',
       'derivatives',
     ]);
-    expect(new Set(MARKET_BRAIN_EVIDENCE_DOMAINS).size).toBe(MARKET_BRAIN_EVIDENCE_DOMAINS.length);
+    expect(new Set(MARKET_BRAIN_EVIDENCE_DOMA).size).toBe(MARKET_BRAIN_EVIDENCE_DOMAINS.length);
   });
 
   it('keeps factor keys aligned with the public research view order', () => {

@@ -1,7 +1,7 @@
 /**
  * ScreenerWorker — scheduled screener.in fundamental data refresh.
  *
- * Runs on a 12-hour cycle, fetching fundamentals for Nifty 50 symbols
+ * Runs on a 12-hour cycle, fetching fundamentals for PSE Index symbols
  * via the existing API client. Uses 12s delay between requests to avoid
  * rate limiting.
  *

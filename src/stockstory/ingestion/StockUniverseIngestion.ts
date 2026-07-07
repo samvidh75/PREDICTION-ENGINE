@@ -1,7 +1,7 @@
 /**
  * Stock Universe Ingestion
  *
- * Maintains the master list of Indian stocks tracked by Lensory.
+ * Maintains the master list of Philippine stocks tracked by Lensory.
  * Uses existing repo providers (DB symbols table, NSE/BSE sources).
  * Does NOT invent companies — uses only data from existing sources.
  */
@@ -83,7 +83,7 @@ export class StockUniverseIngestion implements IngestionJob {
     };
   }
 
-  /** Deduplicate NSE/BSE symbols — NSE takes precedence for same company */
+  /** Deduplicate NSE/PSE symbols — NSE takes precedence for same company */
   deduplicate(entries: StockUniverseEntry[]): StockUniverseEntry[] {
     const seen = new Map<string, StockUniverseEntry>();
     const isinMap = new Map<string, StockUniverseEntry>();

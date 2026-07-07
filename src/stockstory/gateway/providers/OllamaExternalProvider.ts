@@ -59,7 +59,7 @@ export class OllamaExternalProvider implements LLMProvider {
   }
 
   generateThesis(input: StockStoryResearchInput): StockStoryNarrativeOutput {
-    const prompt = `Analyze ${input.symbol} (${input.name || input.symbol}) for the Indian equity market.
+    const prompt = `Analyze ${input.symbol} (${input.name || input.symbol}) for the PSE equity market.
 
 Key metrics:
 ${JSON.stringify(input, null, 2)}
@@ -67,7 +67,7 @@ ${JSON.stringify(input, null, 2)}
 Provide a structured research narrative covering: investment thesis, bull case, bear case, what changed recently, why the company matters, key risks, what to watch next, peer context, confidence note, and methodology.`;
 
     try {
-      const result = this.generate(prompt, 'You are a professional Indian equity research analyst. Provide concise, factual analysis. No disclaimers about financial advice. Output as plain text paragraphs, not JSON.');
+      const result = this.generate(prompt, 'You are a professional PSE equity research analyst. Provide concise, factual analysis. No disclaimers about financial advice. Output as plain text paragraphs, not JSON.');
       // Then parse it into StockStoryNarrativeOutput using deterministic fallback for structure
       return researchNarrativeService.generateFullNarrative(input);
     } catch {
@@ -76,7 +76,7 @@ Provide a structured research narrative covering: investment thesis, bull case, 
   }
 
   parseScannerQuery(query: string): ScannerQueryPlan {
-    const prompt = `Convert this natural-language scanner query into structured stock filters for the Indian market (NSE/BSE).
+    const prompt = `Convert this natural-language scanner query into structured stock filters for the Philippine market (NSE/BSE).
 
 Query: "${query}"
 
@@ -159,7 +159,7 @@ Focus on: earnings impact, regulatory changes, competitive developments, and sec
     const { symbols, scores, factorComparison } = input;
     if (symbols.length < 2) return 'Select at least two companies for comparison.';
 
-    const prompt = `Compare these Indian stocks: ${symbols.join(', ')}
+    const prompt = `Compare these Philippine stocks: ${symbols.join(', ')}
 
 Scores (out of 100): ${JSON.stringify(scores)}
 Factor comparison: ${JSON.stringify(factorComparison)}

@@ -40,14 +40,14 @@ const DOMAIN_MATRIX: Record<string, Array<{ key: string; domain: ProviderDomain 
   JUGAD_DATA: [
     { key: "jugaad-data", domain: "quote" },
     { key: "jugaad-data", domain: "historical" },
-    { key: "jugaad-data", domain: "bhavcopy" },
+    { key: "jugaad-data", domain: "pse-daily" },
     { key: "jugaad-data", domain: "index" },
     { key: "jugaad-data", domain: "rbi" },
   ],
   NSEPYTHON: [
     { key: "nsepython", domain: "quote" },
     { key: "nsepython", domain: "historical" },
-    { key: "nsepython", domain: "bhavcopy" },
+    { key: "nsepython", domain: "pse-daily" },
     { key: "nsepython", domain: "index_quote" },
   ],
   YAHOO: [

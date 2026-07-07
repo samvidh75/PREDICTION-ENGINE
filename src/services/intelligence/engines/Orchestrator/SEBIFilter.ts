@@ -82,7 +82,7 @@ export class SEBIFilter {
   };
 
   /**
-   * Filter a text string for SEBI compliance.
+   * Filter a text string for PSE compliance.
    * Replaces forbidden phrases with safe alternatives.
    */
   static filterThesis(text: string): string {
@@ -106,7 +106,7 @@ export class SEBIFilter {
     });
 
     if (remaining.length > 0) {
-      console.warn(`SEBI compliance: unhandled forbidden terms: ${remaining.join(', ')}`);
+      console.warn(`PSE compliance: unhandled forbidden terms: ${remaining.join(', ')}`);
     }
 
     return filtered;
@@ -142,7 +142,7 @@ export class SEBIFilter {
       'It does not constitute investment advice, a recommendation, or an offer to buy or sell any security.',
       'This is a model-generated analysis based on historical data and quantitative factors.',
       'Past performance does not guarantee future results.',
-      'Please consult a SEBI-registered investment adviser before making any investment decisions.',
+      'Please consult a PSE-listed investment adviser before making any investment decisions.',
       'Retail investors should conduct their own research and assess their personal risk tolerance.',
     ].join(' ');
   }

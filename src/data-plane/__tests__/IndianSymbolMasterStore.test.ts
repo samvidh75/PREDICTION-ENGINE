@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { IndianSymbolMasterStore } from '../symbols/IndianSymbolMasterStore';
-import type { IndianEquitySymbol } from '../symbols/IndianEquitySymbol';
+import type { PSESymbol } from '../symbols/PSESymbol';
 
 // ---------------------------------------------------------------------------
 // The store uses a placeholder runQuery that returns [] — so methods resolve
@@ -31,7 +31,7 @@ describe('IndianSymbolMasterStore', () => {
   });
 
   it('upsert resolves to symbol when not connected to DB', async () => {
-    const symbol: IndianEquitySymbol = {
+    const symbol: PSESymbol = {
       canonicalSymbol: 'RELIANCE',
       exchange: 'NSE',
       segment: 'EQ',

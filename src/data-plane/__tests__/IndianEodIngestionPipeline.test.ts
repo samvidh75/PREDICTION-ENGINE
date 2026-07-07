@@ -2,14 +2,14 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { IndianEodIngestionPipeline } from '../ingestion/IndianEodIngestionPipeline';
 import type { EodDataCacheLike, RawCandleInput } from '../ingestion/IndianEodIngestionPipeline';
 import type { IndianSymbolResolver, SymbolResolutionResult } from '../symbols/IndianSymbolResolver';
-import type { IndianEquitySymbol } from '../symbols/IndianEquitySymbol';
+import type { PSESymbol } from '../symbols/PSESymbol';
 import type { EodIngestionBatch } from '../ingestion/IndianEodIngestionTypes';
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
-function makeSymbol(canonicalSymbol: string): IndianEquitySymbol & { canonicalSymbol: string } {
+function makeSymbol(canonicalSymbol: string): PSESymbol & { canonicalSymbol: string } {
   return {
     canonicalSymbol,
     exchange: 'NSE',
@@ -49,7 +49,7 @@ function makeCache(): EodDataCacheLike {
 function makeBatch(tradeDate = '2026-06-17'): EodIngestionBatch {
   return {
     batchId: crypto.randomUUID(),
-    source: 'nse_bhavcopy',
+    source: 'nse_pse-daily',
     tradeDate,
     count: 0,
     createdAt: new Date().toISOString(),
@@ -71,7 +71,7 @@ describe('IndianEodIngestionPipeline', () => {
 
   beforeEach(() => {
     resolver = makeResolver({
-      [RESOLVABLE]: { status: 'exact' as const, symbol: makeSymbol(RESOLVABLE) as IndianEquitySymbol },
+      [RESOLVABLE]: { status: 'exact' as const, symbol: makeSymbol(RESOLVABLE) as PSESymbol },
     });
     cache = makeCache();
     pipeline = new IndianEodIngestionPipeline(resolver, cache);
@@ -154,13 +154,13 @@ describe('IndianEodIngestionPipeline', () => {
     const result = await pipeline.ingest(batch, inputs);
     expect(result.batch.batchId).toBe(batch.batchId);
     expect(result.batch.tradeDate).toBe('2026-06-17');
-    expect(result.batch.source).toBe('nse_bhavcopy');
+    expect(result.batch.source).toBe('nse_pse-daily');
   });
 
   it('createTaskRecord produces valid task record', async () => {
     const startedAt = new Date().toISOString();
     const record = await pipeline.createTaskRecord({
-      source: 'nse_bhavcopy',
+      source: 'nse_pse-daily',
       tradeDate: '2026-06-17',
       startedAt,
       status: 'running',
@@ -168,7 +168,7 @@ describe('IndianEodIngestionPipeline', () => {
       rejected: 0,
     });
     expect(record.taskId).toBeDefined();
-    expect(record.source).toBe('nse_bhavcopy');
+    expect(record.source).toBe('nse_pse-daily');
     expect(record.status).toBe('running');
     expect(record.accepted).toBe(5);
   });

@@ -74,7 +74,7 @@ export class ResearchConsistencyValidator extends BaseValidator {
 
     let totalChecks = 0;
 
-    for (const pattern of CONTRADICTION_PATTERNS) {
+    for (const pattern of CONTRADICTION_PATTE) {
       totalChecks++;
       const v1 = payload[pattern.fields[0]];
       const v2 = payload[pattern.fields[1]];
@@ -122,7 +122,7 @@ export class ResearchConsistencyValidator extends BaseValidator {
   runStructuredChecks(symbol: string, data: Record<string, number>): ConsistencyCheck[] {
     const checks: ConsistencyCheck[] = [];
 
-    for (const pattern of CONTRADICTION_PATTERNS) {
+    for (const pattern of CONTRADICTION_PATTE) {
       const v1 = data[pattern.fields[0]];
       const v2 = data[pattern.fields[1]];
       if (v1 == null || v2 == null) continue;

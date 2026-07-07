@@ -727,7 +727,7 @@ export default async function registerApiRoutes(server: FastifyInstance) {
     ).toUpperCase().trim();
     if (!symbol) return reply.status(400).send({ error: "symbol required" });
 
-    // Normalize exchange-prefixed symbols (BSE502865 → clean=502865, suffix=BO)
+    // Normalize exchange-prefixed symbols (BSE502865 → clean=502865, suffix)
     const { cleanSymbol, exchangeSuffix } = parseSymbol(symbol);
 
     const cached = stockCache.get(symbol);
@@ -1021,7 +1021,7 @@ export default async function registerApiRoutes(server: FastifyInstance) {
     }
 
     return reply.send({
-      response: response || "Ask about: P/E ratio, ROE, Debt/Equity, Dividend strategy, Growth metrics, or Valuation methods. I can help analyze Indian stocks!",
+      response: response || "Ask about: P/E ratio, ROE, Debt/Equity, Dividend strategy, Growth metrics, or Valuation methods. I can help analyze Philippine stocks!",
       confidence: response ? 0.95 : 0.8,
       source: "server",
     });

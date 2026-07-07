@@ -1,5 +1,5 @@
 // src/services/providers/unified/TrendlyneProvider.ts
-// Trendlyne — Indian equity fundamentals via Trendlyne.com
+// Trendlyne — PSE equity fundamentals via Trendlyne.com
 // NOTE: Trendlyne now requires member login for stock pages.
 // This provider works as best-effort fallback when pages are accessible.
 // Provides P/E, P/B, ROE, ROA, ROCE, D/E, market cap, and more

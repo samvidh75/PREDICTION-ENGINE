@@ -259,7 +259,7 @@ class SQLitePool {
         UNIQUE(symbol, prediction_date, prediction_horizon)
       )`,
       `CREATE TABLE IF NOT EXISTS benchmark_observations (
-        date TEXT PRIMARY KEY, nifty50 REAL, nifty100 REAL, nifty500 REAL,
+        date TEXT PRIMARY KEY, pse-index50 REAL, pse-index100 REAL, pse-index500 REAL,
         equal_weight REAL, source TEXT
       )`,
       `CREATE TABLE IF NOT EXISTS daily_prediction_snapshots (

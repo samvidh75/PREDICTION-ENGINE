@@ -33,8 +33,8 @@ type FeatureTimelineCard = {
 };
 
 const exchangeCards: ExchangeCard[] = [
-  { label: "NSE Nifty 50", value: "24,842.10", move: "+0.84%", health: "Healthy" },
-  { label: "BSE Sensex", value: "81,486.21", move: "+0.61%", health: "Stable" },
+  { label: "NSE PSE Index", value: "24,842.10", move: "+0.84%", health: "Healthy" },
+  { label: "BSE PSE Composite", value: "81,486.21", move: "+0.61%", health: "Stable" },
   { label: "SME Index", value: "4,936.48", move: "-0.28%", health: "Weakening" },
 ];
 
@@ -497,7 +497,7 @@ export default function AboutPage() {
                   textShadow: "none",
                 }}
               >
-                Indian markets are mapping a resilient narrative.
+                Philippine markets are mapping a resilient narrative.
               </h1>
 
               <p

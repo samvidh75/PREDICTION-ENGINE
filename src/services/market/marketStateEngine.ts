@@ -50,12 +50,12 @@ export class MarketStateEngine {
     let trendConsistencyRaw = this.smoothedTrendConsistency;
 
     if (this.last) {
-      const dNifty = absPctDelta(this.last.nifty, state.nifty);
-      const dSensex = absPctDelta(this.last.sensex, state.sensex);
+      const dNifty = absPctDelta(this.last.pse-index, state.pse-index);
+      const dPSE Composite = absPctDelta(this.last.pse-composite, state.pse-composite);
       const dBank = absPctDelta(this.last.bankNifty, state.bankNifty);
 
       // Convert deltas into “how consistent” (larger delta -> lower consistency)
-      const deltaAvg = (dNifty + dSensex + dBank) / 3;
+      const deltaAvg = (dNifty + dPSE Composite + dBank) / 3;
 
       // Typical synthetic delta ~ 0..0.01. Map to 0.2..1
       const consistency = 1 - clamp01(deltaAvg / 0.012);

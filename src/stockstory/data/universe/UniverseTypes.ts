@@ -1,13 +1,13 @@
 /**
- * Indian Equity Universe Types
+ * PSE Universe Types
  *
- * Defines the canonical stock universe structure for Indian equities.
+ * Defines the canonical stock universe structure for Philippine equities.
  * Every stock in the system must trace back to this universe.
  */
 
 export type ListingStatus = 'active' | 'suspended' | 'delisted' | 'merged' | 'unknown';
 
-export interface IndianEquitySymbol {
+export interface PSESymbol {
   symbol: string;
   isin: string | null;
   nseSymbol: string | null;

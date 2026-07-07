@@ -122,7 +122,7 @@ export default function ModelDebugPage() {
 
   const testVersioning = async () => {
     return runTest('Model Versioning', async () => {
-      for (const version of MODEL_VERSIONS) {
+      for (const version of MODEL_VERSI) {
         await modelVersionManager.saveVersion(version);
       }
       const saved = await modelVersionManager.listVersions();

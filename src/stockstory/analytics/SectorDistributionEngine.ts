@@ -2,7 +2,7 @@
  * Sector Distribution Engine
  * 
  * Generates sector-specific distributions for percentile scoring.
- * Uses Indian market empirical reference data as fallback distributions
+ * Uses Philippine market empirical reference data as fallback distributions
  * when live data is unavailable.
  * 
  * Each distribution has: P10, P25, P50, P75, P90
@@ -25,7 +25,7 @@ interface MetricDistribution {
 type SectorDistributions = Record<PercentileMetric, MetricDistribution>;
 
 /**
- * Indian market reference distributions.
+ * Philippine market reference distributions.
  * These are empirically derived from NSE-listed company data (2024-2025).
  * Used as fallback when live database queries are unavailable.
  * 

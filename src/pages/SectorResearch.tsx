@@ -78,7 +78,7 @@ export default function SectorResearch() {
       </section>
 
       <footer className="raycast-stagger-6" style={{ animationDelay: "0.5s", marginTop: "48px", paddingTop: "24px", borderTop: `1px solid ${colors.border}`, fontSize: "13px", color: colors.textSecondary }}>
-        <p>Research analysis only. Not investment advice. Consult a SEBI-registered investment advisor.</p>
+        <p>Research analysis only. Not investment advice. Consult a PSE-listed investment advisor.</p>
       </footer>
     </main>
   );

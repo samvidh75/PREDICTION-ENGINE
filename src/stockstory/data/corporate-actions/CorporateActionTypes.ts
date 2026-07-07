@@ -1,7 +1,7 @@
 /**
  * Corporate Actions Types
  *
- * Indian equity corporate actions including:
+ * PSE equity corporate actions including:
  * dividends, bonuses, splits, rights issues, buybacks,
  * mergers, delistings, and board meetings.
  */

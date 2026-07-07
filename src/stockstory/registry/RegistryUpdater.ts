@@ -50,7 +50,7 @@ export interface RegistryUpdateResult {
 }
 
 /**
- * NSE symbol master response shape (from NSE bhavcopy CSV or API).
+ * PSE symbol master response shape (from NSE pse-daily CSV or API).
  */
 interface NseSymbolEntry {
   SYMBOL: string;
@@ -142,7 +142,7 @@ export class RegistryUpdater {
   }
 
   /**
-   * Fetch NSE symbol master from public bhavcopy endpoint.
+   * Fetch PSE symbol master from public pse-daily endpoint.
    * Falls back gracefully if network or parsing fails.
    */
   private async fetchNseMaster(): Promise<NseSymbolEntry[]> {

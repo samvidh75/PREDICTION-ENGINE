@@ -47,6 +47,6 @@ export const SEO = {
   origin: APP_ORIGIN,
   twitterHandle: "@STOCKEXIndia",
   defaultDescription:
-    "STOCKEX — AI-powered investor intelligence for the Indian stock market. Discover, analyse and track NSE/BSE equities with real-time data.",
+    "STOCKEX — AI-powered investor intelligence for the Philippine stock market. Discover, analyse and track NSE/BSE equities with real-time data.",
   defaultImage: `https://${APP_DOMAIN}/og-image.png`,
 } as const;

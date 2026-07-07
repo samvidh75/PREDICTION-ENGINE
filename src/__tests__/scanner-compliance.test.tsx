@@ -13,7 +13,7 @@ describe('scannerPolicy compliance', () => {
   });
 
   it('SAFE_SCANNER_ACTIONS uses only research-safe actions', () => {
-    expect(SAFE_SCANNER_ACTIONS).toEqual(['Research', 'Compare', 'Track', 'Review']);
+    expect(SAFE_SCANNER_ACTI).toEqual(['Research', 'Compare', 'Track', 'Review']);
   });
 
   it('SAFE_SCANNER_STATES uses only compliance-safe states', () => {

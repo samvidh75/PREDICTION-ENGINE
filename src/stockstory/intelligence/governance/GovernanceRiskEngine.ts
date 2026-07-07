@@ -253,7 +253,7 @@ export class GovernanceRiskEngine {
       flags.push({
         severity: 'medium',
         category: 'esop',
-        description: `ESOP dilution of ${r.esopDilution}% — above typical Indian market levels.`,
+        description: `ESOP dilution of ${r.esopDilution}% — above typical Philippine market levels.`,
         evidenceSource: 'esopDilution',
       });
     }

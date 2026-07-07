@@ -7,7 +7,7 @@ const ENTITIES: DiscoveryEntity[] = [
     kind: "sector",
     title: "Banking",
     shortNarrative: "Liquidity-sensitive credit and payment posture within the current market structure.",
-    keywords: ["bank", "banking", "nifty bank", "credit", "payments", "lending", "fiidii", "institutional"],
+    keywords: ["bank", "banking", "pse-index bank", "credit", "payments", "lending", "fiidii", "institutional"],
     relationshipTags: ["liquidity", "institutional", "defensive_context", "sector_pacing"],
     details: {
       confidenceEnvironmentHint: "Banking is interpreted as a structure lens: stability cues become more timing-sensitive when confidence turns elevated-risk.",

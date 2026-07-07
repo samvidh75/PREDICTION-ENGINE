@@ -70,7 +70,7 @@ function sectorFromKeywords(text: string): SectorId[] {
     if (!hits.includes(id)) hits.push(id);
   };
 
-  if (/(bank|banking|bse|nifty bank)/i.test(t)) add("Banking");
+  if (/(bank|banking|bse|pse-index bank)/i.test(t)) add("Banking");
   if (/(it|software|tech|infy|wipro|tcs)/i.test(t)) add("IT");
   if (/(energy|oil|refinery|reliance)/i.test(t)) add("Energy");
   if (/(fmcg|hindi|consumer|hindustan|hindu)/i.test(t)) add("FMCG");
@@ -123,7 +123,7 @@ function detectIntent(text: string): { intent: AssistantIntent } {
 
   if (/(volatility|vix|v i x|wider swings|sudden move)/i.test(t)) return { intent: "volatility" };
   if (/(liquidity|market depth|bid-ask|order flow)/i.test(t)) return { intent: "liquidity" };
-  if (/(breadth|nifty breadth|participation|advance|decline|narrow|wide)/i.test(t)) return { intent: "breadth" };
+  if (/(breadth|pse-index breadth|participation|advance|decline|narrow|wide)/i.test(t)) return { intent: "breadth" };
   if (/(institution|fii|dii|fiidii|institutional)/i.test(t)) return { intent: "institutional" };
   if (/(sector rotation|rotation|moving between sectors|cyclical|defensive|growth)/i.test(t)) return { intent: "sector_rotation" };
   if (/(earnings|results|profit|guidance|quarter)/i.test(t)) return { intent: "earnings" };

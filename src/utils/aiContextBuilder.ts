@@ -3,7 +3,7 @@
  * - Conversation history (multi-turn memory)
  * - Live market data (real-time ticker info)
  * - Company fundamentals
- * - SEBI compliance checks
+ * - PSE compliance checks
  */
 
 import type { ChatMessage } from './chatHistoryStorage';
@@ -42,7 +42,7 @@ const FLAGGED_KEYWORDS = [
 ];
 
 const SEBI_DISCLAIMER =
-  '⚠️ SEBI COMPLIANCE: This is educational content only, not investment advice. Always consult a SEBI-registered advisor before making investment decisions.';
+  '⚠️ SEBI COMPLIANCE: This is educational content only, not investment advice. Always consult a PSE-listed advisor before making investment decisions.';
 
 export function buildAIContext(
   userQuery: string,
@@ -119,7 +119,7 @@ function formatConversationContext(history: ChatMessage[]): string {
 }
 
 function buildSystemPrompt(_ticker: string, marketContext: string, conversationContext: string): string {
-  return `You are StockEX Encyclopedia, an expert financial analyst for Indian equities.
+  return `You are StockEX Encyclopedia, an expert financial analyst for Philippine equities.
 
 ROLE:
 - Provide accurate, educational financial analysis
@@ -137,7 +137,7 @@ INSTRUCTIONS:
 2. When asked "should I buy/sell": Redirect to fundamental analysis and SEBI disclaimer
 3. When asked about price predictions: Explain you cannot predict, offer analysis framework instead
 4. Use real data from context above when available
-5. For any investment decision: End with "Consult a SEBI-registered advisor"
+5. For any investment decision: End with "Consult a PSE-listed advisor"
 
 OUTPUT FORMAT:
 - Clear, concise responses

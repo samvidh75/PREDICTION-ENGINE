@@ -1,7 +1,7 @@
 /**
  * Dividend Tracking Service
  * Manages stock dividend data, TDS calculation, and historical tracking
- * For Indian equities (NSE/BSE stocks)
+ * For Philippine equities (NSE/BSE stocks)
  */
 
 export interface DividendPayment {
@@ -44,7 +44,7 @@ export interface DividendPortfolioStats {
   taxableIncome: number; // total dividends (before TDS)
 }
 
-// Indian stock dividend database (common dividend-paying stocks)
+// Philippine stock dividend database (common dividend-paying stocks)
 const STOCK_DIVIDEND_DB: Record<
   string,
   {

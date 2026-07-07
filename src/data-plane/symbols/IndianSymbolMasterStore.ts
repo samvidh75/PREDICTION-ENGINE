@@ -2,7 +2,7 @@
 // Phase 21A — Symbol master store (DB-backed)
 //
 // Production implementation of the symbol master store.  Persists canonical
-// IndianEquitySymbol entries in the `symbol_master` DB table.
+// PSESymbol entries in the `symbol_master` DB table.
 //
 // Public API
 // ──────────
@@ -16,7 +16,7 @@
 // - search(query)       LIKE search on symbol / companyName
 // ─────────────────────────────────────────────────────────────────────────────
 
-import type { IndianEquitySymbol, IndianExchange, IndianInstrumentSegment, IndianListingStatus } from './IndianEquitySymbol';
+import type { PSESymbol, IndianExchange, IndianInstrumentSegment, IndianListingStatus } from './PSESymbol';
 
 // ---------------------------------------------------------------------------
 // DB row shape
@@ -45,7 +45,7 @@ interface SymbolMasterRow {
 // Helpers
 // ---------------------------------------------------------------------------
 
-function rowToSymbol(row: SymbolMasterRow): IndianEquitySymbol {
+function rowToSymbol(row: SymbolMasterRow): PSESymbol {
   return {
     canonicalSymbol: row.symbol,
     exchange: row.exchange as IndianExchange,
@@ -60,13 +60,13 @@ function rowToSymbol(row: SymbolMasterRow): IndianEquitySymbol {
     nseSymbol: row.nse_symbol,
     faceValue: row.face_value,
     marketCapCr: row.market_cap_cr,
-    marketCapCategory: row.market_cap_category as IndianEquitySymbol['marketCapCategory'],
+    marketCapCategory: row.market_cap_category as PSESymbol['marketCapCategory'],
     firstSeenAt: row.first_seen_at,
     lastSeenAt: row.last_seen_at,
   };
 }
 
-function symbolToRow(s: IndianEquitySymbol): SymbolMasterRow {
+function symbolToRow(s: PSESymbol): SymbolMasterRow {
   return {
     symbol: s.canonicalSymbol,
     exchange: s.exchange,
@@ -106,7 +106,7 @@ export class IndianSymbolMasterStore {
    * Insert or replace a symbol entry.
    * Returns the upserted symbol.
    */
-  async upsert(symbol: IndianEquitySymbol): Promise<IndianEquitySymbol> {
+  async upsert(symbol: PSESymbol): Promise<PSESymbol> {
     const row = symbolToRow(symbol);
     await runQuery(
       `INSERT INTO symbol_master (
@@ -143,7 +143,7 @@ export class IndianSymbolMasterStore {
   /**
    * Bulk upsert multiple symbols in a single transaction.
    */
-  async bulkUpsert(symbols: IndianEquitySymbol[]): Promise<number> {
+  async bulkUpsert(symbols: PSESymbol[]): Promise<number> {
     for (const s of symbols) {
       await this.upsert(s);
     }
@@ -153,7 +153,7 @@ export class IndianSymbolMasterStore {
   /**
    * Look up by canonical symbol (exact match).
    */
-  async findBySymbol(symbol: string): Promise<IndianEquitySymbol | null> {
+  async findBySymbol(symbol: string): Promise<PSESymbol | null> {
     const rows = await runQuery<SymbolMasterRow>(
       'SELECT * FROM symbol_master WHERE symbol = $1',
       [symbol],
@@ -164,7 +164,7 @@ export class IndianSymbolMasterStore {
   /**
    * Look up by alias (searches aliases JSON array via LIKE).
    */
-  async findByAlias(alias: string): Promise<IndianEquitySymbol | null> {
+  async findByAlias(alias: string): Promise<PSESymbol | null> {
     const rows = await runQuery<SymbolMasterRow>(
       `SELECT * FROM symbol_master WHERE aliases LIKE $1`,
       [`%"${alias}"%`],
@@ -183,7 +183,7 @@ export class IndianSymbolMasterStore {
   /**
    * Look up by ISIN.
    */
-  async findByIsin(isin: string): Promise<IndianEquitySymbol | null> {
+  async findByIsin(isin: string): Promise<PSESymbol | null> {
     if (!isin || isin.length < 12) return null;
     const rows = await runQuery<SymbolMasterRow>(
       'SELECT * FROM symbol_master WHERE isin = $1',
@@ -195,7 +195,7 @@ export class IndianSymbolMasterStore {
   /**
    * Look up by BSE scrip code.
    */
-  async findByBseCode(code: string): Promise<IndianEquitySymbol | null> {
+  async findByBseCode(code: string): Promise<PSESymbol | null> {
     const rows = await runQuery<SymbolMasterRow>(
       'SELECT * FROM symbol_master WHERE bse_code = $1',
       [code],
@@ -206,7 +206,7 @@ export class IndianSymbolMasterStore {
   /**
    * Search symbols by ticker or company name (LIKE query).
    */
-  async search(query: string): Promise<IndianEquitySymbol[]> {
+  async search(query: string): Promise<PSESymbol[]> {
     const pattern = `%${query.toUpperCase()}%`;
     const rows = await runQuery<SymbolMasterRow>(
       `SELECT * FROM symbol_master
@@ -221,7 +221,7 @@ export class IndianSymbolMasterStore {
   /**
    * List all active (trading) symbols.
    */
-  async listActive(): Promise<IndianEquitySymbol[]> {
+  async listActive(): Promise<PSESymbol[]> {
     const rows = await runQuery<SymbolMasterRow>(
       "SELECT * FROM symbol_master WHERE listing_status = 'active' ORDER BY symbol ASC",
     );
@@ -231,7 +231,7 @@ export class IndianSymbolMasterStore {
   /**
    * List all retired (suspended / delisted) symbols.
    */
-  async listRetired(): Promise<IndianEquitySymbol[]> {
+  async listRetired(): Promise<PSESymbol[]> {
     const rows = await runQuery<SymbolMasterRow>(
       "SELECT * FROM symbol_master WHERE listing_status IN ('suspended', 'delisted') ORDER BY symbol ASC",
     );

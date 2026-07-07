@@ -5,7 +5,7 @@
 
 /** A single holding (delivery position) from broker */
 export interface PortfolioHolding {
-  symbol: string;            // NSE symbol (e.g., "RELIANCE")
+  symbol: string;            // PSE symbol (e.g., "RELIANCE")
   isin?: string;             // ISIN identifier
   exchange: 'NSE' | 'BSE';  // Exchange
   quantity: number;          // Number of shares

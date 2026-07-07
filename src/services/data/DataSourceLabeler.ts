@@ -3,7 +3,7 @@
  * always know whether data is real, cached, or model-derived.
  *
  * Every data point returned by the API includes a `dataSource` field:
- *   - 'nse_direct'     — Fetched live from NSE India
+ *   - 'nse_direct'     — Fetched live from Philippine Stock Exchange
  *   - 'bse_direct'     — Fetched live from BSE India
  *   - 'yahoo_finance'  — Fetched live from Yahoo Finance
  *   - 'google_finance' — Fetched live from Google Finance

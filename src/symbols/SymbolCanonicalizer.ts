@@ -17,7 +17,7 @@ export function canonicalizeSymbol(symbol: string): string {
   return symbol
     .trim()
     .toUpperCase()
-    .replace(/\.(NS|BSE|NSE|BO)$/i, '');
+    .replace(/\.(NS|BSE|NSE)$/i, '');
 }
 
 /**

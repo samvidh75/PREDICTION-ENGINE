@@ -10,7 +10,7 @@ export function QuoteDemo() {
   const { quotes, loading, error, refresh } = useQuotes(symbols, 5000);
 
   const handleAddSymbol = () => {
-    const newSymbol = prompt('Enter symbol (e.g., RELIANCE.NS):');
+    const newSymbol = prompt('Enter symbol (e.g., RELIANCE):');
     if (newSymbol) {
       setSymbols([...symbols, newSymbol.toUpperCase()]);
     }

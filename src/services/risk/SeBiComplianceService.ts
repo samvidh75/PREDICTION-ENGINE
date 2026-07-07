@@ -50,7 +50,7 @@ export class SeBiComplianceService {
       ? `${criticalFailures} critical compliance failure(s) detected. Immediate remediation required.`
       : warnings > 0
         ? `${warnings} compliance warning(s) found. Review recommended.`
-        : 'All SEBI compliance checks passed.';
+        : 'All PSE compliance checks passed.';
 
     return {
       generatedAt: new Date().toISOString(),

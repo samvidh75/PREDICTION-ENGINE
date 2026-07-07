@@ -88,7 +88,7 @@ class PortfolioAIContext {
   private analyzeSectors(holdings: Holding[]): Array<{ sector: string; count: number }> {
     const sectorMap: Map<string, number> = new Map();
 
-    // Simplified sector mapping based on common Indian stock patterns
+    // Simplified sector mapping based on common Philippine stock patterns
     const sectorPatterns: Record<string, string> = {
       INFY: 'IT',
       TCS: 'IT',

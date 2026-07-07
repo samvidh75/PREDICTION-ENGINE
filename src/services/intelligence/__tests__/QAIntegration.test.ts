@@ -5,7 +5,7 @@
  * and the master orchestrator. Validates:
  * - All engines produce valid 0-100 scores
  * - Orchestrator weighted aggregation is correct
- * - SEBI compliance in disclaimers
+ * - PSE compliance in disclaimers
  * - Response structure completeness
  * - Error handling for missing/bad data
  * - Consistency across multiple stocks
@@ -419,7 +419,7 @@ describe('QA & Integration (PROMPT 30)', () => {
     });
   });
 
-  // ── 4. Thesis generation & SEBI compliance ──────────────────────────
+  // ── 4. Thesis generation & PSE compliance ──────────────────────────
 
   describe('Thesis & SEBI Compliance', () => {
     it('generates bull case, bear case, and whatToWatch', async () => {

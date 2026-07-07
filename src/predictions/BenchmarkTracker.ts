@@ -39,21 +39,21 @@ export class BenchmarkTracker {
       priceMap[row.symbol] = Number(row.close);
     }
 
-    const nifty50 = priceMap['NIFTY 50'] ?? null;
-    const nifty100 = priceMap['NIFTY 100'] ?? null;
-    const nifty500 = priceMap['NIFTY 500'] ?? null;
+    const pse-index50 = priceMap['NIFTY 50'] ?? null;
+    const pse-index100 = priceMap['NIFTY 100'] ?? null;
+    const pse-index500 = priceMap['NIFTY 500'] ?? null;
 
     // Insert into benchmark_observations (upsert on observed_date)
     const insertResult = await pool.query(
-      `INSERT INTO benchmark_observations (observed_date, nifty50, nifty100, nifty500)
+      `INSERT INTO benchmark_observations (observed_date, pse-index50, pse-index100, pse-index500)
        VALUES ($1, $2, $3, $4)
        ON CONFLICT (observed_date) DO UPDATE SET
-         nifty50 = EXCLUDED.nifty50,
-         nifty100 = EXCLUDED.nifty100,
-         nifty500 = EXCLUDED.nifty500,
+         pse-index50 = EXCLUDED.pse-index50,
+         pse-index100 = EXCLUDED.pse-index100,
+         pse-index500 = EXCLUDED.pse-index500,
          recorded_at = NOW()
-       RETURNING observed_date, nifty50, nifty100, nifty500, recorded_at`,
-      [date, nifty50, nifty100, nifty500]
+       RETURNING observed_date, pse-index50, pse-index100, pse-index500, recorded_at`,
+      [date, pse-index50, pse-index100, pse-index500]
     );
 
     const row = insertResult.rows[0];
@@ -62,9 +62,9 @@ export class BenchmarkTracker {
       date: row.observed_date instanceof Date
         ? row.observed_date.toISOString().split('T')[0]
         : String(row.observed_date),
-      nifty50: row.nifty50 !== null ? Number(row.nifty50) : 0,
-      nifty100: row.nifty100 !== null ? Number(row.nifty100) : 0,
-      nifty500: row.nifty500 !== null ? Number(row.nifty500) : 0,
+      pse-index50: row.pse-index50 !== null ? Number(row.pse-index50) : 0,
+      pse-index100: row.pse-index100 !== null ? Number(row.pse-index100) : 0,
+      pse-index500: row.pse-index500 !== null ? Number(row.pse-index500) : 0,
     };
   }
 
@@ -74,7 +74,7 @@ export class BenchmarkTracker {
    */
   async getObservations(from: string, to: string): Promise<BenchmarkObservation[]> {
     const result = await pool.query(
-      `SELECT observed_date, nifty50, nifty100, nifty500
+      `SELECT observed_date, pse-index50, pse-index100, pse-index500
        FROM benchmark_observations
        WHERE observed_date >= $1
          AND observed_date <= $2
@@ -86,9 +86,9 @@ export class BenchmarkTracker {
       date: row.observed_date instanceof Date
         ? row.observed_date.toISOString().split('T')[0]
         : String(row.observed_date),
-      nifty50: row.nifty50 !== null ? Number(row.nifty50) : 0,
-      nifty100: row.nifty100 !== null ? Number(row.nifty100) : 0,
-      nifty500: row.nifty500 !== null ? Number(row.nifty500) : 0,
+      pse-index50: row.pse-index50 !== null ? Number(row.pse-index50) : 0,
+      pse-index100: row.pse-index100 !== null ? Number(row.pse-index100) : 0,
+      pse-index500: row.pse-index500 !== null ? Number(row.pse-index500) : 0,
     }));
   }
 }

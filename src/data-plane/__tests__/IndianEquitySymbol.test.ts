@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import { buildSymbolMasterFixture } from '../fixtures/symbol-master';
-import type { IndianExchange, IndianInstrumentSegment, IndianListingStatus } from '../symbols/IndianEquitySymbol';
+import type { IndianExchange, IndianInstrumentSegment, IndianListingStatus } from '../symbols/PSESymbol';
 
-describe('IndianEquitySymbol contract', () => {
+describe('PSESymbol contract', () => {
   const symbols = buildSymbolMasterFixture();
 
   it('all fixtures have non-empty canonicalSymbol', () => {
@@ -48,7 +48,7 @@ describe('IndianEquitySymbol contract', () => {
     }
   });
 
-  it('NSE symbols have nseSymbol equal to canonicalSymbol', () => {
+  it('PSE symbols have nseSymbol equal to canonicalSymbol', () => {
     for (const s of symbols) {
       if (s.exchange === 'NSE') {
         expect(s.nseSymbol).toBe(s.canonicalSymbol);
@@ -56,7 +56,7 @@ describe('IndianEquitySymbol contract', () => {
     }
   });
 
-  it('NSE symbols have bseCode set', () => {
+  it('PSE symbols have bseCode set', () => {
     for (const s of symbols) {
       if (s.exchange === 'NSE') {
         expect(s.bseCode).toBeTruthy();

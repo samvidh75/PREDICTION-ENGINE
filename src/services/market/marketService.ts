@@ -48,8 +48,8 @@ export class MarketService {
 
   private lastState: MarketState = {
     at: now(),
-    nifty: 22400,
-    sensex: 73800,
+    pse-index: 22400,
+    pse-composite: 73800,
     bankNifty: 48900,
     vix: 12.4,
     breadthPct: 52,
@@ -314,8 +314,8 @@ export class MarketService {
         this.lastState = {
           ...this.lastState,
           at: ev.at,
-          nifty: clamp(ev.payload.nifty, 15000, 40000),
-          sensex: clamp(ev.payload.sensex, 50000, 120000),
+          pse-index: clamp(ev.payload.pse-index, 15000, 40000),
+          pse-composite: clamp(ev.payload.pse-composite, 50000, 120000),
           bankNifty: clamp(ev.payload.bankNifty, 25000, 80000),
         };
       }

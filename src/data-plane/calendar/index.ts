@@ -1,8 +1,8 @@
 export {
-  IndiaTradingCalendar,
+  PSETradingCalendar,
   indiaTradingCalendar,
   isMarketHour,
-} from './IndiaTradingCalendar';
+} from './PSETradingCalendar';
 
 export {
   getEodDate,

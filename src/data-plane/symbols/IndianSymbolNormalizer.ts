@@ -5,7 +5,7 @@
 // No side effects, no I/O.  Can be used on the client or the server.
 // ─────────────────────────────────────────────────────────────────────────────
 
-import type { IndianExchange, IndianInstrumentSegment } from './IndianEquitySymbol';
+import type { IndianExchange, IndianInstrumentSegment } from './PSESymbol';
 
 // ---------------------------------------------------------------------------
 // Suffix / prefix patterns for known Indian ticker formats
@@ -72,12 +72,12 @@ export function normalizeTicker(raw: string): string {
   let s = raw.trim();
 
   // Strip known prefixes
-  for (const pat of PREFIX_PATTERNS) {
+  for (const pat of PREFIX_PATTE) {
     s = s.replace(pat, '');
   }
 
   // Strip known suffixes
-  for (const pat of SUFFIX_PATTERNS) {
+  for (const pat of SUFFIX_PATTE) {
     s = s.replace(pat, '');
   }
 

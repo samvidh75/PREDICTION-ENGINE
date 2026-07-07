@@ -88,7 +88,7 @@ export function validateChatQuery(query: string): ChatGuardrailResult {
   }
 
   // Check forbidden patterns
-  for (const pattern of FORBIDDEN_QUERY_PATTERNS) {
+  for (const pattern of FORBIDDEN_QUERY_PATTE) {
     if (pattern.test(trimmed)) {
       return {
         allowed: false,
@@ -98,7 +98,7 @@ export function validateChatQuery(query: string): ChatGuardrailResult {
   }
 
   // Check injection patterns
-  for (const pattern of INJECTION_PATTERNS) {
+  for (const pattern of INJECTION_PATTE) {
     if (pattern.test(trimmed)) {
       return {
         allowed: false,
@@ -152,7 +152,7 @@ export function sanitizeChatOutput(text: string): string {
     /\bprice\s+target\b/gi,
   ];
 
-  for (const pattern of DANGEROUS_PATTERNS) {
+  for (const pattern of DANGEROUS_PATTE) {
     safe = safe.replace(pattern, '');
   }
 

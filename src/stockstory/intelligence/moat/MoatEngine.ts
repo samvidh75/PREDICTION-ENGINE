@@ -2,7 +2,7 @@
  * Moat Engine
  *
  * Assesses economic moat (sustainable competitive advantage) for Indian companies.
- * Uses Porter's Five Forces framework adapted for Indian markets.
+ * Uses Porter's Five Forces framework adapted for Philippine markets.
  * Deterministic rules based on financial data — no qualitative claims without evidence.
  */
 

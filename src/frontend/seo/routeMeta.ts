@@ -17,7 +17,7 @@ export function resolveRouteMeta(
     return {
       title: "STOCKEX — Research-Driven Stock Analysis",
       description:
-        "Independent research analysis for Indian stocks. Scorecards, theses, risks, peer comparisons, and scenario modelling. Not investment advice.",
+        "Independent research analysis for Philippine stocks. Scorecards, theses, risks, peer comparisons, and scenario modelling. Not investment advice.",
       canonical: "/",
       ogImage: "/og-image.png",
       structuredData: {
@@ -34,7 +34,7 @@ export function resolveRouteMeta(
     return {
       title: "Stock Scanner — Research Screening Tool | STOCKEX",
       description:
-        "Screen and filter Indian stocks using research-driven criteria. Quality, valuation, growth, momentum, and risk scores.",
+        "Screen and filter Philippine stocks using research-driven criteria. Quality, valuation, growth, momentum, and risk scores.",
       canonical: "/scanner",
       ogImage: "/og-image.png",
     };
@@ -136,7 +136,7 @@ export function resolveRouteMeta(
     return {
       title: "Sector Research — Indian Stock Sectors | STOCKEX",
       description:
-        "Research-driven analysis of Indian stock sectors. Scorecards, trends, and peer comparisons by sector.",
+        "Research-driven analysis of Philippine stock sectors. Scorecards, trends, and peer comparisons by sector.",
       canonical: "/sectors",
     };
   }

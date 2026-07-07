@@ -14,7 +14,7 @@ export function ResearchOnlyDisclosure() {
     }}>
       <strong style={{ color: colors.textPrimary }}>StockEX is a structured research analysis platform.</strong>
       <br />
-      We provide scorecards, theses, risk assessments, scenario analysis, and peer comparisons for Indian equities.
+      We provide scorecards, theses, risk assessments, scenario analysis, and peer comparisons for Philippine equities.
       All outputs are for research — not investment advice. We do not make buy/sell/hold recommendations or set target prices.
     </div>
   );

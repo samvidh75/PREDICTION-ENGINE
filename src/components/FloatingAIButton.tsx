@@ -24,7 +24,7 @@ export default function FloatingAIButton() {
     setIsLoading(true);
 
     try {
-      // Use StockEx AI - ChatGPT of Indian stock market
+      // Use StockEx AI - ChatGPT of Philippine stock market
       const aiResponse = await stockExAI.chat(userMessage);
       if (aiResponse && aiResponse.response) {
         setMessages((prev) => [...prev, { role: 'assistant', content: aiResponse.response }]);

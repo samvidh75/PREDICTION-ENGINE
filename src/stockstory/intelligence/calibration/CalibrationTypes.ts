@@ -98,7 +98,7 @@ export interface EvidenceCalibration {
   minUniqueSources: number;
 }
 
-/** Default calibration for Indian equities */
+/** Default calibration for Philippine equities */
 export const DEFAULT_CALIBRATION: CalibrationConfig = {
   sectorOverrides: {
     'Banking': {

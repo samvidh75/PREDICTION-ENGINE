@@ -29,7 +29,7 @@ export function useScrollReveal(scopeRef?: React.RefObject<HTMLElement | null>) 
           observerRef.current?.unobserve(entry.target);
         }
       }
-    }, OBSERVER_OPTIONS);
+    }, OBSERVER_OPTI);
 
     const root = scopeRef?.current ?? document.documentElement;
     const elements = root.querySelectorAll(REVEAL_SELECTOR);

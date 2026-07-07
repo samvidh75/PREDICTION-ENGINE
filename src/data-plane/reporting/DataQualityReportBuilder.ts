@@ -10,10 +10,10 @@
 // All computations are deterministic — no network calls.
 // ─────────────────────────────────────────────────────────────────────────────
 
-import type { IndianEquitySymbol, IndianExchange, IndianInstrumentSegment } from '../symbols/IndianEquitySymbol';
+import type { PSESymbol, IndianExchange, IndianInstrumentSegment } from '../symbols/PSESymbol';
 import type { IndianEodCandle } from '../eod/IndianEodCandle';
 import { validateEodCandle } from '../eod/IndianEodCandle';
-import type { IndiaTradingCalendar } from '../calendar/IndiaTradingCalendar';
+import type { PSETradingCalendar } from '../calendar/PSETradingCalendar';
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
@@ -67,7 +67,7 @@ export interface DataQualityReport {
 
 // ── Symbol health ───────────────────────────────────────────────────────────
 
-export function buildSymbolHealthSummary(symbols: IndianEquitySymbol[]): SymbolHealthSummary {
+export function buildSymbolHealthSummary(symbols: PSESymbol[]): SymbolHealthSummary {
   const byExchange: Record<string, number> = {};
   const bySegment: Record<string, number> = {};
   const byCapCategory: Record<string, number> = {};
@@ -171,7 +171,7 @@ export function buildEodQualitySummary(candles: IndianEodCandle[]): EodQualitySu
 
 // ── Calendar coverage ───────────────────────────────────────────────────────
 
-export function buildCalendarCoverageSummary(calendar: IndiaTradingCalendar): CalendarCoverageSummary {
+export function buildCalendarCoverageSummary(calendar: PSETradingCalendar): CalendarCoverageSummary {
   const holidayList = calendar.getHolidays();
   const tradingDaysInRange = holidayList.length > 0 ? 248 : 0; // Approx NSE trading days
   const holidays = holidayList.length;
@@ -200,7 +200,7 @@ export function buildCalendarCoverageSummary(calendar: IndiaTradingCalendar): Ca
 // ── Universe overlap ────────────────────────────────────────────────────────
 
 export function buildUniverseOverlapSummary(
-  universes: Map<string, IndianEquitySymbol[]>,
+  universes: Map<string, PSESymbol[]>,
 ): UniverseOverlapSummary {
   const universeNames = [...universes.keys()];
   const sizeByUniverse: Record<string, number> = {};
@@ -209,7 +209,7 @@ export function buildUniverseOverlapSummary(
   }
 
   // Common symbols: symbols present in ALL universes
-  const symbolSets = [...universes.values()].map((arr: IndianEquitySymbol[]) => new Set(arr.map(s => s.canonicalSymbol)));
+  const symbolSets = [...universes.values()].map((arr: PSESymbol[]) => new Set(arr.map(s => s.canonicalSymbol)));
   const commonSymbols = symbolSets.length > 0
     ? [...symbolSets[0]].filter(s => symbolSets.every(set => set.has(s)))
     : [];
@@ -224,10 +224,10 @@ export function buildUniverseOverlapSummary(
 // ── Full report builder ─────────────────────────────────────────────────────
 
 export function buildFullDataQualityReport(
-  symbols: IndianEquitySymbol[],
+  symbols: PSESymbol[],
   candles: IndianEodCandle[] | null,
-  calendar: IndiaTradingCalendar | null,
-  universes: Map<string, IndianEquitySymbol[]> | null,
+  calendar: PSETradingCalendar | null,
+  universes: Map<string, PSESymbol[]> | null,
 ): DataQualityReport {
   const notes: string[] = [];
 

@@ -21,7 +21,7 @@ export async function chatRoutes(fastify: FastifyInstance) {
 
     const systemPrompt =
       `You are the official fine-tuned StockEX Encyclopedia running serverless on Cloudflare. ` +
-      `Provide deterministic, mathematically accurate reference data for Indian equity: ${symbol}. ` +
+      `Provide deterministic, mathematically accurate reference data for PSE equity: ${symbol}. ` +
       `Answer user queries using exactly two sentences based on structural market parameters.`;
 
     try {

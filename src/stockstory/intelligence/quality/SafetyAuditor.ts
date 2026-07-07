@@ -22,7 +22,7 @@ const FAKE_DATA_PATTERNS = [
   'sampleSymbol', 'exampleSymbol',
 ];
 
-/** US stock symbols that should not appear in Indian equity output */
+/** US stock symbols that should not appear in PSE equity output */
 const US_SYMBOLS = ['AAPL', 'GOOGL', 'MSFT', 'AMZN', 'TSLA', 'META', 'NVDA'];
 
 const HALLUCINATION_RISK_PATTERNS = [
@@ -46,13 +46,13 @@ export class SafetyAuditor {
     for (const p of FORBIDDEN_BACKEND_PHRASES) {
       this.forbiddenBackend.push({ phrase: p, category: 'backend' });
     }
-    for (const p of FAKE_DATA_PATTERNS) {
+    for (const p of FAKE_DATA_PATTE) {
       this.fakeDataPatterns.push({ phrase: p.toLowerCase(), category: 'fake_data' });
     }
     for (const p of US_SYMBOLS) {
       this.usSymbols.push({ phrase: p, category: 'fake_data' });
     }
-    for (const p of HALLUCINATION_RISK_PATTERNS) {
+    for (const p of HALLUCINATION_RISK_PATTE) {
       this.hallucinationPatterns.set(p.toLowerCase(), 'hallucination_risk');
     }
   }

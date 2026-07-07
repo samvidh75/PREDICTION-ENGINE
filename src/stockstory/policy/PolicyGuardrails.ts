@@ -74,7 +74,7 @@ export interface PolicyCheckResult {
 
 export class PolicyGuardrails {
   check(text: string, context?: string): PolicyCheckResult {
-    for (const exception of ALLOWED_EXCEPTIONS) {
+    for (const exception of ALLOWED_EXCEPTI) {
       if (context && exception.test(context)) {
         return { blocked: false };
       }

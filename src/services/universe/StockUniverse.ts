@@ -1,4 +1,4 @@
-// Curated Nifty 50 universe — symbols only, no prices or fabricated scores.
+// Curated PSE Index universe — symbols only, no prices or fabricated scores.
 // Used by public scanner flows for batch pipeline runs.
 
 export const NIFTY50_SYMBOLS: string[] = [

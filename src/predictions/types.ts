@@ -135,9 +135,9 @@ export interface StatisticalValidation {
 
 export interface BenchmarkObservation {
   date: string;
-  nifty50: number;
-  nifty100: number;
-  nifty500: number;
+  pse-index50: number;
+  pse-index100: number;
+  pse-index500: number;
 }
 
 export interface PredictionCredibilityScore {

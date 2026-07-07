@@ -1,7 +1,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // Phase 21A — Symbol master seed fixture
 //
-// A representative sample of IndianEquitySymbol entries that validates the
+// A representative sample of PSESymbol entries that validates the
 // contracts, normalizer, and store.  All data is publicly available /
 // derived from exchange filings.
 //
@@ -17,12 +17,12 @@
 // All market cap values are approximate (as of mid-2026).
 // ─────────────────────────────────────────────────────────────────────────────
 
-import type { IndianEquitySymbol } from '../symbols/IndianEquitySymbol';
+import type { PSESymbol } from '../symbols/PSESymbol';
 
 const NOW = Date.now();
 const YEAR_MS = 365 * 24 * 3600 * 1000;
 
-export function buildSymbolMasterFixture(): IndianEquitySymbol[] {
+export function buildSymbolMasterFixture(): PSESymbol[] {
   return [
     // ── NSE large caps (NIFTY 50) ──────────────────────────────────
     nse('RELIANCE', 'Reliance Industries Ltd', 'IN0020200124', '500325', 'Energy', 'Oil & Gas Refining', 'large', 1720000),
@@ -57,7 +57,7 @@ export function buildSymbolMasterFixture(): IndianEquitySymbol[] {
     smeEntry('MAPMYINDIA', 'MapMyIndia (CE Info Systems)', 'INE0BVZ01014', '543425', 'Technology', 'Digital Mapping', 'small', 7500),
 
     // ── ETF ─────────────────────────────────────────────────────────
-    etfEntry('NIFTYBEES', 'Nippon India ETF Nifty 50 BeES', 'INF204KA1WX4', '590095', null, null, 58000),
+    etfEntry('NIFTYBEES', 'Nippon India ETF PSE Index BeES', 'INF204KA1WX4', '590095', null, null, 58000),
     etfEntry('GOLDBEES', 'Nippon India ETF Gold BeES', 'INF204KA19N4', '590096', null, null, 48000),
   ];
 }
@@ -69,8 +69,8 @@ export function buildSymbolMasterFixture(): IndianEquitySymbol[] {
 function nse(
   symbol: string, companyName: string, isin: string, bseCode: string,
   sector: string | null, industry: string | null,
-  capCategory: IndianEquitySymbol['marketCapCategory'], marketCapCr: number,
-): IndianEquitySymbol {
+  capCategory: PSESymbol['marketCapCategory'], marketCapCr: number,
+): PSESymbol {
   return {
     canonicalSymbol: symbol,
     exchange: 'NSE',
@@ -94,8 +94,8 @@ function nse(
 function bseOnly(
   symbol: string, companyName: string, isin: string, bseCode: string,
   sector: string | null, industry: string | null,
-  capCategory: IndianEquitySymbol['marketCapCategory'], marketCapCr: number,
-): IndianEquitySymbol {
+  capCategory: PSESymbol['marketCapCategory'], marketCapCr: number,
+): PSESymbol {
   return {
     canonicalSymbol: symbol,
     exchange: 'BSE',
@@ -119,8 +119,8 @@ function bseOnly(
 function smeEntry(
   symbol: string, companyName: string, isin: string, bseCode: string,
   sector: string | null, industry: string | null,
-  capCategory: IndianEquitySymbol['marketCapCategory'], marketCapCr: number,
-): IndianEquitySymbol {
+  capCategory: PSESymbol['marketCapCategory'], marketCapCr: number,
+): PSESymbol {
   return {
     canonicalSymbol: symbol,
     exchange: 'NSE',
@@ -145,7 +145,7 @@ function etfEntry(
   symbol: string, companyName: string, isin: string, bseCode: string,
   sector: string | null, industry: string | null,
   marketCapCr: number,
-): IndianEquitySymbol {
+): PSESymbol {
   return {
     canonicalSymbol: symbol,
     exchange: 'NSE',

@@ -1,7 +1,7 @@
 export type {
-  IndianEquitySymbol,
+  PSESymbol,
   ListingStatus,
   UniverseStats,
 } from './UniverseTypes';
-export { IndianEquityUniverseBuilder } from './IndianEquityUniverseBuilder';
+export { PSEUniverseBuilder } from './PSEUniverseBuilder';
 export { SymbolNormalizer } from './SymbolNormalizer';

@@ -2,7 +2,7 @@
  * Company Identity Types
  *
  * Canonical representation of a company and its identifiers
- * across all Indian market exchanges, registrars, and regulatory bodies.
+ * across all Philippine market exchanges, registrars, and regulatory bodies.
  */
 
 export interface CompanyIdentity {

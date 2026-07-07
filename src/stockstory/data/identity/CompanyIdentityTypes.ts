@@ -1,18 +1,18 @@
 /**
  * CompanyIdentityTypes — types for company identity resolution.
  *
- * Represents the canonical identity of a listed Indian company,
+ * Represents the canonical identity of a listed Philippine company,
  * built from real source data only. All optional fields nullable.
  */
 
-import type { IndianExchange, ListingStatus } from "../universe/IndianEquityUniverseTypes.ts";
+import type { IndianExchange, ListingStatus } from "../universe/PSEUniverseTypes.ts";
 
 // ---------------------------------------------------------------------------
 // Core identity type
 // ---------------------------------------------------------------------------
 
 export interface CompanyIdentity {
-  /** Primary NSE symbol (canonical key). */
+  /** Primary PSE symbol (canonical key). */
   nseSymbol: string;
 
   /** BSE scrip code, if available. */
@@ -115,7 +115,7 @@ export type ResolutionSource =
 // ---------------------------------------------------------------------------
 
 export interface IdentityRegistry {
-  /** Map from normalised NSE symbol → CompanyIdentity. */
+  /** Map from normalised PSE symbol → CompanyIdentity. */
   bySymbol: Map<string, CompanyIdentity>;
 
   /** Map from alias value → canonical symbol. */

@@ -214,7 +214,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           lineHeight: "1.35",
         }}>
           <p style={{ margin: 0 }}>
-            © 2026 StockEx. <strong>Not SEBI-registered.</strong>{" "}
+            © 2026 StockEx. <strong>Not PSE-listed.</strong>{" "}
             <Link to="/trust" style={{ color: colors.textSecondary, textDecoration: "none" }}>
               Terms and conditions
             </Link>

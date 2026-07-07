@@ -154,7 +154,7 @@ ${stock.analysis.pros.slice(0, 2).map(p => `  ✓ ${p}`).join('\n')}`;
         `• Shows what investors pay for every rupee of earnings\n` +
         `• Low P/E (10-15x): May be undervalued or risky\n` +
         `• High P/E (25-35x): Growth potential or overvalued\n` +
-        `• Typical Indian market: 15-22x\n\n` +
+        `• Typical Philippine market: 15-22x\n\n` +
         `Don't rely on P/E alone - always check:\n` +
         `• Company growth rate\n` +
         `• Return on equity (ROE)\n` +
@@ -224,8 +224,8 @@ ${stock.analysis.pros.slice(0, 2).map(p => `  ✓ ${p}`).join('\n')}`;
     const response = `📈 **Market Snapshot**\n\n` +
       `**Market Status**: Strong Bull Trend with Consolidation\n\n` +
       `**Indices Performance**\n` +
-      `• Nifty 50: 24,500 (↑2.3% YTD)\n` +
-      `• Sensex: 80,200 (↑2.5% YTD)\n` +
+      `• PSE Index: 24,500 (↑2.3% YTD)\n` +
+      `• PSE Composite: 80,200 (↑2.5% YTD)\n` +
       `• Nifty Midcap: 34,100 (↑4.2% YTD)\n\n` +
       `**Sector Rotation**\n` +
       `🔴 Banking: Strong (IT demand recovering)\n` +

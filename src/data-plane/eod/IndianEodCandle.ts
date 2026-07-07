@@ -1,11 +1,11 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // Phase 21A — Indian EOD candle contract and validator
 //
-// Typed representation of a single daily price record for an Indian equity.
+// Typed representation of a single daily price record for an PSE equity.
 // Every candle in the system MUST conform to this interface.
 // ─────────────────────────────────────────────────────────────────────────────
 
-import type { IndianExchange } from '../symbols/IndianEquitySymbol';
+import type { IndianExchange } from '../symbols/PSESymbol';
 
 // ---------------------------------------------------------------------------
 // Contract

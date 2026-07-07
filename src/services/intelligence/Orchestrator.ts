@@ -244,7 +244,7 @@ export class MasterOrchestrator {
       bearCase.push('No significant bearish flags — overall risk profile appears manageable.');
     }
 
-    // Apply SEBI compliance filter to all thesis text
+    // Apply PSE compliance filter to all thesis text
     return {
       bullCase: SEBIFilter.filterThesisArray(bullCase.slice(0, 4)),
       bearCase: SEBIFilter.filterThesisArray(bearCase.slice(0, 4)),

@@ -122,8 +122,8 @@ export function recordAction(
   }
 
   // Trim
-  if (state.actions.length > MAX_ACTIONS) {
-    state.actions = state.actions.slice(-MAX_ACTIONS);
+  if (state.actions.length > MAX_ACTI) {
+    state.actions = state.actions.slice(-MAX_ACTI);
   }
 
   saveState(state);

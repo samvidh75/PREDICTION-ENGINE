@@ -6,7 +6,7 @@ import { marketTimestampFromEpoch, normalizeYahooExchange } from './YahooProvide
 /** Resolve a Yahoo ticker without appending duplicate exchange suffixes. */
 export function resolveYahooQuoteTicker(symbol: string): string {
   const normalized = symbol.trim().toUpperCase();
-  return /\.(NS|BO)$/.test(normalized) ? normalized : `${normalized}.NS`;
+  return /\.(NS)$/.test(normalized) ? normalized : `${normalized}.NS`;
 }
 
 function finiteNumber(value: unknown): number | undefined {
@@ -41,7 +41,7 @@ export class YahooFinancePriceProvider implements PriceProvider {
     }
 
     return {
-      symbol: String(result.symbol ?? ticker).replace(/\.(NS|BO)$/i, '').toUpperCase(),
+      symbol: String(result.symbol ?? ticker).replace(/\.(NS)$/i, '').toUpperCase(),
       exchange: normalizeYahooExchange(result.fullExchangeName ?? result.exchange, String(result.symbol ?? ticker)) ?? 'Data unavailable',
       price,
       change: finiteNumber(result.regularMarketChange) ?? 0,

@@ -2,30 +2,29 @@ import type { UnifiedQuote, QuoteResult } from './types';
 import { browserCache } from './BrowserCache';
 
 /**
- * NSE client for live Indian stock prices.
- * Primary: jugasad API (if configured)
- * Fallback: screener.in data via ScreenerClient
+ * PSE (Philippine Stock Exchange) Client
+ * Fetches live Philippine stock prices from yfinance and fallback providers.
  */
-export class NSEClient {
-  private readonly baseUrl = (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_NSE_PROXY_URL) || 'https://api.jugasad.io/nse';
+export class PSEClient {
+  private readonly yfinanceBaseUrl = 'https://query1.finance.yahoo.com';
   private lastError: Error | null = null;
 
   /**
-   * Fetch NSE quote for Indian symbol (auto-adds .NS if not present).
+   * Fetch PSE quote (auto-adds .PSE if not present).
    */
   async fetchQuote(symbol: string, useCache = true): Promise<QuoteResult> {
-    const nseSymbol = this.toNSESymbol(symbol);
+    const pseSymbol = this.toPSESymbol(symbol);
 
     // Check cache first
     if (useCache) {
-      const cached = await browserCache.get(nseSymbol);
+      const cached = await browserCache.get(pseSymbol);
       if (cached) {
         return { success: true, quote: { ...cached, cached: true } };
       }
     }
 
     try {
-      const quote = await this.fetchFromJugasad(nseSymbol);
+      const quote = await this.fetchFromYFinance(pseSymbol);
       await browserCache.set(quote);
       return { success: true, quote };
     } catch (error) {
@@ -35,7 +34,7 @@ export class NSEClient {
         error: {
           symbol,
           error: this.lastError.message,
-          source: 'jugasad',
+          source: 'yfinance',
           timestamp: Date.now(),
         },
       };
@@ -43,7 +42,7 @@ export class NSEClient {
   }
 
   /**
-   * Batch fetch from NSE with concurrency limiting.
+   * Batch fetch from PSE with concurrency limiting.
    */
   async fetchBatch(symbols: string[]): Promise<Array<{ symbol: string; quote?: UnifiedQuote; error?: string }>> {
     const concurrency = 3;
@@ -64,101 +63,74 @@ export class NSEClient {
   }
 
   /**
-   * Internal: fetch from jugasad API.
-   * jugasad exposes NSE API via simple HTTP wrapper.
+   * Internal: fetch from yfinance API.
    */
-  private async fetchFromJugasad(symbol: string): Promise<UnifiedQuote> {
-    // Try local proxy first (for development)
-    const endpoints = [
-      `${this.baseUrl}/quote/${symbol}`, // configured proxy
-      `https://api.jugasad.io/nse/quote/${symbol}`, // fallback public API
-    ];
-
-    let lastError: Error | null = null;
-
-    for (const url of endpoints) {
-      try {
-        const response = await fetch(url, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'User-Agent': 'StockStory/1.0',
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}`);
+  private async fetchFromYFinance(symbol: string): Promise<UnifiedQuote> {
+    try {
+      const response = await fetch(
+        `${this.yfinanceBaseUrl}/v10/finance/quoteSummary/${symbol}?modules=price`,
+        {
+          headers: { 'User-Agent': 'Mozilla/5.0' },
         }
+      );
 
-        const data = (await response.json()) as NSEQuoteResponse;
-        return this.parseNSEResponse(symbol, data);
-      } catch (error) {
-        lastError = error instanceof Error ? error : new Error(String(error));
-        continue;
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
       }
-    }
 
-    throw lastError || new Error('All NSE endpoints failed');
+      const data = await response.json();
+      const priceData = data.quoteSummary?.result?.[0]?.price;
+
+      if (!priceData) {
+        throw new Error(`No price data for ${symbol}`);
+      }
+
+      return this.parseYFinanceResponse(symbol, priceData);
+    } catch (error) {
+      throw error instanceof Error ? error : new Error(String(error));
+    }
   }
 
   /**
-   * Parse jugasad/NSE response into UnifiedQuote.
+   * Parse yfinance response into UnifiedQuote.
    */
-  private parseNSEResponse(symbol: string, data: NSEQuoteResponse): UnifiedQuote {
-    const quote = data.data || {};
-
-    if (!quote.lastPrice) {
-      throw new Error(`No price data for ${symbol}`);
-    }
+  private parseYFinanceResponse(symbol: string, data: any): UnifiedQuote {
+    const price = parseFloat(data.regularMarketPrice?.raw || 0);
+    const previousClose = parseFloat(data.regularMarketPreviousClose?.raw || price);
+    const change = price - previousClose;
+    const changePercent = previousClose > 0 ? (change / previousClose) * 100 : 0;
 
     return {
       symbol,
-      exchange: 'NSE',
+      exchange: 'PSE',
       timestamp: Date.now(),
-      price: quote.lastPrice,
-      open: quote.openPrice || 0,
-      high: quote.dayHigh || 0,
-      low: quote.dayLow || 0,
-      close: quote.previousClose || 0,
-      volume: quote.totalTradedVolume || 0,
-      bid: quote.bidPrice,
-      ask: quote.askPrice,
-      bidSize: quote.bidQty,
-      askSize: quote.askQty,
-      change: (quote.lastPrice || 0) - (quote.previousClose || 0),
-      changePercent: quote.pChange || 0,
-      source: 'jugasad',
+      price,
+      open: parseFloat(data.regularMarketOpen?.raw || 0),
+      high: parseFloat(data.fiftyTwoWeekHigh?.raw || 0),
+      low: parseFloat(data.fiftyTwoWeekLow?.raw || 0),
+      close: previousClose,
+      volume: data.regularMarketVolume?.raw || 0,
+      bid: parseFloat(data.bid?.raw || 0),
+      ask: parseFloat(data.ask?.raw || 0),
+      bidSize: data.bidSize || 0,
+      askSize: data.askSize || 0,
+      change,
+      changePercent,
+      source: 'yfinance',
       fetched: Date.now(),
       cached: false,
     };
   }
 
   /**
-   * Convert symbol to NSE format (e.g., "RELIANCE" → "RELIANCE.NS").
+   * Convert symbol to PSE format (e.g., "BDO" → "BDO.PSE").
    */
-  private toNSESymbol(symbol: string): string {
+  private toPSESymbol(symbol: string): string {
     const upper = symbol.toUpperCase();
     if (upper.includes('.')) return upper;
-    return `${upper}.NS`;
+    return `${upper}.PSE`;
   }
 }
 
-interface NSEQuoteResponse {
-  data?: {
-    symbol?: string;
-    lastPrice?: number;
-    openPrice?: number;
-    dayHigh?: number;
-    dayLow?: number;
-    previousClose?: number;
-    totalTradedVolume?: number;
-    bidPrice?: number;
-    askPrice?: number;
-    bidQty?: number;
-    askQty?: number;
-    pChange?: number; // percentage change
-  };
-}
-
 // Singleton
-export const nseClient = new NSEClient();
+export const pseClient = new PSEClient();

@@ -6,7 +6,7 @@
 export const RESEARCH_ONLY_DISCLAIMER = 
   'This platform provides research scores, factor rankings, and historical observations. ' +
   'Nothing on this platform constitutes investment advice, buy/sell recommendations, ' +
-  'or price targets. Users must consult a SEBI-registered investment adviser before ' +
+  'or price targets. Users must consult a PSE-listed investment adviser before ' +
   'making any investment decisions. Model outputs are based on historical data and ' +
   'do not guarantee future performance.';
 

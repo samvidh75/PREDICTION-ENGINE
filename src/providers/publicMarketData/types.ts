@@ -1,7 +1,7 @@
 export type ProviderDomain =
   | "quote"
   | "historical"
-  | "bhavcopy"
+  | "pse-daily"
   | "index"
   | "index_quote"
   | "fundamentals"

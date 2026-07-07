@@ -124,7 +124,7 @@ export class ProductEventValidator {
     if (event.metadata && typeof event.metadata === 'object') {
       const meta = event.metadata as Record<string, unknown>;
       for (const [k, v] of Object.entries(meta)) {
-        for (const pii of PII_PATTERNS) {
+        for (const pii of PII_PATTE) {
           if (pii.test(k) || (typeof v === 'string' && pii.test(v))) {
             warnings.push({
               field: `metadata.${k}`,

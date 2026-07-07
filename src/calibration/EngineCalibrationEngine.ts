@@ -225,7 +225,7 @@ export class EngineCalibrationEngine {
   private detectScoreInflation(records: PredictionRecord[]): CalibrationIssue[] {
     const issues: CalibrationIssue[] = [];
 
-    for (const { engine, column } of ENGINE_SCORE_COLUMNS) {
+    for (const { engine, column } of ENGINE_SCORE_COLU) {
       const scores = records
         .map(r => r[column] as number)
         .filter(s => s !== null && s !== undefined);
@@ -256,7 +256,7 @@ export class EngineCalibrationEngine {
   private detectScoreCompression(records: PredictionRecord[]): CalibrationIssue[] {
     const issues: CalibrationIssue[] = [];
 
-    for (const { engine, column } of ENGINE_SCORE_COLUMNS) {
+    for (const { engine, column } of ENGINE_SCORE_COLU) {
       const scores = records
         .map(r => r[column] as number)
         .filter(s => s !== null && s !== undefined);

@@ -5,9 +5,9 @@ import { resolveYahooQuoteTicker } from './YahooFinancePriceProvider';
 describe('Yahoo quote trust helpers', () => {
   it('normalizes exchange only from source labels or resolved ticker evidence', () => {
     expect(normalizeYahooExchange('NSE')).toBe('NSE');
-    expect(normalizeYahooExchange('National Stock Exchange of India')).toBe('NSE');
+    expect(normalizeYahooExchange('Philippine Stock Exchange of India')).toBe('NSE');
     expect(normalizeYahooExchange('BSE')).toBe('BSE');
-    expect(normalizeYahooExchange('Bombay Stock Exchange')).toBe('BSE');
+    expect(normalizeYahooExchange('Philippine Stock Exchange')).toBe('BSE');
     expect(normalizeYahooExchange(undefined, 'RELIANCE.NS')).toBe('NSE');
     expect(normalizeYahooExchange(undefined, 'RELIANCE.BO')).toBe('BSE');
     expect(normalizeYahooExchange('NASDAQ', 'RELIANCE')).toBeUndefined();

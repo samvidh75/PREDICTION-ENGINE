@@ -120,7 +120,7 @@ export default function StockStoryPage() {
           marginLeft: 'auto',
           marginRight: 'auto',
         }}>
-          We're building the research platform for Indian stock investors who believe in data-driven decisions.
+          We're building the research platform for Philippine stock investors who believe in data-driven decisions.
         </p>
       </div>
 
@@ -139,7 +139,7 @@ export default function StockStoryPage() {
             {
               icon: <TrendingUp size={32} />,
               title: 'Real Data',
-              desc: 'Live NSE/BSE data, calculated scores, not predictions',
+              desc: 'Live PSE data, calculated scores, not predictions',
             },
             {
               icon: <Shield size={32} />,
@@ -204,9 +204,9 @@ export default function StockStoryPage() {
           gap: '20px',
         }}>
           {[
-            { title: 'NSE Stocks', items: '1,500+ stocks', icon: '📈' },
-            { title: 'BSE Stocks', items: '500+ stocks', icon: '📊' },
-            { title: 'SME Listed', items: '200+ companies', icon: '🏢' },
+            { title: 'PSE Stocks', items: '18 main stocks', icon: '📈' },
+            { title: 'PSE Stocks', items: '18 stocks', icon: '📊' },
+            { title: 'SME Listed', items: '18 companies', icon: '🏢' },
             { title: 'Technical Analysis', items: 'Charting & Indicators', icon: '📉' },
           ].map((market, i) => (
             <div
@@ -259,7 +259,7 @@ export default function StockStoryPage() {
             {
               step: '1',
               title: 'Search Any Stock',
-              desc: 'Find NSE, BSE, or SME companies with typo correction',
+              desc: 'Find PSE companies with typo correction',
             },
             {
               step: '2',
@@ -336,7 +336,7 @@ export default function StockStoryPage() {
           fontSize: 'clamp(14px, 3vw, 18px)',
           color: colors.textSecondary,
         }}>
-          Start with 1,500+ stocks and real-time market data
+          Start with 18 main stocks and real-time market data
         </p>
 
         <button

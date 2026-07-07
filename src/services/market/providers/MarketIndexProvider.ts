@@ -3,7 +3,7 @@ import type { MarketState } from "../../../types/MarketState";
 export type MarketConnectionStatus = "disconnected" | "connecting" | "connected" | "reconnecting";
 
 export type MarketIndexEvent =
-  | { type: "market_prices"; at: number; payload: { nifty: number; sensex: number; bankNifty: number } }
+  | { type: "market_prices"; at: number; payload: { pse-index: number; pse-composite: number; bankNifty: number } }
   | { type: "market_volatility"; at: number; payload: { vix: number } }
   | { type: "market_breadth"; at: number; payload: { breadthPct: number } }
   | { type: "institutional_flows"; at: number; payload: { fiiDiiTone: number } }

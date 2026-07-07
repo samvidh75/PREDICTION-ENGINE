@@ -1,7 +1,7 @@
 /**
- * UpstoxFundamentalsProvider — Indian equity fundamentals via Upstox Fundamentals API.
+ * UpstoxFundamentalsProvider — PSE equity fundamentals via Upstox Fundamentals API.
  *
- * TRACK-8E: Tier 1 FinancialProvider — primary source for Indian equity fundamentals.
+ * TRACK-8E: Tier 1 FinancialProvider — primary source for PSE equity fundamentals.
  *   Free with your Upstox account. Guaranteed Indian coverage. Already authenticated.
  *
  * Endpoints used:

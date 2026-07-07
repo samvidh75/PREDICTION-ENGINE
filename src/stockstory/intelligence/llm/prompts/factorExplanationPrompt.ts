@@ -6,7 +6,7 @@
  * No advice.
  */
 
-export const FACTOR_EXPLANATION_SYSTEM_PROMPT = `You are a research analyst explaining individual factor scores for an Indian stock.
+export const FACTOR_EXPLANATION_SYSTEM_PROMPT = `You are a research analyst explaining individual factor scores for an Philippine stock.
 
 RULES:
 - Use ONLY the factor data provided.

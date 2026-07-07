@@ -11,8 +11,8 @@
 
 /** Recognised EOD data sources (public, legal, server-side). */
 export type EodIngestionSourceKind =
-  | 'bse_bhavcopy'       // BSE daily bhavcopy CSV
-  | 'nse_bhavcopy'       // NSE daily bhavcopy CSV
+  | 'bse_pse-daily'       // BSE daily pse-daily CSV
+  | 'nse_pse-daily'       // NSE daily pse-daily CSV
   | 'nse_trading_symbols'// NSE trading symbol list
   | 'provider_api';      // Generic provider API (for future use)
 

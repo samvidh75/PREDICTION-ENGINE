@@ -126,7 +126,7 @@ describe('normalizeExchange', () => {
   it.each([
     { input: 'NSE', expected: 'NSE' },
     { input: 'BSE', expected: 'BSE' },
-    { input: 'National Stock Exchange', expected: 'NSE' },
+    { input: 'Philippine Stock Exchange', expected: 'NSE' },
     { input: 'bombay stock exchange', expected: 'BSE' },
     { input: 'BOMBAY STOCK EXCHANGE', expected: 'BSE' },
     { input: 'NYSE', expected: 'NYSE' },

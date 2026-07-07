@@ -198,7 +198,7 @@ export class OutcomeValidationEngine {
   ): Promise<number | null> {
     // Try benchmark_observations first
     const benchResult = await pool.query(
-      `SELECT nifty50, observed_date
+      `SELECT pse-index50, observed_date
        FROM benchmark_observations
        WHERE observed_date <= $1
        ORDER BY observed_date DESC
@@ -206,8 +206,8 @@ export class OutcomeValidationEngine {
       [referenceDate],
     );
 
-    if (benchResult.rows.length > 0 && benchResult.rows[0].nifty50 !== null) {
-      return Number(benchResult.rows[0].nifty50);
+    if (benchResult.rows.length > 0 && benchResult.rows[0].pse-index50 !== null) {
+      return Number(benchResult.rows[0].pse-index50);
     }
 
     // Fallback: Try daily_prices for a NIFTY 50 proxy symbol

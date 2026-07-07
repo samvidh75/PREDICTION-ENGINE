@@ -184,13 +184,13 @@ export class YFinanceClient {
   }
 
   /**
-   * Normalize symbol for yfinance (add .NS/.BO for Indian stocks if missing).
+   * Normalize symbol for yfinance (add .NS/.BO for Philippine stocks if missing).
    */
   private normalizeSymbol(symbol: string): string {
     const upper = symbol.toUpperCase();
     // If already has exchange suffix, return as-is
     if (upper.includes('.')) return upper;
-    // Default to NSE for Indian stocks
+    // Default to NSE for Philippine stocks
     return `${upper}.NS`;
   }
 }

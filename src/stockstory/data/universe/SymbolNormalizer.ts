@@ -1,7 +1,7 @@
 /**
  * Symbol Normalizer
  *
- * Normalizes Indian stock symbols to a canonical format.
+ * Normalizes Philippine stock symbols to a canonical format.
  * Handles NSE/BSE differences, common suffix variations,
  * and maps deprecated symbols to current ones.
  */

@@ -1,22 +1,22 @@
 /**
- * Indian Equity Universe Builder
+ * PSE Universe Builder
  *
- * Builds and maintains the canonical stock universe for Indian equities.
+ * Builds and maintains the canonical stock universe for Philippine equities.
  * Normalizes symbols, deduplicates, and tracks listing status.
  * Uses existing data sources only — no invented companies.
  */
 
-import type { IndianEquitySymbol, ListingStatus, UniverseStats } from './UniverseTypes';
+import type { PSESymbol, ListingStatus, UniverseStats } from './UniverseTypes';
 import { SymbolNormalizer } from './SymbolNormalizer';
 import { dataSourceRegistry } from '../sources/DataSourceRegistry';
 
 export interface UniverseProvider {
   name: string;
-  fetchSymbols(): Promise<Partial<IndianEquitySymbol>[]>;
+  fetchSymbols(): Promise<Partial<PSESymbol>[]>;
   available(): boolean;
 }
 
-export class IndianEquityUniverseBuilder {
+export class PSEUniverseBuilder {
   private normalizer = new SymbolNormalizer();
   private providers: UniverseProvider[] = [];
 
@@ -24,9 +24,9 @@ export class IndianEquityUniverseBuilder {
     this.providers = providers;
   }
 
-  async build(): Promise<{ symbols: IndianEquitySymbol[]; stats: UniverseStats; errors: string[] }> {
+  async build(): Promise<{ symbols: PSESymbol[]; stats: UniverseStats; errors: string[] }> {
     const errors: string[] = [];
-    const rawEntries: Partial<IndianEquitySymbol>[] = [];
+    const rawEntries: Partial<PSESymbol>[] = [];
 
     for (const provider of this.providers) {
       if (!provider.available()) continue;
@@ -44,10 +44,10 @@ export class IndianEquityUniverseBuilder {
     return { symbols, stats, errors };
   }
 
-  private mergeAndDeduplicate(entries: Partial<IndianEquitySymbol>[]): IndianEquitySymbol[] {
-    const byISIN = new Map<string, IndianEquitySymbol>();
-    const bySymbol = new Map<string, IndianEquitySymbol>();
-    const byNse = new Map<string, IndianEquitySymbol>();
+  private mergeAndDeduplicate(entries: Partial<PSESymbol>[]): PSESymbol[] {
+    const byISIN = new Map<string, PSESymbol>();
+    const bySymbol = new Map<string, PSESymbol>();
+    const byNse = new Map<string, PSESymbol>();
 
     for (const entry of entries) {
       const normalizedSymbol = this.normalizer.normalize(entry.symbol ?? '');
@@ -60,7 +60,7 @@ export class IndianEquityUniverseBuilder {
         continue;
       }
 
-      // Merge by NSE symbol
+      // Merge by PSE symbol
       const nse = entry.nseSymbol ?? normalizedSymbol;
       if (nse && byNse.has(nse)) {
         this.mergeInto(byNse.get(nse)!, entry);
@@ -73,7 +73,7 @@ export class IndianEquityUniverseBuilder {
         continue;
       }
 
-      const symbol: IndianEquitySymbol = {
+      const symbol: PSESymbol = {
         symbol: normalizedSymbol,
         isin,
         nseSymbol: entry.nseSymbol ?? normalizedSymbol,
@@ -107,7 +107,7 @@ export class IndianEquityUniverseBuilder {
     return result;
   }
 
-  private mergeInto(target: IndianEquitySymbol, source: Partial<IndianEquitySymbol>): void {
+  private mergeInto(target: PSESymbol, source: Partial<PSESymbol>): void {
     if (source.companyName && (!target.companyName || target.companyName === target.symbol)) {
       target.companyName = source.companyName;
     }
@@ -127,7 +127,7 @@ export class IndianEquityUniverseBuilder {
     }
   }
 
-  private inferExchange(entry: Partial<IndianEquitySymbol>): 'NSE' | 'BSE' | 'both' {
+  private inferExchange(entry: Partial<PSESymbol>): 'NSE' | 'BSE' | 'both' {
     if (entry.exchange) return entry.exchange;
     const hasNse = !!(entry.nseSymbol);
     const hasBse = !!(entry.bseCode);
@@ -137,20 +137,20 @@ export class IndianEquityUniverseBuilder {
     return 'NSE'; // default
   }
 
-  private inferStatus(entry: Partial<IndianEquitySymbol>): ListingStatus {
+  private inferStatus(entry: Partial<PSESymbol>): ListingStatus {
     return entry.listingStatus ?? 'active';
   }
 
-  private inferMcapCategory(mcap: number | null | undefined): IndianEquitySymbol['marketCapCategory'] {
+  private inferMcapCategory(mcap: number | null | undefined): PSESymbol['marketCapCategory'] {
     if (mcap === null || mcap === undefined) return 'unknown';
-    // Indian market cap categories (approximate, in crores)
+    // Philippine market cap categories (approximate, in crores)
     if (mcap >= 20000) return 'large';
     if (mcap >= 5000) return 'mid';
     if (mcap >= 500) return 'small';
     return 'micro';
   }
 
-  private computeStats(symbols: IndianEquitySymbol[]): UniverseStats {
+  private computeStats(symbols: PSESymbol[]): UniverseStats {
     const byExchange = { NSE: 0, BSE: 0, both: 0 };
     const byMarketCap: UniverseStats['byMarketCap'] = { large: 0, mid: 0, small: 0, micro: 0, unknown: 0 };
     const bySector: Record<string, number> = {};

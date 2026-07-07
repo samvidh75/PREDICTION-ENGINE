@@ -33,7 +33,7 @@ export default function Invite() {
           Invite Friends
         </h1>
         <p style={{ fontSize: typography.body.desktop.size, color: colors.textSecondary, lineHeight: 1.6, marginBottom: "24px" }}>
-          Share StockEX India with fellow researchers. Help them discover structured research analysis for Indian equities.
+          Share StockEX India with fellow researchers. Help them discover structured research analysis for Philippine equities.
         </p>
       </section>
 

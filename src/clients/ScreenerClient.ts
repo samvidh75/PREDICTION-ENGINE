@@ -14,7 +14,7 @@ export class ScreenerClient {
   private lastError: Error | null = null;
 
   /**
-   * Fetch fundamental data from screener.in for Indian stock.
+   * Fetch fundamental data from screener.in for Philippine stock.
    * Returns: price + fundamental metrics (P/E, ROE, debt/equity, dividend yield).
    */
   async fetchQuote(symbol: string, useCache = true): Promise<{ success: boolean; quote?: UnifiedQuote; error?: string }> {

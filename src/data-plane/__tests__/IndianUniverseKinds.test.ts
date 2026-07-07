@@ -1,14 +1,14 @@
 import { describe, it, expect } from 'vitest';
-import { UNIVERSE_REGISTRY, buildUniverse, getUniverseInfo } from '../universe/IndianUniverseKinds';
+import { UNIVERSE_REGISTRY, buildUniverse, getUniverseInfo } from '../universe/PSEUniverseKinds';
 import type { IndianSymbolMasterStore } from '../symbols/IndianSymbolMasterStore';
-import type { IndianEquitySymbol } from '../symbols/IndianEquitySymbol';
+import type { PSESymbol } from '../symbols/PSESymbol';
 import { buildSymbolMasterFixture } from '../fixtures/symbol-master';
 
 // ---------------------------------------------------------------------------
 // Mock store that returns fixture data
 // ---------------------------------------------------------------------------
 
-function mockStore(symbols: IndianEquitySymbol[]): IndianSymbolMasterStore {
+function mockStore(symbols: PSESymbol[]): IndianSymbolMasterStore {
   return {
     listActive: () => Promise.resolve(symbols.filter(s => s.listingStatus === 'active')),
   } as IndianSymbolMasterStore;
@@ -91,8 +91,8 @@ describe('buildUniverse', () => {
     }
   });
 
-  it('nifty_50 resolves to large cap proxy', async () => {
-    const result = await buildUniverse('nifty_50', undefined, store);
+  it('pse-index_50 resolves to large cap proxy', async () => {
+    const result = await buildUniverse('pse-index_50', undefined, store);
     expect(result.length).toBeGreaterThanOrEqual(1);
   });
 
@@ -110,9 +110,9 @@ describe('buildUniverse', () => {
 
 describe('getUniverseInfo', () => {
   it('returns metadata for a known universe', () => {
-    const info = getUniverseInfo('nifty_50');
+    const info = getUniverseInfo('pse-index_50');
     expect(info).toBeDefined();
-    expect(info.kind).toBe('nifty_50');
+    expect(info.kind).toBe('pse-index_50');
     expect(info.label).toBe('NIFTY 50');
   });
 

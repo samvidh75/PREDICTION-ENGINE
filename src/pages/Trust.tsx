@@ -4,7 +4,7 @@ const SECTIONS = [
   {
     id: "what-we-are",
     title: "What StockEX India Is",
-    content: "StockEX India is a structured equity research platform. We provide scorecards, theses, risk assessments, scenario analysis, and peer comparisons for listed Indian equities."
+    content: "StockEX India is a structured equity research platform. We provide scorecards, theses, risk assessments, scenario analysis, and peer comparisons for listed Philippine equities."
   },
   {
     id: "what-we-are-not",

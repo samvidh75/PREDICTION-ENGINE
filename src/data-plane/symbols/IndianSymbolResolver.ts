@@ -1,11 +1,11 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // Phase 21A — Indian symbol resolver
 //
-// Resolves any ticker-like input to a canonical IndianEquitySymbol entry
+// Resolves any ticker-like input to a canonical PSESymbol entry
 // using the symbol master store.  This is the server-side lookup layer.
 // ─────────────────────────────────────────────────────────────────────────────
 
-import type { IndianEquitySymbol } from './IndianEquitySymbol';
+import type { PSESymbol } from './PSESymbol';
 import { normalizeTicker } from './IndianSymbolNormalizer';
 
 // ---------------------------------------------------------------------------
@@ -14,7 +14,7 @@ import { normalizeTicker } from './IndianSymbolNormalizer';
 
 export interface SymbolResolutionResult {
   /** The resolved symbol entry, or `null` when no match found. */
-  symbol: IndianEquitySymbol | null;
+  symbol: PSESymbol | null;
 
   /** Human-readable status message. */
   status: 'exact' | 'alias' | 'normalized' | 'not_found';
@@ -35,7 +35,7 @@ export interface SymbolResolutionResult {
  */
 export interface IndianSymbolResolver {
   /**
-   * Resolve a raw ticker/alias to a canonical IndianEquitySymbol.
+   * Resolve a raw ticker/alias to a canonical PSESymbol.
    *
    * Resolution priority:
    * 1. Exact match by canonicalSymbol
@@ -49,17 +49,17 @@ export interface IndianSymbolResolver {
   /**
    * Resolve by ISIN.  Returns `null` when no symbol has that ISIN.
    */
-  resolveByIsin(isin: string): Promise<IndianEquitySymbol | null>;
+  resolveByIsin(isin: string): Promise<PSESymbol | null>;
 
   /**
    * Resolve by BSE scrip code (numeric string).
    */
-  resolveByBseCode(code: string): Promise<IndianEquitySymbol | null>;
+  resolveByBseCode(code: string): Promise<PSESymbol | null>;
 
   /**
    * List all active symbols (listingStatus = 'active').
    */
-  listActive(): Promise<IndianEquitySymbol[]>;
+  listActive(): Promise<PSESymbol[]>;
 }
 
 // ---------------------------------------------------------------------------
@@ -108,15 +108,15 @@ export class StoreBackedSymbolResolver implements IndianSymbolResolver {
     return { symbol: null, status: 'not_found', matchedKey: normalized };
   }
 
-  async resolveByIsin(isin: string): Promise<IndianEquitySymbol | null> {
+  async resolveByIsin(isin: string): Promise<PSESymbol | null> {
     return this.store.findByIsin(isin);
   }
 
-  async resolveByBseCode(code: string): Promise<IndianEquitySymbol | null> {
+  async resolveByBseCode(code: string): Promise<PSESymbol | null> {
     return this.store.findByBseCode(code);
   }
 
-  async listActive(): Promise<IndianEquitySymbol[]> {
+  async listActive(): Promise<PSESymbol[]> {
     return this.store.listActive();
   }
 }
@@ -126,9 +126,9 @@ export class StoreBackedSymbolResolver implements IndianSymbolResolver {
  * Decouples resolver from the actual store implementation.
  */
 export interface IndianSymbolMasterStoreLike {
-  findBySymbol(symbol: string): Promise<IndianEquitySymbol | null>;
-  findByAlias(alias: string): Promise<IndianEquitySymbol | null>;
-  findByIsin(isin: string): Promise<IndianEquitySymbol | null>;
-  findByBseCode(code: string): Promise<IndianEquitySymbol | null>;
-  listActive(): Promise<IndianEquitySymbol[]>;
+  findBySymbol(symbol: string): Promise<PSESymbol | null>;
+  findByAlias(alias: string): Promise<PSESymbol | null>;
+  findByIsin(isin: string): Promise<PSESymbol | null>;
+  findByBseCode(code: string): Promise<PSESymbol | null>;
+  listActive(): Promise<PSESymbol[]>;
 }

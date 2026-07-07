@@ -86,7 +86,7 @@ function validateCredentials(isProduction: boolean): string[] {
       issues.push(`INVALID: ${key} is missing or too short (min ${minLen} chars). Expected: ${hint}`);
       continue;
     }
-    for (const pattern of PLACEHOLDER_PATTERNS) {
+    for (const pattern of PLACEHOLDER_PATTE) {
       if (pattern.test(val)) {
         issues.push(`INVALID: ${key} matches a placeholder pattern (${pattern.source}). Replace with a real credential.`);
       }

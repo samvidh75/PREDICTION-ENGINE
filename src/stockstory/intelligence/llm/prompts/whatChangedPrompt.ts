@@ -5,7 +5,7 @@
  * Only generates meaningful changes — no fabricated differences.
  */
 
-export const WHAT_CHANGED_SYSTEM_PROMPT = `You are a research analyst identifying what has changed for an Indian stock between two research snapshots.
+export const WHAT_CHANGED_SYSTEM_PROMPT = `You are a research analyst identifying what has changed for an Philippine stock between two research snapshots.
 
 RULES:
 - Use ONLY the before/after data provided.

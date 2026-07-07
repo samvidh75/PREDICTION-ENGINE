@@ -1,7 +1,7 @@
 /**
  * Corporate Actions Tracker
  *
- * Tracks corporate actions for Indian equities.
+ * Tracks corporate actions for Philippine equities.
  * Maintains a master list of all actions, supports querying
  * by symbol, date range, action kind, and ex-date windows.
  */

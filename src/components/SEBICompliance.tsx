@@ -12,7 +12,7 @@ export function SEBIComplianceBanner() {
       <strong style={{ fontSize: '14px' }}>ⓘ Research Analysis</strong>
       <p style={{ margin: '4px 0 0' }}>
         This analysis is for educational purposes only and not investment advice.
-        StockStory India is not a SEBI-registered investment advisor.
+        StockStory India is not a PSE-listed investment advisor.
         Always consult a qualified financial advisor before making investment decisions.
       </p>
       <details style={{ marginTop: '8px', cursor: 'pointer' }}>

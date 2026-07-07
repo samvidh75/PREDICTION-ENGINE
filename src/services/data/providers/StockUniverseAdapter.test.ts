@@ -27,7 +27,7 @@ describe('StockUniverseAdapter', () => {
 
   // ── Known symbols ──────────────────────────────────────────────────────────
 
-  it('returns company master data for a known NSE symbol', async () => {
+  it('returns company master data for a known PSE symbol', async () => {
     const result = await adapter.getCompanyMaster('RELIANCE');
     expect(result.ok).toBe(true);
     if (result.ok) {
@@ -41,7 +41,7 @@ describe('StockUniverseAdapter', () => {
     expect(result.asOf).toMatch(ISO_PATTERN);
   });
 
-  it('returns company master data for a known BSE symbol', async () => {
+  it('returns company master data for a known PSE symbol', async () => {
     // Symbols with numeric values are BSE-listed
     const result = await adapter.getCompanyMaster('TCS');
     expect(result.ok).toBe(true);

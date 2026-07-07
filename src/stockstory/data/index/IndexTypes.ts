@@ -1,24 +1,24 @@
 /**
  * Index Types
  *
- * Types for Indian equity index membership tracking.
+ * Types for PSE equity index membership tracking.
  * Covers NSE and BSE indices.
  */
 
 export type IndexName =
-  | 'nifty50'
-  | 'nifty_next_50'
-  | 'nifty_100'
-  | 'nifty_200'
-  | 'nifty_500'
-  | 'nifty_midcap_100'
-  | 'nifty_smallcap_100'
-  | 'nifty_bank'
-  | 'nifty_it'
-  | 'nifty_pharma'
-  | 'nifty_fmcg'
-  | 'nifty_auto'
-  | 'sensex'
+  | 'pse-index50'
+  | 'pse-index_next_50'
+  | 'pse-index_100'
+  | 'pse-index_200'
+  | 'pse-index_500'
+  | 'pse-index_midcap_100'
+  | 'pse-index_smallcap_100'
+  | 'pse-index_bank'
+  | 'pse-index_it'
+  | 'pse-index_pharma'
+  | 'pse-index_fmcg'
+  | 'pse-index_auto'
+  | 'pse-composite'
   | 'bse_100'
   | 'bse_200'
   | 'bse_500'

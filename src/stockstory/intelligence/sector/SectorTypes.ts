@@ -18,7 +18,7 @@ export interface SectorIntelligenceProfile {
   /** Sector-level risks */
   risks: SectorRisk[];
 
-  /** Indian market specific context */
+  /** Philippine market specific context */
   indiaContext: IndiaSectorContext;
 
   /** Aggregate scores */

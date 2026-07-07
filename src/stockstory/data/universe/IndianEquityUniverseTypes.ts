@@ -1,7 +1,7 @@
 /**
- * IndianEquityUniverseTypes — canonical types for the Indian equity universe.
+ * PSEUniverseTypes — canonical types for the PSE equity universe.
  *
- * Every listed Indian equity tracked by Lensory. These types represent the
+ * Every listed PSE equity tracked by Lensory. These types represent the
  * "golden record" of what companies exist, their identifiers, and their
  * current trading status.
  */
@@ -25,8 +25,8 @@ export type MarketCapBucket =
   | "unknown";
 
 /** A single canonical equity entry. */
-export interface IndianEquityEntry {
-  /** Primary NSE symbol (canonical). */
+export interface PSEEntry {
+  /** Primary PSE symbol (canonical). */
   symbol: string;
   /** Exchange (or "NSE" as default). */
   exchange: IndianExchange;
@@ -44,13 +44,13 @@ export interface IndianEquityEntry {
   marketCapBucket: MarketCapBucket;
   /** Market capitalisation in INR (raw value, if available). */
   marketCap: number | null;
-  /** Comma-separated index memberships (e.g. "Nifty 50, Nifty Next 50"). */
+  /** Comma-separated index memberships (e.g. "PSE Index, Nifty Next 50"). */
   indexMembership: string | null;
   /** Whether the stock is currently trading (if known from source data). */
   isTrading: boolean;
   /** BSE scrip code if this is a BSE-listed company. */
   bseCode: string | null;
-  /** NSE symbol alias (may differ from canonical). */
+  /** PSE symbol alias (may differ from canonical). */
   nseSymbol: string;
   /** ISO date string of when this entry was last synced. */
   lastSeenAt: string;

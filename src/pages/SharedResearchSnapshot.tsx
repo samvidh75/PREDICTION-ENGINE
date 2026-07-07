@@ -112,7 +112,7 @@ export default function SharedResearchSnapshot() {
       )}
 
       <footer style={{ marginTop: "48px", paddingTop: "24px", borderTop: `1px solid ${colors.border}`, fontSize: "13px", color: colors.textSecondary }}>
-        <p>Research analysis only. Not investment advice. Consult a SEBI-registered investment advisor before making investment decisions.</p>
+        <p>Research analysis only. Not investment advice. Consult a PSE-listed investment advisor before making investment decisions.</p>
       </footer>
     </main>
   );

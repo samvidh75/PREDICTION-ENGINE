@@ -1,9 +1,9 @@
 /**
  * BSE Provider Integration Test
- * Tests real data fetching from Bombay Stock Exchange
+ * Tests real data fetching from Philippine Stock Exchange
  */
 
-import { bseClient } from '../clients/BSEClient';
+import { pseClient } from '../clients/PSEClient';
 import { providerAggregator } from '../clients/ProviderAggregator';
 
 // Sample BSE stocks for testing
@@ -30,7 +30,7 @@ async function testBSEProvider() {
       const startTime = Date.now();
 
       // Test 1: Direct BSE client
-      const bseResult = await bseClient.fetchQuote(symbol);
+      const bseResult = await pseClient.fetchQuote(symbol);
       const responseTime = Date.now() - startTime;
 
       if (bseResult.success && bseResult.quote) {

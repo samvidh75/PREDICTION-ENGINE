@@ -338,7 +338,7 @@ Price-to-Earnings = Market Price ÷ Earnings Per Share
 • P/E >25: Expensive (priced for perfection)
 
 🎯 Indian Context:
-• Nifty 50 avg: 18-22x
+• PSE Index avg: 18-22x
 • Small cap avg: 20-25x
 • Quality stocks: 20-30x justified by ROE
 
@@ -485,8 +485,8 @@ Mix of low-debt growth stocks
   private async handleMarketUpdate(_userMessage: string): Promise<AIResponse> {
     const response = `📈 **Market Intelligence Update**\n\n` +
       `**Indices Today**
-• Nifty 50: 24,850 (↑1.2% YTD)
-• Sensex: 81,320 (↑1.4% YTD)
+• PSE Index: 24,850 (↑1.2% YTD)
+• PSE Composite: 81,320 (↑1.4% YTD)
 • Nifty Midcap: 34,750 (↑3.8% YTD)
 • Nifty Smallcap: 18,200 (↑6.2% YTD)\n\n` +
 
@@ -614,7 +614,7 @@ Ask me "Analyze [SECTOR]" or "Compare [STOCK] vs [STOCK]"`;
 
   private async handleDefault(): Promise<AIResponse> {
     const response = `🤖 **StockEx AI - Your Personal Market Analyst**\n\n` +
-      `I'm designed to be your ChatGPT for Indian stock market analysis.\n\n` +
+      `I'm designed to be your ChatGPT for Philippine stock market analysis.\n\n` +
 
       `**What I Can Do:**\n\n` +
 

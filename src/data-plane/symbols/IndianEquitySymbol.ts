@@ -1,16 +1,16 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// Phase 21A — Canonical Indian equity symbol contract
+// Phase 21A — Canonical PSE equity symbol contract
 //
-// Single-source-of-truth interface for any Indian equity symbol in the
+// Single-source-of-truth interface for any PSE equity symbol in the
 // prediction-engine system. All ingestion, storage, and display code
 // references this contract — not multiple ad-hoc type definitions.
 // ─────────────────────────────────────────────────────────────────────────────
 
-/** Recognised Indian stock exchanges for equity trading. */
+/** Recognised Philippine stock exchanges for equity trading. */
 export type IndianExchange = 'NSE' | 'BSE';
 
 /**
- * Instrument segment for an Indian equity.
+ * Instrument segment for an PSE equity.
  * - `EQ` = Normal equity (most common)
  * - `SM` = Small and Medium Enterprise (SME)
  * - `ET` = Exchange Traded Fund / Index Fund
@@ -28,14 +28,14 @@ export type IndianInstrumentSegment = 'EQ' | 'SM' | 'ET' | 'BE';
 export type IndianListingStatus = 'active' | 'suspended' | 'delisted';
 
 /**
- * Canonical Indian equity symbol.
+ * Canonical PSE equity symbol.
  *
  * Every symbol in the system MUST be expressed as an instance of this
  * interface.  The canonical symbol is always the NSE ticker (uppercase,
  * no suffix).  BSE-only symbols use their BSE code as `canonicalSymbol`
  * with `exchange: 'BSE'`.
  */
-export interface IndianEquitySymbol {
+export interface PSESymbol {
   /** Primary stable identifier — always the NSE ticker (uppercase, no
    *  `.NS` / `-EQ` suffix) for NSE-traded equities, or the BSE ticker
    *  for BSE-only equities. */
@@ -73,7 +73,7 @@ export interface IndianEquitySymbol {
    *  to preserve leading-zero codes.  `null` if not applicable. */
   readonly bseCode: string | null;
 
-  /** NSE symbol (same as `canonicalSymbol` for NSE-primary equities). */
+  /** PSE symbol (same as `canonicalSymbol` for NSE-primary equities). */
   readonly nseSymbol: string | null;
 
   /** Face value per share in INR (if known). */

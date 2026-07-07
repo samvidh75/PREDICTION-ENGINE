@@ -21,7 +21,7 @@ class StockMarketIntelligence {
     const lowerQuery = query.toLowerCase().trim();
 
     // Market status queries
-    if (this.matchesPattern(lowerQuery, ['market', 'today', 'performance', 'nifty', 'sensex', 'index'])) {
+    if (this.matchesPattern(lowerQuery, ['market', 'today', 'performance', 'pse-index', 'pse-composite', 'index'])) {
       return this.getMarketStatus();
     }
 
@@ -74,7 +74,7 @@ class StockMarketIntelligence {
 
   private getMarketStatus(): MarketInsight {
     return {
-      response: `📊 Market Status Update\n\n✓ Indian market showing resilience with selective opportunities\n• Nifty50: Trading near all-time highs (~24,500)\n• Sensex: Strong momentum in auto and bank sectors\n• Market Cap: ₹420 lakh crore (strong)\n• FII Activity: Mixed (watch RBI policy)\n\n💡 Best Performing: IT, FMCG, Pharma\n⚠️ Watch Out: Metals, PSU Banking (cyclical)\n\nTop Opportunities: Value plays in mid-caps and small-caps with strong fundamentals`,
+      response: `📊 Market Status Update\n\n✓ Philippine market showing resilience with selective opportunities\n• Nifty50: Trading near all-time highs (~24,500)\n• PSE Composite: Strong momentum in auto and bank sectors\n• Market Cap: ₹420 lakh crore (strong)\n• FII Activity: Mixed (watch RBI policy)\n\n💡 Best Performing: IT, FMCG, Pharma\n⚠️ Watch Out: Metals, PSU Banking (cyclical)\n\nTop Opportunities: Value plays in mid-caps and small-caps with strong fundamentals`,
       confidence: 0.92,
       category: 'market-info',
       suggestedFollowUp: 'Which sectors interest you? I can suggest specific stocks.'

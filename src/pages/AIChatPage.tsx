@@ -23,7 +23,7 @@ type Conversation = {
 
 const SUGGESTED_QUESTIONS = [
   "Analyze Reliance Industries — bull vs bear case",
-  "Which Nifty 50 stocks have the strongest quality scores?",
+  "Which PSE Index stocks have the strongest quality scores?",
   "Compare TCS vs Infosys on valuation metrics",
   "What's driving the IT sector's momentum today?",
   "Screen for growth stocks with low debt under ₹5000 Cr",
@@ -224,7 +224,7 @@ export default function AIChatPage() {
           id: "welcome",
           role: "assistant",
           content:
-            "👋 Hi! I'm StockEX AI — your equity research analyst.\n\nI can help you with:\n• **Stock analysis** — bull/bear cases, 8-factor scoring\n• **Screening** — find stocks matching your criteria\n• **Comparisons** — side-by-side peer analysis\n• **Market context** — sector trends, macro signals\n• **Portfolio insights** — conviction tracking, risk\n\nAsk me anything about Indian equities!",
+            "👋 Hi! I'm StockEX AI — your equity research analyst.\n\nI can help you with:\n• **Stock analysis** — bull/bear cases, 8-factor scoring\n• **Screening** — find stocks matching your criteria\n• **Comparisons** — side-by-side peer analysis\n• **Market context** — sector trends, macro signals\n• **Portfolio insights** — conviction tracking, risk\n\nAsk me anything about Philippine equities!",
           timestamp: Date.now(),
         },
       ],
@@ -281,7 +281,7 @@ export default function AIChatPage() {
           body: JSON.stringify({
             message: userMessage,
             symbol: "",
-            context: "General Indian stock market research and analysis.",
+            context: "General Philippine stock market research and analysis.",
           }),
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -294,7 +294,7 @@ export default function AIChatPage() {
           content,
           timestamp: Date.now(),
           thinkingSteps,
-          citations: data?.citations?.length ? data.citations : ["NSE India", "SEBI Filings"],
+          citations: data?.citations?.length ? data.citations : ["Philippine Stock Exchange", "SEBI Filings"],
         };
 
         setLoading(false);

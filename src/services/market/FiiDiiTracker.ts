@@ -76,7 +76,7 @@ export class FiiDiiTracker {
 
     let interpretation: string;
     if (month.fiiNet > 0 && month.diiNet > 0) {
-      interpretation = 'Both FII and DII are net buyers, indicating strong broad-based confidence in Indian equities.';
+      interpretation = 'Both FII and DII are net buyers, indicating strong broad-based confidence in Philippine equities.';
     } else if (month.fiiNet > 0 && month.diiNet < 0) {
       interpretation = `FIIs are net buyers (₹${Math.abs(month.fiiNet).toFixed(0)}Cr) while DIIs are profit-taking. Foreign inflows signal global confidence in India's growth story.`;
     } else if (month.fiiNet < 0 && month.diiNet > 0) {

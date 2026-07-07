@@ -1,7 +1,7 @@
 export type WebsocketConnectionStatus = "disconnected" | "connecting" | "connected" | "reconnecting";
 
 export type MarketWebsocketEvent =
-  | { type: "market_prices"; at: number; payload: { nifty: number; sensex: number; bankNifty: number } }
+  | { type: "market_prices"; at: number; payload: { pse-index: number; pse-composite: number; bankNifty: number } }
   | { type: "market_volatility"; at: number; payload: { vix: number } }
   | { type: "market_breadth"; at: number; payload: { breadthPct: number } }
   | { type: "institutional_flows"; at: number; payload: { fiiDiiTone: number } }
@@ -33,8 +33,8 @@ export class WebsocketManager {
   private lastEmitAt = 0;
 
   // synthetic state
-  private nifty = 22400;
-  private sensex = 73800;
+  private pse-index = 22400;
+  private pse-composite = 73800;
   private bankNifty = 48900;
   private vix = 12.4;
   private breadthPct = 52;
@@ -122,8 +122,8 @@ export class WebsocketManager {
     // small drift
     const drift = (n1 - 0.5) * 0.9;
 
-    this.nifty = clamp(this.nifty + drift * 8, 21000, 25000);
-    this.sensex = clamp(this.sensex + drift * 14, 69000, 82000);
+    this.pse-index = clamp(this.pse-index + drift * 8, 21000, 25000);
+    this.pse-composite = clamp(this.pse-composite + drift * 14, 69000, 82000);
     this.bankNifty = clamp(this.bankNifty + drift * 10, 43000, 56000);
 
     // VIX and breadth are more “tensional”: smaller movement, but directionally meaningful.
@@ -141,8 +141,8 @@ export class WebsocketManager {
       type: "market_prices",
       at: now,
       payload: {
-        nifty: this.nifty,
-        sensex: this.sensex,
+        pse-index: this.pse-index,
+        pse-composite: this.pse-composite,
         bankNifty: this.bankNifty,
       },
     });

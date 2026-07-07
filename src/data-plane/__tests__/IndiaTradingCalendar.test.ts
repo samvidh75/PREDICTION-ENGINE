@@ -1,14 +1,14 @@
 import { describe, it, expect } from 'vitest';
-import { IndiaTradingCalendar, isMarketHour } from '../calendar/IndiaTradingCalendar';
+import { PSETradingCalendar, isMarketHour } from '../calendar/PSETradingCalendar';
 
-const cal = new IndiaTradingCalendar();
+const cal = new PSETradingCalendar();
 
 /** Create a UTC-midnight Date for a YYYY-MM-DD string. */
 function utcDate(isoDate: string): Date {
   return new Date(`${isoDate}T00:00:00.000Z`);
 }
 
-describe('IndiaTradingCalendar', () => {
+describe('PSETradingCalendar', () => {
   describe('isTradingDay', () => {
     it('returns true for a weekday in middle of week', () => {
       expect(cal.isTradingDay(utcDate('2026-06-17'))).toBe(true); // Wednesday

@@ -2,8 +2,8 @@ export type {
   IndianExchange,
   IndianInstrumentSegment,
   IndianListingStatus,
-  IndianEquitySymbol,
-} from './IndianEquitySymbol';
+  PSESymbol,
+} from './PSESymbol';
 
 export {
   normalizeTicker,

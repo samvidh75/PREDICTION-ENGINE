@@ -4,7 +4,7 @@
  */
 
 export interface PortfolioHolding {
-  symbol: string;           // NSE symbol (e.g., "RELIANCE")
+  symbol: string;           // PSE symbol (e.g., "RELIANCE")
   isin?: string;
   exchange: string;
   quantity: number;

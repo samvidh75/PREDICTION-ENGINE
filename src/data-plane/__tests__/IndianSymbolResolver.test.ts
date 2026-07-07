@@ -1,13 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { StoreBackedSymbolResolver } from '../symbols/IndianSymbolResolver';
-import type { IndianEquitySymbol } from '../symbols/IndianEquitySymbol';
+import type { PSESymbol } from '../symbols/PSESymbol';
 import type { IndianSymbolMasterStoreLike } from '../symbols/IndianSymbolResolver';
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
-function makeSymbol(overrides: Partial<IndianEquitySymbol> & { canonicalSymbol: string }): IndianEquitySymbol {
+function makeSymbol(overrides: Partial<PSESymbol> & { canonicalSymbol: string }): PSESymbol {
   return {
     exchange: 'NSE',
     segment: 'EQ',
@@ -33,7 +33,7 @@ function makeSymbol(overrides: Partial<IndianEquitySymbol> & { canonicalSymbol: 
 // ---------------------------------------------------------------------------
 
 function createMockStore(): IndianSymbolMasterStoreLike {
-  const symbols: IndianEquitySymbol[] = [
+  const symbols: PSESymbol[] = [
     makeSymbol({ canonicalSymbol: 'RELIANCE', aliases: ['RELIANCE', 'RELIANCE.NS', 'RELIANCE-EQ', '500325'], isin: 'IN0020200124', bseCode: '500325' }),
     makeSymbol({ canonicalSymbol: 'TCS', aliases: ['TCS', 'TCS.NS', 'TCS-EQ', '532540'], isin: 'INE467B01029', bseCode: '532540' }),
     makeSymbol({ canonicalSymbol: 'HDFCBANK', aliases: ['HDFCBANK', 'HDFCBANK.NS', 'HDFCBANK-EQ', '500180'], isin: 'INE040A01034', bseCode: '500180' }),
@@ -41,10 +41,10 @@ function createMockStore(): IndianSymbolMasterStoreLike {
   ];
 
   // Build lookup maps
-  const bySymbol = new Map<string, IndianEquitySymbol>();
-  const byIsin = new Map<string, IndianEquitySymbol>();
-  const byBse = new Map<string, IndianEquitySymbol>();
-  const byAlias = new Map<string, IndianEquitySymbol>();
+  const bySymbol = new Map<string, PSESymbol>();
+  const byIsin = new Map<string, PSESymbol>();
+  const byBse = new Map<string, PSESymbol>();
+  const byAlias = new Map<string, PSESymbol>();
 
   for (const s of symbols) {
     bySymbol.set(s.canonicalSymbol, s);

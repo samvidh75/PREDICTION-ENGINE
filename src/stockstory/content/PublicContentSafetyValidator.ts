@@ -17,7 +17,7 @@ const ERROR_PATTERNS: { pattern: RegExp; label: string; suggestion: string }[] =
   { pattern: /\bbest stocks? to buy\b/i, label: "Best stocks to buy", suggestion: 'Use "notable companies for research" or "companies with strong scores"' },
   { pattern: /\bmutlibagger\b/i, label: "Multibagger claim", suggestion: 'Use "high-growth companies" or "companies with strong momentum"' },
   { pattern: /\bguaranteed\s+(return|profit|income)\b/i, label: "Guaranteed return", suggestion: 'Remove guarantee language - returns are never guaranteed' },
-  { pattern: /\bSEBI\s+registered\b/i, label: "SEBI registered", suggestion: 'Be accurate - Lensory is not SEBI-registered' },
+  { pattern: /\bSEBI\s+registered\b/i, label: "SEBI registered", suggestion: 'Be accurate - Lensory is not PSE-listed' },
   { pattern: /\binvestment\s+advisor\b/i, label: "Investment advisor claim", suggestion: 'Use "research platform" or "research tool"' },
   { pattern: /\bpast\s+returns?\s+(guarantee|assure)/i, label: "Past returns guarantee", suggestion: 'Add disclaimer that past performance does not guarantee future results' },
   { pattern: /\bfake\s+(testimonial|review|user|media|partner)/i, label: "Fake attribution", suggestion: 'Do not fabricate user quotes, media mentions, or partnerships' },
@@ -34,7 +34,7 @@ const WARNING_PATTERNS: { pattern: RegExp; label: string; suggestion: string }[]
 export function validateContent(text: string, sourceFile?: string): SafetyViolation[] {
   const violations: SafetyViolation[] = [];
 
-  for (const { pattern, label, suggestion } of ERROR_PATTERNS) {
+  for (const { pattern, label, suggestion } of ERROR_PATTE) {
     const matches = text.matchAll(new RegExp(pattern.source, "gi"));
     for (const match of matches) {
       const start = Math.max(0, (match.index || 0) - 40);
@@ -49,7 +49,7 @@ export function validateContent(text: string, sourceFile?: string): SafetyViolat
     }
   }
 
-  for (const { pattern, label, suggestion } of WARNING_PATTERNS) {
+  for (const { pattern, label, suggestion } of WARNING_PATTE) {
     const matches = text.matchAll(new RegExp(pattern.source, "gi"));
     for (const match of matches) {
       const start = Math.max(0, (match.index || 0) - 40);

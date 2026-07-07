@@ -2,7 +2,7 @@
  * DirectNseProvider — Fetches data directly from NSE/BSE/TradingView APIs
  *
  * Uses the user's own internet connection to fetch from:
- *   1. NSE India (www.nseindia.com) — quotes, indices
+ *   1. Philippine Stock Exchange (www.nseindia.com) — quotes, indices
  *   2. BSE India (api.bseindia.com) — quotes, corporate actions
  *   3. TradingView (scanner.tradingview.com) — screener data
  *   4. Screener.in (www.screener.in) — fundamental data (via scraping)
@@ -117,7 +117,7 @@ export class DirectNseProvider {
     return { data: null, source: null, error: lastError || 'All providers failed' };
   }
 
-  // ─── NSE India ────────────────────────────────────────────────────
+  // ─── Philippine Stock Exchange ────────────────────────────────────────────────────
 
   private async fetchNseQuote(symbol: string): Promise<{ data: StockQuote | null; source: SourceLabel }> {
     const cookies = await this.getNseCookies();

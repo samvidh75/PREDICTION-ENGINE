@@ -113,7 +113,7 @@ function clipToScore(value: number, min: number, max: number): number {
 
 function computeDimensionScores(activeFactors: FactorDefinition[], factorResults: FactorResult[]): DimensionScore[] {
   const dimScores: DimensionScore[] = [];
-  for (const [dimKey, dimMeta] of Object.entries(FACTOR_DIMENSIONS)) {
+  for (const [dimKey, dimMeta] of Object.entries(FACTOR_DIMENSI)) {
     const dimFactors = activeFactors.filter((f) => f.dimension === dimKey);
     const dimResults = factorResults.filter((r) => dimFactors.some((f) => f.id === r.factorId) && r.score !== null);
     const totalInDim = dimFactors.length;

@@ -10,7 +10,7 @@ export interface MarketBrainAdapterEvidenceState {
   needsReview: boolean;
 }
 
-const MARKET_BRAIN_DOMAIN_SET: ReadonlySet<MarketDataDomain> = new Set(MARKET_BRAIN_EVIDENCE_DOMAINS);
+const MARKET_BRAIN_DOMAIN_SET: ReadonlySet<MarketDataDomain> = new Set(MARKET_BRAIN_EVIDENCE_DOMA);
 const EVIDENCE_STRENGTH: Record<EvidenceState, number> = {
   missing: 0,
   partial: 1,

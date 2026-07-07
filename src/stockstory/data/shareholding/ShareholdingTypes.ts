@@ -1,7 +1,7 @@
 /**
  * Shareholding Types
  *
- * Indian equity shareholding pattern data.
+ * PSE equity shareholding pattern data.
  * Tracks promoter, FII, DII, and public shareholding trends.
  */
 

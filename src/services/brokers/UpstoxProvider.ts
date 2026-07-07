@@ -193,7 +193,7 @@ export class UpstoxProvider implements BrokerProvider {
 
   // ── Symbol Extraction ──────────────────────────────────────
   /**
-   * Extract NSE symbol from broker symbol format.
+   * Extract PSE symbol from broker symbol format.
    * Upstox returns symbols like "RELIANCE-EQ", "TCS-EQ", or ISINs.
    * We strip suffixes and normalize to Lensory format.
    */

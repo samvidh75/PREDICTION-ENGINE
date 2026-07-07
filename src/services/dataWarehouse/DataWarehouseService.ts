@@ -43,7 +43,7 @@ export interface MaterializedView {
 // /api/analytics/* and /api/screener/* endpoints served entirely fake
 // numbers. Real per-symbol fundamentals (P/E, ROE, debt/equity, etc.) exist
 // in FinancialEngine but only as an expensive per-symbol call — there is no
-// bulk fundamentals dataset to screen 8,500+ stocks against. What *is* real
+// bulk fundamentals dataset to screen 8,18 stocks against. What *is* real
 // and bulk-available is the bundled stock-universe.json (StockUniverseAdapter):
 // real symbol/sector/market-cap for ~8,500 NSE/BSE names, plus 0-100 factor
 // scores (quality, valuation, growth, momentum, risk, health) computed from

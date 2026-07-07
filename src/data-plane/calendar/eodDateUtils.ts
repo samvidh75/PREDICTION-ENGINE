@@ -5,7 +5,7 @@
 // precompute engines.
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { indiaTradingCalendar } from './IndiaTradingCalendar';
+import { indiaTradingCalendar } from './PSETradingCalendar';
 
 /**
  * Get the "EOD date" — the most recent completed trading day.
