@@ -60,12 +60,12 @@ const EDUCATIONAL_FACTS = [
   {
     icon: TrendingUp,
     title: "Compounding needs time",
-    body: "The best Indian wealth creators over 20 years delivered 18‑22% CAGR — consistency beats heroics.",
+    body: "The best PSE wealth creators over 20 years delivered 18‑22% CAGR — consistency beats heroics.",
   },
   {
     icon: Star,
-    title: "Promoter holding matters",
-    body: "Indian companies with >50% promoter holding tend to be more aligned with minority shareholders.",
+    title: "Family conglomerates",
+    body: "Philippine companies with strong family backing tend to be more aligned with long-term growth.",
   },
   {
     icon: Shield,
@@ -456,7 +456,7 @@ export default function HomePage() {
               <Zap size={15} /> Live Price Feed
             </h2>
           </div>
-          <LivePriceFeed maxDisplay={10} watchlistTickers={["RELIANCE", "TCS", "INFY", "HDFCBANK", "SBIN"]} />
+          <LivePriceFeed maxDisplay={10} watchlistTickers={["BDO", "JFC", "MER", "SM", "AEV", "PAL", "TEL", "GLOBE", "SMC", "AC"]} />
         </section>
 
         {/* Recent alerts */}
