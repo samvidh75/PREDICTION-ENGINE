@@ -3,7 +3,7 @@
  *
  * Whenever a user clicks "Continue with broker" the service:
  *  1. Generates a research summary that the user can review
- *  2. Shows a SEBI disclaimer
+ *  2. Shows a SEC disclaimer
  *  3. Provides a broker-specific URL (deep‑link or external)
  *
  * Lensory does NOT place trades, charge brokerage, or
@@ -24,7 +24,7 @@ export interface HandoffPayload {
   timestamp: string;
 }
 
-const SEBI_DISCLAIMER =
+const SEC_DISCLAIMER =
   'Lensory is not a PSE-listed investment advisor. All research is for educational ' +
   'and informational purposes only. Trade execution occurs solely on the broker platform. ' +
   'Past performance does not guarantee future results. Consult your financial advisor before trading.';
@@ -56,16 +56,16 @@ export function prepareHandoff(
     broker,
     researchSummary,
     handoffUrl,
-    disclaimer: SEBI_DISCLAIMER,
+    disclaimer: SEC_DISCLAIMER,
     timestamp: new Date().toISOString(),
   };
 }
 
 /**
- * Return the SEBI disclaimer text (used wherever handoff UI is rendered).
+ * Return the SEC disclaimer text (used wherever handoff UI is rendered).
  */
 export function getDisclaimer(): string {
-  return SEBI_DISCLAIMER;
+  return SEC_DISCLAIMER;
 }
 
 /**

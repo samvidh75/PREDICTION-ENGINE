@@ -12,7 +12,7 @@ import { PercentileEngine, type Distribution } from '../scoring/PercentileEngine
 import { SectorPercentileEngine, type PercentileMetric } from '../scoring/SectorPercentileEngine';
 import type { SectorType } from '../sectors/SectorWeightEngine';
 
-// ─── Reference Distributions (Indian Market Empirical Data) ───────
+// ─── Reference Distributions (Philippine Market Empirical Data) ───────
 
 interface MetricDistribution {
   p10: number;
@@ -26,7 +26,7 @@ type SectorDistributions = Record<PercentileMetric, MetricDistribution>;
 
 /**
  * Philippine market reference distributions.
- * These are empirically derived from NSE-listed company data (2024-2025).
+ * These are empirically derived from PSE-listed company data (2024-2025).
  * Used as fallback when live database queries are unavailable.
  * 
  * profitGrowth, fcfGrowth, grossMargin added in TRACK-P1 as provisional values.

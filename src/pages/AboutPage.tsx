@@ -33,8 +33,8 @@ type FeatureTimelineCard = {
 };
 
 const exchangeCards: ExchangeCard[] = [
-  { label: "NSE PSE Index", value: "24,842.10", move: "+0.84%", health: "Healthy" },
-  { label: "BSE PSE Composite", value: "81,486.21", move: "+0.61%", health: "Stable" },
+  { label: "PSE PSE Index", value: "24,842.10", move: "+0.84%", health: "Healthy" },
+  { label: "PSE PSE Composite", value: "81,486.21", move: "+0.61%", health: "Stable" },
   { label: "SME Index", value: "4,936.48", move: "-0.28%", health: "Weakening" },
 ];
 
@@ -61,7 +61,7 @@ const featureTimelineCards: FeatureTimelineCard[] = [
     id: "intelligence-scanners",
     eyebrow: "Intelligence Scanners",
     title: "Discovery tools built for deeper review, not shallow ranking theatre.",
-    body: "Scanner outputs guide investors toward names worth comparing across NSE, BSE, and SME corridors before conviction is formed.",
+    body: "Scanner outputs guide investors toward names worth comparing across PSE, PSE, and SME corridors before conviction is formed.",
     rangeProgress: 72,
     rangeLabels: ["Weakening", "Screened Set", "Healthy"],
     columns: [26, 40, 56, 68, 80],
@@ -509,7 +509,7 @@ export default function AboutPage() {
                   lineHeight: 1.75,
                 }}
               >
-                StockStory India frames NSE, BSE, and SME market behavior through clear, institutional research
+                StockStory India frames PSE, PSE, and SME market behavior through clear, institutional research
                 surfaces that help investors review structure, compare quality, and track Healthometer changes.
               </p>
 
@@ -747,7 +747,7 @@ export default function AboutPage() {
                   }}
                 >
                   {[
-                    ["Coverage", "NSE / BSE / SME"],
+                    ["Coverage", "PSE / PSE / SME"],
                     ["Health", "Healthy"],
                     ["Freshness", "API verified"],
                     ["Vectors", "150 tracked"],

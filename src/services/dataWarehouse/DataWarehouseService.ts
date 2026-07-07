@@ -45,7 +45,7 @@ export interface MaterializedView {
 // in FinancialEngine but only as an expensive per-symbol call — there is no
 // bulk fundamentals dataset to screen 8,18 stocks against. What *is* real
 // and bulk-available is the bundled stock-universe.json (StockUniverseAdapter):
-// real symbol/sector/market-cap for ~8,500 NSE/BSE names, plus 0-100 factor
+// real symbol/sector/market-cap for ~8,500 PSE/PSE names, plus 0-100 factor
 // scores (quality, valuation, growth, momentum, risk, health) computed from
 // real fundamentals+price data at generation time. The metric/dimension
 // catalog below reflects only what is actually real and queryable now.
@@ -64,7 +64,7 @@ export class DataWarehouseService {
   private dimensions: DataWarehouseDimension[] = [
     { name: 'sector', description: 'Industry sector classification', cardinality: 'low' },
     { name: 'symbol', description: 'Stock ticker symbol', cardinality: 'high' },
-    { name: 'exchange', description: 'NSE or BSE', cardinality: 'low' },
+    { name: 'exchange', description: 'PSE or PSE', cardinality: 'low' },
     { name: 'market_cap_category', description: 'Large/Mid/Small/Micro cap', cardinality: 'low' },
   ];
 
@@ -202,7 +202,7 @@ export class DataWarehouseService {
   private universeRowsCache: Record<string, unknown>[] | null = null;
 
   /**
-   * Loads the real bundled stock universe (~8,500 NSE/BSE names) and flattens
+   * Loads the real bundled stock universe (~8,500 PSE/PSE names) and flattens
    * each entry's factor scores into queryable columns. Cached in memory since
    * StockUniverseAdapter itself only reloads the underlying file on demand.
    */

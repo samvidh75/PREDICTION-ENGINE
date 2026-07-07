@@ -76,7 +76,7 @@ describe('fetchMarketBrainResearch public symbol normalization', () => {
         companyName: 'Test Company',
         research: {
           ...baseResearch,
-          symbol: 'NSE:TEST<script>',
+          symbol: 'PSE:TEST<script>',
           companyName: 'Test Company',
         },
       }),

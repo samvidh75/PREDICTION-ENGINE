@@ -53,8 +53,8 @@ function mockAdapterTracked(
         rowCount: applied.length,
       });
     }
-    // Track INSERTs
-    if (sql.includes('INSERT INTO schema_migrations') && Array.isArray(params) && params.length >= 3) {
+    // Track IPSERTs
+    if (sql.includes('IPSERT INTO schema_migrations') && Array.isArray(params) && params.length >= 3) {
       applied.push({
         id: String(params[0]),
         checksum: String(params[1]),
@@ -201,7 +201,7 @@ describe('MigrationRunner', () => {
     const calls = (adapter.query as ReturnType<typeof vi.fn>).mock.calls;
     const insertCall = calls.find(
       (c: unknown[]) =>
-        typeof c[0] === 'string' && (c[0] as string).includes('INSERT INTO schema_migrations'),
+        typeof c[0] === 'string' && (c[0] as string).includes('IPSERT INTO schema_migrations'),
     );
     expect(insertCall).toBeUndefined();
   });

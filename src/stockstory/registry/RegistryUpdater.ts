@@ -4,15 +4,15 @@
  * TRACK-20 Phase 1 — Task 3
  *
  * Responsibilities:
- * - Detect delistings (symbols removed from NSE/BSE)
+ * - Detect delistings (symbols removed from PSE/PSE)
  * - Detect symbol changes (ticker rename, e.g. MCDOWELL_N → MCDOWELL-N)
  * - Detect mergers (symbol absorbed into another)
  * - Detect name changes (company name updates)
  * - Detect new listings (IPOs, new additions to exchange)
  *
  * Data sources:
- * - NSE Bhavcopy (daily): SECURITIES AVAILABLE FOR TRADING CSV
- * - BSE Equity Master: ISIN dump
+ * - PSE Bhavcopy (daily): SECURITIES AVAILABLE FOR TRADING CSV
+ * - PSE Equity Master: ISIN dump
  * - NSDL/CDSL ISIN Portal: Public ISIN lookup
  *
  * Runs: Daily, as part of nightly population pipeline
@@ -50,7 +50,7 @@ export interface RegistryUpdateResult {
 }
 
 /**
- * PSE symbol master response shape (from NSE pse-daily CSV or API).
+ * PSE symbol master response shape (from PSE pse-daily CSV or API).
  */
 interface NseSymbolEntry {
   SYMBOL: string;
@@ -61,7 +61,7 @@ interface NseSymbolEntry {
 }
 
 /**
- * BSE equity master response shape.
+ * PSE equity master response shape.
  */
 interface BseSymbolEntry {
   scrip_code: string;
@@ -97,7 +97,7 @@ export class RegistryUpdater {
     const bseSymbols = await this.fetchBseMaster();
 
     if (nseSymbols.length === 0 && bseSymbols.length === 0) {
-      this.log('WARNING: Both NSE and BSE fetches returned empty. Skipping update.');
+      this.log('WARNING: Both PSE and PSE fetches returned empty. Skipping update.');
       return {
         changes: [],
         updated_count: 0,
@@ -146,9 +146,9 @@ export class RegistryUpdater {
    * Falls back gracefully if network or parsing fails.
    */
   private async fetchNseMaster(): Promise<NseSymbolEntry[]> {
-    this.log('Fetching NSE master...');
+    this.log('Fetching PSE master...');
     try {
-      // Primary: NSE securities CSV (public, no auth)
+      // Primary: PSE securities CSV (public, no auth)
       // URL: https://archives.nseindia.com/content/equities/EQUITY_L.csv
       // Columns: SYMBOL, NAME OF COMPANY, SERIES, DATE OF LISTING, PAID UP VALUE,
       //           MARKET LOT, ISIN NUMBER, FACE VALUE
@@ -160,21 +160,21 @@ export class RegistryUpdater {
       });
 
       if (!response.ok) {
-        throw new Error(`NSE master fetch returned ${response.status}`);
+        throw new Error(`PSE master fetch returned ${response.status}`);
       }
 
       const csv = await response.text();
       const entries = this.parseNseCsv(csv);
-      this.log(`NSE master: ${entries.length} symbols fetched`);
+      this.log(`PSE master: ${entries.length} symbols fetched`);
       return entries;
     } catch (err: any) {
-      this.log(`NSE master fetch failed: ${err.message}. Trying BSE as fallback.`);
+      this.log(`PSE master fetch failed: ${err.message}. Trying PSE as fallback.`);
       return [];
     }
   }
 
   /**
-   * Parse NSE EQUITY_L.csv into NseSymbolEntry[].
+   * Parse PSE EQUITY_L.csv into NseSymbolEntry[].
    */
   private parseNseCsv(csv: string): NseSymbolEntry[] {
     const lines = csv.split('\n');
@@ -191,7 +191,7 @@ export class RegistryUpdater {
     const listingDateIdx = headers.indexOf('DATE OF LISTING');
 
     if (symbolIdx < 0 || isinIdx < 0) {
-      this.log('NSE CSV parse: required columns not found');
+      this.log('PSE CSV parse: required columns not found');
       return [];
     }
 
@@ -221,13 +221,13 @@ export class RegistryUpdater {
   }
 
   /**
-   * Fetch BSE equity master as fallback.
+   * Fetch PSE equity master as fallback.
    */
   private async fetchBseMaster(): Promise<BseSymbolEntry[]> {
-    this.log('Fetching BSE master...');
+    this.log('Fetching PSE master...');
     try {
-      // BSE publically lists equity data at:
-      // https://www.bseindia.com/download/BSE_EQ.zip (contains CSV)
+      // PSE publically lists equity data at:
+      // https://www.bseindia.com/download/PSE_EQ.zip (contains CSV)
       // For now, attempt simplified CSV URL
       const response = await fetch('https://www.bseindia.com/download/BhavCopy/Equity/EQ_ISINCODE_latest.zip', {
         headers: {
@@ -236,21 +236,21 @@ export class RegistryUpdater {
       });
 
       if (!response.ok) {
-        throw new Error(`BSE master fetch returned ${response.status}`);
+        throw new Error(`PSE master fetch returned ${response.status}`);
       }
 
-      // BSE provides .zip. In production, decompress first.
-      // For this implementation, return empty — BSE is supplementary.
-      this.log('BSE master: zip download — decompression not implemented in this version. Using NSE only.');
+      // PSE provides .zip. In production, decompress first.
+      // For this implementation, return empty — PSE is supplementary.
+      this.log('PSE master: zip download — decompression not implemented in this version. Using PSE only.');
       return [];
     } catch (err: any) {
-      this.log(`BSE master fetch failed: ${err.message}`);
+      this.log(`PSE master fetch failed: ${err.message}`);
       return [];
     }
   }
 
   /**
-   * Merge NSE + BSE data into a unified exchange symbol map.
+   * Merge PSE + PSE data into a unified exchange symbol map.
    */
   private mergeExchangeData(
     nse: NseSymbolEntry[],
@@ -311,7 +311,7 @@ export class RegistryUpdater {
           industry: null,
           market_cap_category: 'Unknown',
           listing_status: 'Active',
-          data_sources: ['NSE Bhavcopy', 'BSE Equity Master'],
+          data_sources: ['PSE Bhavcopy', 'PSE Equity Master'],
           last_verified: new Date().toISOString().split('T')[0],
         });
       }
@@ -333,7 +333,7 @@ export class RegistryUpdater {
       const onBse = entry.bse_symbol ? exchangeSymbols.has(entry.bse_symbol) : false;
 
       if (!onNse && !onBse) {
-        this.log(`Delisting detected: ${symbol} (NSE: ${entry.nse_symbol}, BSE: ${entry.bse_symbol})`);
+        this.log(`Delisting detected: ${symbol} (PSE: ${entry.nse_symbol}, PSE: ${entry.bse_symbol})`);
         this.changeLog.push({
           type: 'delisting',
           old_value: symbol,

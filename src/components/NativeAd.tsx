@@ -1,7 +1,7 @@
 /**
  * NativeAd — Sponsored content slot for positions 3 & 7 in news feeds.
  * 
- * CPM model: ₹50-100 per 1K impressions. Labeled "SPONSORED" per SEBI guidelines.
+ * CPM model: ₹50-100 per 1K impressions. Labeled "SPONSORED" per SEC guidelines.
  * Premium subscribers see no ads (FeatureGate checks subscription tier).
  * 
  * Spec ref: Section "Native Advertising" — ad positions 3 & 7.
@@ -59,7 +59,7 @@ const AD_INVENTORY = [
     id: "ad-5",
     sponsor: "INDmoney",
     headline: "Track all your investments in one app",
-    body: "Stocks, MFs, FD, EPF, NPS — everything. Free portfolio tracker for Indian investors.",
+    body: "Stocks, MFs, FD, EPF, NPS — everything. Free portfolio tracker for Philippine investors.",
     cta: "Download INDmoney →",
     url: "https://indmoney.onelink.me/Rb36?ref=stockstory",
     logo: "IN",

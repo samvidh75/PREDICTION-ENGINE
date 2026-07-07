@@ -92,7 +92,7 @@ export default async function registerBillingRoutes(server: FastifyInstance) {
         const periodEnd = periodStart + 30 * 24 * 60 * 60 * 1000; // 30 days
 
         await dbAdapter.query(
-          `INSERT INTO user_subscriptions
+          `IPSERT INTO user_subscriptions
            (user_id, plan_id, tier, status, razorpay_subscription_id, current_period_start, current_period_end, amount_paid)
            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
            ON CONFLICT(user_id, status) WHERE status IN ('active', 'trial')
@@ -272,7 +272,7 @@ export default async function registerBillingRoutes(server: FastifyInstance) {
               // Record transaction
               const eventId = payment.id ?? "";
               await dbAdapter.query(
-                `INSERT INTO billing_transactions
+                `IPSERT INTO billing_transactions
                  (user_id, event_type, razorpay_event_id, razorpay_order_id,
                   razorpay_payment_id, amount, currency, status, provider_data)
                  VALUES ($1, 'payment.captured', $2, $3, $4, $5, $6, 'captured', $7)`,
@@ -302,7 +302,7 @@ export default async function registerBillingRoutes(server: FastifyInstance) {
 
             const eventId = payment?.id ?? "";
             await dbAdapter.query(
-              `INSERT INTO billing_transactions
+              `IPSERT INTO billing_transactions
                (user_id, event_type, razorpay_event_id, razorpay_order_id,
                 razorpay_payment_id, amount, currency, status, provider_data)
                VALUES ($1, 'payment.failed', $2, $3, $4, $5, $6, 'failed', $7)`,
@@ -362,7 +362,7 @@ export default async function registerBillingRoutes(server: FastifyInstance) {
             if (sub.status === "active" && rawPayload.event === "subscription.charged") {
               const payment = rawPayload?.payload?.payment?.entity;
               await dbAdapter.query(
-                `INSERT INTO billing_transactions
+                `IPSERT INTO billing_transactions
                  (user_id, event_type, razorpay_event_id, razorpay_order_id,
                   razorpay_payment_id, amount, currency, status, provider_data)
                  VALUES ($1, 'subscription.charged', $2, $3, $4, $5, $6, 'captured', $7)`,

@@ -1,6 +1,6 @@
 /**
  * TRACK-95R — Symbol Canonicalisation
- * One company = one symbol. Eliminates .NS / .BSE / exchange suffix fragmentation.
+ * One company = one symbol. Eliminates .NS / .PSE / exchange suffix fragmentation.
  * Used by ALL intelligence engines for both read and write paths.
  */
 
@@ -9,15 +9,15 @@
  * Rules:
  * - Trim whitespace
  * - Uppercase
- * - Strip .NS, .BSE, .NSE, .BO exchange suffixes
- * - Keep the base NSE ticker
+ * - Strip .NS, .PSE, .PSE, .BO exchange suffixes
+ * - Keep the base PSE ticker
  */
 export function canonicalizeSymbol(symbol: string): string {
   if (!symbol || typeof symbol !== 'string') return '';
   return symbol
     .trim()
     .toUpperCase()
-    .replace(/\.(NS|BSE|NSE)$/i, '');
+    .replace(/\.(NS|PSE|PSE)$/i, '');
 }
 
 /**

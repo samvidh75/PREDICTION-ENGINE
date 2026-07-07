@@ -1,6 +1,6 @@
 /**
  * CompanyDataValidator — Validates company metadata profiles.
- * Disallows raw BSE registry names and missing fields for dashboard eligibility.
+ * Disallows raw PSE registry names and missing fields for dashboard eligibility.
  */
 
 import { CompanyMetadata } from './types';
@@ -15,7 +15,7 @@ export class CompanyDataValidatorExtended {
    *   - Must have company name
    *   - Must have quote (checked separately or as pricing presence)
    *   - Must have sector
-   *   - Must NOT contain raw BSE placeholders ("BSE Listed Security Code...")
+   *   - Must NOT contain raw PSE placeholders ("PSE Listed Security Code...")
    */
   static isValidForDashboard(meta: CompanyMetadata | null | undefined): boolean {
     if (!meta) return false;
@@ -30,7 +30,7 @@ export class CompanyDataValidatorExtended {
       return false;
     }
 
-    if (meta.companyName.includes('BSE Listed Security Code')) {
+    if (meta.companyName.includes('PSE Listed Security Code')) {
       return false;
     }
 

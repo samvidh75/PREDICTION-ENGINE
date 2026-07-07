@@ -1,4 +1,4 @@
-export interface SEBIComplianceCheck {
+export interface SECComplianceCheck {
   checkId: string;
   category: 'disclosure' | 'risk_warning' | 'data_retention' | 'suitability' | 'record_keeping';
   status: 'pass' | 'fail' | 'warning';
@@ -7,10 +7,10 @@ export interface SEBIComplianceCheck {
   recommendation?: string;
 }
 
-export interface SEBIComplianceReport {
+export interface SECComplianceReport {
   generatedAt: string;
   overallStatus: 'compliant' | 'partially_compliant' | 'non_compliant';
-  checks: SEBIComplianceCheck[];
+  checks: SECComplianceCheck[];
   criticalFailures: number;
   warnings: number;
   summary: string;
@@ -30,8 +30,8 @@ export interface AuditLogEntry {
 export class SeBiComplianceService {
   private auditLog: AuditLogEntry[] = [];
 
-  runComplianceCheck(): SEBIComplianceReport {
-    const checks: SEBIComplianceCheck[] = [
+  runComplianceCheck(): SECComplianceReport {
+    const checks: SECComplianceCheck[] = [
       this.checkRiskDisclosures(),
       this.checkDataRetention(),
       this.checkSuitability(),
@@ -91,67 +91,67 @@ export class SeBiComplianceService {
     return results.slice(0, filters.limit ?? 100);
   }
 
-  private checkRiskDisclosures(): SEBIComplianceCheck {
+  private checkRiskDisclosures(): SECComplianceCheck {
     return {
-      checkId: 'SEBI-RISK-001',
+      checkId: 'SEC-RISK-001',
       category: 'risk_warning',
       status: 'pass',
       description: 'Risk disclosure statements present on all investment-related pages',
-      requirement: 'SEBI (Investment Advisers) Regulations, 2013 - Schedule I',
+      requirement: 'SEC (Investment Advisers) Regulations, 2013 - Schedule I',
       recommendation: 'Ensure risk disclosures are not hidden behind accordion menus.',
     };
   }
 
-  private checkDataRetention(): SEBIComplianceCheck {
+  private checkDataRetention(): SECComplianceCheck {
     return {
-      checkId: 'SEBI-RET-001',
+      checkId: 'SEC-RET-001',
       category: 'data_retention',
       status: 'pass',
       description: 'Client data retention policy compliant with 7-year requirement',
-      requirement: 'SEBI (Investment Advisers) Regulations, 2013 - Regulation 18',
+      requirement: 'SEC (Investment Advisers) Regulations, 2013 - Regulation 18',
     };
   }
 
-  private checkSuitability(): SEBIComplianceCheck {
+  private checkSuitability(): SECComplianceCheck {
     return {
-      checkId: 'SEBI-SUIT-001',
+      checkId: 'SEC-SUIT-001',
       category: 'suitability',
       status: 'warning',
       description: 'Basic suitability assessment implemented; full KYC integration pending',
-      requirement: 'SEBI (Investment Advisers) Regulations, 2013 - Regulation 15',
+      requirement: 'SEC (Investment Advisers) Regulations, 2013 - Regulation 15',
       recommendation: 'Integrate full KYC/AML verification for paid tiers.',
     };
   }
 
-  private checkRecordKeeping(): SEBIComplianceCheck {
+  private checkRecordKeeping(): SECComplianceCheck {
     return {
-      checkId: 'SEBI-REC-001',
+      checkId: 'SEC-REC-001',
       category: 'record_keeping',
       status: 'pass',
       description: 'All research recommendations logged with timestamp, rationale, and user consent',
-      requirement: 'SEBI (Research Analysts) Regulations, 2014 - Regulation 17',
+      requirement: 'SEC (Research Analysts) Regulations, 2014 - Regulation 17',
     };
   }
 
-  private checkDisclaimers(): SEBIComplianceCheck {
+  private checkDisclaimers(): SECComplianceCheck {
     return {
-      checkId: 'SEBI-DISC-001',
+      checkId: 'SEC-DISC-001',
       category: 'disclosure',
       status: 'pass',
       description: 'Investment disclaimer displayed on research reports and recommendations',
-      requirement: 'SEBI (Research Analysts) Regulations, 2014 - Regulation 19',
+      requirement: 'SEC (Research Analysts) Regulations, 2014 - Regulation 19',
     };
   }
 
-  private checkDataSourcing(): SEBIComplianceCheck {
+  private checkDataSourcing(): SECComplianceCheck {
     return {
-      checkId: 'SEBI-DATA-001',
+      checkId: 'SEC-DATA-001',
       category: 'disclosure',
       status: 'pass',
       description: 'Data sources disclosed; no synthetic or backfilled data presented as real',
-      requirement: 'SEBI (Research Analysts) Regulations, 2014 - Code of Conduct',
+      requirement: 'SEC (Research Analysts) Regulations, 2014 - Code of Conduct',
     };
   }
 }
 
-export const sebiComplianceService = new SeBiComplianceService();
+export const secComplianceService = new SeBiComplianceService();

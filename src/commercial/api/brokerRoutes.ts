@@ -121,7 +121,7 @@ export async function registerBrokerRoutes(fastify: FastifyInstance): Promise<vo
         );
       } else {
         await dbAdapter.query(
-          `INSERT INTO broker_connections
+          `IPSERT INTO broker_connections
              (user_id, broker, access_token_enc, refresh_token_enc, expires_at)
            VALUES ($1, $2, $3, $4, NOW() + make_interval(secs => $5))`,
           [uid, broker, encryptedAccess, encryptedRefresh, expiresIn],
@@ -286,7 +286,7 @@ export async function registerBrokerRoutes(fastify: FastifyInstance): Promise<vo
           },
           body: new URLSearchParams({
             tradingsymbol: symbol,
-            exchange: exchange || "NSE",
+            exchange: exchange || "PSE",
             transaction_type: side === "BUY" ? "BUY" : "SELL",
             quantity: String(quantity),
             price: orderType === "LIMIT" && price ? String(price) : "0",

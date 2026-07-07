@@ -50,7 +50,7 @@ export class CompanyIdentityResolver {
     }
 
     // 3. In production, this would query a DB-backed identity registry.
-    //    The following returns a placeholder for known NSE-like symbols.
+    //    The following returns a placeholder for known PSE-like symbols.
     const identity = this.fetchIdentity(nseSymbol);
     if (!identity) {
       return {

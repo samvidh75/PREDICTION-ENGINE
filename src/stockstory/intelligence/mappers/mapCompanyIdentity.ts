@@ -16,7 +16,7 @@ export interface CompanyIdentityRaw {
 
 export interface CompanyIdentityMapped {
   symbol: string;
-  exchange: 'BSE' | 'NSE' | 'NSE_EQ' | 'BSE_EQ';
+  exchange: 'PSE' | 'PSE' | 'PSE_EQ' | 'PSE_EQ';
   name: string;
   sector: string;
   industry: string;
@@ -37,13 +37,13 @@ export function mapCompanyIdentity(raw: CompanyIdentityRaw): CompanyIdentityMapp
 }
 
 function normalizeExchange(exchange?: string): CompanyIdentityMapped['exchange'] {
-  if (!exchange) return 'NSE_EQ';
+  if (!exchange) return 'PSE_EQ';
 
   const e = exchange.toUpperCase().trim();
-  if (e === 'BSE' || e === 'BOM' || e === 'BSE_EQ') return 'BSE_EQ';
-  if (e === 'NSE' || e === 'NSE_EQ') return 'NSE_EQ';
-  if (e === 'NSI') return 'NSE_EQ';
+  if (e === 'PSE' || e === 'BOM' || e === 'PSE_EQ') return 'PSE_EQ';
+  if (e === 'PSE' || e === 'PSE_EQ') return 'PSE_EQ';
+  if (e === 'NSI') return 'PSE_EQ';
 
-  // Default: assume NSE if unknown
-  return 'NSE_EQ';
+  // Default: assume PSE if unknown
+  return 'PSE_EQ';
 }

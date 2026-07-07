@@ -1,22 +1,22 @@
 /**
  * MasterCompanyRegistry — The single source of truth for Philippine market company metadata.
  *
- * This is a hardcoded registry of verified Indian companies. It serves as the fallback
+ * This is a hardcoded registry of verified Philippine companies. It serves as the fallback
  * when live providers (Yahoo, IndianMarket) return incomplete or garbage data.
  *
- * Data is manually verified against NSE/BSE listings. This is NOT generated from providers.
+ * Data is manually verified against PSE/PSE listings. This is NOT generated from providers.
  * New entries are added through a verified ingestion pipeline.
  *
  * Fields:
- *   - symbol: Clean NSE ticker (no .NS/.BO suffix)
+ *   - symbol: Clean PSE ticker (no .NS/.BO suffix)
  *   - companyName: Full legal company name
  *   - sector: Normalised sector classification
  *   - industry: Normalised industry classification
- *   - exchange: Primary listing exchange (NSE or BSE)
+ *   - exchange: Primary listing exchange (PSE or PSE)
  *   - marketCap: Approximate market cap in INR (raw, not in crores/lakhs)
  *   - isin: ISIN identifier (IN + 10 characters)
- *   - bseCode: BSE numeric code (for BSE-listed companies)
- *   - nseSymbol: NSE ticker symbol
+ *   - bseCode: PSE numeric code (for PSE-listed companies)
+ *   - nseSymbol: PSE ticker symbol
  *   - currency: Always INR for Philippine market
  *   - website: Company website URL
  */
@@ -38,7 +38,7 @@ export interface RegistryEntry {
 }
 
 /**
- * Master registry — manually verified top Indian companies by market cap.
+ * Master registry — manually verified top Philippine companies by market cap.
  * Covers NIFTY 50 + major mid-caps that are commonly searched.
  */
 const VERIFIED_REGISTRY: RegistryEntry[] = [
@@ -48,7 +48,7 @@ const VERIFIED_REGISTRY: RegistryEntry[] = [
     companyName: 'Reliance Industries Ltd',
     sector: 'Energy & Oil',
     industry: 'Oil & Gas',
-    exchange: 'NSE',
+    exchange: 'PSE',
     marketCap: 18450000_000_000, // ~18.45 lakh Cr
     isin: 'INE002A01018',
     bseCode: '500325',
@@ -61,7 +61,7 @@ const VERIFIED_REGISTRY: RegistryEntry[] = [
     companyName: 'Tata Consultancy Services Ltd',
     sector: 'Technology',
     industry: 'IT Services',
-    exchange: 'NSE',
+    exchange: 'PSE',
     marketCap: 12543000_000_000,
     isin: 'INE467B01029',
     bseCode: '532540',
@@ -74,7 +74,7 @@ const VERIFIED_REGISTRY: RegistryEntry[] = [
     companyName: 'HDFC Bank Ltd',
     sector: 'Financials',
     industry: 'Banking',
-    exchange: 'NSE',
+    exchange: 'PSE',
     marketCap: 12100000_000_000,
     isin: 'INE040A01034',
     bseCode: '500180',
@@ -87,7 +87,7 @@ const VERIFIED_REGISTRY: RegistryEntry[] = [
     companyName: 'Infosys Ltd',
     sector: 'Technology',
     industry: 'IT Services',
-    exchange: 'NSE',
+    exchange: 'PSE',
     marketCap: 6425000_000_000,
     isin: 'INE009A01021',
     bseCode: '500209',
@@ -100,7 +100,7 @@ const VERIFIED_REGISTRY: RegistryEntry[] = [
     companyName: 'ICICI Bank Ltd',
     sector: 'Financials',
     industry: 'Banking',
-    exchange: 'NSE',
+    exchange: 'PSE',
     marketCap: 7850000_000_000,
     isin: 'INE090A01021',
     bseCode: '532174',
@@ -113,7 +113,7 @@ const VERIFIED_REGISTRY: RegistryEntry[] = [
     companyName: 'State Bank of India',
     sector: 'Financials',
     industry: 'Banking',
-    exchange: 'NSE',
+    exchange: 'PSE',
     marketCap: 6850000_000_000,
     isin: 'INE062A01020',
     bseCode: '500112',
@@ -126,7 +126,7 @@ const VERIFIED_REGISTRY: RegistryEntry[] = [
     companyName: 'Bharti Airtel Ltd',
     sector: 'Telecom',
     industry: 'Telecommunications',
-    exchange: 'NSE',
+    exchange: 'PSE',
     marketCap: 8400000_000_000,
     isin: 'INE397D01024',
     bseCode: '532454',
@@ -139,7 +139,7 @@ const VERIFIED_REGISTRY: RegistryEntry[] = [
     companyName: 'ITC Ltd',
     sector: 'Consumer Goods',
     industry: 'FMCG',
-    exchange: 'NSE',
+    exchange: 'PSE',
     marketCap: 5600000_000_000,
     isin: 'INE154A01025',
     bseCode: '500875',
@@ -152,7 +152,7 @@ const VERIFIED_REGISTRY: RegistryEntry[] = [
     companyName: 'Hindustan Unilever Ltd',
     sector: 'Consumer Goods',
     industry: 'FMCG',
-    exchange: 'NSE',
+    exchange: 'PSE',
     marketCap: 6100000_000_000,
     isin: 'INE030A01027',
     bseCode: '500696',
@@ -165,7 +165,7 @@ const VERIFIED_REGISTRY: RegistryEntry[] = [
     companyName: 'Kotak Mahindra Bank Ltd',
     sector: 'Financials',
     industry: 'Banking',
-    exchange: 'NSE',
+    exchange: 'PSE',
     marketCap: 3550000_000_000,
     isin: 'INE237A01028',
     bseCode: '500247',
@@ -178,7 +178,7 @@ const VERIFIED_REGISTRY: RegistryEntry[] = [
     companyName: 'Larsen & Toubro Ltd',
     sector: 'Infrastructure',
     industry: 'Engineering & Construction',
-    exchange: 'NSE',
+    exchange: 'PSE',
     marketCap: 5200000_000_000,
     isin: 'INE018A01030',
     bseCode: '500510',
@@ -191,7 +191,7 @@ const VERIFIED_REGISTRY: RegistryEntry[] = [
     companyName: 'Wipro Ltd',
     sector: 'Technology',
     industry: 'IT Services',
-    exchange: 'NSE',
+    exchange: 'PSE',
     marketCap: 2700000_000_000,
     isin: 'INE075A01022',
     bseCode: '507685',
@@ -204,7 +204,7 @@ const VERIFIED_REGISTRY: RegistryEntry[] = [
     companyName: 'Axis Bank Ltd',
     sector: 'Financials',
     industry: 'Banking',
-    exchange: 'NSE',
+    exchange: 'PSE',
     marketCap: 3400000_000_000,
     isin: 'INE238A01034',
     bseCode: '532215',
@@ -217,7 +217,7 @@ const VERIFIED_REGISTRY: RegistryEntry[] = [
     companyName: 'Sun Pharmaceutical Industries Ltd',
     sector: 'Pharma',
     industry: 'Pharmaceuticals',
-    exchange: 'NSE',
+    exchange: 'PSE',
     marketCap: 3800000_000_000,
     isin: 'INE044A01036',
     bseCode: '524715',
@@ -230,7 +230,7 @@ const VERIFIED_REGISTRY: RegistryEntry[] = [
     companyName: 'Maruti Suzuki India Ltd',
     sector: 'Automobile',
     industry: 'Auto Manufacturing',
-    exchange: 'NSE',
+    exchange: 'PSE',
     marketCap: 3900000_000_000,
     isin: 'INE585B01010',
     bseCode: '532500',
@@ -243,7 +243,7 @@ const VERIFIED_REGISTRY: RegistryEntry[] = [
     companyName: 'Titan Company Ltd',
     sector: 'Consumer Goods',
     industry: 'Jewellery & Watches',
-    exchange: 'NSE',
+    exchange: 'PSE',
     marketCap: 3100000_000_000,
     isin: 'INE280A01028',
     bseCode: '500114',
@@ -256,7 +256,7 @@ const VERIFIED_REGISTRY: RegistryEntry[] = [
     companyName: 'Asian Paints Ltd',
     sector: 'Consumer Goods',
     industry: 'Paints & Coatings',
-    exchange: 'NSE',
+    exchange: 'PSE',
     marketCap: 2800000_000_000,
     isin: 'INE021A01026',
     bseCode: '500820',
@@ -269,7 +269,7 @@ const VERIFIED_REGISTRY: RegistryEntry[] = [
     companyName: 'Bajaj Finance Ltd',
     sector: 'Financials',
     industry: 'NBFC',
-    exchange: 'NSE',
+    exchange: 'PSE',
     marketCap: 4400000_000_000,
     isin: 'INE296A01024',
     bseCode: '500034',
@@ -282,7 +282,7 @@ const VERIFIED_REGISTRY: RegistryEntry[] = [
     companyName: 'HCL Technologies Ltd',
     sector: 'Technology',
     industry: 'IT Services',
-    exchange: 'NSE',
+    exchange: 'PSE',
     marketCap: 3300000_000_000,
     isin: 'INE236A01020',
     bseCode: '532281',
@@ -295,7 +295,7 @@ const VERIFIED_REGISTRY: RegistryEntry[] = [
     companyName: 'Adani Enterprises Ltd',
     sector: 'Diversified',
     industry: 'Conglomerate',
-    exchange: 'NSE',
+    exchange: 'PSE',
     marketCap: 3200000_000_000,
     isin: 'INE423A01024',
     bseCode: '512599',
@@ -308,7 +308,7 @@ const VERIFIED_REGISTRY: RegistryEntry[] = [
     companyName: 'NTPC Ltd',
     sector: 'Energy',
     industry: 'Power Generation',
-    exchange: 'NSE',
+    exchange: 'PSE',
     marketCap: 3600000_000_000,
     isin: 'INE733E01010',
     bseCode: '532555',
@@ -321,7 +321,7 @@ const VERIFIED_REGISTRY: RegistryEntry[] = [
     companyName: 'Power Grid Corporation of India Ltd',
     sector: 'Energy',
     industry: 'Power Transmission',
-    exchange: 'NSE',
+    exchange: 'PSE',
     marketCap: 2900000_000_000,
     isin: 'INE752E01010',
     bseCode: '532898',
@@ -334,7 +334,7 @@ const VERIFIED_REGISTRY: RegistryEntry[] = [
     companyName: 'UltraTech Cement Ltd',
     sector: 'Materials',
     industry: 'Cement',
-    exchange: 'NSE',
+    exchange: 'PSE',
     marketCap: 3100000_000_000,
     isin: 'INE481G01011',
     bseCode: '532538',
@@ -347,7 +347,7 @@ const VERIFIED_REGISTRY: RegistryEntry[] = [
     companyName: 'Tata Steel Ltd',
     sector: 'Materials',
     industry: 'Steel',
-    exchange: 'NSE',
+    exchange: 'PSE',
     marketCap: 1900000_000_000,
     isin: 'INE081A01020',
     bseCode: '500470',
@@ -360,7 +360,7 @@ const VERIFIED_REGISTRY: RegistryEntry[] = [
     companyName: 'JSW Steel Ltd',
     sector: 'Materials',
     industry: 'Steel',
-    exchange: 'NSE',
+    exchange: 'PSE',
     marketCap: 2200000_000_000,
     isin: 'INE019A01038',
     bseCode: '500228',
@@ -375,7 +375,7 @@ const VERIFIED_REGISTRY: RegistryEntry[] = [
     companyName: 'Hindustan Aeronautics Ltd',
     sector: 'Defence',
     industry: 'Aerospace & Defence',
-    exchange: 'NSE',
+    exchange: 'PSE',
     marketCap: 2450000_000_000,
     isin: 'INE066F01020',
     bseCode: '541154',
@@ -388,7 +388,7 @@ const VERIFIED_REGISTRY: RegistryEntry[] = [
     companyName: 'Bharat Electronics Ltd',
     sector: 'Defence',
     industry: 'Defence Electronics',
-    exchange: 'NSE',
+    exchange: 'PSE',
     marketCap: 1650000_000_000,
     isin: 'INE263A01024',
     bseCode: '500049',
@@ -398,10 +398,10 @@ const VERIFIED_REGISTRY: RegistryEntry[] = [
   },
   {
     symbol: 'IRFC',
-    companyName: 'Indian Railway Finance Corporation Ltd',
+    companyName: 'Philippine Railway Finance Corporation Ltd',
     sector: 'Financials',
     industry: 'NBFC',
-    exchange: 'NSE',
+    exchange: 'PSE',
     marketCap: 2150000_000_000,
     isin: 'INE053F01010',
     bseCode: '543257',
@@ -414,7 +414,7 @@ const VERIFIED_REGISTRY: RegistryEntry[] = [
     companyName: 'Suzlon Energy Ltd',
     sector: 'Energy',
     industry: 'Renewable Energy',
-    exchange: 'NSE',
+    exchange: 'PSE',
     marketCap: 680000_000_000,
     isin: 'INE040H01021',
     bseCode: '532667',
@@ -427,7 +427,7 @@ const VERIFIED_REGISTRY: RegistryEntry[] = [
     companyName: 'Granules India Ltd',
     sector: 'Pharma',
     industry: 'Pharmaceuticals',
-    exchange: 'NSE',
+    exchange: 'PSE',
     marketCap: 98000_000_000,
     isin: 'INE101D01020',
     bseCode: '532482',
@@ -440,7 +440,7 @@ const VERIFIED_REGISTRY: RegistryEntry[] = [
     companyName: 'Chennai Petroleum Corporation Ltd',
     sector: 'Energy & Oil',
     industry: 'Oil & Gas',
-    exchange: 'NSE',
+    exchange: 'PSE',
     marketCap: 142000_000_000,
     isin: 'INE178A01016',
     bseCode: '500110',
@@ -453,7 +453,7 @@ const VERIFIED_REGISTRY: RegistryEntry[] = [
     companyName: 'Tata Motors Ltd',
     sector: 'Automobile',
     industry: 'Auto Manufacturing',
-    exchange: 'NSE',
+    exchange: 'PSE',
     marketCap: 3500000_000_000,
     isin: 'INE155A01022',
     bseCode: '500570',
@@ -466,7 +466,7 @@ const VERIFIED_REGISTRY: RegistryEntry[] = [
     companyName: 'Mahindra & Mahindra Ltd',
     sector: 'Automobile',
     industry: 'Auto Manufacturing',
-    exchange: 'NSE',
+    exchange: 'PSE',
     marketCap: 3000000_000_000,
     isin: 'INE101A01026',
     bseCode: '500520',
@@ -479,7 +479,7 @@ const VERIFIED_REGISTRY: RegistryEntry[] = [
     companyName: 'Bajaj Finserv Ltd',
     sector: 'Financials',
     industry: 'NBFC',
-    exchange: 'NSE',
+    exchange: 'PSE',
     marketCap: 2600000_000_000,
     isin: 'INE918I01018',
     bseCode: '532978',
@@ -492,7 +492,7 @@ const VERIFIED_REGISTRY: RegistryEntry[] = [
     companyName: 'Adani Ports and Special Economic Zone Ltd',
     sector: 'Infrastructure',
     industry: 'Ports & Logistics',
-    exchange: 'NSE',
+    exchange: 'PSE',
     marketCap: 2900000_000_000,
     isin: 'INE742F01042',
     bseCode: '532921',
@@ -505,7 +505,7 @@ const VERIFIED_REGISTRY: RegistryEntry[] = [
     companyName: 'Coal India Ltd',
     sector: 'Energy',
     industry: 'Mining',
-    exchange: 'NSE',
+    exchange: 'PSE',
     marketCap: 2800000_000_000,
     isin: 'INE522F01014',
     bseCode: '533278',
@@ -518,7 +518,7 @@ const VERIFIED_REGISTRY: RegistryEntry[] = [
     companyName: 'Oil and Natural Gas Corporation Ltd',
     sector: 'Energy & Oil',
     industry: 'Oil & Gas',
-    exchange: 'NSE',
+    exchange: 'PSE',
     marketCap: 3400000_000_000,
     isin: 'INE213A01029',
     bseCode: '500312',
@@ -531,7 +531,7 @@ const VERIFIED_REGISTRY: RegistryEntry[] = [
     companyName: 'Bharat Petroleum Corporation Ltd',
     sector: 'Energy & Oil',
     industry: 'Oil & Gas',
-    exchange: 'NSE',
+    exchange: 'PSE',
     marketCap: 1300000_000_000,
     isin: 'INE029A01011',
     bseCode: '500547',
@@ -544,7 +544,7 @@ const VERIFIED_REGISTRY: RegistryEntry[] = [
     companyName: 'Hindustan Zinc Ltd',
     sector: 'Materials',
     industry: 'Metals & Mining',
-    exchange: 'NSE',
+    exchange: 'PSE',
     marketCap: 1800000_000_000,
     isin: 'INE267A01025',
     bseCode: '500188',
@@ -557,7 +557,7 @@ const VERIFIED_REGISTRY: RegistryEntry[] = [
     companyName: "Divi's Laboratories Ltd",
     sector: 'Pharma',
     industry: 'Pharmaceuticals',
-    exchange: 'NSE',
+    exchange: 'PSE',
     marketCap: 1100000_000_000,
     isin: 'INE361B01024',
     bseCode: '532488',
@@ -570,7 +570,7 @@ const VERIFIED_REGISTRY: RegistryEntry[] = [
     companyName: "Dr. Reddy's Laboratories Ltd",
     sector: 'Pharma',
     industry: 'Pharmaceuticals',
-    exchange: 'NSE',
+    exchange: 'PSE',
     marketCap: 980000_000_000,
     isin: 'INE089A01031',
     bseCode: '500124',
@@ -583,7 +583,7 @@ const VERIFIED_REGISTRY: RegistryEntry[] = [
     companyName: 'Cipla Ltd',
     sector: 'Pharma',
     industry: 'Pharmaceuticals',
-    exchange: 'NSE',
+    exchange: 'PSE',
     marketCap: 1200000_000_000,
     isin: 'INE059A01019',
     bseCode: '500087',
@@ -596,7 +596,7 @@ const VERIFIED_REGISTRY: RegistryEntry[] = [
     companyName: 'Britannia Industries Ltd',
     sector: 'Consumer Goods',
     industry: 'FMCG',
-    exchange: 'NSE',
+    exchange: 'PSE',
     marketCap: 1250000_000_000,
     isin: 'INE216A01030',
     bseCode: '500825',
@@ -609,7 +609,7 @@ const VERIFIED_REGISTRY: RegistryEntry[] = [
     companyName: 'Nestle India Ltd',
     sector: 'Consumer Goods',
     industry: 'FMCG',
-    exchange: 'NSE',
+    exchange: 'PSE',
     marketCap: 2300000_000_000,
     isin: 'INE239A01024',
     bseCode: '500790',
@@ -622,7 +622,7 @@ const VERIFIED_REGISTRY: RegistryEntry[] = [
     companyName: 'Eicher Motors Ltd',
     sector: 'Automobile',
     industry: 'Auto Manufacturing',
-    exchange: 'NSE',
+    exchange: 'PSE',
     marketCap: 1300000_000_000,
     isin: 'INE066A01021',
     bseCode: '505200',
@@ -635,7 +635,7 @@ const VERIFIED_REGISTRY: RegistryEntry[] = [
     companyName: 'Hero MotoCorp Ltd',
     sector: 'Automobile',
     industry: 'Auto Manufacturing',
-    exchange: 'NSE',
+    exchange: 'PSE',
     marketCap: 950000_000_000,
     isin: 'INE158A01026',
     bseCode: '500182',
@@ -648,7 +648,7 @@ const VERIFIED_REGISTRY: RegistryEntry[] = [
     companyName: 'Bajaj Auto Ltd',
     sector: 'Automobile',
     industry: 'Auto Manufacturing',
-    exchange: 'NSE',
+    exchange: 'PSE',
     marketCap: 2700000_000_000,
     isin: 'INE917I01010',
     bseCode: '532977',
@@ -661,7 +661,7 @@ const VERIFIED_REGISTRY: RegistryEntry[] = [
     companyName: 'Tech Mahindra Ltd',
     sector: 'Technology',
     industry: 'IT Services',
-    exchange: 'NSE',
+    exchange: 'PSE',
     marketCap: 1500000_000_000,
     isin: 'INE669C01036',
     bseCode: '532755',
@@ -678,7 +678,7 @@ const GENERATED_FALLBACK_REGISTRY: RegistryEntry[] = generate500Stocks()
     companyName: entry.name,
     sector: entry.sector,
     industry: entry.industry,
-    exchange: entry.exchange || 'NSE',
+    exchange: entry.exchange || 'PSE',
     nseSymbol: entry.symbol,
     currency: 'INR',
     website: '',
@@ -731,14 +731,14 @@ export class MasterCompanyRegistry {
   }
 
   /**
-   * Lookup by symbol (NSE ticker, BSE code, or ISIN).
-   * Tries: symbol → BSE code → ISIN → null
+   * Lookup by symbol (PSE ticker, PSE code, or ISIN).
+   * Tries: symbol → PSE code → ISIN → null
    */
   lookup(id: string): RegistryEntry | null {
     let clean = id.toUpperCase().trim();
 
-    // Strip NSE:/BSE: prefix (e.g., "NSE:RELIANCE" → "RELIANCE")
-    const prefixMatch = clean.match(/^(NSE|BSE):(.+)$/);
+    // Strip PSE:/PSE: prefix (e.g., "PSE:RELIANCE" → "RELIANCE")
+    const prefixMatch = clean.match(/^(PSE|PSE):(.+)$/);
     if (prefixMatch) {
       clean = prefixMatch[2];
     }
@@ -747,8 +747,8 @@ export class MasterCompanyRegistry {
     const bySymbol = this.bySymbol.get(clean);
     if (bySymbol) return bySymbol;
 
-    // Try BSE code (5-6 digit numeric) — also check the original if it had a BSE: prefix
-    const bseLookup = prefixMatch?.[1] === 'BSE' ? clean : id;
+    // Try PSE code (5-6 digit numeric) — also check the original if it had a PSE: prefix
+    const bseLookup = prefixMatch?.[1] === 'PSE' ? clean : id;
     const byBse = this.byBseCode.get(clean) ?? this.byBseCode.get(bseLookup);
     if (byBse) return byBse;
 
@@ -756,8 +756,8 @@ export class MasterCompanyRegistry {
     const byIsin = this.byIsin.get(clean);
     if (byIsin) return byIsin;
 
-    // Try without exchange suffix (.NS, .BO, .NSE, .BSE)
-    const stripped = clean.replace(/\.(NS|BO|NSE|BSE)$/i, '');
+    // Try without exchange suffix (.NS, .BO, .PSE, .PSE)
+    const stripped = clean.replace(/\.(NS|BO|PSE|PSE)$/i, '');
     if (stripped !== clean) {
       const byStripped = this.bySymbol.get(stripped);
       if (byStripped) return byStripped;

@@ -95,13 +95,13 @@ export class SectorProfileBuilder {
     const risks: SectorRisk[] = [];
     const name = (sector.name || '').toLowerCase();
 
-    // Indian sector-specific risk patterns
+    // Philippine sector-specific risk patterns
     if (name.includes('bank') || name.includes('financial') || name.includes('nbfc')) {
       risks.push({ riskType: 'regulatory', severity: 'medium', description: 'RBI regulatory changes may affect lending norms and capital requirements.' });
       risks.push({ riskType: 'demand', severity: 'medium', description: 'Credit growth sensitivity to economic cycles.' });
     }
     if (name.includes('pharma') || name.includes('health')) {
-      risks.push({ riskType: 'regulatory', severity: 'medium', description: 'USFDA and Indian drug pricing regulations.' });
+      risks.push({ riskType: 'regulatory', severity: 'medium', description: 'USFDA and Philippine drug pricing regulations.' });
       risks.push({ riskType: 'competition', severity: 'medium', description: 'Intense generic competition and patent cliffs.' });
     }
     if (name.includes('it') || name.includes('software') || name.includes('tech')) {
@@ -176,7 +176,7 @@ export class SectorProfileBuilder {
       formalisationBenefit = 'significant';
     }
 
-    const relevantRegulations: string[] = ['SEBI', 'Companies Act'];
+    const relevantRegulations: string[] = ['SEC', 'Companies Act'];
     if (name.includes('bank')) relevantRegulations.push('RBI', 'Banking Regulation Act');
     if (name.includes('insurance')) relevantRegulations.push('IRDAI');
     if (name.includes('telecom')) relevantRegulations.push('TRAI');

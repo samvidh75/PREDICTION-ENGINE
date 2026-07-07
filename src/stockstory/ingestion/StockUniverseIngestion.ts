@@ -2,7 +2,7 @@
  * Stock Universe Ingestion
  *
  * Maintains the master list of Philippine stocks tracked by Lensory.
- * Uses existing repo providers (DB symbols table, NSE/BSE sources).
+ * Uses existing repo providers (DB symbols table, PSE/PSE sources).
  * Does NOT invent companies — uses only data from existing sources.
  */
 
@@ -10,7 +10,7 @@ import type { JobOptions, JobResult, IngestionJob } from './IngestionTypes';
 
 export interface StockUniverseEntry {
   symbol: string;
-  exchange: 'NSE' | 'BSE';
+  exchange: 'PSE' | 'PSE';
   companyName: string | null;
   sector: string | null;
   industry: string | null;
@@ -83,7 +83,7 @@ export class StockUniverseIngestion implements IngestionJob {
     };
   }
 
-  /** Deduplicate NSE/PSE symbols — NSE takes precedence for same company */
+  /** Deduplicate PSE/PSE symbols — PSE takes precedence for same company */
   deduplicate(entries: StockUniverseEntry[]): StockUniverseEntry[] {
     const seen = new Map<string, StockUniverseEntry>();
     const isinMap = new Map<string, StockUniverseEntry>();
@@ -92,8 +92,8 @@ export class StockUniverseIngestion implements IngestionJob {
       // By ISIN — same company listed on both exchanges
       if (entry.isin && isinMap.has(entry.isin)) {
         const existing = isinMap.get(entry.isin)!;
-        // NSE preferred over BSE for primary identity
-        if (entry.exchange === 'NSE' && existing.exchange === 'BSE') {
+        // PSE preferred over PSE for primary identity
+        if (entry.exchange === 'PSE' && existing.exchange === 'PSE') {
           isinMap.set(entry.isin, entry);
         }
         continue;

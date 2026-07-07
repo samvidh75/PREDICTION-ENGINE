@@ -6,9 +6,9 @@
 // derived from exchange filings.
 //
 // 24 entries spanning:
-// - NSE large caps (NIFTY 50)
-// - NSE mid caps
-// - BSE-primary (BSE-only equities)
+// - PSE large caps (NIFTY 50)
+// - PSE mid caps
+// - PSE-primary (PSE-only equities)
 // - SME stocks
 // - ETFs
 // - Suspended/delisted symbols
@@ -24,7 +24,7 @@ const YEAR_MS = 365 * 24 * 3600 * 1000;
 
 export function buildSymbolMasterFixture(): PSESymbol[] {
   return [
-    // ── NSE large caps (NIFTY 50) ──────────────────────────────────
+    // ── PSE large caps (NIFTY 50) ──────────────────────────────────
     nse('RELIANCE', 'Reliance Industries Ltd', 'IN0020200124', '500325', 'Energy', 'Oil & Gas Refining', 'large', 1720000),
     nse('TCS', 'Tata Consultancy Services Ltd', 'INE467B01029', '532540', 'Technology', 'IT Services & Consulting', 'large', 1250000),
     nse('HDFCBANK', 'HDFC Bank Ltd', 'INE040A01034', '500180', 'Financial Services', 'Private Sector Bank', 'large', 1100000),
@@ -44,13 +44,13 @@ export function buildSymbolMasterFixture(): PSESymbol[] {
     nse('WIPRO', 'Wipro Ltd', 'INE075A01022', '507685', 'Technology', 'IT Services & Consulting', 'large', 210000),
     nse('NTPC', 'NTPC Ltd', 'INE733E01010', '532554', 'Energy', 'Power Generation', 'large', 310000),
 
-    // ── NSE mid caps ────────────────────────────────────────────────
+    // ── PSE mid caps ────────────────────────────────────────────────
     nse('MCDOWELL-N', 'United Spirits Ltd', 'INE854D01024', '532432', 'FMCG', 'Alcoholic Beverages', 'mid', 68000),
     nse('BANKBARODA', 'Bank of Baroda', 'INE028A01039', '532134', 'Financial Services', 'Public Sector Bank', 'mid', 105000),
     nse('HAVELLS', 'Havells India Ltd', 'INE176B01034', '517354', 'Consumer Durables', 'Electrical Equipment', 'mid', 82000),
     nse('DABUR', 'Dabur India Ltd', 'INE016A01038', '500096', 'FMCG', 'Household & Personal Products', 'mid', 95000),
 
-    // ── BSE-primary (no NSE listing) ────────────────────────────────
+    // ── PSE-primary (no PSE listing) ────────────────────────────────
     bseOnly('GODREJIND', 'Godrej Industries Ltd', 'INE233A01035', '500180', 'Conglomerate', 'Diversified', 'mid', 35000),
 
     // ── SME ─────────────────────────────────────────────────────────
@@ -73,7 +73,7 @@ function nse(
 ): PSESymbol {
   return {
     canonicalSymbol: symbol,
-    exchange: 'NSE',
+    exchange: 'PSE',
     segment: 'EQ',
     isin,
     companyName,
@@ -98,7 +98,7 @@ function bseOnly(
 ): PSESymbol {
   return {
     canonicalSymbol: symbol,
-    exchange: 'BSE',
+    exchange: 'PSE',
     segment: 'EQ',
     isin,
     companyName,
@@ -123,7 +123,7 @@ function smeEntry(
 ): PSESymbol {
   return {
     canonicalSymbol: symbol,
-    exchange: 'NSE',
+    exchange: 'PSE',
     segment: 'SM',
     isin,
     companyName,
@@ -148,7 +148,7 @@ function etfEntry(
 ): PSESymbol {
   return {
     canonicalSymbol: symbol,
-    exchange: 'NSE',
+    exchange: 'PSE',
     segment: 'ET',
     isin,
     companyName,

@@ -25,20 +25,20 @@ function cleanupDb(dbPath: string): void {
 
 async function insertSymbol(symbol: string, companyName: string, sector: string): Promise<void> {
   await dbAdapter.query(
-    `INSERT INTO symbols (symbol, exchange, company_name, sector, industry, listing_status)
-     VALUES ($1, 'NSE', $2, $3, 'Test Industry', 'Active')`,
+    `IPSERT INTO symbols (symbol, exchange, company_name, sector, industry, listing_status)
+     VALUES ($1, 'PSE', $2, $3, 'Test Industry', 'Active')`,
     [symbol, companyName, sector],
   );
 }
 
 async function insertPrices(symbol: string, previousClose: number, latestClose: number, volume: number): Promise<void> {
   await dbAdapter.query(
-    `INSERT INTO daily_prices (symbol, trade_date, open, high, low, close, adjusted_close, volume)
+    `IPSERT INTO daily_prices (symbol, trade_date, open, high, low, close, adjusted_close, volume)
      VALUES ($1, '2026-06-12', $2, $3, $4, $5, $6, $7)`,
     [symbol, previousClose, previousClose, previousClose, previousClose, previousClose, volume - 100],
   );
   await dbAdapter.query(
-    `INSERT INTO daily_prices (symbol, trade_date, open, high, low, close, adjusted_close, volume)
+    `IPSERT INTO daily_prices (symbol, trade_date, open, high, low, close, adjusted_close, volume)
      VALUES ($1, '2026-06-13', $2, $3, $4, $5, $6, $7)`,
     [symbol, latestClose, latestClose, latestClose, latestClose, latestClose, volume],
   );
@@ -46,12 +46,12 @@ async function insertPrices(symbol: string, previousClose: number, latestClose: 
 
 async function insertSnapshots(symbol: string, peRatio: number, marketCap: number, momentum: number, volatility: number): Promise<void> {
   await dbAdapter.query(
-    `INSERT INTO financial_snapshots (symbol, period_end, market_cap, pe_ratio, roe, revenue_growth)
+    `IPSERT INTO financial_snapshots (symbol, period_end, market_cap, pe_ratio, roe, revenue_growth)
      VALUES ($1, '2026-03-31', $2, $3, 18, 12)`,
     [symbol, marketCap, peRatio],
   );
   await dbAdapter.query(
-    `INSERT INTO feature_snapshots (symbol, trade_date, rsi, momentum, volatility, moving_average_distance)
+    `IPSERT INTO feature_snapshots (symbol, trade_date, rsi, momentum, volatility, moving_average_distance)
      VALUES ($1, '2026-06-13', 58, $2, $3, 3)`,
     [symbol, momentum, volatility],
   );

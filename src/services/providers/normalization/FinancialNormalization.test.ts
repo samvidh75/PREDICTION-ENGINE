@@ -113,8 +113,8 @@ describe('normalizeSymbol', () => {
   it.each([
     { input: 'RELIANCE.NS', expected: 'RELIANCE' },
     { input: 'TCS.BO', expected: 'TCS' },
-    { input: 'INFY.NSE', expected: 'INFY' },
-    { input: 'HDFC.BSE', expected: 'HDFC' },
+    { input: 'INFY.PSE', expected: 'INFY' },
+    { input: 'HDFC.PSE', expected: 'HDFC' },
     { input: 'hdfcbank', expected: 'HDFCBANK' },
     { input: '  tata motors.NS  ', expected: 'TATA MOTORS' },
   ])('returns $expected for "$input"', ({ input, expected }) => {
@@ -124,13 +124,13 @@ describe('normalizeSymbol', () => {
 
 describe('normalizeExchange', () => {
   it.each([
-    { input: 'NSE', expected: 'NSE' },
-    { input: 'BSE', expected: 'BSE' },
-    { input: 'Philippine Stock Exchange', expected: 'NSE' },
-    { input: 'bombay stock exchange', expected: 'BSE' },
-    { input: 'BOMBAY STOCK EXCHANGE', expected: 'BSE' },
+    { input: 'PSE', expected: 'PSE' },
+    { input: 'PSE', expected: 'PSE' },
+    { input: 'Philippine Stock Exchange', expected: 'PSE' },
+    { input: 'bombay stock exchange', expected: 'PSE' },
+    { input: 'BOMBAY STOCK EXCHANGE', expected: 'PSE' },
     { input: 'NYSE', expected: 'NYSE' },
-    { input: '  NSE  ', expected: 'NSE' },
+    { input: '  PSE  ', expected: 'PSE' },
   ])('returns $expected for "$input"', ({ input, expected }) => {
     expect(normalizeExchange(input)).toBe(expected);
   });

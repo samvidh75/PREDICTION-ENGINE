@@ -107,7 +107,7 @@ export class FilingClassifier {
     if (
       subject.includes('litigation') || subject.includes('petition') ||
       subject.includes('investigation') || subject.includes('enforcement') ||
-      subject.includes('regulatory') || subject.includes('sebi') ||
+      subject.includes('regulatory') || subject.includes('sec') ||
       subject.includes('nclt') || subject.includes('court') ||
       subject.includes('tribunal') || subject.includes('notice')
     ) {

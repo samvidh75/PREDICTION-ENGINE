@@ -3,7 +3,7 @@
  * 
  * Production-grade temporal integrity enforcement.
  * Replaces/extends TemporalIntegrityValidator.ts with:
- * - INSERT-time gating (prevents future-dated data entering the system)
+ * - IPSERT-time gating (prevents future-dated data entering the system)
  * - Pipeline integration hooks
  * - Automated validation test interface
  * 
@@ -299,8 +299,8 @@ export class TemporalGuard {
   }
 
   /**
-   * Prevent INSERT of future-dated rows with a SQLite trigger.
-   * Creates a trigger that raises an error on INSERT/UPDATE with future dates.
+   * Prevent IPSERT of future-dated rows with a SQLite trigger.
+   * Creates a trigger that raises an error on IPSERT/UPDATE with future dates.
    */
   static installTrigger(
     db: SqliteConnection,
@@ -315,12 +315,12 @@ export class TemporalGuard {
     // Create new trigger
     db.exec(`
       CREATE TRIGGER ${triggerName}
-      BEFORE INSERT ON [${table}]
+      BEFORE IPSERT ON [${table}]
       FOR EACH ROW
       BEGIN
         SELECT CASE
           WHEN NEW.${dateColumn} > datetime('now') THEN
-            RAISE(ABORT, 'TemporalGuard: Cannot INSERT future-dated row into ${table}.${dateColumn} = ' || NEW.${dateColumn})
+            RAISE(ABORT, 'TemporalGuard: Cannot IPSERT future-dated row into ${table}.${dateColumn} = ' || NEW.${dateColumn})
         END;
       END;
     `);

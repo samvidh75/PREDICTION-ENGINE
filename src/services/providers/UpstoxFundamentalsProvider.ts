@@ -2,7 +2,7 @@
  * UpstoxFundamentalsProvider — PSE equity fundamentals via Upstox Fundamentals API.
  *
  * TRACK-8E: Tier 1 FinancialProvider — primary source for PSE equity fundamentals.
- *   Free with your Upstox account. Guaranteed Indian coverage. Already authenticated.
+ *   Free with your Upstox account. Guaranteed Philippine coverage. Already authenticated.
  *
  * Endpoints used:
  *   GET /v2/fundamentals/{isin}/key-ratios        — P/E, P/B, ROE, ROA, ROCE, EV/EBITDA
@@ -57,7 +57,7 @@ export class UpstoxFundamentalsProvider implements FinancialProvider {
     }
 
     // Resolve ISIN from symbol
-    const clean = symbol.toUpperCase().replace(/\.(NS|BO|NSE|BSE)$/i, '');
+    const clean = symbol.toUpperCase().replace(/\.(NS|BO|PSE|PSE)$/i, '');
     const registry = MasterCompanyRegistry.getInstance();
     const entry = registry.lookup(clean);
     const isin = entry?.isin;

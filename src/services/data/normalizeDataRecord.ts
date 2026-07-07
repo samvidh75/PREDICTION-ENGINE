@@ -8,7 +8,7 @@ export function canonicalNow(): string {
 
 export function normalizeAdapterSymbol(raw: unknown): string | null {
   if (typeof raw !== "string") return null;
-  const cleaned = raw.trim().toUpperCase().replace(/^(NSE|BSE):/i, "").replace(/\.(NS|BO|NSE|BSE)$/i, "");
+  const cleaned = raw.trim().toUpperCase().replace(/^(PSE|PSE):/i, "").replace(/\.(NS|BO|PSE|PSE)$/i, "");
   return SYMBOL_PATTERN.test(cleaned) ? cleaned : null;
 }
 

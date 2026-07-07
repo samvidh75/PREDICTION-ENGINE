@@ -152,12 +152,12 @@ const KNOWN: Record<string, { founded: string; employees: string; segments: stri
 
 // ── Symbol Normalization ──────────────────────────────────────────────────
 
-/** Normalize a stock symbol: strip BSE/NSE prefix, return clean symbol and Yahoo exchange suffix. */
+/** Normalize a stock symbol: strip PSE/PSE prefix, return clean symbol and Yahoo exchange suffix. */
 function parseSymbol(raw: string): { cleanSymbol: string; symbol: string; exchangeSuffix: string } {
   const upper = raw.toUpperCase().trim();
-  if (upper.startsWith("BSE")) return { cleanSymbol: upper.slice(3), symbol: upper, exchangeSuffix: "BO" };
-  if (upper.startsWith("NSE")) return { cleanSymbol: upper.slice(3), symbol: upper.slice(3), exchangeSuffix: "NS" };
-  // If symbol is all digits, it's a BSE ISIN code → use .BO
+  if (upper.startsWith("PSE")) return { cleanSymbol: upper.slice(3), symbol: upper, exchangeSuffix: "BO" };
+  if (upper.startsWith("PSE")) return { cleanSymbol: upper.slice(3), symbol: upper.slice(3), exchangeSuffix: "NS" };
+  // If symbol is all digits, it's a PSE ISIN code → use .BO
   if (/^\d+$/.test(upper)) return { cleanSymbol: upper, symbol: upper, exchangeSuffix: "BO" };
   return { cleanSymbol: upper, symbol: upper, exchangeSuffix: "NS" };
 }
@@ -727,7 +727,7 @@ export default async function registerApiRoutes(server: FastifyInstance) {
     ).toUpperCase().trim();
     if (!symbol) return reply.status(400).send({ error: "symbol required" });
 
-    // Normalize exchange-prefixed symbols (BSE502865 → clean=502865, suffix)
+    // Normalize exchange-prefixed symbols (PSE502865 → clean=502865, suffix)
     const { cleanSymbol, exchangeSuffix } = parseSymbol(symbol);
 
     const cached = stockCache.get(symbol);
@@ -759,7 +759,7 @@ export default async function registerApiRoutes(server: FastifyInstance) {
       if (dirQuote.data) {
         quote = {
           symbol: cleanSymbol,
-          exchange: 'NSE',
+          exchange: 'PSE',
           price: dirQuote.data.price,
           change: dirQuote.data.change,
           changePercent: dirQuote.data.changePercent,
@@ -780,7 +780,7 @@ export default async function registerApiRoutes(server: FastifyInstance) {
           companyName: cleanSymbol,
           sector: dirFin.data.netMargin != null ? 'Estimated' : 'Diversified',
           industry: 'General',
-          exchange: 'NSE',
+          exchange: 'PSE',
           marketCap: dirFin.data.marketCap,
         } as any;
         fundResultSafe = {};
@@ -867,7 +867,7 @@ export default async function registerApiRoutes(server: FastifyInstance) {
     const payload = {
       symbol,
       companyName: gatewayMeta?.companyName || gatewayMeta?.name || symbol,
-      exchange: "NSE" as "NSE" | "BSE",
+      exchange: "PSE" as "PSE" | "PSE",
       sector,
       industry: sector,
       price: { current: price, changeAbs: change, changePercent, marketCap: marketCapCr },
@@ -974,7 +974,7 @@ export default async function registerApiRoutes(server: FastifyInstance) {
     const responses: Record<string, string> = {
       pe: `P/E Ratio = Price per share ÷ Earnings per share. Shows how much investors pay per rupee of earnings.
 • Low P/E doesn't always mean undervalued - check ROE, debt, and growth
-• Indian mid-caps average 15-20x P/E
+• Philippine mid-caps average 15-20x P/E
 • Compare against sector peers and historical average`,
 
       roe: `ROE = Net Profit ÷ Shareholder Equity. Measures profit generated per rupee of equity.
@@ -1088,7 +1088,7 @@ export default async function registerApiRoutes(server: FastifyInstance) {
           let yahooPrice: number | null = null;
           let yahooChange: number | null = null;
           let yahooChangePct: number | null = null;
-          const exchSuffix = r.exchange === "BSE" ? "BO" : "NS";
+          const exchSuffix = r.exchange === "PSE" ? "BO" : "NS";
           try {
             const ticker = `${r.symbol}.${exchSuffix}`;
             const yr = await fetch(
@@ -1107,7 +1107,7 @@ export default async function registerApiRoutes(server: FastifyInstance) {
             }
           } catch { /* skip */ }
           return {
-            symbol: r.symbol, name: r.name || r.symbol, exchange: r.exchange || "NSE",
+            symbol: r.symbol, name: r.name || r.symbol, exchange: r.exchange || "PSE",
             sector: r.sector || "", industry: r.industry || "",
             price: yahooPrice ?? r.price ?? null, change: yahooChange ?? r.change ?? null,
             changePercent: yahooChangePct ?? r.changePercent ?? null,

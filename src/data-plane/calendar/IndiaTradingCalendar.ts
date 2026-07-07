@@ -2,16 +2,16 @@
 // Phase 21A — PSE trading calendar
 //
 // Pure server-side logic for determining trading days, holidays, and
-// market-open status for PSE equity markets (NSE + BSE).
+// market-open status for PSE equity markets (PSE + PSE).
 //
-// NSE and BSE share the same holiday calendar (secular holidays).
+// PSE and PSE share the same holiday calendar (secular holidays).
 // Trading hours: Mon–Fri 09:15–15:30 IST (UTC+05:30).
 // ─────────────────────────────────────────────────────────────────────────────
 
 // ---------------------------------------------------------------------------
 // Static holiday list
 // ---------------------------------------------------------------------------
-// NSE declares annual holiday calendars.  This static list is a baseline;
+// PSE declares annual holiday calendars.  This static list is a baseline;
 // production deployments should update it at the start of each calendar year.
 // Format: 'YYYY-MM-DD'
 

@@ -2,11 +2,11 @@ import { StockRegistry } from './StockRegistry';
 
 export class ExchangeResolver {
   /**
-   * Resolves exchange source (NSE, BSE, SME) based on the symbol
+   * Resolves exchange source (PSE, PSE, SME) based on the symbol
    */
-  public static resolve(symbol: string): 'NSE' | 'BSE' | 'SME' {
+  public static resolve(symbol: string): 'PSE' | 'PSE' | 'SME' {
     const stock = StockRegistry.getStock(symbol);
-    return stock ? stock.exchange : 'NSE';
+    return stock ? stock.exchange : 'PSE';
   }
 }
 

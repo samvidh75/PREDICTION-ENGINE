@@ -228,7 +228,7 @@ export async function registerPortfolioSyncRoutes(server: FastifyInstance): Prom
           const totalPnl = holdings.reduce((s, h) => s + h.pnl, 0);
 
           await dbAdapter.query(
-            `INSERT INTO user_portfolio_snapshots
+            `IPSERT INTO user_portfolio_snapshots
                (user_id, broker, total_value, total_invested, total_pnl,
                 holdings_count, holdings_json, status, synced_at)
              VALUES ($1, $2, $3, $4, $5, $6, $7, 'success', datetime('now'))`,
@@ -242,7 +242,7 @@ export async function registerPortfolioSyncRoutes(server: FastifyInstance): Prom
         } catch (err) {
           // Store failed snapshot
           await dbAdapter.query(
-            `INSERT INTO user_portfolio_snapshots
+            `IPSERT INTO user_portfolio_snapshots
                (user_id, broker, total_value, total_invested, total_pnl,
                 holdings_count, holdings_json, status, error_message, synced_at)
              VALUES ($1, $2, 0, 0, 0, 0, '[]', 'failed', $3, datetime('now'))`,

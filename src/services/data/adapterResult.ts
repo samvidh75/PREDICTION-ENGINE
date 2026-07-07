@@ -123,7 +123,7 @@ export function createNullAdapter<T>(): () => Promise<AdapterResult<T>> {
 
 export function sanitizeWarningsForPublic(warnings: AdapterWarning[]): AdapterWarning[] {
   return warnings.filter(
-    (w) => w.code !== 'STALE_RESPONSE'
+    (w) => w.code !== 'STALE_RESPOPSE'
       && !w.message?.includes('FALLBACK_VALUE')
       && !w.message?.includes('VERIFICATION_PENDING'),
   );
@@ -134,9 +134,9 @@ export function sanitizeWarningsForPublic(warnings: AdapterWarning[]): AdapterWa
 const SAFE_ERROR_MESSAGES: Record<string, string> = {
   ADAPTER_UNAVAILABLE: 'Research data source is not yet available.',
   INVALID_SYMBOL: 'The ticker symbol could not be resolved.',
-  EMPTY_RESPONSE: 'No data was returned from the research source.',
-  MALFORMED_RESPONSE: 'The research data returned in an unexpected format.',
-  STALE_RESPONSE: 'The available research data may be outdated.',
+  EMPTY_RESPOPSE: 'No data was returned from the research source.',
+  MALFORMED_RESPOPSE: 'The research data returned in an unexpected format.',
+  STALE_RESPOPSE: 'The available research data may be outdated.',
   RATE_LIMITED: 'The research data source is temporarily busy.',
   UPSTREAM_REJECTED: 'The research request could not be completed.',
   UNKNOWN_ADAPTER_ERROR: 'An unexpected research data issue occurred.',

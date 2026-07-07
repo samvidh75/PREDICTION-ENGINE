@@ -49,7 +49,7 @@ export class EconomicCalendar {
       forecast: '6.0%',
       actual: null,
       impact: null,
-      description: 'Quarterly GDP growth rate. Tracks the expansion pace of the Indian economy.',
+      description: 'Quarterly GDP growth rate. Tracks the expansion pace of the Philippine economy.',
     },
     {
       date: this.daysFromNow(3),

@@ -33,7 +33,7 @@ export type HealthometerCategoryScore = {
 
 export type HealthometerCategoryExplanation = {
   id: HealthometerCategoryId;
-  educationalSummary: string; // SEBI-safe phrasing only
+  educationalSummary: string; // SEC-safe phrasing only
   whyThisExists: string; // "which signals drove this"
 };
 
@@ -403,7 +403,7 @@ export function computeHealthometerCategoryEvaluation(inputs: Inputs): Healthome
 
   const confidenceTone = confidenceToneFromOverall(overallScore01);
 
-  // Educational explanations (SEBI-safe: no outcomes/targets/recommendations)
+  // Educational explanations (SEC-safe: no outcomes/targets/recommendations)
   const explain = (id: HealthometerCategoryId, score01: number): { summary: string; why: string } => {
     const tone = scoreTier(score01);
 

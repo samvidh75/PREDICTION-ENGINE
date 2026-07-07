@@ -36,8 +36,8 @@ const CANONICAL_COLUMNS = [
   'alpha', 'created_at', 'created_by',
 ];
 
-const VALID_INSERT_SQL = `
-  INSERT INTO prediction_registry
+const VALID_IPSERT_SQL = `
+  IPSERT INTO prediction_registry
     (symbol, prediction_date, ranking_score, classification, confidence_score,
      confidence_level, quality_score, growth_score, value_score,
      momentum_score, risk_score, sector_score, prediction_horizon)
@@ -114,7 +114,7 @@ describe('PostgreSQL prediction_registry integration', () => {
 
     await dbAdapter.initialize();
 
-    await dbAdapter.query(VALID_INSERT_SQL, [
+    await dbAdapter.query(VALID_IPSERT_SQL, [
       TEST_SYMBOL, '2025-06-01', 88.5, 'Excellent', 92.0,
       'Very High', 82.0, 78.0, 72.0,
       80.0, 12.0, 68.0, 90,
@@ -143,11 +143,11 @@ describe('PostgreSQL prediction_registry integration', () => {
       85, 80, 75, 65, 10, 70, 30];
 
     // First insert succeeds
-    await dbAdapter.query(VALID_INSERT_SQL, params);
+    await dbAdapter.query(VALID_IPSERT_SQL, params);
 
     // Second insert with same (symbol, date, horizon) should fail
     await expect(
-      dbAdapter.query(VALID_INSERT_SQL, params)
+      dbAdapter.query(VALID_IPSERT_SQL, params)
     ).rejects.toThrow();
   });
 
@@ -161,7 +161,7 @@ describe('PostgreSQL prediction_registry integration', () => {
     await dbAdapter.initialize();
 
     await expect(
-      dbAdapter.query(VALID_INSERT_SQL, [
+      dbAdapter.query(VALID_IPSERT_SQL, [
         TEST_SYMBOL, '2025-06-03', 50, 'INVALID_CLASS', 60,
         'Medium', 45, 40, 35, 30, 50, 25, 30,
       ])
@@ -178,7 +178,7 @@ describe('PostgreSQL prediction_registry integration', () => {
     await dbAdapter.initialize();
 
     await expect(
-      dbAdapter.query(VALID_INSERT_SQL, [
+      dbAdapter.query(VALID_IPSERT_SQL, [
         TEST_SYMBOL, '2025-06-04', 60, 'Good', 70,
         'IMPOSSIBLE_LEVEL', 50, 45, 40, 35, 50, 30, 30,
       ])
@@ -195,7 +195,7 @@ describe('PostgreSQL prediction_registry integration', () => {
     await dbAdapter.initialize();
 
     await expect(
-      dbAdapter.query(VALID_INSERT_SQL, [
+      dbAdapter.query(VALID_IPSERT_SQL, [
         TEST_SYMBOL, '2025-06-05', 50, 'Good', 60,
         'Medium', 45, 40, 35, 30, 50, 25, 999,
       ])
@@ -213,7 +213,7 @@ describe('PostgreSQL prediction_registry integration', () => {
 
     await expect(
       dbAdapter.query(
-        `INSERT INTO prediction_registry
+        `IPSERT INTO prediction_registry
          (symbol, prediction_date, ranking_score, classification, confidence_score,
           confidence_level, quality_score, growth_score, value_score,
           momentum_score, risk_score, sector_score, prediction_horizon, created_by)
@@ -235,11 +235,11 @@ describe('PostgreSQL prediction_registry integration', () => {
     await dbAdapter.initialize();
 
     // Insert two predictions with different dates
-    await dbAdapter.query(VALID_INSERT_SQL, [
+    await dbAdapter.query(VALID_IPSERT_SQL, [
       TEST_SYMBOL, '2025-06-01', 88.5, 'Excellent', 92.0,
       'Very High', 82.0, 78.0, 72.0, 80.0, 12.0, 68.0, 90,
     ]);
-    await dbAdapter.query(VALID_INSERT_SQL, [
+    await dbAdapter.query(VALID_IPSERT_SQL, [
       TEST_SYMBOL, '2025-06-08', 91.0, 'Exceptional', 95.0,
       'Very High', 87.0, 83.0, 77.0, 75.0, 10.0, 72.0, 30,
     ]);

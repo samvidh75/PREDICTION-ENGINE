@@ -5,7 +5,7 @@
  * Predictions are frozen before outcomes occur — no retroactive edits.
  *
  * Invariants enforced at the application level:
- *   1. Records are INSERT-only (no UPDATE queries)
+ *   1. Records are IPSERT-only (no UPDATE queries)
  *   2. created_at and all engine scores are frozen at creation time
  *   3. Validation data (future_return, benchmark_return, alpha) are set
  *      only during validation, after the prediction horizon has passed
@@ -24,7 +24,7 @@ import type {
 
 export class PredictionRegistry {
   /**
-   * Create a new prediction record. INSERT-only — no UPDATE path.
+   * Create a new prediction record. IPSERT-only — no UPDATE path.
    * Returns the created record.
    */
   async createPrediction(input: CreatePredictionInput): Promise<PredictionRecord> {
@@ -32,7 +32,7 @@ export class PredictionRegistry {
     const createdBy = input.createdBy || 'DailyPredictionCapture';
 
     const result = await pool.query(
-      `INSERT INTO prediction_registry (
+      `IPSERT INTO prediction_registry (
         id, symbol, prediction_date, ranking_score, classification,
         confidence_score, confidence_level,
         quality_score, growth_score, value_score, momentum_score, risk_score, sector_score,
@@ -83,7 +83,7 @@ export class PredictionRegistry {
         const createdBy = input.createdBy || 'DailyPredictionCapture';
 
         const result = await client.query(
-          `INSERT INTO prediction_registry (
+          `IPSERT INTO prediction_registry (
             id, symbol, prediction_date, ranking_score, classification,
             confidence_score, confidence_level,
             quality_score, growth_score, value_score, momentum_score, risk_score, sector_score,
@@ -249,7 +249,7 @@ export class PredictionRegistry {
    */
   async storeDailySnapshot(snapshot: PredictionSlice): Promise<void> {
     await pool.query(
-      `INSERT INTO daily_prediction_snapshots (
+      `IPSERT INTO daily_prediction_snapshots (
         snapshot_date, n_symbols_ranked, benchmark_level,
         top10, top25, top50, bottom10, bottom25
       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)

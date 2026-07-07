@@ -1,7 +1,7 @@
 /**
  * Tax Planning Service
  * Calculates tax implications and optimization suggestions
- * For Indian income tax (STCG/LTCG, Section 80C, etc.)
+ * For Philippine income tax (STCG/LTCG, Section 80C, etc.)
  */
 
 export interface TaxableGain {

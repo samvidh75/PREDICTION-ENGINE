@@ -49,7 +49,7 @@ function confidenceToneFor(idx: number, confidenceState: ConfidenceState): Confi
   return confidenceState;
 }
 
-function safeSEBI(input: string): string {
+function safeSEC(input: string): string {
   // Conservative filter: ensures “no execution / no guarantees” language exists.
   return applyComplianceCopyFilter(input, "educational");
 }
@@ -81,7 +81,7 @@ function buildEducationalPanel(inputs: BuildNewsStoryInputs, synthesis: NeuralMa
       ];
 
   const headline = beginner ? "How to read this market context (calm + structured)" : "Understanding market changes as educational context";
-  const body = safeSEBI(
+  const body = safeSEC(
     `${confidenceLine}\n\nWhat changed here is the *conditioning texture*—macro pacing, sector relevance, and company update framing. ${liquidityLine}\n\nWhen you explore, use the “What changed?” lens: interpret it as a structured learning node.`,
   );
 
@@ -113,8 +113,8 @@ function buildEvent(args: {
 }): NewsEvent {
   return {
     ...args,
-    summary: safeSEBI(args.summary),
-    impactExplanation: safeSEBI(args.impactExplanation),
+    summary: safeSEC(args.summary),
+    impactExplanation: safeSEC(args.impactExplanation),
   };
 }
 

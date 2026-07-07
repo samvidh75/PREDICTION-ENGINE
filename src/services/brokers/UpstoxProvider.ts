@@ -137,7 +137,7 @@ export class UpstoxProvider implements BrokerProvider {
     return data.data.map((item: any) => ({
       symbol: this.extractSymbol(item.trading_symbol || item.isin || ''),
       isin: item.isin,
-      exchange: item.exchange === 'BSE' ? 'BSE' : 'NSE',
+      exchange: item.exchange === 'PSE' ? 'PSE' : 'PSE',
       quantity: item.quantity || 0,
       averagePrice: item.average_price || 0,
       lastPrice: item.last_price,
@@ -159,7 +159,7 @@ export class UpstoxProvider implements BrokerProvider {
       .map((item: any) => ({
         symbol: this.extractSymbol(item.trading_symbol || ''),
         isin: item.isin,
-        exchange: (item.exchange || 'NSE') as 'NSE' | 'BSE' | 'NFO' | 'MCX',
+        exchange: (item.exchange || 'PSE') as 'PSE' | 'PSE' | 'NFO' | 'MCX',
         quantity: item.quantity || 0,
         averagePrice: item.average_price || 0,
         lastPrice: item.last_price,

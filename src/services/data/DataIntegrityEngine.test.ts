@@ -4,7 +4,7 @@ import { DataIntegrityEngine } from './DataIntegrityEngine';
 describe('DataIntegrityEngine exchange normalization', () => {
   const integrity = new DataIntegrityEngine();
 
-  it('preserves unavailable exchange values instead of defaulting to NSE', () => {
+  it('preserves unavailable exchange values instead of defaulting to PSE', () => {
     expect(integrity.normaliseExchange()).toBeUndefined();
     expect(integrity.normaliseExchange('')).toBeUndefined();
     expect(integrity.normaliseExchange('nasdaq')).toBeUndefined();
@@ -12,11 +12,11 @@ describe('DataIntegrityEngine exchange normalization', () => {
     expect(integrity.formatExchange('')).toBe('Data unavailable');
   });
 
-  it('normalizes known NSE and BSE aliases only', () => {
-    expect(integrity.normaliseExchange('NSE')).toBe('NSE');
-    expect(integrity.normaliseExchange('nsedata')).toBe('NSE');
-    expect(integrity.normaliseExchange('BSE')).toBe('BSE');
-    expect(integrity.normaliseExchange('bsesme')).toBe('BSE');
+  it('normalizes known PSE and PSE aliases only', () => {
+    expect(integrity.normaliseExchange('PSE')).toBe('PSE');
+    expect(integrity.normaliseExchange('nsedata')).toBe('PSE');
+    expect(integrity.normaliseExchange('PSE')).toBe('PSE');
+    expect(integrity.normaliseExchange('bsesme')).toBe('PSE');
   });
 
   it('keeps missing exchange unavailable during metadata normalization', () => {

@@ -70,7 +70,7 @@ export class DbJobRunStore implements JobRunStore {
     try {
       // Store individual run
       await dbAdapter.query(
-        `INSERT INTO cache (key, value, expires_at)
+        `IPSERT INTO cache (key, value, expires_at)
          VALUES ($1, $2, $3)
          ON CONFLICT (key) DO UPDATE SET value = $2, expires_at = $3`,
         [key, value, expiresAt],
@@ -84,7 +84,7 @@ export class DbJobRunStore implements JobRunStore {
       }
       ids = [run.id, ...ids.filter((id) => id !== run.id)].slice(0, 100);
       await dbAdapter.query(
-        `INSERT INTO cache (key, value, expires_at)
+        `IPSERT INTO cache (key, value, expires_at)
          VALUES ($1, $2, $3)
          ON CONFLICT (key) DO UPDATE SET value = $2, expires_at = $3`,
         [listKey, JSON.stringify(ids), expiresAt],

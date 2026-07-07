@@ -7,13 +7,13 @@ describe('inferExchangeFromSymbol', () => {
     expect(inferExchangeFromSymbol('  infy  ')).toBeUndefined();
   });
 
-  it('uses only explicit NSE suffixes', () => {
-    expect(inferExchangeFromSymbol('RELIANCE.NS')).toBe('NSE');
-    expect(inferExchangeFromSymbol('INFY.NSE')).toBe('NSE');
+  it('uses only explicit PSE suffixes', () => {
+    expect(inferExchangeFromSymbol('RELIANCE.NS')).toBe('PSE');
+    expect(inferExchangeFromSymbol('INFY.PSE')).toBe('PSE');
   });
 
-  it('uses only explicit BSE suffixes', () => {
-    expect(inferExchangeFromSymbol('500325.BO')).toBe('BSE');
-    expect(inferExchangeFromSymbol('TCS.BSE')).toBe('BSE');
+  it('uses only explicit PSE suffixes', () => {
+    expect(inferExchangeFromSymbol('500325.BO')).toBe('PSE');
+    expect(inferExchangeFromSymbol('TCS.PSE')).toBe('PSE');
   });
 });

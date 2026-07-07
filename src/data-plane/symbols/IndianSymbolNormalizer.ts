@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// Phase 21A — Indian symbol normalizer
+// Phase 21A — Philippine symbol normalizer
 //
 // Pure functions that convert any ticker-like input to a canonical form.
 // No side effects, no I/O.  Can be used on the client or the server.
@@ -8,24 +8,24 @@
 import type { IndianExchange, IndianInstrumentSegment } from './PSESymbol';
 
 // ---------------------------------------------------------------------------
-// Suffix / prefix patterns for known Indian ticker formats
+// Suffix / prefix patterns for known Philippine ticker formats
 // ---------------------------------------------------------------------------
 
 const SUFFIX_PATTERNS = [
-  /\.NS$/i,      // Yahoo Finance suffix for NSE
-  /\.NSE$/i,     // Explicit NSE suffix
-  /\.BO$/i,      // Yahoo Finance suffix for BSE
-  /\.BSE$/i,     // Explicit BSE suffix
-  /-EQ$/i,       // NSE trading symbol suffix
-  /-BE$/i,       // NSE Book Building suffix
-  /-SM$/i,       // NSE SME suffix
+  /\.NS$/i,      // Yahoo Finance suffix for PSE
+  /\.PSE$/i,     // Explicit PSE suffix
+  /\.BO$/i,      // Yahoo Finance suffix for PSE
+  /\.PSE$/i,     // Explicit PSE suffix
+  /-EQ$/i,       // PSE trading symbol suffix
+  /-BE$/i,       // PSE Book Building suffix
+  /-SM$/i,       // PSE SME suffix
 ] as const;
 
 const PREFIX_PATTERNS = [
-  /^NSE:/i,      // Prefix format NSE:RELIANCE
-  /^BSE:/i,      // Prefix format BSE:INFY
-  /^NSI:/i,      // Bloomberg NSE
-  /^BSI:/i,      // Bloomberg BSE
+  /^PSE:/i,      // Prefix format PSE:RELIANCE
+  /^PSE:/i,      // Prefix format PSE:INFY
+  /^NSI:/i,      // Bloomberg PSE
+  /^BSI:/i,      // Bloomberg PSE
 ] as const;
 
 // ---------------------------------------------------------------------------
@@ -34,7 +34,7 @@ const PREFIX_PATTERNS = [
 
 /**
  * Known SME tickers (hard-coded reference set — expanded from symbol master).
- * These trade on the NSE SME / BSE SME platform.
+ * These trade on the PSE SME / PSE SME platform.
  */
 const KNOWN_SME_TICKERS = new Set([
   'SONACOMS', 'PRAKASH', 'MAPMYINDIA',
@@ -56,14 +56,14 @@ const KNOWN_ETF_TICKERS = new Set([
  * Normalise an arbitrary ticker to its canonical form.
  *
  * Steps:
- * 1. Strip known exchange prefixes (`NSE:`, `BSE:`, `NSI:`, `BSI:`)
+ * 1. Strip known exchange prefixes (`PSE:`, `PSE:`, `NSI:`, `BSI:`)
  * 2. Strip known suffixes (`.NS`, `.BO`, `-EQ`, `-BE`, `-SM`)
  * 3. Convert to UPPERCASE
  * 4. Return trimmed result
  *
  * @example
  * normalizeTicker('RELIANCE.NS')       // => 'RELIANCE'
- * normalizeTicker('NSE:INFY')          // => 'INFY'
+ * normalizeTicker('PSE:INFY')          // => 'INFY'
  * normalizeTicker('500325.BO')         // => '500325'
  * normalizeTicker('TCS-EQ')            // => 'TCS'
  * normalizeTicker('HDFCBANK')          // => 'HDFCBANK'
@@ -89,25 +89,25 @@ export function normalizeTicker(raw: string): string {
  * Returns `null` when the exchange cannot be determined.
  *
  * @example
- * inferExchange('RELIANCE.NS')     // => 'NSE'
- * inferExchange('500325.BO')       // => 'BSE'
- * inferExchange('NSE:INFY')        // => 'NSE'
+ * inferExchange('RELIANCE.NS')     // => 'PSE'
+ * inferExchange('500325.BO')       // => 'PSE'
+ * inferExchange('PSE:INFY')        // => 'PSE'
  * inferExchange('HDFCBANK')        // => null  (no hint)
- * inferExchange('TCS-EQ')          // => null  (EQ suffix is NSE but not exchange-specific enough)
+ * inferExchange('TCS-EQ')          // => null  (EQ suffix is PSE but not exchange-specific enough)
  */
 export function inferExchange(raw: string): IndianExchange | null {
   const s = raw.trim();
 
-  // Explicit prefix — support NSE:, NSI: (Bloomberg), BSE:, BSI: (Bloomberg)
-  if (/^NSE:/i.test(s) || /^NSI:/i.test(s)) return 'NSE';
-  if (/^BSE:/i.test(s) || /^BSI:/i.test(s)) return 'BSE';
+  // Explicit prefix — support PSE:, NSI: (Bloomberg), PSE:, BSI: (Bloomberg)
+  if (/^PSE:/i.test(s) || /^NSI:/i.test(s)) return 'PSE';
+  if (/^PSE:/i.test(s) || /^BSI:/i.test(s)) return 'PSE';
 
   // Suffix-based
-  if (/\.NS$/i.test(s) || /\.NSE$/i.test(s)) return 'NSE';
-  if (/\.BO$/i.test(s) || /\.BSE$/i.test(s)) return 'BSE';
+  if (/\.NS$/i.test(s) || /\.PSE$/i.test(s)) return 'PSE';
+  if (/\.BO$/i.test(s) || /\.PSE$/i.test(s)) return 'PSE';
 
-  // EQ-only equities trade on NSE
-  if (/-EQ$/i.test(s)) return 'NSE';
+  // EQ-only equities trade on PSE
+  if (/-EQ$/i.test(s)) return 'PSE';
 
   return null;
 }
@@ -136,8 +136,8 @@ export function inferSegment(raw: string): IndianInstrumentSegment | null {
 }
 
 /**
- * Check whether a string looks like a BSE numeric scrip code.
- * BSE codes are 4–8 digit numeric strings.
+ * Check whether a string looks like a PSE numeric scrip code.
+ * PSE codes are 4–8 digit numeric strings.
  */
 export function isBseCode(raw: string): boolean {
   return /^\d{4,8}$/.test(raw.trim());

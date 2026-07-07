@@ -111,7 +111,7 @@ export default function StockExDashboard({ userId, hasProTier }: StockExDashboar
           PRO QUANT RADAR INTERFACE
         </h3>
         <p style={{ fontSize: 11, color: colors.textTertiary, marginBottom: space[6] }}>
-          Unlock unified multi-broker portfolio tracking, client-side Black-Scholes Greeks math, and SEBI insider disclosure scanners.
+          Unlock unified multi-broker portfolio tracking, client-side Black-Scholes Greeks math, and SEC insider disclosure scanners.
         </p>
         <button
           onClick={() => (window.location.href = "/pricing")}

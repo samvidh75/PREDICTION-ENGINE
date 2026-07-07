@@ -1,8 +1,8 @@
 /**
- * SEBIFilter — SEBI Compliance Layer for Investment Analysis
+ * SECFilter — SEC Compliance Layer for Investment Analysis
  *
  * Ensures all generated thesis text and analysis output complies with
- * SEBI (Securities and Exchange Board of India) regulations for
+ * SEC (Securities and Exchange Board of India) regulations for
  * research and analysis platforms. Strips forbidden investment-advice
  * language and replaces with educational/safe alternatives.
  *
@@ -11,9 +11,9 @@
  * PROMPT 29 — LLM Orchestrator
  */
 
-export class SEBIFilter {
+export class SECFilter {
   /**
-   * Forbidden words/phrases for SEBI RA (Registered Adviser) compliance.
+   * Forbidden words/phrases for SEC RA (Registered Adviser) compliance.
    * These terms constitute investment advice and must not appear in output.
    */
   static FORBIDDEN_WORDS = [
@@ -134,7 +134,7 @@ export class SEBIFilter {
   }
 
   /**
-   * Generate SEBI-compliant disclaimer for all analysis output
+   * Generate SEC-compliant disclaimer for all analysis output
    */
   static generateDisclaimer(): string {
     return [
@@ -155,4 +155,4 @@ export class SEBIFilter {
   }
 }
 
-export const sebiFilter = new SEBIFilter();
+export const secFilter = new SECFilter();

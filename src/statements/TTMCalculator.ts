@@ -187,7 +187,7 @@ export class TTMCalculator {
     if (ttm.dataQuality === 'unavailable') return;
 
     await pool.query(
-      `INSERT INTO financial_statements (
+      `IPSERT INTO financial_statements (
          symbol, period_end, period_type,
          revenue, cost_of_revenue, gross_profit,
          operating_income, net_income, eps, ebitda,

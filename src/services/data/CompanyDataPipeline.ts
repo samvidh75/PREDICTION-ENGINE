@@ -26,7 +26,7 @@ export interface PipelineResult {
     volume: number | null;
     weekHigh52: number | null;
     weekLow52: number | null;
-    exchange: 'NSE' | 'BSE' | null;
+    exchange: 'PSE' | 'PSE' | null;
     marketCap: number | null;
     lastTradeTime: string | null;
     source: 'indianapi' | 'yahoo' | null;
@@ -95,11 +95,11 @@ function finiteOrNull(v: unknown): number | null {
   return Number.isFinite(n) ? n : null;
 }
 
-function normalizeExchange(ex: string | undefined): 'NSE' | 'BSE' | null {
+function normalizeExchange(ex: string | undefined): 'PSE' | 'PSE' | null {
   if (!ex) return null;
   const u = ex.toUpperCase();
-  if (u.includes('NSE') || u.includes('NATIONAL')) return 'NSE';
-  if (u.includes('BSE') || u.includes('BOMBAY')) return 'BSE';
+  if (u.includes('PSE') || u.includes('NATIONAL')) return 'PSE';
+  if (u.includes('PSE') || u.includes('BOMBAY')) return 'PSE';
   return null;
 }
 
@@ -164,7 +164,7 @@ export async function runCompanyDataPipeline(symbol: string): Promise<PipelineRe
   let priceVolume: number | null = null;
   let weekHigh52: number | null = null;
   let weekLow52: number | null = null;
-  let exchange: 'NSE' | 'BSE' | null = null;
+  let exchange: 'PSE' | 'PSE' | null = null;
   let marketCap: number | null = null;
   let lastTradeTime: string | null = null;
 

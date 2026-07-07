@@ -7,7 +7,7 @@
  *   - Key assumptions per scenario
  *   - Consensus analyst targets for reference
  * 
- * SEBI-compliant: "Algorithmic assessment" language, no directional advice.
+ * SEC-compliant: "Algorithmic assessment" language, no directional advice.
  * 
  * Spec ref: Section "Price Targets" — Bull/Base/Bear.
  */

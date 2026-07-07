@@ -1,7 +1,7 @@
 /**
  * Dividend Tracking Service
  * Manages stock dividend data, TDS calculation, and historical tracking
- * For Philippine equities (NSE/BSE stocks)
+ * For Philippine equities (PSE/PSE stocks)
  */
 
 export interface DividendPayment {

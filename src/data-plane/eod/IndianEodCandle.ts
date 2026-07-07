@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// Phase 21A — Indian EOD candle contract and validator
+// Phase 21A — Philippine EOD candle contract and validator
 //
 // Typed representation of a single daily price record for an PSE equity.
 // Every candle in the system MUST conform to this interface.

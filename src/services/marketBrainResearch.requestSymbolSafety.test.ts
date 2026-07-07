@@ -30,7 +30,7 @@ describe('fetchMarketBrainResearch request symbol safety', () => {
     vi.unstubAllGlobals();
   });
 
-  it('allows NSE-style public symbols in request paths', async () => {
+  it('allows PSE-style public symbols in request paths', async () => {
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
       status: 200,

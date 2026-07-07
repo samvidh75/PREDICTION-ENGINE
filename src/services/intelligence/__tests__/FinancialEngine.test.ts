@@ -112,7 +112,7 @@ describe('Financial Engine', () => {
     });
   });
 
-  describe('Major Indian Stocks', () => {
+  describe('Major Philippine Stocks', () => {
     it('should score 5 major stocks correctly', async () => {
       const testStocks = [
         { name: 'TCS', roe: 48, om: 24, nm: 22, rg: 6.3, eg: 8.1, de: 0.15, ic: 45, roa: 25, dy: 0.012, mc: 1500000 },

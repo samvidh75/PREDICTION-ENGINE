@@ -9,7 +9,7 @@ import type { IntelligenceInput } from '../types';
 function mockInput(overrides: Partial<IntelligenceInput['technicals']> = {}): IntelligenceInput {
   return {
     symbol: 'TEST',
-    exchange: 'NSE_EQ',
+    exchange: 'PSE_EQ',
     tradeDate: '2025-01-15',
     financials: {},
     technicals: {

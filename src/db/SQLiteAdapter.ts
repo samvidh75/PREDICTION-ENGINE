@@ -93,7 +93,7 @@ function translateSQL(sql: string): string {
     .replace(/information_schema\.columns/gi, 'pragma_table_info');
 
   if (/ON CONFLICT.*DO UPDATE/i.test(translated)) {
-    translated = translated.replace('INSERT INTO', 'INSERT OR REPLACE INTO');
+    translated = translated.replace('IPSERT INTO', 'IPSERT OR REPLACE INTO');
     translated = translated.replace(/ON CONFLICT\s*\([^)]*\)\s*DO UPDATE\s*SET\s*[^;]*/gi, '');
   }
 
@@ -153,7 +153,7 @@ function execAndMap(db: SqlJsDatabase, sql: string, params?: unknown[]): SQLiteR
   }
   const rowCount = db.getRowsModified();
 
-  if (isReturning && /INSERT/i.test(sql)) {
+  if (isReturning && /IPSERT/i.test(sql)) {
     const idResult = db.exec('SELECT last_insert_rowid() as id');
     const lastId = idResult?.[0]?.values?.[0]?.[0];
     if (lastId && Number(lastId) > 0) {

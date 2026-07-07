@@ -10,9 +10,9 @@ export type MarketDataDomain =
 export type AdapterErrorCode =
   | "ADAPTER_UNAVAILABLE"
   | "INVALID_SYMBOL"
-  | "EMPTY_RESPONSE"
-  | "MALFORMED_RESPONSE"
-  | "STALE_RESPONSE"
+  | "EMPTY_RESPOPSE"
+  | "MALFORMED_RESPOPSE"
+  | "STALE_RESPOPSE"
   | "RATE_LIMITED"
   | "UPSTREAM_REJECTED"
   | "UNKNOWN_ADAPTER_ERROR";
@@ -28,7 +28,7 @@ export type AdapterResult<T> =
 
 export interface CompanyMasterRecord {
   symbol: string;
-  exchange?: "NSE" | "BSE" | "UNKNOWN";
+  exchange?: "PSE" | "PSE" | "UNKNOWN";
   isin?: string | null;
   companyName: string;
   sector?: string | null;

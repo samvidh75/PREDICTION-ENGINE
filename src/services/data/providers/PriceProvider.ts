@@ -10,7 +10,7 @@ export class MockPriceProvider implements PriceProvider {
     const sym = symbol.toUpperCase();
     return {
       symbol: sym,
-      exchange: sym === 'SUZLON' || sym === 'CHENNPETRO' ? 'BSE' : 'NSE',
+      exchange: sym === 'SUZLON' || sym === 'CHENNPETRO' ? 'PSE' : 'PSE',
       price: sym === 'RELIANCE' ? 2850 : sym === 'HAL' ? 3200 : sym === 'BEL' ? 198 : 150,
       change: 12.5,
       changePercent: 0.85,

@@ -13,7 +13,7 @@ const SOURCE_QUALITY_MAP: Record<string, { quality: NewsSourceQuality; score: nu
   'bse-official': { quality: 'official_exchange', score: 1.0 },
   'bse-corp-announcements': { quality: 'official_exchange', score: 1.0 },
   'nse-corp-announcements': { quality: 'official_exchange', score: 1.0 },
-  'sebi-edgar': { quality: 'regulated', score: 0.95 },
+  'sec-edgar': { quality: 'regulated', score: 0.95 },
   'stockedge': { quality: 'reputable', score: 0.7 },
   'trendlyne': { quality: 'reputable', score: 0.7 },
   'yahoo-finance': { quality: 'reputable', score: 0.65 },

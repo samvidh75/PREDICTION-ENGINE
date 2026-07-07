@@ -150,7 +150,7 @@ describe('Risk Engine', () => {
     });
   });
 
-  describe('Major Indian Stocks', () => {
+  describe('Major Philippine Stocks', () => {
     it('should rank 5 major stocks by risk correctly', () => {
       const testStocks: { name: string; metrics: RiskMetrics }[] = [
         {

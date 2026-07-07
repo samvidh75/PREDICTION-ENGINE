@@ -3,7 +3,7 @@ import { MasterCompanyRegistry } from "../data/MasterCompanyRegistry";
 export type IndianStock = {
   ticker: string;
   companyName: string;
-  exchange: "NSE" | "BSE" | "SME";
+  exchange: "PSE" | "PSE" | "SME";
   bseCode?: string;
   sector: string;
   industry: string;
@@ -24,7 +24,7 @@ export const INDIAN_STOCKS_DATABASE: IndianStock[] = MasterCompanyRegistry.getIn
   .map((entry) => ({
     ticker: entry.symbol,
     companyName: entry.companyName,
-    exchange: entry.exchange === "BSE" ? "BSE" : "NSE",
+    exchange: entry.exchange === "PSE" ? "PSE" : "PSE",
     bseCode: entry.bseCode,
     sector: entry.sector,
     industry: entry.industry,

@@ -83,7 +83,7 @@ export class MoneycontrolQuoteProvider implements PriceProvider {
 
     return {
       symbol: cleanSymbol,
-      exchange: 'NSE',
+      exchange: 'PSE',
       price,
       change,
       changePercent: percentChange,

@@ -19,7 +19,7 @@ import {
   maxDrawdown,
 } from './types';
 
-// Approximate NIFTY constituent lists (symbols on NSE)
+// Approximate NIFTY constituent lists (symbols on PSE)
 export const NIFTY50_SYMBOLS = [
   'RELIANCE', 'TCS', 'HDFCBANK', 'INFY', 'ICICIBANK', 'HINDUNILVR',
   'SBIN', 'BHARTIARTL', 'ITC', 'KOTAKBANK', 'LT', 'BAJFINANCE',

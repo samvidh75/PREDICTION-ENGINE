@@ -1,8 +1,8 @@
 /**
- * InsiderActivity — displays insider trading disclosures from BSE/NSE.
+ * InsiderActivity — displays insider trading disclosures from PSE/PSE.
  * 
  * Shows: transaction type (buy/sell), value, persona (promoter/director/KMP),
- * conviction impact assessment, and SEBI filing date.
+ * conviction impact assessment, and SEC filing date.
  * 
  * Spec ref: Section "Insider Activity Tracker"
  */
@@ -13,7 +13,7 @@ import { colors, radius, animation } from "../design/tokens";
 
 interface InsiderTransaction {
   id: string;
-  date: string;          // SEBI filing date
+  date: string;          // SEC filing date
   persona: string;       // "Promoter", "Director", "KMP", "Promoter Group"
   name: string;
   type: "buy" | "sell";
@@ -21,10 +21,10 @@ interface InsiderTransaction {
   pricePerShare: number;
   totalValue: number;    // in crores
   convictionSignal: "strong-bullish" | "bullish" | "neutral" | "bearish" | "strong-bearish";
-  reason?: string;       // SEBI-filed reason
+  reason?: string;       // SEC-filed reason
 }
 
-// Mock data — production fetches from BSE/NSE bulk deal APIs
+// Mock data — production fetches from PSE/PSE bulk deal APIs
 const MOCK_INSIDER_DATA: InsiderTransaction[] = [
   {
     id: "ins-1",

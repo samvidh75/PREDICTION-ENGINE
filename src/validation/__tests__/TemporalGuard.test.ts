@@ -253,14 +253,14 @@ describe('TemporalGuard', () => {
   });
 
   describe('installTrigger', () => {
-    it('creates INSERT and UPDATE triggers', () => {
+    it('creates IPSERT and UPDATE triggers', () => {
       const executed: string[] = [];
       const db: SqliteConnection = {
         prepare() { return { all() { return []; }, run() { return { changes: 0 }; }, get() { return null; } }; },
         exec(sql: string) { executed.push(sql); },
       };
       TemporalGuard.installTrigger(db, 'factor_snapshots', 'trade_date');
-      const insertTriggers = executed.filter(s => s.includes('CREATE TRIGGER') && s.includes('INSERT'));
+      const insertTriggers = executed.filter(s => s.includes('CREATE TRIGGER') && s.includes('IPSERT'));
       const updateTriggers = executed.filter(s => s.includes('CREATE TRIGGER') && s.includes('UPDATE'));
       const dropTriggers = executed.filter(s => s.includes('DROP TRIGGER'));
       expect(insertTriggers).toHaveLength(1);

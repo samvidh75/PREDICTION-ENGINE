@@ -10,10 +10,10 @@ import type {
 } from './IntelligenceValidationTypes';
 
 /**
- * Known PSE equity universe — built from BSE/NSE master list.
+ * Known PSE equity universe — built from PSE/PSE master list.
  * In production, loaded from a DB table or CSV; hardcoded here for initial validation.
  */
-const KNOWN_NSE_SYMBOLS = new Set<string>([
+const KNOWN_PSE_SYMBOLS = new Set<string>([
   'RELIANCE', 'TCS', 'HDFCBANK', 'INFY', 'ICICIBANK', 'HINDUNILVR',
   'ITC', 'SBIN', 'BHARTIARTL', 'KOTAKBANK', 'LT', 'BAJFINANCE',
   'AXISBANK', 'WIPRO', 'ASIANPAINT', 'MARUTI', 'SUNPHARMA',
@@ -127,7 +127,7 @@ export class MarketRealityValidator extends BaseValidator {
     caps?: Record<string, { min: number; max: number }>,
   ) {
     super();
-    this.knownSymbols = symbols ?? KNOWN_NSE_SYMBOLS;
+    this.knownSymbols = symbols ?? KNOWN_PSE_SYMBOLS;
     this.sectorMap = sectors ?? SECTOR_MAP;
     this.marketCapRanges = caps ?? MARKET_CAP_RANGES;
   }
@@ -148,8 +148,8 @@ export class MarketRealityValidator extends BaseValidator {
         severity: 'error',
         module: this.id,
         symbol,
-        reason: `Symbol "${symbol}" not found in known NSE universe`,
-        recommendedFix: 'Verify symbol against NSE master list; remove if fake or add if newly listed',
+        reason: `Symbol "${symbol}" not found in known PSE universe`,
+        recommendedFix: 'Verify symbol against PSE master list; remove if fake or add if newly listed',
         detectedAt: new Date().toISOString(),
       });
     }

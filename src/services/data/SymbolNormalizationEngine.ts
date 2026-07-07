@@ -1,5 +1,5 @@
 /**
- * SymbolNormalizationEngine — Resolves various symbol formats (Ticker, NSE:Ticker, BSE codes, ISINs)
+ * SymbolNormalizationEngine — Resolves various symbol formats (Ticker, PSE:Ticker, PSE codes, ISINs)
  * into their canonical ticker symbols.
  */
 
@@ -58,17 +58,17 @@ export class SymbolNormalizationEngine {
   ]);
 
   /**
-   * Normalize any input identifier to its canonical NSE ticker symbol.
+   * Normalize any input identifier to its canonical PSE ticker symbol.
    */
   static async normalize(identifier: string): Promise<string | null> {
     if (!identifier) return null;
     let clean = identifier.toUpperCase().trim();
 
     // 1. Handle common suffix or prefix removals
-    clean = clean.replace(/^(NSE|BSE):/i, '');
-    clean = clean.replace(/\.(NS|BO|NSE|BSE)$/i, '');
+    clean = clean.replace(/^(PSE|PSE):/i, '');
+    clean = clean.replace(/\.(NS|BO|PSE|PSE)$/i, '');
 
-    // 2. Direct lookup in static BSE code map
+    // 2. Direct lookup in static PSE code map
     if (this.bseCodeMap.has(clean)) {
       return this.bseCodeMap.get(clean)!;
     }

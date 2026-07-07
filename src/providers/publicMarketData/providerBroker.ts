@@ -44,7 +44,7 @@ const DOMAIN_MATRIX: Record<string, Array<{ key: string; domain: ProviderDomain 
     { key: "jugaad-data", domain: "index" },
     { key: "jugaad-data", domain: "rbi" },
   ],
-  NSEPYTHON: [
+  PSEPYTHON: [
     { key: "nsepython", domain: "quote" },
     { key: "nsepython", domain: "historical" },
     { key: "nsepython", domain: "pse-daily" },
@@ -171,7 +171,7 @@ export class PublicMarketDataProviderBroker {
       const domains: Partial<Record<ProviderDomain, DomainStatus>> = {};
       for (const { domain } of entries) {
         let healthy = false;
-        if (envKey === 'NSEPYTHON') {
+        if (envKey === 'PSEPYTHON') {
           const probeKey = domain === 'quote' ? 'index_quote' : domain;
           healthy = domainHealthy(nsepython?.domains?.[probeKey]?.status);
         } else if (envKey === 'JUGAD_DATA') {

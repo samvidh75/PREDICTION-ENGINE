@@ -8,7 +8,7 @@
  *   - Stale records (not verified in >30 days)
  *   - Missing company names
  *   - Inconsistent exchange/symbol mappings
- *   - Orphaned records (listed as Active but not on NSE)
+ *   - Orphaned records (listed as Active but not on PSE)
  *
  * Runs as part of the nightly pipeline (Stage 1b).
  */
@@ -85,7 +85,7 @@ export class RegistryVerificationJob {
   async persistReport(report: VerificationReport): Promise<void> {
     try {
       await pool.query(
-        `INSERT INTO registry_verification_logs (run_date, total_records, active_records, issues_json, passed)
+        `IPSERT INTO registry_verification_logs (run_date, total_records, active_records, issues_json, passed)
          VALUES ($1, $2, $3, $4, $5)
          ON CONFLICT (run_date) DO UPDATE SET
            total_records = EXCLUDED.total_records,
@@ -111,7 +111,7 @@ export class RegistryVerificationJob {
         symbol: row.symbol,
         issue: 'Missing ISIN',
         severity: 'medium',
-        details: `${row.company_name}: no ISIN assigned. Resolution requires NSE/BSE ISIN mapping.`,
+        details: `${row.company_name}: no ISIN assigned. Resolution requires PSE/PSE ISIN mapping.`,
       });
     }
   }
@@ -174,8 +174,8 @@ export class RegistryVerificationJob {
        FROM master_security_registry
        WHERE listing_status = 'Active'
          AND (
-           (exchange = 'NSE' AND nse_symbol IS NOT NULL AND nse_symbol != symbol)
-           OR (exchange = 'BSE' AND bse_symbol IS NOT NULL AND bse_symbol != symbol)
+           (exchange = 'PSE' AND nse_symbol IS NOT NULL AND nse_symbol != symbol)
+           OR (exchange = 'PSE' AND bse_symbol IS NOT NULL AND bse_symbol != symbol)
          )`
     );
     for (const row of result.rows) {

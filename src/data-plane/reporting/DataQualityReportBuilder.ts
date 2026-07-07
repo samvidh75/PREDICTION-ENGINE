@@ -173,7 +173,7 @@ export function buildEodQualitySummary(candles: IndianEodCandle[]): EodQualitySu
 
 export function buildCalendarCoverageSummary(calendar: PSETradingCalendar): CalendarCoverageSummary {
   const holidayList = calendar.getHolidays();
-  const tradingDaysInRange = holidayList.length > 0 ? 248 : 0; // Approx NSE trading days
+  const tradingDaysInRange = holidayList.length > 0 ? 248 : 0; // Approx PSE trading days
   const holidays = holidayList.length;
 
   // Verify weekend consistency
@@ -240,7 +240,7 @@ export function buildFullDataQualityReport(
     notes.push(`⚠️  ${symbolHealth.missingIsin} symbols missing ISIN.`);
   }
   if (symbolHealth.missingBseCode > 0) {
-    notes.push(`ℹ️  ${symbolHealth.missingBseCode} symbols missing BSE code (expected for BSE-primary).`);
+    notes.push(`ℹ️  ${symbolHealth.missingBseCode} symbols missing PSE code (expected for PSE-primary).`);
   }
 
   const eodQuality = candles ? buildEodQualitySummary(candles) : null;
@@ -296,7 +296,7 @@ export function renderDataQualityReport(report: DataQualityReport): string {
   }
   lines.push(`- **With ISIN:** ${report.symbolHealth.withIsin}`);
   lines.push(`- **Missing ISIN:** ${report.symbolHealth.missingIsin}`);
-  lines.push(`- **With BSE code:** ${report.symbolHealth.withBseCode}`);
+  lines.push(`- **With PSE code:** ${report.symbolHealth.withBseCode}`);
   if (report.symbolHealth.duplicatesBySymbol.length > 0) {
     lines.push(`- **Duplicate symbols:** ${report.symbolHealth.duplicatesBySymbol.join(', ')}`);
   }

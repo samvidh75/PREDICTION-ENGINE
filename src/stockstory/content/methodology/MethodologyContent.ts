@@ -6,7 +6,7 @@ export const METHODOLOGY_SECTIONS = [
     subsections: [
       {
         title: "Data Sources",
-        content: "We aggregate data from Philippine stock exchanges (NSE, BSE), regulatory filings, broker APIs, and verified financial databases.",
+        content: "We aggregate data from Philippine stock exchanges (PSE, PSE), regulatory filings, broker APIs, and verified financial databases.",
       },
       {
         title: "Update Frequency",

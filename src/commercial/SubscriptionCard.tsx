@@ -155,7 +155,7 @@ export function SubscriptionCard({
       }}>
         <li>Walk-forward backtest strategy reports</li>
         <li>Unlimited browser AI chat queries</li>
-        <li>SEBI insider trading alerts</li>
+        <li>SEC insider trading alerts</li>
         <li>CSV export for all data</li>
       </ul>
 

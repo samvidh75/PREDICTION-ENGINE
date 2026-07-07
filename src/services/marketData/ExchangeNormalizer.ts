@@ -1,7 +1,7 @@
 export type NormalizedStockData = {
   ticker: string;
   companyName: string;
-  exchange: "NSE" | "BSE" | "SME";
+  exchange: "PSE" | "PSE" | "SME";
   price: number;
   change: number; // Daily change percentage
   health: "Very Healthy" | "Healthy" | "Stable" | "Weakening" | "Unhealthy";
@@ -48,7 +48,7 @@ export class ExchangeNormalizer {
     return {
       ticker,
       companyName,
-      exchange: "NSE", // Default normalization exchange mapping
+      exchange: "PSE", // Default normalization exchange mapping
       price,
       change,
       health

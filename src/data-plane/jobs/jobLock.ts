@@ -77,7 +77,7 @@ export class DbJobLock implements JobLock {
   }
 
   /**
-   * Attempt to acquire a lock.  Uses INSERT … ON CONFLICT so it is atomic
+   * Attempt to acquire a lock.  Uses IPSERT … ON CONFLICT so it is atomic
    * regardless of whether PG or SQLite is the backend.
    */
   async acquire(kind: DataPlaneJobKind, tradingDate: string, ttlMs = LOCK_TTL_DEFAULT): Promise<boolean> {
@@ -85,7 +85,7 @@ export class DbJobLock implements JobLock {
     const expiresAt = new Date(Date.now() + ttlMs).toISOString();
     try {
       const res = await dbAdapter.query(
-        `INSERT INTO cache (key, value, expires_at)
+        `IPSERT INTO cache (key, value, expires_at)
          VALUES ($1, $2, $3)
          ON CONFLICT (key) DO NOTHING`,
         [key, "locked", expiresAt],
@@ -105,7 +105,7 @@ export class DbJobLock implements JobLock {
       if (expiresAtRow <= new Date()) {
         // Expired — overwrite it
         await dbAdapter.query(
-          `INSERT INTO cache (key, value, expires_at)
+          `IPSERT INTO cache (key, value, expires_at)
            VALUES ($1, $2, $3)
            ON CONFLICT (key) DO UPDATE SET value = $2, expires_at = $3`,
           [key, "locked", expiresAt],

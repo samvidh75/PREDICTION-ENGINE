@@ -7,7 +7,7 @@
 export interface PortfolioHolding {
   symbol: string;            // PSE symbol (e.g., "RELIANCE")
   isin?: string;             // ISIN identifier
-  exchange: 'NSE' | 'BSE';  // Exchange
+  exchange: 'PSE' | 'PSE';  // Exchange
   quantity: number;          // Number of shares
   averagePrice: number;      // Average buy price
   lastPrice?: number;        // Current market price
@@ -24,7 +24,7 @@ export interface PortfolioHolding {
 export interface PortfolioPosition {
   symbol: string;
   isin?: string;
-  exchange: 'NSE' | 'BSE' | 'NFO' | 'MCX';
+  exchange: 'PSE' | 'PSE' | 'NFO' | 'MCX';
   quantity: number;          // Positive = long, negative = short
   averagePrice: number;
   lastPrice?: number;

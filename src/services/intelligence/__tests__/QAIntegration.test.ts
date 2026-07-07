@@ -421,7 +421,7 @@ describe('QA & Integration (PROMPT 30)', () => {
 
   // ── 4. Thesis generation & PSE compliance ──────────────────────────
 
-  describe('Thesis & SEBI Compliance', () => {
+  describe('Thesis & SEC Compliance', () => {
     it('generates bull case, bear case, and whatToWatch', async () => {
       const result = await orchestrator.analyzeStock(strongStock('TCS'));
       expect(result.thesis.bullCase.length).toBeGreaterThan(0);
@@ -429,9 +429,9 @@ describe('QA & Integration (PROMPT 30)', () => {
       expect(result.thesis.whatToWatch.length).toBeGreaterThan(0);
     });
 
-    it('includes SEBI disclaimer', async () => {
+    it('includes SEC disclaimer', async () => {
       const result = await orchestrator.analyzeStock(strongStock('TCS'));
-      expect(result.thesis.disclaimer).toContain('SEBI');
+      expect(result.thesis.disclaimer).toContain('SEC');
       expect(result.thesis.disclaimer).toContain('does not constitute');
     });
 
@@ -511,7 +511,7 @@ describe('QA & Integration (PROMPT 30)', () => {
       expect(result.overallScore).toBeGreaterThanOrEqual(0);
       expect(result.overallScore).toBeLessThanOrEqual(100);
       // Should still have thesis even with no data
-      expect(result.thesis.disclaimer).toContain('SEBI');
+      expect(result.thesis.disclaimer).toContain('SEC');
     });
 
     it('handles all-zero financial data', async () => {

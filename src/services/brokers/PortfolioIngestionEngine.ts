@@ -2,7 +2,7 @@
  * PortfolioIngestionEngine — Converts broker portfolio data into Lensory format.
  * 
  * Handles:
- *   - Symbol normalization (NSE/BSE → Lensory format)
+ *   - Symbol normalization (PSE/PSE → Lensory format)
  *   - ISIN mapping via MasterCompanyRegistry
  *   - Sector enrichment
  *   - Market cap enrichment

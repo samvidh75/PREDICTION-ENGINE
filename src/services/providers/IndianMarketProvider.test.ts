@@ -1,18 +1,18 @@
 import { describe, expect, it } from 'vitest';
 import { inferIndianApiExchange, sourceTimestampFromIndianApi } from './IndianMarketProvider';
 
-describe('IndianMarketProvider trust helpers', () => {
+describe('PhilippineMarketProvider trust helpers', () => {
   it('uses explicit symbol suffixes when supplied', () => {
-    expect(inferIndianApiExchange('RELIANCE.NS', { NSE: 100, BSE: 101 })).toBe('NSE');
-    expect(inferIndianApiExchange('RELIANCE.NSE', { NSE: 100, BSE: 101 })).toBe('NSE');
-    expect(inferIndianApiExchange('RELIANCE.BO', { NSE: 100, BSE: 101 })).toBe('BSE');
-    expect(inferIndianApiExchange('RELIANCE.BSE', { NSE: 100, BSE: 101 })).toBe('BSE');
+    expect(inferIndianApiExchange('RELIANCE.NS', { PSE: 100, PSE: 101 })).toBe('PSE');
+    expect(inferIndianApiExchange('RELIANCE.PSE', { PSE: 100, PSE: 101 })).toBe('PSE');
+    expect(inferIndianApiExchange('RELIANCE.BO', { PSE: 100, PSE: 101 })).toBe('PSE');
+    expect(inferIndianApiExchange('RELIANCE.PSE', { PSE: 100, PSE: 101 })).toBe('PSE');
   });
 
   it('infers venue only when the payload exposes a single valid venue price', () => {
-    expect(inferIndianApiExchange('RELIANCE', { NSE: 100 })).toBe('NSE');
-    expect(inferIndianApiExchange('RELIANCE', { BSE: 101 })).toBe('BSE');
-    expect(inferIndianApiExchange('RELIANCE', { NSE: 100, BSE: 101 })).toBeUndefined();
+    expect(inferIndianApiExchange('RELIANCE', { PSE: 100 })).toBe('PSE');
+    expect(inferIndianApiExchange('RELIANCE', { PSE: 101 })).toBe('PSE');
+    expect(inferIndianApiExchange('RELIANCE', { PSE: 100, PSE: 101 })).toBeUndefined();
     expect(inferIndianApiExchange('RELIANCE', {})).toBeUndefined();
   });
 

@@ -19,7 +19,7 @@ function makeBrokerMock(impl: (provider: string, operation: string, symbol: stri
   });
 }
 
-describe('IndianApiFinancialProvider', () => {
+describe('PhilippineApiFinancialProvider', () => {
   const originalEnv = process.env;
 
   beforeEach(() => {

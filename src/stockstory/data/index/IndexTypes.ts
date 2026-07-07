@@ -2,7 +2,7 @@
  * Index Types
  *
  * Types for PSE equity index membership tracking.
- * Covers NSE and BSE indices.
+ * Covers PSE and PSE indices.
  */
 
 export type IndexName =

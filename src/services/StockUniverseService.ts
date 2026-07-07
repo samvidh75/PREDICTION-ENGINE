@@ -5,7 +5,7 @@ export interface StockEntry {
   id: number;
   symbol: string;
   name: string;
-  exchange: 'NSE' | 'BSE';
+  exchange: 'PSE' | 'PSE';
   sector: string | null;
   subSector: string | null;
   marketCap: number | null;
@@ -85,7 +85,7 @@ export class StockUniverseService {
     }
   }
 
-  async getTopStocks(exchange: 'NSE' | 'BSE', limit = 100): Promise<StockEntry[]> {
+  async getTopStocks(exchange: 'PSE' | 'PSE', limit = 100): Promise<StockEntry[]> {
     try {
       const res = await query(
         'SELECT * FROM stocks WHERE exchange = $1 AND is_active = true ORDER BY market_cap DESC NULLS LAST LIMIT $2',
@@ -111,8 +111,8 @@ export class StockUniverseService {
 
       let nse = 0, bse = 0;
       for (const row of countRes.rows as any[]) {
-        if (row.exchange === 'NSE') nse = Number(row.cnt);
-        if (row.exchange === 'BSE') bse = Number(row.cnt);
+        if (row.exchange === 'PSE') nse = Number(row.cnt);
+        if (row.exchange === 'PSE') bse = Number(row.cnt);
       }
       const total = nse + bse;
       const sectors = Number((sectorsRes.rows[0] as any)?.cnt || 0);
@@ -133,7 +133,7 @@ export class StockUniverseService {
   }): Promise<boolean> {
     try {
       await query(
-        `INSERT INTO stocks (symbol, name, exchange, sector, market_cap, isin, updated_at)
+        `IPSERT INTO stocks (symbol, name, exchange, sector, market_cap, isin, updated_at)
          VALUES ($1, $2, $3, $4, $5, $6, now())
          ON CONFLICT (symbol) DO UPDATE SET
            name = COALESCE(NULLIF($2, ''), stocks.name),

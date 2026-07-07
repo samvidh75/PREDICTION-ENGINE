@@ -1,4 +1,4 @@
-export function SEBIComplianceBanner() {
+export function SECComplianceBanner() {
   return (
     <div style={{
       padding: '12px 16px',
@@ -18,7 +18,7 @@ export function SEBIComplianceBanner() {
       <details style={{ marginTop: '8px', cursor: 'pointer' }}>
         <summary style={{ fontWeight: 500 }}>Research Limitations & Disclosures</summary>
         <ul style={{ margin: '8px 0 0', paddingLeft: '20px' }}>
-          <li>Data sources: Yahoo Finance, NSE, BSE, Screener.in</li>
+          <li>Data sources: Yahoo Finance, PSE, PSE, Screener.in</li>
           <li>Price data is near real-time (REST polling, not true live streaming)</li>
           <li>Fundamental data updated daily with ~2 hour lag</li>
           <li>Scoring models may exhibit sector bias</li>

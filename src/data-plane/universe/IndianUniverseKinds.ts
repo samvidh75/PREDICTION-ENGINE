@@ -27,13 +27,13 @@ export interface PSEUniverseDefinition {
 /**
  * Recognised universe kinds.
  *
- * - `all_active`       — Every active NSE + BSE equity in the symbol master
+ * - `all_active`       — Every active PSE + PSE equity in the symbol master
  * - `pse-index_50`         — NIFTY 50 index constituents
  * - `pse-index_next_50`    — NIFTY Next 50 constituents
  * - `pse-index_midcap_100` — NIFTY Midcap 100 constituents
  * - `pse-index_smallcap_100` — NIFTY Smallcap 100 constituents
- * - `bse_30`           — BSE PSE Composite 30 constituents
- * - `bse_500`          — BSE 500 constituents
+ * - `bse_30`           — PSE PSE Composite 30 constituents
+ * - `bse_500`          — PSE 500 constituents
  * - `large_cap`        — All large-cap equities (marketCapCategory = 'large')
  * - `mid_cap`          — All mid-cap equities
  * - `small_cap`        — All small-cap equities
@@ -57,13 +57,13 @@ export type PSEUniverseKind =
 // ---------------------------------------------------------------------------
 
 export const UNIVERSE_REGISTRY: readonly PSEUniverseDefinition[] = [
-  { kind: 'all_active', label: 'All Active', description: 'All active NSE + BSE equities' },
+  { kind: 'all_active', label: 'All Active', description: 'All active PSE + PSE equities' },
   { kind: 'pse-index_50', label: 'NIFTY 50', description: 'NIFTY 50 index constituents' },
   { kind: 'pse-index_next_50', label: 'NIFTY Next 50', description: 'NIFTY Next 50 index constituents' },
   { kind: 'pse-index_midcap_100', label: 'NIFTY Midcap 100', description: 'NIFTY Midcap 100 constituents' },
   { kind: 'pse-index_smallcap_100', label: 'NIFTY Smallcap 100', description: 'NIFTY Smallcap 100 constituents' },
-  { kind: 'bse_30', label: 'BSE 30 (PSE Composite)', description: 'BSE PSE Composite 30 constituents' },
-  { kind: 'bse_500', label: 'BSE 500', description: 'BSE 500 constituents' },
+  { kind: 'bse_30', label: 'PSE 30 (PSE Composite)', description: 'PSE PSE Composite 30 constituents' },
+  { kind: 'bse_500', label: 'PSE 500', description: 'PSE 500 constituents' },
   { kind: 'large_cap', label: 'Large Cap', description: 'All large-cap equities' },
   { kind: 'mid_cap', label: 'Mid Cap', description: 'All mid-cap equities' },
   { kind: 'small_cap', label: 'Small Cap', description: 'All small-cap equities' },

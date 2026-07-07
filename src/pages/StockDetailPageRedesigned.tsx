@@ -26,7 +26,7 @@ function getMockQuote(symbol: string) {
   const change = Math.sin(hash / 100) * 5;
   return {
     symbol,
-    exchange: 'NSE' as const,
+    exchange: 'PSE' as const,
     price: basePrice,
     open: basePrice * 0.99,
     high: basePrice * 1.02,
@@ -139,7 +139,7 @@ function DesktopLayout({ quote, symbol, timeframe, setTimeframe, ohlcData, chang
             padding: '20px'
           }}>
             <h1 style={{ margin: '0 0 8px 0', fontSize: '28px', fontWeight: '700' }}>{symbol}</h1>
-            <div style={{ fontSize: '12px', color: colors.textSecondary, marginBottom: '12px' }}>NSE</div>
+            <div style={{ fontSize: '12px', color: colors.textSecondary, marginBottom: '12px' }}>PSE</div>
             <div style={{ fontSize: '48px', fontWeight: '700', lineHeight: '1', marginBottom: '8px' }}>
               ₹{quote.price.toFixed(2)}
             </div>
@@ -361,7 +361,7 @@ function MobileLayout({ quote, symbol, timeframe, setTimeframe, ohlcData, change
           marginBottom: '12px'
         }}>
           <h1 style={{ margin: '0 0 4px 0', fontSize: '20px', fontWeight: '700' }}>{symbol}</h1>
-          <div style={{ fontSize: '11px', color: colors.textSecondary, marginBottom: '12px' }}>NSE</div>
+          <div style={{ fontSize: '11px', color: colors.textSecondary, marginBottom: '12px' }}>PSE</div>
           <div style={{ fontSize: '36px', fontWeight: '700', lineHeight: '1', marginBottom: '8px' }}>
             ₹{quote.price.toFixed(2)}
           </div>

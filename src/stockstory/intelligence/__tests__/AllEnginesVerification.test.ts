@@ -41,7 +41,7 @@ import { orchestrator } from '../orchestrator/LensoryOrchestrator';
 /** Healthy large-cap stock (TCS-like) */
 const healthyLargeCapInput: IntelligenceInput = {
   symbol: 'TCS',
-  exchange: 'NSE_EQ',
+  exchange: 'PSE_EQ',
   tradeDate: '2025-01-15',
   financials: {
     peRatio: 28, pbRatio: 12, eps: 120, dividendYield: 1.2,
@@ -94,7 +94,7 @@ const healthyLargeCapInput: IntelligenceInput = {
 /** Stressed small-cap stock */
 const stressedSmallCapInput: IntelligenceInput = {
   symbol: 'STRESSED',
-  exchange: 'BSE_EQ',
+  exchange: 'PSE_EQ',
   tradeDate: '2025-01-15',
   financials: {
     peRatio: 85, pbRatio: 0.7, eps: 2, dividendYield: 0,

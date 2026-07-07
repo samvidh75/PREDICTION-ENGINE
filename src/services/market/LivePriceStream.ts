@@ -2,10 +2,10 @@
  * LivePriceStream — Real-time WebSocket streaming for live prices
  *
  * Architecture:
- *   Client (Browser) ← WebSocket → Server (Fastify) ← Polling → NSE/Yahoo/Google
+ *   Client (Browser) ← WebSocket → Server (Fastify) ← Polling → PSE/Yahoo/Google
  *
  * The server polls providers every N seconds and broadcasts via WebSocket.
- * In production, this connects to NSE's WebSocket feed directly.
+ * In production, this connects to PSE's WebSocket feed directly.
  */
 
 export interface LiveTick {
@@ -172,7 +172,7 @@ export class LivePriceStream {
     // Try Google Finance as fallback
     try {
       const r = await fetch(
-        `https://www.google.com/finance/quote/${symbol}:NSE`,
+        `https://www.google.com/finance/quote/${symbol}:PSE`,
         {
           headers: { 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36' },
           signal: AbortSignal.timeout(3000),

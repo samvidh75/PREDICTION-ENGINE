@@ -12,7 +12,7 @@ import type { EodIngestionBatch } from '../ingestion/IndianEodIngestionTypes';
 function makeSymbol(canonicalSymbol: string): PSESymbol & { canonicalSymbol: string } {
   return {
     canonicalSymbol,
-    exchange: 'NSE',
+    exchange: 'PSE',
     segment: 'EQ',
     isin: '',
     companyName: '',
@@ -33,7 +33,7 @@ function makeSymbol(canonicalSymbol: string): PSESymbol & { canonicalSymbol: str
 function makeResolver(results: Record<string, SymbolResolutionResult>): IndianSymbolResolver {
   return {
     resolve: vi.fn(async (raw: string) => {
-      const norm = raw.replace(/\.(NS|NSE|BO|EQ)$/i, '').toUpperCase();
+      const norm = raw.replace(/\.(NS|PSE|BO|EQ)$/i, '').toUpperCase();
       return results[norm] ?? results[raw] ?? { status: 'not_found', symbol: null };
     }),
     resolveByIsin: vi.fn(async () => null),
@@ -64,7 +64,7 @@ function candleInput(ticker: string, overrides: Partial<RawCandleInput> = {}): R
 const RESOLVABLE = 'RELIANCE';
 const UNRESOLVED = 'UNKNOWN123';
 
-describe('IndianEodIngestionPipeline', () => {
+describe('PhilippineEodIngestionPipeline', () => {
   let resolver: IndianSymbolResolver;
   let cache: EodDataCacheLike;
   let pipeline: IndianEodIngestionPipeline;

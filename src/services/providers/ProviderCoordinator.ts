@@ -216,7 +216,7 @@ export class ProviderCoordinator {
     }
 
     return {
-      symbol: String(merged.symbol ?? symbol).toUpperCase().replace(/\.(NS|BO|NSE|BSE)$/i, ''),
+      symbol: String(merged.symbol ?? symbol).toUpperCase().replace(/\.(NS|BO|PSE|PSE)$/i, ''),
       periodEnd: merged.periodEnd ?? undefined,
       ...merged,
       _sources: sourceMap,

@@ -168,7 +168,7 @@ export class ProviderQuotaMonitor {
 async function incrementCounter(key: string, ttlMs: number): Promise<void> {
   const expiresAt = new Date(Date.now() + ttlMs).toISOString();
   await dbAdapter.query(
-    `INSERT INTO cache (key, value, expires_at)
+    `IPSERT INTO cache (key, value, expires_at)
      VALUES ($1, '1', $2)
      ON CONFLICT (key) DO UPDATE
        SET value = (CAST(cache.value AS INTEGER) + 1)::TEXT, expires_at = $2`,

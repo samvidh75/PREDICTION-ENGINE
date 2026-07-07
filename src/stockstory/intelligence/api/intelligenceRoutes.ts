@@ -37,7 +37,7 @@ export async function registerIntelligenceRoutes(app: FastifyInstance): Promise<
           required: ['symbol'],
           properties: {
             symbol: { type: 'string' },
-            exchange: { type: 'string', enum: ['BSE', 'NSE', 'NSE_EQ', 'BSE_EQ'] },
+            exchange: { type: 'string', enum: ['PSE', 'PSE', 'PSE_EQ', 'PSE_EQ'] },
             tradeDate: { type: 'string' },
           },
         },
@@ -45,7 +45,7 @@ export async function registerIntelligenceRoutes(app: FastifyInstance): Promise<
     },
     async (req: FastifyRequest<{ Querystring: StockQuery }>, reply: FastifyReply) => {
       const { symbol, exchange, tradeDate } = req.query;
-      const ex = (exchange ?? 'NSE_EQ') as IntelligenceInput['exchange'];
+      const ex = (exchange ?? 'PSE_EQ') as IntelligenceInput['exchange'];
 
       // Check cache
       const cached = globalIntelligenceCache.get(symbol, tradeDate);
@@ -117,7 +117,7 @@ export async function registerIntelligenceRoutes(app: FastifyInstance): Promise<
       // Process sequentially to avoid overwhelming external resources
       for (const s of stocks) {
         try {
-          const ex = (s.exchange ?? 'NSE_EQ') as IntelligenceInput['exchange'];
+          const ex = (s.exchange ?? 'PSE_EQ') as IntelligenceInput['exchange'];
           const input = buildInput(s.symbol, ex, s.tradeDate);
           const report = await orchestrator.analyze(input);
           globalIntelligenceCache.set(report);

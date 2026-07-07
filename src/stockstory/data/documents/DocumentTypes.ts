@@ -13,7 +13,7 @@ export type DocumentKind =
   | 'credit_rating_report'
   | 'research_report'
   | 'drip_report'
-  | 'sebi_filing'
+  | 'sec_filing'
   | 'other';
 
 export interface DocumentMetadata {

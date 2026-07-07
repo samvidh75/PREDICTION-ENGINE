@@ -27,7 +27,7 @@ export interface ResearchAlertViewModel {
 const MAX_STRING_LENGTH = 280;
 const MAX_ARRAY_LENGTH = 4;
 
-const UNSAFE_COPY_PATTERN = /\b(?:Buy|Sell|Hold|Strong Buy|guaranteed|sure shot|multibagger|target|provider|API|backend|diagnostics|coverage|freshness|lineage|migration|backfill|source pending|source verified|quote unavailable|history unavailable|RAG|vector|embedding|chunk|narrativePromptPayload|adapter|ADAPTER_UNAVAILABLE|EMPTY_RESPONSE|MALFORMED_RESPONSE)\b/i;
+const UNSAFE_COPY_PATTERN = /\b(?:Buy|Sell|Hold|Strong Buy|guaranteed|sure shot|multibagger|target|provider|API|backend|diagnostics|coverage|freshness|lineage|migration|backfill|source pending|source verified|quote unavailable|history unavailable|RAG|vector|embedding|chunk|narrativePromptPayload|adapter|ADAPTER_UNAVAILABLE|EMPTY_RESPOPSE|MALFORMED_RESPOPSE)\b/i;
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {
   return Boolean(value) && typeof value === 'object' && !Array.isArray(value);

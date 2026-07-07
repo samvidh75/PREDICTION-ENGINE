@@ -4,7 +4,7 @@ import { browserCache } from './BrowserCache';
 /**
  * Screener.in client for fundamental data + fallback pricing.
  * Parses screener.in pages to get: P/E, P/B, ROE, debt/equity, etc.
- * Also provides price quotes as fallback when yfinance/NSE unavailable.
+ * Also provides price quotes as fallback when yfinance/PSE unavailable.
  *
  * Note: This uses web scraping (no official API).
  * Better to use: own Supabase with real fundamental data.
@@ -99,7 +99,7 @@ export class ScreenerClient {
 
     return {
       symbol,
-      exchange: 'NSE',
+      exchange: 'PSE',
       timestamp: Date.now(),
       price,
       open: data.openPrice || 0,
@@ -149,7 +149,7 @@ export class ScreenerClient {
 
     return {
       symbol,
-      exchange: 'NSE',
+      exchange: 'PSE',
       timestamp: Date.now(),
       price: price || 0,
       open: 0,

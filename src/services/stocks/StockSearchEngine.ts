@@ -12,7 +12,7 @@ export class StockSearchEngine {
     const universe = StockRegistry.getAllStocks().filter((stock) => {
       if (/^\d{5,6}$/.test(stock.symbol)) return false;
       if (!stock.companyName || stock.companyName.toUpperCase() === stock.symbol.toUpperCase()) return false;
-      if (stock.companyName.includes('BSE Listed Security Code')) return false;
+      if (stock.companyName.includes('PSE Listed Security Code')) return false;
       if (!stock.sector || stock.sector === 'Data unavailable') return false;
       return true;
     });

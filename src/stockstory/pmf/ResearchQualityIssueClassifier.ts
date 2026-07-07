@@ -63,7 +63,7 @@ const CATEGORY_KEYWORDS: Array<{ category: IssueCategory; keywords: RegExp[]; we
   },
   {
     category: 'COMPLIANCE_RISK',
-    keywords: [/sebi/i, /regulatory/i, /compliance/i, /disclosure/i, /disclaimer/i, /recommendation/i, /advice/i, /misleading/i],
+    keywords: [/sec/i, /regulatory/i, /compliance/i, /disclosure/i, /disclaimer/i, /recommendation/i, /advice/i, /misleading/i],
     weight: 0.9,
   },
 ];

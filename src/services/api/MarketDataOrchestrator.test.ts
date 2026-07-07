@@ -6,7 +6,7 @@ describe('buildCompanyTelemetry', () => {
     const telemetry = buildCompanyTelemetry(
       {
         symbol: 'RELIANCE',
-        exchange: 'NSE',
+        exchange: 'PSE',
         price: 1400,
         change: 10,
         changePercent: 0.72,

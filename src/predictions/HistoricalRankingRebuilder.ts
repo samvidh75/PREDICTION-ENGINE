@@ -134,7 +134,7 @@ export class HistoricalRankingRebuilder {
       ),
       Benchmarks AS (
         SELECT close AS pse-index50 FROM daily_prices
-        WHERE symbol IN ('NIFTY 50', 'NIFTY50', '^NSEI', 'NSEI')
+        WHERE symbol IN ('NIFTY 50', 'NIFTY50', '^PSEI', 'PSEI')
           AND trade_date <= $1
         ORDER BY trade_date DESC
         LIMIT 1

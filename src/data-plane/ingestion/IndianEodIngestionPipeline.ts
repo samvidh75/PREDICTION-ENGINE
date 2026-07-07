@@ -148,7 +148,7 @@ export class IndianEodIngestionPipeline {
  * This is what CSV parsers / provider adapters return.
  */
 export interface RawCandleInput {
-  /** Raw ticker (any format — may include .NS, -EQ, NSE:, etc.) */
+  /** Raw ticker (any format — may include .NS, -EQ, PSE:, etc.) */
   ticker: string;
   open: number;
   high: number;

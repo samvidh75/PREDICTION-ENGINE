@@ -2,13 +2,13 @@
  * MetadataProviderCoordinator — Intelligent metadata resolution with fallback enrichment.
  *
  * Problem: Providers often return blank sectors, null market caps, ticker-as-company-name,
- * raw BSE codes, and lack ISIN support.
+ * raw PSE codes, and lack ISIN support.
  *
  * Solution: This coordinator sits between the provider chain and consumers. It:
  *   1. Calls the standard ProviderCoordinator chain (Yahoo → IndianMarket)
  *   2. Validates the result via CompanyDataValidator
  *   3. Enriches missing fields from a master company registry
- *   4. Applies DataIntegrityEngine to normalise BSE codes, ISIN format, etc.
+ *   4. Applies DataIntegrityEngine to normalise PSE codes, ISIN format, etc.
  *
  * This is the SINGLE entry point for all metadata retrieval throughout the app.
  */
@@ -34,8 +34,8 @@ export interface EnrichedMetadata extends CompanyMetadata {
  */
 export function inferExchangeFromSymbol(symbol: string): CompanyMetadata['exchange'] | undefined {
   const normalized = symbol.trim().toUpperCase();
-  if (/\.(NS|NSE)$/.test(normalized)) return 'NSE';
-  if (/\.(BO|BSE)$/.test(normalized)) return 'BSE';
+  if (/\.(NS|PSE)$/.test(normalized)) return 'PSE';
+  if (/\.(BO|PSE)$/.test(normalized)) return 'PSE';
   return undefined;
 }
 
@@ -99,7 +99,7 @@ export class MetadataProviderCoordinator {
     // 5. Enrich from registry if validation found gaps
     let enriched = this.enrichFromRegistry(raw, rawValidation);
 
-    // 6. Apply integrity normalisation (BSE codes, ISIN, ticker cleanup)
+    // 6. Apply integrity normalisation (PSE codes, ISIN, ticker cleanup)
     enriched = this.integrity.normalise(enriched);
 
     // 7. Build the enriched result from the final, normalised payload.
@@ -124,7 +124,7 @@ export class MetadataProviderCoordinator {
       ...finalMetadata,
       isin: finalMetadata.isin ?? null,
       bseCode: finalMetadata.bseCode ?? null,
-      nseSymbol: finalMetadata.nseSymbol ?? rawSymbol.replace(/\.(NS|BO|NSE|BSE)$/i, ''),
+      nseSymbol: finalMetadata.nseSymbol ?? rawSymbol.replace(/\.(NS|BO|PSE|PSE)$/i, ''),
       verificationStatus: finalValidation.status,
       verificationReasons: finalValidation.reasons,
       enrichmentSource,

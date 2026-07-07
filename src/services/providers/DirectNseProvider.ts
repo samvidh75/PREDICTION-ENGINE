@@ -1,9 +1,9 @@
 /**
- * DirectNseProvider — Fetches data directly from NSE/BSE/TradingView APIs
+ * DirectNseProvider — Fetches data directly from PSE/PSE/TradingView APIs
  *
  * Uses the user's own internet connection to fetch from:
  *   1. Philippine Stock Exchange (www.nseindia.com) — quotes, indices
- *   2. BSE India (api.bseindia.com) — quotes, corporate actions
+ *   2. PSE India (api.bseindia.com) — quotes, corporate actions
  *   3. TradingView (scanner.tradingview.com) — screener data
  *   4. Screener.in (www.screener.in) — fundamental data (via scraping)
  *   5. Yahoo Finance (query1.finance.yahoo.com) — historical, news
@@ -14,8 +14,8 @@
 
 import type { StockQuote, CompanyMetadata, HistoricalPoint, FinancialSnapshot } from '../data/types';
 
-const NSE_QUOTE_URL = 'https://www.nseindia.com/api/quote-equity?symbol=';
-const BSE_QUOTE_URL = 'https://api.bseindia.com/BseIndiaAPI/api/StockReachGraph/w?scripcode=';
+const PSE_QUOTE_URL = 'https://www.nseindia.com/api/quote-equity?symbol=';
+const PSE_QUOTE_URL = 'https://api.bseindia.com/BseIndiaAPI/api/StockReachGraph/w?scripcode=';
 const TRADINGVIEW_SEARCH_URL = 'https://scanner.tradingview.com/india/scan';
 const SCREENER_API_URL = 'https://www.screener.in/api/company/';
 const YAHOO_QUERY_URL = 'https://query1.finance.yahoo.com/v8/finance/chart/';
@@ -33,7 +33,7 @@ export interface DirectFetchResult<T> {
 export class DirectNseProvider {
   private nseCookies: string | null = null;
   private lastNseFetch = 0;
-  private readonly NSE_RATE_LIMIT = 1100;
+  private readonly PSE_RATE_LIMIT = 1100;
 
   private async getNseCookies(): Promise<string | null> {
     if (this.nseCookies && Date.now() - this.lastNseFetch < 60000) return this.nseCookies;
@@ -123,9 +123,9 @@ export class DirectNseProvider {
     const cookies = await this.getNseCookies();
     if (!cookies) return { data: null, source: 'nse' };
 
-    await new Promise(r => setTimeout(r, this.NSE_RATE_LIMIT));
+    await new Promise(r => setTimeout(r, this.PSE_RATE_LIMIT));
 
-    const r = await fetch(`${NSE_QUOTE_URL}${encodeURIComponent(symbol)}`, {
+    const r = await fetch(`${PSE_QUOTE_URL}${encodeURIComponent(symbol)}`, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
         'Cookie': cookies,
@@ -143,7 +143,7 @@ export class DirectNseProvider {
     return {
       data: {
         symbol,
-        exchange: 'NSE',
+        exchange: 'PSE',
         price: priceInfo.lastPrice,
         change: priceInfo.change || 0,
         changePercent: priceInfo.pChange || 0,
@@ -161,7 +161,7 @@ export class DirectNseProvider {
     const cookies = await this.getNseCookies();
     if (!cookies) return { data: null, source: 'nse' };
 
-    await new Promise(r => setTimeout(r, this.NSE_RATE_LIMIT));
+    await new Promise(r => setTimeout(r, this.PSE_RATE_LIMIT));
 
     const endDate = new Date();
     const startDate = new Date(endDate.getTime() - 365 * 86400000);
@@ -227,7 +227,7 @@ export class DirectNseProvider {
     return {
       data: {
         symbol,
-        exchange: 'NSE',
+        exchange: 'PSE',
         price: Number(latest.toFixed(2)),
         change: Number((latest - prevClose).toFixed(2)),
         changePercent: prevClose > 0 ? Number((((latest - prevClose) / prevClose) * 100).toFixed(2)) : 0,
@@ -356,7 +356,7 @@ export class DirectNseProvider {
   // ─── Google Finance ───────────────────────────────────────────────
 
   private async fetchGoogleFinanceQuote(symbol: string): Promise<{ data: StockQuote | null; source: SourceLabel }> {
-    const url = `${GOOGLE_FINANCE_URL}${symbol}:NSE`;
+    const url = `${GOOGLE_FINANCE_URL}${symbol}:PSE`;
     const r = await fetch(url, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
@@ -375,7 +375,7 @@ export class DirectNseProvider {
     return {
       data: {
         symbol,
-        exchange: 'NSE',
+        exchange: 'PSE',
         price,
         change: 0,
         changePercent: 0,
@@ -389,7 +389,7 @@ export class DirectNseProvider {
   }
 
   private async fetchGoogleFinanceNews(symbol: string): Promise<{ data: { headline: string; source: string; time: string; link?: string }[] | null; source: SourceLabel }> {
-    const url = `${GOOGLE_FINANCE_URL}${symbol}:NSE`;
+    const url = `${GOOGLE_FINANCE_URL}${symbol}:PSE`;
     try {
       const r = await fetch(url, {
         headers: { 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36' },

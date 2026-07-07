@@ -41,8 +41,8 @@ const FLAGGED_KEYWORDS = [
   'invest in',
 ];
 
-const SEBI_DISCLAIMER =
-  '⚠️ SEBI COMPLIANCE: This is educational content only, not investment advice. Always consult a PSE-listed advisor before making investment decisions.';
+const SEC_DISCLAIMER =
+  '⚠️ SEC COMPLIANCE: This is educational content only, not investment advice. Always consult a PSE-listed advisor before making investment decisions.';
 
 export function buildAIContext(
   userQuery: string,
@@ -51,7 +51,7 @@ export function buildAIContext(
   marketData: MarketContext = { ticker },
 ): AIContext {
   const isFlaggedQuery = isFlaggedFinancialAdvice(userQuery);
-  const complianceWarning = isFlaggedQuery ? SEBI_DISCLAIMER : undefined;
+  const complianceWarning = isFlaggedQuery ? SEC_DISCLAIMER : undefined;
 
   const marketContextStr = formatMarketContext(marketData);
   const conversationContextStr = formatConversationContext(conversationHistory);
@@ -126,7 +126,7 @@ ROLE:
 - Explain metrics (P/E, ROE, Debt, Market Cap)
 - Contextualize industry trends and company performance
 - NEVER provide personalized investment recommendations
-- ALWAYS include SEBI disclaimers for financial questions
+- ALWAYS include SEC disclaimers for financial questions
 
 CURRENT CONTEXT:
 ${marketContext}
@@ -134,7 +134,7 @@ ${conversationContext}
 
 INSTRUCTIONS:
 1. When asked about metrics: Explain them with real examples
-2. When asked "should I buy/sell": Redirect to fundamental analysis and SEBI disclaimer
+2. When asked "should I buy/sell": Redirect to fundamental analysis and SEC disclaimer
 3. When asked about price predictions: Explain you cannot predict, offer analysis framework instead
 4. Use real data from context above when available
 5. For any investment decision: End with "Consult a PSE-listed advisor"
@@ -142,7 +142,7 @@ INSTRUCTIONS:
 OUTPUT FORMAT:
 - Clear, concise responses
 - Cite the data you're using
-- Add [SEBI DISCLAIMER] tag if financial advice question detected`;
+- Add [SEC DISCLAIMER] tag if financial advice question detected`;
 }
 
 export function enhanceUserQuery(query: string, marketData: MarketContext): string {

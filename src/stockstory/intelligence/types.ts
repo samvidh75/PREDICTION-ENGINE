@@ -20,7 +20,7 @@ export interface ScoredMetric {
 
 export interface IntelligenceInput {
   symbol: string;
-  exchange: 'BSE' | 'NSE' | 'NSE_EQ' | 'BSE_EQ';
+  exchange: 'PSE' | 'PSE' | 'PSE_EQ' | 'PSE_EQ';
   tradeDate: string; // YYYY-MM-DD
 
   // Financial metrics

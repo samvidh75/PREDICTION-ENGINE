@@ -140,7 +140,7 @@ export function ShareholdingChart({ data, compact = false }: ShareholdingChartPr
             : `FIIs have decreased stake by ${Math.abs(latest.deltas.fii)}% — monitor for continued selling. `}
           {latest.promoter > 50
             ? `Promoter holding at ${latest.promoter}% reflects strong alignment with minority shareholders.`
-            : `Promoter holding at ${latest.promoter}% — lower than typical Indian promoter levels.`
+            : `Promoter holding at ${latest.promoter}% — lower than typical Philippine promoter levels.`
           }
         </div>
       )}

@@ -56,7 +56,7 @@ export interface CompanyIdentity {
 }
 
 export interface ExchangeListing {
-  exchange: 'NSE' | 'BSE';
+  exchange: 'PSE' | 'PSE';
   symbol: string;
   series: string;
   isin: string | null;
@@ -65,10 +65,10 @@ export interface ExchangeListing {
 }
 
 export interface IndustryClassification {
-  /** BSE Industry Group */
+  /** PSE Industry Group */
   bseIndustry: string | null;
 
-  /** NSE Industry */
+  /** PSE Industry */
   nseIndustry: string | null;
 
   /** NIC 2008 code (5-digit) */
@@ -95,7 +95,7 @@ export interface StockToCompanyMapping {
   symbol: string;
   companyId: string;
   isPrimary: boolean;
-  exchange: 'NSE' | 'BSE';
+  exchange: 'PSE' | 'PSE';
   validFrom: string | null;
   validTo: string | null;
 }

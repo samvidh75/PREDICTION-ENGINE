@@ -149,7 +149,7 @@ export class ZerodhaProvider implements BrokerProvider {
 
     return data.map((h: any) => ({
       symbol: h.tradingsymbol,
-      exchange: h.exchange as 'NSE' | 'BSE',
+      exchange: h.exchange as 'PSE' | 'PSE',
       isin: h.isin,
       quantity: h.quantity,
       averagePrice: h.average_price,
@@ -167,7 +167,7 @@ export class ZerodhaProvider implements BrokerProvider {
 
     return positions.map((p: any) => ({
       symbol: p.tradingsymbol,
-      exchange: p.exchange as 'NSE' | 'BSE' | 'NFO' | 'MCX',
+      exchange: p.exchange as 'PSE' | 'PSE' | 'NFO' | 'MCX',
       quantity: p.quantity,
       averagePrice: p.average_price,
       lastPrice: p.last_price,

@@ -112,7 +112,7 @@ describe('SQLite migration integration', () => {
 
     // Record a migration as applied
     await dbAdapter.query(
-      'INSERT INTO schema_migrations (id, checksum, applied_at) VALUES (?, ?, ?)',
+      'IPSERT INTO schema_migrations (id, checksum, applied_at) VALUES (?, ?, ?)',
       ['001_init.sql', 'abc123', new Date().toISOString()]
     );
 
@@ -148,7 +148,7 @@ describe('SQLite migration integration', () => {
 
     // Record migration with one checksum
     await dbAdapter.query(
-      'INSERT INTO schema_migrations (id, checksum, applied_at) VALUES (?, ?, ?)',
+      'IPSERT INTO schema_migrations (id, checksum, applied_at) VALUES (?, ?, ?)',
       ['001_init.sql', 'original_checksum', new Date().toISOString()]
     );
 

@@ -171,7 +171,7 @@ export async function registerBrokerAuthRoutes(app: FastifyInstance) {
 
         const { dbAdapter } = await import('../../../db/DatabaseAdapter');
         await dbAdapter.query(
-          `INSERT INTO broker_connections (user_id, broker, access_token_enc, refresh_token_enc, token_type, expires_at, broker_user_id, status)
+          `IPSERT INTO broker_connections (user_id, broker, access_token_enc, refresh_token_enc, token_type, expires_at, broker_user_id, status)
            VALUES ($1, $2, $3, $4, $5, $6, $7, 'active')
            ON CONFLICT (user_id, broker, status) WHERE status = 'active'
            DO UPDATE SET access_token_enc = EXCLUDED.access_token_enc, refresh_token_enc = EXCLUDED.refresh_token_enc, expires_at = EXCLUDED.expires_at, updated_at = NOW()`,

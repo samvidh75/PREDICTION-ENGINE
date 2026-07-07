@@ -9,7 +9,7 @@
 export type EvidenceKind = 'market' | 'fundamental' | 'corporate_action' | 'filing' | 'result' | 'news' | 'derived';
 
 export interface EvidenceId {
-  /** Unique evidence identifier: e.g., "ev_NSE_TCS_Q3FY24_001" */
+  /** Unique evidence identifier: e.g., "ev_PSE_TCS_Q3FY24_001" */
   id: string;
 
   /** Human-readable label */

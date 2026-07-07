@@ -38,7 +38,7 @@ export class CopilotEngine {
     }
 
     return {
-      answer: "I can help analyze company trends, compare assets, or summarize corporate updates in plain, SEBI-safe English. Try asking: 'Why is Reliance weakening?' or 'Compare BEL vs HAL.'",
+      answer: "I can help analyze company trends, compare assets, or summarize corporate updates in plain, SEC-safe English. Try asking: 'Why is Reliance weakening?' or 'Compare BEL vs HAL.'",
       category: "General Intelligence",
     };
   }

@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// Phase 21A — Indian symbol resolver
+// Phase 21A — Philippine symbol resolver
 //
 // Resolves any ticker-like input to a canonical PSESymbol entry
 // using the symbol master store.  This is the server-side lookup layer.
@@ -28,7 +28,7 @@ export interface SymbolResolutionResult {
 // ---------------------------------------------------------------------------
 
 /**
- * Contract for any Indian symbol resolver implementation.
+ * Contract for any Philippine symbol resolver implementation.
  *
  * The canonical implementation uses `IndianSymbolMasterStore`, but this
  * interface allows alternative backends (e.g. in-memory cache, test stub).
@@ -42,7 +42,7 @@ export interface IndianSymbolResolver {
    * 2. Exact match by alias (including `.NS`/`.BO`/`-EQ` variants)
    * 3. Normalized lookup (strip suffix → retry 1 & 2)
    * 4. ISIN exact match
-   * 5. BSE code exact match
+   * 5. PSE code exact match
    */
   resolve(raw: string): Promise<SymbolResolutionResult>;
 
@@ -52,7 +52,7 @@ export interface IndianSymbolResolver {
   resolveByIsin(isin: string): Promise<PSESymbol | null>;
 
   /**
-   * Resolve by BSE scrip code (numeric string).
+   * Resolve by PSE scrip code (numeric string).
    */
   resolveByBseCode(code: string): Promise<PSESymbol | null>;
 
@@ -99,7 +99,7 @@ export class StoreBackedSymbolResolver implements IndianSymbolResolver {
       if (byIsin) return { symbol: byIsin, status: 'alias', matchedKey: trimmed };
     }
 
-    // 5. BSE code match
+    // 5. PSE code match
     if (/^\d{4,8}$/.test(trimmed)) {
       const byBse = await this.store.findByBseCode(trimmed);
       if (byBse) return { symbol: byBse, status: 'alias', matchedKey: trimmed };

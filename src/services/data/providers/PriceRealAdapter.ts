@@ -72,8 +72,8 @@ export class PriceRealAdapter implements PriceAdapter {
       const result = await dbAdapter.query(sql, params);
 
       if (!result.rows || result.rows.length === 0) {
-        return adapterErr('EMPTY_RESPONSE', [
-          { code: 'EMPTY_RESPONSE', message: `No price data found for "${normalized}"` },
+        return adapterErr('EMPTY_RESPOPSE', [
+          { code: 'EMPTY_RESPOPSE', message: `No price data found for "${normalized}"` },
         ]);
       }
 
@@ -110,8 +110,8 @@ export class PriceRealAdapter implements PriceAdapter {
     _options?: PriceQueryOptions,
   ): Promise<AdapterResult<PriceCandle[]>> {
     // No intraday data available in the local DB
-    return adapterErr('EMPTY_RESPONSE', [
-      { code: 'EMPTY_RESPONSE', message: 'Intraday data is not available from the local database' },
+    return adapterErr('EMPTY_RESPOPSE', [
+      { code: 'EMPTY_RESPOPSE', message: 'Intraday data is not available from the local database' },
     ]);
   }
 }

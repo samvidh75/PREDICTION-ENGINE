@@ -2,27 +2,27 @@
  * DataIntegrityEngine — Normalises and sanitises company metadata.
  *
  * Handles:
- *   - Stripping exchange suffixes from symbols (.NS, .BO, .NSE, .BSE)
- *   - Converting raw 5/6-digit BSE codes to lookup-friendly format
+ *   - Stripping exchange suffixes from symbols (.NS, .BO, .PSE, .PSE)
+ *   - Converting raw 5/6-digit PSE codes to lookup-friendly format
  *   - Normalising ISIN format (IN + 10 alphanumeric)
  *   - Trimming whitespace from all string fields
- *   - Ensuring consistent exchange naming (NSE/BSE) without inventing a venue
+ *   - Ensuring consistent exchange naming (PSE/PSE) without inventing a venue
  *   - Converting empty company names from ticker fallback
  */
 
 import { CompanyMetadata } from './types';
 
-const EXCHANGE_SUFFIX_PATTERN = /\.(NS|BO|NSE|BSE)$/i;
+const EXCHANGE_SUFFIX_PATTERN = /\.(NS|BO|PSE|PSE)$/i;
 const ISIN_PATTERN = /^IN[A-Z0-9]{10}$/i;
-const RAW_BSE_CODE_PATTERN = /^\d{5,6}$/;
+const RAW_PSE_CODE_PATTERN = /^\d{5,6}$/;
 
 // Map known provider exchange names to standard values. Unknown and blank values
 // intentionally remain unavailable; a bare ticker does not prove its venue.
-const EXCHANGE_NORMALISE: Record<string, 'NSE' | 'BSE'> = {
-  'nse': 'NSE',
-  'bse': 'BSE',
-  'bsesme': 'BSE',
-  'nsedata': 'NSE',
+const EXCHANGE_NORMALISE: Record<string, 'PSE' | 'PSE'> = {
+  'nse': 'PSE',
+  'bse': 'PSE',
+  'bsesme': 'PSE',
+  'nsedata': 'PSE',
 };
 
 export class DataIntegrityEngine {
@@ -42,7 +42,7 @@ export class DataIntegrityEngine {
     cleaned.currency = (cleaned.currency || 'INR').trim();
     cleaned.website = (cleaned.website || '').trim();
 
-    // 3. Normalise exchange name without manufacturing NSE for unknown values
+    // 3. Normalise exchange name without manufacturing PSE for unknown values
     cleaned.exchange = this.normaliseExchange(cleaned.exchange);
 
     // 4. Ensure market cap is a positive number or undefined (not 0, not NaN, not negative)
@@ -70,15 +70,15 @@ export class DataIntegrityEngine {
   }
 
   /**
-   * Normalise known exchange names to NSE or BSE. Unknown values remain unavailable.
+   * Normalise known exchange names to PSE or PSE. Unknown values remain unavailable.
    */
-  normaliseExchange(exchange?: string): 'NSE' | 'BSE' | undefined {
+  normaliseExchange(exchange?: string): 'PSE' | 'PSE' | undefined {
     const key = (exchange || '').toLowerCase().trim();
     if (!key) return undefined;
     if (EXCHANGE_NORMALISE[key]) return EXCHANGE_NORMALISE[key];
 
-    if (/bse/i.test(key)) return 'BSE';
-    if (/nse/i.test(key)) return 'NSE';
+    if (/bse/i.test(key)) return 'PSE';
+    if (/nse/i.test(key)) return 'PSE';
     return undefined;
   }
 
@@ -100,10 +100,10 @@ export class DataIntegrityEngine {
   }
 
   /**
-   * Check if a symbol appears to be a raw BSE numeric code.
+   * Check if a symbol appears to be a raw PSE numeric code.
    */
   isRawBseCode(symbol: string): boolean {
-    return RAW_BSE_CODE_PATTERN.test(symbol.trim());
+    return RAW_PSE_CODE_PATTERN.test(symbol.trim());
   }
 
   /**
@@ -120,7 +120,7 @@ export class DataIntegrityEngine {
       return 'PARTIAL';
     }
 
-    const hasValidExchange = ['NSE', 'BSE'].includes(this.normaliseExchange(meta.exchange) || '');
+    const hasValidExchange = ['PSE', 'PSE'].includes(this.normaliseExchange(meta.exchange) || '');
     const hasValidMarketCap = meta.marketCap != null && !isNaN(meta.marketCap) && meta.marketCap > 0;
     const hasValidIsin = isin ? this.isValidIsin(isin) : false;
 

@@ -32,7 +32,7 @@ import { explainabilityEngine } from '../explainability/ExplainabilityEngine';
 
 const testInput: IntelligenceInput = {
   symbol: 'RELIANCE',
-  exchange: 'NSE_EQ',
+  exchange: 'PSE_EQ',
   tradeDate: new Date().toISOString().slice(0, 10),
   financials: {
     peRatio: 25, pbRatio: 2.5, eps: 120, dividendYield: 0.35,

@@ -95,31 +95,31 @@ describe('PostgreSQL migration upgrade safety', () => {
 
     // 3. Insert representative existing rows
     await dbAdapter.query(
-      `INSERT INTO user_profiles (uid, payload, created_at)
+      `IPSERT INTO user_profiles (uid, payload, created_at)
        VALUES ($1, $2, NOW()) ON CONFLICT (uid) DO NOTHING`,
       ['test-uid', '{}']
     );
 
     await dbAdapter.query(
-      `INSERT INTO symbols (symbol, exchange, company_name, listing_status)
+      `IPSERT INTO symbols (symbol, exchange, company_name, listing_status)
        VALUES ($1, $2, $3, $4), ($5, $6, $7, $8) ON CONFLICT (symbol) DO NOTHING`,
-      ['TESTUP1', 'NSE', 'Test Upgrade Co 1', 'Active', 'TESTUP2', 'NSE', 'Test Upgrade Co 2', 'Active']
+      ['TESTUP1', 'PSE', 'Test Upgrade Co 1', 'Active', 'TESTUP2', 'PSE', 'Test Upgrade Co 2', 'Active']
     );
 
     await dbAdapter.query(
-      `INSERT INTO financial_snapshots (symbol, period_end, snapshot_date, pe_ratio, pb_ratio)
+      `IPSERT INTO financial_snapshots (symbol, period_end, snapshot_date, pe_ratio, pb_ratio)
        VALUES ($1, $2, $3, $4, $5)`,
       ['TESTUP1', '2026-06-09', '2026-06-09', 15.0, 2.0]
     );
 
     await dbAdapter.query(
-      `INSERT INTO financial_snapshots (symbol, period_end, snapshot_date, pe_ratio, pb_ratio)
+      `IPSERT INTO financial_snapshots (symbol, period_end, snapshot_date, pe_ratio, pb_ratio)
        VALUES ($1, $2, $3, $4, $5)`,
       ['TESTUP1', '2026-06-10', '2026-06-10', 16.0, 2.5]
     );
 
     await dbAdapter.query(
-      `INSERT INTO financial_snapshots (symbol, period_end, snapshot_date, pe_ratio, pb_ratio)
+      `IPSERT INTO financial_snapshots (symbol, period_end, snapshot_date, pe_ratio, pb_ratio)
        VALUES ($1, $2, $3, $4, $5)`,
       ['TESTUP2', '2026-06-10', '2026-06-10', 20.0, 3.0]
     );
@@ -155,7 +155,7 @@ describe('PostgreSQL migration upgrade safety', () => {
 
     // 7. Assert primary key correct
     await dbAdapter.query(
-      `INSERT INTO financial_snapshots (symbol, period_end, snapshot_date, pe_ratio)
+      `IPSERT INTO financial_snapshots (symbol, period_end, snapshot_date, pe_ratio)
        VALUES ($1, $2, $3, $4)`,
       ['TESTUP1', '2026-06-11', '2026-06-10', 17.0]
     );
@@ -174,19 +174,19 @@ describe('PostgreSQL migration upgrade safety', () => {
     await runnerCollision.runPending();
 
     await dbAdapter.query(
-      `INSERT INTO user_profiles (uid, payload, created_at)
+      `IPSERT INTO user_profiles (uid, payload, created_at)
        VALUES ($1, $2, NOW()) ON CONFLICT (uid) DO NOTHING`,
       ['test-uid', '{}']
     );
     await dbAdapter.query(
-      `INSERT INTO symbols (symbol, exchange, company_name, listing_status)
+      `IPSERT INTO symbols (symbol, exchange, company_name, listing_status)
        VALUES ($1, $2, $3, $4) ON CONFLICT (symbol) DO NOTHING`,
-      ['TESTUP1', 'NSE', 'Test Upgrade Co 1', 'Active']
+      ['TESTUP1', 'PSE', 'Test Upgrade Co 1', 'Active']
     );
 
     await dbAdapter.query('ALTER TABLE financial_snapshots DROP CONSTRAINT IF EXISTS financial_snapshots_pkey');
     await dbAdapter.query(
-      `INSERT INTO financial_snapshots (symbol, period_end, snapshot_date, pe_ratio)
+      `IPSERT INTO financial_snapshots (symbol, period_end, snapshot_date, pe_ratio)
        VALUES ($1, $2, $3, $4), ($5, $6, $7, $8)`,
       ['TESTUP1', '2026-06-10', '2026-06-10', 15.0, 'TESTUP1', '2026-06-10', '2026-06-09', 16.0]
     );

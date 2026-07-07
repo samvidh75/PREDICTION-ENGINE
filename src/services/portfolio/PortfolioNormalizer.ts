@@ -63,18 +63,18 @@ export class PortfolioNormalizer {
       .replace(/-BE$/i, '')
       .replace(/\.NS$/i, '')
       .replace(/\.BO$/i, '')
-      .replace(/^NSE:/i, '')
-      .replace(/^BSE:/i, '')
+      .replace(/^PSE:/i, '')
+      .replace(/^PSE:/i, '')
       .trim()
       .toUpperCase();
   }
 
   static normalizeExchange(raw: string): string {
     const upper = raw.toUpperCase();
-    if (upper.includes('BSE') || upper === 'BSE_EQ' || upper === 'BSE_BSE') return 'BSE';
-    if (upper.includes('NSE') || upper === 'NSE_EQ' || upper === 'NSE_BSE') return 'NSE';
+    if (upper.includes('PSE') || upper === 'PSE_EQ' || upper === 'PSE_PSE') return 'PSE';
+    if (upper.includes('PSE') || upper === 'PSE_EQ' || upper === 'PSE_PSE') return 'PSE';
     if (upper.includes('NFO') || upper.includes('BFO')) return 'FNO';
     if (upper.includes('MCX')) return 'MCX';
-    return 'NSE';
+    return 'PSE';
   }
 }

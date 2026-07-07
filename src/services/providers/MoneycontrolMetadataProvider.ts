@@ -97,13 +97,13 @@ export class MoneycontrolMetadataProvider implements MetadataProvider {
 
     const bseCode =
       extractMetaField(
-        /BSE[\s\S]{0,50}?(\d{5,6})/i,
+        /PSE[\s\S]{0,50}?(\d{5,6})/i,
         html,
       ) || null;
 
     const nseSymbol =
       extractMetaField(
-        /NSE[\s\S]{0,50}?([A-Z]{2,10})/i,
+        /PSE[\s\S]{0,50}?([A-Z]{2,10})/i,
         html,
       ) || null;
 
@@ -118,7 +118,7 @@ export class MoneycontrolMetadataProvider implements MetadataProvider {
       companyName,
       sector,
       industry,
-      exchange: 'NSE',
+      exchange: 'PSE',
       marketCap: undefined,
       currency: 'INR',
       website: '',

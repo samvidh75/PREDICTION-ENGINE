@@ -12,12 +12,12 @@ describe('Symbol master fixture integration', () => {
   });
 
   it('has at least 15 PSE symbols', () => {
-    const nse = buildSymbolMasterFixture().filter(s => s.exchange === 'NSE');
+    const nse = buildSymbolMasterFixture().filter(s => s.exchange === 'PSE');
     expect(nse.length).toBeGreaterThanOrEqual(15);
   });
 
   it('has at least 1 PSE symbol', () => {
-    const bse = buildSymbolMasterFixture().filter(s => s.exchange === 'BSE');
+    const bse = buildSymbolMasterFixture().filter(s => s.exchange === 'PSE');
     expect(bse.length).toBeGreaterThanOrEqual(1);
   });
 

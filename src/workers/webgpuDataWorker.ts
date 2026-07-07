@@ -1,7 +1,7 @@
 /**
  * WebGPU Data Worker: Fetches live market data on user's browser.
  *
- * Zero server bandwidth cost (client pulls directly from Yahoo/NSE/Groww).
+ * Zero server bandwidth cost (client pulls directly from Yahoo/PSE/Groww).
  * No rate-limiting on our infrastructure (each user has own IP).
  * P2P architecture: server never sees raw API calls.
  */
@@ -96,7 +96,7 @@ async function fetchYahooHistorical(symbol: string): Promise<any[]> {
   }
 }
 
-async function fetchNSEQuote(symbol: string): Promise<{
+async function fetchPSEQuote(symbol: string): Promise<{
   symbol: string;
   ltp: number;
   bid: number;
@@ -116,7 +116,7 @@ async function fetchNSEQuote(symbol: string): Promise<{
       }
     });
 
-    if (!res.ok) throw new Error(`NSE API returned ${res.status}`);
+    if (!res.ok) throw new Error(`PSE API returned ${res.status}`);
 
     const data = await res.json();
 
@@ -130,12 +130,12 @@ async function fetchNSEQuote(symbol: string): Promise<{
       timestamp: Date.now()
     };
   } catch (err) {
-    console.error(`NSE API error for ${symbol}:`, err);
+    console.error(`PSE API error for ${symbol}:`, err);
     return null;
   }
 }
 
-async function fetchNSEOptionChain(symbol: string): Promise<{
+async function fetchPSEOptionChain(symbol: string): Promise<{
   strikePrice: number;
   callOI: number;
   callVolume: number;
@@ -169,7 +169,7 @@ async function fetchNSEOptionChain(symbol: string): Promise<{
       iv: null
     }));
   } catch (err) {
-    console.error(`NSE options chain error for ${symbol}:`, err);
+    console.error(`PSE options chain error for ${symbol}:`, err);
     return [];
   }
 }
@@ -225,7 +225,7 @@ async function fetchAggregatedData(
         return { symbol, timestamp: Date.now(), dataType, data, source };
       }
 
-      data = await fetchNSEQuote(symbol);
+      data = await fetchPSEQuote(symbol);
       if (data) {
         source = 'nse';
         return { symbol, timestamp: Date.now(), dataType, data, source };
@@ -237,7 +237,7 @@ async function fetchAggregatedData(
       data = await fetchYahooHistorical(symbol);
       source = 'yahoo';
     } else if (dataType === 'options') {
-      data = await fetchNSEOptionChain(symbol);
+      data = await fetchPSEOptionChain(symbol);
       source = 'nse';
     }
 

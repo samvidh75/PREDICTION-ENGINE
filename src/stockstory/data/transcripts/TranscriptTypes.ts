@@ -1,7 +1,7 @@
 /**
  * Transcript Types
  *
- * Conference call transcript data for Indian companies.
+ * Conference call transcript data for Philippine companies.
  * Supports multi-speaker transcripts, Q&A extraction, and sentiment tagging.
  */
 

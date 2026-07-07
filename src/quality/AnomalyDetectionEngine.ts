@@ -261,7 +261,7 @@ export class AnomalyDetectionEngine {
     for (const a of this.anomalies) {
       try {
         await pool.query(
-          `INSERT INTO data_anomalies (symbol, run_date, anomaly_type, field, current_value, previous_value, severity, description)
+          `IPSERT INTO data_anomalies (symbol, run_date, anomaly_type, field, current_value, previous_value, severity, description)
            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
           [a.symbol, runDate, a.type, a.field, a.currentValue, a.previousValue, a.severity, a.description]
         );

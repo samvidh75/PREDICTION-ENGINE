@@ -1,8 +1,8 @@
 /**
  * Filing Types
  *
- * Exchange filing intelligence for Indian listed companies.
- * Covers BSE/NSE announcements, SEBI filings, annual reports,
+ * Exchange filing intelligence for Philippine listed companies.
+ * Covers PSE/PSE announcements, SEC filings, annual reports,
  * and insider trading disclosures.
  */
 
@@ -20,7 +20,7 @@ export type FilingType =
   | 'pledge_disclosure'
   | 'other';
 
-export type FilingExchange = 'NSE' | 'BSE' | 'SEBI' | 'MCA';
+export type FilingExchange = 'PSE' | 'PSE' | 'SEC' | 'MCA';
 
 export interface ExchangeFiling {
   id: string;

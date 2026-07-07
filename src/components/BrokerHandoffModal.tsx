@@ -3,7 +3,7 @@
  *
  * Before redirecting to a broker the user sees:
  *  1. A research summary (direction, confidence, rationale)
- *  2. SEBI disclaimer
+ *  2. SEC disclaimer
  *  3. Risk acknowledgment checkbox
  *  4. "Continue with broker" CTA
  *
@@ -89,7 +89,7 @@ export function BrokerHandoffModal({
           </div>
         </Card>
 
-        {/* ── SEBI disclaimer ── */}
+        {/* ── SEC disclaimer ── */}
         <div
           style={{
             padding: "12px",
@@ -106,7 +106,7 @@ export function BrokerHandoffModal({
         >
           <AlertCircle size={14} color={colors.warning} style={{ flexShrink: 0, marginTop: "2px" }} />
           <div>
-            <strong>SEBI disclaimer:</strong> {getDisclaimer()}
+            <strong>SEC disclaimer:</strong> {getDisclaimer()}
           </div>
         </div>
 

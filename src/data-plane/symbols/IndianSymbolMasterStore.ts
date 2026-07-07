@@ -8,9 +8,9 @@
 // ──────────
 // - upsert(symbol)      Insert or replace on conflict (by canonicalSymbol)
 // - findBySymbol(s)     Exact match by canonicalSymbol
-// - findByAlias(s)      Alias / ISIN / BSE-code match
+// - findByAlias(s)      Alias / ISIN / PSE-code match
 // - findByIsin(s)       ISIN match
-// - findByBseCode(s)    BSE numeric code match
+// - findByBseCode(s)    PSE numeric code match
 // - listActive()        All symbols with listingStatus = 'active'
 // - listRetired()       All symbols with listingStatus = 'suspended' | 'delisted'
 // - search(query)       LIKE search on symbol / companyName
@@ -109,7 +109,7 @@ export class IndianSymbolMasterStore {
   async upsert(symbol: PSESymbol): Promise<PSESymbol> {
     const row = symbolToRow(symbol);
     await runQuery(
-      `INSERT INTO symbol_master (
+      `IPSERT INTO symbol_master (
         symbol, exchange, segment, isin, company_name, sector, industry,
         listing_status, aliases, bse_code, nse_symbol, face_value,
         market_cap_cr, market_cap_category, first_seen_at, last_seen_at
@@ -193,7 +193,7 @@ export class IndianSymbolMasterStore {
   }
 
   /**
-   * Look up by BSE scrip code.
+   * Look up by PSE scrip code.
    */
   async findByBseCode(code: string): Promise<PSESymbol | null> {
     const rows = await runQuery<SymbolMasterRow>(

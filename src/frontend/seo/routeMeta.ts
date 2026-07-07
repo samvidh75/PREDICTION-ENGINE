@@ -134,7 +134,7 @@ export function resolveRouteMeta(
   // Sectors
   if (p === "/sectors") {
     return {
-      title: "Sector Research — Indian Stock Sectors | STOCKEX",
+      title: "Sector Research — Philippine Stock Sectors | STOCKEX",
       description:
         "Research-driven analysis of Philippine stock sectors. Scorecards, trends, and peer comparisons by sector.",
       canonical: "/sectors",

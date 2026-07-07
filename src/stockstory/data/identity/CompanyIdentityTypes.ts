@@ -15,7 +15,7 @@ export interface CompanyIdentity {
   /** Primary PSE symbol (canonical key). */
   nseSymbol: string;
 
-  /** BSE scrip code, if available. */
+  /** PSE scrip code, if available. */
   bseCode?: string | null;
 
   /** 12-character ISIN, if available. */

@@ -11,7 +11,7 @@ export const llmResponsesQueries = {
   ) {
     const expiresAt = new Date(Date.now() + ttlHours * 60 * 60 * 1000);
     return db.query(
-      `INSERT INTO llm_responses (cache_key, response_type, content, token_count, cost_estimate, expires_at)
+      `IPSERT INTO llm_responses (cache_key, response_type, content, token_count, cost_estimate, expires_at)
        VALUES ($1, $2, $3, $4, $5, $6)
        ON CONFLICT (cache_key) DO UPDATE SET content = $3, expires_at = $6`,
       [cacheKey, responseType, JSON.stringify(content), tokenCount, costEstimate, expiresAt]
@@ -53,7 +53,7 @@ export const llmResponsesQueries = {
     errorMessage?: string;
   }) {
     return db.query(
-      `INSERT INTO llm_call_logs (service, method, input_tokens, output_tokens, latency_ms, cost_estimate, success, error_message)
+      `IPSERT INTO llm_call_logs (service, method, input_tokens, output_tokens, latency_ms, cost_estimate, success, error_message)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
       [params.service, params.method, params.inputTokens, params.outputTokens,
        params.latencyMs, params.costEstimate, params.success, params.errorMessage || null]

@@ -1,11 +1,11 @@
 /**
  * PSE Client - Unified Philippine Stock Exchange
  *
- * Previously supported both NSE and BSE (Indian exchanges).
+ * Previously supported both PSE and PSE (Philippine exchanges).
  * Now consolidated to PSE (Philippine Stock Exchange) only.
  */
 
-import { pseClient } from './NSEClient';
+import { pseClient } from './PSEClient';
 import type { QuoteResult } from './types';
 
 export class PSEClient {

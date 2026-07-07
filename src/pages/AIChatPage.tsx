@@ -294,7 +294,7 @@ export default function AIChatPage() {
           content,
           timestamp: Date.now(),
           thinkingSteps,
-          citations: data?.citations?.length ? data.citations : ["Philippine Stock Exchange", "SEBI Filings"],
+          citations: data?.citations?.length ? data.citations : ["Philippine Stock Exchange", "SEC Filings"],
         };
 
         setLoading(false);

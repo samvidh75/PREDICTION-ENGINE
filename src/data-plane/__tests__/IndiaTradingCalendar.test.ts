@@ -146,7 +146,7 @@ describe('PSETradingCalendar', () => {
       expect(cal.getHolidays().length).toBeGreaterThanOrEqual(10);
     });
 
-    it('includes all major NSE holidays', () => {
+    it('includes all major PSE holidays', () => {
       const h = cal.getHolidays();
       expect(h).toContain('2026-01-26'); // Republic Day
       expect(h).toContain('2026-10-02'); // Gandhi Jayanti

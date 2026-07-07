@@ -35,7 +35,7 @@ export interface AnalystContextLoader {
 function baseIntelligenceInput(symbol: string): IntelligenceInput {
   return {
     symbol: symbol.toUpperCase(),
-    exchange: 'NSE_EQ',
+    exchange: 'PSE_EQ',
     tradeDate: new Date().toISOString().slice(0, 10),
     financials: {},
     technicals: {},

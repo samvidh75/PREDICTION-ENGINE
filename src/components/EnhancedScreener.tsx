@@ -145,7 +145,7 @@ export function EnhancedScreener() {
       {/* Info */}
       <div style={{ marginTop: '30px', padding: '15px', backgroundColor: '#e7f3ff', borderRadius: '8px', fontSize: '14px', color: '#004085' }}>
         <p>
-          <strong>How it works:</strong> Live quotes are fetched from yfinance, NSE (jugasad), and screener.in in parallel.
+          <strong>How it works:</strong> Live quotes are fetched from yfinance, PSE (jugasad), and screener.in in parallel.
           Cached quotes are shown with (cached) label and restore instantly on page reload.
         </p>
         <p>

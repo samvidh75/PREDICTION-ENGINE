@@ -4,7 +4,7 @@
  * Deterministic heuristics-only analysis of user/community messages.
  * - No network calls
  * - No investment/trade recommendations
- * - SEBI-safe educational framing: focuses on verification, risk awareness,
+ * - SEC-safe educational framing: focuses on verification, risk awareness,
  *   and respectful discussion.
  */
 
@@ -37,7 +37,7 @@ export type CommunityQualityAnalysis = {
 const clamp01 = (n: number): number => Math.max(0, Math.min(1, n));
 
 /**
- * A very small, "SEBI-safe" abusive regex list.
+ * A very small, "SEC-safe" abusive regex list.
  * Note: intentionally avoids protected-class slurs; focuses on generic insults.
  */
 const abusiveRegex = /\b(idiot|moron|stupid|dumb|loser|trash|clown|fool)\b/i;
@@ -250,7 +250,7 @@ export function analyzeCommunityMessage(text: string): CommunityQualityAnalysis 
 }
 
 /**
- * Builds an SEBI-safe educational reframe from the analysis.
+ * Builds an SEC-safe educational reframe from the analysis.
  * Never recommends trades or specific buy/sell actions.
  */
 export function buildEducationalReframe(
@@ -308,7 +308,7 @@ export function buildEducationalReframe(
     }
 
     case 'EDUCATIONAL': {
-      // Reframe educational content to be more SEBI-safe and uncertainty-aware.
+      // Reframe educational content to be more SEC-safe and uncertainty-aware.
       const reframed =
         experienceLevel === 'beginner'
           ? `${levelPreamble} Thanks for sharing—this reads like educational material. ${disclaimer} To make it even safer for learners: include uncertainty (what you know vs what you’re guessing), mention risks, and avoid absolute promises. Encourage readers to verify with reliable sources.`

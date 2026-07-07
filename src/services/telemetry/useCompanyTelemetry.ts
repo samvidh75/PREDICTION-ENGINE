@@ -4,7 +4,7 @@ import { TelemetrySnapshotFactory } from './TelemetrySnapshotFactory';
 
 /**
  * Custom hook to translate raw company telemetry into our standardized,
- * high-fidelity, and SEBI-safe TelemetrySnapshot shape.
+ * high-fidelity, and SEC-safe TelemetrySnapshot shape.
  */
 export function useCompanyTelemetry(
   company: CompanyTelemetry | null,

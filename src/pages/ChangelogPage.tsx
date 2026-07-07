@@ -9,7 +9,7 @@ const CHANGELOG_ENTRIES = [
     items: [
       "Added industry filters to the stock scanner",
       "Improved watchlist sync performance",
-      "Fixed NSE data refresh timing issue",
+      "Fixed PSE data refresh timing issue",
       "Added PE ratio and market cap columns to scanner results",
     ],
   },
@@ -19,7 +19,7 @@ const CHANGELOG_ENTRIES = [
     title: "Private Beta Launch",
     items: [
       "Initial private beta release",
-      "NSE stock scanner with multi-factor screening",
+      "PSE stock scanner with multi-factor screening",
       "Watchlist with timely price updates",
       "Stock detail pages with fundamental data",
       "Research profiles for tracking thesis",

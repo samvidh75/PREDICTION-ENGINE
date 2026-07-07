@@ -6,8 +6,8 @@
  *   - Sector is not blank
  *   - Industry is not blank
  *   - Market cap is present and > 0
- *   - Exchange is valid (NSE, BSE)
- *   - Symbol format is clean (no raw BSE codes like "500002")
+ *   - Exchange is valid (PSE, PSE)
+ *   - Symbol format is clean (no raw PSE codes like "500002")
  */
 
 import { CompanyMetadata } from './types';
@@ -19,10 +19,10 @@ export interface ValidationResult {
   reasons: string[];
 }
 
-const VALID_EXCHANGES = new Set(['NSE', 'BSE', 'NSE/BSE']);
+const VALID_EXCHANGES = new Set(['PSE', 'PSE', 'PSE/PSE']);
 
-// Raw numeric BSE codes (e.g. "500002", "532540") — these are NOT valid display symbols
-const RAW_BSE_CODE_PATTERN = /^\d{5,6}$/;
+// Raw numeric PSE codes (e.g. "500002", "532540") — these are NOT valid display symbols
+const RAW_PSE_CODE_PATTERN = /^\d{5,6}$/;
 
 export class CompanyDataValidator {
   /**
@@ -58,13 +58,13 @@ export class CompanyDataValidator {
       reasons.push('invalid_exchange');
     }
 
-    // 6. Symbol must not be a raw BSE code
-    if (RAW_BSE_CODE_PATTERN.test(meta.symbol)) {
+    // 6. Symbol must not be a raw PSE code
+    if (RAW_PSE_CODE_PATTERN.test(meta.symbol)) {
       reasons.push('raw_bse_code_as_symbol');
     }
 
     // 7. Symbol should not contain exchange suffix in metadata (clean it)
-    if (/\.(NS|BO|NSE|BSE)$/i.test(meta.symbol)) {
+    if (/\.(NS|BO|PSE|PSE)$/i.test(meta.symbol)) {
       reasons.push('symbol_has_exchange_suffix');
     }
 

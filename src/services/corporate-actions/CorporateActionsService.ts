@@ -52,7 +52,7 @@ export interface BulkDeal {
   price: number;
   value: number;
   tradeDate: string;
-  exchange: 'NSE' | 'BSE';
+  exchange: 'PSE' | 'PSE';
 }
 
 export class CorporateActionsService {
@@ -89,11 +89,11 @@ export class CorporateActionsService {
   private seedBulkDeals(): BulkDeal[] {
     const now = new Date();
     return [
-      { id: 'bd1', symbol: 'RELIANCE', companyName: 'Reliance Industries Ltd', dealType: 'block', buyer: 'Mukesh Ambani', seller: 'Unknown', quantity: 250000, price: 2980, value: 745000000, tradeDate: new Date(now.getTime() - 1 * 86400000).toISOString(), exchange: 'NSE' },
-      { id: 'bd2', symbol: 'ZOMATO', companyName: 'Zomato Ltd', dealType: 'bulk', buyer: 'Fidelity Investments', seller: 'Ant Group', quantity: 15000000, price: 185, value: 2775000000, tradeDate: new Date(now.getTime() - 3 * 86400000).toISOString(), exchange: 'NSE' },
-      { id: 'bd3', symbol: 'PAYTM', companyName: 'One 97 Communications', dealType: 'bulk', buyer: 'Nomura', seller: 'Antfin', quantity: 8000000, price: 520, value: 4160000000, tradeDate: new Date(now.getTime() - 5 * 86400000).toISOString(), exchange: 'BSE' },
-      { id: 'bd4', symbol: 'ICICIBANK', companyName: 'ICICI Bank Ltd', dealType: 'block', buyer: 'ICICI Prudential MF', seller: 'ICICI Lombard', quantity: 5000000, price: 1150, value: 5750000000, tradeDate: new Date(now.getTime() - 2 * 86400000).toISOString(), exchange: 'NSE' },
-      { id: 'bd5', symbol: 'HAL', companyName: 'Hindustan Aeronautics Ltd', dealType: 'block', buyer: 'Government of India', seller: 'LIC', quantity: 1000000, price: 4200, value: 4200000000, tradeDate: new Date(now.getTime() - 7 * 86400000).toISOString(), exchange: 'NSE' },
+      { id: 'bd1', symbol: 'RELIANCE', companyName: 'Reliance Industries Ltd', dealType: 'block', buyer: 'Mukesh Ambani', seller: 'Unknown', quantity: 250000, price: 2980, value: 745000000, tradeDate: new Date(now.getTime() - 1 * 86400000).toISOString(), exchange: 'PSE' },
+      { id: 'bd2', symbol: 'ZOMATO', companyName: 'Zomato Ltd', dealType: 'bulk', buyer: 'Fidelity Investments', seller: 'Ant Group', quantity: 15000000, price: 185, value: 2775000000, tradeDate: new Date(now.getTime() - 3 * 86400000).toISOString(), exchange: 'PSE' },
+      { id: 'bd3', symbol: 'PAYTM', companyName: 'One 97 Communications', dealType: 'bulk', buyer: 'Nomura', seller: 'Antfin', quantity: 8000000, price: 520, value: 4160000000, tradeDate: new Date(now.getTime() - 5 * 86400000).toISOString(), exchange: 'PSE' },
+      { id: 'bd4', symbol: 'ICICIBANK', companyName: 'ICICI Bank Ltd', dealType: 'block', buyer: 'ICICI Prudential MF', seller: 'ICICI Lombard', quantity: 5000000, price: 1150, value: 5750000000, tradeDate: new Date(now.getTime() - 2 * 86400000).toISOString(), exchange: 'PSE' },
+      { id: 'bd5', symbol: 'HAL', companyName: 'Hindustan Aeronautics Ltd', dealType: 'block', buyer: 'Government of India', seller: 'LIC', quantity: 1000000, price: 4200, value: 4200000000, tradeDate: new Date(now.getTime() - 7 * 86400000).toISOString(), exchange: 'PSE' },
     ];
   }
 

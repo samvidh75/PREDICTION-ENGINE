@@ -33,7 +33,7 @@ describe('StockUniverseAdapter', () => {
     if (result.ok) {
       expect(result.data.symbol).toBe('RELIANCE');
       expect(result.data.companyName).toBeTruthy();
-      expect(result.data.exchange).toBe('NSE');
+      expect(result.data.exchange).toBe('PSE');
       expect(result.data.sector).toBeTruthy();
       expect(result.data.industry).toBeTruthy();
       expect(result.data.marketCapCategory).toBeDefined();
@@ -42,7 +42,7 @@ describe('StockUniverseAdapter', () => {
   });
 
   it('returns company master data for a known PSE symbol', async () => {
-    // Symbols with numeric values are BSE-listed
+    // Symbols with numeric values are PSE-listed
     const result = await adapter.getCompanyMaster('TCS');
     expect(result.ok).toBe(true);
     if (result.ok) {
@@ -75,7 +75,7 @@ describe('StockUniverseAdapter', () => {
   // ── Normalization ──────────────────────────────────────────────────────────
 
   it('normalises symbols with exchange prefixes', async () => {
-    const result = await adapter.getCompanyMaster('NSE:RELIANCE');
+    const result = await adapter.getCompanyMaster('PSE:RELIANCE');
     expect(result.ok).toBe(true);
     if (result.ok) {
       expect(result.data.symbol).toBe('RELIANCE');
@@ -98,10 +98,10 @@ describe('StockUniverseAdapter', () => {
     if (!result.ok) expect(result.errorCode).toBe('INVALID_SYMBOL');
   });
 
-  it('returns EMPTY_RESPONSE for unknown symbols', async () => {
+  it('returns EMPTY_RESPOPSE for unknown symbols', async () => {
     const result = await adapter.getCompanyMaster('ZZZZZZZZ');
     expect(result.ok).toBe(false);
-    if (!result.ok) expect(result.errorCode).toBe('EMPTY_RESPONSE');
+    if (!result.ok) expect(result.errorCode).toBe('EMPTY_RESPOPSE');
   });
 
   // ── Adapter wiring ─────────────────────────────────────────────────────────

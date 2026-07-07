@@ -8,7 +8,7 @@ import type {
 function fullInput(overrides: Partial<UnifiedPredictionInput> = {}): UnifiedPredictionInput {
   return {
     symbol: 'TEST',
-    exchange: 'NSE',
+    exchange: 'PSE',
     sector: 'Technology',
     tradeDate: '2026-06-14',
     horizon: 90,

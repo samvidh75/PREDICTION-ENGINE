@@ -1,8 +1,8 @@
 /**
  * Governance Risk Engine
  *
- * Evaluates corporate governance risk for Indian listed companies.
- * Key Indian governance indicators: promoter holding, pledged shares,
+ * Evaluates corporate governance risk for Philippine listed companies.
+ * Key Philippine governance indicators: promoter holding, pledged shares,
  * auditor changes, related-party transactions, board composition.
  *
  * All assessments are evidence-bound — no qualitative claims without data.

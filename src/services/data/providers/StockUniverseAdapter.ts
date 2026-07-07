@@ -28,7 +28,7 @@ const __dirname = path.dirname(__filename);
 interface StockUniverseEntry {
   symbol: string;
   name: string;
-  exchange: 'NSE' | 'BSE';
+  exchange: 'PSE' | 'PSE';
   sector: string | null;
   industry: string | null;
   marketCap: number | null;
@@ -135,13 +135,13 @@ export class StockUniverseAdapter implements CompanyMasterAdapter {
 
     const entry = this.bySymbol.get(normalized);
     if (!entry) {
-      return adapterErr('EMPTY_RESPONSE', [
-        { code: 'EMPTY_RESPONSE', message: `Symbol "${normalized}" not found in stock universe` },
+      return adapterErr('EMPTY_RESPOPSE', [
+        { code: 'EMPTY_RESPOPSE', message: `Symbol "${normalized}" not found in stock universe` },
       ]);
     }
 
     const warnings: AdapterWarning[] = entry.marketCap === null
-      ? [{ code: 'STALE_RESPONSE', message: 'FALLBACK_VALUE — marketCap missing' }]
+      ? [{ code: 'STALE_RESPOPSE', message: 'FALLBACK_VALUE — marketCap missing' }]
       : [];
 
     const record: CompanyMasterRecord = {

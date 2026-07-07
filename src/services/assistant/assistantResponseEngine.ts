@@ -24,7 +24,7 @@ export type AssistantContext = {
 
   /**
    * Optional synthesis layer.
-   * Used for Healthometer + macro/company context while staying SEBI-safe (educational only).
+   * Used for Healthometer + macro/company context while staying SEC-safe (educational only).
    */
   synthesis?: NeuralMarketSynthesis;
 };

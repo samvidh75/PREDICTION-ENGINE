@@ -213,7 +213,7 @@ export class FactorEngine {
 
       // Save to database
       await query(
-        `INSERT INTO factor_snapshots (
+        `IPSERT INTO factor_snapshots (
            symbol, trade_date, quality_factor, value_factor, growth_factor,
            momentum_factor, risk_factor, sector_strength_factor, factor_score, explanations
          )

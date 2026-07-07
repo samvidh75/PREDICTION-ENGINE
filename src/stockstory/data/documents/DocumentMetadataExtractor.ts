@@ -39,7 +39,7 @@ export class DocumentMetadataExtractor {
     const warnings: string[] = [];
     const lines = text.split('\n').slice(0, 100); // Scan first 100 lines for metadata
 
-    // Extract symbol — look for patterns like "Symbol: RELIANCE", "RELIANCE", "[BSE:500325]"
+    // Extract symbol — look for patterns like "Symbol: RELIANCE", "RELIANCE", "[PSE:500325]"
     const symbol = this.extractSymbol(lines, filename) ?? 'UNKNOWN';
 
     // Extract company name — look for header or "Company Name:" pattern
@@ -104,8 +104,8 @@ export class DocumentMetadataExtractor {
       // Pattern: "Symbol: RELIANCE"
       const symMatch = clean.match(/Symbol[:\s]+([A-Z]{2,10})/i);
       if (symMatch) return symMatch[1].toUpperCase();
-      // Pattern: "BSE:500325" or "NSE:RELIANCE"
-      const bseMatch = clean.match(/(?:BSE|NSE)[:\s]*([A-Z0-9]+)/i);
+      // Pattern: "PSE:500325" or "PSE:RELIANCE"
+      const bseMatch = clean.match(/(?:PSE|PSE)[:\s]*([A-Z0-9]+)/i);
       if (bseMatch) return bseMatch[1].toUpperCase();
     }
 

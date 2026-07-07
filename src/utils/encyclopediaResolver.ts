@@ -17,8 +17,8 @@ const AUDIT_MAP: Record<string, string> = {
 };
 
 const EXCHANGE_MAP: Record<string, string> = {
-  '{exchange_nse}': 'NSE Mainboard/SME',
-  '{exchange_bse}': 'BSE',
+  '{exchange_nse}': 'PSE Mainboard/SME',
+  '{exchange_bse}': 'PSE',
 };
 
 export function resolveEncyclopediaPlaceholders(

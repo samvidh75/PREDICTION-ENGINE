@@ -123,7 +123,7 @@ export class AsymmetricDataGateway {
       // Upsert baseline fundamental parameters into the cache table
       // Only update if no existing data (Python scripts are the source of truth for fundamentals)
       await dbAdapter.query(
-        `INSERT INTO asset_fundamental_ratios
+        `IPSERT INTO asset_fundamental_ratios
            (ticker, market_cap_cr, pe_ratio, debt_to_equity,
             promoter_pledged_pct, auditor_remarks, last_updated)
          VALUES ($1, NULL, NULL, NULL, NULL, 'Pending background ingestion', NOW())
@@ -133,7 +133,7 @@ export class AsymmetricDataGateway {
 
       // Seed a historical candle node to maintain chart parity
       await dbAdapter.query(
-        `INSERT INTO asset_historical_candles
+        `IPSERT INTO asset_historical_candles
            (ticker, timestamp, open, high, low, close, volume)
          VALUES ($1, $2, $3, $4, $5, $6, $7)
          ON CONFLICT (ticker, timestamp) DO NOTHING`,
@@ -238,7 +238,7 @@ export class AsymmetricDataGateway {
 
     // Upsert fundamentals
     await dbAdapter.query(
-      `INSERT INTO asset_fundamental_ratios
+      `IPSERT INTO asset_fundamental_ratios
          (ticker, market_cap_cr, pe_ratio, debt_to_equity, last_updated)
        VALUES ($1, $2, $3, $4, NOW())
        ON CONFLICT (ticker) DO UPDATE SET
@@ -251,7 +251,7 @@ export class AsymmetricDataGateway {
 
     // Upsert candle
     await dbAdapter.query(
-      `INSERT INTO asset_historical_candles (ticker, timestamp, open, high, low, close, volume)
+      `IPSERT INTO asset_historical_candles (ticker, timestamp, open, high, low, close, volume)
        VALUES ($1, $2, $3, $4, $5, $6, $7)
        ON CONFLICT (ticker, timestamp) DO UPDATE SET
          close = EXCLUDED.close, volume = EXCLUDED.volume`,

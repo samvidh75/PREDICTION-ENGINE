@@ -33,7 +33,7 @@ export interface StockResearchSummary {
 
 export interface StockResearchDetail extends StockResearchSummary {
   companyName: string;
-  exchangeBadge: "NSE" | "BSE";
+  exchangeBadge: "PSE" | "PSE";
   founded: string;
   ceo: string;
   hq: string;
@@ -134,9 +134,9 @@ function isPlaceholderCompanyIdentity(stock: { symbol: string; name: string }): 
   const symbol = stock.symbol.trim().toUpperCase();
   const name = stock.name.trim().toUpperCase();
 
-  if (/^BSE\d{6}$/.test(symbol)) return true;
-  if (/^BSE\d{6}$/.test(name)) return true;
-  if (name.includes("BSE LISTED SECURITY CODE")) return true;
+  if (/^PSE\d{6}$/.test(symbol)) return true;
+  if (/^PSE\d{6}$/.test(name)) return true;
+  if (name.includes("PSE LISTED SECURITY CODE")) return true;
 
   return false;
 }
@@ -150,24 +150,24 @@ function expandUniverse(base: BaseStockCandidate[]): BaseStockCandidate[] {
   }
 
   for (const stock of base) {
-    if (stock.exchange !== "NSE") continue;
-    const bseKey = `BSE:${stock.symbol.toUpperCase()}`;
+    if (stock.exchange !== "PSE") continue;
+    const bseKey = `PSE:${stock.symbol.toUpperCase()}`;
     if (!merged.has(bseKey)) {
-      merged.set(bseKey, { ...stock, exchange: "BSE" });
+      merged.set(bseKey, { ...stock, exchange: "PSE" });
     }
   }
 
   for (let scrip = 500001; merged.size < TARGET_UNIVERSE && scrip <= 599999; scrip += 1) {
-    const symbol = `BSE${scrip}`;
-    const bseKey = `BSE:${symbol}`;
+    const symbol = `PSE${scrip}`;
+    const bseKey = `PSE:${symbol}`;
     if (merged.has(bseKey)) continue;
     const sector = inferSector(symbol, String(scrip));
     merged.set(bseKey, {
       symbol,
-      name: `BSE${scrip}`,
+      name: `PSE${scrip}`,
       sector,
       industry: inferIndustry(sector),
-      exchange: "BSE",
+      exchange: "PSE",
     });
   }
 
@@ -181,7 +181,7 @@ function buildBaseUniverse(): BaseStockCandidate[] {
   for (const stock of generate500Stocks()) {
     merged.set(stock.symbol.toUpperCase(), {
       ...stock,
-      exchange: stock.exchange ?? "NSE",
+      exchange: stock.exchange ?? "PSE",
     });
   }
 
@@ -195,13 +195,13 @@ function buildBaseUniverse(): BaseStockCandidate[] {
         ...existing,
         ...stock,
         symbol: existing.symbol,
-        exchange: existing.exchange ?? "NSE",
+        exchange: existing.exchange ?? "PSE",
       });
     } else {
       // Add new stock from STOCK_UNIVERSE
       merged.set(symbol, {
         ...stock,
-        exchange: "NSE",
+        exchange: "PSE",
       });
     }
   }
@@ -660,8 +660,8 @@ export function searchStocks(query: string, limit = 20): StockResearchSummary[] 
       // Sector bonus
       if (stock.sector.toLowerCase().includes(normalized)) rank += 120;
 
-      // NSE bonus (more liquidity)
-      if (stock.exchange === "NSE") rank += 50;
+      // PSE bonus (more liquidity)
+      if (stock.exchange === "PSE") rank += 50;
 
       return { stock, rank };
     })
@@ -766,7 +766,7 @@ export function getStockResearch(symbol: string): StockResearchDetail | null {
   return {
     ...summary,
     companyName: summary.name,
-    exchangeBadge: summary.exchange === "BSE" ? "BSE" : "NSE",
+    exchangeBadge: summary.exchange === "PSE" ? "PSE" : "PSE",
     founded: profile.founded,
     ceo: profile.ceo,
     hq: profile.hq,

@@ -21,7 +21,7 @@ interface TradeFromWatchlistProps {
   currentPrice: number;
 }
 
-export function TradeFromWatchlist({ symbol, exchange = "NSE", currentPrice }: TradeFromWatchlistProps) {
+export function TradeFromWatchlist({ symbol, exchange = "PSE", currentPrice }: TradeFromWatchlistProps) {
   const [connections, setConnections] = useState<BrokerConnection[]>([]);
   const [selectedConn, setSelectedConn] = useState<string>("");
   const [form, setForm] = useState<TradeFormState>({ side: "BUY", quantity: 1, orderType: "MARKET", price: "" });

@@ -27,7 +27,7 @@ export async function registerPublicEngagementRoutes(server: FastifyInstance, de
       const position = Number(countResult.rows[0]?.cnt ?? 0) + 1;
 
       const result = await deps.dbQuery(
-        `INSERT INTO waitlist_entries (email, name, position)
+        `IPSERT INTO waitlist_entries (email, name, position)
          VALUES ($1, $2, $3)
          RETURNING id, email, name, status, position, created_at`,
         [email.toLowerCase().trim(), name?.trim() ?? null, position],
@@ -61,7 +61,7 @@ export async function registerPublicEngagementRoutes(server: FastifyInstance, de
 
     try {
       const result = await deps.dbQuery(
-        `INSERT INTO feedback_entries (category, title, body, page_url, email)
+        `IPSERT INTO feedback_entries (category, title, body, page_url, email)
          VALUES ($1, $2, $3, $4, $5)
          RETURNING id, category, status, created_at`,
         [cat, title.trim(), body.trim(), pageUrl?.trim() ?? null, email?.trim() ?? null],

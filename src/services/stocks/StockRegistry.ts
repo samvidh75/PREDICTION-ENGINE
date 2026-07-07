@@ -3,13 +3,13 @@ import { MasterCompanyRegistry } from '../data/MasterCompanyRegistry';
 
 export interface RegisteredStock extends CompanyTelemetry {
   companyName: string;
-  exchange: 'NSE' | 'BSE' | 'SME';
+  exchange: 'PSE' | 'PSE' | 'SME';
   sector: string;
 }
 
 import { generate500Stocks } from "./generate500Stocks";
 
-// ─── Master Stock Registry Dataset (NSE, BSE, SME Segment Boundaries) ───────────────
+// ─── Master Stock Registry Dataset (PSE, PSE, SME Segment Boundaries) ───────────────
 const MASTER_STOCK_REGISTRY: Record<string, RegisteredStock> = {};
 const registry = MasterCompanyRegistry.getInstance();
 

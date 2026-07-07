@@ -89,7 +89,7 @@ describe('SQLite prediction_registry integration', () => {
     await initAdapter(dbPath);
 
     await dbAdapter.query(
-      `INSERT INTO prediction_registry
+      `IPSERT INTO prediction_registry
        (symbol, prediction_date, ranking_score, classification, confidence_score,
         confidence_level, quality_score, growth_score, value_score,
         momentum_score, risk_score, sector_score, prediction_horizon)
@@ -110,7 +110,7 @@ describe('SQLite prediction_registry integration', () => {
     await initAdapter(dbPath);
 
     await dbAdapter.query(
-      `INSERT INTO prediction_registry
+      `IPSERT INTO prediction_registry
        (symbol, prediction_date, ranking_score, classification, confidence_score,
         confidence_level, quality_score, growth_score, value_score,
         momentum_score, risk_score, sector_score, prediction_horizon)
@@ -132,7 +132,7 @@ describe('SQLite prediction_registry integration', () => {
 
     const insertRow = () =>
       dbAdapter.query(
-        `INSERT INTO prediction_registry
+        `IPSERT INTO prediction_registry
          (symbol, prediction_date, ranking_score, classification, confidence_score,
           confidence_level, quality_score, growth_score, value_score,
           momentum_score, risk_score, sector_score, prediction_horizon)
@@ -155,7 +155,7 @@ describe('SQLite prediction_registry integration', () => {
     await initAdapter(dbPath);
 
     await dbAdapter.query(
-      `INSERT INTO prediction_registry
+      `IPSERT INTO prediction_registry
        (symbol, prediction_date, ranking_score, classification, confidence_score,
         confidence_level, quality_score, growth_score, value_score,
         momentum_score, risk_score, sector_score, prediction_horizon)
@@ -181,7 +181,7 @@ describe('SQLite prediction_registry integration', () => {
 
     // First insert succeeds
     await dbAdapter.query(
-      `INSERT INTO prediction_registry
+      `IPSERT INTO prediction_registry
        (symbol, prediction_date, ranking_score, classification, confidence_score,
         confidence_level, quality_score, growth_score, value_score,
         momentum_score, risk_score, sector_score, prediction_horizon)
@@ -192,7 +192,7 @@ describe('SQLite prediction_registry integration', () => {
     // Duplicate insert fails with UNIQUE constraint
     await expect(
       dbAdapter.query(
-        `INSERT INTO prediction_registry
+        `IPSERT INTO prediction_registry
          (symbol, prediction_date, ranking_score, classification, confidence_score,
           confidence_level, quality_score, growth_score, value_score,
           momentum_score, risk_score, sector_score, prediction_horizon)
@@ -208,7 +208,7 @@ describe('SQLite prediction_registry integration', () => {
 
     await expect(
       dbAdapter.query(
-        `INSERT INTO prediction_registry
+        `IPSERT INTO prediction_registry
          (symbol, prediction_date, ranking_score, classification, confidence_score,
           confidence_level, quality_score, growth_score, value_score,
           momentum_score, risk_score, sector_score, prediction_horizon)
@@ -225,7 +225,7 @@ describe('SQLite prediction_registry integration', () => {
 
     await expect(
       dbAdapter.query(
-        `INSERT INTO prediction_registry
+        `IPSERT INTO prediction_registry
          (symbol, prediction_date, ranking_score, classification, confidence_score,
           confidence_level, quality_score, growth_score, value_score,
           momentum_score, risk_score, sector_score, prediction_horizon)
@@ -242,7 +242,7 @@ describe('SQLite prediction_registry integration', () => {
 
     await expect(
       dbAdapter.query(
-        `INSERT INTO prediction_registry
+        `IPSERT INTO prediction_registry
          (symbol, prediction_date, ranking_score, classification, confidence_score,
           confidence_level, quality_score, growth_score, value_score,
           momentum_score, risk_score, sector_score, prediction_horizon, created_by)

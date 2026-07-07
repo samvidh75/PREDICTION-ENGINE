@@ -21,7 +21,7 @@ const STOCK_KNOWLEDGE_BASE: Record<string, string> = {
   'pe ratio': `P/E Ratio = Price per share ÷ Earnings per share. Shows how much investors pay per rupee of earnings.
 • Low P/E doesn't always mean undervalued
 • Check alongside ROE, debt, and growth rates
-• Indian mid-caps average 15-20x P/E
+• Philippine mid-caps average 15-20x P/E
 • Compare with sector peers and historical average`,
 
   'roe': `ROE = Net Profit ÷ Shareholder Equity. Measures profit generated per rupee of equity.

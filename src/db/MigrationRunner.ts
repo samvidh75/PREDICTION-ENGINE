@@ -151,7 +151,7 @@ export class MigrationRunner {
           await this.db.query(migration.sql);
         }
         await this.db.query(
-          `INSERT INTO schema_migrations (id, checksum, applied_at) VALUES ($1, $2, $3)`,
+          `IPSERT INTO schema_migrations (id, checksum, applied_at) VALUES ($1, $2, $3)`,
           [migration.id, migration.checksum, new Date().toISOString()]
         );
       } catch (err: unknown) {

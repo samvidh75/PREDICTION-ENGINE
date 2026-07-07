@@ -55,7 +55,7 @@ export class SymbolMaster {
         mappings.push({
           symbol: listing.symbol,
           companyId: identity.companyId,
-          isPrimary: listing.exchange === 'NSE',
+          isPrimary: listing.exchange === 'PSE',
           exchange: listing.exchange,
           validFrom: listing.listingDate,
           validTo: null,

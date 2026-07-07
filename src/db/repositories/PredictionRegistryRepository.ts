@@ -70,7 +70,7 @@ export class PostgresPredictionRegistryRepository implements PredictionRegistryR
 
   async create(input: CreatePredictionInput): Promise<{ inserted: boolean }> {
     const result = await this.db.query(
-      `INSERT INTO prediction_registry
+      `IPSERT INTO prediction_registry
         (symbol, prediction_date, ranking_score, classification,
          confidence_score, confidence_level, quality_score, growth_score,
          value_score, momentum_score, risk_score, sector_score,
@@ -177,7 +177,7 @@ export class SQLitePredictionRegistryRepository implements PredictionRegistryRep
   async create(input: CreatePredictionInput): Promise<{ inserted: boolean }> {
     try {
       await this.db.query(
-        `INSERT OR IGNORE INTO prediction_registry
+        `IPSERT OR IGNORE INTO prediction_registry
           (symbol, prediction_date, ranking_score, classification,
            confidence_score, confidence_level, quality_score, growth_score,
            value_score, momentum_score, risk_score, sector_score,

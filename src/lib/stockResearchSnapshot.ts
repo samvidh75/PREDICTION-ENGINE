@@ -63,7 +63,7 @@ function rankPersistedEntry(entry: PersistedUniverseEntry, normalized: string): 
   if (name.startsWith(normalized)) rank += 350;
   else if (name.includes(normalized)) rank += 240;
   if (entry.sector.toLowerCase().includes(normalized)) rank += 120;
-  if (entry.exchange === "NSE") rank += 50;
+  if (entry.exchange === "PSE") rank += 50;
   return rank;
 }
 
@@ -160,7 +160,7 @@ export async function getPersistedStockResearch(symbol: string): Promise<StockRe
   const fromMemory = getStockResearch(symbol);
   if (fromMemory) return fromMemory;
 
-  // Fall back to the full persisted universe (8503+ stocks, including all BSE codes)
+  // Fall back to the full persisted universe (8503+ stocks, including all PSE codes)
   const persisted = await loadPersistedUniverse();
   if (!persisted) return null;
 
@@ -175,8 +175,8 @@ export async function getPersistedStockResearch(symbol: string): Promise<StockRe
     symbol: entry.symbol,
     name: entry.name,
     companyName: entry.name,
-    exchange: entry.exchange as "NSE" | "BSE",
-    exchangeBadge: (entry.exchange === "BSE" ? "BSE" : "NSE") as "NSE" | "BSE",
+    exchange: entry.exchange as "PSE" | "PSE",
+    exchangeBadge: (entry.exchange === "PSE" ? "PSE" : "PSE") as "PSE" | "PSE",
     sector: entry.sector,
     industry: entry.industry || entry.sector,
     price: syntheticPrice,

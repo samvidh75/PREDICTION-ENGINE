@@ -7,7 +7,7 @@
 
 import { FastifyInstance, FastifyRequest } from 'fastify';
 import fastifyWebsocket from '@fastify/websocket';
-import { fetchLiveQuoteNSE, fetchLiveQuoteGroww } from '../../data/liveQuoteProviders';
+import { fetchLiveQuotePSE, fetchLiveQuoteGroww } from '../../data/liveQuoteProviders';
 
 interface QuoteSubscription {
   ws: any;
@@ -78,7 +78,7 @@ async function startQuoteBroadcaster() {
     const quotes = await Promise.all(
       Array.from(allSymbols).map(async (symbol) => {
         try {
-          let quote = await fetchLiveQuoteNSE(symbol);
+          let quote = await fetchLiveQuotePSE(symbol);
           if (!quote) {
             quote = await fetchLiveQuoteGroww(symbol);
           }

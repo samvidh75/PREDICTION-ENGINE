@@ -1,5 +1,5 @@
 /**
- * InsiderTrackingPanel — SEBI Insider Disclosure Radar Widget.
+ * InsiderTrackingPanel — SEC Insider Disclosure Radar Widget.
  *
  * Fetches corporate insider filings from the backend API and renders them
  * in the Raycast design system (dark theme, hairline borders).

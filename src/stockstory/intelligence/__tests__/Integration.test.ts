@@ -65,7 +65,7 @@ describe('KnowledgeBase', () => {
 describe('LLMExplainer', () => {
   const mockReport: StockIntelligenceReport = {
     symbol: 'TEST',
-    exchange: 'NSE',
+    exchange: 'PSE',
     generatedAt: '2025-01-15T00:00:00.000Z',
     compositeScore: { score: 72, label: 'good' },
     classification: 'healthy',
@@ -121,7 +121,7 @@ describe('IntelligenceCache', () => {
     cache = new IntelligenceCache(60);
     report = {
       symbol: 'TEST',
-      exchange: 'NSE',
+      exchange: 'PSE',
       generatedAt: '2025-01-15T00:00:00.000Z',
       compositeScore: { score: 70, label: 'good' },
       classification: 'healthy',
@@ -168,7 +168,7 @@ describe('IntelligenceCache', () => {
 describe('LensoryOrchestrator', () => {
   const input: IntelligenceInput = {
     symbol: 'TEST',
-    exchange: 'NSE_EQ',
+    exchange: 'PSE_EQ',
     tradeDate: '2025-01-15',
     financials: {
       peRatio: 15, pbRatio: 2.5, eps: 50, dividendYield: 1.5,

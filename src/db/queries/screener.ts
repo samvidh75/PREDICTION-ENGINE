@@ -4,7 +4,7 @@ import type { Fundamentals } from '@/types';
 export const screenerQueries = {
   async insert(symbol: string, data: Fundamentals) {
     return db.query(
-      `INSERT INTO screener_data (symbol, data, fetched_at)
+      `IPSERT INTO screener_data (symbol, data, fetched_at)
        VALUES ($1, $2, $3)
        ON CONFLICT (symbol) DO UPDATE SET data=$2, fetched_at=$3`,
       [symbol, JSON.stringify(data), new Date()]

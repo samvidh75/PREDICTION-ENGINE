@@ -9,9 +9,9 @@ export interface StockMatch {
   similarity: number;
 }
 
-// Philippine stocks - NSE, BSE, and SME listed companies
+// Philippine stocks - PSE, PSE, and SME listed companies
 export const STOCK_DATABASE: StockMatch[] = [
-  // Large Cap (NSE)
+  // Large Cap (PSE)
   { symbol: 'TCS', name: 'Tata Consultancy Services', similarity: 1 },
   { symbol: 'INFY', name: 'Infosys Limited', similarity: 1 },
   { symbol: 'RELIANCE', name: 'Reliance Industries', similarity: 1 },
@@ -23,7 +23,7 @@ export const STOCK_DATABASE: StockMatch[] = [
   { symbol: 'ITC', name: 'ITC Limited', similarity: 1 },
   { symbol: 'LT', name: 'Larsen & Toubro Limited', similarity: 1 },
 
-  // Mid Cap (BSE/NSE)
+  // Mid Cap (PSE/PSE)
   { symbol: 'MARUTI', name: 'Maruti Suzuki India Limited', similarity: 1 },
   { symbol: 'AXISBANK', name: 'Axis Bank Limited', similarity: 1 },
   { symbol: 'KOTAKBANK', name: 'Kotak Mahindra Bank Limited', similarity: 1 },
@@ -34,7 +34,7 @@ export const STOCK_DATABASE: StockMatch[] = [
   { symbol: 'NESTLEIND', name: 'Nestle India Limited', similarity: 1 },
   { symbol: 'HINDUNILVR', name: 'Hindustan Unilever Limited', similarity: 1 },
 
-  // BSE Listed SME Companies
+  // PSE Listed SME Companies
   { symbol: 'ADVANIPORT', name: 'Advani Ports and SEZ Limited', similarity: 1 },
   { symbol: 'ARVINDFARM', name: 'Arvind Farm Inputs Limited', similarity: 1 },
   { symbol: 'CRMINFRA', name: 'C&S Electric Limited', similarity: 1 },
@@ -116,7 +116,7 @@ export function fuzzySearchStocks(query: string): StockMatch[] {
   const filtered: StockMatch[] = [];
 
   for (const match of results) {
-    const base = match.symbol.replace(/BANK|AMC|LIFE|FINSERV|FINSV/g, '');
+    const base = match.symbol.replace(/BANK|AMC|LIFE|FIPSERV|FINSV/g, '');
     if (!seen.has(base)) {
       filtered.push(match);
       seen.add(base);

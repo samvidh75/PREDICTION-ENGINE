@@ -151,7 +151,7 @@ export class StatementIngestionPipeline {
     const periodEnd = bs?.periodEnd ?? is?.periodEnd ?? cf?.periodEnd ?? new Date().toISOString().split('T')[0];
 
     await pool.query(
-      `INSERT INTO financial_statements (
+      `IPSERT INTO financial_statements (
          symbol, period_end, period_type,
          total_assets, total_liabilities, total_equity,
          current_assets, current_liabilities,

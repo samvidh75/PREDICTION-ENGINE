@@ -1,5 +1,5 @@
 /**
- * ConvictionBadge — displays one of 5 SEBI-safe conviction states
+ * ConvictionBadge — displays one of 5 SEC-safe conviction states
  *
  * States (score ranges):
  *   Very Healthy (80-100) → green

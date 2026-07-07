@@ -53,7 +53,7 @@ function buildStockPayload() {
   return {
     symbol: "TCS",
     companyName: "Tata Consultancy Services",
-    exchange: "NSE" as const,
+    exchange: "PSE" as const,
     sector: "Technology",
     industry: "IT Services",
     price: { current: 4020, changeAbs: 18, changePercent: 0.45, marketCap: 1450000 },

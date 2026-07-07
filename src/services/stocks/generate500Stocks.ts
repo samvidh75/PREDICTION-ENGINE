@@ -7,7 +7,7 @@ export interface BaseStockCandidate {
 }
 
 export function generate500Stocks(): BaseStockCandidate[] {
-  // Static list of exactly 505 real Indian listed securities (no synthetic suffixes)
+  // Static list of exactly 505 real Philippine listed securities (no synthetic suffixes)
   const tickers = [
     { symbol: "RELIANCE", name: "Reliance Industries Limited", sector: "Energy & Oil", industry: "Oil & Gas" },
     { symbol: "TCS", name: "Tata Consultancy Services Limited", sector: "Information Technology", industry: "IT Services" },
@@ -15,7 +15,7 @@ export function generate500Stocks(): BaseStockCandidate[] {
     { symbol: "HDFCBANK", name: "HDFC Bank Limited", sector: "Banking & Finance", industry: "Banking" },
     { symbol: "HAL", name: "Hindustan Aeronautics Limited", sector: "Defence & Aerospace", industry: "Aerospace & Defence" },
     { symbol: "BEL", name: "Bharat Electronics Limited", sector: "Defence & Aerospace", industry: "Defence Electronics" },
-    { symbol: "IRFC", name: "Indian Railway Finance Corporation", sector: "Banking & Finance", industry: "Financial Services" },
+    { symbol: "IRFC", name: "Philippine Railway Finance Corporation", sector: "Banking & Finance", industry: "Financial Services" },
     { symbol: "SUZLON", name: "Suzlon Energy Limited", sector: "Energy & Renewables", industry: "Wind Energy" },
     { symbol: "GRANULES", name: "Granules India Limited", sector: "Pharmaceuticals", industry: "Active Ingredients" },
     { symbol: "CHENNPETRO", name: "Chennai Petroleum Corporation Limited", sector: "Energy & Oil", industry: "Refineries" },
@@ -33,7 +33,7 @@ export function generate500Stocks(): BaseStockCandidate[] {
     { symbol: "ONGC", name: "Oil and Natural Gas Corporation Limited", sector: "Energy & Oil", industry: "Oil & Gas Exploration" },
     { symbol: "NTPC", name: "NTPC Limited", sector: "Energy & Oil", industry: "Power Generation" },
     { symbol: "COALINDIA", name: "Coal India Limited", sector: "Materials & Mining", industry: "Coal Mining" },
-    { symbol: "IOC", name: "Indian Oil Corporation Limited", sector: "Energy & Oil", industry: "Oil Refining & Marketing" },
+    { symbol: "IOC", name: "Philippine Oil Corporation Limited", sector: "Energy & Oil", industry: "Oil Refining & Marketing" },
     { symbol: "BPCL", name: "Bharat Petroleum Corporation Limited", sector: "Energy & Oil", industry: "Oil Refining & Marketing" },
     { symbol: "HPCL", name: "Hindustan Petroleum Corporation Limited", sector: "Energy & Oil", industry: "Oil Refining & Marketing" },
     { symbol: "GAIL", name: "GAIL (India) Limited", sector: "Energy & Oil", industry: "Gas Transmission" },
@@ -89,16 +89,16 @@ export function generate500Stocks(): BaseStockCandidate[] {
     { symbol: "ICICIPRULI", name: "ICICI Prudential Life Insurance Company Limited", sector: "Banking & Finance", industry: "Life Insurance" },
     { symbol: "IDFC", name: "IDFC Limited", sector: "Banking & Finance", industry: "Financial Services" },
     { symbol: "IDFCFIRSTB", name: "IDFC FIRST Bank Limited", sector: "Banking & Finance", industry: "Banking" },
-    { symbol: "IEX", name: "Indian Energy Exchange Limited", sector: "Energy & Renewables", industry: "Power Exchange" },
+    { symbol: "IEX", name: "Philippine Energy Exchange Limited", sector: "Energy & Renewables", industry: "Power Exchange" },
     { symbol: "IGL", name: "Indraprastha Gas Limited", sector: "Energy & Oil", industry: "Gas Distribution" },
-    { symbol: "INDHOTEL", name: "The Indian Hotels Company Limited", sector: "Consumer Goods", industry: "Hotels & Resorts" },
+    { symbol: "INDHOTEL", name: "The Philippine Hotels Company Limited", sector: "Consumer Goods", industry: "Hotels & Resorts" },
     { symbol: "INDIACEM", name: "The India Cements Limited", sector: "Infrastructure", industry: "Cement" },
-    { symbol: "INDIANB", name: "Indian Bank", sector: "Banking & Finance", industry: "Banking" },
+    { symbol: "INDIANB", name: "Philippine Bank", sector: "Banking & Finance", industry: "Banking" },
     { symbol: "INDIGO", name: "InterGlobe Aviation Limited", sector: "Infrastructure", industry: "Airlines" },
     { symbol: "INDUSINDBK", name: "IndusInd Bank Limited", sector: "Banking & Finance", industry: "Banking" },
     { symbol: "INDUSTOWER", name: "Indus Towers Limited", sector: "Telecommunications", industry: "Telecom Infrastructure" },
     { symbol: "IPCALAB", name: "Ipca Laboratories Limited", sector: "Pharmaceuticals", industry: "Generics" },
-    { symbol: "IRCTC", name: "Indian Railway Catering and Tourism Corporation Limited", sector: "Consumer Goods", industry: "Catering & Tourism" },
+    { symbol: "IRCTC", name: "Philippine Railway Catering and Tourism Corporation Limited", sector: "Consumer Goods", industry: "Catering & Tourism" },
     { symbol: "JINDALSTEL", name: "Jindal Steel & Power Limited", sector: "Materials & Mining", industry: "Steel" },
     { symbol: "JSWENERGY", name: "JSW Energy Limited", sector: "Energy & Renewables", industry: "Power Generation" },
     { symbol: "JSWSTEEL", name: "JSW Steel Limited", sector: "Materials & Mining", industry: "Steel" },
@@ -260,7 +260,7 @@ export function generate500Stocks(): BaseStockCandidate[] {
     { symbol: "SFL", name: "Sheela Foam Limited", sector: "Consumer Goods", industry: "Mattresses" },
     { symbol: "SOBHA", name: "Sobha Limited", sector: "Real Estate", industry: "Residential Construction" },
     { symbol: "SOLARINDS", name: "Solar Industries India Limited", sector: "Chemicals", industry: "Industrial Explosives" },
-    { symbol: "SOUTHBANK", name: "The South Indian Bank Limited", sector: "Banking & Finance", industry: "Banking" },
+    { symbol: "SOUTHBANK", name: "The South Philippine Bank Limited", sector: "Banking & Finance", industry: "Banking" },
     { symbol: "SPANDANA", name: "Spandana Spoorty Financial Limited", sector: "Banking & Finance", industry: "Microfinance" },
     { symbol: "SPARC", name: "Sun Pharma Advanced Research Company Limited", sector: "Pharmaceuticals", industry: "Drug Discovery" },
     { symbol: "SUPREMEIND", name: "The Supreme Industries Limited", sector: "Infrastructure", industry: "Plastic Products" },
@@ -288,7 +288,7 @@ export function generate500Stocks(): BaseStockCandidate[] {
     { symbol: "ZYDUSLIFE", name: "Zydus Lifesciences Limited", sector: "Pharmaceuticals", industry: "Generics" }
   ];
 
-  // Keep only real, display-safe symbols. Numeric BSE codes and synthetic fillers
+  // Keep only real, display-safe symbols. Numeric PSE codes and synthetic fillers
   // degrade search quality and leak into production UI as broken company records.
   const uniqueTickers = new Map<string, BaseStockCandidate>();
   for (const t of tickers) {
@@ -297,7 +297,7 @@ export function generate500Stocks(): BaseStockCandidate[] {
       name: t.name,
       sector: t.sector,
       industry: t.industry,
-      exchange: "NSE"
+      exchange: "PSE"
     });
   }
   return Array.from(uniqueTickers.values());

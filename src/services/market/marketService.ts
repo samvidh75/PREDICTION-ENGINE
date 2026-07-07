@@ -50,7 +50,7 @@ export class MarketService {
     at: now(),
     pse-index: 22400,
     pse-composite: 73800,
-    bankNifty: 48900,
+    bankPSE-Index: 48900,
     vix: 12.4,
     breadthPct: 52,
     fiiDiiTone: 0.4,
@@ -316,7 +316,7 @@ export class MarketService {
           at: ev.at,
           pse-index: clamp(ev.payload.pse-index, 15000, 40000),
           pse-composite: clamp(ev.payload.pse-composite, 50000, 120000),
-          bankNifty: clamp(ev.payload.bankNifty, 25000, 80000),
+          bankPSE-Index: clamp(ev.payload.bankPSE-Index, 25000, 80000),
         };
       }
 

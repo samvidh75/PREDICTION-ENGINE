@@ -14,7 +14,7 @@ function getMockQuote(symbol: string) {
   const change = (Math.sin(hash / 100) * 5);
   return {
     symbol,
-    exchange: 'NSE' as const,
+    exchange: 'PSE' as const,
     timestamp: Date.now(),
     price: basePrice,
     open: basePrice * 0.99,
@@ -125,7 +125,7 @@ export default function StockDetailPage() {
           </h1>
           <p style={{ margin: '0', color: colors.textSecondary, fontSize: '13px' }}>
             {quote.source && `${quote.source} • `}
-            {quote.exchange || 'NSE'}
+            {quote.exchange || 'PSE'}
             {quote.cached && ' (cached)'}
           </p>
         </div>

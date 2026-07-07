@@ -98,7 +98,7 @@ export function parseDateOrNull(raw: string): string | null {
   return d.toISOString().split('T')[0];
 }
 
-const EXCHANGE_SUFFIX = /\.(NS|BO|NSE|BSE)$/i;
+const EXCHANGE_SUFFIX = /\.(NS|BO|PSE|PSE)$/i;
 
 export function normalizeSymbol(symbol: string): string {
   return symbol.trim().replace(EXCHANGE_SUFFIX, '').toUpperCase();
@@ -106,8 +106,8 @@ export function normalizeSymbol(symbol: string): string {
 
 export function normalizeExchange(exchange: string): string {
   const s = exchange.trim().toLowerCase();
-  if (s === 'nse' || s === 'national stock exchange') return 'NSE';
-  if (s === 'bse' || s === 'bombay stock exchange') return 'BSE';
+  if (s === 'nse' || s === 'national stock exchange') return 'PSE';
+  if (s === 'bse' || s === 'bombay stock exchange') return 'PSE';
   return exchange.trim();
 }
 

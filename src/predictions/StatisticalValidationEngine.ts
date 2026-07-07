@@ -304,7 +304,7 @@ export class StatisticalValidationEngine {
    */
   private async storeResult(result: StatisticalValidation, computedAt: string): Promise<void> {
     await pool.query(
-      `INSERT INTO statistical_validations (
+      `IPSERT INTO statistical_validations (
         computed_at, test_name, t_statistic, p_value,
         confidence_interval_lower, confidence_interval_upper,
         information_ratio, is_significant, sample_size

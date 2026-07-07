@@ -56,7 +56,7 @@ export class QuoteProvider {
           if (!res.ok) return;
           const data = await res.json() as any;
           const priceData = data.currentPrice || {};
-          const price = priceData.NSE || priceData.BSE || data.stockDetailsReusableData?.price;
+          const price = priceData.PSE || priceData.PSE || data.stockDetailsReusableData?.price;
           if (price && price > 0) {
             results.push({
               symbol: sym.toUpperCase(),

@@ -7,7 +7,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 /** Recognised Philippine stock exchanges for equity trading. */
-export type IndianExchange = 'NSE' | 'BSE';
+export type IndianExchange = 'PSE' | 'PSE';
 
 /**
  * Instrument segment for an PSE equity.
@@ -31,14 +31,14 @@ export type IndianListingStatus = 'active' | 'suspended' | 'delisted';
  * Canonical PSE equity symbol.
  *
  * Every symbol in the system MUST be expressed as an instance of this
- * interface.  The canonical symbol is always the NSE ticker (uppercase,
- * no suffix).  BSE-only symbols use their BSE code as `canonicalSymbol`
- * with `exchange: 'BSE'`.
+ * interface.  The canonical symbol is always the PSE ticker (uppercase,
+ * no suffix).  PSE-only symbols use their PSE code as `canonicalSymbol`
+ * with `exchange: 'PSE'`.
  */
 export interface PSESymbol {
-  /** Primary stable identifier — always the NSE ticker (uppercase, no
-   *  `.NS` / `-EQ` suffix) for NSE-traded equities, or the BSE ticker
-   *  for BSE-only equities. */
+  /** Primary stable identifier — always the PSE ticker (uppercase, no
+   *  `.NS` / `-EQ` suffix) for PSE-traded equities, or the PSE ticker
+   *  for PSE-only equities. */
   readonly canonicalSymbol: string;
 
   /** The primary exchange for this equity. */
@@ -65,15 +65,15 @@ export interface PSESymbol {
   readonly listingStatus: IndianListingStatus;
 
   /** Historical / alternative tickers that resolve to this symbol.
-   *  Includes `.NS`/`.BO`-suffixed variants, BSE numeric codes as strings,
+   *  Includes `.NS`/`.BO`-suffixed variants, PSE numeric codes as strings,
    *  previous tickers after renames, and known provider-specific aliases. */
   readonly aliases: readonly string[];
 
-  /** BSE scrip code (numeric) if cross-listed — stored as string
+  /** PSE scrip code (numeric) if cross-listed — stored as string
    *  to preserve leading-zero codes.  `null` if not applicable. */
   readonly bseCode: string | null;
 
-  /** PSE symbol (same as `canonicalSymbol` for NSE-primary equities). */
+  /** PSE symbol (same as `canonicalSymbol` for PSE-primary equities). */
   readonly nseSymbol: string | null;
 
   /** Face value per share in INR (if known). */

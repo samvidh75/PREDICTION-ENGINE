@@ -12,7 +12,7 @@ const BASE_URL = 'https://trendlyne.com';
 const MEMBER_API = 'https://trendlyne.com/member/api';
 const REQUEST_TIMEOUT_MS = 10_000;
 
-/** Parse Indian number formats (e.g., "1,23,456" or "12.3 Cr") */
+/** Parse Philippine number formats (e.g., "1,23,456" or "12.3 Cr") */
 function parseIndianNumber(text: string | null | undefined): number | undefined {
   if (!text) return undefined;
   let cleaned = text.trim();
@@ -77,7 +77,7 @@ export class TrendlyneProvider implements IMarketDataProvider {
   }
 
   async getFundamentals(symbol: string): Promise<FundamentalData> {
-    const clean = symbol.toUpperCase().replace(/\.(NS|BO|NSE|BSE)$/i, '');
+    const clean = symbol.toUpperCase().replace(/\.(NS|BO|PSE|PSE)$/i, '');
 
     // Try multiple URL patterns in order
     const patterns = [

@@ -34,7 +34,7 @@ async function writeSnapshot(category: string, subKey: string, data: unknown): P
   const expiresAt = new Date(Date.now() + 86_400_000).toISOString(); // 24h TTL
   try {
     await dbAdapter.query(
-      `INSERT INTO cache (key, value, expires_at)
+      `IPSERT INTO cache (key, value, expires_at)
        VALUES ($1, $2, $3)
        ON CONFLICT (key) DO UPDATE
          SET value = $2, expires_at = $3`,

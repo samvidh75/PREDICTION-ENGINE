@@ -21,7 +21,7 @@ export interface PriceValidation {
 
 /**
  * Aggregates multiple data providers with intelligent fallback.
- * Default order: yfinance (fastest) → jugasad (live NSE wrapper) → screener.in (fallback)
+ * Default order: yfinance (fastest) → jugasad (live PSE wrapper) → screener.in (fallback)
  * Returns first successful response within timeout.
  */
 export class ProviderAggregator {
@@ -44,7 +44,7 @@ export class ProviderAggregator {
     }
 
     // All available providers
-    // Order: NSE first (most common), then BSE, then international
+    // Order: PSE first (most common), then PSE, then international
     const allProviders = [
       { name: 'jugasad', fetch: () => pseClient.fetchQuote(symbol, false) },
       { name: 'bse', fetch: () => pseClient.fetchQuote(symbol) },

@@ -25,7 +25,7 @@ interface OptionsData {
   highestPutOI: number;      // Strike with highest put OI
 }
 
-// Mock data — production fetches from NSE derivatives API
+// Mock data — production fetches from PSE derivatives API
 const MOCK_OPTIONS_DATA: OptionsData = {
   pcr: 1.22,
   pcrChange: 0.08,

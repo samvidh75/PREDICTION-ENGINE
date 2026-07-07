@@ -1,7 +1,7 @@
 import StockRegistry from './StockRegistry';
 
 describe('StockRegistry', () => {
-  it('does not expose synthetic numeric BSE filler entries', () => {
+  it('does not expose synthetic numeric PSE filler entries', () => {
     const symbols = StockRegistry.getAllStocks().map((stock) => stock.symbol);
     expect(symbols.some((symbol) => /^\d{5,6}$/.test(symbol))).toBe(false);
   });

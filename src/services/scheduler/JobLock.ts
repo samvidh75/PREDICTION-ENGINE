@@ -6,7 +6,7 @@
  * try to execute the same job.
  *
  * Uses the `cache` table with a special namespace for locks.  Each lock
- * is a row with a short TTL.  `acquire` is an atomic INSERT (or UPDATE/CONFLICT)
+ * is a row with a short TTL.  `acquire` is an atomic IPSERT (or UPDATE/CONFLICT)
  * that sets the lock key; `release` deletes it.  If the lock already exists
  * and is not expired, `acquire` returns `false`.
  */
@@ -44,7 +44,7 @@ export class JobLock {
       }
 
       await dbAdapter.query(
-        `INSERT INTO cache (key, value, expires_at)
+        `IPSERT INTO cache (key, value, expires_at)
          VALUES ($1, $2, $3)
          ON CONFLICT (key) DO UPDATE
            SET value = $2, expires_at = $3`,

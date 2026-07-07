@@ -46,7 +46,7 @@ export class ClientMarketDataFetcher {
 
   constructor() {
     const providers = [
-      'YFinance', 'IndianAPI', 'Groww', 'NSEIndia', 'Screener', 'Moneycontrol',
+      'YFinance', 'PhilippineAPI', 'Groww', 'PSEIndia', 'Screener', 'Moneycontrol',
     ];
     for (const name of providers) {
       this.providerHealth.set(name, {
@@ -173,9 +173,9 @@ export class ClientMarketDataFetcher {
   private async tryFetch(symbol: string): Promise<FetchResult | null> {
     const providers: Array<{ name: string; fn: (sym: string) => Promise<FetchResult | null> }> = [
       { name: 'YFinance', fn: this.fetchYFinance.bind(this) },
-      { name: 'NSEIndia', fn: this.fetchNSEIndia.bind(this) },
+      { name: 'PSEIndia', fn: this.fetchPSEIndia.bind(this) },
       { name: 'Groww', fn: this.fetchGroww.bind(this) },
-      { name: 'IndianAPI', fn: this.fetchIndianAPI.bind(this) },
+      { name: 'PhilippineAPI', fn: this.fetchIndianAPI.bind(this) },
       { name: 'Screener', fn: this.fetchScreener.bind(this) },
       { name: 'Moneycontrol', fn: this.fetchMoneycontrol.bind(this) },
     ];
@@ -279,7 +279,7 @@ export class ClientMarketDataFetcher {
     }
   }
 
-  private async fetchNSEIndia(symbol: string): Promise<FetchResult | null> {
+  private async fetchPSEIndia(symbol: string): Promise<FetchResult | null> {
     try {
       const ticker = symbol.toUpperCase();
       const res = await fetch(

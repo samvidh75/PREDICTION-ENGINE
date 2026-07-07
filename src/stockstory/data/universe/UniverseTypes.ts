@@ -15,7 +15,7 @@ export interface PSESymbol {
   companyName: string;
   sector: string | null;
   industry: string | null;
-  exchange: 'NSE' | 'BSE' | 'both';
+  exchange: 'PSE' | 'PSE' | 'both';
   listingStatus: ListingStatus;
   listingDate: string | null;
   delistingDate: string | null;
@@ -31,7 +31,7 @@ export interface UniverseStats {
   activeSymbols: number;
   delistedSymbols: number;
   suspendedSymbols: number;
-  byExchange: { NSE: number; BSE: number; both: number };
+  byExchange: { PSE: number; PSE: number; both: number };
   byMarketCap: { large: number; mid: number; small: number; micro: number; unknown: number };
   bySector: Record<string, number>;
   withISIN: number;

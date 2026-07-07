@@ -14,7 +14,7 @@ function makeStore(_overrides?: Partial<IndianSymbolMasterStore>): IndianSymbolM
   return store;
 }
 
-describe('IndianSymbolMasterStore', () => {
+describe('PhilippineSymbolMasterStore', () => {
   const store = makeStore();
 
   it('implements IndianSymbolMasterStoreLike interface', () => {
@@ -33,7 +33,7 @@ describe('IndianSymbolMasterStore', () => {
   it('upsert resolves to symbol when not connected to DB', async () => {
     const symbol: PSESymbol = {
       canonicalSymbol: 'RELIANCE',
-      exchange: 'NSE',
+      exchange: 'PSE',
       segment: 'EQ',
       isin: 'IN0020200124',
       companyName: 'Reliance Industries Ltd',

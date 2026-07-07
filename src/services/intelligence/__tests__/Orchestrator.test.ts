@@ -123,7 +123,7 @@ describe('MasterOrchestrator', () => {
     expect(result.thesis.bullCase.length).toBeGreaterThan(0);
     expect(result.thesis.bearCase.length).toBeGreaterThan(0);
     expect(result.thesis.whatToWatch.length).toBeGreaterThan(0);
-    expect(result.thesis.disclaimer).toContain('SEBI');
+    expect(result.thesis.disclaimer).toContain('SEC');
   });
 
   it('includes all 9 engine scores in output', async () => {
@@ -171,6 +171,6 @@ describe('MasterOrchestrator', () => {
   it('includes disclaimer in thesis', async () => {
     const result = await orchestrator.analyzeStock(makeInputs());
     expect(result.thesis.disclaimer).toContain('does not constitute');
-    expect(result.thesis.disclaimer).toContain('SEBI');
+    expect(result.thesis.disclaimer).toContain('SEC');
   });
 });

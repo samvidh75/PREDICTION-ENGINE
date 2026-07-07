@@ -131,7 +131,7 @@ export async function registerAlertPreferencesRoutes(server: FastifyInstance): P
 
       // Upsert preferences
       await dbAdapter.query(
-        `INSERT INTO user_alert_preferences
+        `IPSERT INTO user_alert_preferences
            (user_id, sms_enabled, email_enabled, telegram_enabled,
             phone_number, email_address, telegram_chat_id,
             breakout_alerts, volume_spike_alerts, trend_change_alerts,

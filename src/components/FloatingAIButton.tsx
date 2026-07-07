@@ -115,7 +115,7 @@ export default function FloatingAIButton() {
               >
                 <div style={{ fontWeight: '600', marginBottom: '8px' }}>🤖 StockEx AI</div>
                 <div style={{ fontSize: '12px', opacity: 0.8, marginBottom: '12px' }}>
-                  ChatGPT of Indian Stock Market - Deep Analysis Included
+                  ChatGPT of Philippine Stock Market - Deep Analysis Included
                 </div>
                 <div style={{ fontSize: '11px', opacity: 0.7, display: 'flex', flexDirection: 'column', gap: '4px' }}>
                   <span>📊 "Best tech stocks now"</span>

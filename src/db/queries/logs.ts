@@ -3,7 +3,7 @@ import { db } from '../init';
 export const logQueries = {
   async insert(level: string, message: string, context?: Record<string, any>) {
     return db.query(
-      'INSERT INTO logs (level, message, context) VALUES ($1, $2, $3)',
+      'IPSERT INTO logs (level, message, context) VALUES ($1, $2, $3)',
       [level, message, context ? JSON.stringify(context) : null]
     );
   },

@@ -1,4 +1,4 @@
-export type ExchangeVenue = "NSE" | "BSE" | "SME" | "UNKNOWN";
+export type ExchangeVenue = "PSE" | "PSE" | "SME" | "UNKNOWN";
 
 export type ResolveExchangeInput = {
   ticker: string;
@@ -8,18 +8,18 @@ export type ResolveExchangeInput = {
 function normalizeExchange(raw: string | undefined | null): ExchangeVenue {
   if (!raw) return "UNKNOWN";
   const v = String(raw).trim().toUpperCase();
-  if (v === "NSE") return "NSE";
-  if (v === "BSE") return "BSE";
+  if (v === "PSE") return "PSE";
+  if (v === "PSE") return "PSE";
   if (v === "SME") return "SME";
   return "UNKNOWN";
 }
 
 function splitPrefixedTicker(ticker: string): { exchange: ExchangeVenue; cleanTicker: string } {
   // Supported prefix forms:
-  // - "NSE:RELIANCE"
-  // - "BSE:500114"
+  // - "PSE:RELIANCE"
+  // - "PSE:500114"
   // - "SME:XYZ"
-const m = String(ticker).trim().match(/^(NSE|BSE|SME)\s*:\s*([A-Z0-9.-]+)$/i);
+const m = String(ticker).trim().match(/^(PSE|PSE|SME)\s*:\s*([A-Z0-9.-]+)$/i);
   if (!m) return { exchange: "UNKNOWN", cleanTicker: String(ticker).trim() };
 
   const ex = normalizeExchange(m[1]);
@@ -30,10 +30,10 @@ const m = String(ticker).trim().match(/^(NSE|BSE|SME)\s*:\s*([A-Z0-9.-]+)$/i);
 /**
  * Deterministic exchange resolution:
  * - Prefer explicit URL exchange param if valid.
- * - Else parse ticker prefix "NSE:..." / "BSE:..." / "SME:..."
+ * - Else parse ticker prefix "PSE:..." / "PSE:..." / "SME:..."
  * - Else infer from ticker shape:
- *   - numeric tickers default to BSE (SME listings are typically numeric too; we keep default conservative)
- *   - otherwise default to NSE
+ *   - numeric tickers default to PSE (SME listings are typically numeric too; we keep default conservative)
+ *   - otherwise default to PSE
  */
 export function resolveExchangeAndTicker(input: ResolveExchangeInput): {
   exchange: ExchangeVenue;
@@ -47,7 +47,7 @@ export function resolveExchangeAndTicker(input: ResolveExchangeInput): {
   }
 
   if (exchangeFromParam !== "UNKNOWN") {
-    // If param is valid, we don't remove any prefixes from ticker; we only normalize known NSE/BSE/SME prefix forms.
+    // If param is valid, we don't remove any prefixes from ticker; we only normalize known PSE/PSE/SME prefix forms.
     const split = splitPrefixedTicker(rawTicker);
     const normalizedTicker = split.cleanTicker || rawTicker.toUpperCase();
     return { exchange: exchangeFromParam, normalizedTicker };
@@ -61,8 +61,8 @@ export function resolveExchangeAndTicker(input: ResolveExchangeInput): {
   // Shape inference (best-effort, conservative)
   const isNumeric = /^[0-9]{1,6}$/.test(rawTicker);
   if (isNumeric) {
-    return { exchange: "BSE", normalizedTicker: rawTicker };
+    return { exchange: "PSE", normalizedTicker: rawTicker };
   }
 
-  return { exchange: "NSE", normalizedTicker: rawTicker.toUpperCase() };
+  return { exchange: "PSE", normalizedTicker: rawTicker.toUpperCase() };
 }

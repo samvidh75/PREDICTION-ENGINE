@@ -24,7 +24,7 @@ function initializeSpeechRecognition(): any {
   recognition = new SpeechRecognition();
   recognition.continuous = false;
   recognition.interimResults = true;
-  recognition.lang = 'en-IN'; // Indian English
+  recognition.lang = 'en-IN'; // Philippine English
 
   return recognition;
 }

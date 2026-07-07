@@ -109,7 +109,7 @@ class UpstoxPriceService {
       method: 'sub',
       data: {
         mode: 'ltpc',
-        tokenList: ['NIFTY50_INDEX', 'SENSEX_INDEX']
+        tokenList: ['NIFTY50_INDEX', 'SEPSEX_INDEX']
       }
     };
 
@@ -239,7 +239,7 @@ class UpstoxPriceService {
     // Try Upstox REST API
     try {
       const response = await fetch(
-        `https://api.upstox.com/v2/market-quote/?symbol=NSE_EQ|${symbol}`,
+        `https://api.upstox.com/v2/market-quote/?symbol=PSE_EQ|${symbol}`,
         {
           headers: {
             'Authorization': `Bearer ${this.accessToken}`,
@@ -251,7 +251,7 @@ class UpstoxPriceService {
       if (!response.ok) throw new Error(`API error: ${response.status}`);
 
       const data = await response.json();
-      const quote = data.data?.[`NSE_EQ|${symbol}`]?.ltp;
+      const quote = data.data?.[`PSE_EQ|${symbol}`]?.ltp;
 
       if (quote) {
         const update: PriceUpdate = {
@@ -432,10 +432,10 @@ class UpstoxPriceService {
    * Map Upstox token to symbol
    */
   private getUpstoxToken(symbol: string): string {
-    // NSE tokens (simplified)
+    // PSE tokens (simplified)
     const tokens: Record<string, string> = {
       'NIFTY50_INDEX': '99926000',
-      'SENSEX_INDEX': '99926009',
+      'SEPSEX_INDEX': '99926009',
       'HDFCBANK': '175065857',
       'TCS': '1333652',
       'INFY': '1594550',
@@ -452,7 +452,7 @@ class UpstoxPriceService {
   private getSymbolFromToken(token: string): string | null {
     const tokenToSymbol: Record<string, string> = {
       '99926000': 'NIFTY50_INDEX',
-      '99926009': 'SENSEX_INDEX',
+      '99926009': 'SEPSEX_INDEX',
       '175065857': 'HDFCBANK',
       '1333652': 'TCS',
       '1594550': 'INFY',

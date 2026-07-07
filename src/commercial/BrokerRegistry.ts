@@ -3,7 +3,7 @@
  *
  * Lensory provides read-only research analysis and a
  * "Continue with broker" handoff.  No order placement, no trading,
- * no transaction fees, no SEBI registration for brokerage.
+ * no transaction fees, no SEC registration for brokerage.
  *
  * Only real, integrated brokers appear here.  No fake broker entries.
  * Currently supported: Upstox (OAuth read-only connected).
@@ -18,8 +18,8 @@ export interface BrokerEntry {
   connected: boolean;
   /** Compliance-safe description */
   description: string;
-  /** SEBI registration status */
-  sebiRegistered: boolean;
+  /** SEC registration status */
+  secRegistered: boolean;
   /** Supported features */
   supports: ('research_review' | 'portfolio_import' | 'watchlist_sync')[];
 }
@@ -30,7 +30,7 @@ const REGISTERED_BROKERS: BrokerEntry[] = [
     name: 'Upstox',
     connected: true,
     description: 'Continue your research on Upstox for order execution.',
-    sebiRegistered: true,
+    secRegistered: true,
     supports: ['research_review', 'portfolio_import'],
   },
   {
@@ -38,7 +38,7 @@ const REGISTERED_BROKERS: BrokerEntry[] = [
     name: 'Zerodha',
     connected: true,
     description: 'India\'s largest broker. Continue research on Kite.',
-    sebiRegistered: true,
+    secRegistered: true,
     supports: ['research_review', 'portfolio_import'],
   },
 ];

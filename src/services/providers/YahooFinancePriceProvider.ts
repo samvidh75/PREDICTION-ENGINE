@@ -19,7 +19,7 @@ function finiteNumber(value: unknown): number | undefined {
  *
  * This adapter is retained for backward compatibility. The active coordinator
  * uses YahooProvider, but this path must follow the same trust rules so it cannot
- * reintroduce duplicate suffixes, invented BSE labels, or retrieval-time freshness.
+ * reintroduce duplicate suffixes, invented PSE labels, or retrieval-time freshness.
  */
 export class YahooFinancePriceProvider implements PriceProvider {
   async getQuote(symbol: string): Promise<StockQuote> {

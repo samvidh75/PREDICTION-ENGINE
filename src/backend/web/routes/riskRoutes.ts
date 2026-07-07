@@ -1,6 +1,6 @@
 import type { FastifyInstance } from 'fastify';
 import { valueAtRiskEngine, type VaRInput, type StressTestScenario } from '../../../services/risk/ValueAtRiskEngine.js';
-import { sebiComplianceService } from '../../../services/risk/SeBiComplianceService.js';
+import { secComplianceService } from '../../../services/risk/SeBiComplianceService.js';
 import { greeksEngine, type PositionForGreeks } from '../../../engines/GreeksEngine.js';
 
 function parseVaRInput(body: unknown): VaRInput | null {
@@ -74,12 +74,12 @@ export async function registerRiskRoutes(app: FastifyInstance) {
   });
 
   app.get('/api/risk/compliance', async (_request, _reply) => {
-    return sebiComplianceService.runComplianceCheck();
+    return secComplianceService.runComplianceCheck();
   });
 
   app.get('/api/risk/compliance/audit-log', async (request, _reply) => {
     const query = request.query as Record<string, string>;
-    return sebiComplianceService.queryAuditLog({
+    return secComplianceService.queryAuditLog({
       userId: query.userId,
       action: query.action,
       limit: Number(query.limit ?? 100),

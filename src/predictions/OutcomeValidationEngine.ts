@@ -189,7 +189,7 @@ export class OutcomeValidationEngine {
   /**
    * Fetch the current NIFTY 50 benchmark level.
    * Tries benchmark_observations first, then falls back to daily_prices
-   * for the ^NSEI or NIFTY 50 symbol.
+   * for the ^PSEI or NIFTY 50 symbol.
    *
    * @returns Current benchmark level or null if unavailable
    */
@@ -211,11 +211,11 @@ export class OutcomeValidationEngine {
     }
 
     // Fallback: Try daily_prices for a NIFTY 50 proxy symbol
-    // Common tickers: ^NSEI, NIFTY50, NIFTY 50
+    // Common tickers: ^PSEI, NIFTY50, NIFTY 50
     const fallbackResult = await pool.query(
       `SELECT dp.close
        FROM daily_prices dp
-       WHERE dp.symbol IN ('^NSEI', 'NIFTY50', 'NIFTY 50', 'NSEI')
+       WHERE dp.symbol IN ('^PSEI', 'NIFTY50', 'NIFTY 50', 'PSEI')
          AND dp.trade_date <= $1
        ORDER BY dp.trade_date DESC
        LIMIT 1`,

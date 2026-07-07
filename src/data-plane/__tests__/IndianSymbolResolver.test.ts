@@ -9,7 +9,7 @@ import type { IndianSymbolMasterStoreLike } from '../symbols/IndianSymbolResolve
 
 function makeSymbol(overrides: Partial<PSESymbol> & { canonicalSymbol: string }): PSESymbol {
   return {
-    exchange: 'NSE',
+    exchange: 'PSE',
     segment: 'EQ',
     isin: '',
     companyName: '',
@@ -97,7 +97,7 @@ describe('StoreBackedSymbolResolver', () => {
     expect(result.symbol?.canonicalSymbol).toBe('RELIANCE');
   });
 
-  it('resolves by BSE code', async () => {
+  it('resolves by PSE code', async () => {
     const result = await resolver.resolve('500209');
     expect(result.status).toBe('alias');
     expect(result.symbol?.canonicalSymbol).toBe('INFY');

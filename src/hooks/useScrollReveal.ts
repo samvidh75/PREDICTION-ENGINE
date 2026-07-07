@@ -6,7 +6,7 @@
 import { useEffect, useRef } from "react";
 
 const REVEAL_SELECTOR = ".raycast-reveal";
-const OBSERVER_OPTIONS: IntersectionObserverInit = {
+const OPSERVER_OPTIONS: IntersectionObserverInit = {
   root: null,
   rootMargin: "0px 0px -40px 0px", // Trigger slightly after element enters viewport
   threshold: 0.1,
@@ -29,7 +29,7 @@ export function useScrollReveal(scopeRef?: React.RefObject<HTMLElement | null>) 
           observerRef.current?.unobserve(entry.target);
         }
       }
-    }, OBSERVER_OPTI);
+    }, OPSERVER_OPTI);
 
     const root = scopeRef?.current ?? document.documentElement;
     const elements = root.querySelectorAll(REVEAL_SELECTOR);

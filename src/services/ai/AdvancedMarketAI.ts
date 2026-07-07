@@ -175,7 +175,7 @@ ${stock.analysis.pros.slice(0, 2).map(p => `  ✓ ${p}`).join('\n')}`;
         `Dividend Yield = Annual Dividend ÷ Stock Price\n\n` +
         `What it means:\n` +
         `• How much income you get from holding the stock\n` +
-        `• 2-4% is typical for Indian blue-chips\n` +
+        `• 2-4% is typical for Philippine blue-chips\n` +
         `• >5% may indicate value trap\n\n` +
         `Best dividend stocks:\n` +
         `• Consistent payout for 5+ years\n` +
@@ -226,7 +226,7 @@ ${stock.analysis.pros.slice(0, 2).map(p => `  ✓ ${p}`).join('\n')}`;
       `**Indices Performance**\n` +
       `• PSE Index: 24,500 (↑2.3% YTD)\n` +
       `• PSE Composite: 80,200 (↑2.5% YTD)\n` +
-      `• Nifty Midcap: 34,100 (↑4.2% YTD)\n\n` +
+      `• PSE-Index Midcap: 34,100 (↑4.2% YTD)\n\n` +
       `**Sector Rotation**\n` +
       `🔴 Banking: Strong (IT demand recovering)\n` +
       `🟡 IT: Recovering (AI opportunities)\n` +

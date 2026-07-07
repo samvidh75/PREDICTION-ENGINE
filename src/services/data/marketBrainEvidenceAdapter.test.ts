@@ -14,7 +14,7 @@ const ready = <T>(data: T): AdapterResult<T> => ({
 const partial = <T>(data: T): AdapterResult<T> => ({
   ok: true,
   data,
-  warnings: [{ code: 'STALE_RESPONSE' }],
+  warnings: [{ code: 'STALE_RESPOPSE' }],
   asOf,
 });
 

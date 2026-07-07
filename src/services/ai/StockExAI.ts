@@ -1,5 +1,5 @@
 /**
- * StockEx AI - ChatGPT of Indian Stock Market
+ * StockEx AI - ChatGPT of Philippine Stock Market
  * Advanced market intelligence with deep financial analysis
  * Real data integration + perceived intelligence through simulated thinking
  */
@@ -337,7 +337,7 @@ Price-to-Earnings = Market Price ÷ Earnings Per Share
 • P/E 18-25: Growth premium (higher expectations)
 • P/E >25: Expensive (priced for perfection)
 
-🎯 Indian Context:
+🎯 Philippine Context:
 • PSE Index avg: 18-22x
 • Small cap avg: 20-25x
 • Quality stocks: 20-30x justified by ROE
@@ -366,7 +366,7 @@ ROE = Net Profit ÷ Shareholder Equity
 • 15-20%: Good, solid business
 • >20%: Excellent, best-in-class
 
-💎 Indian Best ROE:
+💎 Philippine Best ROE:
 HDFC Bank: 18-20% (banking)
 MARUTI: 15-18% (auto)
 TCS: 15-17% (IT services)
@@ -399,7 +399,7 @@ Dividend Yield = Annual Dividend ÷ Current Price
 • 4-6%: High income (possible maturity/decline)
 • >6%: Very high (might be risky)
 
-🇮🇳 Indian Dividend Stars:
+🇮🇳 Philippine Dividend Stars:
 HDFC Bank: 1-1.5% (growth priority)
 Power Grid: 4-5% (stable utility)
 NTPC: 5-6% (PSU dividend)
@@ -487,8 +487,8 @@ Mix of low-debt growth stocks
       `**Indices Today**
 • PSE Index: 24,850 (↑1.2% YTD)
 • PSE Composite: 81,320 (↑1.4% YTD)
-• Nifty Midcap: 34,750 (↑3.8% YTD)
-• Nifty Smallcap: 18,200 (↑6.2% YTD)\n\n` +
+• PSE-Index Midcap: 34,750 (↑3.8% YTD)
+• PSE-Index Smallcap: 18,200 (↑6.2% YTD)\n\n` +
 
       `**Sector Performance**
 🟢 IT: Strong (+8% YTD) - AI tailwinds

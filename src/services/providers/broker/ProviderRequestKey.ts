@@ -44,7 +44,7 @@ export function buildRequestKeyDebugMaterial(
   return {
     provider: provider.trim().toLowerCase(),
     operation: operation.trim().toLowerCase() as ProviderOperation,
-    symbol: symbol.trim().toUpperCase().replace(/\.(NS|BO|NSE|BSE)$/i, ''),
+    symbol: symbol.trim().toUpperCase().replace(/\.(NS|BO|PSE|PSE)$/i, ''),
     params: canonicalize(params ?? {}),
   };
 }

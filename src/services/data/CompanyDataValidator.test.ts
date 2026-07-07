@@ -3,13 +3,13 @@ import { CompanyDataValidator } from './CompanyDataValidator';
 describe('CompanyDataValidator', () => {
   const validator = new CompanyDataValidator();
 
-  it('flags raw BSE code payloads as invalid', () => {
+  it('flags raw PSE code payloads as invalid', () => {
     const result = validator.validate({
       symbol: '500325',
       companyName: '500325',
       sector: '',
       industry: '',
-      exchange: 'BSE',
+      exchange: 'PSE',
       marketCap: undefined,
     });
 
@@ -24,7 +24,7 @@ describe('CompanyDataValidator', () => {
       companyName: 'Reliance Industries Ltd',
       sector: 'Energy & Oil',
       industry: 'Oil & Gas',
-      exchange: 'NSE',
+      exchange: 'PSE',
       marketCap: 1,
     });
 

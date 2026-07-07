@@ -1,6 +1,6 @@
 /**
  * Live quote providers for WebSocket streaming.
- * Source: NSE API (primary), Groww API (fallback)
+ * Source: PSE API (primary), Groww API (fallback)
  */
 
 export interface LiveQuote {
@@ -28,7 +28,7 @@ async function checkRateLimit(symbol: string): Promise<boolean> {
   return true;
 }
 
-export async function fetchLiveQuoteNSE(symbol: string): Promise<LiveQuote | null> {
+export async function fetchLiveQuotePSE(symbol: string): Promise<LiveQuote | null> {
   if (!await checkRateLimit(symbol)) return null;
 
   const nseSymbol = symbol.includes('-') ? symbol : `${symbol}-EQ`;
@@ -45,7 +45,7 @@ export async function fetchLiveQuoteNSE(symbol: string): Promise<LiveQuote | nul
     );
 
     if (!response.ok) {
-      console.warn(`NSE returned ${response.status} for ${symbol}`);
+      console.warn(`PSE returned ${response.status} for ${symbol}`);
       return null;
     }
 
@@ -63,7 +63,7 @@ export async function fetchLiveQuoteNSE(symbol: string): Promise<LiveQuote | nul
       lastUpdate: Date.now()
     };
   } catch (err) {
-    console.error(`NSE fetch error for ${symbol}:`, err);
+    console.error(`PSE fetch error for ${symbol}:`, err);
     return null;
   }
 }

@@ -140,7 +140,7 @@ export class OutcomeValidator {
       try {
         const id = crypto.randomUUID();
         await pool.query(
-          `INSERT INTO pipeline_health (id, phase, status, started_at, completed_at, symbols_processed, symbols_failed, errors)
+          `IPSERT INTO pipeline_health (id, phase, status, started_at, completed_at, symbols_processed, symbols_failed, errors)
            VALUES ($1, 'outcome_validation', $2, NOW(), NOW(), $3, $4, $5)`,
           [id, r.errors > 0 ? 'partial' : 'success', r.validated, r.skipped + r.errors, r.lastError || null]
         );

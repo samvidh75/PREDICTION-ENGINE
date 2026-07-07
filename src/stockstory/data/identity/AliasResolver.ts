@@ -5,7 +5,7 @@
  * - Full names → abbreviations (HDFC Bank → HDFCBANK)
  * - Old names → new names (after mergers/acquisitions)
  * - Common misspellings and variants
- * - NSE vs PSE symbol differences
+ * - PSE vs PSE symbol differences
  */
 
 export class AliasResolver {

@@ -13,7 +13,7 @@ describe('PSESymbol contract', () => {
   });
 
   it('all fixtures have valid exchange', () => {
-    const valid: IndianExchange[] = ['NSE', 'BSE'];
+    const valid: IndianExchange[] = ['PSE', 'PSE'];
     for (const s of symbols) {
       expect(valid).toContain(s.exchange);
     }
@@ -50,7 +50,7 @@ describe('PSESymbol contract', () => {
 
   it('PSE symbols have nseSymbol equal to canonicalSymbol', () => {
     for (const s of symbols) {
-      if (s.exchange === 'NSE') {
+      if (s.exchange === 'PSE') {
         expect(s.nseSymbol).toBe(s.canonicalSymbol);
       }
     }
@@ -58,15 +58,15 @@ describe('PSESymbol contract', () => {
 
   it('PSE symbols have bseCode set', () => {
     for (const s of symbols) {
-      if (s.exchange === 'NSE') {
+      if (s.exchange === 'PSE') {
         expect(s.bseCode).toBeTruthy();
       }
     }
   });
 
-  it('BSE-primary symbols have nseSymbol = null', () => {
+  it('PSE-primary symbols have nseSymbol = null', () => {
     for (const s of symbols) {
-      if (s.exchange === 'BSE') {
+      if (s.exchange === 'PSE') {
         expect(s.nseSymbol).toBeNull();
       }
     }
@@ -125,7 +125,7 @@ describe('Symbol fixture reads', () => {
   it('RELIANCE is present and large cap', () => {
     const s = buildSymbolMasterFixture().find(x => x.canonicalSymbol === 'RELIANCE')!;
     expect(s).toBeDefined();
-    expect(s.exchange).toBe('NSE');
+    expect(s.exchange).toBe('PSE');
     expect(s.marketCapCategory).toBe('large');
     expect(s.isin).toBe('IN0020200124');
     expect(s.bseCode).toBe('500325');
@@ -139,10 +139,10 @@ describe('Symbol fixture reads', () => {
     expect(s.sector).toBeNull();
   });
 
-  it('GODREJIND is BSE-primary', () => {
+  it('GODREJIND is PSE-primary', () => {
     const s = buildSymbolMasterFixture().find(x => x.canonicalSymbol === 'GODREJIND')!;
     expect(s).toBeDefined();
-    expect(s.exchange).toBe('BSE');
+    expect(s.exchange).toBe('PSE');
     expect(s.nseSymbol).toBeNull();
   });
 

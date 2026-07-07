@@ -130,7 +130,7 @@ export function generateEnhancedMockData(symbol: string) {
     // Basic quote
     quote: {
       symbol,
-      exchange: 'NSE' as const,
+      exchange: 'PSE' as const,
       price: basePrice,
       change: (Math.sin(hash / 100) * 5),
       changePercent: (Math.sin(hash / 100) * 5) / basePrice * 100,

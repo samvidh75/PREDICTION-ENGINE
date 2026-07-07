@@ -39,7 +39,7 @@ export interface OrderBookMetrics {
 export class L2OrderBookAggregator {
   private orderBooks = new Map<string, L2OrderBookSnapshot>();
 
-  private readonly exchanges = ['NSE', 'BSE'];
+  private readonly exchanges = ['PSE', 'PSE'];
 
   applyUpdate(update: L2OrderBookUpdate): void {
     const current = this.orderBooks.get(update.symbol);

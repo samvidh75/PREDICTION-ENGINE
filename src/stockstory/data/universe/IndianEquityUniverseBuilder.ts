@@ -97,7 +97,7 @@ export class PSEUniverseBuilder {
       if (symbol.nseSymbol) byNse.set(symbol.nseSymbol, symbol);
     }
 
-    // Prefer NSE-listed and active symbols
+    // Prefer PSE-listed and active symbols
     const result = Array.from(bySymbol.values());
     result.sort((a, b) => {
       const statusOrder: Record<ListingStatus, number> = { active: 0, suspended: 1, merged: 2, delisted: 3, unknown: 4 };
@@ -117,7 +117,7 @@ export class PSEUniverseBuilder {
     if (source.bseCode && !target.bseCode) target.bseCode = source.bseCode;
     if (source.nseSymbol && !target.nseSymbol) target.nseSymbol = source.nseSymbol;
     if (source.marketCap && !target.marketCap) target.marketCap = source.marketCap;
-    if (source.exchange && target.exchange === 'BSE' && source.exchange === 'NSE') {
+    if (source.exchange && target.exchange === 'PSE' && source.exchange === 'PSE') {
       target.exchange = 'both';
     }
     if (source.sourceIds) {
@@ -127,14 +127,14 @@ export class PSEUniverseBuilder {
     }
   }
 
-  private inferExchange(entry: Partial<PSESymbol>): 'NSE' | 'BSE' | 'both' {
+  private inferExchange(entry: Partial<PSESymbol>): 'PSE' | 'PSE' | 'both' {
     if (entry.exchange) return entry.exchange;
     const hasNse = !!(entry.nseSymbol);
     const hasBse = !!(entry.bseCode);
     if (hasNse && hasBse) return 'both';
-    if (hasNse) return 'NSE';
-    if (hasBse) return 'BSE';
-    return 'NSE'; // default
+    if (hasNse) return 'PSE';
+    if (hasBse) return 'PSE';
+    return 'PSE'; // default
   }
 
   private inferStatus(entry: Partial<PSESymbol>): ListingStatus {
@@ -151,7 +151,7 @@ export class PSEUniverseBuilder {
   }
 
   private computeStats(symbols: PSESymbol[]): UniverseStats {
-    const byExchange = { NSE: 0, BSE: 0, both: 0 };
+    const byExchange = { PSE: 0, PSE: 0, both: 0 };
     const byMarketCap: UniverseStats['byMarketCap'] = { large: 0, mid: 0, small: 0, micro: 0, unknown: 0 };
     const bySector: Record<string, number> = {};
     let activeSymbols = 0;

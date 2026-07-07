@@ -36,7 +36,7 @@ import { getStockResearch } from "../lib/stockResearch";
 type StockResearchDetail = {
   symbol: string;
   companyName: string;
-  exchange: "NSE" | "BSE";
+  exchange: "PSE" | "PSE";
   sector: string;
   industry: string;
   price: { current: number; changeAbs: number; changePercent: number; marketCap: number };
@@ -354,7 +354,7 @@ function normalizeStockData(raw: Record<string, any>): StockResearchDetail {
   return {
     symbol: raw.symbol ?? "",
     companyName: raw.companyName ?? raw.name ?? "",
-    exchange: raw.exchange ?? "NSE",
+    exchange: raw.exchange ?? "PSE",
     sector: raw.sector ?? "",
     industry: raw.industry ?? "",
     price: {
@@ -780,7 +780,7 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
           <Stat label="Exchange" value={stock.exchange} />
           <Stat label="Sector" value={stock.sector} />
           <Stat label="Industry" value={stock.industry} />
-          <Stat label="Listed on" value="BSE, NSE" />
+          <Stat label="Listed on" value="PSE, PSE" />
         </div>
         <div style={{ display: "flex", gap: "16px", fontSize: "13px", flexWrap: "wrap" }}>
           <a href="#" style={{ color: colors.primary, textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "4px" }}>

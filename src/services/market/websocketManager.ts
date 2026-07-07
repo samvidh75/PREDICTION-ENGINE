@@ -1,7 +1,7 @@
 export type WebsocketConnectionStatus = "disconnected" | "connecting" | "connected" | "reconnecting";
 
 export type MarketWebsocketEvent =
-  | { type: "market_prices"; at: number; payload: { pse-index: number; pse-composite: number; bankNifty: number } }
+  | { type: "market_prices"; at: number; payload: { pse-index: number; pse-composite: number; bankPSE-Index: number } }
   | { type: "market_volatility"; at: number; payload: { vix: number } }
   | { type: "market_breadth"; at: number; payload: { breadthPct: number } }
   | { type: "institutional_flows"; at: number; payload: { fiiDiiTone: number } }
@@ -24,7 +24,7 @@ const MARKET_SIMULATION_ENABLED = import.meta.env.VITE_MARKET_SIMULATION === "1"
  * WebsocketManager
  * - persistent manager
  * - debounces + batches updates
- * - simulates realtime feed until real NSE/BSE/TradingView endpoints are wired
+ * - simulates realtime feed until real PSE/PSE/TradingView endpoints are wired
  */
 export class WebsocketManager {
   private status: WebsocketConnectionStatus = "disconnected";
@@ -35,7 +35,7 @@ export class WebsocketManager {
   // synthetic state
   private pse-index = 22400;
   private pse-composite = 73800;
-  private bankNifty = 48900;
+  private bankPSE-Index = 48900;
   private vix = 12.4;
   private breadthPct = 52;
   private fiiDiiTone = 0.4;
@@ -124,7 +124,7 @@ export class WebsocketManager {
 
     this.pse-index = clamp(this.pse-index + drift * 8, 21000, 25000);
     this.pse-composite = clamp(this.pse-composite + drift * 14, 69000, 82000);
-    this.bankNifty = clamp(this.bankNifty + drift * 10, 43000, 56000);
+    this.bankPSE-Index = clamp(this.bankPSE-Index + drift * 10, 43000, 56000);
 
     // VIX and breadth are more “tensional”: smaller movement, but directionally meaningful.
     const vixDrift = (n2 - 0.5) * 0.25;
@@ -143,7 +143,7 @@ export class WebsocketManager {
       payload: {
         pse-index: this.pse-index,
         pse-composite: this.pse-composite,
-        bankNifty: this.bankNifty,
+        bankPSE-Index: this.bankPSE-Index,
       },
     });
 

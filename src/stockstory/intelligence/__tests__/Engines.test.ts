@@ -15,7 +15,7 @@ import type { IntelligenceInput } from '../types';
 
 const baseInput: IntelligenceInput = {
   symbol: 'TEST',
-  exchange: 'NSE_EQ',
+  exchange: 'PSE_EQ',
   tradeDate: '2025-01-15',
   financials: {
     peRatio: 15, pbRatio: 2.5, eps: 50, dividendYield: 1.5,

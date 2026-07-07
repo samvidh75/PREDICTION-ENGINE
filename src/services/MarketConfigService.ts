@@ -132,7 +132,7 @@ export class MarketConfigService {
     const dateStr = now.split('T')[0];
     try {
       await query(
-        `INSERT INTO market_snapshots (date, timestamp, stocks, metadata)
+        `IPSERT INTO market_snapshots (date, timestamp, stocks, metadata)
          VALUES ($1, $2, $3::jsonb, $4::jsonb)
          ON CONFLICT (date) DO UPDATE SET timestamp = $2, stocks = $3::jsonb, metadata = $4::jsonb`,
         [dateStr, now, JSON.stringify(stocks), JSON.stringify(metadata)],

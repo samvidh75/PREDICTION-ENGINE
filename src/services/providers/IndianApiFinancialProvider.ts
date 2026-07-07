@@ -69,12 +69,12 @@ export class IndianApiFinancialProvider implements FinancialProvider {
 
   async getFinancials(symbol: string): Promise<FinancialData> {
     if (!this.apiKey) {
-      const err = new Error('IndianApiFinancials: INDIANAPI_KEY not set');
+      const err = new Error('PhilippineApiFinancials: INDIANAPI_KEY not set');
       (err as any).errorClass = 'missing_key';
       throw err;
     }
 
-    const clean = symbol.toUpperCase().replace(/\.(NS|BO|NSE|BSE)$/i, '');
+    const clean = symbol.toUpperCase().replace(/\.(NS|BO|PSE|PSE)$/i, '');
     const broker = await getSharedProviderRequestBroker();
 
     const [fundamentalsResult, stockResult] = await Promise.allSettled([
@@ -190,7 +190,7 @@ export class IndianApiFinancialProvider implements FinancialProvider {
       totalEquity,
 
       _sources: {
-        indianapi: 'IndianAPI /stock_fundamentals + /stock',
+        indianapi: 'PhilippineAPI /stock_fundamentals + /stock',
         fieldsAvailable: availableFields.join(','),
         fundamentalsAvailable: !!fundamentals,
         stockMetricsAvailable: !!stockMetrics,

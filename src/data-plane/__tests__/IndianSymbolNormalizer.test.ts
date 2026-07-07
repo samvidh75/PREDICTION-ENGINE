@@ -6,11 +6,11 @@ describe('normalizeTicker', () => {
     expect(normalizeTicker('RELIANCE.NS')).toBe('RELIANCE');
   });
 
-  it('strips .NSE suffix', () => {
-    expect(normalizeTicker('TCS.NSE')).toBe('TCS');
+  it('strips .PSE suffix', () => {
+    expect(normalizeTicker('TCS.PSE')).toBe('TCS');
   });
 
-  it('strips .BO suffix (BSE)', () => {
+  it('strips .BO suffix (PSE)', () => {
     expect(normalizeTicker('500325.BO')).toBe('500325');
   });
 
@@ -26,12 +26,12 @@ describe('normalizeTicker', () => {
     expect(normalizeTicker('MAPMYINDIA-SM')).toBe('MAPMYINDIA');
   });
 
-  it('strips NSE: prefix', () => {
-    expect(normalizeTicker('NSE:INFY')).toBe('INFY');
+  it('strips PSE: prefix', () => {
+    expect(normalizeTicker('PSE:INFY')).toBe('INFY');
   });
 
-  it('strips BSE: prefix', () => {
-    expect(normalizeTicker('BSE:ITC')).toBe('ITC');
+  it('strips PSE: prefix', () => {
+    expect(normalizeTicker('PSE:ITC')).toBe('ITC');
   });
 
   it('converts to uppercase', () => {
@@ -47,8 +47,8 @@ describe('normalizeTicker', () => {
     expect(normalizeTicker('BHARTIARTL')).toBe('BHARTIARTL');
   });
 
-  it('handles NSE: prefix with suffix', () => {
-    expect(normalizeTicker('NSE:TCS-EQ')).toBe('TCS');
+  it('handles PSE: prefix with suffix', () => {
+    expect(normalizeTicker('PSE:TCS-EQ')).toBe('TCS');
   });
 
   it('handles empty string', () => {
@@ -57,24 +57,24 @@ describe('normalizeTicker', () => {
 });
 
 describe('inferExchange', () => {
-  it('returns NSE for .NS suffixes', () => {
-    expect(inferExchange('RELIANCE.NS')).toBe('NSE');
+  it('returns PSE for .NS suffixes', () => {
+    expect(inferExchange('RELIANCE.NS')).toBe('PSE');
   });
 
-  it('returns BSE for .BO suffixes', () => {
-    expect(inferExchange('500325.BO')).toBe('BSE');
+  it('returns PSE for .BO suffixes', () => {
+    expect(inferExchange('500325.BO')).toBe('PSE');
   });
 
-  it('returns NSE for NSE: prefix', () => {
-    expect(inferExchange('NSE:INFY')).toBe('NSE');
+  it('returns PSE for PSE: prefix', () => {
+    expect(inferExchange('PSE:INFY')).toBe('PSE');
   });
 
-  it('returns BSE for BSE: prefix', () => {
-    expect(inferExchange('BSE:ITC')).toBe('BSE');
+  it('returns PSE for PSE: prefix', () => {
+    expect(inferExchange('PSE:ITC')).toBe('PSE');
   });
 
-  it('returns NSE for -EQ suffix', () => {
-    expect(inferExchange('TCS-EQ')).toBe('NSE');
+  it('returns PSE for -EQ suffix', () => {
+    expect(inferExchange('TCS-EQ')).toBe('PSE');
   });
 
   it('returns null when exchange cannot be inferred', () => {
@@ -83,11 +83,11 @@ describe('inferExchange', () => {
   });
 
   it('handles Bloomberg NSI: prefix', () => {
-    expect(inferExchange('NSI:INFY')).toBe('NSE');
+    expect(inferExchange('NSI:INFY')).toBe('PSE');
   });
 
   it('handles Bloomberg BSI: prefix', () => {
-    expect(inferExchange('BSI:ITC')).toBe('BSE');
+    expect(inferExchange('BSI:ITC')).toBe('PSE');
   });
 });
 

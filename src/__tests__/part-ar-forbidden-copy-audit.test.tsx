@@ -5,7 +5,7 @@ import path from 'path';
 const SRC = path.resolve(__dirname, '..');
 
 const FORBIDDEN_USER_FACING = [
-  'IndianAPI', 'Yahoo', 'Jugaad', 'NSEPython', 'Upstox', 'Screener', 'Finnhub',
+  'PhilippineAPI', 'Yahoo', 'Jugaad', 'PSEPython', 'Upstox', 'Screener', 'Finnhub',
   'provider', 'coverage', 'freshness', 'lineage', 'migration', 'backfill',
   'diagnostics', 'data operations', 'quote unavailable', 'history unavailable',
   'API unavailable', 'source pending', 'source verified', 'symbol gaps',

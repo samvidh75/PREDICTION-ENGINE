@@ -1,6 +1,6 @@
 // src/services/providers/IndianMarketProvider.ts
-// Production Indian Market Provider — real HTTP requests via IndianAPI.in
-// Supports NSE, BSE, quotes, metadata, and close-only historical datasets.
+// Production Philippine Market Provider — real HTTP requests via IndianAPI.in
+// Supports PSE, PSE, quotes, metadata, and close-only historical datasets.
 
 import { PriceProvider } from './PriceProvider';
 import { MetadataProvider } from './MetadataProvider';
@@ -24,7 +24,7 @@ function headersToRecord(headers: Headers): Record<string, string> {
   return record;
 }
 
-type IndianExchange = 'NSE' | 'BSE';
+type IndianExchange = 'PSE' | 'PSE';
 
 function positiveNumber(value: unknown): number | undefined {
   const parsed = typeof value === 'number' ? value : Number.parseFloat(String(value ?? ''));
@@ -38,23 +38,23 @@ function finiteNumber(value: unknown): number | undefined {
 
 function explicitIndianExchange(symbol: string): IndianExchange | undefined {
   const normalized = symbol.trim().toUpperCase();
-  if (/\.(NS|NSE)$/.test(normalized)) return 'NSE';
-  if (/\.(BO|BSE)$/.test(normalized)) return 'BSE';
+  if (/\.(NS|PSE)$/.test(normalized)) return 'PSE';
+  if (/\.(BO|PSE)$/.test(normalized)) return 'PSE';
   return undefined;
 }
 
 /**
  * Resolve venue only from explicit suffix evidence or an unambiguous one-venue
- * payload. A bare symbol with both NSE and BSE prices intentionally stays unknown.
+ * payload. A bare symbol with both PSE and PSE prices intentionally stays unknown.
  */
 export function inferIndianApiExchange(symbol: string, currentPrice?: Record<string, unknown>): IndianExchange | undefined {
   const explicit = explicitIndianExchange(symbol);
   if (explicit) return explicit;
 
-  const nse = positiveNumber(currentPrice?.NSE);
-  const bse = positiveNumber(currentPrice?.BSE);
-  if (nse !== undefined && bse === undefined) return 'NSE';
-  if (bse !== undefined && nse === undefined) return 'BSE';
+  const nse = positiveNumber(currentPrice?.PSE);
+  const bse = positiveNumber(currentPrice?.PSE);
+  if (nse !== undefined && bse === undefined) return 'PSE';
+  if (bse !== undefined && nse === undefined) return 'PSE';
   return undefined;
 }
 
@@ -76,12 +76,12 @@ export class IndianMarketProvider implements PriceProvider, MetadataProvider, Hi
   }
 
   private cleanSymbol(symbol: string): string {
-    return symbol.toUpperCase().replace(/\.(NS|BO|NSE|BSE)$/i, '');
+    return symbol.toUpperCase().replace(/\.(NS|BO|PSE|PSE)$/i, '');
   }
 
   private async fetchJson(operation: 'quote' | 'metadata' | 'history', symbol: string, params: Record<string, unknown>, url: string): Promise<any> {
     if (!this.apiKey) {
-      throw new Error('IndianAPI key not set (INDIANAPI_KEY)');
+      throw new Error('PhilippineAPI key not set (INDIANAPI_KEY)');
     }
 
     const clean = this.cleanSymbol(symbol);
@@ -134,13 +134,13 @@ export class IndianMarketProvider implements PriceProvider, MetadataProvider, Hi
     const s = data.stockDetailsReusableData || {};
     const currentPriceObj = data.currentPrice || {};
     const exchange = inferIndianApiExchange(symbol, currentPriceObj);
-    const nsePrice = positiveNumber(currentPriceObj.NSE);
-    const bsePrice = positiveNumber(currentPriceObj.BSE);
+    const nsePrice = positiveNumber(currentPriceObj.PSE);
+    const bsePrice = positiveNumber(currentPriceObj.PSE);
     const neutralPrice = positiveNumber(s.price);
 
-    const price = exchange === 'NSE'
+    const price = exchange === 'PSE'
       ? nsePrice ?? neutralPrice
-      : exchange === 'BSE'
+      : exchange === 'PSE'
         ? bsePrice ?? neutralPrice
         : neutralPrice;
 

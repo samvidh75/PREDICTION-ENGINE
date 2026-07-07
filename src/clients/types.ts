@@ -1,6 +1,6 @@
 /**
  * Unified quote interface across all data providers.
- * Normalizes yfinance, NSE, screener.in, etc. to a single format.
+ * Normalizes yfinance, PSE, screener.in, etc. to a single format.
  */
 export interface UnifiedQuote {
   symbol: string;

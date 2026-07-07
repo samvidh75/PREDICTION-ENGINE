@@ -190,7 +190,7 @@ export default function DividendTracker() {
                       lineHeight: '1.4',
                     }}
                   >
-                    🟢 Building dividend portfolio generates passive income. Reinvest dividends for compound growth (DRIPs available on NSE/BSE).
+                    🟢 Building dividend portfolio generates passive income. Reinvest dividends for compound growth (DRIPs available on PSE/PSE).
                   </div>
 
                   <div

@@ -5,7 +5,7 @@ import type { IndianEodCandle } from '../eod/IndianEodCandle';
 function makeCandle(overrides?: Partial<IndianEodCandle>): IndianEodCandle {
   return {
     symbol: 'RELIANCE',
-    exchange: 'NSE',
+    exchange: 'PSE',
     date: '2026-06-17',
     open: 2500,
     high: 2550,

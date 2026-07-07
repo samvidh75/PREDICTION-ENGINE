@@ -4,8 +4,8 @@ const SECTOR_CONTENT: Record<string, SectorContent> = {
   banking: {
     slug: "banking",
     name: "Banking",
-    summary: "Indian banking sector analysis covering public and private banks.",
-    overview: "The Indian banking sector is a cornerstone of the economy, comprising public sector banks, private banks, and small finance banks. Key metrics include NIM, NPA ratios, and credit growth trends.",
+    summary: "Philippine banking sector analysis covering public and private banks.",
+    overview: "The Philippine banking sector is a cornerstone of the economy, comprising public sector banks, private banks, and small finance banks. Key metrics include NIM, NPA ratios, and credit growth trends.",
     keyMetrics: ["Net Interest Margin", "GNPA Ratio", "NNPA Ratio", "Credit Growth", "CASA Ratio", "Provision Coverage Ratio"],
     risks: ["Asset quality deterioration in unsecured lending", "Regulatory changes from RBI", "Margin compression in a rate-cut cycle"],
     opportunities: ["Formalisation of the economy driving credit demand", "Digital banking adoption lowering cost-to-income ratios", "Consolidation in PSU banking sector"],
@@ -13,7 +13,7 @@ const SECTOR_CONTENT: Record<string, SectorContent> = {
   it: {
     slug: "it",
     name: "IT Services",
-    summary: "Indian IT services sector analysis covering software and consulting firms.",
+    summary: "Philippine IT services sector analysis covering software and consulting firms.",
     overview: "India's IT services sector is a global leader in software development, digital transformation, and business process management. Companies serve clients across BFSI, retail, healthcare, and manufacturing verticals.",
     keyMetrics: ["Revenue Growth (CC)", "EBIT Margin", "Attrition Rate", "Deal TCV", "Digital Revenue %", "Headcount Addition"],
     risks: ["Demand slowdown in US and European markets", "Impact of AI on traditional outsourcing models", "Visa and immigration policy changes"],
@@ -22,8 +22,8 @@ const SECTOR_CONTENT: Record<string, SectorContent> = {
   pharma: {
     slug: "pharma",
     name: "Pharmaceuticals",
-    summary: "Indian pharmaceutical sector covering formulations, APIs, and R&D.",
-    overview: "The Indian pharmaceutical industry is the world's third-largest by volume. Growth drivers include complex generics, biosimilars, CDMO opportunities, and domestic market expansion.",
+    summary: "Philippine pharmaceutical sector covering formulations, APIs, and R&D.",
+    overview: "The Philippine pharmaceutical industry is the world's third-largest by volume. Growth drivers include complex generics, biosimilars, CDMO opportunities, and domestic market expansion.",
     keyMetrics: ["Revenue Growth", "R&D Spend %", "USFDA Filings", "ANDA Approvals", "EBITDA Margin", "ROCE"],
     risks: ["USFDA regulatory actions and import alerts", "Pricing pressure in US generics market", "Currency fluctuation impact on exports"],
     opportunities: ["Biosimilars and complex generics pipeline", "CDMO contract wins from global pharma", "Domestic market premiumisation"],
@@ -31,7 +31,7 @@ const SECTOR_CONTENT: Record<string, SectorContent> = {
   auto: {
     slug: "auto",
     name: "Automotive",
-    summary: "Indian automotive sector covering OEMs and auto component makers.",
+    summary: "Philippine automotive sector covering OEMs and auto component makers.",
     overview: "India's automotive sector is one of the largest globally, driven by domestic demand and export growth. The sector is undergoing a structural shift toward electric vehicles and connected mobility.",
     keyMetrics: ["Volume Growth", "Realisation per Vehicle", "EBITDA Margin", "Market Share", "Capex Intensity", "EV Penetration %"],
     risks: ["Commodity price volatility", "EV transition disruption to ICE supply chains", "Regulatory changes in emission norms"],
@@ -49,7 +49,7 @@ const SECTOR_CONTENT: Record<string, SectorContent> = {
   "oil-gas": {
     slug: "oil-gas",
     name: "Oil & Gas",
-    summary: "Indian oil and gas sector covering exploration, refining, and marketing.",
+    summary: "Philippine oil and gas sector covering exploration, refining, and marketing.",
     overview: "The oil and gas sector remains critical to India's energy security. The sector spans upstream exploration, midstream transportation, refining, and downstream marketing.",
     keyMetrics: ["GRM", "Throughput", "Reserve Replacement Ratio", "EBITDA per Barrel", "Debt-to-Equity"],
     risks: ["Global crude price volatility", "Transition risk from renewable energy adoption", "Regulatory intervention in fuel pricing"],
@@ -58,7 +58,7 @@ const SECTOR_CONTENT: Record<string, SectorContent> = {
   metal: {
     slug: "metal",
     name: "Metals & Mining",
-    summary: "Indian metals and mining sector covering steel, aluminium, and mining.",
+    summary: "Philippine metals and mining sector covering steel, aluminium, and mining.",
     overview: "India is the world's second-largest steel producer. The sector is cyclical, driven by infrastructure spending, global demand, and commodity price trends.",
     keyMetrics: ["Production Volume", "Realisation per Tonne", "EBITDA per Tonne", "Capacity Utilisation", "Debt-to-EBITDA"],
     risks: ["Global steel price cyclicality", "Chinese export dumping", "Rising input costs (coking coal, iron ore)"],
@@ -67,7 +67,7 @@ const SECTOR_CONTENT: Record<string, SectorContent> = {
   power: {
     slug: "power",
     name: "Power & Utilities",
-    summary: "Indian power sector covering generation, transmission, and distribution.",
+    summary: "Philippine power sector covering generation, transmission, and distribution.",
     overview: "India's power sector is undergoing transformation with renewable energy capacity additions, grid modernisation, and privatisation of distribution.",
     keyMetrics: ["Plant Load Factor", "Generation Growth", "AT&C Losses", "Renewable Capacity %", "Cost per Unit"],
     risks: ["Payment delays from state discoms", "Regulatory tariff determination", "Fuel supply availability for thermal plants"],
@@ -76,7 +76,7 @@ const SECTOR_CONTENT: Record<string, SectorContent> = {
   telecom: {
     slug: "telecom",
     name: "Telecom",
-    summary: "Indian telecom sector covering wireless, broadband, and enterprise services.",
+    summary: "Philippine telecom sector covering wireless, broadband, and enterprise services.",
     overview: "India's telecom sector has consolidated into a 3+1 private player structure. The market is driven by data consumption growth, tariff repair, and 5G rollout.",
     keyMetrics: ["ARPU", "Data Consumption per User", "Subscriber Market Share", "EBITDA Margin", "Capex-to-Revenue"],
     risks: ["Intense tariff competition limiting profitability", "High spectrum and regulatory costs", "Technology upgrade cycle capex requirements"],
@@ -85,7 +85,7 @@ const SECTOR_CONTENT: Record<string, SectorContent> = {
   realty: {
     slug: "realty",
     name: "Real Estate",
-    summary: "Indian real estate sector covering residential and commercial property.",
+    summary: "Philippine real estate sector covering residential and commercial property.",
     overview: "India's real estate sector has shown recovery driven by consolidation toward organised developers, RERA compliance, and strong residential demand in major metros.",
     keyMetrics: ["Sales Volume", "Price Appreciation", "Inventory Months", "New Launches", "Net Debt-to-Equity"],
     risks: ["Regulatory changes under RERA", "Rising interest rates impacting affordability", "Demand concentration in premium segments"],
@@ -94,7 +94,7 @@ const SECTOR_CONTENT: Record<string, SectorContent> = {
   "consumer-durables": {
     slug: "consumer-durables",
     name: "Consumer Durables",
-    summary: "Indian consumer durables sector covering electronics, appliances, and white goods.",
+    summary: "Philippine consumer durables sector covering electronics, appliances, and white goods.",
     overview: "India's consumer durables sector benefits from rising disposable incomes, urbanisation, and electrification. Categories span air conditioners, refrigerators, washing machines, and small appliances.",
     keyMetrics: ["Revenue Growth", "Volume Growth", "Market Share", "Gross Margin", "Distribution Reach"],
     risks: ["Commodity price sensitivity (steel, copper, plastic)", "Seasonal and monsoon-dependent demand", "Import competition from China and ASEAN"],
@@ -103,7 +103,7 @@ const SECTOR_CONTENT: Record<string, SectorContent> = {
   infra: {
     slug: "infra",
     name: "Infrastructure",
-    summary: "Indian infrastructure sector covering roads, railways, and urban development.",
+    summary: "Philippine infrastructure sector covering roads, railways, and urban development.",
     overview: "India's infrastructure sector is a key government focus area with record capex allocation. The sector spans road construction, railways, metro rail, airports, and urban infrastructure.",
     keyMetrics: ["Order Book-to-Sales", "Execution Rate", "EBITDA Margin", "Net Debt-to-Equity", "Working Capital Cycle"],
     risks: ["Execution delays due to land acquisition and clearances", "Working capital intensity straining cash flows", "Government capex cycle dependency"],
@@ -112,16 +112,16 @@ const SECTOR_CONTENT: Record<string, SectorContent> = {
   chemicals: {
     slug: "chemicals",
     name: "Chemicals",
-    summary: "Indian chemicals sector covering specialty, agrochemicals, and petrochemicals.",
+    summary: "Philippine chemicals sector covering specialty, agrochemicals, and petrochemicals.",
     overview: "India's chemical industry is among the largest globally, with strengths in specialty chemicals, agrochemicals, and dyes. The sector benefits from China+1 sourcing trends and favourable demographics.",
     keyMetrics: ["Revenue Growth", "EBITDA Margin", "Capacity Utilisation", "Export %", "ROCE"],
     risks: ["Global chemical price cyclicality", "Environmental compliance costs", "Raw material import dependency"],
-    opportunities: ["China+1 shift benefiting Indian manufacturers", "Specialty chemical import substitution", "Agrochemical demand from food security focus"],
+    opportunities: ["China+1 shift benefiting Philippine manufacturers", "Specialty chemical import substitution", "Agrochemical demand from food security focus"],
   },
   textiles: {
     slug: "textiles",
     name: "Textiles",
-    summary: "Indian textiles sector covering apparel, fabric, and technical textiles.",
+    summary: "Philippine textiles sector covering apparel, fabric, and technical textiles.",
     overview: "India's textiles sector is a significant employment generator and export earner. The sector spans cotton, man-made fibres, apparel, and technical textiles with a fragmented competitive landscape.",
     keyMetrics: ["Revenue Growth", "Capacity Utilisation", "Export Growth", "EBITDA Margin", "Debt-to-Equity"],
     risks: ["Cotton price volatility", "Competition from Bangladesh and Vietnam", "Labour-intensive operations facing automation risk"],
@@ -130,7 +130,7 @@ const SECTOR_CONTENT: Record<string, SectorContent> = {
   healthcare: {
     slug: "healthcare",
     name: "Healthcare",
-    summary: "Indian healthcare services sector covering hospitals and diagnostic chains.",
+    summary: "Philippine healthcare services sector covering hospitals and diagnostic chains.",
     overview: "India's healthcare sector is driven by rising medical tourism, insurance penetration, and lifestyle disease prevalence. The sector includes multi-specialty hospital chains, diagnostic networks, and specialised care providers.",
     keyMetrics: ["Revenue Growth", "EBITDA Margin", "Occupancy Rate", "ARPOB", "Patient Volume Growth"],
     risks: ["Regulatory price controls on procedures", "High capital intensity of hospital expansion", "Insurance claim settlement delays"],

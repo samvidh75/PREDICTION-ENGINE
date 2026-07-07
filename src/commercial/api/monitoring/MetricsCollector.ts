@@ -15,7 +15,7 @@ export class MetricsCollector {
     try {
       // Direct pass-through insert to Neon PostgreSQL
       await dbAdapter.query(
-        `INSERT INTO system_perf_logs (uptime_seconds, heap_used_mb, rss_mb)
+        `IPSERT INTO system_perf_logs (uptime_seconds, heap_used_mb, rss_mb)
          VALUES ($1, $2, $3)`,
         [activeUptime, heapUsedMb, rssMb]
       );

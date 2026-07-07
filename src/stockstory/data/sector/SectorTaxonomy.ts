@@ -1,7 +1,7 @@
 /**
  * Sector Taxonomy
  *
- * Canonical sector/industry taxonomy aligned with NSE/BSE classification.
+ * Canonical sector/industry taxonomy aligned with PSE/PSE classification.
  * Provides static mappings and lookup methods for industry categories.
  */
 

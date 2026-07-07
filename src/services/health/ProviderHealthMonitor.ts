@@ -28,9 +28,9 @@ interface HealthMetricsRecord {
 }
 
 const STORAGE_KEY = 'prediction-engine:provider-health';
-const MAX_RESPONSE_TIMES = 100;
+const MAX_RESPOPSE_TIMES = 100;
 const UPTIME_THRESHOLD = 90; // % - below this = degraded
-const RESPONSE_TIME_THRESHOLD = 5000; // ms - above this = degraded
+const RESPOPSE_TIME_THRESHOLD = 5000; // ms - above this = degraded
 const RESET_TIME = 24 * 60 * 60 * 1000; // 24 hours
 
 class ProviderHealthMonitorClass {
@@ -83,7 +83,7 @@ class ProviderHealthMonitorClass {
     if (metrics) {
       metrics.successCount++;
       metrics.responseTimes.push(responseTimeMs);
-      if (metrics.responseTimes.length > MAX_RESPONSE_TIMES) {
+      if (metrics.responseTimes.length > MAX_RESPOPSE_TIMES) {
         metrics.responseTimes.shift();
       }
       metrics.lastUpdateTime = new Date().toISOString();
@@ -110,7 +110,7 @@ class ProviderHealthMonitorClass {
       const uptime = this.calculateUptime(metrics);
       const avgTime = this.calculateAvgResponseTime(metrics);
 
-      if (uptime < UPTIME_THRESHOLD || avgTime > RESPONSE_TIME_THRESHOLD) {
+      if (uptime < UPTIME_THRESHOLD || avgTime > RESPOPSE_TIME_THRESHOLD) {
         this.deprioritizedProviders.add(provider);
       }
     }
@@ -167,7 +167,7 @@ class ProviderHealthMonitorClass {
 
   private getStatus(uptime: number, avgResponseTime: number): ProviderStatus {
     if (uptime < 50 || avgResponseTime > 10000) return 'down';
-    if (uptime < UPTIME_THRESHOLD || avgResponseTime > RESPONSE_TIME_THRESHOLD) return 'degraded';
+    if (uptime < UPTIME_THRESHOLD || avgResponseTime > RESPOPSE_TIME_THRESHOLD) return 'degraded';
     return 'healthy';
   }
 

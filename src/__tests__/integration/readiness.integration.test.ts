@@ -128,7 +128,7 @@ describe('Readiness integration', () => {
       );`
     );
     await dbAdapter.query(
-      'INSERT INTO schema_migrations (id, checksum, applied_at) VALUES (?, ?, ?)',
+      'IPSERT INTO schema_migrations (id, checksum, applied_at) VALUES (?, ?, ?)',
       ['001_init.sql', 'wrong_checksum', new Date().toISOString()]
     );
 

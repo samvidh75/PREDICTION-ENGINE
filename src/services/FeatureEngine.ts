@@ -301,7 +301,7 @@ export class FeatureEngine {
       // Only save if enough indicators are calculated (e.g. at least RSI and MACD exist)
       if (snapshot.rsi !== null && snapshot.macd !== null) {
         await query(
-          `INSERT INTO feature_snapshots (
+          `IPSERT INTO feature_snapshots (
              symbol, trade_date, rsi, macd, macd_signal, macd_histogram,
              adx, atr, bollinger_width, momentum, volatility, relative_strength,
              moving_average_distance, trend_strength

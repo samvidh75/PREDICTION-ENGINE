@@ -78,7 +78,7 @@ export async function registerLedgerRoutes(fastify: FastifyInstance): Promise<vo
         }
 
         const result = await dbAdapter.queryWithTenantContext(
-          `INSERT INTO trading_ledger
+          `IPSERT INTO trading_ledger
              (user_id, symbol, direction, entry_price, exit_price, quantity,
               pnl, pnl_percentage, entry_date, exit_date, notes)
            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)

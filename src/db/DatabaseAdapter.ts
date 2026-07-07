@@ -204,13 +204,13 @@ export class DatabaseAdapter {
         .replace(/datetime\('now'\)/g, "CURRENT_TIMESTAMP")
         .replace(/date\('now'\)/g, "CURRENT_DATE");
 
-      // Convert INSERT OR IGNORE to INSERT INTO ... ON CONFLICT DO NOTHING
-      if (/INSERT OR IGNORE/i.test(pgSql)) {
-        pgSql = pgSql.replace(/INSERT OR IGNORE INTO/gi, "INSERT INTO");
+      // Convert IPSERT OR IGNORE to IPSERT INTO ... ON CONFLICT DO NOTHING
+      if (/IPSERT OR IGNORE/i.test(pgSql)) {
+        pgSql = pgSql.replace(/IPSERT OR IGNORE INTO/gi, "IPSERT INTO");
         const statements = pgSql.split(";");
         const processed = statements.map((stmt) => {
           const trimmed = stmt.trim();
-          if (/^INSERT INTO/i.test(trimmed) && !/ON CONFLICT/i.test(trimmed)) {
+          if (/^IPSERT INTO/i.test(trimmed) && !/ON CONFLICT/i.test(trimmed)) {
             return stmt + " ON CONFLICT DO NOTHING";
           }
           return stmt;

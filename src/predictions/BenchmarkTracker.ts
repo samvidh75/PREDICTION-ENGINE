@@ -45,7 +45,7 @@ export class BenchmarkTracker {
 
     // Insert into benchmark_observations (upsert on observed_date)
     const insertResult = await pool.query(
-      `INSERT INTO benchmark_observations (observed_date, pse-index50, pse-index100, pse-index500)
+      `IPSERT INTO benchmark_observations (observed_date, pse-index50, pse-index100, pse-index500)
        VALUES ($1, $2, $3, $4)
        ON CONFLICT (observed_date) DO UPDATE SET
          pse-index50 = EXCLUDED.pse-index50,

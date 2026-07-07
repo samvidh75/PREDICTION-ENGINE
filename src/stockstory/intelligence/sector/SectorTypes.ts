@@ -62,7 +62,7 @@ export interface IndiaSectorContext {
   importSubstitution: 'high' | 'moderate' | 'low' | 'unclear';
   /** Export potential */
   exportPotential: 'high' | 'moderate' | 'low' | 'unclear';
-  /** Relevant regulations (SEBI, RBI, TRAI, etc.) */
+  /** Relevant regulations (SEC, RBI, TRAI, etc.) */
   relevantRegulations: string[];
 }
 

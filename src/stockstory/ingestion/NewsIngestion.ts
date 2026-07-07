@@ -50,7 +50,7 @@ export class NewsClassifier {
     if (this.hasAny(text, ['quarter', 'result', 'revenue grew', 'profit rose', 'net profit', 'eps', 'ebitda'])) {
       return 'earnings-result';
     }
-    if (this.hasAny(text, ['sebi', 'rbi', 'regulator', 'complaint', 'penalty', 'fine imposed', 'notice'])) {
+    if (this.hasAny(text, ['sec', 'rbi', 'regulator', 'complaint', 'penalty', 'fine imposed', 'notice'])) {
       return 'regulatory';
     }
     if (this.hasAny(text, ['lawsuit', 'litigation', 'court', 'appeal', 'petition', 'legal dispute'])) {

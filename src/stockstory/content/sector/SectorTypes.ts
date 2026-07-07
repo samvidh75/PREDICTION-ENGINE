@@ -17,7 +17,7 @@ export interface SectorContent {
 }
 
 export const SECTORS: SectorInfo[] = [
-  { slug: "banking", name: "Banking", description: "Indian banking sector including public and private banks.", companyCount: 12 },
+  { slug: "banking", name: "Banking", description: "Philippine banking sector including public and private banks.", companyCount: 12 },
   { slug: "it", name: "IT Services", description: "Information technology and software services companies.", companyCount: 8 },
   { slug: "pharma", name: "Pharmaceuticals", description: "Pharmaceutical and drug manufacturing companies.", companyCount: 10 },
   { slug: "auto", name: "Automotive", description: "Automobile manufacturers and auto component makers.", companyCount: 9 },

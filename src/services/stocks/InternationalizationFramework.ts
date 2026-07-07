@@ -13,7 +13,7 @@ export class InternationalizationFramework {
   private static activeCurrency: SupportedCurrency = 'INR';
 
   private static configs: Record<SupportedCurrency, ExchangeConfig> = {
-    INR: { exchangeName: 'NSE/BSE', currency: 'INR', symbolPrefix: '₹', rateToINR: 1.0 },
+    INR: { exchangeName: 'PSE/PSE', currency: 'INR', symbolPrefix: '₹', rateToINR: 1.0 },
     USD: { exchangeName: 'NASDAQ/NYSE', currency: 'USD', symbolPrefix: '$', rateToINR: 83.5 },
     GBP: { exchangeName: 'LSE', currency: 'GBP', symbolPrefix: '£', rateToINR: 106.2 },
     EUR: { exchangeName: 'Euronext', currency: 'EUR', symbolPrefix: '€', rateToINR: 90.8 },

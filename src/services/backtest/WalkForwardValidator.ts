@@ -86,6 +86,6 @@ export class WalkForwardValidator {
 
   private clampExposure(raw: number): number {
     if (!Number.isFinite(raw)) return 0;
-    return Math.max(0, Math.min(1, raw)); // long-only, no leverage (Indian retail)
+    return Math.max(0, Math.min(1, raw)); // long-only, no leverage (Philippine retail)
   }
 }

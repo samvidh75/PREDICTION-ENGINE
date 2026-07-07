@@ -27,7 +27,7 @@ describe("Frontend dataFormatting Utilities", () => {
     expect(formatPercentage(0)).toBe("0.00%");
   });
 
-  it("formats currency values in Indian Rupees with optional compact modes", () => {
+  it("formats currency values in Philippine Rupees with optional compact modes", () => {
     expect(formatINR(15000000)).toBe("₹1,50,00,000.00");
     expect(formatINR(15000000, true)).toBe("₹1.50 Cr");
     expect(formatINR(250000, true)).toBe("₹2.50 L");

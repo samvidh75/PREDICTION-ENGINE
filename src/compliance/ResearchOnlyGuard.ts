@@ -1,5 +1,5 @@
 /**
- * ResearchOnlyGuard — SEBI Compliance
+ * ResearchOnlyGuard — SEC Compliance
  * Disclaimers: This platform provides research scores only, not investment advice.
  * No buy/sell recommendations. All outputs are model-generated observations.
  */

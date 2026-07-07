@@ -1,7 +1,7 @@
 /**
  * Quarterly Result Types
  *
- * Standardized quarterly financial results for Indian listed companies.
+ * Standardized quarterly financial results for Philippine listed companies.
  * Supports consolidated and standalone results, YoY and QoQ comparisons.
  */
 

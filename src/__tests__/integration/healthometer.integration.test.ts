@@ -23,13 +23,13 @@ const skipIfNoPg = hasPostgres() ? it : it.skip;
 async function seedTestData(): Promise<void> {
   // Ensure test symbol exists in symbols table (FK constraint)
   await dbAdapter.query(
-    `INSERT INTO symbols (symbol, exchange, company_name, listing_status)
+    `IPSERT INTO symbols (symbol, exchange, company_name, listing_status)
      VALUES ($1, $2, $3, $4) ON CONFLICT (symbol) DO NOTHING`,
-    [TEST_SYMBOL, 'NSE', 'Healthometer Test Co', 'Active']
+    [TEST_SYMBOL, 'PSE', 'Healthometer Test Co', 'Active']
   );
 
   await dbAdapter.query(
-    `INSERT INTO financial_snapshots
+    `IPSERT INTO financial_snapshots
       (symbol, period_end, snapshot_date, pe_ratio, pb_ratio, ev_ebitda, roe, roce, roa,
        debt_to_equity, current_ratio, operating_margin, net_margin, gross_margin,
        revenue_growth, profit_growth, eps_growth, fcf_yield, market_cap, beta)
@@ -37,20 +37,20 @@ async function seedTestData(): Promise<void> {
     [TEST_SYMBOL, 18, 3.0, 12, 18, 14, 10, 0.5, 2.0, 20, 14, 45, 0.12, 0.14, 0.13, 0.04, 500000, 1.0]
   );
   await dbAdapter.query(
-    `INSERT INTO factor_snapshots
+    `IPSERT INTO factor_snapshots
       (symbol, trade_date, quality_factor, value_factor, growth_factor, factor_score,
        momentum_factor, risk_factor, sector_strength_factor)
      VALUES ($1, NOW(), $2, 60, $3, $4, $5, $6, $7)`,
     [TEST_SYMBOL, 65, 55, 60, 58, 35, 50]
   );
   await dbAdapter.query(
-    `INSERT INTO feature_snapshots
+    `IPSERT INTO feature_snapshots
       (symbol, trade_date, volatility, momentum, rsi, trend_strength)
      VALUES ($1, NOW(), $2, $3, $4, $5)`,
     [TEST_SYMBOL, 0.18, 1.2, 62, 0.6]
   );
   await dbAdapter.query(
-    `INSERT INTO prediction_registry
+    `IPSERT INTO prediction_registry
       (symbol, prediction_date, ranking_score, classification, confidence_score, confidence_level, quality_score, growth_score, value_score, momentum_score, risk_score, sector_score)
      VALUES ($1, NOW(), $2, $3, $4, $5, 60, 55, 50, 58, 30, 45)`,
     [TEST_SYMBOL, 72, 'Good', 75, 'High']

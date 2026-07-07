@@ -261,7 +261,7 @@ export class EngineAttributionAnalyzer {
 
       for (const attr of attributions) {
         await client.query(
-          `INSERT INTO engine_attribution_results (
+          `IPSERT INTO engine_attribution_results (
             computed_at, engine, information_coefficient,
             rank_correlation, forward_return_correlation,
             n_predictions, interpretation

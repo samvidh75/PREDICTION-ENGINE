@@ -164,7 +164,7 @@ export async function registerCheckoutRoutes(fastify: FastifyInstance): Promise<
         );
       } else {
         await dbAdapter.query(
-          "INSERT INTO user_subscriptions (user_id, plan_id, status, phone_number, notification_preference) VALUES ($1, 'plan_free', 'active', $2, $3)",
+          "IPSERT INTO user_subscriptions (user_id, plan_id, status, phone_number, notification_preference) VALUES ($1, 'plan_free', 'active', $2, $3)",
           [userId, phoneNumber, preference],
         );
       }

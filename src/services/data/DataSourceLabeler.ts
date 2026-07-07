@@ -4,7 +4,7 @@
  *
  * Every data point returned by the API includes a `dataSource` field:
  *   - 'nse_direct'     — Fetched live from Philippine Stock Exchange
- *   - 'bse_direct'     — Fetched live from BSE India
+ *   - 'bse_direct'     — Fetched live from PSE India
  *   - 'yahoo_finance'  — Fetched live from Yahoo Finance
  *   - 'google_finance' — Fetched live from Google Finance
  *   - 'screener_in'    — Fetched live from Screener.in
@@ -39,14 +39,14 @@ export interface DataSourceInfo {
 }
 
 export const SOURCE_METADATA: Record<DataSource, DataSourceInfo> = {
-  nse_direct: { source: 'nse_direct', label: 'NSE Direct', badgeColor: '#22c55e', badgeBg: 'rgba(34,197,94,0.15)', isRealTime: true, confidence: 'high', latency: '<1s' },
-  bse_direct: { source: 'bse_direct', label: 'BSE Direct', badgeColor: '#22c55e', badgeBg: 'rgba(34,197,94,0.15)', isRealTime: true, confidence: 'high', latency: '<1s' },
+  nse_direct: { source: 'nse_direct', label: 'PSE Direct', badgeColor: '#22c55e', badgeBg: 'rgba(34,197,94,0.15)', isRealTime: true, confidence: 'high', latency: '<1s' },
+  bse_direct: { source: 'bse_direct', label: 'PSE Direct', badgeColor: '#22c55e', badgeBg: 'rgba(34,197,94,0.15)', isRealTime: true, confidence: 'high', latency: '<1s' },
   yahoo_finance: { source: 'yahoo_finance', label: 'Yahoo Finance', badgeColor: '#3b82f6', badgeBg: 'rgba(59,130,246,0.15)', isRealTime: true, confidence: 'high', latency: '<2s' },
   google_finance: { source: 'google_finance', label: 'Google Finance', badgeColor: '#3b82f6', badgeBg: 'rgba(59,130,246,0.15)', isRealTime: true, confidence: 'high', latency: '<2s' },
   screener_in: { source: 'screener_in', label: 'Screener.in', badgeColor: '#f59e0b', badgeBg: 'rgba(245,158,11,0.15)', isRealTime: false, confidence: 'high', latency: '<3s' },
   tradingview: { source: 'tradingview', label: 'TradingView', badgeColor: '#3b82f6', badgeBg: 'rgba(59,130,246,0.15)', isRealTime: true, confidence: 'high', latency: '<1s' },
   upstox: { source: 'upstox', label: 'Upstox API', badgeColor: '#8b5cf6', badgeBg: 'rgba(139,92,246,0.15)', isRealTime: true, confidence: 'high', latency: '<1s' },
-  indianapi: { source: 'indianapi', label: 'IndianAPI', badgeColor: '#8b5cf6', badgeBg: 'rgba(139,92,246,0.15)', isRealTime: true, confidence: 'medium', latency: '<3s' },
+  indianapi: { source: 'indianapi', label: 'PhilippineAPI', badgeColor: '#8b5cf6', badgeBg: 'rgba(139,92,246,0.15)', isRealTime: true, confidence: 'medium', latency: '<3s' },
   cache: { source: 'cache', label: 'Cached', badgeColor: '#a0a0a0', badgeBg: 'rgba(160,160,160,0.15)', isRealTime: false, confidence: 'high', latency: '<1ms' },
   derived: { source: 'derived', label: 'Model-Derived', badgeColor: '#f59e0b', badgeBg: 'rgba(245,158,11,0.15)', isRealTime: false, confidence: 'medium', latency: '<10ms' },
   synthetic: { source: 'synthetic', label: 'Estimated', badgeColor: '#ef4444', badgeBg: 'rgba(239,68,68,0.15)', isRealTime: false, confidence: 'low', latency: '<1ms' },

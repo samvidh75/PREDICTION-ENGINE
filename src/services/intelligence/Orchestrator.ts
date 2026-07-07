@@ -2,7 +2,7 @@
  * Master Orchestrator — PROMPT 29
  *
  * Runs all 9 intelligence engines, aggregates with weights,
- * classifies investment state, and generates a SEBI-compliant thesis.
+ * classifies investment state, and generates a SEC-compliant thesis.
  *
  * Weights (from PROMPT 29 spec):
  *   Financial 15%, Valuation 15%, Earnings 15%, Risk 10% (inverted),
@@ -29,7 +29,7 @@ import { sectorEngine } from './engines/SectorEngine/index';
 import { newsEngine } from './engines/NewsEngine/index';
 import { eventEngine } from './engines/EventEngine/index';
 import { ragEngine } from './engines/RAGEngine/index';
-import { SEBIFilter } from './engines/Orchestrator/SEBIFilter';
+import { SECFilter } from './engines/Orchestrator/SECFilter';
 import logger from '../../config/logger';
 
 // ── Weights (sum = 100%) ──────────────────────────────────────────────────
@@ -246,10 +246,10 @@ export class MasterOrchestrator {
 
     // Apply PSE compliance filter to all thesis text
     return {
-      bullCase: SEBIFilter.filterThesisArray(bullCase.slice(0, 4)),
-      bearCase: SEBIFilter.filterThesisArray(bearCase.slice(0, 4)),
-      whatToWatch: SEBIFilter.filterThesisArray(whatToWatch.slice(0, 4)),
-      disclaimer: SEBIFilter.generateDisclaimer(),
+      bullCase: SECFilter.filterThesisArray(bullCase.slice(0, 4)),
+      bearCase: SECFilter.filterThesisArray(bearCase.slice(0, 4)),
+      whatToWatch: SECFilter.filterThesisArray(whatToWatch.slice(0, 4)),
+      disclaimer: SECFilter.generateDisclaimer(),
     };
   }
 }

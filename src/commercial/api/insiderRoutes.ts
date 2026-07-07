@@ -1,7 +1,7 @@
 /**
  * commercial/api/insiderRoutes — Corporate Insider Disclosure API.
  *
- * Public endpoints that expose SEBI regulatory filing data from the
+ * Public endpoints that expose SEC regulatory filing data from the
  * corporate_insider_disclosures table.  All data is public regulatory
  * information — no authentication is required for reads.
  *
