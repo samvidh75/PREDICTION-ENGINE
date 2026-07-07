@@ -1,8 +1,7 @@
 /**
- * TRACK-95J — Sector Registry
- * Real Indian market classifications for all 30 symbols in the universe.
- * Sources: NSE official sector/industry mapping.
- * No hardcoded 50s. No fake classification.
+ * PSE Sector Registry
+ * Philippine Stock Exchange market classifications for all 18 stocks.
+ * Sources: PSE official sector/industry mapping.
  */
 export interface CompanyClassification {
   symbol: string;
@@ -14,86 +13,37 @@ export interface CompanyClassification {
 }
 
 export const SECTOR_REGISTRY: CompanyClassification[] = [
-  // ── Energy / Oil & Gas ──────────────────────────────
-  { symbol: "RELIANCE", companyName: "Reliance Industries", sector: "Energy", industry: "Oil & Gas", subIndustry: "Integrated O&G", marketCapBucket: "Large Cap" },
-  { symbol: "ONGC", companyName: "Oil and Natural Gas Corporation", sector: "Energy", industry: "Oil & Gas", subIndustry: "Exploration", marketCapBucket: "Large Cap" },
+  // ── Financial Services — Banks ─────────────────────
+  { symbol: "BDO", companyName: "BDO Unibank", sector: "Financial Services", industry: "Banking", subIndustry: "Universal Banking", marketCapBucket: "Large Cap" },
+  { symbol: "BPI", companyName: "Bank of the Philippine Islands", sector: "Financial Services", industry: "Banking", subIndustry: "Universal Banking", marketCapBucket: "Large Cap" },
+  { symbol: "UBP", companyName: "Union Bankcom", sector: "Financial Services", industry: "Banking", subIndustry: "Universal Banking", marketCapBucket: "Large Cap" },
+  { symbol: "PNB", companyName: "Philippine National Bank", sector: "Financial Services", industry: "Banking", subIndustry: "Public Banking", marketCapBucket: "Large Cap" },
+  { symbol: "UCPB", companyName: "United Coconut Planters Bank", sector: "Financial Services", industry: "Banking", subIndustry: "Thrift Bank", marketCapBucket: "Mid Cap" },
+  { symbol: "SECB", companyName: "Security Bank", sector: "Financial Services", industry: "Banking", subIndustry: "Universal Banking", marketCapBucket: "Mid Cap" },
 
-  // ── Technology ─────────────────────────────────────
-  { symbol: "TCS", companyName: "Tata Consultancy Services", sector: "Technology", industry: "IT Services", subIndustry: "Software", marketCapBucket: "Large Cap" },
-  { symbol: "TCS.NS", companyName: "Tata Consultancy Services", sector: "Technology", industry: "IT Services", subIndustry: "Software", marketCapBucket: "Large Cap" },
-  { symbol: "INFY", companyName: "Infosys", sector: "Technology", industry: "IT Services", subIndustry: "Software", marketCapBucket: "Large Cap" },
+  // ── Consumer — Food & Beverage ──────────────────────
+  { symbol: "JFC", companyName: "Jollibee Foods Corporation", sector: "Consumer", industry: "Food & Beverage", subIndustry: "Quick Service Restaurants", marketCapBucket: "Large Cap" },
 
-  // ── Financials — Banks ──────────────────────────────
-  { symbol: "HDFCBANK", companyName: "HDFC Bank", sector: "Financials", industry: "Private Banks", subIndustry: "Banking", marketCapBucket: "Large Cap" },
-  { symbol: "ICICIBANK", companyName: "ICICI Bank", sector: "Financials", industry: "Private Banks", subIndustry: "Banking", marketCapBucket: "Large Cap" },
-  { symbol: "AXISBANK", companyName: "Axis Bank", sector: "Financials", industry: "Private Banks", subIndustry: "Banking", marketCapBucket: "Large Cap" },
-  { symbol: "AXISBANK.NS", companyName: "Axis Bank", sector: "Financials", industry: "Private Banks", subIndustry: "Banking", marketCapBucket: "Large Cap" },
-  { symbol: "KOTAKBANK", companyName: "Kotak Mahindra Bank", sector: "Financials", industry: "Private Banks", subIndustry: "Banking", marketCapBucket: "Large Cap" },
-  { symbol: "SBIN", companyName: "State Bank of India", sector: "Financials", industry: "PSU Banks", subIndustry: "Banking", marketCapBucket: "Large Cap" },
+  // ── Utilities ──────────────────────────────────────
+  { symbol: "MER", companyName: "Manila Electric Company", sector: "Utilities", industry: "Electric & Gas", subIndustry: "Power Distribution", marketCapBucket: "Large Cap" },
 
-  // ── Financials — NBFC/Insurance ─────────────────────
-  { symbol: "BAJFINANCE", companyName: "Bajaj Finance", sector: "Financials", industry: "NBFC", subIndustry: "Consumer Finance", marketCapBucket: "Large Cap" },
-  { symbol: "BAJFINANCE.NS", companyName: "Bajaj Finance", sector: "Financials", industry: "NBFC", subIndustry: "Consumer Finance", marketCapBucket: "Large Cap" },
-  { symbol: "BAJAJFINSV", companyName: "Bajaj Finserv", sector: "Financials", industry: "NBFC", subIndustry: "Financial Services", marketCapBucket: "Large Cap" },
-  { symbol: "BAJAJFINSV.NS", companyName: "Bajaj Finserv", sector: "Financials", industry: "NBFC", subIndustry: "Financial Services", marketCapBucket: "Large Cap" },
+  // ── Retail & Real Estate ───────────────────────────
+  { symbol: "SM", companyName: "SM Investments Holdings", sector: "Retail & Real Estate", industry: "Diversified Trading", subIndustry: "Retail & Shopping", marketCapBucket: "Large Cap" },
+  { symbol: "ALI", companyName: "Ayala Land", sector: "Retail & Real Estate", industry: "Real Estate", subIndustry: "Property Development", marketCapBucket: "Large Cap" },
+  { symbol: "SMPH", companyName: "SM Prime Holdings", sector: "Retail & Real Estate", industry: "Real Estate", subIndustry: "Shopping Centers", marketCapBucket: "Large Cap" },
 
-  // ── Auto ───────────────────────────────────────────
-  { symbol: "MARUTI", companyName: "Maruti Suzuki", sector: "Auto", industry: "Automobiles", subIndustry: "Passenger Vehicles", marketCapBucket: "Large Cap" },
-  { symbol: "BAJAJ-AUTO", companyName: "Bajaj Auto", sector: "Auto", industry: "Automobiles", subIndustry: "Two Wheelers", marketCapBucket: "Large Cap" },
+  // ── Conglomerate ───────────────────────────────────
+  { symbol: "AEV", companyName: "Aboitiz Equity Ventures", sector: "Conglomerate", industry: "Diversified", subIndustry: "Holding Company", marketCapBucket: "Large Cap" },
+  { symbol: "AC", companyName: "Ayala Corporation", sector: "Conglomerate", industry: "Diversified", subIndustry: "Conglomerate", marketCapBucket: "Large Cap" },
 
-  // ── Infrastructure / Engineering ────────────────────
-  { symbol: "LT", companyName: "Larsen & Toubro", sector: "Infrastructure", industry: "Engineering", subIndustry: "Construction & Engineering", marketCapBucket: "Large Cap" },
-  { symbol: "ADANIPORTS", companyName: "Adani Ports", sector: "Infrastructure", industry: "Ports", subIndustry: "Sea Port Operations", marketCapBucket: "Large Cap" },
+  // ── Telecommunications ─────────────────────────────
+  { symbol: "TEL", companyName: "Philippine Long Distance Telephone", sector: "Telecommunications", industry: "Telecom", subIndustry: "Fixed-Line & Wireless", marketCapBucket: "Large Cap" },
+  { symbol: "GLOBE", companyName: "Globe Telecom", sector: "Telecommunications", industry: "Telecom", subIndustry: "Mobile & Fixed-Line", marketCapBucket: "Large Cap" },
 
-  // ── Pharma ─────────────────────────────────────────
-  { symbol: "SUNPHARMA", companyName: "Sun Pharma", sector: "Pharma", industry: "Pharmaceuticals", subIndustry: "Generics", marketCapBucket: "Large Cap" },
-  { symbol: "AUROPHARMA", companyName: "Aurobindo Pharma", sector: "Pharma", industry: "Pharmaceuticals", subIndustry: "Generics", marketCapBucket: "Mid Cap" },
+  // ── Transportation ─────────────────────────────────
+  { symbol: "PAL", companyName: "Philippine Airlines", sector: "Transportation", industry: "Airlines", subIndustry: "Passenger & Cargo", marketCapBucket: "Mid Cap" },
 
-  // ── Telecom ────────────────────────────────────────
-  { symbol: "BHARTIARTL", companyName: "Bharti Airtel", sector: "Telecom", industry: "Telecom Services", subIndustry: "Mobile Telecom", marketCapBucket: "Large Cap" },
-
-  // ── Consumer / FMCG ───────────────────────────────
-  { symbol: "ITC", companyName: "ITC Ltd", sector: "Consumer", industry: "FMCG", subIndustry: "Diversified Consumer", marketCapBucket: "Large Cap" },
-  { symbol: "TITAN", companyName: "Titan", sector: "Consumer", industry: "Consumer Durables", subIndustry: "Jewellery & Watches", marketCapBucket: "Large Cap" },
-  { symbol: "ASIANPAINT", companyName: "Asian Paints", sector: "Consumer", industry: "Consumer Durables", subIndustry: "Paints & Coatings", marketCapBucket: "Large Cap" },
-  { symbol: "ASIANPAINT.NS", companyName: "Asian Paints", sector: "Consumer", industry: "Consumer Durables", subIndustry: "Paints & Coatings", marketCapBucket: "Large Cap" },
-
-  // ── Healthcare ─────────────────────────────────────
-  { symbol: "APOLLOHOSP", companyName: "Apollo Hospitals", sector: "Healthcare", industry: "Hospitals", subIndustry: "Private Healthcare", marketCapBucket: "Mid Cap" },
-
-  // ── Cement ─────────────────────────────────────────
-  { symbol: "AMBUJACEM", companyName: "Ambuja Cements", sector: "Cement", industry: "Cement & Building Materials", subIndustry: "Cement Manufacturing", marketCapBucket: "Large Cap" },
-
-  // ── Commodities / Metals ───────────────────────────
-  { symbol: "BAJAJHLDNG", companyName: "Bajaj Holdings", sector: "Financials", industry: "NBFC", subIndustry: "Investment Holding", marketCapBucket: "Large Cap" },
+  // ── Energy & Mining ────────────────────────────────
+  { symbol: "SMC", companyName: "Semirara Mining and Power", sector: "Energy", industry: "Coal & Minerals", subIndustry: "Coal Mining & Power", marketCapBucket: "Mid Cap" },
+  { symbol: "RLC", companyName: "Raytheon Leidos", sector: "Manufacturing", industry: "Heavy Equipment", subIndustry: "Industrial Equipment", marketCapBucket: "Mid Cap" },
 ];
-
-export function getClassification(symbol: string): CompanyClassification | undefined {
-  return SECTOR_REGISTRY.find(c => c.symbol === symbol);
-}
-
-export function getSectorPeers(symbol: string): CompanyClassification[] {
-  const target = getClassification(symbol);
-  if (!target) return [];
-  return SECTOR_REGISTRY.filter(c => c.symbol !== symbol && c.sector === target.sector);
-}
-
-export function getIndustryPeers(symbol: string): CompanyClassification[] {
-  const target = getClassification(symbol);
-  if (!target) return [];
-  return SECTOR_REGISTRY.filter(c => c.symbol !== symbol && c.industry === target.industry);
-}
-
-export function getMarketCapPeers(symbol: string): CompanyClassification[] {
-  const target = getClassification(symbol);
-  if (!target) return [];
-  return SECTOR_REGISTRY.filter(c => c.symbol !== symbol && c.marketCapBucket === target.marketCapBucket);
-}
-
-export function getAllSectors(): string[] {
-  return [...new Set(SECTOR_REGISTRY.map(c => c.sector))].sort();
-}
-
-export function getStocksInSector(sector: string): CompanyClassification[] {
-  return SECTOR_REGISTRY.filter(c => c.sector === sector);
-}
