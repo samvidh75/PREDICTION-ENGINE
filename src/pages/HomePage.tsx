@@ -281,7 +281,7 @@ export default function HomePage() {
               <input
                 ref={searchRef}
                 aria-label="Search stocks"
-                placeholder="Search HDFCBANK, TCS, Infosys…"
+                placeholder="Search BDO, JFC, Meralco…"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={(e) => {
@@ -333,7 +333,7 @@ export default function HomePage() {
                 <Command size={10} />K
               </kbd>
             </div>
-            <Button onClick={() => navigate(`/stock/${resolveSearchTarget() ?? "HDFCBANK"}`)}>Research</Button>
+            <Button onClick={() => navigate(`/stock/${resolveSearchTarget() ?? "BDO"}`)}>Research</Button>
           </div>
           {searchResults.length > 0 && (
             <div style={{
@@ -611,7 +611,7 @@ export default function HomePage() {
           </div>
         </div>
         <div style={{ display: "flex", gap: space[2], flexWrap: "wrap" }}>
-          {["HDFCBANK", "TCS", "INFY", "RELIANCE", "ICICIBANK", "LT"].map((symbol, i) => (
+          {["BDO", "JFC", "MER", "SM", "AEV", "PAL"].map((symbol, i) => (
             <button
               key={symbol}
               onClick={() => navigate(`/stock/${symbol}`)}
