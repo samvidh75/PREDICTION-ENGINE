@@ -377,7 +377,7 @@ export default function StockStoryPage() {
         fontSize: '12px',
       }}>
         <p style={{ margin: '0' }}>
-          StockEx India — Research platform for Indian equities. Not SEBI-registered. Not investment advice.
+          StockEx PSE — Research platform for Philippine Stock Exchange. Not financial advice. Educational purposes only.
         </p>
       </div>
     </div>

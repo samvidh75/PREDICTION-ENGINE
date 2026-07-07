@@ -131,7 +131,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
           padding: '24px', borderTop: '1px solid rgba(255,255,255,0.06)',
           textAlign: 'center', fontSize: '12px', color: '#666',
         }}>
-          StockEx India — Research platform for Indian equities. Not SEBI-registered. Not investment advice.
+          StockEx PSE — Research platform for Philippine Stock Exchange. Not financial advice. Educational purposes only.
         </footer>
       </div>
     </div>
