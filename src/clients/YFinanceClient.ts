@@ -174,24 +174,23 @@ export class YFinanceClient {
   }
 
   /**
-   * Guess exchange from symbol suffix (NS=NSE, BO=BSE, no suffix=NASDAQ/NYSE).
+   * Guess exchange from symbol suffix (PSE for Philippine stocks).
    */
-  private guessExchange(symbol: string): 'NSE' | 'BSE' | 'NASDAQ' | 'NYSE' {
-    if (symbol.endsWith('.NS')) return 'NSE';
-    if (symbol.endsWith('.BO')) return 'BSE';
+  private guessExchange(symbol: string): 'PSE' | 'NASDAQ' | 'NYSE' {
+    if (symbol.endsWith('.PSE')) return 'PSE';
     if (symbol.includes('-')) return 'NASDAQ';
     return 'NYSE';
   }
 
   /**
-   * Normalize symbol for yfinance (add .NS/.BO for Philippine stocks if missing).
+   * Normalize symbol for yfinance (add .PSE for Philippine stocks if missing).
    */
   private normalizeSymbol(symbol: string): string {
     const upper = symbol.toUpperCase();
     // If already has exchange suffix, return as-is
     if (upper.includes('.')) return upper;
-    // Default to NSE for Philippine stocks
-    return `${upper}.NS`;
+    // Default to PSE for Philippine stocks
+    return `${upper}.PSE`;
   }
 }
 

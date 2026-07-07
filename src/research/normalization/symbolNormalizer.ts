@@ -2,12 +2,11 @@ import { normalizeSymbol } from "./numericUtils";
 
 export function normalizeExchangeSymbol(raw: string): string {
   const cleaned = normalizeSymbol(raw);
-  return cleaned.replace(/\.NS$|\.BO$/i, "");
+  return cleaned.replace(/\.PSE$/i, "");
 }
 
-export function parseExchange(raw: string): "NSE" | "BSE" | null {
+export function parseExchange(raw: string): "PSE" | null {
   const upper = raw.toUpperCase();
-  if (upper.endsWith(".NS")) return "NSE";
-  if (upper.endsWith(".BO")) return "BSE";
+  if (upper.endsWith(".PSE")) return "PSE";
   return null;
 }
