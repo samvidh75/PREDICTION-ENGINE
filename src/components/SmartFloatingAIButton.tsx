@@ -71,7 +71,9 @@ export default function SmartFloatingAIButton() {
         onMouseLeave={() => setIsHovering(false)}
         title="AI Assistant - Ask about stocks!"
       >
-        <span className="ai-icon">✨</span>
+        <svg className="ai-icon" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+        </svg>
         {isHovering && <span className="ai-label">StockEx AI</span>}
       </button>
 
@@ -103,9 +105,6 @@ export default function SmartFloatingAIButton() {
           </div>
 
           {/* Status indicator - hidden for cleaner UI */}
-          <div className="ai-status" style={{ display: 'none' }}>
-            <span className="status-indicator">{status}</span>
-          </div>
 
           {/* Messages */}
           <div className="ai-messages">
@@ -167,15 +166,14 @@ export default function SmartFloatingAIButton() {
         }
 
         .ai-button {
-          width: 48px;
-          height: 48px;
+          width: 56px;
+          height: 56px;
           border-radius: 16px;
-          background: linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.04) 100%);
-          border: 1px solid rgba(255,255,255,0.06);
+          background: rgba(0, 0, 0, 0.4);
+          border: 1px solid rgba(255, 255, 255, 0.1);
           color: #ffffff;
-          font-size: 20px;
           cursor: pointer;
-          box-shadow: 0 0 0 1px rgba(255,255,255,0.03) inset, 0 18px 40px rgba(0,0,0,0.28);
+          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
           backdrop-filter: blur(18px);
           -webkit-backdrop-filter: blur(18px);
           transition: all 0.2s ease;
@@ -187,18 +185,16 @@ export default function SmartFloatingAIButton() {
 
         .ai-button:hover {
           transform: scale(1.08);
-          background: linear-gradient(180deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.06) 100%);
-          border-color: rgba(255,255,255,0.08);
+          background: rgba(0, 0, 0, 0.5);
+          border-color: rgba(255, 255, 255, 0.15);
         }
 
         .ai-icon {
-          display: inline-block;
-          animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.6; }
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 24px;
+          height: 24px;
         }
 
         .ai-label {
