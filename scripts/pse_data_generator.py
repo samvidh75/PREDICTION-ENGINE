@@ -89,12 +89,20 @@ class PSEDataGenerator:
         indicators['MACD_Signal'] = round(signal, 2)
 
         # Bollinger Bands
-        mean = sum(prices[-20:]) / 20 if len(prices) >= 20 else prices[-1]
-        variance = sum([(p - mean) ** 2 for p in prices[-20:]]) / 20 if len(prices) >= 20 else 0
-        std_dev = math.sqrt(variance)
-        indicators['BB_Upper'] = round(mean + (2 * std_dev), 2)
-        indicators['BB_Lower'] = round(mean - (2 * std_dev), 2)
-        indicators['BB_Middle'] = round(mean, 2)
+        try:
+            mean = sum(prices[-20:]) / 20 if len(prices) >= 20 else prices[-1]
+            if len(prices) >= 20:
+                variance = sum([(p - mean) ** 2 for p in prices[-20:]]) / 20
+                variance = min(variance, 10000)  # Cap variance to prevent overflow
+            else:
+                variance = 0
+            std_dev = math.sqrt(variance) if variance > 0 else 0.1
+        except (OverflowError, ValueError):
+            std_dev = 0.1
+
+        indicators['BB_Upper'] = round(mean + (2 * std_dev), 2) if 'mean' in locals() else round(prices[-1] * 1.05, 2)
+        indicators['BB_Lower'] = round(mean - (2 * std_dev), 2) if 'mean' in locals() else round(prices[-1] * 0.95, 2)
+        indicators['BB_Middle'] = round(mean, 2) if 'mean' in locals() else round(prices[-1], 2)
 
         return indicators
 
