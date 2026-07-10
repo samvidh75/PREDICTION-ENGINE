@@ -103,6 +103,30 @@ def classify_intent(text: str, known_tickers_in_convo: list[str]) -> dict:
 # Response builders per intent
 # ---------------------------------------------------------------------------
 
+def _clean_generation(text: str) -> str:
+    """Post-process model output: drop repeated lines, cut off after the model
+    drifts into unrelated boilerplate (e.g. stray years, dangling fragments)."""
+    lines = [l.strip() for l in text.split("\n") if l.strip()]
+    seen = set()
+    cleaned = []
+    for line in lines:
+        key = line.lower()
+        if key in seen:
+            continue  # drop exact-repeat lines (the "loop" failure mode)
+        seen.add(key)
+        # Drop lines that are just a stray bracketed year or single token — generation drift artifacts
+        if re.fullmatch(r"\(?\d{4}\)?", line):
+            continue
+        cleaned.append(line)
+    result = "\n".join(cleaned).strip()
+    # If it ends mid-sentence (no terminal punctuation) drop the trailing partial line
+    if result and result[-1] not in ".!?":
+        parts = result.rsplit("\n", 1)
+        if len(parts) == 2:
+            result = parts[0].strip()
+    return result or text.strip()
+
+
 def _handle_greeting(text: str) -> str:
     return (
         "Hey! I'm your PSE research assistant — I can pull live prices, recent news, "
@@ -164,6 +188,9 @@ def _handle_stock_analysis(text: str, tickers: list[str], session_id: str) -> tu
 
     risk_note = f"\nUser's noted risk tolerance: {facts['risk_tolerance']}" if "risk_tolerance" in facts else ""
 
+    # Prompt anchored tightly to the exact training-data format (Instruction/Input/Output +
+    # "Analysis for TICKER (period): / Signal: X (confidence) / Technical Analysis: / ...").
+    # Deviating from this format is what let the model drift into repeated/garbled boilerplate.
     prompt = (
         f"Instruction: Analyze {ticker} stock for potential investment. Provide technical, "
         f"fundamental, and geopolitical analysis with a clear signal.\n"
@@ -172,17 +199,24 @@ def _handle_stock_analysis(text: str, tickers: list[str], session_id: str) -> tu
         f"Recent news:\n{news_lines}\n\n"
         f"Geopolitical context:\n{geo_lines}"
         f"{risk_note}\n"
-        f"Output:"
+        f"Output:\nAnalysis for {ticker}:\n\nSignal:"
     )
 
     inputs = _tokenizer(prompt, return_tensors="pt", truncation=True, max_length=1800)
     with torch.no_grad():
         outputs = _model.generate(
-            inputs["input_ids"], max_new_tokens=300, do_sample=False,
-            pad_token_id=_tokenizer.eos_token_id, attention_mask=inputs["attention_mask"],
+            inputs["input_ids"],
+            max_new_tokens=220,
+            do_sample=False,
+            num_beams=3,                 # beam search beats greedy for coherence on a small model
+            repetition_penalty=1.3,       # penalize re-emitting the same phrase
+            no_repeat_ngram_size=3,       # hard-block any repeated 3-gram (kills the loop failure mode)
+            pad_token_id=_tokenizer.eos_token_id,
+            attention_mask=inputs["attention_mask"],
         )
     raw = _tokenizer.decode(outputs[0], skip_special_tokens=True)
     model_analysis = raw.split("Output:")[-1].strip() if "Output:" in raw else raw
+    model_analysis = _clean_generation(model_analysis)
 
     live_disclaimer = "" if not quote.get("stale") else "\n\n⚠️ Note: live price feed was unreachable, so this leans on historical patterns only — treat as lower confidence."
 
