@@ -44,6 +44,13 @@ class ProviderHealthMonitorClass {
   }
 
   initialize() {
+    if (typeof localStorage === 'undefined') {
+      // Non-browser context (Node scripts, SSR) — in-memory only, no persistence.
+      for (const provider of ['yfinance', 'nselib', 'jugasad', 'screener'] as ProviderName[]) {
+        this.metrics.set(provider, this.createEmptyMetrics(provider));
+      }
+      return;
+    }
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
@@ -210,6 +217,7 @@ class ProviderHealthMonitorClass {
   }
 
   private persist() {
+    if (typeof localStorage === 'undefined') return;
     try {
       const data: Record<string, unknown> = {
         lastResetTime: this.lastResetTime,
