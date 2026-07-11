@@ -166,6 +166,115 @@ def _handle_market_overview(_: str) -> str:
     return f"Here's what's moving the PSE right now, from today's coverage:\n\n{lines}"
 
 
+SIGNAL_PATTERN = re.compile(r"Signal:\s*(Buy|Sell|Hold|Neutral|Bullish|Bearish)", re.IGNORECASE)
+POSITIVE_SIGNALS = {"buy", "bullish"}
+NEGATIVE_SIGNALS = {"sell", "bearish"}
+
+# Words that, when found in the free-text summary, contradict the direction implied
+# by the locked Signal line. This is what catches "Signal: Sell ... more likely to
+# recover" — the model agreeing with itself on the label but not on the prose.
+RECOVERY_WORDS = {"recover", "rebound", "bounce back", "turn around", "improve"}
+DECLINE_WORDS = {"decline further", "keep falling", "continue to drop", "worsen"}
+
+
+def _generate_once(prompt: str, sample: bool) -> str:
+    inputs = _tokenizer(prompt, return_tensors="pt", truncation=True, max_length=1800)
+    gen_kwargs = dict(
+        max_new_tokens=220,
+        repetition_penalty=1.3,
+        no_repeat_ngram_size=3,
+        pad_token_id=_tokenizer.eos_token_id,
+        attention_mask=inputs["attention_mask"],
+    )
+    if sample:
+        gen_kwargs.update(do_sample=True, temperature=0.7, top_p=0.9)
+    else:
+        gen_kwargs.update(do_sample=False, num_beams=3)
+
+    with torch.no_grad():
+        outputs = _model.generate(inputs["input_ids"], **gen_kwargs)
+    raw = _tokenizer.decode(outputs[0], skip_special_tokens=True)
+    text = raw.split("Output:")[-1].strip() if "Output:" in raw else raw
+    return _clean_generation(text)
+
+
+def _extract_signal_polarity(text: str) -> str | None:
+    m = SIGNAL_PATTERN.search(text)
+    if not m:
+        return None
+    word = m.group(1).lower()
+    if word in POSITIVE_SIGNALS:
+        return "positive"
+    if word in NEGATIVE_SIGNALS:
+        return "negative"
+    return "neutral"
+
+
+def _has_contradiction(text: str, polarity: str) -> bool:
+    lower = text.lower()
+    if polarity == "negative" and any(w in lower for w in RECOVERY_WORDS):
+        return True
+    if polarity == "positive" and any(w in lower for w in DECLINE_WORDS):
+        return True
+    return False
+
+
+BULLISH_WORDS = {
+    "bullish", "buy", "uptrend", "breakout to the north", "rise", "rising", "rally",
+    "outperform", "upside", "gain", "gains", "strength", "strong momentum",
+    "positive momentum", "recover", "rebound", "improve", "growth",
+}
+BEARISH_WORDS = {
+    "bearish", "sell", "downtrend", "breakout to the south", "fall", "falling",
+    "decline", "declining", "weakness", "weak momentum", "negative momentum",
+    "underperform", "downside", "drop", "worsen", "risk of further losses",
+}
+
+
+def _score_body_polarity(body: str) -> str:
+    """Count directional words across the whole generated body and derive the
+    dominant sentiment. This is the source of truth for the Signal label —
+    deriving the label FROM the text (rather than forcing the text to match a
+    pre-picked label) guarantees consistency by construction, since a 2B model's
+    beam search doesn't reliably keep a forced opening token consistent with
+    everything generated afterward (verified: locking 'Sell' still produced a
+    fully bullish body — 'may continue to rise' — because the bias only touches
+    the first few tokens, not the model's overall completion tendency)."""
+    lower = body.lower()
+    bull_count = sum(lower.count(w) for w in BULLISH_WORDS)
+    bear_count = sum(lower.count(w) for w in BEARISH_WORDS)
+    if bull_count > bear_count:
+        return "positive"
+    if bear_count > bull_count:
+        return "negative"
+    return "neutral"
+
+
+def _generate_consistent_analysis(prompt: str, ticker: str) -> str:
+    """Generate the analysis body WITHOUT asking the model to commit to a Signal
+    label up front (that's what let 'Sell' and 'bullish...rise' coexist — the
+    label and the body are produced almost independently by a model this size).
+    Instead: generate the reasoning first, score its actual directional language,
+    and derive+prepend the Signal label from that score. The label can never
+    contradict the body because it's computed from the body."""
+    body_prompt = prompt.replace("Output:\nAnalysis for {}:\n\nSignal:".format(ticker),
+                                  f"Output:\nAnalysis for {ticker}:\n\nTechnical:")
+    body = _generate_once(body_prompt, sample=False)
+    # Model sometimes echoes "Analysis for TICKER:" back into the body since it was
+    # part of the prompt it's continuing — strip it so "Technical:" isn't duplicated.
+    body = re.sub(rf"^Analysis for {re.escape(ticker)}:\s*\n*", "", body, flags=re.IGNORECASE).strip()
+
+    polarity = _score_body_polarity(body)
+    label = {"positive": "Buy", "negative": "Sell", "neutral": "Hold"}[polarity]
+
+    # Body may or may not already start with "Technical:" depending on what the
+    # model echoed back — normalize so we don't double it up.
+    if not body.lower().startswith("technical"):
+        body = f"Technical: {body}"
+
+    return f"Signal: {label}\n{body}"
+
+
 def _handle_stock_analysis(text: str, tickers: list[str], session_id: str) -> tuple[str, dict]:
     _load_model()
     ticker = tickers[0]
@@ -202,21 +311,7 @@ def _handle_stock_analysis(text: str, tickers: list[str], session_id: str) -> tu
         f"Output:\nAnalysis for {ticker}:\n\nSignal:"
     )
 
-    inputs = _tokenizer(prompt, return_tensors="pt", truncation=True, max_length=1800)
-    with torch.no_grad():
-        outputs = _model.generate(
-            inputs["input_ids"],
-            max_new_tokens=220,
-            do_sample=False,
-            num_beams=3,                 # beam search beats greedy for coherence on a small model
-            repetition_penalty=1.3,       # penalize re-emitting the same phrase
-            no_repeat_ngram_size=3,       # hard-block any repeated 3-gram (kills the loop failure mode)
-            pad_token_id=_tokenizer.eos_token_id,
-            attention_mask=inputs["attention_mask"],
-        )
-    raw = _tokenizer.decode(outputs[0], skip_special_tokens=True)
-    model_analysis = raw.split("Output:")[-1].strip() if "Output:" in raw else raw
-    model_analysis = _clean_generation(model_analysis)
+    model_analysis = _generate_consistent_analysis(prompt, ticker)
 
     live_disclaimer = "" if not quote.get("stale") else "\n\n⚠️ Note: live price feed was unreachable, so this leans on historical patterns only — treat as lower confidence."
 

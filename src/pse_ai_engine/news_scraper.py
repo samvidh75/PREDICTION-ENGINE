@@ -1,12 +1,18 @@
 """Live news + geopolitical context for PSE analysis via Google News RSS.
 No API key required, no scraping ToS violation (RSS is a public feed)."""
 import feedparser
+import socket
 import time
+import urllib.request
 from datetime import datetime
 from urllib.parse import quote_plus
 
 _CACHE_TTL = 300  # 5 min — news doesn't need to be fetched every call
 _cache: dict[str, tuple[float, list]] = {}
+_FETCH_TIMEOUT = 6.0  # feedparser.parse(url) has NO built-in timeout and can hang
+# indefinitely on a slow/stalled connection — this was silently blocking the whole
+# chat pipeline for minutes. Fetch the bytes ourselves with a real socket timeout,
+# then hand the bytes (not the URL) to feedparser so it never opens its own connection.
 
 
 def _fetch_rss(query: str, limit: int = 8) -> list[dict]:
@@ -17,7 +23,10 @@ def _fetch_rss(query: str, limit: int = 8) -> list[dict]:
 
     url = f"https://news.google.com/rss/search?q={quote_plus(query)}&hl=en-PH&gl=PH&ceid=PH:en"
     try:
-        feed = feedparser.parse(url)
+        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+        with urllib.request.urlopen(req, timeout=_FETCH_TIMEOUT) as resp:
+            raw = resp.read()
+        feed = feedparser.parse(raw)
         items = [
             {
                 "title": e.title,
