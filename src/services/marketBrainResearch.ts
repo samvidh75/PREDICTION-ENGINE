@@ -106,7 +106,7 @@ export class MarketBrainResearchError extends Error {
 const normalizeSymbol = (symbol: string): string => symbol.trim().toUpperCase();
 
 const MARKET_BRAIN_RESEARCH_STATES = new Set<MarketBrainResearchState>(MARKET_BRAIN_ALLOWED_STATES);
-const MARKET_BRAIN_EVIDENCE_DOMAINS = new Set<MarketBrainEvidenceDomain>(MARKET_BRAIN_PUBLIC_EVIDENCE_DOMA);
+const MARKET_BRAIN_EVIDENCE_DOMAINS = new Set<MarketBrainEvidenceDomain>(MARKET_BRAIN_PUBLIC_EVIDENCE_DOMAINS);
 const MARKET_BRAIN_FACTOR_KEYS = new Set<MarketBrainFactorKey>(MARKET_BRAIN_PUBLIC_FACTOR_KEYS);
 const PUBLIC_SYMBOL_PATTERN = /^[A-Z0-9][A-Z0-9&.-]*$/;
 

@@ -317,7 +317,7 @@ class BrowserLLM {
       await modelVersionManager.initialize();
 
       // Save current model versions if not already saved
-      for (const version of MODEL_VERSI) {
+      for (const version of MODEL_VERSIONS) {
         const existing = await modelVersionManager.getVersion(version.version);
         if (!existing) {
           await modelVersionManager.saveVersion(version);

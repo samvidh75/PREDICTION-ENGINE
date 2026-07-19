@@ -128,7 +128,7 @@ export function EnhancedScreener() {
                       padding: '12px',
                       textAlign: 'center',
                       fontSize: '11px',
-                      color: quote.source === 'yfinance' ? '#0066cc' : quote.source === 'jugasad' ? '#cc6600' : '#666',
+                      color: quote.source === 'yfinance' ? '#0066cc' : quote.source === 'pse' ? '#cc6600' : '#666',
                       fontWeight: 'bold',
                     }}
                   >

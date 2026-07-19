@@ -30,6 +30,22 @@ class LocalLLMService {
   private isLoaded = false;
   private modelCache: Map<string, any> = new Map();
   private currentModel: string = 'gpt2'; // Small, fast model
+  private webgpuAvailable: boolean | null = null;
+
+  /** Detect once and cache; used to pick the WebGPU vs WASM execution backend. */
+  private async getDevice(): Promise<'webgpu' | 'wasm'> {
+    if (this.webgpuAvailable === null) {
+      try {
+        this.webgpuAvailable =
+          typeof navigator !== 'undefined' &&
+          'gpu' in navigator &&
+          Boolean(await (navigator as any).gpu.requestAdapter());
+      } catch {
+        this.webgpuAvailable = false;
+      }
+    }
+    return this.webgpuAvailable ? 'webgpu' : 'wasm';
+  }
 
   /**
    * Initialize the LLM service (lazy load)
@@ -59,6 +75,11 @@ class LocalLLMService {
     }
   }
 
+  /** Whether the last (or next) generation will run on the WebGPU backend. */
+  async isUsingWebGPU(): Promise<boolean> {
+    return (await this.getDevice()) === 'webgpu';
+  }
+
   /**
    * Generate stock market analysis using local LLM
    */
@@ -79,9 +100,11 @@ class LocalLLMService {
     try {
       const prompt = this.buildAnalysisPrompt(symbol, metrics, query);
 
-      // Use text generation pipeline
+      // Use text generation pipeline, preferring the WebGPU backend when the
+      // browser/device supports it (falls back to WASM otherwise).
+      const device = await this.getDevice();
       const pipeline = (transformers as any).pipeline;
-      const generator = await pipeline('text-generation', this.currentModel);
+      const generator = await pipeline('text-generation', this.currentModel, { device });
 
       const result = await generator(prompt, {
         max_new_tokens: options?.maxNewTokens || 200,

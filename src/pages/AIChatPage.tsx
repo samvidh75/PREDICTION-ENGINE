@@ -3,6 +3,8 @@ import { Send, Sparkles, User, TrendingUp, BarChart3, Zap, X, Plus, Cpu } from "
 import type { LucideIcon } from "lucide-react";
 import { colors, typography, space, radius } from "../design/tokens";
 import type { FC, KeyboardEvent, FormEvent } from "react";
+import { localLLMService } from "../services/ai/LocalLLMService";
+import { isWebGpuEnabledInConfig, detectWebGpuSupport } from "../services/ai/webgpuConfig";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 interface Message {
@@ -237,6 +239,18 @@ export default function AIChatPage() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
+  // WebGPU local inference: onboarding stores a `webgpuEnabled` preference
+  // but nothing ever consumed it — the chatbot always went straight to the
+  // server API. This re-verifies actual browser support and, when the user
+  // opts in via the toggle below, runs generation locally through
+  // LocalLLMService (Transformers.js on the WebGPU backend) instead.
+  const [webgpuSupported, setWebgpuSupported] = useState(false);
+  const [localModeEnabled, setLocalModeEnabled] = useState(false);
+  useEffect(() => {
+    if (!isWebGpuEnabledInConfig()) return;
+    detectWebGpuSupport().then(setWebgpuSupported);
+  }, []);
+
   const active = conversations.find((c) => c.id === activeId) ?? conversations[0];
 
   // Auto-scroll
@@ -261,7 +275,9 @@ export default function AIChatPage() {
     [activeId],
   );
 
-  // Generate AI response via the local API
+  // Generate AI response — either via the server API (Groq), or, when the
+  // user has opted into local mode and WebGPU is supported, entirely
+  // on-device via LocalLLMService (no network round-trip).
   const generateResponse = useCallback(
     async (userMessage: string) => {
       setLoading(true);
@@ -270,6 +286,24 @@ export default function AIChatPage() {
         "Analyzing 8-factor scores…",
         "Compiling research context…",
       ];
+
+      if (localModeEnabled && webgpuSupported) {
+        try {
+          const result = await localLLMService.generateStockAnalysis("", {}, userMessage, { maxNewTokens: 200 });
+          setLoading(false);
+          return {
+            id: `ai-${Date.now()}`,
+            role: "assistant" as const,
+            content: result.text || "Local model returned an empty response — try disabling local mode.",
+            timestamp: Date.now(),
+            thinkingSteps,
+            citations: ["On-device WebGPU inference (experimental)"],
+          };
+        } catch (error) {
+          console.error("[AIChatPage] Local WebGPU generation failed, falling back to server:", error);
+          // fall through to the server API below
+        }
+      }
 
       const apiBase = import.meta.env.VITE_API_BASE_URL || (window.location.hostname.includes("stockstory-india.com") ? "/api" : "/api");
       const apiUrl = `${apiBase}/chat`;
@@ -310,7 +344,7 @@ export default function AIChatPage() {
         return aiMsg;
       }
     },
-    [],
+    [localModeEnabled, webgpuSupported],
   );
 
   const handleSend = useCallback(async () => {
@@ -488,13 +522,37 @@ export default function AIChatPage() {
           </div>
           <div
             style={{
-              textAlign: "center",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: space[3],
               marginTop: space[2],
-              fontSize: typography.captionSm.size,
-              color: colors.textTertiary,
             }}
           >
-            StockEX AI may make mistakes. Verify critical data before investing.
+            <div style={{ fontSize: typography.captionSm.size, color: colors.textTertiary }}>
+              StockEX AI may make mistakes. Verify critical data before investing.
+            </div>
+            {webgpuSupported && (
+              <button
+                onClick={() => setLocalModeEnabled((v) => !v)}
+                title="Run responses on-device via WebGPU instead of the server — faster privacy, weaker model quality (experimental)."
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 4,
+                  padding: "2px 8px",
+                  borderRadius: radius.md,
+                  border: `1px solid ${localModeEnabled ? colors.accentRed : colors.hairline}`,
+                  background: localModeEnabled ? `${colors.accentRed}15` : "transparent",
+                  color: localModeEnabled ? colors.accentRed : colors.textTertiary,
+                  fontSize: typography.captionSm.size,
+                  cursor: "pointer",
+                }}
+              >
+                <Cpu size={11} />
+                {localModeEnabled ? "WebGPU local mode: ON" : "Run locally (WebGPU)"}
+              </button>
+            )}
           </div>
         </div>
       </main>

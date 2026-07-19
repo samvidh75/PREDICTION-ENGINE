@@ -742,7 +742,7 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
       <Card className="stock-metrics-card raycast-slideUp" style={{ animationDelay: "0.15s", animationFillMode: "both" }}>
         <CardLabel>Key metrics</CardLabel>
         <div className="stock-metric-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "16px" }}>
-          <MetricCard label="Market Cap" value={`₹${formatNumber(Math.round(stock.price.marketCap))} Cr`} />
+          <MetricCard label="Market Cap" value={stock.price.marketCap != null ? `₹${formatNumber(Math.round(stock.price.marketCap))} Cr` : "—"} />
           <MetricCard label="PE (TTM)" value={formatDecimal(fundamentals.pe, 1)}
             trend={fundamentals.pe != null && fundamentals.pe < 20 ? "up" : fundamentals.pe != null && fundamentals.pe > 30 ? "down" : "neutral"}
             subtitle={fundamentals.industryPe != null ? `Sector: ${formatDecimal(fundamentals.industryPe, 1)}` : sectorRelMap["pe"] ? `Sector: ${sectorRelMap["pe"]}` : undefined} />

@@ -72,12 +72,12 @@ export function normalizeTicker(raw: string): string {
   let s = raw.trim();
 
   // Strip known prefixes
-  for (const pat of PREFIX_PATTE) {
+  for (const pat of PREFIX_PATTERNS) {
     s = s.replace(pat, '');
   }
 
   // Strip known suffixes
-  for (const pat of SUFFIX_PATTE) {
+  for (const pat of SUFFIX_PATTERNS) {
     s = s.replace(pat, '');
   }
 

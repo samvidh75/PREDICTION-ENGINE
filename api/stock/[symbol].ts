@@ -358,6 +358,220 @@ const relatedStocks: Record<string, any> = {
   ],
 };
 
+// ── PSE (Philippine Stock Exchange) support ─────────────────────
+// The rest of this file (fallbackFundamentals, companyProfiles, Yahoo
+// ".NS" fetches) is NSE/India-only. PSE tickers were previously unhandled
+// entirely — any PSE symbol 404'd. This block adds a self-contained PSE
+// path (kept inline rather than importing src/clients/PSEClient.ts to
+// avoid depending on an unverified cross-directory bundle for this
+// Vercel serverless function).
+const PSE_PROFILES: Record<string, { name: string; sector: string; industry: string; description: string }> = {
+  'JFC': { name: 'Jollibee Foods Corporation', sector: 'Consumer Discretionary', industry: 'Restaurants', description: 'The Philippines\' largest fast-food chain operator, also owning international brands including Smashburger and The Coffee Bean & Tea Leaf.' },
+  'SM': { name: 'SM Investments Corporation', sector: 'Diversified', industry: 'Conglomerate', description: 'One of the largest Philippine conglomerates, with interests spanning retail, banking, and property.' },
+  'SMPH': { name: 'SM Prime Holdings', sector: 'Real Estate', industry: 'Property Development', description: 'The largest integrated property developer in the Philippines, operating malls, residences, and offices.' },
+  'BDO': { name: 'BDO Unibank Inc.', sector: 'Financial Services', industry: 'Banks', description: 'The largest bank in the Philippines by assets, offering universal banking services.' },
+  'BPI': { name: 'Bank of the Philippine Islands', sector: 'Financial Services', industry: 'Banks', description: 'One of the oldest and largest banks in the Philippines, part of the Ayala group.' },
+  'MBT': { name: 'Metropolitan Bank & Trust Company', sector: 'Financial Services', industry: 'Banks', description: 'A leading Philippine universal bank offering corporate, commercial, and consumer banking.' },
+  'AC': { name: 'Ayala Corporation', sector: 'Diversified', industry: 'Conglomerate', description: 'One of the oldest and largest conglomerates in the Philippines, spanning real estate, banking, telecoms, and utilities.' },
+  'ALI': { name: 'Ayala Land Inc.', sector: 'Real Estate', industry: 'Property Development', description: 'A leading Philippine real estate developer under the Ayala group, spanning residential, office, and mall properties.' },
+  'AEV': { name: 'Aboitiz Equity Ventures Inc.', sector: 'Diversified', industry: 'Conglomerate', description: 'A major Philippine conglomerate with interests in power, banking, food, and infrastructure.' },
+  'AP': { name: 'Aboitiz Power Corporation', sector: 'Utilities', industry: 'Power Generation', description: 'One of the largest power generation and distribution companies in the Philippines.' },
+  'MER': { name: 'Manila Electric Company (Meralco)', sector: 'Utilities', industry: 'Electric Utilities', description: 'The largest electric power distribution company in the Philippines, serving Metro Manila and surrounding provinces.' },
+  'PLDT': { name: 'PLDT Inc.', sector: 'Communication Services', industry: 'Telecommunications', description: 'The leading integrated telecommunications company in the Philippines.' },
+  'GLO': { name: 'Globe Telecom Inc.', sector: 'Communication Services', industry: 'Telecommunications', description: 'One of the two dominant mobile and broadband operators in the Philippines.' },
+  'ICT': { name: 'International Container Terminal Services Inc.', sector: 'Industrials', industry: 'Marine Ports & Logistics', description: 'A global port operator headquartered in the Philippines, running terminals across several continents.' },
+  'URC': { name: 'Universal Robina Corporation', sector: 'Consumer Staples', industry: 'Packaged Foods', description: 'One of the largest branded food and beverage companies in the Philippines and Southeast Asia.' },
+  'JGS': { name: 'JG Summit Holdings Inc.', sector: 'Diversified', industry: 'Conglomerate', description: 'A major Philippine conglomerate spanning food, air transport, petrochemicals, banking, and real estate.' },
+  'LTG': { name: 'LT Group Inc.', sector: 'Diversified', industry: 'Conglomerate', description: 'The holding company of the Tan group, spanning liquor, tobacco, banking, and property.' },
+  'GTCAP': { name: 'GT Capital Holdings Inc.', sector: 'Diversified', industry: 'Conglomerate', description: 'A Philippine conglomerate with interests in banking, automotive, property, and power.' },
+  'MPI': { name: 'Metro Pacific Investments Corporation', sector: 'Industrials', industry: 'Infrastructure', description: 'A Philippine infrastructure holding company focused on toll roads, water, power, and hospitals.' },
+  'FGEN': { name: 'First Gen Corporation', sector: 'Utilities', industry: 'Power Generation', description: 'A leading Philippine power generation company focused on clean and renewable energy.' },
+  'SCC': { name: 'Semirara Mining and Power Corporation', sector: 'Energy', industry: 'Coal & Power', description: 'The largest coal producer in the Philippines, also engaged in power generation.' },
+  'MEG': { name: 'Megaworld Corporation', sector: 'Real Estate', industry: 'Property Development', description: 'A major Philippine property developer known for its integrated township developments.' },
+  'RLC': { name: 'Robinsons Land Corporation', sector: 'Real Estate', industry: 'Property Development', description: 'A diversified Philippine real estate developer under the Gokongwei group.' },
+  'DMC': { name: 'DMCI Holdings Inc.', sector: 'Industrials', industry: 'Construction & Mining', description: 'A Philippine conglomerate spanning construction, mining, power, water, and real estate.' },
+  'PGOLD': { name: 'Puregold Price Club Inc.', sector: 'Consumer Staples', industry: 'Retail', description: 'One of the largest supermarket and hypermarket chains in the Philippines.' },
+  'CNVRG': { name: 'Converge ICT Solutions Inc.', sector: 'Communication Services', industry: 'Broadband', description: 'A leading fixed-line fiber broadband internet service provider in the Philippines.' },
+  'WLCON': { name: 'Wilcon Depot Inc.', sector: 'Consumer Discretionary', industry: 'Home Improvement Retail', description: 'The largest home improvement and construction supplies retailer in the Philippines.' },
+  'MWC': { name: 'Manila Water Company Inc.', sector: 'Utilities', industry: 'Water Utilities', description: 'A major water and wastewater services provider for Metro Manila\'s east zone.' },
+};
+
+const PSE_COMPANY_TO_TICKER: Record<string, string> = {
+  'JOLLIBEE': 'JFC',
+  'JOLLIBEE FOODS': 'JFC',
+  'SMINVESTMENTS': 'SM',
+  'BDOUNIBANK': 'BDO',
+  'AYALA': 'AC',
+  'AYALALAND': 'ALI',
+  'MERALCO': 'MER',
+  'GLOBE': 'GLO',
+  'PUREGOLD': 'PGOLD',
+};
+
+function isPSESymbol(symbol: string): boolean {
+  return Boolean(PSE_PROFILES[symbol]);
+}
+
+// Fetch a live PSE quote from the phisix feed — a public mirror of PSE's
+// own live ticker data. Yahoo Finance carries no real PSE-listed prices
+// (its ".PS"/".PSE" symbols resolve to unrelated US OTC ADR proxies at a
+// different price/currency), so phisix is the only viable free source here.
+async function fetchPSEPrice(symbol: string): Promise<any> {
+  try {
+    const response = await fetch(
+      `https://phisix-api3.appspot.com/stocks/${symbol.toLowerCase()}.json`,
+      { signal: AbortSignal.timeout(6000) },
+    );
+    if (!response.ok) return null;
+
+    const data = await response.json() as any;
+    const stock = data?.stocks?.[0];
+    if (!stock) return null;
+
+    const price = stock.price?.amount ?? 0;
+    if (!price) return null;
+    const changePercent = stock.percentChange ?? 0;
+    const prevClose = changePercent !== 0 ? price / (1 + changePercent / 100) : price;
+
+    return {
+      price: Number(price.toFixed(2)),
+      change: Number((price - prevClose).toFixed(2)),
+      changePercent: Number(changePercent.toFixed(2)),
+      // phisix doesn't expose market cap or 52-week range — left null rather
+      // than faked, matching the "—" null-safe rendering on the frontend.
+      marketCap: null,
+      high52w: null,
+      low52w: null,
+      longName: stock.name || symbol,
+      exchange: 'PSE',
+    };
+  } catch (error) {
+    console.error(`Failed to fetch PSE price for ${symbol}:`, error);
+    return null;
+  }
+}
+
+// ── AI-generated investment thesis (Groq / Llama 3 70B) ─────────
+// Previously this endpoint never set a `thesis` field at all, so the
+// frontend always fell back to blank strings for every stock. This uses
+// the same Groq key already configured for api/groq.ts.
+async function generateThesis(params: {
+  symbol: string;
+  companyName: string;
+  sector: string;
+  exchange: string;
+  scores: { overall: number; quality: number; growth: number; valuation: number; momentum: number; risk: number };
+}): Promise<{ thesis: string; bullCase: string; bearCase: string; whatToWatch: string; stance: string }> {
+  const fallback = {
+    thesis: `Research coverage for ${params.companyName} (${params.symbol}) is limited to the structured metrics shown above; a full narrative thesis is not currently available.`,
+    bullCase: 'Insufficient data to summarize strengths automatically.',
+    bearCase: 'Insufficient data to summarize risks automatically.',
+    whatToWatch: 'Check back once more research context is available for this name.',
+    stance: 'Watch',
+  };
+
+  if (!process.env.GROQ_API_KEY) return fallback;
+
+  try {
+    const systemPrompt = `You are a research analyst generating a concise company thesis for a ${params.exchange === 'PSE' ? 'Philippine' : 'Indian'} stock.
+
+RULES:
+- Use only the structured data provided below. Do NOT invent metrics, financial figures, or company facts.
+- Do NOT provide personal financial advice. Do NOT use Buy/Hold/Sell language.
+- If the data is insufficient, say the view is limited.
+- Output strict JSON only, matching this schema exactly, no markdown fences:
+{"thesis": "3-5 sentence narrative, max 500 chars", "bullCase": "1-2 sentences on strengths, max 250 chars", "bearCase": "1-2 sentences on risks, max 250 chars", "whatToWatch": "1-2 sentences on what to monitor, max 250 chars", "stance": "one of: Positive, Watch, Cautious"}`;
+
+    const userPrompt = `Company: ${params.companyName} (${params.symbol})
+Exchange: ${params.exchange}
+Sector: ${params.sector}
+Overall Score: ${params.scores.overall}/100
+Quality Score: ${params.scores.quality}/100
+Growth Score: ${params.scores.growth}/100
+Valuation Score: ${params.scores.valuation}/100
+Momentum Score: ${params.scores.momentum}/100
+Risk Score: ${params.scores.risk}/100`;
+
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'llama-3-70b-versatile',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt },
+        ],
+        max_tokens: 500,
+        temperature: 0.4,
+        response_format: { type: 'json_object' },
+      }),
+      signal: AbortSignal.timeout(9000),
+    });
+
+    if (!response.ok) return fallback;
+
+    const data = await response.json() as any;
+    const raw = data?.choices?.[0]?.message?.content;
+    if (!raw) return fallback;
+
+    const parsed = JSON.parse(raw);
+    return {
+      thesis: typeof parsed.thesis === 'string' && parsed.thesis.length > 10 ? parsed.thesis : fallback.thesis,
+      bullCase: typeof parsed.bullCase === 'string' ? parsed.bullCase : fallback.bullCase,
+      bearCase: typeof parsed.bearCase === 'string' ? parsed.bearCase : fallback.bearCase,
+      whatToWatch: typeof parsed.whatToWatch === 'string' ? parsed.whatToWatch : fallback.whatToWatch,
+      stance: ['Positive', 'Watch', 'Cautious'].includes(parsed.stance) ? parsed.stance : 'Watch',
+    };
+  } catch (error) {
+    console.error(`Thesis generation failed for ${params.symbol}:`, error);
+    return fallback;
+  }
+}
+
+// ── Live news (NewsAPI) ──────────────────────────────────────────
+// Previously `newsData` was a hardcoded dict covering exactly 3 symbols;
+// every other stock (all PSE names, and 47+ of the 50 NSE names) got [].
+async function fetchLiveNews(symbol: string, companyName: string): Promise<any[]> {
+  const apiKey = process.env.NEWS_API_KEY;
+  if (!apiKey) return [];
+
+  try {
+    const query = `"${companyName}" stock`;
+    const response = await fetch(
+      `https://newsapi.org/v2/everything?q=${encodeURIComponent(query)}&sortBy=publishedAt&language=en&pageSize=6&apiKey=${apiKey}`,
+      { signal: AbortSignal.timeout(6000) },
+    );
+    if (!response.ok) return [];
+
+    const data = await response.json() as any;
+    const positiveWords = ['rise', 'surge', 'gain', 'jump', 'rally', 'strong', 'upgrade', 'beat', 'outperform', 'bull'];
+    const negativeWords = ['fall', 'drop', 'decline', 'crash', 'lose', 'weak', 'downgrade', 'miss', 'underperform', 'bear'];
+
+    return (data.articles || []).slice(0, 6).map((article: any) => {
+      const text = `${article.title ?? ''} ${article.description ?? ''}`.toLowerCase();
+      const posHit = positiveWords.some((w) => text.includes(w));
+      const negHit = negativeWords.some((w) => text.includes(w));
+      const sentiment = posHit && !negHit ? 'positive' : negHit && !posHit ? 'negative' : 'neutral';
+      const publishedAt = article.publishedAt ? new Date(article.publishedAt) : null;
+      const hoursAgo = publishedAt ? Math.max(1, Math.round((Date.now() - publishedAt.getTime()) / 3600000)) : null;
+
+      return {
+        headline: article.title,
+        source: article.source?.name || 'News',
+        time: hoursAgo != null ? (hoursAgo < 24 ? `${hoursAgo}h ago` : `${Math.round(hoursAgo / 24)}d ago`) : '',
+        sentiment,
+        url: article.url,
+      };
+    });
+  } catch (error) {
+    console.error(`News fetch failed for ${symbol}:`, error);
+    return [];
+  }
+}
+
 // Fetch historical chart data from Yahoo Finance
 async function fetchChartData(symbol: string): Promise<any> {
   try {
@@ -417,6 +631,11 @@ async function fetchYahooPrice(symbol: string): Promise<any> {
       change: Number((latest - prevClose).toFixed(2)),
       changePercent: prevClose > 0 ? Number((((latest - prevClose) / prevClose) * 100).toFixed(2)) : 0,
       marketCap: meta.marketCap ? Math.round(meta.marketCap / 10000000) : null,
+      // Chart endpoint's meta carries 52W high/low too — use as fallback when
+      // quoteSummary (fetchFundamentals) fails, which happens for any symbol
+      // outside the small fallbackFundamentals whitelist.
+      high52w: meta.fiftyTwoWeekHigh ?? null,
+      low52w: meta.fiftyTwoWeekLow ?? null,
       longName: meta.longName || symbol,
       exchange: 'NSE',
     };
@@ -477,28 +696,50 @@ export default async function handler(
   let symbol = (req.query.symbol as string || '').toUpperCase().trim();
 
   // Resolve symbol aliases
-  symbol = symbolAliases[symbol] || symbol;
+  symbol = symbolAliases[symbol] || PSE_COMPANY_TO_TICKER[symbol] || symbol;
 
   if (!symbol) {
     return res.status(400).json({ error: 'Symbol required' });
   }
 
   try {
-    // Fetch price and chart data in parallel
-    const [priceData, chartData] = await Promise.all([
-      fetchYahooPrice(symbol),
-      fetchChartData(symbol),
-    ]);
+    const preferPSE = isPSESymbol(symbol);
+
+    // Fetch price and chart data in parallel. PSE-known symbols try phisix
+    // first; anything else tries NSE (Yahoo) first, then falls back to
+    // phisix in case it's a PSE ticker we don't have a profile for yet.
+    let priceData: any = null;
+    let chartData: any[] = [];
+    let exchange: 'NSE' | 'PSE' = 'NSE';
+
+    if (preferPSE) {
+      priceData = await fetchPSEPrice(symbol);
+      exchange = 'PSE';
+      // phisix has no historical series; chartData stays [] and the
+      // frontend already renders a graceful "No chart data available" state.
+    } else {
+      [priceData, chartData] = await Promise.all([
+        fetchYahooPrice(symbol),
+        fetchChartData(symbol),
+      ]);
+      if (!priceData) {
+        // Not a known NSE symbol and Yahoo had nothing — last-resort PSE try.
+        priceData = await fetchPSEPrice(symbol);
+        exchange = 'PSE';
+        chartData = [];
+      }
+    }
 
     if (!priceData) {
       return res.status(404).json({ error: 'Stock not found', symbol });
     }
 
-    // Fetch fundamentals
-    const fundamentalsData = await fetchFundamentals(symbol);
+    // Fetch fundamentals — PSE has no free fundamentals feed wired up yet,
+    // so fields stay null (rendered as "—") rather than faked.
+    const fundamentalsData = exchange === 'PSE' ? null : await fetchFundamentals(symbol);
 
     // Get company profile data
-    const profile = companyProfiles[symbol] || {};
+    const profile = exchange === 'PSE' ? (PSE_PROFILES[symbol] || {}) : (companyProfiles[symbol] || {});
 
     // Calculate comprehensive health score (350+ parameters)
     const healthScores = calculateHealthScore({
@@ -516,9 +757,9 @@ export default async function handler(
       dividendYield: fundamentalsData?.dividendYield,
       revenueGrowth: null,
       profitGrowth: null,
-      marketCap: fundamentalsData?.marketCap,
-      high52w: fundamentalsData?.high52w,
-      low52w: fundamentalsData?.low52w,
+      marketCap: fundamentalsData?.marketCap ?? priceData.marketCap ?? null,
+      high52w: fundamentalsData?.high52w ?? priceData.high52w ?? null,
+      low52w: fundamentalsData?.low52w ?? priceData.low52w ?? null,
       beta: fundamentalsData?.beta,
       rsi: fundamentalsData?.rsi,
       macd: fundamentalsData?.macd,
@@ -526,12 +767,28 @@ export default async function handler(
       historicalVolatility: fundamentalsData?.volatility,
     });
 
+    const companyName = profile.name || priceData.longName || symbol;
+
+    // Fetch news + generate thesis in parallel — both are live, per-symbol
+    // calls now (previously: a 3-symbol hardcoded news dict, and no thesis
+    // field at all).
+    const [liveNews, thesis] = await Promise.all([
+      fetchLiveNews(symbol, companyName),
+      generateThesis({
+        symbol,
+        companyName,
+        sector: profile.sector || 'Unknown',
+        exchange,
+        scores: healthScores,
+      }),
+    ]);
+
     // Return data in format compatible with normalizeStockData
     const response = {
       symbol,
-      name: profile.name || priceData.longName,
-      companyName: profile.name || priceData.longName,
-      exchange: priceData.exchange || 'NSE',
+      name: companyName,
+      companyName,
+      exchange: priceData.exchange || exchange,
       sector: profile.sector || 'Unknown',
       industry: profile.industry || 'Unknown',
       description: profile.description || '',
@@ -539,7 +796,7 @@ export default async function handler(
         current: priceData.price,
         changeAbs: priceData.change,
         changePercent: priceData.changePercent,
-        marketCap: fundamentalsData?.marketCap ?? priceData.marketCap,
+        marketCap: fundamentalsData?.marketCap ?? priceData.marketCap ?? null,
       },
       pe: fundamentalsData?.pe ?? null,
       pb: fundamentalsData?.pb ?? null,
@@ -549,9 +806,9 @@ export default async function handler(
       roa: fundamentalsData?.roa ?? null,
       roce: fundamentalsData?.roce ?? null,
       debtToEquity: fundamentalsData?.debtToEquity ?? null,
-      high52w: fundamentalsData?.high52w ?? null,
-      low52w: fundamentalsData?.low52w ?? null,
-      marketCap: fundamentalsData?.marketCap ?? null,
+      high52w: fundamentalsData?.high52w ?? priceData.high52w ?? null,
+      low52w: fundamentalsData?.low52w ?? priceData.low52w ?? null,
+      marketCap: fundamentalsData?.marketCap ?? priceData.marketCap ?? null,
       beta: fundamentalsData?.beta ?? null,
       rsi: fundamentalsData?.rsi ?? null,
       macd: fundamentalsData?.macd ?? null,
@@ -572,12 +829,13 @@ export default async function handler(
       },
       companyProfile: profile,
       shareholding: shareholdingData[symbol] || [],
-      news: newsData[symbol] || [],
+      news: liveNews.length > 0 ? liveNews : (newsData[symbol] || []),
+      thesis,
       financials: financialsData[symbol] || null,
       priceTargets: priceTargets[symbol] || null,
       relatedStocks: relatedStocks[symbol] || [],
       priceChart: chartData,
-      source: 'yahoo-finance',
+      source: exchange === 'PSE' ? 'phisix' : 'yahoo-finance',
       timestamp: new Date().toISOString(),
     };
 
