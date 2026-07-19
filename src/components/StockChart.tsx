@@ -63,6 +63,12 @@ export default function StockChart({
         const module = await import('lightweight-charts');
         const { createChart } = module;
 
+        // Container may have unmounted (or ref changed) during the async import.
+        if (!containerRef.current) {
+          setIsLoading(false);
+          return;
+        }
+
         // Create chart
         const chart = createChart(containerRef.current, {
           width: containerRef.current.clientWidth,

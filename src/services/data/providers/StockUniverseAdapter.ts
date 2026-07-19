@@ -28,7 +28,7 @@ const __dirname = path.dirname(__filename);
 interface StockUniverseEntry {
   symbol: string;
   name: string;
-  exchange: 'PSE' | 'PSE';
+  exchange: 'NSE' | 'BSE';
   sector: string | null;
   industry: string | null;
   marketCap: number | null;
@@ -146,7 +146,7 @@ export class StockUniverseAdapter implements CompanyMasterAdapter {
 
     const record: CompanyMasterRecord = {
       symbol: normalized,
-      exchange: entry.exchange ?? 'UNKNOWN',
+      exchange: entry.exchange ? 'PSE' : 'UNKNOWN',
       companyName: entry.name || normalized,
       sector: entry.sector ?? null,
       industry: entry.industry ?? null,
@@ -181,7 +181,7 @@ export class StockUniverseAdapter implements CompanyMasterAdapter {
     if (!this.loaded) this.load();
     return Array.from(this.bySymbol.entries()).map(([symbol, entry]) => ({
       symbol,
-      exchange: entry.exchange ?? 'UNKNOWN',
+      exchange: entry.exchange ? 'PSE' : 'UNKNOWN',
       companyName: entry.name || symbol,
       sector: entry.sector ?? null,
       industry: entry.industry ?? null,

@@ -6,8 +6,8 @@
 // references this contract — not multiple ad-hoc type definitions.
 // ─────────────────────────────────────────────────────────────────────────────
 
-/** Recognised Philippine stock exchanges for equity trading. */
-export type IndianExchange = 'PSE';
+/** Recognised Indian stock exchanges for a symbol's primary listing. */
+export type IndianExchange = 'NSE' | 'BSE';
 
 /**
  * Instrument segment for an PSE equity.

@@ -6,7 +6,7 @@ import { marketTimestampFromEpoch, normalizeYahooExchange } from './YahooProvide
 /** Resolve a Yahoo ticker without appending duplicate exchange suffixes. */
 export function resolveYahooQuoteTicker(symbol: string): string {
   const normalized = symbol.trim().toUpperCase();
-  return /\.(NS)$/.test(normalized) ? normalized : `${normalized}.NS`;
+  return /\.(NS|BO)$/.test(normalized) ? normalized : `${normalized}.NS`;
 }
 
 function finiteNumber(value: unknown): number | undefined {

@@ -10,10 +10,11 @@ import {
 import { buildSymbolMasterFixture } from '../fixtures/symbol-master';
 import { PSETradingCalendar } from '../calendar/PSETradingCalendar';
 import type { IndianEodCandle } from '../eod/IndianEodCandle';
+import type { PSESymbol } from '../symbols/PSESymbol';
 
 function makeCandle(overrides?: Partial<IndianEodCandle>): IndianEodCandle {
   return {
-    symbol: 'RELIANCE', exchange: 'PSE', date: '2026-06-17',
+    symbol: 'RELIANCE', exchange: 'NSE', date: '2026-06-17',
     open: 2500, high: 2550, low: 2480, close: 2540, volume: 5000000,
     deliveryPct: 45, unadjustedClose: 2540, dividend: 0, splitFactor: 1,
     ...overrides,
@@ -30,8 +31,8 @@ describe('buildSymbolHealthSummary', () => {
 
   it('breaks down by exchange', () => {
     const result = buildSymbolHealthSummary(symbols);
-    expect(result.byExchange.PSE).toBeGreaterThan(0);
-    expect(result.byExchange.PSE).toBeGreaterThan(0);
+    expect(result.byExchange.NSE).toBeGreaterThan(0);
+    expect(result.byExchange.BSE).toBeGreaterThan(0);
   });
 
   it('detects ISIN coverage', () => {
@@ -100,14 +101,14 @@ describe('buildUniverseOverlapSummary', () => {
     universes.set('mid_cap', symbols.filter(s => s.marketCapCategory === 'mid'));
 
     const result = buildUniverseOverlapSummary(universes);
-    expect(result.sizeByUniverse.pse-index_50).toBeGreaterThan(0);
+    expect(result.sizeByUniverse['pse-index_50']).toBeGreaterThan(0);
     expect(result.sizeByUniverse.mid_cap).toBeGreaterThan(0);
   });
 
   it('finds common symbols', () => {
     const symbols = buildSymbolMasterFixture();
     const allActive = symbols;
-    const nse = symbols.filter(s => s.exchange === 'PSE');
+    const nse = symbols.filter(s => s.exchange === 'NSE');
     const universes = new Map<string, PSESymbol[]>();
     universes.set('all', allActive);
     universes.set('nse', nse);

@@ -1,8 +1,8 @@
 /**
- * Live Price Feed Component
- * - Real Upstox WebSocket data
+ * Ticker Feed Component
+ * - Upstox WebSocket data
  * - Fallback to REST API and cache
- * - Shows live ticks and connection status
+ * - Shows ticks and connection status
  */
 
 import { useEffect, useState } from 'react';

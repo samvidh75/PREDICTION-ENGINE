@@ -31,7 +31,7 @@ export default function DividendTracker() {
         const holdings = portfolio.holdings.map((h) => ({
           ticker: h.ticker,
           quantity: h.quantity,
-          currentPrice: 0, // Would need live price here
+          currentPrice: 0, // Would need current quote here
         }));
 
         const stats = dividendTrackingService.calculatePortfolioStats(holdings);

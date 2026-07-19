@@ -39,7 +39,7 @@ describe('Security Master V2 Data Quality & Validation Tests', () => {
     entries.forEach(entry => {
       expect(entry.exchange).toBeDefined();
       const norm = integrity.normaliseExchange(entry.exchange);
-      expect(['PSE', 'PSE']).toContain(norm);
+      expect(norm).toBe('PSE');
     });
   });
 });

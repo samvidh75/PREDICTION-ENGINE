@@ -13,7 +13,7 @@ describe('PSESymbol contract', () => {
   });
 
   it('all fixtures have valid exchange', () => {
-    const valid: IndianExchange[] = ['PSE', 'PSE'];
+    const valid: IndianExchange[] = ['NSE', 'BSE'];
     for (const s of symbols) {
       expect(valid).toContain(s.exchange);
     }
@@ -48,25 +48,25 @@ describe('PSESymbol contract', () => {
     }
   });
 
-  it('PSE symbols have nseSymbol equal to canonicalSymbol', () => {
+  it('NSE symbols have nseSymbol equal to canonicalSymbol', () => {
     for (const s of symbols) {
-      if (s.exchange === 'PSE') {
+      if (s.exchange === 'NSE') {
         expect(s.nseSymbol).toBe(s.canonicalSymbol);
       }
     }
   });
 
-  it('PSE symbols have bseCode set', () => {
+  it('NSE symbols have bseCode set', () => {
     for (const s of symbols) {
-      if (s.exchange === 'PSE') {
+      if (s.exchange === 'NSE') {
         expect(s.bseCode).toBeTruthy();
       }
     }
   });
 
-  it('PSE-primary symbols have nseSymbol = null', () => {
+  it('BSE-primary symbols have nseSymbol = null', () => {
     for (const s of symbols) {
-      if (s.exchange === 'PSE') {
+      if (s.exchange === 'BSE') {
         expect(s.nseSymbol).toBeNull();
       }
     }
@@ -125,7 +125,7 @@ describe('Symbol fixture reads', () => {
   it('RELIANCE is present and large cap', () => {
     const s = buildSymbolMasterFixture().find(x => x.canonicalSymbol === 'RELIANCE')!;
     expect(s).toBeDefined();
-    expect(s.exchange).toBe('PSE');
+    expect(s.exchange).toBe('NSE');
     expect(s.marketCapCategory).toBe('large');
     expect(s.isin).toBe('IN0020200124');
     expect(s.bseCode).toBe('500325');
@@ -139,10 +139,10 @@ describe('Symbol fixture reads', () => {
     expect(s.sector).toBeNull();
   });
 
-  it('GODREJIND is PSE-primary', () => {
+  it('GODREJIND is BSE-primary', () => {
     const s = buildSymbolMasterFixture().find(x => x.canonicalSymbol === 'GODREJIND')!;
     expect(s).toBeDefined();
-    expect(s.exchange).toBe('PSE');
+    expect(s.exchange).toBe('BSE');
     expect(s.nseSymbol).toBeNull();
   });
 

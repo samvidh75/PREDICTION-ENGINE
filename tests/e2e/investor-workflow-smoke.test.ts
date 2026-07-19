@@ -119,7 +119,9 @@ function walkDir(dir: string): string[] {
       const fullPath = path.join(dir, entry.name);
       if (entry.isDirectory() && !entry.name.startsWith('.') && entry.name !== 'node_modules') {
         files.push(...walkDir(fullPath));
-      } else if (entry.isFile() && /\.(ts|tsx)$/.test(entry.name)) {
+      } else if (entry.isFile() && !entry.name.startsWith('.') && /\.(ts|tsx)$/.test(entry.name)) {
+        // Skip dotfiles — macOS AppleDouble metadata files (e.g. "._Foo.tsx")
+        // created on some external/network filesystems are not real source.
         files.push(fullPath);
       }
     }

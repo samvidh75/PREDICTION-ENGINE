@@ -217,7 +217,7 @@ function DesktopLayout({ quote, symbol, timeframe, setTimeframe, ohlcData, chang
             <StockChart symbol={symbol} ohlcData={ohlcData || []} timeframe={timeframe} height={280} />
           </div>
 
-          {/* Right: Key Metrics Grid (Screener.in Style) */}
+          {/* Right: Key Metrics Grid */}
           {isLoading ? <MetricsSkeleton /> : <div style={{
             background: colors.surface,
             border: `1px solid ${colors.border}`,
@@ -285,7 +285,7 @@ function DesktopLayout({ quote, symbol, timeframe, setTimeframe, ohlcData, chang
           }}>
             <h3 style={{ margin: '0 0 12px 0', fontSize: '12px', fontWeight: '600', textTransform: 'uppercase', color: colors.textSecondary }}>LATEST NEWS</h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <NewsItem title="Stock rises on strong Q3 earnings" source="Yahoo Finance" />
+              <NewsItem title="Stock rises on strong Q3 earnings" source="Market News" />
               <NewsItem title="Analyst upgrades rating" source="MoneyControl" />
               <NewsItem title="Sector momentum continues" source="BusinessToday" />
             </div>
@@ -484,7 +484,7 @@ function MobileLayout({ quote, symbol, timeframe, setTimeframe, ohlcData, change
         }}>
           <h3 style={{ margin: '0 0 8px 0', fontSize: '11px', fontWeight: '600', textTransform: 'uppercase', color: colors.textSecondary }}>NEWS</h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            <NewsItem title="Strong Q3 earnings" source="Yahoo" />
+            <NewsItem title="Strong Q3 earnings" source="Market News" />
             <NewsItem title="Analyst upgrade" source="MoneyControl" />
           </div>
         </div>

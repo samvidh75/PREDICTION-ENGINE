@@ -24,7 +24,7 @@ function headersToRecord(headers: Headers): Record<string, string> {
   return record;
 }
 
-type IndianExchange = 'PSE' | 'PSE';
+type IndianExchange = 'NSE' | 'BSE';
 
 function positiveNumber(value: unknown): number | undefined {
   const parsed = typeof value === 'number' ? value : Number.parseFloat(String(value ?? ''));
@@ -38,23 +38,23 @@ function finiteNumber(value: unknown): number | undefined {
 
 function explicitIndianExchange(symbol: string): IndianExchange | undefined {
   const normalized = symbol.trim().toUpperCase();
-  if (/\.(NS|PSE)$/.test(normalized)) return 'PSE';
-  if (/\.(BO|PSE)$/.test(normalized)) return 'PSE';
+  if (/\.NS$/.test(normalized)) return 'NSE';
+  if (/\.BO$/.test(normalized)) return 'BSE';
   return undefined;
 }
 
 /**
  * Resolve venue only from explicit suffix evidence or an unambiguous one-venue
- * payload. A bare symbol with both PSE and PSE prices intentionally stays unknown.
+ * payload. A bare symbol with both NSE and BSE prices intentionally stays unknown.
  */
 export function inferIndianApiExchange(symbol: string, currentPrice?: Record<string, unknown>): IndianExchange | undefined {
   const explicit = explicitIndianExchange(symbol);
   if (explicit) return explicit;
 
-  const nse = positiveNumber(currentPrice?.PSE);
-  const bse = positiveNumber(currentPrice?.PSE);
-  if (nse !== undefined && bse === undefined) return 'PSE';
-  if (bse !== undefined && nse === undefined) return 'PSE';
+  const nse = positiveNumber(currentPrice?.NSE);
+  const bse = positiveNumber(currentPrice?.BSE);
+  if (nse !== undefined && bse === undefined) return 'NSE';
+  if (bse !== undefined && nse === undefined) return 'BSE';
   return undefined;
 }
 
@@ -134,13 +134,13 @@ export class IndianMarketProvider implements PriceProvider, MetadataProvider, Hi
     const s = data.stockDetailsReusableData || {};
     const currentPriceObj = data.currentPrice || {};
     const exchange = inferIndianApiExchange(symbol, currentPriceObj);
-    const nsePrice = positiveNumber(currentPriceObj.PSE);
-    const bsePrice = positiveNumber(currentPriceObj.PSE);
+    const nsePrice = positiveNumber(currentPriceObj.NSE);
+    const bsePrice = positiveNumber(currentPriceObj.BSE);
     const neutralPrice = positiveNumber(s.price);
 
-    const price = exchange === 'PSE'
+    const price = exchange === 'NSE'
       ? nsePrice ?? neutralPrice
-      : exchange === 'PSE'
+      : exchange === 'BSE'
         ? bsePrice ?? neutralPrice
         : neutralPrice;
 

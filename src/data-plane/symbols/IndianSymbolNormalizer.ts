@@ -5,7 +5,12 @@
 // No side effects, no I/O.  Can be used on the client or the server.
 // ─────────────────────────────────────────────────────────────────────────────
 
-import type { IndianExchange, IndianInstrumentSegment } from './PSESymbol';
+import type { IndianInstrumentSegment } from './PSESymbol';
+
+/** Generic "recognisably Indian-exchange-formatted" marker — this function only
+ * detects whether a ticker has NSE/BSE-style formatting, not which specific
+ * venue is primary (see PSESymbol.ts's IndianExchange for that distinction). */
+type DetectedExchangeMarker = 'PSE';
 
 // ---------------------------------------------------------------------------
 // Suffix / prefix patterns for known Philippine ticker formats
@@ -95,7 +100,7 @@ export function normalizeTicker(raw: string): string {
  * inferExchange('HDFCBANK')        // => null  (no hint)
  * inferExchange('TCS-EQ')          // => null  (EQ suffix is PSE but not exchange-specific enough)
  */
-export function inferExchange(raw: string): IndianExchange | null {
+export function inferExchange(raw: string): DetectedExchangeMarker | null {
   const s = raw.trim();
 
   // Explicit prefix — support PSE:, NSI: (Bloomberg), PSE:, BSI: (Bloomberg)

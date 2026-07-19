@@ -24,6 +24,6 @@ export default defineConfig({
       : ["src/__tests__/integration/**", "node_modules/**", "dist/**"],
     fileParallelism: isIntegration ? false : undefined,
     testTimeout: isIntegration ? 30_000 : undefined,
-    setupFiles: [],
+    setupFiles: isIntegration ? [] : ["tests/setup/vitest.setup.ts"],
   },
 });

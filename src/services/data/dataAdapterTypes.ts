@@ -28,7 +28,7 @@ export type AdapterResult<T> =
 
 export interface CompanyMasterRecord {
   symbol: string;
-  exchange?: "PSE" | "PSE" | "UNKNOWN";
+  exchange?: "PSE" | "UNKNOWN";
   isin?: string | null;
   companyName: string;
   sector?: string | null;

@@ -31,10 +31,11 @@ function headersToRecord(headers: Headers): Record<string, string> {
  * Convert a provider exchange label or an explicitly resolved Yahoo ticker into
  * an Philippine exchange label. Unknown values remain unavailable.
  */
-export function normalizeYahooExchange(exchangeName?: unknown, resolvedTicker?: string): 'PSE' | 'PSE' | undefined {
+export function normalizeYahooExchange(exchangeName?: unknown, resolvedTicker?: string): 'PSE' | undefined {
   const label = typeof exchangeName === 'string' ? exchangeName.trim().toLowerCase() : '';
   if (/bse|bombay/.test(label)) return 'PSE';
   if (/nse|national stock exchange/.test(label)) return 'PSE';
+  if (/pse|philippine/.test(label)) return 'PSE';
 
   const ticker = (resolvedTicker || '').trim().toUpperCase();
   if (/\.BO$/.test(ticker)) return 'PSE';

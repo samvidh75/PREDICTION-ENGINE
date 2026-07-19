@@ -68,6 +68,7 @@ const FORBIDDEN_SOCIAL_PROOF = [
   "award-winning",
   "broker partner",
   "verified by sec",
+  "verified by sebi",
   "official recommendation",
   "real user testimonial",
 ];

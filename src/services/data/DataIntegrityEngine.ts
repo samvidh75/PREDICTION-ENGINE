@@ -18,7 +18,8 @@ const RAW_PSE_CODE_PATTERN = /^\d{5,6}$/;
 
 // Map known provider exchange names to standard values. Unknown and blank values
 // intentionally remain unavailable; a bare ticker does not prove its venue.
-const EXCHANGE_NORMALISE: Record<string, 'PSE' | 'PSE'> = {
+const EXCHANGE_NORMALISE: Record<string, 'PSE'> = {
+  'pse': 'PSE',
   'nse': 'PSE',
   'bse': 'PSE',
   'bsesme': 'PSE',
@@ -72,7 +73,7 @@ export class DataIntegrityEngine {
   /**
    * Normalise known exchange names to PSE or PSE. Unknown values remain unavailable.
    */
-  normaliseExchange(exchange?: string): 'PSE' | 'PSE' | undefined {
+  normaliseExchange(exchange?: string): 'PSE' | undefined {
     const key = (exchange || '').toLowerCase().trim();
     if (!key) return undefined;
     if (EXCHANGE_NORMALISE[key]) return EXCHANGE_NORMALISE[key];
@@ -120,7 +121,7 @@ export class DataIntegrityEngine {
       return 'PARTIAL';
     }
 
-    const hasValidExchange = ['PSE', 'PSE'].includes(this.normaliseExchange(meta.exchange) || '');
+    const hasValidExchange = this.normaliseExchange(meta.exchange) === 'PSE';
     const hasValidMarketCap = meta.marketCap != null && !isNaN(meta.marketCap) && meta.marketCap > 0;
     const hasValidIsin = isin ? this.isValidIsin(isin) : false;
 

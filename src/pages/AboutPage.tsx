@@ -620,7 +620,7 @@ export default function AboutPage() {
             {[
               {
                 title: "Research",
-                body: "Company review surfaces keep factors, freshness, and historical structure aligned in one frame.",
+                body: "Company review surfaces keep factors, recency, and historical structure aligned in one frame.",
                 icon: Search,
               },
               {
@@ -747,9 +747,9 @@ export default function AboutPage() {
                   }}
                 >
                   {[
-                    ["Coverage", "PSE / PSE / SME"],
+                    ["Markets", "NSE / BSE / SME"],
                     ["Health", "Healthy"],
-                    ["Freshness", "API verified"],
+                    ["Last Updated", "Verified"],
                     ["Vectors", "150 tracked"],
                   ].map(([label, value]) => (
                     <div key={label}>

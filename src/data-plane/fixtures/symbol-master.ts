@@ -73,7 +73,7 @@ function nse(
 ): PSESymbol {
   return {
     canonicalSymbol: symbol,
-    exchange: 'PSE',
+    exchange: 'NSE',
     segment: 'EQ',
     isin,
     companyName,
@@ -98,7 +98,7 @@ function bseOnly(
 ): PSESymbol {
   return {
     canonicalSymbol: symbol,
-    exchange: 'PSE',
+    exchange: 'BSE',
     segment: 'EQ',
     isin,
     companyName,
@@ -123,7 +123,7 @@ function smeEntry(
 ): PSESymbol {
   return {
     canonicalSymbol: symbol,
-    exchange: 'PSE',
+    exchange: 'NSE',
     segment: 'SM',
     isin,
     companyName,
@@ -148,7 +148,7 @@ function etfEntry(
 ): PSESymbol {
   return {
     canonicalSymbol: symbol,
-    exchange: 'PSE',
+    exchange: 'NSE',
     segment: 'ET',
     isin,
     companyName,
