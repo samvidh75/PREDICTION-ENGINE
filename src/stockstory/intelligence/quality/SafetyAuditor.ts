@@ -46,13 +46,13 @@ export class SafetyAuditor {
     for (const p of FORBIDDEN_BACKEND_PHRASES) {
       this.forbiddenBackend.push({ phrase: p, category: 'backend' });
     }
-    for (const p of FAKE_DATA_PATTE) {
+    for (const p of FAKE_DATA_PATTERNS) {
       this.fakeDataPatterns.push({ phrase: p.toLowerCase(), category: 'fake_data' });
     }
     for (const p of US_SYMBOLS) {
       this.usSymbols.push({ phrase: p, category: 'fake_data' });
     }
-    for (const p of HALLUCINATION_RISK_PATTE) {
+    for (const p of HALLUCINATION_RISK_PATTERNS) {
       this.hallucinationPatterns.set(p.toLowerCase(), 'hallucination_risk');
     }
   }

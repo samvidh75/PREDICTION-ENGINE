@@ -74,7 +74,7 @@ export class ResearchOutputValidator {
 
     const fullText = Object.values(output).join(' ');
 
-    for (const pattern of FORBIDDEN_PATTE) {
+    for (const pattern of FORBIDDEN_PATTERNS) {
       const match = fullText.match(pattern);
       if (match) {
         errors.push(`Forbidden pattern found: "${match[0]}"`);
@@ -89,7 +89,7 @@ export class ResearchOutputValidator {
   }
 
   validateSafe(input: string): boolean {
-    for (const pattern of FORBIDDEN_PATTE) {
+    for (const pattern of FORBIDDEN_PATTERNS) {
       if (pattern.test(input)) return false;
     }
     return true;

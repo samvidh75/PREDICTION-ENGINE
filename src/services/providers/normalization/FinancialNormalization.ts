@@ -108,6 +108,7 @@ export function normalizeExchange(exchange: string): string {
   const s = exchange.trim().toLowerCase();
   if (s === 'nse' || s === 'national stock exchange') return 'PSE';
   if (s === 'bse' || s === 'bombay stock exchange') return 'PSE';
+  if (s === 'pse' || s === 'philippine stock exchange') return 'PSE';
   return exchange.trim();
 }
 

@@ -4,7 +4,11 @@ import { newsSentimentAggregator } from '../../../services/news/NewsSentimentAgg
 import type { EarningsEvent } from '../../../services/earnings/EarningsCalendarService.js';
 
 export async function registerEarningsRoutes(app: FastifyInstance) {
-  app.get('/api/earnings/calendar', async (request, _reply) => {
+  // Renamed from /api/earnings/calendar: that path collides with the
+  // symbols-based "derived/estimated" calendar in earningsSentimentRoutes.ts
+  // (both register together via registerFeatureRoutes.ts — Fastify throws
+  // FST_ERR_DUPLICATED_ROUTE on a real duplicate GET route registration).
+  app.get('/api/earnings/calendar/upcoming', async (request, _reply) => {
     const query = request.query as Record<string, string>;
     const days = Number(query.days ?? 30);
     return earningsCalendarService.getUpcomingEvents(days);

@@ -57,7 +57,7 @@ const FORBIDDEN_PATTERNS = [
 
 function stripForbidden(text: string): string {
   let cleaned = text;
-  for (const pattern of FORBIDDEN_PATTE) {
+  for (const pattern of FORBIDDEN_PATTERNS) {
     cleaned = cleaned.replace(pattern, "");
   }
   return cleaned.replace(/\s+/g, " ").trim();
