@@ -8,6 +8,7 @@
   },
   "scripts": {
     "dev": "vite",
+    "dev:websocket": "PORT=8080 tsx src/render/startServer.ts",
     "dev:stockstory": "VITE_APP_DOMAIN=stockstory-india.com VITE_APP_ORIGIN=http://stockstory-india.com:5174 VITE_API_DOMAIN=stockstory-india.com vite --host 0.0.0.0",
     "build": "npm run build:frontend",
     "redis:health": "npx tsx scripts/redis-health.ts",

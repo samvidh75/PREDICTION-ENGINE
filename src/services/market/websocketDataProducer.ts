@@ -23,18 +23,21 @@ async function fetchLatestPrices(): Promise<TickerTick[]> {
   try {
     // Get the most recent candle for each ticker
     // We query a wider set and let the database handle deduplication
+    // DISTINCT ON is Postgres-only (SQLite — the local/offline fallback
+    // dbAdapter can use — throws "near ON: syntax error" on it). Rewritten
+    // with ROW_NUMBER() OVER (PARTITION BY ...), which both dialects support
+    // (already the pattern used in MarketActionService.ts).
     const result = await dbAdapter.query(
-      `WITH latest AS (
-        SELECT DISTINCT ON (ticker)
+      `WITH ranked AS (
+        SELECT
           ticker,
           close as price,
-          ROUND(((close - open) / NULLIF(open, 0)) * 100, 2) as change_pct
+          ROUND(((close - open) / NULLIF(open, 0)) * 100, 2) as change_pct,
+          ROW_NUMBER() OVER (PARTITION BY ticker ORDER BY date DESC) AS rn
         FROM asset_historical_candles
         WHERE date >= CURRENT_DATE - INTERVAL '7 days'
-        ORDER BY ticker, date DESC
-        LIMIT $1
       )
-      SELECT * FROM latest`,
+      SELECT ticker, price, change_pct FROM ranked WHERE rn = 1 LIMIT $1`,
       [BATCH_SIZE]
     );
 

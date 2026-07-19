@@ -3,7 +3,13 @@ import { l2OrderBookAggregator } from '../../../services/market/L2OrderBookAggre
 import type { L2OrderBookUpdate } from '../../../services/market/L2OrderBookAggregator.js';
 
 export async function registerMarketDepthRoutes(app: FastifyInstance) {
-  app.get('/api/market/orderbook/L2/:symbol', async (request, reply) => {
+  // Renamed from /api/market/orderbook/L2/:symbol: that path collides with
+  // liveQuotesWs.ts's route (registered earlier in startServer.ts), which
+  // derives its order book live from quotes rather than from this
+  // aggregator's externally-POSTed snapshots — two genuinely different data
+  // flows sharing one URL. Fastify throws FST_ERR_DUPLICATED_ROUTE on the
+  // real duplicate GET registration.
+  app.get('/api/market/orderbook/L2-aggregated/:symbol', async (request, reply) => {
     const { symbol } = request.params as Record<string, string>;
     const snapshot = l2OrderBookAggregator.getSnapshot(symbol.toUpperCase());
     if (!snapshot) {

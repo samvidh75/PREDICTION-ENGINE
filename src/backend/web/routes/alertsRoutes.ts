@@ -4,7 +4,13 @@ import { webhookService } from '../../../services/alerts/WebhookService.js';
 import type { WebhookConfig } from '../../../services/alerts/WebhookService.js';
 
 export async function registerAlertsRoutes(app: FastifyInstance) {
-  app.post('/api/alerts/create', async (request, reply) => {
+  // Prefixed with /multileg/: this file's create/rules/evaluate routes
+  // collide with unifiedAlertsRoutes.ts (registered earlier in
+  // startServer.ts, has a pinning test) — two genuinely different alert
+  // engines (multi-leg condition rules + webhooks here, vs. thesis-status
+  // alerts there) sharing plain-English URL names. Fastify throws
+  // FST_ERR_DUPLICATED_ROUTE on the real duplicate registration.
+  app.post('/api/alerts/multileg/create', async (request, reply) => {
     const body = (request.body ?? {}) as Record<string, unknown>;
     const conditions = body.conditions;
     if (!Array.isArray(conditions) || conditions.length === 0) {
@@ -22,12 +28,12 @@ export async function registerAlertsRoutes(app: FastifyInstance) {
     return rule;
   });
 
-  app.get('/api/alerts/rules', async (request, _reply) => {
+  app.get('/api/alerts/multileg/rules', async (request, _reply) => {
     const query = request.query as Record<string, string>;
     return multiLegAlertEngine.listRules(query.symbol);
   });
 
-  app.post('/api/alerts/evaluate', async (request, reply) => {
+  app.post('/api/alerts/multileg/evaluate', async (request, reply) => {
     const body = request.body as AlertEvaluationContext | null;
     if (!body || !body.symbol || !body.currentValues) {
       return reply.status(400).send({ error: 'symbol and currentValues required' });

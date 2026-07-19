@@ -100,6 +100,8 @@ function translateSQL(sql: string): string {
   translated = translated
     .replace(/NOW\(\)/gi, "datetime('now')")
     .replace(/CURRENT_TIMESTAMP/gi, "datetime('now')")
+    .replace(/CURRENT_DATE\s*-\s*INTERVAL\s*'(\d+)\s*(day|days|month|months|year|years)'/gi, (_m, n, unit) => `date('now', '-${n} ${unit}')`)
+    .replace(/CURRENT_DATE\s*\+\s*INTERVAL\s*'(\d+)\s*(day|days|month|months|year|years)'/gi, (_m, n, unit) => `date('now', '+${n} ${unit}')`)
     .replace(/IS NOT TRUE/gi, '= 0')
     .replace(/IS TRUE/gi, '= 1')
     .replace(/ILIKE/gi, 'LIKE')

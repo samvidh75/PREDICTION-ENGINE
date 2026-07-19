@@ -961,9 +961,13 @@ export default async function registerApiRoutes(server: FastifyInstance) {
     }
   });
 
-  // POST /api/ai/chat — Floating AI button endpoint
-  // Provides stock market analysis for browser-based LLM fallback
-  server.post("/api/ai/chat", async (req, reply) => {
+  // POST /api/ai/chat-faq — Floating AI button endpoint (canned FAQ fallback)
+  // Renamed from /api/ai/chat: that path collides with aiRoutes.ts's real
+  // model-inference chat endpoint (registered later in startServer.ts) —
+  // two genuinely different features (keyword-matched static FAQ answers
+  // here vs. the fine-tuned model there) sharing one URL. Fastify throws
+  // FST_ERR_DUPLICATED_ROUTE on the real duplicate registration.
+  server.post("/api/ai/chat-faq", async (req, reply) => {
     const { message } = (req.body || {}) as { message?: string };
 
     if (!message || typeof message !== "string" || message.trim().length === 0) {
