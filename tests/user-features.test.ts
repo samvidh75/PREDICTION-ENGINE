@@ -201,6 +201,14 @@ describe('Investor Memory Engine', () => {
   let IME: any;
 
   beforeEach(async () => {
+    // getMemory() fires a real fetch('/api/investor-state') on its first call
+    // (module-level flag, only once per module load) whose async .then()
+    // overwrites localStorage with backend data if it resolves. Left
+    // unstubbed, that resolution can land mid-test — arbitrarily, since
+    // dynamic import() caches the module across tests in this file — and
+    // clobber whatever the current test just wrote, causing order-dependent
+    // flakiness. Stub it so the sync call fails fast and never overwrites.
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('no network in tests')));
     IME = await import('../src/services/portfolio/InvestorMemoryEngine');
     localStorage.clear();
   });

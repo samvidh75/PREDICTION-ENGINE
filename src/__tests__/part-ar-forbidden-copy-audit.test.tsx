@@ -27,7 +27,7 @@ function findFiles(dir: string, pattern: RegExp, results: string[] = []): string
       const full = path.join(dir, entry.name);
       if (entry.isDirectory() && !entry.name.startsWith('__') && !entry.name.startsWith('node_modules') && !entry.name.startsWith('.') && entry.name !== 'backend') {
         findFiles(full, pattern, results);
-      } else if (entry.isFile() && pattern.test(entry.name)) {
+      } else if (entry.isFile() && !entry.name.startsWith('.') && pattern.test(entry.name)) {
         results.push(full);
       }
     }
