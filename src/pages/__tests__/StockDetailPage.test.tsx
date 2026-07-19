@@ -169,7 +169,8 @@ describe("StockDetailPage", () => {
     }));
     renderPage();
 
-    expect(await screen.findByText(/Research summary/i)).toBeTruthy();
+    expect(await screen.findByText(/Investment Thesis/i)).toBeTruthy();
+    expect(screen.queryAllByText(/Investment Thesis/i).length).toBe(1);
     expect(screen.queryByText(/AI explanation/i)).toBeNull();
     expect(screen.queryByText(/Research context only\. Not a recommendation\./i)).toBeNull();
   });

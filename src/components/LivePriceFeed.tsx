@@ -8,7 +8,7 @@
 import { useEffect, useState } from 'react';
 import { Zap, AlertCircle, CheckCircle } from 'lucide-react';
 import { colors } from '../design/tokens';
-import { upstoxPriceService, PriceUpdate } from '../services/realtime/UpstoxPriceService';
+import { upstoxPriceService, PriceUpdate } from '../services/quotes/UpstoxPriceService';
 
 interface LivePriceFeedProps {
   watchlistTickers: string[];
