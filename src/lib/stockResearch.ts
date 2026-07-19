@@ -33,7 +33,7 @@ export interface StockResearchSummary {
 
 export interface StockResearchDetail extends StockResearchSummary {
   companyName: string;
-  exchangeBadge: "PSE" | "PSE";
+  exchangeBadge: "PSE" | "NSE";
   founded: string;
   ceo: string;
   hq: string;
@@ -766,7 +766,7 @@ export function getStockResearch(symbol: string): StockResearchDetail | null {
   return {
     ...summary,
     companyName: summary.name,
-    exchangeBadge: summary.exchange === "PSE" ? "PSE" : "PSE",
+    exchangeBadge: summary.exchange === "PSE" ? "PSE" : "NSE",
     founded: profile.founded,
     ceo: profile.ceo,
     hq: profile.hq,
