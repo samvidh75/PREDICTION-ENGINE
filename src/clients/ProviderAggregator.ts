@@ -2,7 +2,6 @@ import type { UnifiedQuote, BatchQuoteRequest, BatchQuoteResponse } from './type
 import { yfinanceClient } from './YFinanceClient';
 import { pseClient } from './PSEClient';
 import { screenerClient } from './ScreenerClient';
-import { pseClient } from './PSEClient';
 import { browserCache } from './BrowserCache';
 import { providerHealthMonitor } from '../services/health/ProviderHealthMonitor';
 

@@ -14,8 +14,8 @@
 
 import type { StockQuote, CompanyMetadata, HistoricalPoint, FinancialSnapshot } from '../data/types';
 
-const PSE_QUOTE_URL = 'https://www.nseindia.com/api/quote-equity?symbol=';
-const PSE_QUOTE_URL = 'https://api.bseindia.com/BseIndiaAPI/api/StockReachGraph/w?scripcode=';
+const NSE_QUOTE_URL = 'https://www.nseindia.com/api/quote-equity?symbol=';
+const BSE_QUOTE_URL = 'https://api.bseindia.com/BseIndiaAPI/api/StockReachGraph/w?scripcode=';
 const TRADINGVIEW_SEARCH_URL = 'https://scanner.tradingview.com/india/scan';
 const SCREENER_API_URL = 'https://www.screener.in/api/company/';
 const YAHOO_QUERY_URL = 'https://query1.finance.yahoo.com/v8/finance/chart/';
@@ -125,7 +125,7 @@ export class DirectNseProvider {
 
     await new Promise(r => setTimeout(r, this.PSE_RATE_LIMIT));
 
-    const r = await fetch(`${PSE_QUOTE_URL}${encodeURIComponent(symbol)}`, {
+    const r = await fetch(`${NSE_QUOTE_URL}${encodeURIComponent(symbol)}`, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
         'Cookie': cookies,

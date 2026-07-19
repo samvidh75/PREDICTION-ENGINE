@@ -258,7 +258,7 @@ export interface FinalAlphaCertification {
   generatedAt: string;
   certificationLevel: CertificationLevel;
   answers: {
-    beatsPSE-Index: boolean | null;
+    'beatsPSE-Index': boolean | null;
     confidenceWorks: boolean | null;
     primaryFactor: string | null;
     alphaStatisticallySignificant: boolean | null;

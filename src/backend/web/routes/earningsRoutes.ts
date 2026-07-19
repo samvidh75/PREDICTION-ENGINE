@@ -52,11 +52,6 @@ export async function registerEarningsRoutes(app: FastifyInstance) {
     return result;
   });
 
-  app.get('/api/news/:symbol/sentiment', async (request, _reply) => {
-    const { symbol } = request.params as Record<string, string>;
-    return newsSentimentAggregator.getSentimentSummary(symbol.toUpperCase());
-  });
-
   app.post('/api/news/article', async (request, _reply) => {
     const body = (request.body ?? {}) as Record<string, string | number | string[]>;
     return newsSentimentAggregator.addArticle({

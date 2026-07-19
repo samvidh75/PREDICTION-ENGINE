@@ -41,7 +41,9 @@ def _load_model():
     if not HF_TOKEN:
         raise RuntimeError("HF_TOKEN environment variable is not set")
     login(token=HF_TOKEN)
-    base = AutoModelForCausalLM.from_pretrained(BASE_MODEL, dtype=torch.float32, device_map="cpu")
+    # bfloat16 halves memory vs float32 (~5GB vs ~10GB) — required to fit an 8GB VPS
+    # without OOM. Verified: float32 was OOM-killed by the kernel on this server.
+    base = AutoModelForCausalLM.from_pretrained(BASE_MODEL, dtype=torch.bfloat16, device_map="cpu")
     _model = PeftModel.from_pretrained(base, ADAPTER_REPO, token=HF_TOKEN)
     _tokenizer = AutoTokenizer.from_pretrained(BASE_MODEL, token=HF_TOKEN)
     if _tokenizer.pad_token is None:
