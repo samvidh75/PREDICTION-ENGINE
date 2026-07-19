@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { NSE_BSE_STOCKS } from "./universe.js";
-import { stockDataAggregator } from "../services/stockDataAggregator.js";
+import { stockDataAggregator } from "../_lib/services/stockDataAggregator.js";
 
 /**
  * Search and filter 5000+ stocks by various criteria

@@ -7,7 +7,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 /** Recognised Philippine stock exchanges for equity trading. */
-export type IndianExchange = 'PSE' | 'PSE';
+export type IndianExchange = 'PSE';
 
 /**
  * Instrument segment for an PSE equity.

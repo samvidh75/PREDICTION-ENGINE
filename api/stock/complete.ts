@@ -4,10 +4,10 @@
  */
 
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { stockDataAggregator } from "../services/stockDataAggregator.js";
-import { calculateAdvancedIndicators } from "../services/advancedIndicators.js";
-import { premiumFeaturesEngine } from "../services/premiumFeatures.js";
-import { portfolioManager, alertSystem } from "../services/portfolioAndAlerts.js";
+import { stockDataAggregator } from "../_lib/services/stockDataAggregator.js";
+import { calculateAdvancedIndicators } from "../_lib/services/advancedIndicators.js";
+import { premiumFeaturesEngine } from "../_lib/services/premiumFeatures.js";
+import { portfolioManager, alertSystem } from "../_lib/services/portfolioAndAlerts.js";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const { symbol } = req.query;

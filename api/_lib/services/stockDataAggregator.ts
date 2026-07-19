@@ -4,7 +4,7 @@
  * Handles all technical indicators, fundamentals, and real-time data
  */
 
-import { CompleteStockData } from "../stocks/universe.js";
+import { CompleteStockData } from "../data/universe.js";
 
 interface DataSource {
   name: string;
