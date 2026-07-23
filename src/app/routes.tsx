@@ -4,7 +4,6 @@ import { AppShell } from "./AppShell";
 import { PublicLayout } from "./PublicLayout";
 import { getBetaConfig, isFeatureEnabled } from "../config/beta";
 import { useAuth } from "../context/AuthContext";
-import { colors, typography } from "../design/tokens";
 
 const HomePage = lazy(() => import("../pages/HomePage"));
 const ScannerPage = lazy(() => import("../pages/ScannerPage"));
@@ -31,20 +30,18 @@ const AdvancedScanner = lazy(() => import("../components/AdvancedScanner"));
 const BillingSuccessPage = lazy(() => import("../pages/BillingSuccessPage"));
 const BillingCancelPage = lazy(() => import("../pages/BillingCancelPage"));
 const OpsDashboard = lazy(() => import("../pages/OpsDashboard"));
-const DashboardPage = lazy(() => import("../pages/DashboardPage"));
 const OptionsChainPage = lazy(() => import("../pages/OptionsChainPage"));
 const BacktestPage = lazy(() => import("../pages/BacktestPage"));
 const AlertPage = lazy(() => import("../pages/AlertPage"));
 const PortfolioAnalyticsPage = lazy(() => import("../pages/PortfolioAnalyticsPage"));
 const LiveMarketPage = lazy(() => import("../pages/LiveMarketPage"));
-const StockDetailPage = lazy(() => import("../pages/StockDetailPage"));
 const PortfolioDetailPage = lazy(() => import("../pages/PortfolioDetailPage"));
 const StockStoryPage = lazy(() => import("../pages/StockStoryPage"));
 const AITestPage = lazy(() => import("../pages/AITestPage"));
 const BrowserAITestPage = lazy(() => import("../pages/BrowserAITestPage"));
 const ComponentTestPage = lazy(() => import("../pages/ComponentTestPage"));
 
-const SHOW_ABOUT_PAGE = import.meta.env.VITE_SHOW_ABOUT_PAGE === "true";
+const SHOW_ABOUT_PAGE = true;
 
 function RouteFallback() {
   return (
@@ -54,15 +51,46 @@ function RouteFallback() {
         display: "grid",
         placeItems: "center",
         color: "#ffffff",
-        fontSize: "18px",
-        fontFamily: "sans-serif",
+        fontFamily: "-apple-system, BlinkMacSystemFont, 'Inter', sans-serif",
         backgroundColor: "#000000",
       }}
     >
       <div style={{ textAlign: "center" }}>
-        <p>Loading research…</p>
-        <p style={{ fontSize: "12px", color: "#a0a0a0", marginTop: "20px" }}>If this takes too long, please reload the page.</p>
+        <div className="stockex-loader" aria-hidden="true">
+          <span className="stockex-loader-ring" />
+          <span className="stockex-loader-core" />
+        </div>
+        <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.55)", marginTop: "18px", letterSpacing: "0.01em" }}>
+          Loading research…
+        </p>
+        <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)", marginTop: "6px" }}>
+          If this takes too long, please reload the page.
+        </p>
       </div>
+      <style>{`
+        .stockex-loader { position: relative; width: 40px; height: 40px; margin: 0 auto; }
+        .stockex-loader-ring {
+          position: absolute; inset: 0; border-radius: 50%;
+          border: 2px solid rgba(255,107,74,0.16);
+          border-top-color: #FF6B4A;
+          animation: stockex-loader-spin 0.9s cubic-bezier(0.4,0,0.2,1) infinite;
+        }
+        .stockex-loader-core {
+          position: absolute; left: 50%; top: 50%; width: 6px; height: 6px;
+          transform: translate(-50%, -50%); border-radius: 50%;
+          background: #FF6B4A; box-shadow: 0 0 12px 2px rgba(255,107,74,0.6);
+          animation: stockex-loader-pulse 1.6s ease-in-out infinite;
+        }
+        @keyframes stockex-loader-spin { to { transform: rotate(360deg); } }
+        @keyframes stockex-loader-pulse {
+          0%, 100% { opacity: 0.5; transform: translate(-50%, -50%) scale(0.85); }
+          50%      { opacity: 1;   transform: translate(-50%, -50%) scale(1.15); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .stockex-loader-ring { animation-duration: 1.6s; }
+          .stockex-loader-core { animation: none; }
+        }
+      `}</style>
     </div>
   );
 }
@@ -82,7 +110,6 @@ function WorkspaceRoute({ children }: { children: ReactNode }) {
 }
 
 export function AppRoutes() {
-  const { user, loading } = useAuth();
   const { enableWaitlistPage } = getBetaConfig();
   const changelogEnabled = isFeatureEnabled("changelog");
   const publicFallback = SHOW_ABOUT_PAGE ? "/about" : "/dashboard";
@@ -104,7 +131,6 @@ export function AppRoutes() {
         <Route path="/scanner" element={<Suspense fallback={<RouteFallback />}><PublicLayout><ScannerPage /></PublicLayout></Suspense>} />
         <Route path="/scanner/:preset" element={<Suspense fallback={<RouteFallback />}><PublicLayout><ScannerLanding /></PublicLayout></Suspense>} />
         <Route path="/stock/:symbol/*" element={<Suspense fallback={<RouteFallback />}><PublicLayout><StockPage /></PublicLayout></Suspense>} />
-        <Route path="/stock-detail/:symbol" element={<Suspense fallback={<RouteFallback />}><PublicLayout><StockDetailPage /></PublicLayout></Suspense>} />
         <Route path="/portfolio-detail" element={<Suspense fallback={<RouteFallback />}><PublicLayout><PortfolioDetailPage /></PublicLayout></Suspense>} />
         <Route path="/compare" element={<Suspense fallback={<RouteFallback />}><PublicLayout><ComparePage /></PublicLayout></Suspense>} />
         <Route path="/sectors" element={<Suspense fallback={<RouteFallback />}><PublicLayout><Sectors /></PublicLayout></Suspense>} />
