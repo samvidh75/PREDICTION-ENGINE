@@ -25,7 +25,7 @@ export function StockCardMobile({ symbol, conviction, health, price, change, cha
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div>
           <h3 style={{ fontSize: '18px', fontWeight: 600, margin: 0 }}>{symbol}</h3>
-          <p style={{ fontSize: '14px', color: '#666', margin: '4px 0 0' }}>₹{price.toFixed(2)}</p>
+          <p style={{ fontSize: '14px', color: '#666', margin: '4px 0 0' }}>₱{price.toFixed(2)}</p>
         </div>
         <div style={{
           padding: '4px 8px',

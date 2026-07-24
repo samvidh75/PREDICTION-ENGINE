@@ -64,7 +64,7 @@ export const FILTER_PRESETS: Record<string, FilterPreset> = {
     name: 'Emerging Stocks',
     description: 'Small cap, high growth potential, reasonable valuation',
     filters: [
-      { field: 'marketCap', operator: 'lte', value: 50000, label: 'Market Cap ≤ ₹500Cr' },
+      { field: 'marketCap', operator: 'lte', value: 50000, label: 'Market Cap ≤ ₱500Cr' },
       { field: 'revenueGrowth', operator: 'gte', value: 20, label: 'Revenue Growth ≥ 20%' },
       { field: 'pe', operator: 'lte', value: 25, label: 'P/E Ratio ≤ 25' },
     ],

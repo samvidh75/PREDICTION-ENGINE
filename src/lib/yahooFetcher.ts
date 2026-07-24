@@ -28,7 +28,7 @@ export interface YahooQuote {
 
 export async function fetchYahooQuote(symbol: string): Promise<YahooQuote | null> {
   try {
-    const ticker = `${symbol}.NS`;
+    const ticker = `${symbol}.PS`;
     const raw = await httpGet(`https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(ticker)}?range=1d&interval=1m`);
     const d = JSON.parse(raw);
     const meta = d?.chart?.result?.[0]?.meta;
@@ -58,7 +58,7 @@ export interface YahooFundamentals {
 
 export async function fetchYahooFundamentals(symbol: string): Promise<YahooFundamentals | null> {
   try {
-    const raw = await httpGet(`https://query1.finance.yahoo.com/v10/finance/quoteSummary/${encodeURIComponent(symbol)}.NS?modules=financialData,defaultKeyStatistics,summaryDetail`);
+    const raw = await httpGet(`https://query1.finance.yahoo.com/v10/finance/quoteSummary/${encodeURIComponent(symbol)}.PS?modules=financialData,defaultKeyStatistics,summaryDetail`);
     const d = JSON.parse(raw);
     const qs = d?.quoteSummary?.result?.[0];
     if (!qs) return null;
@@ -89,7 +89,7 @@ export interface YahooHistoryPoint {
 export async function fetchYahooHistory(symbol: string): Promise<YahooHistoryPoint[] | null> {
   try {
     const now = Math.floor(Date.now() / 1000);
-    const raw = await httpGet(`https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}.NS?period1=${now - 365*86400}&period2=${now}&interval=1d`);
+    const raw = await httpGet(`https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}.PS?period1=${now - 365*86400}&period2=${now}&interval=1d`);
     const d = JSON.parse(raw);
     const result = d?.chart?.result?.[0];
     const timestamps: number[] = result?.timestamp ?? [];
@@ -122,7 +122,7 @@ export interface YahooNewsItem {
 
 export async function fetchYahooNews(symbol: string): Promise<YahooNewsItem[] | null> {
   try {
-    const raw = await httpGet(`https://query1.finance.yahoo.com/v1/finance/search?q=${encodeURIComponent(symbol)}&lang=en-IN&region=IN&quotesCount=0&newsCount=6`);
+    const raw = await httpGet(`https://query1.finance.yahoo.com/v1/finance/search?q=${encodeURIComponent(symbol)}&lang=en-PH&region=IN&quotesCount=0&newsCount=6`);
     const d = JSON.parse(raw);
     const articles = ((d?.news ?? []) as any[]).slice(0, 5).map((item: any) => ({
       headline: item.title || "",

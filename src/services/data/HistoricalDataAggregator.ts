@@ -49,8 +49,8 @@ export class HistoricalDataAggregator {
    */
   private async fetchFromYahooFinance(symbol: string, days: number): Promise<OHLC[]> {
     try {
-      // Convert .BO to standard format for Yahoo
-      const yahooSymbol = symbol.includes('.BO') ? symbol : `${symbol}.NS`;
+      // Convert to standard format for Yahoo
+      const yahooSymbol = symbol.includes('.PS') ? symbol : `${symbol}.PS`;
 
       // Calculate date range
       const endDate = Math.floor(Date.now() / 1000);

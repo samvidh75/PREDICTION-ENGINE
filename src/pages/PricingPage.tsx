@@ -19,7 +19,7 @@ import { colors, space, radius, layout } from "../design/tokens";
 const ANNUAL_DISCOUNT_MULTIPLIER = 10; // 2 months free on annual
 
 function PricingCard({ plan, featured, annual, onSelect }: { plan: Plan; featured: boolean; annual: boolean; onSelect?: () => void }) {
-  const monthlyPrice = plan.priceInr;
+  const monthlyPrice = plan.pricePkr;
   const annualPrice = Math.round(monthlyPrice * ANNUAL_DISCOUNT_MULTIPLIER);
   const displayPrice = annual ? annualPrice : monthlyPrice;
   const periodLabel = annual ? "/yr" : "/mo";
@@ -58,12 +58,12 @@ function PricingCard({ plan, featured, annual, onSelect }: { plan: Plan; feature
       )}
       <h3 style={{ margin: 0, fontSize: 20, fontWeight: 700 }}>{plan.name}</h3>
       <div style={{ display: "flex", alignItems: "baseline", gap: 4 }}>
-        <span style={{ fontSize: 36, fontWeight: 700 }}>₹{displayPrice.toLocaleString()}</span>
+        <span style={{ fontSize: 36, fontWeight: 700 }}>Rs.{displayPrice.toLocaleString()}</span>
         <span style={{ color: colors.textSecondary, fontSize: 14 }}>{periodLabel}</span>
       </div>
-      {annual && plan.priceInr > 0 && (
+      {annual && plan.pricePkr > 0 && (
         <div style={{ fontSize: 13, color: colors.success, fontWeight: 600, marginTop: -8 }}>
-          Save {savingsPercent}% (₹{Math.round(monthlyPrice * 12 - annualPrice).toLocaleString()}/yr)
+          Save {savingsPercent}% (Rs.{Math.round(monthlyPrice * 12 - annualPrice).toLocaleString()}/yr)
         </div>
       )}
       <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: space[2] }}>
@@ -80,19 +80,19 @@ function PricingCard({ plan, featured, annual, onSelect }: { plan: Plan; feature
             display: "inline-block",
             padding: "10px 24px",
             borderRadius: radius.md,
-            background: plan.priceInr === 0 ? "transparent" : featured ? colors.primary : "transparent",
-            color: plan.priceInr === 0 ? colors.primary : featured ? colors.onPrimary : colors.textPrimary,
-            border: plan.priceInr === 0 ? `1px solid ${colors.primary}` : featured ? "none" : `1px solid ${colors.border}`,
+            background: plan.pricePkr === 0 ? "transparent" : featured ? colors.primary : "transparent",
+            color: plan.pricePkr === 0 ? colors.primary : featured ? colors.onPrimary : colors.textPrimary,
+            border: plan.pricePkr === 0 ? `1px solid ${colors.primary}` : featured ? "none" : `1px solid ${colors.border}`,
             fontSize: 15,
             fontWeight: 600,
-            cursor: plan.priceInr > 0 ? "pointer" : "default",
+            cursor: plan.pricePkr > 0 ? "pointer" : "default",
             width: "100%",
             textAlign: "center",
             transition: "all 0.2s ease",
           }}
           onClick={onSelect}
         >
-          {plan.priceInr === 0 ? "Current plan" : featured ? "Get early access" : "Coming soon"}
+          {plan.pricePkr === 0 ? "Current plan" : featured ? "Get early access" : "Coming soon"}
         </div>
       </div>
     </div>
@@ -239,7 +239,7 @@ export default function PricingPage() {
             plan={plan}
             featured={plan.tier === "plus"}
             annual={annual}
-            onSelect={plan.priceInr > 0 ? () => handleSelect(plan) : undefined}
+            onSelect={plan.pricePkr > 0 ? () => handleSelect(plan) : undefined}
           />
         ))}
       </div>
@@ -254,6 +254,8 @@ export default function PricingPage() {
         }} onClick={() => { if (!checkoutLoading) { setCheckoutTier(null); setCheckoutError(null); } }}>
           <div style={{
             background: colors.card,
+            backdropFilter: "blur(20px) saturate(160%)",
+            WebkitBackdropFilter: "blur(20px) saturate(160%)",
             padding: space[6],
             borderRadius: radius.lg,
             maxWidth: 420,
@@ -365,7 +367,7 @@ export default function PricingPage() {
       </div>
 
       <div style={{ marginTop: space[6], padding: space[5], background: colors.fill, borderRadius: radius.lg, fontSize: 13, color: colors.textSecondary, textAlign: "center" }}>
-        <strong>Compliance Notice:</strong> StockEX India is not PSE-listed. 
+        <strong>Compliance Notice:</strong> StockEX Pakistan is not PSX-listed. 
         All plans provide research analysis tools only — no investment advice, 
         no buy/sell recommendations, no portfolio management. Past performance 
         does not guarantee future results. Subscription will be processed via 

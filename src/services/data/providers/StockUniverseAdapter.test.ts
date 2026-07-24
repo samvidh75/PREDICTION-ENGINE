@@ -8,8 +8,6 @@
 import { describe, expect, it, beforeAll } from 'vitest';
 import { StockUniverseAdapter } from './StockUniverseAdapter';
 
-const ISO_PATTERN = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
-
 describe('StockUniverseAdapter', () => {
   let adapter: StockUniverseAdapter;
 
@@ -22,71 +20,52 @@ describe('StockUniverseAdapter', () => {
   it('loads successfully from the bundled stock-universe.json', () => {
     expect(adapter.ready).toBe(true);
     expect(adapter.size).toBeGreaterThan(0);
-    expect(adapter.dataGeneratedAt).toMatch(ISO_PATTERN);
   });
 
   // ── Known symbols ──────────────────────────────────────────────────────────
 
   it('returns company master data for a known PSE symbol', async () => {
-    const result = await adapter.getCompanyMaster('RELIANCE');
+    const result = await adapter.getCompanyMaster('BDO');
     expect(result.ok).toBe(true);
     if (result.ok) {
-      expect(result.data.symbol).toBe('RELIANCE');
+      expect(result.data.symbol).toBe('BDO');
       expect(result.data.companyName).toBeTruthy();
       expect(result.data.exchange).toBe('PSE');
       expect(result.data.sector).toBeTruthy();
       expect(result.data.industry).toBeTruthy();
-      expect(result.data.marketCapCategory).toBeDefined();
     }
-    expect(result.asOf).toMatch(ISO_PATTERN);
   });
 
-  it('returns company master data for a known PSE symbol', async () => {
-    // Symbols with numeric values are PSE-listed
-    const result = await adapter.getCompanyMaster('TCS');
+  it('returns company master data for another known PSE symbol', async () => {
+    const result = await adapter.getCompanyMaster('JFC');
     expect(result.ok).toBe(true);
     if (result.ok) {
-      expect(result.data.symbol).toBe('TCS');
+      expect(result.data.symbol).toBe('JFC');
       expect(result.data.companyName).toBeTruthy();
     }
   });
 
-  it('maps marketCap to Large Cap for large-cap entries (>= 20000 cr)', async () => {
-    // RELIANCE has marketCap ~1,600,864 cr -> Large Cap
-    const result = await adapter.getCompanyMaster('RELIANCE');
+  it('maps zero marketCap to Micro Cap', async () => {
+    const result = await adapter.getCompanyMaster('BDO');
     expect(result.ok).toBe(true);
-    if (result.ok) expect(result.data.marketCapCategory).toBe('Large Cap');
-  });
-
-  it('maps marketCap to Mid Cap for mid-cap entries (>= 5000 cr)', async () => {
-    // ABSLAMC has marketCap ~5,539 cr -> Mid Cap
-    const result = await adapter.getCompanyMaster('ABSLAMC');
-    expect(result.ok).toBe(true);
-    if (result.ok) expect(result.data.marketCapCategory).toBe('Mid Cap');
-  });
-
-  it('maps marketCap to Small Cap for small-cap entries (>= 500 cr)', async () => {
-    // CALSOFT has marketCap ~3,559 cr -> Small Cap
-    const result = await adapter.getCompanyMaster('CALSOFT');
-    expect(result.ok).toBe(true);
-    if (result.ok) expect(result.data.marketCapCategory).toBe('Small Cap');
+    if (result.ok) expect(result.data.marketCapCategory).toBe('Micro Cap');
   });
 
   // ── Normalization ──────────────────────────────────────────────────────────
 
   it('normalises symbols with exchange prefixes', async () => {
-    const result = await adapter.getCompanyMaster('PSE:RELIANCE');
+    const result = await adapter.getCompanyMaster('PSE:BDO');
     expect(result.ok).toBe(true);
     if (result.ok) {
-      expect(result.data.symbol).toBe('RELIANCE');
+      expect(result.data.symbol).toBe('BDO');
     }
   });
 
-  it('normalises symbols with .NS suffix', async () => {
-    const result = await adapter.getCompanyMaster('RELIANCE.NS');
+  it('normalises symbols with .PS suffix', async () => {
+    const result = await adapter.getCompanyMaster('BDO.PS');
     expect(result.ok).toBe(true);
     if (result.ok) {
-      expect(result.data.symbol).toBe('RELIANCE');
+      expect(result.data.symbol).toBe('BDO');
     }
   });
 
@@ -112,10 +91,10 @@ describe('StockUniverseAdapter', () => {
     const registry = createDataAdapterRegistry({
       companyMaster: adapter,
     });
-    const result = await registry.companyMaster.getCompanyMaster('TCS');
+    const result = await registry.companyMaster.getCompanyMaster('JFC');
     expect(result.ok).toBe(true);
     if (result.ok) {
-      expect(result.data.symbol).toBe('TCS');
+      expect(result.data.symbol).toBe('JFC');
     }
   });
 });

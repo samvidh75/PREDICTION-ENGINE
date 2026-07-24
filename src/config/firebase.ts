@@ -10,7 +10,7 @@
  * In production:   set these in the deployment provider's secret/env UI
  *
  * ── How to obtain the missing values ──────────────────────────────────────
- *  1. Go to https://console.firebase.google.com/project/stockstory-india/settings/general
+ *  1. Go to https://console.firebase.google.com/project/stockstory-ph/settings/general
  *  2. Scroll to "Your apps" → click your web app → "Firebase SDK snippet" → "Config"
  *  3. Copy apiKey, messagingSenderId, appId into .env as VITE_FIREBASE_* vars
  */
@@ -26,9 +26,9 @@ import {
 import { getFirestore, type Firestore } from "firebase/firestore";
 
 // ── Known project constants (safe to hardcode — public by Firebase design) ──
-const PROJECT_ID = "stockstory-india";
-const AUTH_DOMAIN = "stockstory-india.firebaseapp.com";
-const STORAGE_BUCKET = "stockstory-india.firebasestorage.app";
+const PROJECT_ID = "stockstory-ph";
+const AUTH_DOMAIN = "stockstory-ph.firebaseapp.com";
+const STORAGE_BUCKET = "stockstory-ph.firebasestorage.app";
 
 // ── Secret values — must be set in .env / .env.production ──────────────────
 const API_KEY = import.meta.env.VITE_FIREBASE_API_KEY as string | undefined;

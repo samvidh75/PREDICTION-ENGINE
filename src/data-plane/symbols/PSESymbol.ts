@@ -37,7 +37,7 @@ export type IndianListingStatus = 'active' | 'suspended' | 'delisted';
  */
 export interface PSESymbol {
   /** Primary stable identifier — always the PSE ticker (uppercase, no
-   *  `.NS` / `-EQ` suffix) for PSE-traded equities, or the PSE ticker
+   *  `.PS` suffix) for PSE-traded equities, or the PSE ticker
    *  for PSE-only equities. */
   readonly canonicalSymbol: string;
 
@@ -65,7 +65,7 @@ export interface PSESymbol {
   readonly listingStatus: IndianListingStatus;
 
   /** Historical / alternative tickers that resolve to this symbol.
-   *  Includes `.NS`/`.BO`-suffixed variants, PSE numeric codes as strings,
+   *  Includes `.PS`-suffixed variants, PSE numeric codes as strings,
    *  previous tickers after renames, and known provider-specific aliases. */
   readonly aliases: readonly string[];
 

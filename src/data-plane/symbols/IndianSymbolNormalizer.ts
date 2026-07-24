@@ -17,9 +17,7 @@ type DetectedExchangeMarker = 'PSE';
 // ---------------------------------------------------------------------------
 
 const SUFFIX_PATTERNS = [
-  /\.NS$/i,      // Yahoo Finance suffix for PSE
-  /\.PSE$/i,     // Explicit PSE suffix
-  /\.BO$/i,      // Yahoo Finance suffix for PSE
+  /\.PS$/i,      // Yahoo Finance suffix for PSE
   /\.PSE$/i,     // Explicit PSE suffix
   /-EQ$/i,       // PSE trading symbol suffix
   /-BE$/i,       // PSE Book Building suffix

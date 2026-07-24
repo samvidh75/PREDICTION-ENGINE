@@ -140,7 +140,7 @@ export default function BillingSettings() {
           <div style={styles.plansGrid}>
             <PlanCard
               name="Premium"
-              price="₹299"
+              price="₱299"
               period="/month"
               features={[
                 '50 Groq calls/day',
@@ -155,7 +155,7 @@ export default function BillingSettings() {
 
             <PlanCard
               name="Pro"
-              price="₹799"
+              price="₱799"
               period="/month"
               features={[
                 '200 Groq calls/day',
@@ -207,14 +207,14 @@ export default function BillingSettings() {
                 onClick={() => handleUpgrade('premium')}
                 disabled={upgrading}
               >
-                {upgrading ? 'Processing...' : 'Upgrade to Premium (₹299)'}
+                {upgrading ? 'Processing...' : 'Upgrade to Premium (₱299)'}
               </button>
               <button
                 style={styles.upgradeBtn}
                 onClick={() => handleUpgrade('pro')}
                 disabled={upgrading}
               >
-                {upgrading ? 'Processing...' : 'Upgrade to Pro (₹799)'}
+                {upgrading ? 'Processing...' : 'Upgrade to Pro (₱799)'}
               </button>
               <button
                 style={styles.closeBtn}
@@ -250,10 +250,10 @@ export default function BillingSettings() {
               <div>
                 <div style={styles.paymentDesc}>Premium Subscription</div>
                 <div style={styles.paymentDate}>
-                  {new Date(subscription.startDate).toLocaleDateString('en-IN')}
+                  {new Date(subscription.startDate).toLocaleDateString('en-PH')}
                 </div>
               </div>
-              <div style={styles.paymentAmount}>₹{subscription.price}</div>
+              <div style={styles.paymentAmount}>₱{subscription.price}</div>
             </div>
           </div>
         ) : (

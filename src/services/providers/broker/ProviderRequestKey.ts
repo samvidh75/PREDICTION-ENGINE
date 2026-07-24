@@ -14,6 +14,16 @@ import type { ProviderOperation, RequestKey } from './types';
 /** Parameter values that are always stripped from the key. */
 const SECRET_KEYS = new Set(['token', 'api_key', 'apikey', 'key', 'secret', 'authorization', 'bearer', 'access_token']);
 
+/** Legacy provider ids that resolve to their current canonical name. */
+const PROVIDER_ALIASES: Record<string, string> = {
+  indianapi: 'psxapi',
+};
+
+function canonicalizeProviderId(provider: string): string {
+  const normalized = provider.trim().toLowerCase();
+  return PROVIDER_ALIASES[normalized] ?? normalized;
+}
+
 /**
  * Build a stable, normalized request key.
  * Secrets are stripped before hashing.
@@ -42,9 +52,9 @@ export function buildRequestKeyDebugMaterial(
   params?: Record<string, unknown>,
 ): { provider: string; operation: ProviderOperation; symbol: string; params: unknown } {
   return {
-    provider: provider.trim().toLowerCase(),
+    provider: canonicalizeProviderId(provider),
     operation: operation.trim().toLowerCase() as ProviderOperation,
-    symbol: symbol.trim().toUpperCase().replace(/\.(NS|BO|PSE|PSE)$/i, ''),
+    symbol: symbol.trim().toUpperCase().replace(/\.(NS|BO|PSE|PSX|KAR)$/i, ''),
     params: canonicalize(params ?? {}),
   };
 }

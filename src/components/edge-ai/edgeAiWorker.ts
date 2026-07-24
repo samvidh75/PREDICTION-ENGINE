@@ -276,9 +276,9 @@ function cpuFallbackSMA(data: number[], window: number): number[] {
 
 export function extractLiveScreenerMetrics(htmlContent: string) {
     // Fallback regex pattern mapping if DOM structure drops native query matching
-    const priceRegex = /Current Price\s*<\/span>\s*<span class="number">₹?\s*([\d,.]+)/i;
-    const mcapRegex = /Market Cap\s*<\/span>\s*<span class="number">₹?\s*([\d,.]+)/i;
-    const highLowRegex = /High \/ Low\s*<\/span>\s*<span class="number">₹?\s*([\d,.]+)\s*\/\s*([\d,.]+)/i;
+    const priceRegex = /Current Price\s*<\/span>\s*<span class="number">₱?\s*([\d,.]+)/i;
+    const mcapRegex = /Market Cap\s*<\/span>\s*<span class="number">₱?\s*([\d,.]+)/i;
+    const highLowRegex = /High \/ Low\s*<\/span>\s*<span class="number">₱?\s*([\d,.]+)\s*\/\s*([\d,.]+)/i;
 
     const priceMatch = htmlContent.match(priceRegex);
     const mcapMatch = htmlContent.match(mcapRegex);
@@ -295,7 +295,7 @@ export function extractLiveScreenerMetrics(htmlContent: string) {
 
     return {
         current_price: parseFloat(currentPrice.toFixed(3)),
-        market_cap_display: `INR ${marketCapCr.toFixed(3)} Cr`,
+        market_cap_display: `₱${marketCapCr.toFixed(3)}M`,
         pe_ratio: parseFloat(reCalculatedPE.toFixed(3)),
         fundamentals_override: {
             market_cap_cr: parseFloat(marketCapCr.toFixed(3)),
@@ -780,7 +780,7 @@ export interface GreeksOutput {
  * @param spotPrice - Current underlying price
  * @param strikePrice - Option strike price
  * @param daysToExpiry - Days until expiration
- * @param riskFreeRate - Risk-free rate (default 7% for INR)
+ * @param riskFreeRate - Risk-free rate (default 7% for PHP)
  * @param impliedVol - Implied volatility percentage (e.g. 18.5)
  * @param isCall - true for Call, false for Put
  */

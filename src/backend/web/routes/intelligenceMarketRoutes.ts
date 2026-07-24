@@ -119,7 +119,7 @@ export async function registerIntelligenceMarketRoutes(
 
       events.push({
         type: 'earnings',
-        description: `Next quarterly earnings (est. ${nextEarningsDate.toLocaleDateString('en-IN')})`,
+        description: `Next quarterly earnings (est. ${nextEarningsDate.toLocaleDateString('en-PH')})`,
         expectedDate: nextEarningsDate,
         probability: 0.95,
         expectedImpact: 'high',
@@ -136,7 +136,7 @@ export async function registerIntelligenceMarketRoutes(
         bearishEventCount: revenueGrowth < 0 ? 1 : 0,
         lastUpdated: new Date(),
         fiscalYear: new Date().getFullYear(),
-        currency: 'INR',
+        currency: 'PKR',
       };
 
       const result = await eventEngine.analyze(metrics);

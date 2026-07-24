@@ -1,7 +1,7 @@
 /**
  * Quarterly Result Types
  *
- * Standardized quarterly financial results for Philippine listed companies.
+ * Standardized quarterly financial results for PSX listed companies.
  * Supports consolidated and standalone results, YoY and QoQ comparisons.
  */
 
@@ -18,7 +18,7 @@ export interface QuarterlyResult {
   periodEndDate: string;
   filingDate: string;
   audited: boolean;
-  currency: string; // "INR" typically
+  currency: string; // "PKR" typically
 
   // Revenue
   revenueFromOperations: number | null;

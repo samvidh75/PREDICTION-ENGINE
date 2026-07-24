@@ -105,6 +105,8 @@ function BreakingNewsToast({
       style={{
         padding: "14px 16px",
         background: colors.surface,
+        backdropFilter: "blur(20px) saturate(160%)",
+        WebkitBackdropFilter: "blur(20px) saturate(160%)",
         border: `1px solid ${colors.hairlineStrong}`,
         borderRadius: radius.lg,
         boxShadow: "0 8px 32px rgba(0, 0, 0, 0.4)",
@@ -148,6 +150,8 @@ function BreakingNewsToast({
               fontSize: "10px",
               color: colors.textTertiary,
               background: colors.surfaceCard,
+              backdropFilter: "blur(20px) saturate(160%)",
+              WebkitBackdropFilter: "blur(20px) saturate(160%)",
               padding: "1px 6px",
               borderRadius: radius.full,
             }}

@@ -52,7 +52,7 @@ export interface DataSource {
   homepage?: string;
   requiresAuth: boolean;
   rateLimit?: string;
-  coverageScope: 'india' | 'global' | 'us' | 'other';
+  coverageScope: 'pakistan' | 'global' | 'us' | 'other';
   lastVerified: string | null;
   notes?: string;
 }

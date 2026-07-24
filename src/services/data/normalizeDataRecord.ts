@@ -8,7 +8,7 @@ export function canonicalNow(): string {
 
 export function normalizeAdapterSymbol(raw: unknown): string | null {
   if (typeof raw !== "string") return null;
-  const cleaned = raw.trim().toUpperCase().replace(/^(PSE|NSE|BSE):/i, "").replace(/\.(NS|NSE|BO|BSE)$/i, "");
+  const cleaned = raw.trim().toUpperCase().replace(/^(PSE|NSE|BSE):/i, "").replace(/\.(PS|PSE)$/i, "");
   return SYMBOL_PATTERN.test(cleaned) ? cleaned : null;
 }
 
@@ -21,7 +21,7 @@ export function normalizeNullableString(raw: unknown): string | null {
 export function normalizeFiniteNumber(raw: unknown): number | null {
   if (typeof raw === "number") return Number.isFinite(raw) ? raw : null;
   if (typeof raw !== "string") return null;
-  const parsed = Number(raw.replace(/[₹,%\s,]/g, ""));
+  const parsed = Number(raw.replace(/Rs\.?/gi, "").replace(/[,%\s]/g, ""));
   return Number.isFinite(parsed) ? parsed : null;
 }
 

@@ -49,7 +49,7 @@ export const EdgeAiChatSection: React.FC<EdgeAiChatSectionProps> = ({
       narrative: [
         ...base.narrative,
         ...(candle
-          ? [`Live mesh close: INR ${candle.close.toFixed(3)} via ${meshData?.source || 'direct'}`]
+          ? [`Live mesh close: PKR ${candle.close.toFixed(3)} via ${meshData?.source || 'direct'}`]
           : []),
       ],
     } as EdgeAiResearchContext;

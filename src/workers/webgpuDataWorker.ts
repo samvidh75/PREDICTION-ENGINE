@@ -32,7 +32,7 @@ async function fetchYahooQuote(symbol: string): Promise<{
   dividend: number;
   trailingPE: number;
 } | null> {
-  const yahooSymbol = symbol.endsWith('.NS') ? symbol : `${symbol}.NS`;
+  const yahooSymbol = symbol.endsWith('.PS') ? symbol : `${symbol}.PS`;
 
   const url = `https://query2.finance.yahoo.com/v10/finance/quoteSummary/${yahooSymbol}?modules=price,summaryDetail`;
 
@@ -66,7 +66,7 @@ async function fetchYahooQuote(symbol: string): Promise<{
 }
 
 async function fetchYahooHistorical(symbol: string): Promise<any[]> {
-  const yahooSymbol = symbol.endsWith('.NS') ? symbol : `${symbol}.NS`;
+  const yahooSymbol = symbol.endsWith('.PS') ? symbol : `${symbol}.PS`;
   const url = `https://query1.finance.yahoo.com/v8/finance/chart/${yahooSymbol}?interval=1d&range=1y`;
 
   try {

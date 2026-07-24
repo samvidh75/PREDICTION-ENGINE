@@ -32,7 +32,7 @@ export interface PaymentProviderConfig {
 export interface CreateCheckoutRequest {
   planId: string;
   planName: string;
-  amount: number;       // INR (e.g. 99 for ₹99)
+  amount: number;       // PKR (e.g. 99 for ₱99)
   userId: string;
   successUrl: string;
   cancelUrl: string;
@@ -57,7 +57,7 @@ export interface BillingDetails {
   status: 'active' | 'past_due' | 'cancelled' | 'expired';
   currentPeriodStart: string;   // ISO date
   currentPeriodEnd: string;     // ISO date
-  nextBillingAmount: number;    // INR
+  nextBillingAmount: number;    // PKR
   paymentMethod?: {
     brand: string;              // e.g. "Visa", "UPI"
     last4: string;

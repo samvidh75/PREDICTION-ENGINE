@@ -57,11 +57,11 @@ export class GoogleNewsRssProvider implements NewsProvider {
   async getNews(symbol: string): Promise<NewsItem[]> {
     const clean = symbol.replace(/\.(NS)$/i, "").trim().toUpperCase();
     const query = `${clean} stock`;
-    const url = `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=en-IN&gl=IN&ceid=IN:en`;
+    const url = `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=en-PH&gl=IN&ceid=IN:en`;
 
     const result = await (await getSharedProviderRequestBroker()).execute("google-news", "news", clean, {
       query,
-      hl: "en-IN",
+      hl: "en-PH",
       gl: "IN",
       ceid: "IN:en",
     }, async () => {

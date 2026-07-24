@@ -9,7 +9,7 @@ export type ProviderDomain =
   | "rbi";
 
 export type PublicProviderId =
-  | "indianapi"
+  | "psxapi"
   | "jugaad-data"
   | "nsepython"
   | "yahoo"

@@ -2,7 +2,7 @@
  * Disclosure Types
  *
  * Types for bulk/block deals, insider transactions, SAST disclosures,
- * and other regulatory disclosures in the Philippine market.
+ * and other regulatory disclosures in the PSX market.
  */
 
 export type DisclosureKind =

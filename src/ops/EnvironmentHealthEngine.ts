@@ -24,9 +24,9 @@ export class EnvironmentHealthEngine {
       missingRequired.push('DATABASE_URL');
     }
 
-    const indianapi = process.env.INDIANAPI_KEY;
+    const indianapi = process.env.PSXAPI_KEY;
     checks.push({
-      variable: 'INDIANAPI_KEY',
+      variable: 'PSXAPI_KEY',
       status: indianapi ? 'ok' : 'missing',
       detail: indianapi ? 'Configured' : 'Not set',
     });

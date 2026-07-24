@@ -103,7 +103,7 @@ function strongStock(symbol = 'TCS'): AllEngineInputs {
       ],
       nextEarningsDate: new Date(Date.now() + 30 * 86400000),
       eventCount90Days: 2, bullishEventCount: 2, bearishEventCount: 0,
-      lastUpdated: new Date(), fiscalYear: 2025, currency: 'INR',
+      lastUpdated: new Date(), fiscalYear: 2025, currency: 'PKR',
     },
     rag: {
       patterns: [
@@ -191,7 +191,7 @@ function weakStock(symbol = 'WEAK'): AllEngineInputs {
       ],
       nextEarningsDate: new Date(Date.now() + 14 * 86400000),
       eventCount90Days: 1, bullishEventCount: 0, bearishEventCount: 1,
-      lastUpdated: new Date(), fiscalYear: 2025, currency: 'INR',
+      lastUpdated: new Date(), fiscalYear: 2025, currency: 'PKR',
     },
     rag: {
       patterns: [
@@ -257,7 +257,7 @@ function emptyInputs(symbol = 'NODATA'): AllEngineInputs {
     events: {
       events: [], nextEarningsDate: new Date(0),
       eventCount90Days: 0, bullishEventCount: 0, bearishEventCount: 0,
-      lastUpdated: new Date(), fiscalYear: 2025, currency: 'INR',
+      lastUpdated: new Date(), fiscalYear: 2025, currency: 'PKR',
     },
     rag: {
       patterns: [], knowledgeItems: [], macroSignals: [],

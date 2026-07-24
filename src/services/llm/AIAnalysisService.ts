@@ -91,7 +91,7 @@ function buildAnalysisPrompt(
   scores: ScoreInput,
   existingThesis?: string,
 ): string {
-  return `You are a professional equity research analyst. Analyze ${symbol} (${companyName}, ₹${price}) based on this data:
+  return `You are a professional equity research analyst. Analyze ${symbol} (${companyName}, ₱${price}) based on this data:
 
 Scores (0-100):
 - Quality: ${scores.quality} (ROE, capital efficiency, operating margins)

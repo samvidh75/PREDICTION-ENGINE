@@ -15,7 +15,7 @@ export class NewsService {
     if (cached) return JSON.parse(cached).slice(0, limit);
 
     try {
-      const url = `https://news.google.com/rss/search?q=${symbol}+stock+OR+${symbol}+PSE&hl=en-IN&gl=IN`;
+      const url = `https://news.google.com/rss/search?q=${symbol}+stock+OR+${symbol}+PSE&hl=en-PH&gl=IN`;
       const res = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' } });
       const text = await res.text();
       const items = this.parseRss(text);

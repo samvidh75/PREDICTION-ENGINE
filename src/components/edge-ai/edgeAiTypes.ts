@@ -19,7 +19,7 @@ export interface EdgeAiResearchContext {
   whatToWatch: string[];
   /** Sector the company belongs to */
   sector: string;
-  /** Current market price (in INR) */
+  /** Current market price (in PKR) */
   currentPrice: number;
   /** Absolute price change */
   changeAbs: number;

@@ -62,7 +62,7 @@ describe('edgeAiWorker logic', () => {
   it('responds to price queries with price context', () => {
     const input: EdgeAiWorkerInput = { ...sampleInput, query: 'How is the price doing?' };
     const result = simulateGenerateReply(input);
-    expect(result).toContain('₹3890.50');
+    expect(result).toContain('Rs. 3890.50');
     expect(result).toContain('1.18%');
   });
 
@@ -162,7 +162,7 @@ function simulateGenerateReply(input: EdgeAiWorkerInput): string {
 
   if (lower.includes('price') || lower.includes('return') || lower.includes('performance')) {
     return [
-      `${context.companyName} is currently at ₹${context.currentPrice.toFixed(2)}.`,
+      `${context.companyName} is currently at Rs. ${context.currentPrice.toFixed(2)}.`,
       `Today: ${context.changePercent >= 0 ? '+' : ''}${context.changePercent.toFixed(2)}%`,
       '',
       'Past performance is not indicative of future results.',
@@ -173,7 +173,7 @@ function simulateGenerateReply(input: EdgeAiWorkerInput): string {
     `Here is the research context I have for ${context.companyName}:`,
     '',
     `Sector: ${context.sector}`,
-    `Price: ₹${context.currentPrice.toFixed(2)} (${context.changePercent >= 0 ? '+' : ''}${context.changePercent.toFixed(2)}%)`,
+    `Price: Rs. ${context.currentPrice.toFixed(2)} (${context.changePercent >= 0 ? '+' : ''}${context.changePercent.toFixed(2)}%)`,
     narrativeSnippet ? `Narrative: ${narrativeSnippet}` : '',
     riskCount > 0 ? `Risks flagged: ${riskCount} item(s).` : '',
     watchCount > 0 ? `What to watch: ${watchCount} item(s).` : '',

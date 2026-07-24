@@ -7,6 +7,7 @@
 
 /* ─── Backend provider names ─── */
 const BACKEND_PROVIDER_NAMES = [
+  "psxapi",
   "indianapi",
   "yahoo",
   "jugaad",

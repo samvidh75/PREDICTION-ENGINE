@@ -1,4 +1,4 @@
-import { MasterCompanyRegistry } from "../data/MasterCompanyRegistry";
+import MasterCompanyRegistry from "../data/MasterCompanyRegistry";
 
 export type IndianStock = {
   ticker: string;

@@ -4,8 +4,8 @@ import type { SeoMeta } from "./seoTypes";
 const SITE_NAME = "STOCKEX";
 const DEFAULT_TITLE = "STOCKEX — Research-Driven Stock Analysis";
 const DEFAULT_DESC =
-  "Independent research analysis for Philippine stocks. Scorecards, theses, risks, peer comparisons, and scenario modelling. Not investment advice.";
-const BASE_URL = "https://stockstory-india.com";
+  "Independent research analysis for PSX stocks. Scorecards, theses, risks, peer comparisons, and scenario modelling. Not investment advice.";
+const BASE_URL = "https://stockstory-ph.com";
 
 /**
  * Apply SEO metadata to document head.

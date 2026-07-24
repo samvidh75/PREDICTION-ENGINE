@@ -28,7 +28,6 @@ function setCache(reply: FastifyReply, maxAge: number = 300): void {
 import type { EarningsMetrics, EventMetrics, FinancialMetrics, NewsMetrics, RAGMetrics, RiskMetrics, SectorMetrics, TechnicalMetrics, ValuationMetrics } from "../services/intelligence/types.js";
 import { dcfValuationService } from "../services/valuation/ValuationService.js";
 import { corporateActionsService } from "../services/corporate-actions/CorporateActionsService.js";
-import { directNseProvider } from "../services/providers/DirectNseProvider.js";
 import intelligenceQualityGate from "./intelligenceQualityGate.js";
 import type { UserResearchProfile, AlertChangeView, SavedScannerPreset, DailyResearchDigest, WatchlistThesisView } from "../research/contracts/productContracts.js";
 import { saveProfile, getProfile, createDefaultProfile } from "../services/personalization/researchProfileStore.js";
@@ -211,9 +210,9 @@ async function yahooPriceHistory(symbol: string, exchangeSuffix = "NS"): Promise
         if (closes[i] != null) {
           const dt = new Date(timestamps[i] * 1000);
           let label: string;
-          if (key === "1W") label = dt.toLocaleDateString("en-IN", { weekday: "short", hour: "2-digit", minute: "2-digit" });
-          else if (key === "5Y") label = dt.toLocaleDateString("en-IN", { month: "short", year: "2-digit" });
-          else label = dt.toLocaleDateString("en-IN", { day: "numeric", month: "short" });
+          if (key === "1W") label = dt.toLocaleDateString("en-PH", { weekday: "short", hour: "2-digit", minute: "2-digit" });
+          else if (key === "5Y") label = dt.toLocaleDateString("en-PH", { month: "short", year: "2-digit" });
+          else label = dt.toLocaleDateString("en-PH", { day: "numeric", month: "short" });
           pts.push({ label, price: Number(closes[i]!.toFixed(2)) });
         }
       }
@@ -226,7 +225,7 @@ async function yahooPriceHistory(symbol: string, exchangeSuffix = "NS"): Promise
 async function yahooNews(symbol: string): Promise<{ headline: string; source: string; time: string; link?: string }[]> {
   try {
     const r = await fetch(
-      `https://query1.finance.yahoo.com/v1/finance/search?q=${encodeURIComponent(symbol)}&lang=en-IN&region=IN&quotesCount=0&newsCount=6`,
+      `https://query1.finance.yahoo.com/v1/finance/search?q=${encodeURIComponent(symbol)}&lang=en-PH&region=PH&quotesCount=0&newsCount=6`,
       { headers: { "User-Agent": "Mozilla/5.0" }, signal: AbortSignal.timeout(5_000) }
     );
     if (!r.ok) return [];
@@ -241,10 +240,10 @@ async function yahooNews(symbol: string): Promise<{ headline: string; source: st
 }
 
 async function indianApiFunds(symbol: string): Promise<Record<string, unknown>> {
-  const key = process.env.INDIANAPI_KEY;
+  const key = process.env.PSXAPI_KEY;
   if (!key) return {};
   try {
-    const r = await fetch(`https://stock.indianapi.in/stock_fundamentals?name=${encodeURIComponent(symbol)}`, {
+    const r = await fetch(`https://api.psx.com.pk/stock_fundamentals?name=${encodeURIComponent(symbol)}`, {
       headers: { "X-Api-Key": key, "Content-Type": "application/json" },
       signal: AbortSignal.timeout(5_000),
     });
@@ -272,7 +271,7 @@ function parsePercentValue(value: string): number | null {
 }
 
 function parseCroreValue(value: string): number | null {
-  const cleaned = value.replace(/[₹,%\s]/g, "").replace(/,/g, "").trim();
+  const cleaned = value.replace(/Rs\.?/gi, "").replace(/[,%\s]/g, "").trim();
   const parsed = Number.parseFloat(cleaned);
   return Number.isFinite(parsed) ? parsed : null;
 }
@@ -747,66 +746,11 @@ export default async function registerApiRoutes(server: FastifyInstance) {
 
     const gatewayMeta = await MarketDataGateway.getCompany(cleanSymbol).catch(() => null);
 
-    // Direct provider fallback chain if primary gateways fail
-    let quote = gatewayQuote;
-    let meta = gatewayMeta;
-    let fundResultSafe = fundResult;
-    let priceHistorySafe = priceHistory;
-    let newsSafe = news;
-
-    if (!quote?.price) {
-      const dirQuote = await directNseProvider.getQuote(cleanSymbol);
-      if (dirQuote.data) {
-        quote = {
-          symbol: cleanSymbol,
-          exchange: 'PSE',
-          price: dirQuote.data.price,
-          change: dirQuote.data.change,
-          changePercent: dirQuote.data.changePercent,
-          volume: dirQuote.data.volume,
-          updatedAt: dirQuote.data.updatedAt,
-          retrievedAt: new Date().toISOString(),
-          source: dirQuote.source === 'nse' ? 'provider' : 'provider',
-          freshness: 'current',
-        };
-      }
-    }
-
-    if (!meta?.companyName) {
-      const dirFin = await directNseProvider.getFinancials(cleanSymbol);
-      if (dirFin.data) {
-        meta = {
-          symbol: cleanSymbol,
-          companyName: cleanSymbol,
-          sector: dirFin.data.netMargin != null ? 'Estimated' : 'Diversified',
-          industry: 'General',
-          exchange: 'PSE',
-          marketCap: dirFin.data.marketCap,
-        } as any;
-        fundResultSafe = {};
-        if (dirFin.data.peRatio) (fundResultSafe as any).pe_ratio = dirFin.data.peRatio;
-        if (dirFin.data.pbRatio) (fundResultSafe as any).pb_ratio = dirFin.data.pbRatio;
-        if (dirFin.data.roe) (fundResultSafe as any).roe = dirFin.data.roe;
-        if (dirFin.data.debtToEquity) (fundResultSafe as any).debt_to_equity = dirFin.data.debtToEquity;
-        if (dirFin.data.eps) (fundResultSafe as any).eps = dirFin.data.eps;
-        if (dirFin.data.dividendYield) (fundResultSafe as any).dividend_yield = dirFin.data.dividendYield;
-        if (dirFin.data.revenueGrowth) (fundResultSafe as any).revenue_growth = dirFin.data.revenueGrowth;
-      }
-    }
-
-    if (!priceHistorySafe) {
-      const dirHist = await directNseProvider.getHistory(cleanSymbol);
-      if (dirHist.data) {
-        priceHistorySafe = dirHist.data;
-      }
-    }
-
-    if (!newsSafe || newsSafe.length === 0) {
-      const dirNews = await directNseProvider.getNews(cleanSymbol);
-      if (dirNews.data) {
-        newsSafe = (dirNews.data as any);
-      }
-    }
+    const quote = gatewayQuote;
+    const meta = gatewayMeta;
+    const fundResultSafe = fundResult;
+    const priceHistorySafe = priceHistory;
+    const newsSafe = news;
 
     if (!quote?.price) {
       return reply.status(503).send({
@@ -978,7 +922,7 @@ export default async function registerApiRoutes(server: FastifyInstance) {
     const responses: Record<string, string> = {
       pe: `P/E Ratio = Price per share ÷ Earnings per share. Shows how much investors pay per rupee of earnings.
 • Low P/E doesn't always mean undervalued - check ROE, debt, and growth
-• Philippine mid-caps average 15-20x P/E
+• PSX mid-caps average 15-20x P/E
 • Compare against sector peers and historical average`,
 
       roe: `ROE = Net Profit ÷ Shareholder Equity. Measures profit generated per rupee of equity.
@@ -1025,7 +969,7 @@ export default async function registerApiRoutes(server: FastifyInstance) {
     }
 
     return reply.send({
-      response: response || "Ask about: P/E ratio, ROE, Debt/Equity, Dividend strategy, Growth metrics, or Valuation methods. I can help analyze Philippine stocks!",
+      response: response || "Ask about: P/E ratio, ROE, Debt/Equity, Dividend strategy, Growth metrics, or Valuation methods. I can help analyze PSX stocks!",
       confidence: response ? 0.95 : 0.8,
       source: "server",
     });
@@ -1331,7 +1275,7 @@ export default async function registerApiRoutes(server: FastifyInstance) {
           eventCount90Days: n(synData.eventCount90Days),
           bullishEventCount: n(synData.bullishEventCount),
           bearishEventCount: n(synData.bearishEventCount),
-          lastUpdated: new Date(), fiscalYear: 2025, currency: 'INR',
+          lastUpdated: new Date(), fiscalYear: 2025, currency: 'PHP',
         },
         rag: {
           patterns: Array.isArray(synData.patterns) ? synData.patterns : [],

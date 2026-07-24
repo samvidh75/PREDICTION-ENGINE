@@ -51,7 +51,7 @@ export interface MaterializedView {
 // catalog below reflects only what is actually real and queryable now.
 export class DataWarehouseService {
   private metrics: DataWarehouseMetric[] = [
-    { name: 'market_cap', expression: 'market_cap', description: 'Market capitalization (₹ crore)', dataType: 'currency' },
+    { name: 'market_cap', expression: 'market_cap', description: 'Market capitalization (₱ crore)', dataType: 'currency' },
     { name: 'quality_score', expression: 'quality_score', description: 'Quality factor score (0-100)', dataType: 'number' },
     { name: 'valuation_score', expression: 'valuation_score', description: 'Valuation factor score (0-100, higher = cheaper)', dataType: 'number' },
     { name: 'growth_score', expression: 'growth_score', description: 'Growth factor score (0-100)', dataType: 'number' },

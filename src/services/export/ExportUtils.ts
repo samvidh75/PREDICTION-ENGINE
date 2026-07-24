@@ -37,10 +37,10 @@ export class ExportUtils {
 
   static formatCurrency(value: number | null | undefined): string {
     if (value === null || value === undefined) return '—';
-    if (Math.abs(value) >= 10000000) return `₹${(value / 10000000).toFixed(2)}Cr`;
-    if (Math.abs(value) >= 100000) return `₹${(value / 100000).toFixed(2)}L`;
-    if (Math.abs(value) >= 1000) return `₹${(value / 1000).toFixed(2)}K`;
-    return `₹${value.toFixed(2)}`;
+    if (Math.abs(value) >= 1_000_000_000) return `₱${(value / 1_000_000_000).toFixed(2)}B`;
+    if (Math.abs(value) >= 1_000_000) return `₱${(value / 1_000_000).toFixed(2)}M`;
+    if (Math.abs(value) >= 1_000) return `₱${(value / 1_000).toFixed(2)}K`;
+    return `₱${value.toFixed(2)}`;
   }
 
   static formatPercent(value: number | null | undefined): string {
@@ -50,10 +50,10 @@ export class ExportUtils {
 
   static formatLargeNumber(value: number | null | undefined): string {
     if (value === null || value === undefined) return '—';
-    if (Math.abs(value) >= 10000000) return `${(value / 10000000).toFixed(2)}Cr`;
-    if (Math.abs(value) >= 100000) return `${(value / 100000).toFixed(2)}L`;
-    if (Math.abs(value) >= 1000) return `${(value / 1000).toFixed(1)}K`;
-    return value.toLocaleString('en-IN');
+    if (Math.abs(value) >= 1_000_000_000) return `${(value / 1_000_000_000).toFixed(2)}B`;
+    if (Math.abs(value) >= 1_000_000) return `${(value / 1_000_000).toFixed(2)}M`;
+    if (Math.abs(value) >= 1_000) return `${(value / 1_000).toFixed(1)}K`;
+    return value.toLocaleString('en-PH');
   }
 
   static formatRatio(value: number | null | undefined, decimals: number = 2): string {
@@ -64,13 +64,13 @@ export class ExportUtils {
   static formatDate(dateStr: string | null | undefined): string {
     if (!dateStr) return '—';
     const d = new Date(dateStr);
-    return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+    return d.toLocaleDateString('en-PH', { day: 'numeric', month: 'short', year: 'numeric' });
   }
 
   static formatShortDate(dateStr: string | null | undefined): string {
     if (!dateStr) return '—';
     const d = new Date(dateStr);
-    return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+    return d.toLocaleDateString('en-PH', { day: 'numeric', month: 'short' });
   }
 }
 

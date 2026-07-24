@@ -211,6 +211,19 @@ describe('Investor Memory Engine', () => {
     vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('no network in tests')));
     IME = await import('../src/services/portfolio/InvestorMemoryEngine');
     localStorage.clear();
+    // Force a fresh sync attempt (against the rejecting stub above) instead
+    // of relying on the module-level "already synced" flag, which may have
+    // been set true by an earlier, unstubbed call from a different test file
+    // sharing this module instance — that stale call's async resolution is
+    // the actual source of the cross-test flakiness described above.
+    (IME.InvestorMemoryEngine as any).isInitialSyncStarted = false;
+    // Flush the microtask queue so any pending sync promise (this test's own,
+    // triggered by the getMemory() call below, or a straggler from a prior
+    // test) fully settles against the stub above before the test body runs
+    // and starts writing decisions/preferences.
+    IME.InvestorMemoryEngine.getMemory();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    localStorage.clear();
   });
 
   test('saves and unsaves companies', () => {

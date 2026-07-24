@@ -24,7 +24,7 @@ export default function FloatingAIButton() {
     setIsLoading(true);
 
     try {
-      // Use StockEx AI - ChatGPT of Philippine stock market
+      // Use StockEx AI - ChatGPT of PSX stock market
       const aiResponse = await stockExAI.chat(userMessage);
       if (aiResponse && aiResponse.response) {
         setMessages((prev) => [...prev, { role: 'assistant', content: aiResponse.response }]);
@@ -58,6 +58,8 @@ export default function FloatingAIButton() {
             width: 'min(400px, 90vw)',
             height: '500px',
             backgroundColor: colors.surface,
+            backdropFilter: "blur(20px) saturate(160%)",
+            WebkitBackdropFilter: "blur(20px) saturate(160%)",
             borderRadius: '12px',
             border: `1px solid ${colors.border}`,
             boxShadow: '0 10px 40px rgba(0,0,0,0.3)',
@@ -115,7 +117,7 @@ export default function FloatingAIButton() {
               >
                 <div style={{ fontWeight: '600', marginBottom: '8px' }}>🤖 StockEx AI</div>
                 <div style={{ fontSize: '12px', opacity: 0.8, marginBottom: '12px' }}>
-                  ChatGPT of Philippine Stock Market - Deep Analysis Included
+                  ChatGPT of PSX Stock Market - Deep Analysis Included
                 </div>
                 <div style={{ fontSize: '11px', opacity: 0.7, display: 'flex', flexDirection: 'column', gap: '4px' }}>
                   <span>📊 "Best tech stocks now"</span>
@@ -175,6 +177,8 @@ export default function FloatingAIButton() {
               style={{
                 flex: 1,
                 backgroundColor: colors.canvas,
+                backdropFilter: "blur(20px) saturate(160%)",
+                WebkitBackdropFilter: "blur(20px) saturate(160%)",
                 color: colors.textPrimary,
                 border: `1px solid ${colors.border}`,
                 padding: '8px 12px',

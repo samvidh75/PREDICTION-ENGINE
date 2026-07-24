@@ -34,7 +34,7 @@ export default function StockComparison() {
     {
       label: 'Current Price',
       key: 'price',
-      format: (v) => `₹${v.toFixed(2)}`,
+      format: (v) => `₱${v.toFixed(2)}`,
       highlight: (a, b) => (a < b ? 0 : 1), // Lower price might be better (value)
     },
     {
@@ -58,7 +58,7 @@ export default function StockComparison() {
     {
       label: 'Market Cap',
       key: 'marketCap',
-      format: (v) => `₹${(v / 1e5).toFixed(0)}Cr`,
+      format: (v) => `₱${(v / 1e6).toFixed(0)}M`,
     },
     {
       label: 'Dividend Yield',
@@ -292,7 +292,7 @@ export default function StockComparison() {
         <div className="stock-input-group">
           <input
             type="text"
-            placeholder="Enter stock symbol (e.g., HDFC, TCS, INFY)"
+            placeholder="Enter PSE symbol (e.g., BDO, JFC, AC)"
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
                 addStock((e.target as HTMLInputElement).value.toUpperCase());

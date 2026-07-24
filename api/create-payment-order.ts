@@ -16,12 +16,12 @@ interface OrderRequest {
 
 const PLAN_PRICING: Record<string, { monthly: number; yearly?: number }> = {
   premium: {
-    monthly: 29900, // 299 INR in paise
-    yearly: 249900, // 2499 INR in paise
+    monthly: 29900, // 299 PKR in paise
+    yearly: 249900, // 2499 PKR in paise
   },
   pro: {
-    monthly: 79900, // 799 INR in paise
-    yearly: 699900, // 6999 INR in paise
+    monthly: 79900, // 799 PKR in paise
+    yearly: 699900, // 6999 PKR in paise
   },
 };
 
@@ -57,7 +57,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       },
       body: JSON.stringify({
         amount,
-        currency: 'INR',
+        currency: 'PKR',
         receipt: `order_${userId}_${Date.now()}`,
         notes: {
           userId,

@@ -38,7 +38,7 @@ describe('TechnicalEngine', () => {
     expect(result.trend).toBe('uptrend');
     expect(result.momentumStatus).toBe('strong');
     expect(result.confidence).toBeGreaterThan(0.7);
-    expect(result.reasoning).toContain('₹3500');
+    expect(result.reasoning).toContain('₱3500');
   });
 
   it('should score a weak downtrend stock below 25', () => {

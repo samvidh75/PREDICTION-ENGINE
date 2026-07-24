@@ -280,6 +280,8 @@ export default function RelativeStrengthPage() {
             gap: space[3],
             padding: `${space[3]} ${space[4]}`,
             background: colors.surface,
+            backdropFilter: "blur(20px) saturate(160%)",
+            WebkitBackdropFilter: "blur(20px) saturate(160%)",
             borderBottom: `1px solid ${colors.hairline}`,
             fontSize: typography.captionSm.size,
             color: colors.textTertiary,
@@ -293,7 +295,7 @@ export default function RelativeStrengthPage() {
           <span>Sector</span>
           <span>{active.label} Score</span>
           <span>Rank Δ</span>
-          <span>Price (₹)</span>
+          <span>Price (₱)</span>
         </div>
 
         {filtered.map((stock) => (
@@ -328,7 +330,7 @@ export default function RelativeStrengthPage() {
               <ScoreBar value={stock.scores[activeMetric]} color={active.color} />
             </div>
             <div><RankChange change={stock.change} /></div>
-            <div style={{ color: colors.textSecondary, fontVariantNumeric: "tabular-nums" }}>₹{formatNumber(stock.price)}</div>
+            <div style={{ color: colors.textSecondary, fontVariantNumeric: "tabular-nums" }}>₱{formatNumber(stock.price)}</div>
           </div>
         ))}
       </div>
@@ -341,6 +343,8 @@ export default function RelativeStrengthPage() {
             padding: space[6],
             borderRadius: radius.lg,
             background: colors.surface,
+            backdropFilter: "blur(20px) saturate(160%)",
+            WebkitBackdropFilter: "blur(20px) saturate(160%)",
             border: `1px solid ${colors.hairline}`,
           }}
         >
@@ -391,6 +395,8 @@ export default function RelativeStrengthPage() {
           padding: space[4],
           borderRadius: radius.md,
           background: colors.surface,
+          backdropFilter: "blur(20px) saturate(160%)",
+          WebkitBackdropFilter: "blur(20px) saturate(160%)",
           border: `1px solid ${colors.hairline}`,
           display: "flex",
           gap: space[3],

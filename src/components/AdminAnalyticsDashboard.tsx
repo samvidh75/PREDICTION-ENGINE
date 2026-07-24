@@ -64,7 +64,7 @@ export default function AdminAnalyticsDashboard() {
     },
     {
       label: 'Monthly Revenue',
-      value: '₹1,24,900',
+      value: '₱1,24,900',
       change: '+45% this month',
       icon: '💰',
       color: '#27ae60',
@@ -232,17 +232,17 @@ export default function AdminAnalyticsDashboard() {
         <div style={styles.section}>
           <h2 style={styles.sectionTitle}>💰 Revenue Breakdown</h2>
           <div style={styles.revenueList}>
-            <RevenueLine label="Premium (312 × ₹299)" amount="₹93,288" />
-            <RevenueLine label="Pro (35 × ₹799)" amount="₹27,965" />
+            <RevenueLine label="Premium (312 × ₱299)" amount="₱93,288" />
+            <RevenueLine label="Pro (35 × ₱799)" amount="₱27,965" />
             <div style={styles.revenueDivider} />
             <div style={styles.revenueLine}>
               <strong>Total MRR</strong>
               <strong style={{ color: '#27ae60', fontSize: '18px' }}>
-                ₹1,21,253
+                ₱1,21,253
               </strong>
             </div>
             <div style={styles.revenueNote}>
-              Annual run rate: ₹14,55,036
+              Annual run rate: ₱14,55,036
             </div>
           </div>
         </div>

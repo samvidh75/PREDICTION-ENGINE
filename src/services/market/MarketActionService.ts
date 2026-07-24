@@ -157,13 +157,12 @@ function round(value: number, digits = 2): number {
 }
 
 function displayNumber(value: number, suffix = ''): string {
-  return `${round(value, 2).toLocaleString('en-IN')}${suffix}`;
+  return `${round(value, 2).toLocaleString('en-PH')}${suffix}`;
 }
 
 function marketCapDisplay(value: number): string {
-  const crore = value / 10_000_000;
-  if (crore >= 100_000) return `${round(crore / 100_000, 2).toLocaleString('en-IN')} L Cr`;
-  return `${Math.round(crore).toLocaleString('en-IN')} Cr`;
+  if (value >= 1_000_000_000) return `₱${round(value / 1_000_000_000, 2).toLocaleString('en-PH')}B`;
+  return `₱${Math.round(value / 1_000_000).toLocaleString('en-PH')}M`;
 }
 
 function asMover(row: MarketActionRow): MarketMover | null {

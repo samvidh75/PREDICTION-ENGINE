@@ -48,7 +48,7 @@ export interface PredictionRecord {
 
   // Market context at prediction time
   price_at_prediction: number | null;
-  benchmark_level: number | null;  // NIFTY 50 level
+  benchmark_level: number | null;  // KSE-100 index level
 
   // Forward validation
   prediction_horizon: number;      // days (7, 30, 90, 180, 365)
@@ -135,9 +135,9 @@ export interface StatisticalValidation {
 
 export interface BenchmarkObservation {
   date: string;
-  pse-index50: number;
-  pse-index100: number;
-  pse-index500: number;
+  psei: number;
+  pseiTop10: number;
+  pseAll: number;
 }
 
 export interface PredictionCredibilityScore {

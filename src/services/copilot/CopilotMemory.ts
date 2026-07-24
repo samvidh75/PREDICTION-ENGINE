@@ -19,7 +19,7 @@ export class CopilotMemory {
     this.chatHistory.push({
       sender,
       text,
-      timestamp: new Date().toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" }),
+      timestamp: new Date().toLocaleTimeString("en-PH", { hour: "2-digit", minute: "2-digit" }),
     });
   }
 

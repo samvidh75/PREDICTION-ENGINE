@@ -31,30 +31,30 @@ interface IPO {
 }
 
 const UPCOMING_IPOS: IPO[] = [
-  { id: 'ipo1', name: 'Jio Finance Ltd', symbol: 'JIOFIN', logo: '', status: 'upcoming', priceBand: '₹250–265', lotSize: 56, minInvestment: 14840, openDate: '2026-08-10', closeDate: '2026-08-13', listingDate: null, issueSize: 8500, listingGains: null, subscription: { qib: 0, nii: 0, retail: 0, total: 0 }, gmp: 85, analystRating: 'positive', registrar: 'Link Intime', leadManagers: ['Kotak', 'DAM Capital', 'ICICI Securities'], sector: 'Financial Services' },
-  { id: 'ipo2', name: 'Ola Electric Mobility', symbol: 'OLAELEC', logo: '', status: 'upcoming', priceBand: '₹72–76', lotSize: 195, minInvestment: 14820, openDate: '2026-08-02', closeDate: '2026-08-05', listingDate: null, issueSize: 5500, listingGains: null, subscription: { qib: 0, nii: 0, retail: 0, total: 0 }, gmp: 12, analystRating: 'positive', registrar: 'KFintech', leadManagers: ['Goldman Sachs', 'Kotak', 'Citi'], sector: 'Automotive (EV)' },
-  { id: 'ipo3', name: 'Flipkart India Ltd', symbol: 'FLIPKART', logo: '', status: 'upcoming', priceBand: '₹1,800–1,950', lotSize: 7, minInvestment: 13650, openDate: '2026-09-15', closeDate: '2026-09-18', listingDate: null, issueSize: 35000, listingGains: null, subscription: { qib: 0, nii: 0, retail: 0, total: 0 }, gmp: 150, analystRating: 'neutral', registrar: 'Link Intime', leadManagers: ['Morgan Stanley', 'JM Financial', 'Goldman Sachs'], sector: 'E-commerce' },
+  { id: 'ipo1', name: 'Citicore Renewable Energy Corp', symbol: 'CREC', logo: '', status: 'upcoming', priceBand: '₱2.50–2.65', lotSize: 5000, minInvestment: 13250, openDate: '2026-08-10', closeDate: '2026-08-13', listingDate: null, issueSize: 8500, listingGains: null, subscription: { qib: 0, nii: 0, retail: 0, total: 0 }, gmp: 0.18, analystRating: 'positive', registrar: 'BDO Capital', leadManagers: ['BDO Capital', 'First Metro Investment', 'BPI Capital'], sector: 'Renewable Energy' },
+  { id: 'ipo2', name: 'Figaro Coffee Group', symbol: 'FIGARO', logo: '', status: 'upcoming', priceBand: '₱2.50–2.80', lotSize: 5000, minInvestment: 14000, openDate: '2026-08-02', closeDate: '2026-08-05', listingDate: null, issueSize: 2200, listingGains: null, subscription: { qib: 0, nii: 0, retail: 0, total: 0 }, gmp: 0.15, analystRating: 'positive', registrar: 'RCBC Trust', leadManagers: ['China Bank Capital', 'RCBC Capital'], sector: 'Food & Beverage' },
+  { id: 'ipo3', name: 'MerryMart Consumer Corp', symbol: 'MMRT', logo: '', status: 'upcoming', priceBand: '₱4.10–4.50', lotSize: 2000, minInvestment: 9000, openDate: '2026-09-15', closeDate: '2026-09-18', listingDate: null, issueSize: 3500, listingGains: null, subscription: { qib: 0, nii: 0, retail: 0, total: 0 }, gmp: 0.30, analystRating: 'neutral', registrar: 'BDO Capital', leadManagers: ['PNB Capital', 'First Metro Investment'], sector: 'Retail' },
 ];
 
 const ACTIVE_IPOS: IPO[] = [
-  { id: 'ipo4', name: 'IndiGo Logistics Ltd', symbol: 'INDIGOLOG', logo: '', status: 'open', priceBand: '₹480–505', lotSize: 30, minInvestment: 15150, openDate: '2026-07-26', closeDate: '2026-07-30', listingDate: null, issueSize: 4200, listingGains: null, subscription: { qib: 3.2, nii: 5.8, retail: 2.1, total: 3.5 }, gmp: 45, analystRating: 'positive', registrar: 'KFintech', leadManagers: ['ICICI Securities', 'Axis Capital', 'SBI Caps'], sector: 'Logistics' },
-  { id: 'ipo5', name: 'Greenko Energy Ltd', symbol: 'GREENKO', logo: '', status: 'open', priceBand: '₹640–680', lotSize: 22, minInvestment: 14960, openDate: '2026-07-25', closeDate: '2026-07-29', listingDate: null, issueSize: 6800, listingGains: null, subscription: { qib: 1.8, nii: 3.2, retail: 1.5, total: 2.1 }, gmp: 62, analystRating: 'positive', registrar: 'Link Intime', leadManagers: ['Kotak', 'Morgan Stanley', 'CLSA'], sector: 'Renewable Energy' },
-  { id: 'ipo6', name: 'Bharti Hexacom Ltd', symbol: 'BHARTIHEX', logo: '', status: 'open', priceBand: '₹520–550', lotSize: 27, minInvestment: 14850, openDate: '2026-07-24', closeDate: '2026-07-28', listingDate: null, issueSize: 3800, listingGains: null, subscription: { qib: 4.5, nii: 6.2, retail: 3.8, total: 4.8 }, gmp: 38, analystRating: 'neutral', registrar: 'KFintech', leadManagers: ['Axis Capital', 'BOB Caps', 'IDBI Capital'], sector: 'Telecom Infrastructure' },
+  { id: 'ipo4', name: 'AllHome Property Holdings', symbol: 'AHPH', logo: '', status: 'open', priceBand: '₱6.80–7.20', lotSize: 1000, minInvestment: 7200, openDate: '2026-07-26', closeDate: '2026-07-30', listingDate: null, issueSize: 4200, listingGains: null, subscription: { qib: 3.2, nii: 5.8, retail: 2.1, total: 3.5 }, gmp: 0.45, analystRating: 'positive', registrar: 'BPI Capital', leadManagers: ['BPI Capital', 'China Bank Capital', 'BDO Capital'], sector: 'Real Estate' },
+  { id: 'ipo5', name: 'Solar Philippines Power', symbol: 'SPNEC2', logo: '', status: 'open', priceBand: '₱1.90–2.10', lotSize: 10000, minInvestment: 19000, openDate: '2026-07-25', closeDate: '2026-07-29', listingDate: null, issueSize: 6800, listingGains: null, subscription: { qib: 1.8, nii: 3.2, retail: 1.5, total: 2.1 }, gmp: 0.12, analystRating: 'positive', registrar: 'RCBC Trust', leadManagers: ['First Metro Investment', 'BDO Capital'], sector: 'Renewable Energy' },
+  { id: 'ipo6', name: 'DITO CME Holdings', symbol: 'DITO2', logo: '', status: 'open', priceBand: '₱3.20–3.50', lotSize: 3000, minInvestment: 10500, openDate: '2026-07-24', closeDate: '2026-07-28', listingDate: null, issueSize: 3800, listingGains: null, subscription: { qib: 4.5, nii: 6.2, retail: 3.8, total: 4.8 }, gmp: 0.20, analystRating: 'neutral', registrar: 'BDO Capital', leadManagers: ['PNB Capital', 'China Bank Capital'], sector: 'Telecom' },
 ];
 
 const LISTED_IPOS: IPO[] = [
-  { id: 'ipo7', name: 'MobiKwik Ltd', symbol: 'MOBIKWIK', logo: '', status: 'listed', priceBand: '₹265–279', lotSize: 53, minInvestment: 14787, openDate: '2026-06-15', closeDate: '2026-06-18', listingDate: '2026-06-28', issueSize: 2800, listingGains: 32, subscription: { qib: 42.5, nii: 68.3, retail: 38.2, total: 51.8 }, gmp: 55, analystRating: 'positive', registrar: 'Link Intime', leadManagers: ['SBI Caps', 'DAM Capital'], sector: 'Fintech' },
-  { id: 'ipo8', name: 'Swiggy Ltd', symbol: 'SWIGGY', logo: '', status: 'listed', priceBand: '₹350–380', lotSize: 40, minInvestment: 15200, openDate: '2026-05-20', closeDate: '2026-05-23', listingDate: '2026-06-03', issueSize: 12000, listingGains: 18, subscription: { qib: 15.8, nii: 22.5, retail: 8.6, total: 15.2 }, gmp: 28, analystRating: 'positive', registrar: 'Link Intime', leadManagers: ['Kotak', 'Morgan Stanley', 'Goldman Sachs'], sector: 'Food Tech' },
-  { id: 'ipo9', name: 'Vishal Mega Mart Ltd', symbol: 'VISHAL', logo: '', status: 'listed', priceBand: '₹72–78', lotSize: 190, minInvestment: 14820, openDate: '2026-04-10', closeDate: '2026-04-13', listingDate: '2026-04-23', issueSize: 4200, listingGains: 42, subscription: { qib: 35.2, nii: 48.6, retail: 52.3, total: 46.1 }, gmp: 35, analystRating: 'positive', registrar: 'KFintech', leadManagers: ['ICICI Securities', 'Axis Capital'], sector: 'Retail' },
+  { id: 'ipo7', name: 'Season Tech Holdings', symbol: 'SEASON', logo: '', status: 'listed', priceBand: '₱1.80–1.95', lotSize: 10000, minInvestment: 19000, openDate: '2026-06-15', closeDate: '2026-06-18', listingDate: '2026-06-28', issueSize: 2800, listingGains: 32, subscription: { qib: 42.5, nii: 68.3, retail: 38.2, total: 51.8 }, gmp: 0.25, analystRating: 'positive', registrar: 'BDO Capital', leadManagers: ['BDO Capital', 'RCBC Trust'], sector: 'Technology' },
+  { id: 'ipo8', name: 'GoTyme Financial Corp', symbol: 'GOTYME', logo: '', status: 'listed', priceBand: '₱3.50–3.80', lotSize: 3000, minInvestment: 11400, openDate: '2026-05-20', closeDate: '2026-05-23', listingDate: '2026-06-03', issueSize: 12000, listingGains: 18, subscription: { qib: 15.8, nii: 22.5, retail: 8.6, total: 15.2 }, gmp: 0.28, analystRating: 'positive', registrar: 'BPI Capital', leadManagers: ['BPI Capital', 'First Metro Investment', 'BDO Capital'], sector: 'Fintech' },
+  { id: 'ipo9', name: 'Metro Retail Stores Group', symbol: 'MRSGI2', logo: '', status: 'listed', priceBand: '₱0.72–0.78', lotSize: 20000, minInvestment: 15600, openDate: '2026-04-10', closeDate: '2026-04-13', listingDate: '2026-04-23', issueSize: 4200, listingGains: 42, subscription: { qib: 35.2, nii: 48.6, retail: 52.3, total: 46.1 }, gmp: 0.10, analystRating: 'positive', registrar: 'RCBC Trust', leadManagers: ['China Bank Capital', 'PNB Capital'], sector: 'Retail' },
 ];
 
-function formatIssueSize(cr: number): string {
-  return `₹${cr >= 1000 ? (cr / 1000).toFixed(1) + 'K' : cr} Cr`;
+function formatIssueSize(millions: number): string {
+  return `₱${millions >= 1000 ? (millions / 1000).toFixed(1) + 'B' : millions + 'M'}`;
 }
 
 function formatDate(d: string | null): string {
   if (!d) return '—';
-  return new Date(d).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+  return new Date(d).toLocaleDateString('en-PH', { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
 function StatusBadge({ status }: { status: IPOStatus }) {
@@ -108,7 +108,7 @@ function IPOCard({ ipo }: { ipo: IPO }) {
           <div style={{ fontSize: '10px', color: '#a0a0a0', textTransform: 'uppercase' }}>Total Subscription</div>
         </div>
         <div>
-          <div style={{ fontSize: '22px', fontWeight: 700, color: ipo.gmp ? '#f59e0b' : '#666' }}>{ipo.gmp ? `₹${ipo.gmp}` : '—'}</div>
+          <div style={{ fontSize: '22px', fontWeight: 700, color: ipo.gmp ? '#f59e0b' : '#666' }}>{ipo.gmp ? `₱${ipo.gmp}` : '—'}</div>
           <div style={{ fontSize: '10px', color: '#a0a0a0', textTransform: 'uppercase' }}>GMP (Grey Market)</div>
         </div>
         <div>
@@ -126,7 +126,7 @@ function IPOCard({ ipo }: { ipo: IPO }) {
       <div style={{ display: 'flex', gap: '8px', alignItems: 'center', fontSize: '12px', color: '#a0a0a0', flexWrap: 'wrap' }}>
         <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Calendar size={12} /> {formatDate(ipo.openDate)} – {formatDate(ipo.closeDate)}</span>
         <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Users size={12} /> Lot: {ipo.lotSize} shares</span>
-        <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>Min: ₹{ipo.minInvestment.toLocaleString('en-IN')}</span>
+        <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>Min: ₱{ipo.minInvestment.toLocaleString('en-PH')}</span>
         {ipo.analystRating && (
           <span style={{
             padding: '2px 8px', borderRadius: '10px', fontSize: '11px',
@@ -151,8 +151,8 @@ function IPOCard({ ipo }: { ipo: IPO }) {
             <div style={{ fontSize: '12px', fontWeight: 600, color: '#ccc', marginBottom: '6px' }}>Subscription Details</div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '4px' }}>
               {[
-                { label: 'QIB', value: ipo.subscription.qib, color: '#3b82f6' },
-                { label: 'NII', value: ipo.subscription.nii, color: '#f59e0b' },
+                { label: 'Institutional', value: ipo.subscription.qib, color: '#3b82f6' },
+                { label: 'High Net Worth', value: ipo.subscription.nii, color: '#f59e0b' },
                 { label: 'Retail', value: ipo.subscription.retail, color: '#10b981' },
                 { label: 'Total', value: ipo.subscription.total, color: '#8b5cf6' },
               ].map(s => (

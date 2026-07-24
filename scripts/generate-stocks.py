@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate 500+ NSE stock entries for stockUniverse.ts"""
+"""Generate 500+ PSX stock entries for stockUniverse.ts"""
 import json, random
 
 random.seed(42)
@@ -29,7 +29,7 @@ def ascii_only(s):
     return unicodedata.normalize('NFKD', s).encode('ascii', 'ignore').decode('ascii')
 
 def make_symbol(name):
-    """Generate a reasonable NSE symbol from a company name."""
+    """Generate a reasonable PSX symbol from a company name."""
     name = ascii_only(name)
     parts = name.replace("'", "").replace("&", "").replace("-", " ").split()
     if len(parts) == 1:
@@ -47,37 +47,42 @@ def make_symbol(name):
 # Realistic Nifty 500 company names organized by sector
 NAMES_BY_SECTOR = {
     "Banking": [
-        "HDFC Bank", "ICICI Bank", "State Bank of India", "Kotak Mahindra Bank",
-        "Axis Bank", "IndusInd Bank", "Bank of Baroda", "Punjab National Bank",
-        "Canara Bank", "Union Bank of India", "IDBI Bank", "Indian Bank",
-        "Bank of India", "Central Bank of India", "Yes Bank", "Federal Bank",
-        "South Indian Bank", "Karur Vysya Bank", "City Union Bank", "DCB Bank",
-        "IDFC First Bank", "RBL Bank", "Bandhan Bank", "AU Small Finance Bank",
-        "Equitas Small Finance Bank", "Ujjivan Small Finance Bank", "Jammu & Kashmir Bank",
-        "Karnataka Bank", "Lakshmi Vilas Bank", "Dhanlaxmi Bank",
-        "Tamilnad Mercantile Bank", "CSB Bank", "Suryoday Small Finance Bank",
-        "North East Small Finance Bank", "Shivalik Small Finance Bank",
-        "ESAF Small Finance Bank", "Utkarsh Small Finance Bank",
-        "Fincare Small Finance Bank", "Jana Small Finance Bank", "Capital Small Finance Bank",
+        "Habib Bank Limited", "United Bank Limited", "National Bank of Pakistan", "MCB Bank Limited",
+        "Bank Alfalah Limited", "Meezan Bank Limited", "Bank of Punjab", "Allied Bank Limited",
+        "Habib Metropolitan Bank", "JS Bank Limited", "Askari Bank Limited", "Faysal Bank Limited",
+        "Soneri Bank Limited", "Bank Al-Habib Limited", "Summit Bank Limited", "Silkbank Limited",
+        "Samba Bank Limited", "Al Baraka Bank", "Dubai Islamic Bank Pakistan",
+        "Standard Chartered Pakistan", "Bank Islami Pakistan",
+        "Mobilink Microfinance Bank", "Telenor Microfinance Bank",
+        "Khushhali Microfinance Bank", "FINCA Microfinance Bank",
+        "U Microfinance Bank", "Akhuwat Islamic Microfinance",
+        "NRSP Microfinance Bank", "Advans Pakistan Microfinance",
+        "Sindh Bank Limited", "First Women Bank Limited",
+        "Zarai Taraqiati Bank", "Punjab Provincial Cooperative Bank",
+        "SME Bank Limited", "Industrial Development Bank",
+        "Pak Oman Investment Company", "Pak Libya Holding Company",
+        "Pak Brunei Investment Company", "Pak China Investment Company",
+        "House Building Finance Company",
     ],
     "NBFC": [
-        "Bajaj Finance", "Bajaj Finserv", "HDFC Ltd", "LIC Housing Finance",
-        "Power Finance Corp", "REC Ltd", "Cholamandalam Investment", "Mahindra & Mahindra Financial",
-        "Shriram Transport Finance", "Aditya Birla Finance", "Tata Capital",
-        "Piramal Enterprises", "Sundaram Finance", "Manappuram Finance",
-        "Muthoot Finance", "Indiabulls Housing Finance", "PNB Housing Finance",
-        "Can Fin Homes", "Dewan Housing Finance", "Gruh Finance",
-        "Reliance Capital", "Edelweiss Financial", "IIFL Finance",
-        "L&T Finance Holdings", "SBI Cards", "Bajaj Finserv AMC",
+        "Engro Fertilisers", "Fauji Fertilizer Company", "Dawood Hercules", "Faysal Asset Management",
+        "Pak Kuwait Investment", "Invest Capital Investment Bank", "Cyan Limited",
+        "First Dawood Properties", "Arif Habib Corporation", "Jahangir Siddiqui & Co",
+        "EFU General Insurance", "Adamjee Insurance", "Century Insurance",
+        "IGI Holdings", "Escorts Investment Bank", "First Capital Equities",
+        "Trust Securities & Brokerage", "AKD Securities", "BMA Capital Management",
+        "Arif Habib Limited", "Foundation Securities", "Pearl Securities",
+        "Habib Asset Management", "Atlas Asset Management", "HBL Asset Management",
+        "NAFA Asset Management", "ABL Asset Management",
     ],
     "Insurance": [
-        "HDFC Life Insurance", "SBI Life Insurance", "ICICI Prudential Life",
-        "Max Life Insurance", "Kotak Mahindra Life", "Tata AIA Life",
-        "Birla Sun Life Insurance", "PNB MetLife India", "Aditya Birla Sun Life",
-        "ICICI Lombard General", "New India Assurance", "United India Insurance",
-        "National Insurance", "Oriental Insurance", "Future Generali India",
-        "Reliance General Insurance", "Royal Sundaram", "Cholamandalam MS General",
-        "Bajaj Allianz General", "Magma HDI General Insurance", "Liberty General Insurance",
+        "EFU Life Assurance", "State Life Insurance", "Jubilee Life Insurance",
+        "Adamjee Life Assurance", "IGI Life Insurance", "Askari Life Assurance",
+        "Pakistan Reinsurance Company", "East West Insurance", "Century Insurance",
+        "Silver Star Insurance", "Premier Insurance", "United Insurance Company",
+        "Atlas Insurance", "Crescent Star Insurance", "Habib Insurance",
+        "TPL Insurance", "Asia Insurance", "Pakistan General Insurance",
+        "Universal Insurance", "Security General Insurance", "Shaheen Insurance",
     ],
     "Software": [
         "Tata Consultancy Services", "Infosys", "Wipro", "HCL Technologies",

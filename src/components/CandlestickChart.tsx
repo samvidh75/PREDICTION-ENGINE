@@ -153,6 +153,8 @@ export function CandlestickChart({
     <div
       style={{
         background: colors.surface,
+        backdropFilter: "blur(20px) saturate(160%)",
+        WebkitBackdropFilter: "blur(20px) saturate(160%)",
         border: `1px solid ${colors.hairline}`,
         borderRadius: radius.xl,
         padding: space[4],
@@ -198,6 +200,8 @@ export function CandlestickChart({
             color: colors.textTertiary,
             fontFamily: typography.fontFamily,
             background: colors.canvas,
+            backdropFilter: "blur(20px) saturate(160%)",
+            WebkitBackdropFilter: "blur(20px) saturate(160%)",
             padding: `${space[1]} ${space[2]}`,
             borderRadius: radius.sm,
             border: `1px solid ${colors.hairline}`,

@@ -160,7 +160,7 @@ export async function getPersistedStockResearch(symbol: string): Promise<StockRe
   const fromMemory = getStockResearch(symbol);
   if (fromMemory) return fromMemory;
 
-  // Fall back to the full persisted universe (8503+ stocks, including all PSE codes)
+  // Fall back to the full persisted universe (8503+ stocks, including all PSX codes)
   const persisted = await loadPersistedUniverse();
   if (!persisted) return null;
 
@@ -168,18 +168,21 @@ export async function getPersistedStockResearch(symbol: string): Promise<StockRe
   const entry = persisted.entries.find((e) => e.symbol.toUpperCase() === upper);
   if (!entry) return null;
 
-  // Build a minimal StockResearchDetail from the persisted entry
-  const syntheticPrice = seededPrice(entry.symbol);
-  const [founded, employees] = await syntheticProfile(entry.symbol);
+  // Build a minimal StockResearchDetail from the persisted entry. Price is
+  // left at 0 rather than a seeded/fabricated number — callers needing a
+  // real price should hit api/stock/[symbol].ts (real phisix PSE data)
+  // instead of this metadata-only fallback path.
+  const founded = "";
+  const employees = "";
   return {
     symbol: entry.symbol,
     name: entry.name,
     companyName: entry.name,
-    exchange: entry.exchange as "PSE" | "NSE",
-    exchangeBadge: (entry.exchange === "PSE" ? "PSE" : "NSE") as "PSE" | "NSE",
+    exchange: entry.exchange as "PSE",
+    exchangeBadge: entry.exchange as "PSE",
     sector: entry.sector,
     industry: entry.industry || entry.sector,
-    price: syntheticPrice,
+    price: 0,
     change: 0,
     changePercent: 0,
     marketCap: entry.marketCap,
@@ -200,7 +203,7 @@ export async function getPersistedStockResearch(symbol: string): Promise<StockRe
     scores: entry.scores,
     founded,
     ceo: "Management team",
-    hq: "India",
+    hq: "Philippines",
     employees,
     website: "",
     isin: "",
@@ -227,22 +230,6 @@ export async function getPersistedStockResearch(symbol: string): Promise<StockRe
   };
 }
 
-// Deterministic seeded price for stocks without live data
-function seededPrice(symbol: string): number {
-  let hash = 0;
-  for (let i = 0; i < symbol.length; i++) hash = ((hash << 5) - hash) + symbol.charCodeAt(i);
-  const seed = Math.abs(hash) / 2147483648;
-  return Number((80 + seed * 4120).toFixed(2));
-}
-
-async function syntheticProfile(symbol: string): Promise<[string, string]> {
-  let hash = 0;
-  for (let i = 0; i < symbol.length; i++) hash = ((hash << 5) - hash) + symbol.charCodeAt(i);
-  const seed = Math.abs(hash) / 2147483648;
-  const foundedYear = `${1980 + Math.floor(seed * 40)}`;
-  const employeeCount = Math.round(1800 + seed * 80200).toLocaleString("en-IN");
-  return [foundedYear, `${employeeCount}+`];
-}
 
 export async function listPersistedStockSummaries() {
   const persisted = await loadPersistedUniverse();

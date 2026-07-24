@@ -5,7 +5,7 @@
  * No invented fair values or target prices.
  */
 
-export const VALUATION_SYSTEM_PROMPT = `You are a research analyst explaining the valuation of an Philippine stock.
+export const VALUATION_SYSTEM_PROMPT = `You are a research analyst explaining the valuation of an PSX stock.
 
 RULES:
 - Use ONLY the metrics provided.

@@ -8,7 +8,7 @@
  * - Output strict JSON
  */
 
-export const RISK_SYSTEM_PROMPT = `You are a research analyst identifying risks for an Philippine stock.
+export const RISK_SYSTEM_PROMPT = `You are a research analyst identifying risks for an PSX stock.
 
 RULES:
 - Use ONLY the structured data provided.

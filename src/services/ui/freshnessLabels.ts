@@ -47,7 +47,7 @@ export function formatLastUpdated(isoString: string | null | undefined): string 
   try {
     const date = new Date(isoString);
     if (Number.isNaN(date.getTime())) return "";
-    return date.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
+    return date.toLocaleDateString("en-PH", { day: "numeric", month: "short", year: "numeric" });
   } catch {
     return "";
   }

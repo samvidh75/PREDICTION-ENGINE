@@ -58,7 +58,7 @@ export default function SharedResearchSnapshot() {
           {snapshot.companyName}
         </h1>
         <p style={{ fontSize: "14px", color: colors.textSecondary }}>
-          {snapshot.symbol} &middot; {new Date(snapshot.createdAt).toLocaleDateString("en-IN")}
+          {snapshot.symbol} &middot; {new Date(snapshot.createdAt).toLocaleDateString("en-PH")}
         </p>
       </section>
 
@@ -79,6 +79,8 @@ export default function SharedResearchSnapshot() {
                 style={{
                   padding: "12px",
                   background: colors.card,
+                  backdropFilter: "blur(20px) saturate(160%)",
+                  WebkitBackdropFilter: "blur(20px) saturate(160%)",
                   borderRadius: radius.md,
                   border: `1px solid ${colors.border}`,
                   boxShadow: shadows.card,
@@ -107,7 +109,7 @@ export default function SharedResearchSnapshot() {
 
       {snapshot.expiresAt && (
         <p style={{ fontSize: "12px", color: colors.textTertiary, marginBottom: "24px" }}>
-          This snapshot expires on {new Date(snapshot.expiresAt).toLocaleDateString("en-IN")}.
+          This snapshot expires on {new Date(snapshot.expiresAt).toLocaleDateString("en-PH")}.
         </p>
       )}
 

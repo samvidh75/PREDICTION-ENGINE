@@ -14,7 +14,7 @@ export interface FOEligibility {
   /** Segment under which it is eligible (equity, index, etc.) */
   segment?: 'equity' | 'index' | 'both';
   /** Exchange where F&O is available */
-  exchange?: 'nse' | 'bse' | 'both';
+  exchange?: 'pse' | 'pse' | 'both';
   /** Date of eligibility determination */
   asOf: string;
   /** Reason if not eligible */
@@ -55,7 +55,7 @@ export interface OptionActivity {
   maxCallOiStrike?: number;
   /** Maximum put OI concentration strike */
   maxPutOiStrike?: number;
-  /** India VIX level (if available) */
+  /** Pakistan VIX level (if available) */
   indiaVix?: number;
   asOf: string;
 }

@@ -49,7 +49,7 @@ export class EconomicCalendar {
       forecast: '6.0%',
       actual: null,
       impact: null,
-      description: 'Quarterly GDP growth rate. Tracks the expansion pace of the Philippine economy.',
+      description: 'Quarterly GDP growth rate. Tracks the expansion pace of the PSX economy.',
     },
     {
       date: this.daysFromNow(3),
@@ -133,7 +133,7 @@ export class EconomicCalendar {
       forecast: '3.2%',
       actual: null,
       impact: null,
-      description: 'US inflation reading. Affects Fed rate expectations and USD-INR trajectory.',
+      description: 'US inflation reading. Affects Fed rate expectations and USD-PKR trajectory.',
     },
     {
       date: this.daysFromNow(4),
@@ -181,7 +181,7 @@ export class EconomicCalendar {
       forecast: '$655B',
       actual: null,
       impact: null,
-      description: 'Weekly RBI forex reserves data. Adequacy cushions INR volatility.',
+      description: 'Weekly RBI forex reserves data. Adequacy cushions PKR volatility.',
     },
     {
       date: this.daysFromNow(25),

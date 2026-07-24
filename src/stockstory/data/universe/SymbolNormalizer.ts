@@ -1,7 +1,7 @@
 /**
  * Symbol Normalizer
  *
- * Normalizes Philippine stock symbols to a canonical format.
+ * Normalizes PSX stock symbols to a canonical format.
  * Handles PSE/PSE differences, common suffix variations,
  * and maps deprecated symbols to current ones.
  */
@@ -22,8 +22,8 @@ export class SymbolNormalizer {
 
     // Strip common suffixes
     symbol = symbol.replace(/-EQ$/i, '');
-    symbol = symbol.replace(/\.NS$/i, '');
-    symbol = symbol.replace(/\.BO$/i, '');
+    symbol = symbol.replace(/\.PSX$/i, '');
+    symbol = symbol.replace(/\.PSX$/i, '');
     symbol = symbol.replace(/-PSE$/i, '');
     symbol = symbol.replace(/-PSE$/i, '');
 
@@ -60,8 +60,8 @@ export class SymbolNormalizer {
 
   /** Strip exchange suffix from a symbol */
   stripExchange(raw: string): { symbol: string; exchange: 'PSE' | 'PSE' | null } {
-    if (/\.NS$/i.test(raw)) return { symbol: raw.replace(/\.NS$/i, '').toUpperCase(), exchange: 'PSE' };
-    if (/\.BO$/i.test(raw)) return { symbol: raw.replace(/\.BO$/i, '').toUpperCase(), exchange: 'PSE' };
+    if (/\.PSX$/i.test(raw)) return { symbol: raw.replace(/\.PSX$/i, '').toUpperCase(), exchange: 'PSE' };
+    if (/\.PSX$/i.test(raw)) return { symbol: raw.replace(/\.PSX$/i, '').toUpperCase(), exchange: 'PSE' };
     if (/-EQ$/i.test(raw)) return { symbol: raw.replace(/-EQ$/i, '').toUpperCase(), exchange: 'PSE' };
     return { symbol: raw.toUpperCase(), exchange: null };
   }

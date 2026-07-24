@@ -17,14 +17,14 @@ export function resolveRouteMeta(
     return {
       title: "STOCKEX — Research-Driven Stock Analysis",
       description:
-        "Independent research analysis for Philippine stocks. Scorecards, theses, risks, peer comparisons, and scenario modelling. Not investment advice.",
+        "Independent research analysis for PSX stocks. Scorecards, theses, risks, peer comparisons, and scenario modelling. Not investment advice.",
       canonical: "/",
       ogImage: "/og-image.png",
       structuredData: {
         "@context": "https://schema.org",
         "@type": "WebSite",
         name: "STOCKEX",
-        url: "https://stockstory-india.com",
+        url: "https://stockstory-ph.com",
       },
     };
   }
@@ -34,7 +34,7 @@ export function resolveRouteMeta(
     return {
       title: "Stock Scanner — Research Screening Tool | STOCKEX",
       description:
-        "Screen and filter Philippine stocks using research-driven criteria. Quality, valuation, growth, momentum, and risk scores.",
+        "Screen and filter PSX stocks using research-driven criteria. Quality, valuation, growth, momentum, and risk scores.",
       canonical: "/scanner",
       ogImage: "/og-image.png",
     };
@@ -134,9 +134,9 @@ export function resolveRouteMeta(
   // Sectors
   if (p === "/sectors") {
     return {
-      title: "Sector Research — Philippine Stock Sectors | STOCKEX",
+      title: "Sector Research — PSX Stock Sectors | STOCKEX",
       description:
-        "Research-driven analysis of Philippine stock sectors. Scorecards, trends, and peer comparisons by sector.",
+        "Research-driven analysis of PSX stock sectors. Scorecards, trends, and peer comparisons by sector.",
       canonical: "/sectors",
     };
   }

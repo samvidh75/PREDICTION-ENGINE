@@ -34,10 +34,10 @@ function QuoteCard({
   return (
     <div className="quote-card" data-testid="quote-card">
       <h2>{symbol}</h2>
-      <p className="price" data-testid="current-price">₹{quote.price?.toFixed(2)}</p>
+      <p className="price" data-testid="current-price">₱{quote.price?.toFixed(2)}</p>
       <div className="quote-details">
-        <span>Bid: ₹{quote.bid?.toFixed(2) ?? '—'}</span>
-        <span>Ask: ₹{quote.ask?.toFixed(2) ?? '—'}</span>
+        <span>Bid: ₱{quote.bid?.toFixed(2) ?? '—'}</span>
+        <span>Ask: ₱{quote.ask?.toFixed(2) ?? '—'}</span>
         <span>Volume: {quote.volume ? (quote.volume / 1e6).toFixed(2) + 'M' : '—'}</span>
       </div>
     </div>

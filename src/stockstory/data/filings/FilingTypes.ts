@@ -1,7 +1,7 @@
 /**
  * Filing Types
  *
- * Exchange filing intelligence for Philippine listed companies.
+ * Exchange filing intelligence for PSX listed companies.
  * Covers PSE/PSE announcements, SEC filings, annual reports,
  * and insider trading disclosures.
  */

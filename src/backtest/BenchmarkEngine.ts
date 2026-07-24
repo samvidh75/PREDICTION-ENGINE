@@ -1,8 +1,8 @@
 /**
  * TRACK-31 PHASE 2 — Benchmark Engine
- * 
- * Computes benchmark metrics for NIFTY50, NIFTY100, NIFTY500, and Equal Weight Universe
- * using real price data from daily_prices table.
+ *
+ * Computes benchmark metrics for PSEi, PSEi Top 10, PSE All Shares, and
+ * Equal Weight Universe using real price data from daily_prices table.
  */
 
 import { query } from '../db/index';
@@ -19,178 +19,161 @@ import {
   maxDrawdown,
 } from './types';
 
-// Approximate NIFTY constituent lists (symbols on PSE)
-export const NIFTY50_SYMBOLS = [
-  'RELIANCE', 'TCS', 'HDFCBANK', 'INFY', 'ICICIBANK', 'HINDUNILVR',
-  'SBIN', 'BHARTIARTL', 'ITC', 'KOTAKBANK', 'LT', 'BAJFINANCE',
-  'ASIANPAINT', 'AXISBANK', 'MARUTI', 'SUNPHARMA', 'TITAN', 'WIPRO',
-  'HCLTECH', 'ULTRACEMCO', 'NTPC', 'POWERGRID', 'ADANIPORTS',
-  'ADANIENT', 'NESTLEIND', 'TECHM', 'ONGC', 'DRREDDY', 'COALINDIA',
-  'JSWSTEEL', 'TATAMOTORS', 'GRASIM', 'BAJAJFINSV', 'TATASTEEL',
-  'HDFCLIFE', 'SBILIFE', 'EICHERMOT', 'DIVISLAB', 'APOLLOHOSP',
-  'BPCL', 'BRITANNIA', 'CIPLA', 'HEROMOTOCO', 'HINDALCO',
-  'INDUSINDBK', 'M&M', 'TATACONSUM', 'UPL', 'BAJAJ-AUTO', 'SHREECEM',
+// PSEi (PSE Index) constituent list — PSE-listed symbols
+export const PSEI_SYMBOLS = [
+  'SM', 'SMPH', 'AC', 'ALI', 'BDO',
+  'BPI', 'MBT', 'ICT', 'JFC', 'URC',
+  'AEV', 'MER', 'TEL', 'GLO', 'LTG',
+  'MPI', 'AGI', 'GTCAP', 'JGS', 'SECB',
+  'CNPF', 'EMI', 'WLCON', 'MONDE', 'PGOLD',
+  'RRHI', 'RLC', 'DMC', 'ACEN', 'BLOOM',
 ];
 
-export const NIFTY100_SYMBOLS = [
-  ...NIFTY50_SYMBOLS,
-  'ABB', 'ADANIGREEN', 'ADANITRANS', 'ALKEM', 'AMBUJACEM',
-  'AUROPHARMA', 'BANDHANBNK', 'BANKBARODA', 'BERGEPAINT',
-  'BIOCON', 'BOSCHLTD', 'CADILAHC', 'CANBK', 'CHOLAFIN',
-  'COLPAL', 'CONCOR', 'DABUR', 'DLF', 'FEDERALBNK', 'GAIL',
-  'GODREJCP', 'HAVELLS', 'HDFCAMC', 'HONAUT', 'ICICIPRULI',
-  'IGL', 'INDUSTOWER', 'IOC', 'JUBLFOOD', 'LICHSGFIN',
-  'LUPIN', 'M&MFIN', 'MARICO', 'MUTHOOTFIN', 'NAUKRI',
-  'NAVINFLUOR', 'NIACL', 'NMDC', 'PAGEIND', 'PEL',
-  'PETRONET', 'PIDILITIND', 'PFC', 'PNB', 'RAMCOCEM',
-  'SBICARD', 'SRTRANSFIN', 'TORNTPHARM', 'TVSMOTOR', 'VEDL',
+export const PSE_ALL_SYMBOLS = [
+  ...PSEI_SYMBOLS,
+  'AP', 'FGEN', 'MWIDE', 'ANI', 'CEB',
+  'DD', 'FLI', 'HLCM', 'IMI', 'MEG',
+  'NIKL', 'PCOR', 'PXP', 'ROCK', 'SCC',
+  'SSI', 'TFHI', 'VLL', 'CHP',
 ];
 
-const NIFTY500_SYMBOLS: string[] = []; // Discovered from registry
+export const PSEI_TOP_10_SYMBOLS = PSEI_SYMBOLS.slice(0, 10);
 
-export class BenchmarkEngine {
-  /**
-   * Fetch daily prices for the given symbols within a date range.
-   * Returns close prices grouped by trade_date, averaged across symbols.
-   */
-  private async fetchIndexPrices(
-    symbols: string[],
-    startDate: string,
-    endDate: string
-  ): Promise<{ dates: string[]; prices: number[]; returns: number[] }> {
-    // Get all prices for requested symbols
-    const result = await query(
-      `SELECT trade_date, AVG(adjusted_close) as avg_close
-       FROM daily_prices
-       WHERE symbol = ANY($1)
-         AND trade_date BETWEEN $2 AND $3
-       GROUP BY trade_date
-       ORDER BY trade_date`,
-      [symbols, startDate, endDate]
-    );
+/**
+ * Compute benchmark metrics for a given index.
+ */
+export async function computeBenchmark(
+  index: BenchmarkIndex,
+  startDate: string,
+  endDate: string
+): Promise<BenchmarkResult> {
+  let symbols: string[];
 
-    const rows = result.rows;
-    const dates: string[] = [];
-    const prices: number[] = [];
-    const returns: number[] = [];
-
-    for (let i = 0; i < rows.length; i++) {
-      dates.push(rows[i].trade_date.toISOString().split('T')[0]);
-      const price = parseFloat(rows[i].avg_close);
-      prices.push(price);
-      if (i > 0 && prices[i - 1] > 0) {
-        returns.push((price - prices[i - 1]) / prices[i - 1]);
-      }
-    }
-
-    return { dates, prices, returns };
+  switch (index) {
+    case 'PSEI':
+      symbols = PSEI_SYMBOLS;
+      break;
+    case 'PSEI_TOP_10':
+      symbols = PSEI_TOP_10_SYMBOLS;
+      break;
+    case 'PSE_ALL':
+      symbols = PSE_ALL_SYMBOLS;
+      break;
+    case 'EQUAL_WEIGHT_UNIVERSE':
+      symbols = PSE_ALL_SYMBOLS;
+      break;
   }
 
-  private computeMetrics(returns: number[], days: number, totalReturn: number): BenchmarkMetrics {
-    const annVol = annualizedVolatility(returns);
-    const annRet = annualizedReturn(totalReturn, days);
-    const monthlyReturns: number[] = [];
-    // Approximate monthly returns from daily
-    for (let i = 0; i < returns.length; i += 21) {
-      const chunk = returns.slice(i, i + 21);
-      if (chunk.length > 0) {
-        const chunkRet = chunk.reduce((a, b) => a + b, 0);
-        monthlyReturns.push(chunkRet);
-      }
-    }
-    const positiveMonths = monthlyReturns.filter(r => r > 0).length;
+  const prices = await fetchBenchmarkPrices(symbols, startDate, endDate);
+  const returns = computeReturns(prices);
+  const metrics = computeMetrics(returns, index);
 
-    return {
-      cagr: annRet,
-      sharpe: sharpeRatio(annRet, annVol),
-      sortino: sortinoRatio(returns),
-      maxDrawdown: maxDrawdown(this.computeEquityCurve(returns)),
-      volatility: annVol,
-      totalReturn,
-      positiveMonths,
-      totalMonths: monthlyReturns.length,
-      winRate: monthlyReturns.length > 0 ? positiveMonths / monthlyReturns.length : 0,
-    };
-  }
-
-  private computeEquityCurve(returns: number[]): number[] {
-    const curve = [1];
-    for (const r of returns) {
-      curve.push(curve[curve.length - 1] * (1 + r));
-    }
-    return curve;
-  }
-
-  async computeBenchmark(
-    index: BenchmarkIndex,
-    startDate: string,
-    endDate: string
-  ): Promise<BenchmarkResult> {
-    let symbols: string[];
-
-    switch (index) {
-      case 'NIFTY50':
-        symbols = NIFTY50_SYMBOLS;
-        break;
-      case 'NIFTY100':
-        symbols = NIFTY100_SYMBOLS;
-        break;
-      case 'NIFTY500':
-      case 'EQUAL_WEIGHT_UNIVERSE': {
-        const regResult = await query(
-          `SELECT symbol FROM master_security_registry
-           WHERE listing_status = 'Active'
-           ORDER BY symbol`
-        );
-        symbols = regResult.rows.map(r => r.symbol);
-        if (index === 'NIFTY500') {
-          symbols = symbols.slice(0, 500);
-        }
-        break;
-      }
-    }
-
-    const { dates, prices, returns } = await this.fetchIndexPrices(symbols, startDate, endDate);
-
-    if (prices.length < 2) {
-      return {
-        index,
-        metrics: {
-          cagr: 0, sharpe: 0, sortino: 0, maxDrawdown: 0,
-          volatility: 0, totalReturn: 0, positiveMonths: 0, totalMonths: 0, winRate: 0,
-        },
-        periodStart: startDate,
-        periodEnd: endDate,
-        constituents: symbols.length,
-      };
-    }
-
-    const totalReturn = (prices[prices.length - 1] - prices[0]) / prices[0];
-    const days = dates.length;
-
-    return {
-      index,
-      metrics: this.computeMetrics(returns, days, totalReturn),
-      periodStart: dates[0],
-      periodEnd: dates[dates.length - 1],
-      constituents: symbols.length,
-    };
-  }
-
-  async computeAllBenchmarks(
-    startDate: string,
-    endDate: string
-  ): Promise<BenchmarkResult[]> {
-    const indices: BenchmarkIndex[] = ['NIFTY50', 'NIFTY100', 'NIFTY500', 'EQUAL_WEIGHT_UNIVERSE'];
-    const results: BenchmarkResult[] = [];
-
-    for (const idx of indices) {
-      const result = await this.computeBenchmark(idx, startDate, endDate);
-      results.push(result);
-    }
-
-    return results;
-  }
+  return {
+    index,
+    metrics,
+    periodStart: startDate,
+    periodEnd: endDate,
+    constituents: symbols.length,
+  };
 }
 
-export const benchmarkEngine = new BenchmarkEngine();
+async function fetchBenchmarkPrices(
+  symbols: string[],
+  startDate: string,
+  endDate: string
+): Promise<Record<string, number[]>> {
+  const prices: Record<string, number[]> = {};
+  for (const sym of symbols) {
+    const result = await query(
+      `SELECT close_price FROM daily_prices WHERE symbol = $1 AND date >= $2 AND date <= $3 ORDER BY date`,
+      [sym, startDate, endDate]
+    );
+    prices[sym] = result.rows.map((r: any) => r.close_price);
+  }
+  return prices;
+}
+
+function computeReturns(prices: Record<string, number[]>): number[] {
+  const allReturns: number[] = [];
+  const symbols = Object.keys(prices);
+  const minLen = Math.min(...Object.values(prices).map(p => p.length));
+  if (minLen < 2) return [];
+
+  for (let i = 1; i < minLen; i++) {
+    let dayReturn = 0;
+    for (const sym of symbols) {
+      const p = prices[sym];
+      if (p.length > i && p[i - 1] > 0) {
+        dayReturn += (p[i] - p[i - 1]) / p[i - 1];
+      }
+    }
+    allReturns.push(dayReturn / symbols.length);
+  }
+  return allReturns;
+}
+
+function computeMetrics(returns: number[], index: BenchmarkIndex): BenchmarkMetrics {
+  if (returns.length === 0) {
+    return {
+      cagr: 0, sharpe: 0, sortino: 0, maxDrawdown: 0,
+      volatility: 0, totalReturn: 0, positiveMonths: 0,
+      totalMonths: 0, winRate: 0,
+    };
+  }
+
+  const totalReturn = returns.reduce((a, b) => a * (1 + b), 1) - 1;
+  const cagr = annualizedReturn(totalReturn, returns.length);
+  const volatility = annualizedVolatility(returns);
+  const sharpe = sharpeRatio(cagr, volatility, 0.06); // PHP risk-free ~6% (PH T-bill)
+  const sortino = sortinoRatio(returns, 0.06);
+  const equityCurve = returns.reduce<number[]>((curve, r) => {
+    const prev = curve.length > 0 ? curve[curve.length - 1] : 1;
+    curve.push(prev * (1 + r));
+    return curve;
+  }, []);
+  const drawdown = maxDrawdown(equityCurve);
+
+  const positiveMonths = returns.filter(r => r > 0).length;
+  const totalMonths = returns.length;
+  const winRate = totalMonths > 0 ? (positiveMonths / totalMonths) * 100 : 0;
+
+  return {
+    cagr: cagr * 100,
+    sharpe,
+    sortino,
+    maxDrawdown: drawdown * 100,
+    volatility: volatility * 100,
+    totalReturn: totalReturn * 100,
+    positiveMonths,
+    totalMonths,
+    winRate,
+  };
+}
+
+/**
+ * Compute benchmarks for all indices.
+ */
+export async function computeAllBenchmarks(
+  startDate: string,
+  endDate: string
+): Promise<BenchmarkResult[]> {
+  const indices: BenchmarkIndex[] = ['PSEI', 'PSEI_TOP_10', 'PSE_ALL', 'EQUAL_WEIGHT_UNIVERSE'];
+  const results: BenchmarkResult[] = [];
+
+  for (const index of indices) {
+    try {
+      const result = await computeBenchmark(index, startDate, endDate);
+      results.push(result);
+    } catch (error) {
+      console.error(`Failed to compute benchmark for ${index}:`, error);
+    }
+  }
+
+  return results;
+}
+
+/** Object wrapper so callers can `import { benchmarkEngine }` and bind its methods. */
+export const benchmarkEngine = {
+  computeBenchmark,
+  computeAllBenchmarks,
+};

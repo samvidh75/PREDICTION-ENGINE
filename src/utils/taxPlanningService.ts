@@ -1,7 +1,7 @@
 /**
  * Tax Planning Service
  * Calculates tax implications and optimization suggestions
- * For Philippine income tax (STCG/LTCG, Section 80C, etc.)
+ * For PSX income tax (STCG/LTCG, Section 80C, etc.)
  */
 
 export interface TaxableGain {
@@ -43,7 +43,7 @@ export interface DividendRecord {
 
 const STCG_TAX_RATE = 15; // 15% STCG under Section 111A
 const LTCG_TAX_RATE = 20; // 20% LTCG on equities
-const LTCG_EXEMPTION = 100000; // ₹1L annual exemption
+const LTCG_EXEMPTION = 100000; // ₱1L annual exemption
 const CESS_RATE = 4; // 4% cess on LTCG tax
 const HOLDING_PERIOD_THRESHOLD = 365; // 1 year = 365 days
 
@@ -72,7 +72,7 @@ class TaxPlanningService {
       // STCG at slab rate (assuming 15% bracket)
       return gain * (STCG_TAX_RATE / 100);
     } else {
-      // LTCG with ₹1L exemption
+      // LTCG with ₱1L exemption
       const taxableGain = Math.max(0, gain - LTCG_EXEMPTION);
       const baseTax = taxableGain * (LTCG_TAX_RATE / 100);
       const cess = baseTax * (CESS_RATE / 100);
@@ -133,11 +133,11 @@ class TaxPlanningService {
     const recommendations: string[] = [];
 
     if (shortTermGains > 0) {
-      recommendations.push(`🔴 Short-term gains: ₹${shortTermGains.toLocaleString('en-IN')}. Tax: ₹${totalSTCGTax.toLocaleString('en-IN')} (15%). Consider holding until 12 months for LTCG benefit.`);
+      recommendations.push(`🔴 Short-term gains: ₱${shortTermGains.toLocaleString('en-PH')}. Tax: ₱${totalSTCGTax.toLocaleString('en-PH')} (15%). Consider holding until 12 months for LTCG benefit.`);
     }
 
     if (longTermGains > 0 && longTermGains > LTCG_EXEMPTION) {
-      recommendations.push(`🟢 Long-term gains: ₹${longTermGains.toLocaleString('en-IN')}. Tax: ₹${totalLTCGTax.toLocaleString('en-IN')} (20% + cess). You've exceeded ₹1L LTCG exemption.`);
+      recommendations.push(`🟢 Long-term gains: ₱${longTermGains.toLocaleString('en-PH')}. Tax: ₱${totalLTCGTax.toLocaleString('en-PH')} (20% + cess). You've exceeded ₱1L LTCG exemption.`);
     }
 
     if (totalGains > 100000) {
@@ -176,7 +176,7 @@ class TaxPlanningService {
         ticker: h.ticker,
         loss: h.gain,
         lossPercent: (h.gain / (h.buyPrice * h.gain / (h.currentPrice - h.buyPrice))) * 100,
-        harvestable: Math.abs(h.gain) > 10000, // Only show losses > ₹10k
+        harvestable: Math.abs(h.gain) > 10000, // Only show losses > ₱10k
       }));
   }
 

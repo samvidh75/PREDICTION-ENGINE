@@ -46,12 +46,12 @@ class PortfolioAIContext {
     // Build summary
     let summary = 'User Portfolio Context:\n';
     summary += `Total Holdings: ${holdings.length} stocks\n`;
-    summary += `Total Invested: ₹${Math.round(totalInvested).toLocaleString('en-IN')}\n\n`;
+    summary += `Total Invested: ₱${Math.round(totalInvested).toLocaleString('en-PH')}\n\n`;
 
     summary += 'Current Allocation:\n';
     for (const alloc of allocations.slice(0, 5)) {
       // Top 5 holdings
-      summary += `- ${alloc.ticker}: ${alloc.percentage.toFixed(1)}% (${alloc.quantity} shares, ₹${Math.round(alloc.value).toLocaleString('en-IN')})\n`;
+      summary += `- ${alloc.ticker}: ${alloc.percentage.toFixed(1)}% (${alloc.quantity} shares, ₱${Math.round(alloc.value).toLocaleString('en-PH')})\n`;
     }
 
     if (allocations.length > 5) {
@@ -88,7 +88,7 @@ class PortfolioAIContext {
   private analyzeSectors(holdings: Holding[]): Array<{ sector: string; count: number }> {
     const sectorMap: Map<string, number> = new Map();
 
-    // Simplified sector mapping based on common Philippine stock patterns
+    // Simplified sector mapping based on common PSX stock patterns
     const sectorPatterns: Record<string, string> = {
       INFY: 'IT',
       TCS: 'IT',

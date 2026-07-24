@@ -1,19 +1,19 @@
 export {};
 /**
- * import-public-fundamentals.ts — Imports financial data from public NSE sources.
+ * import-public-fundamentals.ts — Imports financial data from public PSX sources.
  *
- * Sources: nsepython (nse_results, nse_past_results).
+ * Sources: psx provider.
  * Normalizes into financial_snapshots table format. Idempotent upsert.
  * Dry-run by default, --apply required to write.
  *
  * Usage:
- *   npx tsx scripts/import-public-fundamentals.ts --symbols=RELIANCE,TCS
- *   npx tsx scripts/import-public-fundamentals.ts --symbols=RELIANCE,TCS --apply
- *   npx tsx scripts/import-public-fundamentals.ts --universe=nifty50 --batch-size=10 --delay-ms=500
+ *   npx tsx scripts/import-public-fundamentals.ts --symbols=HBL,ENGRO
+ *   npx tsx scripts/import-public-fundamentals.ts --symbols=HBL,ENGRO --apply
+ *   npx tsx scripts/import-public-fundamentals.ts --universe=kse100 --batch-size=10 --delay-ms=500
  */
 
 import { dbAdapter } from "../src/db/DatabaseAdapter";
-import { NIFTY50_SYMBOLS } from "../src/backtest/BenchmarkEngine";
+import { KSE100_SYMBOLS } from "../src/backtest/BenchmarkEngine";
 import { execSync } from "node:child_process";
 
 const TRACKED_FIELDS = [
@@ -62,10 +62,10 @@ function parseArgs(): CliOptions {
   let symbols: string[];
   if (symbolArg) {
     symbols = [...new Set(symbolArg.split(",").map((s) => s.trim().toUpperCase()).filter(Boolean))];
-  } else if (universe === "nifty50") {
-    symbols = [...NIFTY50_SYMBOLS];
+  } else if (universe === "kse100") {
+    symbols = [...KSE100_SYMBOLS];
   } else {
-    console.error("ERROR: Use --symbols=RELIANCE,TCS or --universe=nifty50");
+    console.error("ERROR: Use --symbols=HBL,ENGRO or --universe=kse100");
     process.exit(1);
   }
 

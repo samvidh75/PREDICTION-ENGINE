@@ -1,15 +1,15 @@
 import { CompanyTelemetry } from '../../types/stock';
-import { MasterCompanyRegistry } from '../data/MasterCompanyRegistry';
+import MasterCompanyRegistry from '../data/MasterCompanyRegistry';
 
 export interface RegisteredStock extends CompanyTelemetry {
   companyName: string;
-  exchange: 'PSE' | 'PSE' | 'SME';
+  exchange: 'PSE' | 'SME';
   sector: string;
 }
 
 import { generate500Stocks } from "./generate500Stocks";
 
-// ─── Master Stock Registry Dataset (PSE, PSE, SME Segment Boundaries) ───────────────
+// ─── Master Stock Registry Dataset (PSE, SME Segment Boundaries) ───────────────
 const MASTER_STOCK_REGISTRY: Record<string, RegisteredStock> = {};
 const registry = MasterCompanyRegistry.getInstance();
 
@@ -24,7 +24,7 @@ for (const stock of dynamicList) {
     sector: registryEntry?.sector || stock.sector,
     marketCap: {
       numeric: marketCap ?? null,
-      formatted: marketCap ? formatIndianMarketCap(marketCap) : "Data unavailable",
+      formatted: marketCap ? formatMarketCap(marketCap) : "Data unavailable",
       availability: marketCap ? 'real' as const : 'unavailable' as const,
     },
     peRatio: null,
@@ -36,13 +36,11 @@ for (const stock of dynamicList) {
   };
 }
 
-function formatIndianMarketCap(value: number): string {
-  const crore = 10_000_000;
-  const lakhCrore = 100_000 * crore;
-  if (value >= lakhCrore) {
-    return `₹${(value / lakhCrore).toFixed(2)} L Cr`;
+function formatMarketCap(value: number): string {
+  if (value >= 1_000_000_000) {
+    return `₱${(value / 1_000_000_000).toFixed(2)}B`;
   }
-  return `₹${(value / crore).toFixed(0)} Cr`;
+  return `₱${(value / 1_000_000).toFixed(0)}M`;
 }
 
 export class StockRegistry {

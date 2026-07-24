@@ -116,6 +116,8 @@ const cardStyle: React.CSSProperties = {
   padding: space[5],
   borderRadius: radius.xl,
   background: colors.card,
+  backdropFilter: "blur(20px) saturate(160%)",
+  WebkitBackdropFilter: "blur(20px) saturate(160%)",
   boxShadow: shadows.card,
 };
 

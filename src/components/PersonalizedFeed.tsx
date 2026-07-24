@@ -74,6 +74,8 @@ export default function PersonalizedFeed() {
               justifyContent: "space-between",
               padding: `${space[3]} ${space[4]}`,
               background: colors.surface,
+              backdropFilter: "blur(20px) saturate(160%)",
+              WebkitBackdropFilter: "blur(20px) saturate(160%)",
               borderRadius: radius.md,
               border: `1px solid ${colors.hairline}`,
             }}

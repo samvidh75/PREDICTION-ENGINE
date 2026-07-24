@@ -88,7 +88,7 @@ function generateReasoning(
   const { currentPrice, ma50, ma200 } = metrics;
   if (ma50 !== undefined) {
     const pctFrom50 = ((currentPrice - ma50) / ma50 * 100).toFixed(1);
-    lines.push(`Price (₹${currentPrice}) is ${pctFrom50}% ${currentPrice > ma50 ? 'above' : 'below'} 50-day MA (${ma50}).`);
+    lines.push(`Price (₱${currentPrice}) is ${pctFrom50}% ${currentPrice > ma50 ? 'above' : 'below'} 50-day MA (${ma50}).`);
   }
   if (ma200 !== undefined) {
     const pctFrom200 = ((currentPrice - ma200) / ma200 * 100).toFixed(1);

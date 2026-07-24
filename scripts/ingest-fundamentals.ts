@@ -1,5 +1,5 @@
 import { dbAdapter } from "../src/db/DatabaseAdapter";
-import { NIFTY50_SYMBOLS } from "../src/backtest/BenchmarkEngine";
+import { PSEI_SYMBOLS } from "../src/backtest/BenchmarkEngine";
 import type { CompanyMetadata } from "../src/services/data/types";
 import type { FinancialData } from "../src/services/providers/FinancialProvider";
 import { execFile } from "node:child_process";
@@ -51,7 +51,7 @@ export interface SymbolResult {
   snapshot: NormalizedFundamentalSnapshot | null;
   error: string | null;
   sector: string | null;
-  sectorSource: "master_security_registry" | FundamentalsProviderId | "indianapi" | null;
+  sectorSource: "master_security_registry" | FundamentalsProviderId | "psx" | null;
   sectorBackfillProposed: boolean;
   industry: string | null;
 }
@@ -94,14 +94,14 @@ type ProviderLike = {
   getMetadata(symbol: string): Promise<CompanyMetadata>;
 };
 
-type IndianMetadataProviderLike = {
+type PSXMetadataProviderLike = {
   getMetadata(symbol: string): Promise<CompanyMetadata>;
 };
 
 export interface RunDeps {
   db?: DbLike;
   provider?: ProviderLike;
-  indianProvider?: IndianMetadataProviderLike | null;
+  psxProvider?: PSXMetadataProviderLike | null;
   now?: () => Date;
   sleep?: (ms: number) => Promise<void>;
 }
@@ -164,11 +164,11 @@ function freshnessDays(asOf: string, now: Date): number {
 }
 
 function providerSourceUrl(provider: FundamentalsProviderId, symbol: string): string {
-  return `https://query2.finance.yahoo.com/v10/finance/quoteSummary/${encodeURIComponent(symbol)}.NS`;
+  return `https://query2.finance.yahoo.com/v10/finance/quoteSummary/${encodeURIComponent(symbol)}.PS`;
 }
 
 function toYahooSymbol(symbol: string): string {
-  return /\.[A-Z]+$/i.test(symbol) ? symbol.toUpperCase() : `${symbol.toUpperCase()}.NS`;
+  return /\.[A-Z]+$/i.test(symbol) ? symbol.toUpperCase() : `${symbol.toUpperCase()}.PS`;
 }
 
 function percentOrNull(value: unknown): number | null {
@@ -187,7 +187,7 @@ export function normalizeYFinanceSnapshot(symbolInput: string, data: FinancialDa
   if (!data || typeof data !== "object") throw new Error("provider response is missing or malformed");
   const raw = data as Record<string, unknown>;
   if (raw.error) throw new Error(String(raw.error));
-  const symbol = String(raw.symbol ?? symbolInput).trim().toUpperCase().replace(/\.(NS|BO)$/i, "");
+  const symbol = String(raw.symbol ?? symbolInput).trim().toUpperCase().replace(/\.(PS|PSE)$/i, "");
   const fiscalPeriod = isoDate(raw.periodEnd, now);
   const snapshot: Omit<NormalizedFundamentalSnapshot, "completenessScore" | "availableFields" | "missingFields"> = {
     symbol,
@@ -241,7 +241,7 @@ class YFinanceBridgeProvider implements ProviderLike {
       companyName: String((financials as Record<string, unknown>).shortName ?? symbol),
       sector: typeof (financials as Record<string, unknown>).sector === "string" ? String((financials as Record<string, unknown>).sector) : "",
       industry: typeof (financials as Record<string, unknown>).industry === "string" ? String((financials as Record<string, unknown>).industry) : "",
-      exchange: "NSE",
+      exchange: "PSX",
     };
   }
 }
@@ -282,9 +282,9 @@ async function tableColumns(db: DbLike, table: string): Promise<Set<string>> {
 async function resolveSymbols(options: CliOptions, db: DbLike): Promise<string[]> {
   if (options.symbols && options.symbols.length > 0) return options.symbols;
   if (options.symbols && options.symbols.length === 0) throw new Error("Symbol list is empty.");
-  if (options.universe === "nifty50") return normalizeSymbols(NIFTY50_SYMBOLS);
+  if (options.universe === "psei") return normalizeSymbols(PSEI_SYMBOLS);
   if (options.universe) throw new Error(`Unsupported universe ${options.universe}.`);
-  throw new Error("Empty symbol list. Use --symbols=RELIANCE,TCS or --universe=nifty50.");
+  throw new Error("Empty symbol list. Use --symbols=BDO,SM or --universe=psei.");
 }
 
 async function existingRegistryMetadata(db: DbLike, symbol: string): Promise<{ sector: string | null; industry: string | null }> {
@@ -304,7 +304,7 @@ async function resolveSector(
   db: DbLike,
   provider: ProviderLike,
   providerId: FundamentalsProviderId,
-  indianProvider: IndianMetadataProviderLike | null,
+  psxProvider: PSXMetadataProviderLike | null,
 ): Promise<{ sector: string | null; industry: string | null; source: SymbolResult["sectorSource"]; proposed: boolean }> {
   const existing = await existingRegistryMetadata(db, symbol);
   if (existing.sector) return { ...existing, source: "master_security_registry", proposed: false };
@@ -317,11 +317,11 @@ async function resolveSector(
     // Optional metadata failure should not reject fundamentals.
   }
 
-  if (indianProvider) {
+  if (psxProvider) {
     try {
-      const meta = await indianProvider.getMetadata(symbol);
+      const meta = await psxProvider.getMetadata(symbol);
       const sector = meta.sector?.trim() || null;
-      if (sector) return { sector, industry: meta.industry?.trim() || null, source: "indianapi", proposed: true };
+      if (sector) return { sector, industry: meta.industry?.trim() || null, source: "psx", proposed: true };
     } catch {
       // Optional fallback unavailable.
     }
@@ -472,7 +472,7 @@ export async function runFundamentalsIngestion(options: CliOptions, deps: RunDep
   await db.initialize();
   const providerId = options.provider as FundamentalsProviderId;
   const provider = deps.provider ?? new YFinanceBridgeProvider();
-  const indianProvider = deps.indianProvider ?? (process.env.INDIANAPI_KEY ? new (await import("../src/services/providers/IndianMarketProvider")).IndianMarketProvider(process.env.INDIANAPI_KEY) : null);
+  const psxProvider = deps.psxProvider ?? null;
   const symbols = await resolveSymbols(options, db);
   if (symbols.length === 0) throw new Error("Symbol list is empty.");
   const startedAt = nowFn();
@@ -483,7 +483,7 @@ export async function runFundamentalsIngestion(options: CliOptions, deps: RunDep
     try {
       const [financials, sector] = await Promise.all([
         provider.getFinancials(symbol),
-        resolveSector(symbol, db, provider, providerId, indianProvider),
+        resolveSector(symbol, db, provider, providerId, psxProvider),
       ]);
       const snapshot = normalizeProviderSnapshot(providerId, symbol, financials, nowFn());
       const errors = validateSnapshot(snapshot);

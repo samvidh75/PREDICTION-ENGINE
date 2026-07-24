@@ -84,6 +84,8 @@ export function TradeFromWatchlist({ symbol, exchange = "PSE", currentPrice }: T
     <div
       style={{
         background: colors.canvas,
+        backdropFilter: "blur(20px) saturate(160%)",
+        WebkitBackdropFilter: "blur(20px) saturate(160%)",
         borderRadius: radius.md,
         padding: space[3],
         border: `1px solid ${colors.hairline}`,
@@ -145,6 +147,8 @@ export function TradeFromWatchlist({ symbol, exchange = "PSE", currentPrice }: T
           style={{
             flex: 1,
             background: colors.surface,
+            backdropFilter: "blur(20px) saturate(160%)",
+            WebkitBackdropFilter: "blur(20px) saturate(160%)",
             border: `1px solid ${colors.hairline}`,
             borderRadius: radius.sm,
             padding: space[1],
@@ -159,6 +163,8 @@ export function TradeFromWatchlist({ symbol, exchange = "PSE", currentPrice }: T
           onChange={(e) => setForm((f) => ({ ...f, orderType: e.target.value as "MARKET" | "LIMIT" }))}
           style={{
             background: colors.surface,
+            backdropFilter: "blur(20px) saturate(160%)",
+            WebkitBackdropFilter: "blur(20px) saturate(160%)",
             border: `1px solid ${colors.hairline}`,
             borderRadius: radius.sm,
             padding: space[1],
@@ -184,6 +190,8 @@ export function TradeFromWatchlist({ symbol, exchange = "PSE", currentPrice }: T
             style={{
               flex: 1,
               background: colors.surface,
+              backdropFilter: "blur(20px) saturate(160%)",
+              WebkitBackdropFilter: "blur(20px) saturate(160%)",
               border: `1px solid ${colors.hairline}`,
               borderRadius: radius.sm,
               padding: space[1],
@@ -203,6 +211,8 @@ export function TradeFromWatchlist({ symbol, exchange = "PSE", currentPrice }: T
           style={{
             flex: 1,
             background: colors.surface,
+            backdropFilter: "blur(20px) saturate(160%)",
+            WebkitBackdropFilter: "blur(20px) saturate(160%)",
             border: `1px solid ${colors.hairline}`,
             borderRadius: radius.sm,
             padding: space[1],

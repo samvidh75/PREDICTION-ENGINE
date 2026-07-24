@@ -148,7 +148,7 @@ export function sanitizeChatOutput(text: string): string {
     /\bstrong\s+(buy|sell)\b/gi,
     /\boutperform\b/gi,
     /\bunderperform\b/gi,
-    /\btarget\s+price\s*(?:is\s*)?[:₹$]?\s*\d+/gi,
+    /\btarget\s+price\s*(?:is\s*)?(?::\s*)?(?:Rs\.?\s*)?\$?\s*\d[\d,.]*/gi,
     /\bprice\s+target\b/gi,
   ];
 

@@ -83,9 +83,7 @@ function buildBrokerUrl(
   direction: 'long' | 'short',
 ): string {
   // In production each broker provides its own deep‑link format.
-  const baseUrls: Record<string, string> = {
-    upstox: 'https://upstox.com/trading',
-  };
+  const baseUrls: Record<string, string> = {};
   const base = baseUrls[brokerId] ?? 'https://example.com/trade';
   return `${base}/${symbol.toLowerCase()}/${direction}`;
 }

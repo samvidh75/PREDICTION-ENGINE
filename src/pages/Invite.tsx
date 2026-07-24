@@ -19,7 +19,7 @@ export default function Invite() {
 
   const handleCopy = async () => {
     try {
-      await navigator.clipboard.writeText(`https://stockstory-india.com${inviteUrl}`);
+      await navigator.clipboard.writeText(`https://stockstory-ph.com${inviteUrl}`);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch { /* fallback */ }
@@ -33,7 +33,7 @@ export default function Invite() {
           Invite Friends
         </h1>
         <p style={{ fontSize: typography.body.desktop.size, color: colors.textSecondary, lineHeight: 1.6, marginBottom: "24px" }}>
-          Share StockEX India with fellow researchers. Help them discover structured research analysis for Philippine equities.
+          Share StockEX with fellow researchers. Help them discover structured research analysis for PSX equities.
         </p>
       </section>
 
@@ -46,7 +46,7 @@ export default function Invite() {
           <input
             type="text"
             readOnly
-            value={`https://stockstory-india.com${inviteUrl}`}
+            value={`https://stockstory-ph.com${inviteUrl}`}
             style={{
               flex: 1, padding: "10px 12px", border: `1px solid ${colors.border}`,
               borderRadius: "6px", fontSize: "14px", background: colors.fill, color: colors.textPrimary,

@@ -28,7 +28,7 @@ const SUGGESTED_QUESTIONS = [
   "Which PSE Index stocks have the strongest quality scores?",
   "Compare TCS vs Infosys on valuation metrics",
   "What's driving the IT sector's momentum today?",
-  "Screen for growth stocks with low debt under ₹5000 Cr",
+  "Screen for growth stocks with low debt under ₱5000 Cr",
   "Explain the 8-factor scoring methodology",
 ];
 
@@ -45,6 +45,8 @@ const QuickAction: FC<{ icon: LucideIcon; label: string; onClick: () => void; co
         borderRadius: radius.lg,
         border: `1px solid ${colors.hairline}`,
         background: colors.surface,
+        backdropFilter: "blur(20px) saturate(160%)",
+        WebkitBackdropFilter: "blur(20px) saturate(160%)",
         color: colors.textPrimary,
         fontFamily: typography.fontFamily,
         fontSize: typography.bodySm.size,
@@ -160,6 +162,8 @@ const Sidebar: FC<{
         width: 260,
         flexShrink: 0,
         background: colors.canvas,
+        backdropFilter: "blur(20px) saturate(160%)",
+        WebkitBackdropFilter: "blur(20px) saturate(160%)",
         borderRight: `1px solid ${colors.hairline}`,
         display: "flex",
         flexDirection: "column",
@@ -226,7 +230,7 @@ export default function AIChatPage() {
           id: "welcome",
           role: "assistant",
           content:
-            "👋 Hi! I'm StockEX AI — your equity research analyst.\n\nI can help you with:\n• **Stock analysis** — bull/bear cases, 8-factor scoring\n• **Screening** — find stocks matching your criteria\n• **Comparisons** — side-by-side peer analysis\n• **Market context** — sector trends, macro signals\n• **Portfolio insights** — conviction tracking, risk\n\nAsk me anything about Philippine equities!",
+            "Hi, I'm the StockEx research assistant.\n\nI can help you with:\n• **Stock breakdowns** — the case for and against a company\n• **Screening** — find stocks that match what you're looking for\n• **Comparisons** — put two or more stocks side by side\n• **Market context** — what's moving a sector right now\n• **Portfolio check-ins** — how your holdings are trending, and the risks to watch\n\nAsk me anything about PSX stocks.",
           timestamp: Date.now(),
         },
       ],
@@ -305,7 +309,7 @@ export default function AIChatPage() {
         }
       }
 
-      const apiBase = import.meta.env.VITE_API_BASE_URL || (window.location.hostname.includes("stockstory-india.com") ? "/api" : "/api");
+      const apiBase = import.meta.env.VITE_API_BASE_URL || (window.location.hostname.includes("stockstory-ph.com") ? "/api" : "/api");
       const apiUrl = `${apiBase}/chat`;
 
       try {
@@ -315,7 +319,7 @@ export default function AIChatPage() {
           body: JSON.stringify({
             message: userMessage,
             symbol: "",
-            context: "General Philippine stock market research and analysis.",
+            context: "General PSX stock market research and analysis.",
           }),
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -328,7 +332,7 @@ export default function AIChatPage() {
           content,
           timestamp: Date.now(),
           thinkingSteps,
-          citations: data?.citations?.length ? data.citations : ["Philippine Stock Exchange", "SEC Filings"],
+          citations: data?.citations?.length ? data.citations : ["PSX Stock Exchange", "SEC Filings"],
         };
 
         setLoading(false);
@@ -464,6 +468,8 @@ export default function AIChatPage() {
             padding: `${space[4]} ${space[8]}`,
             borderTop: `1px solid ${colors.hairline}`,
             background: colors.canvas,
+            backdropFilter: "blur(20px) saturate(160%)",
+            WebkitBackdropFilter: "blur(20px) saturate(160%)",
           }}
         >
           <div
@@ -474,6 +480,8 @@ export default function AIChatPage() {
               gap: space[2],
               alignItems: "flex-end",
               background: colors.surface,
+              backdropFilter: "blur(20px) saturate(160%)",
+              WebkitBackdropFilter: "blur(20px) saturate(160%)",
               borderRadius: radius.lg,
               border: `1px solid ${colors.hairline}`,
               padding: `${space[2]} ${space[2]} ${space[2]} ${space[4]}`,

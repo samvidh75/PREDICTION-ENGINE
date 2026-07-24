@@ -115,7 +115,7 @@ export class IntelligenceService {
     question: string,
     context: string
   ): Promise<string> {
-    const prompt = `You are a financial analyst expert in Philippine stocks.
+    const prompt = `You are a financial analyst expert in PSX stocks.
 
 Stock: ${symbol}
 Context:
@@ -192,7 +192,7 @@ Company Information:
 - Sector: ${data.sector}
 - Industry: ${data.industry}
 - Market Cap: ${data.marketCap}
-- Current Price: ₹${data.price} (${data.changePercent}%)
+- Current Price: ₱${data.price} (${data.changePercent}%)
 
 Financial Metrics:
 - P/E Ratio: ${data.pe}
@@ -207,7 +207,7 @@ Technical Analysis:
 - RSI (14): ${data.rsi}
 - MACD: ${data.macd}
 - Bollinger Width: ${data.bollingerWidth}
-- 52W High/Low: ₹${data.high52w} / ₹${data.low52w}
+- 52W High/Low: ₱${data.high52w} / ₱${data.low52w}
 
 Provide a JSON analysis with these exact fields:
 {
@@ -289,13 +289,13 @@ Generate a recommendation. Return JSON:
   }
 
   private buildComparisonPrompt(stocks: StockData[]): string {
-    return `Compare these Philippine stocks:
+    return `Compare these PSX stocks:
 
 ${stocks
   .map(
     (s) => `
 ${s.symbol}:
-- Price: ₹${s.price}
+- Price: ₱${s.price}
 - P/E: ${s.pe}
 - ROE: ${s.roe}%
 - Growth: ${s.revenueGrowth}%

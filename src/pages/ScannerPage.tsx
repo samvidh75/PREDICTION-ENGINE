@@ -5,7 +5,7 @@ import { Button } from "../ui/Button";
 import { Card } from "../ui/Card";
 import { useResponsiveValue } from "../ui/responsive";
 import { colors, typography, radius } from "../design/tokens";
-import { Sparkles, TrendingUp, TrendingDown, Minus, BarChart3 } from "lucide-react";
+import { TrendingUp, TrendingDown, Minus, BarChart3 } from "lucide-react";
 import { ResearchAiExplanationPanel } from "../components/ai-orchestrator/ResearchAiExplanationPanel";
 import { buildScannerContext } from "../components/ai-orchestrator/researchAiContext";
 
@@ -138,20 +138,16 @@ export default function ScannerPage() {
                   minHeight: isDesktop ? "42px" : "46px",
                   padding: isDesktop ? "0 16px" : "0 18px",
                   borderRadius: "16px",
-                  border: isActive ? "1px solid rgba(255,255,255,0.18)" : `1px solid ${colors.hairline}`,
-                  background: isActive
-                    ? "linear-gradient(180deg, rgba(86, 115, 160, 0.24) 0%, rgba(30, 41, 59, 0.52) 100%)"
-                    : "linear-gradient(180deg, rgba(255,255,255,0.045) 0%, rgba(255,255,255,0.018) 100%)",
+                  border: isActive ? `1px solid ${colors.hairlineStrong}` : `1px solid ${colors.hairline}`,
+                  background: isActive ? colors.fill : "transparent",
                   color: colors.textPrimary,
                   display: "inline-flex",
                   alignItems: "center",
                   gap: "10px",
                   cursor: "pointer",
-                  boxShadow: isActive
-                    ? "0 16px 32px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.08)"
-                    : "inset 0 1px 0 rgba(255,255,255,0.03)",
-                  backdropFilter: "blur(18px)",
-                  WebkitBackdropFilter: "blur(18px)",
+                  boxShadow: isActive ? "none" : "none",
+                  backdropFilter: "none",
+                  WebkitBackdropFilter: "none",
                   transition: "transform 160ms ease, border-color 160ms ease, background 160ms ease, box-shadow 160ms ease",
                   fontFamily: typography.fontFamily,
                   fontSize: isDesktop ? "14px" : "15px",
@@ -176,9 +172,13 @@ export default function ScannerPage() {
                     display: "inline-flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    background: isActive ? "rgba(255,255,255,0.10)" : "rgba(255,255,255,0.04)",
-                    boxShadow: "inset 0 1px 0 rgba(255,255,255,0.05)",
-                    fontSize: isDesktop ? "14px" : "15px",
+                    background: isActive ? colors.accentRed : colors.hairline,
+                    boxShadow: "none",
+                    fontSize: isDesktop ? "12px" : "13px",
+                    fontWeight: 700,
+                    fontFamily: typography.monoFamily,
+                    color: isActive ? colors.onPrimary : colors.textSecondary,
+                    letterSpacing: "0",
                   }}
                 >
                   {preset.icon}
@@ -219,17 +219,17 @@ export default function ScannerPage() {
               border: `1px solid ${colors.hairline}`,
               borderRadius: "44px",
               padding: "0 20px",
-              background: "rgba(255,255,255,0.035)",
-              color: colors.textPrimary,
-              outline: "none",
-              backdropFilter: "blur(12px)",
-              WebkitBackdropFilter: "blur(12px)",
-              boxSizing: "border-box",
-              boxShadow: "inset 0 1px 0 rgba(255,255,255,0.04)",
+                  background: colors.surface,
+                  color: colors.textPrimary,
+                  outline: "none",
+                  backdropFilter: "none",
+                  WebkitBackdropFilter: "none",
+                  boxSizing: "border-box",
+                  boxShadow: `inset 0 1px 0 ${colors.hairlineSoft}`,
               transition: "border-color 0.15s ease, background 0.15s ease",
             }}
-            onFocus={(e) => { e.target.style.borderColor = colors.hairlineStrong; e.target.style.background = "rgba(255,255,255,0.06)"; }}
-            onBlur={(e) => { e.target.style.borderColor = colors.hairline; e.target.style.background = "rgba(255,255,255,0.04)"; }}
+            onFocus={(e) => { e.target.style.borderColor = colors.hairlineStrong; e.target.style.background = colors.card; }}
+            onBlur={(e) => { e.target.style.borderColor = colors.hairline; e.target.style.background = colors.surface; }}
           />
         </div>
 
@@ -329,7 +329,7 @@ export default function ScannerPage() {
                           padding: "8px 6px",
                           textAlign: ci === 1 ? "left" : "right",
                           borderBottom: `1px solid ${colors.hairline}`,
-                          background: (stock.rank - 1) % 2 === 0 ? "transparent" : `rgba(255,255,255,0.02)`,
+                          background: (stock.rank - 1) % 2 === 0 ? "transparent" : `${colors.hairlineSoft}`,
                           transition: "background 120ms ease",
                           borderRadius: ci === 0 ? "6px 0 0 6px" : isLast ? "0 6px 6px 0" : "0",
                           whiteSpace: "nowrap" as const,
@@ -361,13 +361,13 @@ export default function ScannerPage() {
                     minHeight: "66px",
                     borderRadius: "18px",
                     border: `1px solid ${colors.hairline}`,
-                    background: "linear-gradient(180deg, rgba(255,255,255,0.028) 0%, rgba(255,255,255,0.014) 100%)",
+                    background: colors.surface,
                     color: colors.textPrimary,
                     textAlign: "left",
                     cursor: "pointer",
-                    backdropFilter: "blur(18px)",
-                    WebkitBackdropFilter: "blur(18px)",
-                    boxShadow: "inset 0 1px 0 rgba(255,255,255,0.035)",
+                    backdropFilter: "blur(20px) saturate(160%)",
+                    WebkitBackdropFilter: "blur(20px) saturate(160%)",
+                    boxShadow: `inset 0 1px 0 ${colors.hairlineSoft}`,
                   }}
                 >
                   <span style={{
@@ -377,11 +377,11 @@ export default function ScannerPage() {
                     width: "42px",
                     height: "42px",
                     borderRadius: "14px",
-                    background: "rgba(255,255,255,0.04)",
+                    background: colors.hairline,
                     color: colors.textSecondary,
                     fontSize: "16px",
                     fontWeight: 600,
-                    boxShadow: "inset 0 1px 0 rgba(255,255,255,0.04)",
+                    boxShadow: "none",
                   }}>
                     {stock.rank}
                   </span>
@@ -401,17 +401,17 @@ export default function ScannerPage() {
       {isDesktop && activeStock && (
         <div className="raycast-slideUp raycast-stagger-6" style={{
           padding: "16px 20px",
-          background: "rgba(20,20,24,0.92)",
-          backdropFilter: "blur(20px)",
-          WebkitBackdropFilter: "blur(20px)",
+          background: colors.surface,
+          backdropFilter: "none",
+          WebkitBackdropFilter: "none",
           border: `1px solid ${colors.hairline}`,
           borderRadius: radius.md,
-          boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
+          boxShadow: "none",
         }}>
           <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "12px" }}>
-            <Sparkles size={14} color={colors.primary} />
+            <BarChart3 size={14} color={colors.primary} />
             <span style={{ fontSize: "13px", fontWeight: 600, color: colors.primary }}>
-              AI Factor Breakdown
+              Factor Breakdown
             </span>
             <span style={{ fontSize: "14px", fontWeight: 700, color: colors.textPrimary }}>
               {activeStock.name} ({activeStock.symbol})
@@ -475,7 +475,7 @@ export default function ScannerPage() {
           <div style={{
             marginTop: "12px",
             padding: "10px 14px",
-            background: "rgba(255,255,255,0.03)",
+            background: colors.fill,
             borderRadius: radius.md,
             border: `1px solid ${colors.hairline}`,
             display: "flex",
@@ -504,7 +504,7 @@ export default function ScannerPage() {
             rank: activeStock.rank,
             keyReason: activeStock.matchReason || `${activeStock.symbol} scores ${Math.round(activeStock.composite)}% on ${activePreset.label}`,
             riskMarker: FACTOR_COLUMNS.reduce((lowest, fc) => ((activeStock as any)[fc.key] ?? 0) < ((activeStock as any)[lowest.key] ?? 0) ? fc : lowest, FACTOR_COLUMNS[0]).label,
-            conviction: activeStock.composite >= 70 ? "High conviction" : activeStock.composite >= 50 ? "Moderate conviction" : "Speculative",
+            conviction: activeStock.composite >= 70 ? "Strong outlook" : activeStock.composite >= 50 ? "Moderate outlook" : "Cautious",
             oneLineThesis: `${activeStock.symbol} ranks #${activeStock.rank} in ${activePreset.label} with ${Math.round(activeStock.composite)}% composite score.`,
             companyName: activeStock.name || activeStock.symbol,
             symbol: activeStock.symbol,
@@ -518,7 +518,7 @@ export default function ScannerPage() {
         Showing <strong style={{ color: colors.textPrimary }}>{displayResults.length}</strong> of{" "}
         <strong style={{ color: colors.textPrimary }}>{results.length}</strong> results for{" "}
         <strong style={{ color: colors.primary }}>{activePreset.label}</strong>
-        {isDesktop ? <>&nbsp;· Hover a row for AI factor breakdown</> : null}
+        {isDesktop ? <>&nbsp;· Hover a row for factor breakdown</> : null}
       </div>
     </div>
   );

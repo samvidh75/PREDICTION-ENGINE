@@ -15,13 +15,13 @@ import { PortfolioEngine, type UserHolding } from "../services/portfolio/Portfol
 import { PortfolioPerformanceEngine } from "../services/portfolio/PortfolioPerformanceEngine";
 import { PortfolioAnalyticsEngine } from "../services/portfolio/PortfolioAnalyticsEngine";
 import { MarketDataGateway } from "../services/data/MarketDataGateway";
-import { formatINR } from "../services/ui/dataFormatting";
-import { formatPercent } from "../services/ui/indianNumberFormat";
+import { formatPHP } from "../services/ui/dataFormatting";
+import { formatPercent } from "../services/ui/phNumberFormat";
 import { loadAuthSession } from "../services/auth/sessionStore";
 
 function formatInr(n: number): string {
   if (n == null || Number.isNaN(n)) return "—";
-  return "₹" + n.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return "₱" + n.toLocaleString("en-PH", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
 function formatPct(n: number | null): string {
@@ -198,16 +198,16 @@ export default function PortfolioPage() {
 
     return {
       surface: "portfolio",
-      headline: `${holdings.length} holding${holdings.length !== 1 ? "s" : ""} · ${formatINR(totalCost)} cost · ${formatINR(totalValue)} current`,
+      headline: `${holdings.length} holding${holdings.length !== 1 ? "s" : ""} · ${formatPHP(totalCost)} cost · ${formatPHP(totalValue)} current`,
       narrative: [
         `${holdings.length} holding${holdings.length !== 1 ? "s" : ""} across ${sectorWeights.length} sector${sectorWeights.length !== 1 ? "s" : ""}.`,
-        `Top holding: ${topHolding.symbol} (${topHolding.shares} shares @ ${formatINR(topHolding.avgBuyPrice)}).`,
-        `Portfolio P&L: ${formatINR(perf.totalGainAmount)} (${formatPercent(perf.totalGainPct)}). Best performer: ${perf.bestPerformerSymbol}.`,
+        `Top holding: ${topHolding.symbol} (${topHolding.shares} shares @ ${formatPHP(topHolding.avgBuyPrice)}).`,
+        `Portfolio P&L: ${formatPHP(perf.totalGainAmount)} (${formatPercent(perf.totalGainPct)}). Best performer: ${perf.bestPerformerSymbol}.`,
       ],
       comparisonContext: holdings.slice(0, 10).map((h) => {
         const price = currentPrices[h.symbol];
         const gain = price ? formatPercent((price - h.avgBuyPrice) / h.avgBuyPrice * 100) : "—";
-        return `${h.symbol} (${h.sector}): ${h.shares} shares, avg ${formatINR(h.avgBuyPrice)}, current ${price ? formatINR(price) : "—"}, P&L ${gain}`;
+        return `${h.symbol} (${h.sector}): ${h.shares} shares, avg ${formatPHP(h.avgBuyPrice)}, current ${price ? formatPHP(price) : "—"}, P&L ${gain}`;
       }),
       whatToWatch: [
         `${perf.bestPerformerSymbol} is your best performer — monitor for trend continuation.`,
@@ -344,7 +344,7 @@ export default function PortfolioPage() {
                   value={formShares} onChange={(e) => setFormShares(e.target.value)} />
               </div>
               <div style={{ flex: "0 1 120px" }}>
-                <CardLabel>Avg Buy Price (₹)</CardLabel>
+                <CardLabel>Avg Buy Price (₱)</CardLabel>
                 <Input type="number" min="0" step="0.01" placeholder="2500.00"
                   value={formPrice} onChange={(e) => setFormPrice(e.target.value)} />
               </div>
@@ -411,14 +411,14 @@ export default function PortfolioPage() {
               <Card variant="elevated" style={{ padding: "16px" }}>
                 <CardLabel>Total Cost</CardLabel>
                 <span style={{ fontSize: typography.headingSm.size, fontWeight: 600, color: colors.ink }}>
-                  {formatINR(perf.totalCost)}
+                  {formatPHP(perf.totalCost)}
                 </span>
               </Card>
               <Card variant="elevated" style={{ padding: "16px" }}>
                 <CardLabel>Current Value</CardLabel>
                 <PriceFlash value={perf.currentValue}>
                   <span style={{ fontSize: typography.headingSm.size, fontWeight: 600, color: colors.ink }}>
-                    {formatINR(perf.currentValue)}
+                    {formatPHP(perf.currentValue)}
                   </span>
                 </PriceFlash>
               </Card>
@@ -430,7 +430,7 @@ export default function PortfolioPage() {
                     fontWeight: 600,
                     color: perf.totalGainAmount >= 0 ? colors.marketGreen : colors.marketRed,
                   }}>
-                    {formatINR(perf.totalGainAmount)}
+                    {formatPHP(perf.totalGainAmount)}
                     <span style={{ marginLeft: 6, fontSize: typography.captionMd.size }}>
                       ({formatPercent(perf.totalGainPct)})
                     </span>
@@ -496,7 +496,7 @@ export default function PortfolioPage() {
                               {h.shares}
                             </td>
                             <td style={{ padding: "12px 16px", color: colors.body, fontSize: typography.bodySm.size }}>
-                              {formatINR(h.avgBuyPrice)}
+                              {formatPHP(h.avgBuyPrice)}
                             </td>
                             <td style={{ padding: "12px 16px" }}>
                               <PriceFlash value={price ?? 0}>
@@ -505,7 +505,7 @@ export default function PortfolioPage() {
                                   fontSize: typography.bodySm.size,
                                   fontWeight: 500,
                                 }}>
-                                  {price ? formatINR(price) : "—"}
+                                  {price ? formatPHP(price) : "—"}
                                 </span>
                               </PriceFlash>
                             </td>

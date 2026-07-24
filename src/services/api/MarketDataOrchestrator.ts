@@ -10,9 +10,8 @@ function positiveNumber(value: unknown): number | null {
 
 function formatMarketCap(value: number | null | undefined): string {
   if (typeof value !== 'number' || !Number.isFinite(value) || value <= 0) return 'Data unavailable';
-  const crore = value / 10_000_000;
-  if (crore >= 100_000) return `₹${(crore / 100_000).toFixed(2)} L Cr`;
-  return `₹${Math.round(crore).toLocaleString('en-IN')} Cr`;
+  if (value >= 1_000_000_000) return `₱${(value / 1_000_000_000).toFixed(2)}B`;
+  return `₱${(value / 1_000_000).toFixed(0)}M`;
 }
 
 /**

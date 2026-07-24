@@ -1,13 +1,13 @@
 /**
  * WebSocket Live Quotes Route
  *
- * Endpoint: ws://api.stockstory-india.com/api/quotes/ws
+ * Endpoint: ws://api.stockstory-ph.com/api/quotes/ws
  * Protocol: JSON messages every 100-500ms per symbol
  */
 
 import { FastifyInstance, FastifyRequest } from 'fastify';
 import fastifyWebsocket from '@fastify/websocket';
-import { fetchLiveQuotePSE, fetchLiveQuoteGroww } from '../../data/liveQuoteProviders';
+import { fetchLiveQuotePSE, fetchLiveQuoteYahoo } from '../../data/liveQuoteProviders';
 
 interface QuoteSubscription {
   ws: any;
@@ -80,7 +80,7 @@ async function startQuoteBroadcaster() {
         try {
           let quote = await fetchLiveQuotePSE(symbol);
           if (!quote) {
-            quote = await fetchLiveQuoteGroww(symbol);
+            quote = await fetchLiveQuoteYahoo(symbol);
           }
           return quote;
         } catch (err) {

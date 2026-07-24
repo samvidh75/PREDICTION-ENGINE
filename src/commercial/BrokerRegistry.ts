@@ -6,7 +6,7 @@
  * no transaction fees, no SEC registration for brokerage.
  *
  * Only real, integrated brokers appear here.  No fake broker entries.
- * Currently supported: Upstox (OAuth read-only connected).
+ * No broker is currently integrated for PSE order handoff.
  */
 
 export interface BrokerEntry {
@@ -24,24 +24,7 @@ export interface BrokerEntry {
   supports: ('research_review' | 'portfolio_import' | 'watchlist_sync')[];
 }
 
-const REGISTERED_BROKERS: BrokerEntry[] = [
-  {
-    id: 'upstox',
-    name: 'Upstox',
-    connected: true,
-    description: 'Continue your research on Upstox for order execution.',
-    secRegistered: true,
-    supports: ['research_review', 'portfolio_import'],
-  },
-  {
-    id: 'zerodha',
-    name: 'Zerodha',
-    connected: true,
-    description: 'India\'s largest broker. Continue research on Kite.',
-    secRegistered: true,
-    supports: ['research_review', 'portfolio_import'],
-  },
-];
+const REGISTERED_BROKERS: BrokerEntry[] = [];
 
 export function getRegisteredBrokers(): BrokerEntry[] {
   return REGISTERED_BROKERS.filter((b) => b.connected);

@@ -27,7 +27,7 @@ export interface PortfolioPosition {
 }
 
 export interface PortfolioFunds {
-  availableCash: number;    // INR
+  availableCash: number;    // PKR
   usedMargin: number;
   totalMargin: number;
 }

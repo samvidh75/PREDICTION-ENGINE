@@ -1,7 +1,7 @@
 /**
  * Sector Profile Builder
  *
- * Builds a SectorIntelligenceProfile from sector data and Philippine market context.
+ * Builds a SectorIntelligenceProfile from sector data and PSX market context.
  * Provides sector-level intelligence for the company thesis engine.
  */
 
@@ -11,7 +11,7 @@ import type {
   SectorHealth,
   CompetitiveDynamics,
   SectorRisk,
-  IndiaSectorContext,
+  PakistanSectorContext,
   SectorAggregate,
 } from './SectorTypes';
 import { clampScore } from '../scoring';
@@ -22,7 +22,7 @@ export class SectorProfileBuilder {
     const health = this.buildHealth(sector, input);
     const dynamics = this.buildDynamics(sector);
     const risks = this.buildRisks(sector);
-    const india = this.buildIndiaContext(sector);
+    const india = this.buildPakistanContext(sector);
     const aggregate = this.buildAggregate(health);
 
     return {
@@ -95,17 +95,17 @@ export class SectorProfileBuilder {
     const risks: SectorRisk[] = [];
     const name = (sector.name || '').toLowerCase();
 
-    // Philippine sector-specific risk patterns
+    // PSX sector-specific risk patterns
     if (name.includes('bank') || name.includes('financial') || name.includes('nbfc')) {
       risks.push({ riskType: 'regulatory', severity: 'medium', description: 'RBI regulatory changes may affect lending norms and capital requirements.' });
       risks.push({ riskType: 'demand', severity: 'medium', description: 'Credit growth sensitivity to economic cycles.' });
     }
     if (name.includes('pharma') || name.includes('health')) {
-      risks.push({ riskType: 'regulatory', severity: 'medium', description: 'USFDA and Philippine drug pricing regulations.' });
+      risks.push({ riskType: 'regulatory', severity: 'medium', description: 'USFDA and PSX drug pricing regulations.' });
       risks.push({ riskType: 'competition', severity: 'medium', description: 'Intense generic competition and patent cliffs.' });
     }
     if (name.includes('it') || name.includes('software') || name.includes('tech')) {
-      risks.push({ riskType: 'currency', severity: 'medium', description: 'Revenue exposed to USD/INR exchange rate fluctuations.' });
+      risks.push({ riskType: 'currency', severity: 'medium', description: 'Revenue exposed to USD/PKR exchange rate fluctuations.' });
       risks.push({ riskType: 'demand', severity: 'medium', description: 'Global IT spending cycles affect revenue growth.' });
     }
     if (name.includes('oil') || name.includes('gas') || name.includes('energy')) {
@@ -133,13 +133,13 @@ export class SectorProfileBuilder {
     return risks;
   }
 
-  private buildIndiaContext(sector: IntelligenceInput['sector']): IndiaSectorContext {
+  private buildPakistanContext(sector: IntelligenceInput['sector']): PakistanSectorContext {
     const name = (sector.name || '').toLowerCase();
 
-    let governmentSupport: IndiaSectorContext['governmentSupport'] = 'unclear';
-    let formalisationBenefit: IndiaSectorContext['formalisationBenefit'] = 'unclear';
-    let importSubstitution: IndiaSectorContext['importSubstitution'] = 'unclear';
-    let exportPotential: IndiaSectorContext['exportPotential'] = 'unclear';
+    let governmentSupport: PakistanSectorContext['governmentSupport'] = 'unclear';
+    let formalisationBenefit: PakistanSectorContext['formalisationBenefit'] = 'unclear';
+    let importSubstitution: PakistanSectorContext['importSubstitution'] = 'unclear';
+    let exportPotential: PakistanSectorContext['exportPotential'] = 'unclear';
 
     // PLI scheme beneficiaries
     if (name.includes('pharma') || name.includes('bulk drug')) {

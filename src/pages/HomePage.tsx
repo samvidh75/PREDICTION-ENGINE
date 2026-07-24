@@ -1,109 +1,82 @@
 import {
-  BarChart3, Bell, BookOpen, Compass, Gauge, Shield,
-  Sparkles, Star, TrendingUp, Zap, Lightbulb, Command,
-  Keyboard, ChevronDown,
-  Search, ArrowRight,
+  BarChart3, Compass, Gauge, Shield,
+  TrendingUp, Zap, Search, ArrowRight, ChevronDown,
+  BookOpen, Scale, Layers, Activity, Wallet, Quote,
 } from "lucide-react";
-import { useEffect, useMemo, useState, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../ui/Button";
-import { Card } from "../ui/Card";
-import { HealthometerMini } from "../ui/HealthometerMini";
-import { ConvictionBadge } from "../ui/ConvictionBadge";
 import { useResponsiveValue } from "../ui/responsive";
-import { colors, typography, space, layout, media, radius } from "../design/tokens";
-import { scanByPreset } from "../services/scanner/presets";
-import { getAlerts } from "../services/personalization/AlertStore";
+import { layout, media } from "../design/tokens";
 import OnboardingWizard from "../components/GuidedOnboarding";
 import { loadFirstDashboardFlag, dismissFirstDashboardOverlay, markFirstDashboardPending } from "../services/onboarding/onboardingFirstRunMemory";
-import LivePriceFeed from "../components/LivePriceFeed";
-import DataSourceBadge from "../components/DataSourceBadge";
-import type { EnhancedScanType } from "../services/scanner/presets";
-import type { AlertStoreItem } from "../services/personalization/AlertStore";
+import { HeroVisual } from "../components/HeroVisual";
 
-// ─── Quick actions ───────────────────────────────────────────────────
+/* ─── Quick actions (re-cast as plain words, no jargon) ──────────────── */
 
 const QUICK_ACTIONS = [
-  { icon: TrendingUp, label: "Quality Compounders", desc: "High ROE, low debt", route: "/scanner?preset=quality-compounders" },
-  { icon: Zap, label: "High Growth", desc: "Strong revenue & profit growth", route: "/scanner?preset=high-growth" },
-  { icon: Compass, label: "Value Opportunities", desc: "Undervalued with margin of safety", route: "/scanner?preset=value-opportunities" },
-  { icon: Shield, label: "Dividend Champions", desc: "Consistent dividend payers", route: "/scanner?preset=dividend-champions" },
-  { icon: Gauge, label: "Turnaround Stories", desc: "Improving fundamentals, low base", route: "/scanner?preset=turnaround-stories" },
-  { icon: BarChart3, label: "Compare Stocks", desc: "Side-by-side fundamental analysis", route: "/compare" },
+  { icon: TrendingUp, label: "Companies that compound",   desc: "Steady earners, low debt",        route: "/scanner?preset=quality-compounders" },
+  { icon: Zap,        label: "Companies that are growing", desc: "Sales and profit on the rise",     route: "/scanner?preset=high-growth" },
+  { icon: Compass,    label: "Companies that look cheap",   desc: "Trading below what they're worth", route: "/scanner?preset=value-opportunities" },
+  { icon: Shield,     label: "Companies that pay you",     desc: "Steady dividends, year after year", route: "/scanner?preset=dividend-champions" },
+  { icon: Gauge,      label: "Companies turning around",   desc: "Improving from a low base",        route: "/scanner?preset=turnaround-stories" },
+  { icon: BarChart3,  label: "Compare two companies",      desc: "Side by side, on the same terms",  route: "/compare" },
 ];
 
-const LEADBOARD_PRESETS: { id: EnhancedScanType; label: string }[] = [
-  { id: "quality-compounders", label: "Quality" },
-  { id: "high-growth", label: "Growth" },
-  { id: "value-opportunities", label: "Value" },
+/* The five "checks" we score on — explained in plain investor language. */
+const SCORE_DIMS = [
+  { key: "Quality",    label: "Are earnings real?",          hint: "Profit quality, return on equity, cash left over after the basics." },
+  { key: "Growth",     label: "Is the business growing?",     hint: "Three, five, and ten-year revenue and profit trends." },
+  { key: "Valuation",  label: "What does the price assume?", hint: "Margin of safety vs its own history and peers." },
+  { key: "Momentum",   label: "Is the tape on its side?",     hint: "How price and volume have been behaving lately." },
+  { key: "Risk",       label: "What can hurt it?",            hint: "Debt, sector cyclicality, single-customer dependency." },
 ];
 
-const MARKET_MOODS = [
-  { label: "Bullish", emoji: "🐂", stocks: "65% of scanned stocks" },
-  { label: "Defensive", emoji: "🛡️", stocks: "22% of scanned stocks" },
-  { label: "Caution", emoji: "⚠️", stocks: "13% of scanned stocks" },
-];
-
-// ─── Educational facts ──────────────────────────────────────────────
-
-const EDUCATIONAL_FACTS = [
-  {
-    icon: Lightbulb,
-    title: "P/E Ratio is not enough",
-    body: "A low P/E can mean a value trap. Always pair it with ROE, debt levels, and earnings growth for the full picture.",
-  },
+const LESSONS = [
   {
     icon: BookOpen,
-    title: "The 3‑statement check",
-    body: "Always read the P&L, Balance Sheet, and Cash Flow together. A company can show profit but burn cash.",
+    title: "A low P/E is not a free lunch",
+    body: "A cheap multiple can mean a business in trouble. Look at debt, returns on equity and how profit is growing before calling it a deal.",
   },
   {
-    icon: TrendingUp,
-    title: "Compounding needs time",
-    body: "The best PSE wealth creators over 20 years delivered 18‑22% CAGR — consistency beats heroics.",
+    icon: Scale,
+    title: "Profit on paper, cash in the bank",
+    body: "A profitable company can still burn cash. Read the income, balance sheet and cash flow together — they tell different sides of the same story.",
   },
   {
-    icon: Star,
-    title: "Family conglomerates",
-    body: "Philippine companies with strong family backing tend to be more aligned with long-term growth.",
+    icon: Layers,
+    title: "Compounding is a long game",
+    body: "The best wealth creators in the PSXs compound through durable businesses and patient ownership. Consistency beats heroics.",
   },
   {
-    icon: Shield,
-    title: "Debt is a double‑edged sword",
-    body: "Low debt + high ROE = quality compounder. High debt + low ROE = high risk during downturns.",
+    icon: Activity,
+    title: "Debt amplifies both ways",
+    body: "Low debt and high returns usually means a sturdy business. High debt and low returns means a stock that hurts first in a downturn.",
   },
   {
-    icon: BarChart3,
-    title: "Compare, don't isolate",
-    body: "A stock's P/E of 30 means nothing in isolation. Compare it with peers and its own 5‑year history.",
+    icon: Wallet,
+    title: "Buy the business, not the headline",
+    body: "A single good or bad news cycle can swing the quote 10 percent. The business underneath moves slower — invest in that.",
   },
 ];
-
-// ─── Page component ──────────────────────────────────────────────────
 
 export default function HomePage() {
   const navigate = useNavigate();
   const searchRef = useRef<HTMLInputElement>(null);
   const [query, setQuery] = useState("");
   const [searchResults, setSearchResults] = useState<Array<{ symbol: string; name: string }>>([]);
-  const [didYouKnowOpen, setDidYouKnowOpen] = useState(false);
+  const [lessonsOpen, setLessonsOpen] = useState(false);
   const sectionGap = useResponsiveValue(layout.sectionGapMobile, layout.sectionGapDesktop);
   const normalizedQuery = query.trim().toUpperCase();
 
-  // Onboarding state — show wizard for first-time visitors
+  /* Onboarding for first-time visitors */
   const [showOnboarding, setShowOnboarding] = useState(false);
   useEffect(() => {
-    // Mark first dashboard visit if no flag exists
     const existingFlag = loadFirstDashboardFlag();
-    if (!existingFlag) {
-      markFirstDashboardPending();
-    }
+    if (!existingFlag) markFirstDashboardPending();
     const flag = loadFirstDashboardFlag();
-    if (flag?.pending && !flag.dismissedAt) {
-      setShowOnboarding(true);
-    }
+    if (flag?.pending && !flag.dismissedAt) setShowOnboarding(true);
   }, []);
-
   const handleOnboardingComplete = () => {
     dismissFirstDashboardOverlay();
     setShowOnboarding(false);
@@ -111,36 +84,33 @@ export default function HomePage() {
 
   const resolveSearchTarget = () => {
     if (!normalizedQuery) return null;
-
     const exactSymbol = searchResults.find((stock) => stock.symbol.toUpperCase() === normalizedQuery);
     if (exactSymbol) return exactSymbol.symbol;
-
     const exactName = searchResults.find((stock) => stock.name.toUpperCase() === normalizedQuery);
     if (exactName) return exactName.symbol;
-
     return searchResults[0]?.symbol ?? normalizedQuery;
   };
 
-  // Auto-focus search on desktop
+  /* Cmd-K shortcut to focus search */
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
+    const onKey = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === "k") {
         e.preventDefault();
         searchRef.current?.focus();
       }
     };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
   }, []);
 
-  // Debounced search
+  /* Debounced search */
   useEffect(() => {
     let cancelled = false;
     const normalized = query.trim();
     if (normalized.length < 2) { setSearchResults([]); return; }
     const timer = window.setTimeout(async () => {
       try {
-        const res = await fetch(`/api/search?q=${encodeURIComponent(normalized)}&limit=5`);
+        const res = await fetch(`/api/search?q=${encodeURIComponent(normalized)}&limit=6`);
         const payload = await res.json();
         if (!cancelled) {
           const results = payload.results ?? [];
@@ -152,136 +122,179 @@ export default function HomePage() {
           });
           setSearchResults(sorted);
         }
-      } catch { /* search is optional */ }
+      } catch {
+        /* search is optional */
+      }
     }, 200);
     return () => { cancelled = true; clearTimeout(timer); };
   }, [query]);
 
-  // Scanner leaderboard (top 3 per preset)
-  const leaderboard = useMemo(() => {
-    return LEADBOARD_PRESETS.map((p) => ({
-      ...p,
-      stocks: scanByPreset(p.id, 3),
-    }));
+
+  /* Scroll-reveal: sections below the fold fade/rise in as they enter view,
+     instead of dumping the whole page at once (a real landing page paces
+     itself — it doesn't show everything on load). */
+  useEffect(() => {
+    const targets = Array.from(document.querySelectorAll<HTMLElement>(".stockex-reveal"));
+    if (!targets.length) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      targets.forEach((el) => el.classList.add("is-visible"));
+      return;
+    }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-visible");
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.12, rootMargin: "0px 0px -60px 0px" }
+    );
+    targets.forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
   }, []);
 
-  // Recent alerts
-  const recentAlerts = useMemo(() => {
-    return getAlerts().slice(0, 5);
-  }, []);
-
-  // ── Render ─────────────────────────────────────────────────────────
-
-  // Show onboarding wizard for first-time visitors
   if (showOnboarding) {
     return <OnboardingWizard onComplete={handleOnboardingComplete} />;
   }
 
   return (
     <div style={{ display: "grid", gap: sectionGap }}>
-      {/* ════════════════ HERO ════════════════ */}
+      {/* ════════════ HERO — full-viewport impact block, nothing else fights for attention ════════════ */}
       <section
         style={{
           position: "relative",
           overflow: "hidden",
           display: "grid",
-          justifyItems: "center",
-          textAlign: "center",
-          paddingTop: layout.pagePaddingDesktop,
-          paddingBottom: layout.pagePaddingDesktop,
+          alignContent: "center",
+          gap: 32,
+          minHeight: "min(86vh, 780px)",
+          paddingTop: "clamp(40px, 6vw, 72px)",
+          paddingBottom: "clamp(20px, 3vw, 32px)",
         }}
       >
-        {/* Raycast-style red diagonal accent — single refined stripe */}
-        <div
-          style={{
-            position: "absolute",
-            top: -60,
-            left: "50%",
-            transform: "translateX(-50%) rotate(-1.8deg)",
-            width: "clamp(420px, 85vw, 1100px)",
-            height: 220,
-            background: "linear-gradient(90deg, rgba(255,107,107,0.08) 0%, rgba(176,21,30,0.12) 50%, rgba(255,107,107,0.08) 100%)",
-            clipPath: "polygon(0 20%, 100% 0, 100% 80%, 0 100%)",
-            pointerEvents: "none",
-            zIndex: 0,
-          }}
-        />
-        {/* Subtle glow beneath */}
-        <div
-          style={{
-            position: "absolute",
-            top: -40,
-            left: "50%",
-            transform: "translateX(-50%)",
-            width: "clamp(300px, 60vw, 800px)",
-            height: 180,
-            background: "radial-gradient(ellipse at center, rgba(255,107,107,0.06) 0%, transparent 70%)",
-            pointerEvents: "none",
-            zIndex: 0,
-          }}
-        />
+        {/* Central micro-animation — breathing core + slow rotating arc + two
+            orbiting points, one hue throughout. The headline below is short
+            on purpose so this has room to actually read as motion. */}
+        <div className="stockex-beam-field" aria-hidden="true">
+          <div className="stockex-beam" />
+          <div className="stockex-beam-arc" />
+          <div className="stockex-beam-orbit a" />
+          <div className="stockex-beam-orbit b" />
+        </div>
 
-        <div style={{ maxWidth: "680px", display: "grid", gap: space[6], position: "relative", zIndex: 1 }}>
-          <div style={{ display: "grid", gap: space[4] }}>
-            <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 8, marginBottom: space[2] }}>
-              <span style={{
-                display: "inline-flex", alignItems: "center", gap: 4,
-                padding: "4px 12px", borderRadius: "100px",
-                background: "rgba(255,107,107,0.1)",
-                border: "1px solid rgba(255,107,107,0.2)",
-                fontSize: 11, fontWeight: 600, color: "#FF6B6B", letterSpacing: "0.02em",
-              }}>
-                <Sparkles size={12} /> AI-Powered Analysis
-              </span>
-            </div>
-            <h1
+        {/* Everything above the fold sits in its own stacking layer, above the beam */}
+        <div style={{ position: "relative", zIndex: 1, display: "grid", justifyItems: "center", gap: 28, textAlign: "center", maxWidth: 880, margin: "0 auto" }}>
+
+        {/* Short, centered headline — small enough that the micro-animation
+            behind it has room to actually read as motion, not wallpaper. */}
+        <h1
+          className="stockex-load-in"
+          style={{
+            animationDelay: "80ms",
+            fontFamily: "var(--font-display)",
+            fontSize: "clamp(48px, 8vw, 96px)",
+            fontWeight: 600,
+            lineHeight: 1.02,
+            letterSpacing: "-0.03em",
+            color: "var(--text-primary)",
+            fontFeatureSettings: '"ss01" on, "kern" on, "liga" on',
+            margin: 0,
+          }}
+        >
+          Know before you invest.
+        </h1>
+
+        {/* One line, plain language. */}
+        <p
+          className="stockex-load-in"
+          style={{
+            animationDelay: "220ms",
+            fontFamily: "var(--font-display)",
+            fontSize: "clamp(15px, 1.3vw, 18px)",
+            fontWeight: 400,
+            lineHeight: 1.5,
+            color: "var(--text-body)",
+            maxWidth: 460,
+            margin: 0,
+          }}
+        >
+          A quiet research desk for PSX equities.
+        </p>
+
+        {/* Single call to action — the fold makes one ask, not five */}
+        <div className="stockex-load-in" style={{ animationDelay: "340ms", display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
+          <Button onClick={() => searchRef.current?.focus()} size="lg">
+            Find a stock
+            <ArrowRight size={16} />
+          </Button>
+          <span style={{ color: "var(--text-secondary)", fontSize: 12.5, fontFamily: "var(--font-mono)" }}>
+            or press ⌘ K
+          </span>
+        </div>
+        </div>
+
+        {/* Scroll cue */}
+        <button
+          onClick={() => document.getElementById("stockex-below-fold")?.scrollIntoView({ behavior: "smooth", block: "start" })}
+          aria-label="Scroll to explore"
+          className="stockex-load-in"
+          style={{
+            animationDelay: "500ms",
+            position: "relative",
+            zIndex: 1,
+            justifySelf: "center",
+            alignSelf: "end",
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: 36,
+            height: 36,
+            borderRadius: "50%",
+            border: "1px solid var(--border)",
+            background: "transparent",
+            color: "var(--text-secondary)",
+            cursor: "pointer",
+          }}
+        >
+          <ChevronDown size={16} style={{ animation: "stockex-scroll-cue 2.2s ease-in-out infinite" }} />
+        </button>
+      </section>
+
+      {/* ════════════ SEARCH + QUICK ACTIONS — revealed on scroll, not dumped on load ════════════ */}
+      <section id="stockex-below-fold" className="stockex-reveal" style={{ display: "grid", gap: 32 }}>
+        {/* Search + actions */}
+        <div style={{ display: "grid", gap: 16, maxWidth: 720, margin: "0 auto", width: "100%" }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "stretch",
+              gap: 12,
+              flexWrap: "wrap",
+            }}
+          >
+            <label
               style={{
-                color: colors.ink,
-                fontSize: "clamp(32px, 5vw, 56px)",
-                fontWeight: 650,
-                lineHeight: 1.08,
-                letterSpacing: "-0.03em",
-                margin: 0,
+                position: "relative",
+                flex: "1 1 320px",
+                minWidth: 260,
+                display: "block",
               }}
             >
-              Understand the stock{" "}
-              <span style={{ background: "linear-gradient(135deg, #FF6B6B 0%, #b0151e 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
-                before you invest
-              </span>
-              .
-            </h1>
-            <p
-              style={{
-              color: colors.body,
-              fontSize: "16px",
-              fontWeight: 400,
-              lineHeight: 1.6,
-              maxWidth: 540,
-              margin: "0 auto",
-              marginBottom: space[2],
-            }}
-            >
-              Build conviction with calmer research flows, cleaner comparisons, and the key numbers that changed.
-            </p>
-          </div>
-
-          {/* Raycast-inspired search bar */}
-          <div style={{ display: "flex", gap: space[3], flexWrap: "wrap", justifyContent: "center" }}>
-            <div style={{ position: "relative", flex: "1 1 360px", minWidth: "260px" }}>
-              {/* Glass backdrop */}
-              <div style={{
-                position: "absolute", inset: 0,
-                borderRadius: "12px",
-                background: "rgba(255,255,255,0.04)",
-                border: "1px solid rgba(255,255,255,0.08)",
-                backdropFilter: "blur(20px)",
-                WebkitBackdropFilter: "blur(20px)",
-                pointerEvents: "none",
-              }} />
+              <Search
+                size={18}
+                style={{
+                  position: "absolute", left: 16, top: "50%",
+                  transform: "translateY(-50%)",
+                  color: "var(--text-secondary)",
+                  pointerEvents: "none",
+                }}
+              />
               <input
                 ref={searchRef}
-                aria-label="Search stocks"
-                placeholder="Search BDO, JFC, Meralco…"
+                aria-label="Search a stock on the PSE"
+                placeholder="Type a company: BDO, Jollibee, Ayala…"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={(e) => {
@@ -291,61 +304,78 @@ export default function HomePage() {
                   }
                 }}
                 style={{
-                  position: "relative",
-                  zIndex: 1,
-                  height: "48px",
                   width: "100%",
-                  borderRadius: "12px",
-                  border: "none",
-                  padding: "0 56px 0 40px",
-                  fontSize: "15px",
-                  color: colors.ink,
-                  background: "transparent",
+                  height: 52,
+                  border: "1px solid var(--border)",
+                  background: "var(--bg-sheet)",
+                  borderRadius: 4,
+                  padding: "0 56px 0 46px",
+                  fontFamily: "var(--font-display)",
+                  fontSize: 18,
+                  color: "var(--text-primary)",
                   outline: "none",
+                  transition: "border-color 220ms var(--ease-soft), box-shadow 220ms var(--ease-soft)",
                   boxSizing: "border-box",
-                  fontWeight: 500,
+                }}
+                onFocus={(e) => {
+                  e.currentTarget.style.borderColor = "var(--accent)";
+                  e.currentTarget.style.boxShadow = "0 0 0 3px var(--accent-soft)";
+                }}
+                onBlur={(e) => {
+                  e.currentTarget.style.borderColor = "var(--border)";
+                  e.currentTarget.style.boxShadow = "none";
                 }}
               />
-              <Search size={16} style={{
-                position: "absolute", left: 13, top: "50%", transform: "translateY(-50%)",
-                zIndex: 2, pointerEvents: "none", color: "rgba(255,255,255,0.3)",
-              }} />
-              <kbd
+              <span
+                aria-hidden="true"
                 style={{
                   position: "absolute",
-                  right: 10,
-                  top: "50%",
+                  right: 14, top: "50%",
                   transform: "translateY(-50%)",
-                  zIndex: 2,
-                  display: "flex",
+                  display: "inline-flex",
                   alignItems: "center",
-                  gap: 3,
-                  padding: "2px 6px",
-                  borderRadius: "4px",
-                  background: colors.surfaceElevated,
-                  border: `1px solid ${colors.hairline}`,
-                  fontSize: 10,
-                  fontWeight: 600,
-                  color: colors.body,
-                  pointerEvents: "none",
+                  gap: 4,
+                  padding: "3px 8px",
+                  border: "1px solid var(--border)",
+                  borderRadius: 3,
+                  color: "var(--text-secondary)",
+                  fontFamily: "var(--font-mono)",
+                  fontSize: 11,
+                  letterSpacing: "0.04em",
                 }}
               >
-                <Command size={10} />K
-              </kbd>
-            </div>
-            <Button onClick={() => navigate(`/stock/${resolveSearchTarget() ?? "BDO"}`)}>Research</Button>
+                ⌘ K
+              </span>
+            </label>
+          <Button onClick={() => navigate(`/stock/${resolveSearchTarget() ?? "BDO"}`)} size="lg">
+              Research it
+              <ArrowRight size={16} />
+            </Button>
           </div>
+
+          {/* Search results — paper list */}
           {searchResults.length > 0 && (
-            <div style={{
-              display: "grid", gap: 2, textAlign: "left",
-              borderRadius: "12px",
-              background: "rgba(255,255,255,0.04)",
-              border: "1px solid rgba(255,255,255,0.08)",
-              backdropFilter: "blur(20px)",
-              WebkitBackdropFilter: "blur(20px)",
-              overflow: "hidden",
-            }}>
-              <div style={{ padding: "6px 12px 4px", fontSize: 10, fontWeight: 600, color: colors.body, textTransform: "uppercase", letterSpacing: "0.06em" }}>
+            <div
+              style={{
+                display: "grid",
+                gap: 0,
+                border: "1px solid var(--border)",
+                borderRadius: 4,
+                background: "var(--bg-sheet)",
+                overflow: "hidden",
+              }}
+            >
+              <div
+                style={{
+                  padding: "8px 14px",
+                  fontFamily: "var(--font-mono)",
+                  fontSize: 11,
+                  letterSpacing: "0.08em",
+                  textTransform: "uppercase",
+                  color: "var(--accent)",
+                  borderBottom: "1px solid var(--border-soft)",
+                }}
+              >
                 Stocks
               </div>
               {searchResults.map((r) => (
@@ -356,442 +386,349 @@ export default function HomePage() {
                     display: "flex",
                     justifyContent: "space-between",
                     alignItems: "center",
-                    padding: `${space[3]} ${space[4]}`,
+                    padding: "12px 16px",
                     background: "transparent",
                     border: "none",
+                    borderTop: "1px solid var(--border-soft)",
                     cursor: "pointer",
                     textAlign: "left",
-                    transition: "background 0.15s ease",
+                    transition: "background 180ms var(--ease-soft)",
                   }}
-                  onMouseEnter={(e) => e.currentTarget.style.background = "rgba(255,255,255,0.06)"}
+                  onMouseEnter={(e) => e.currentTarget.style.background = "var(--bg-card)"}
                   onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}
                 >
-                  <span style={{ fontWeight: 600, fontSize: 14, color: colors.ink }}>{r.symbol}</span>
-                  <span style={{ color: colors.body, fontSize: 13 }}>{r.name}</span>
+                  <span
+                    style={{
+                      fontFamily: "var(--font-mono)",
+                      fontWeight: 500,
+                      fontSize: 14,
+                      color: "var(--text-primary)",
+                    }}
+                  >
+                    {r.symbol}
+                  </span>
+                  <span style={{ color: "var(--text-body)", fontSize: 13 }}>{r.name}</span>
                 </button>
               ))}
             </div>
           )}
+
+          {/* Quick actions row — flat chips, no orphaned emojis */}
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+            {QUICK_ACTIONS.map((a, i) => (
+              <button
+                key={a.label}
+                onClick={() => navigate(a.route)}
+                className={`stockex-rise stockex-rise-${i + 1}`}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 6,
+                  padding: "6px 12px",
+                  background: "transparent",
+                  border: "1px solid var(--border)",
+                  borderRadius: 999,
+                  color: "var(--text-primary)",
+                  fontFamily: "var(--font-sans)",
+                  fontSize: 12.5,
+                  fontWeight: 500,
+                  cursor: "pointer",
+                  transition: "all 200ms var(--ease-soft)",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = "var(--accent)";
+                  e.currentTarget.style.color = "var(--accent)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = "var(--border)";
+                  e.currentTarget.style.color = "var(--text-primary)";
+                }}
+              >
+                <a.icon size={13} strokeWidth={1.5} />
+                {a.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Abstract motion piece — not a data readout, just the room's ambience */}
+        <div style={{ marginTop: 8 }}>
+          <HeroVisual />
         </div>
       </section>
 
-      {/* ════════════════ AI INSIGHTS ════════════════ */}
-      <div className="ai-insights-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: sectionGap, alignItems: "start" }}>
-        {/* Market pulse */}
-        <section style={{ display: "grid", gap: space[4] }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <div style={{ display: "grid", gap: space[1] }}>
-              <span style={{ fontSize: 10, fontWeight: 600, color: colors.body, textTransform: "uppercase", letterSpacing: "0.08em" }}>
-                Market
-              </span>
-              <h2 style={{ color: colors.ink, fontSize: "18px", fontWeight: 600, margin: 0, letterSpacing: "-0.01em" }}>
-                Market Pulse
-              </h2>
-            </div>
-            <DataSourceBadge />
-          </div>
-          <Card style={{
-            display: "grid", gap: space[5],
-            background: `linear-gradient(135deg, ${colors.surface} 0%, rgba(255,255,255,0.02) 100%)`,
-            border: `1px solid ${colors.hairline}`,
-          }}>
-            <div style={{ display: "flex", alignItems: "center", gap: space[3] }}>
-              <div style={{
-                width: 40, height: 40, borderRadius: "10px",
-                background: "rgba(255,107,107,0.1)",
-                border: "1px solid rgba(255,107,107,0.15)",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                fontSize: 18,
-              }}>
-                📊
-              </div>
-              <div>
-                <p style={{ fontSize: 13, color: colors.ink, margin: 0, lineHeight: 1.4, fontWeight: 500 }}>
-                  Market Overview
-                </p>
-                <p style={{ fontSize: 12, color: colors.body, margin: 0, lineHeight: 1.4 }}>
-                  Based on scores across <strong>{leaderboard.reduce((s, p) => s + p.stocks.length, 0)}</strong> tracked stocks
-                </p>
-              </div>
-            </div>
-            <div style={{ display: "grid", gap: space[3] }}>
-              {MARKET_MOODS.map((mood) => (
-                <div key={mood.label} style={{ display: "flex", alignItems: "center", gap: space[3] }}>
-                  <div style={{
-                    width: 32, height: 32, borderRadius: "8px",
-                    background: "rgba(255,255,255,0.04)",
-                    border: "1px solid rgba(255,255,255,0.06)",
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    fontSize: 16, flexShrink: 0,
-                  }}>
-                    {mood.emoji}
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, fontWeight: 600, color: colors.ink }}>
-                      <span>{mood.label}</span>
-                      <span style={{ color: colors.body, fontWeight: 400 }}>{mood.stocks}</span>
-                    </div>
-                    <div style={{ height: 4, background: colors.hairline, borderRadius: 2, marginTop: 4, overflow: "hidden" }}>
-                      <div style={{
-                        height: "100%",
-                        borderRadius: 2,
-                        width: mood.label === "Bullish" ? "65%" : mood.label === "Defensive" ? "22%" : "13%",
-                        background: mood.label === "Bullish" ? colors.success : mood.label === "Defensive" ? "linear-gradient(90deg, #FF6B6B, #b0151e)" : colors.warning,
-                      }} />
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </Card>
-        </section>
-
-        {/* Live WebSocket feed */}
-        <section style={{ display: "grid", gap: space[4] }}>
-          <div style={{ display: "grid", gap: space[1] }}>
-            <span style={{ fontSize: 10, fontWeight: 600, color: colors.body, textTransform: "uppercase", letterSpacing: "0.08em" }}>
-              Live
-            </span>
-            <h2 style={{ display: "flex", alignItems: "center", gap: space[2], color: colors.ink, fontSize: "18px", fontWeight: 600, margin: 0, letterSpacing: "-0.01em" }}>
-              <Zap size={15} /> Live Price Feed
-            </h2>
-          </div>
-          <LivePriceFeed maxDisplay={10} watchlistTickers={["BDO", "JFC", "MER", "SM", "AEV", "PAL", "TEL", "GLOBE", "SMC", "AC"]} />
-        </section>
-
-        {/* Recent alerts */}
-        <section style={{ display: "grid", gap: space[4] }}>
-          <div style={{ display: "grid", gap: space[1] }}>
-            <span style={{ fontSize: 10, fontWeight: 600, color: colors.body, textTransform: "uppercase", letterSpacing: "0.08em" }}>
-              Alerts
-            </span>
-            <h2 style={{ display: "flex", alignItems: "center", gap: space[2], color: colors.ink, fontSize: "18px", fontWeight: 600, margin: 0, letterSpacing: "-0.01em" }}>
-              <Bell size={15} /> Recent Alerts
-            </h2>
-          </div>
-          <Card style={{ display: "grid", gap: space[2] }}>
-            {recentAlerts.length === 0 ? (
-              <p style={{ fontSize: 13, color: colors.body, margin: 0, padding: space[3], textAlign: "center" }}>
-                No recent alerts. Start researching to get notified of changes.
-              </p>
-            ) : (
-              recentAlerts.map((item: AlertStoreItem) => (
-                <div
-                  key={item.alert.id}
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    padding: `${space[2]} ${space[3]}`,
-                    borderRadius: "8px",
-                    background: item.alert.acknowledged ? "transparent" : colors.hairlineSoft,
-                  }}
-                >
-                  <div style={{ display: "grid", gap: 2 }}>
-                    <span style={{ fontSize: 13, fontWeight: 500, color: colors.ink }}>
-                      {item.alert.symbol ?? "System"}
-                    </span>
-                    <span style={{ fontSize: 12, color: colors.body }}>
-                      {item.alert.title?.slice(0, 80) ?? item.alert.body?.slice(0, 80)}
-                    </span>
-                  </div>
-                  <ConvictionBadge
-                    level={item.alert.type === "thesis_change" ? "caution" : item.alert.type === "watchlist_review" ? "healthy" : "stable"}
-                    size="sm"
-                  />
-                </div>
-              ))
-            )}
-          </Card>
-        </section>
-      </div>
-
-      {/* ════════════════ SCANNER LEADERBOARD ════════════════ */}
-      <section className="raycast-stagger-8" style={{ display: "grid", gap: space[4] }}>
-        <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: space[2] }}>
-          <div style={{ display: "grid", gap: space[1] }}>
-            <span style={{ fontSize: 10, fontWeight: 600, color: colors.body, textTransform: "uppercase", letterSpacing: "0.08em" }}>
-              Leaderboard
-            </span>
-            <h2 style={{ color: colors.ink, fontSize: "18px", fontWeight: 600, margin: 0, letterSpacing: "-0.01em" }}>
-              Scanner Leaderboard
-            </h2>
-          </div>
-          <span style={{ fontSize: 11, color: colors.body, letterSpacing: "0.02em" }}>
-            Top picks per preset
-          </span>
+      {/* ════════════ FIVE CHECKS ════════════ */}
+      <section className="stockex-reveal" style={{ display: "grid", gap: 24 }}>
+        <div style={{ display: "grid", gap: 8 }}>
+          <span className="eyebrow">Methodology</span>
+          <h2
+            style={{
+              fontFamily: "var(--font-display)",
+              fontSize: "clamp(28px, 3vw, 36px)",
+              fontWeight: 500,
+              lineHeight: 1.12,
+              letterSpacing: "-0.018em",
+              color: "var(--text-primary)",
+              maxWidth: 780,
+              margin: 0,
+            }}
+          >
+            Five honest checks, in plain English. <em className="italic-serif" style={{ color: "var(--accent)" }}>No ratings, no “Buy / Sell”.</em>
+          </h2>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: space[4] }}>
-          {leaderboard.map((preset, i) => (
-            <Card
-              key={preset.id}
-              onClick={() => navigate(`/scanner?preset=${preset.id}`)}
-              className={`raycast-slideUp raycast-stagger-${i + 1}`}
-              style={{ cursor: "pointer", padding: space[5] }}
-            >
-              <div style={{ display: "grid", gap: space[4] }}>
-                <div style={{ display: "flex", alignItems: "center", gap: space[3] }}>
-                  <div style={{
-                    width: 28, height: 28, borderRadius: "7px",
-                    background: i === 0 ? "rgba(255,107,107,0.15)" : "rgba(255,255,255,0.05)",
-                    border: `1px solid ${i === 0 ? "rgba(255,107,107,0.2)" : "rgba(255,255,255,0.06)"}`,
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    fontSize: 12, fontWeight: 700,
-                    color: i === 0 ? "#FF6B6B" : colors.body,
-                  }}>
-                    {i + 1}
-                  </div>
-                  <h3 style={{ fontSize: "13px", fontWeight: 600, color: colors.primary, textTransform: "uppercase", letterSpacing: "0.04em", margin: 0 }}>
-                    {preset.label}
-                  </h3>
-                </div>
-                {preset.stocks.length === 0 ? (
-                  <p style={{ fontSize: 12, color: colors.body, margin: 0, padding: space[3], textAlign: "center" }}>No data available</p>
-                ) : (
-                  <div style={{ display: "grid", gap: space[2] }}>
-                    {preset.stocks.map((stock, idx) => (
-                      <div
-                        key={stock.symbol}
-                        style={{
-                          display: "flex", alignItems: "center", gap: space[3],
-                          padding: `${space[2]} ${space[3]}`,
-                          borderRadius: "8px",
-                          background: idx === 0 ? "rgba(255,255,255,0.03)" : "transparent",
-                          border: idx === 0 ? "1px solid rgba(255,255,255,0.06)" : "1px solid transparent",
-                        }}
-                      >
-                        <div style={{
-                          width: 20, height: 20, borderRadius: "6px",
-                          background: idx === 0 ? "rgba(255,107,107,0.15)" : "rgba(255,255,255,0.04)",
-                          display: "flex", alignItems: "center", justifyContent: "center",
-                          fontSize: 10, fontWeight: 700, color: idx === 0 ? "#FF6B6B" : colors.body,
-                          flexShrink: 0,
-                        }}>
-                          {idx + 1}
-                        </div>
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                            <span style={{ fontSize: 13, fontWeight: 600, color: colors.ink }}>
-                              {stock.symbol}
-                            </span>
-                            <HealthometerMini score={Math.round(stock.composite)} size="sm" />
-                          </div>
-                          <p style={{ fontSize: 11, color: colors.body, margin: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                            {stock.matchReason}
-                          </p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </Card>
-          ))}
-        </div>
-      </section>
 
-      {/* ════════════════ RECENTLY RESEARCHED ════════════════ */}
-      <section className="raycast-stagger-9" style={{ display: "grid", gap: space[4] }}>
-        <div style={{ display: "grid", gap: space[1] }}>
-          <span style={{ fontSize: 10, fontWeight: 600, color: colors.body, textTransform: "uppercase", letterSpacing: "0.08em" }}>
-            Recent
-          </span>
-          <div style={{ display: "flex", alignItems: "center", gap: space[2] }}>
-            <div style={{
-              width: 24, height: 24, borderRadius: "6px",
-              background: "rgba(255,255,255,0.05)",
-              border: "1px solid rgba(255,255,255,0.06)",
-              display: "flex", alignItems: "center", justifyContent: "center",
-            }}>
-              <Star size={12} color={colors.primary} />
-            </div>
-            <h2 style={{ color: colors.ink, fontSize: "18px", fontWeight: 600, margin: 0, letterSpacing: "-0.01em" }}>
-              Recently Researched
-            </h2>
-          </div>
-        </div>
-        <div style={{ display: "flex", gap: space[2], flexWrap: "wrap" }}>
-          {["BDO", "JFC", "MER", "SM", "AEV", "PAL"].map((symbol, i) => (
-            <button
-              key={symbol}
-              onClick={() => navigate(`/stock/${symbol}`)}
-              className={`raycast-slideUp raycast-stagger-${i + 10}`}
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+            gap: 1,
+            borderTop: "1px solid var(--border)",
+            borderLeft: "1px solid var(--border)",
+            background: "var(--border)",
+          }}
+        >
+          {SCORE_DIMS.map((d, i) => (
+            <article
+              key={d.key}
+              className={`stockex-rise stockex-rise-${i + 1}`}
               style={{
-                padding: "8px 16px",
-                borderRadius: "10px",
-                background: "rgba(255,255,255,0.04)",
-                border: "1px solid rgba(255,255,255,0.06)",
-                color: colors.ink,
-                fontSize: 13,
-                fontWeight: 500,
-                cursor: "pointer",
-                transition: "all 0.15s ease",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = "rgba(255,255,255,0.08)";
-                e.currentTarget.style.borderColor = "rgba(255,255,255,0.15)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = "rgba(255,255,255,0.04)";
-                e.currentTarget.style.borderColor = "rgba(255,255,255,0.06)";
+                background: "var(--bg-sheet)",
+                padding: "22px 22px 24px",
+                display: "grid",
+                gap: 8,
+                minHeight: 140,
+                position: "relative",
               }}
             >
-              {symbol}
-            </button>
+              <div
+                style={{
+                  fontFamily: "var(--font-mono)",
+                  fontSize: 11,
+                  color: "var(--accent)",
+                  letterSpacing: "0.10em",
+                  textTransform: "uppercase",
+                }}
+              >
+                0{i + 1} · {d.key}
+              </div>
+              <div
+                style={{
+                  fontFamily: "var(--font-display)",
+                  fontSize: 19,
+                  fontWeight: 500,
+                  lineHeight: 1.25,
+                  letterSpacing: "-0.012em",
+                  color: "var(--text-primary)",
+                }}
+              >
+                {d.label}
+              </div>
+              <p
+                style={{
+                  margin: 0,
+                  fontSize: 13.5,
+                  lineHeight: 1.5,
+                  color: "var(--text-body)",
+                }}
+              >
+                {d.hint}
+              </p>
+            </article>
           ))}
         </div>
       </section>
 
-      {/* ════════════════ DID YOU KNOW ════════════════ */}
-      <section style={{ display: "grid", gap: space[4] }}>
+      {/* ════════════ LESSONS ════════════ */}
+      <section className="stockex-reveal" style={{ display: "grid", gap: 0 }}>
         <button
           type="button"
-          onClick={() => setDidYouKnowOpen((prev) => !prev)}
-          aria-expanded={didYouKnowOpen}
+          onClick={() => setLessonsOpen((prev) => !prev)}
+          aria-expanded={lessonsOpen}
           style={{
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            gap: space[3],
+            gap: 16,
             width: "100%",
-            padding: `${space[2]} ${space[3]}`,
-            borderRadius: 14,
-            border: `1px solid ${colors.hairlineSoft}`,
-            background: "linear-gradient(135deg, rgba(255,255,255,0.045) 0%, rgba(255,255,255,0.02) 100%)",
-            backdropFilter: "blur(18px)",
-            WebkitBackdropFilter: "blur(18px)",
-            boxShadow: "0 0 0 1px rgba(255,255,255,0.02) inset",
-            color: colors.ink,
+            padding: "16px 20px",
+            borderTop: "2px solid var(--text-primary)",
+            borderBottom: lessonsOpen ? "1px solid var(--border)" : "2px solid var(--text-primary)",
+            background: "transparent",
+            color: "var(--text-primary)",
             cursor: "pointer",
             textAlign: "left",
           }}
         >
-          <div style={{ display: "flex", alignItems: "center", gap: space[3], minWidth: 0 }}>
-            <div style={{
-              width: 18, height: 18, borderRadius: "5px",
-              background: "rgba(255,149,0,0.08)",
-              border: "1px solid rgba(255,149,0,0.12)",
-              display: "flex", alignItems: "center", justifyContent: "center",
-              flexShrink: 0,
-            }}>
-              <Lightbulb size={10} color={colors.warning} />
-            </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 14, minWidth: 0 }}>
+            <span
+              style={{
+                width: 28, height: 28,
+                borderRadius: "50%",
+                background: "var(--accent-soft)",
+                color: "var(--accent)",
+                display: "inline-flex",
+                alignItems: "center", justifyContent: "center",
+                flexShrink: 0,
+              }}
+            >
+              <Quote size={14} strokeWidth={1.6} />
+            </span>
             <div style={{ display: "grid", gap: 2 }}>
-              <span style={{ fontSize: 9, fontWeight: 600, color: colors.body, textTransform: "uppercase", letterSpacing: "0.08em" }}>
-                Learn
+              <span
+                style={{
+                  fontFamily: "var(--font-mono)",
+                  fontSize: 11,
+                  letterSpacing: "0.10em",
+                  textTransform: "uppercase",
+                  color: "var(--accent)",
+                  fontWeight: 500,
+                }}
+              >
+                Five things worth remembering
               </span>
-              <span style={{ color: colors.ink, fontSize: "15px", fontWeight: 600, letterSpacing: "-0.01em" }}>
-                Did You Know?
+              <span
+                style={{
+                  fontFamily: "var(--font-display)",
+                  fontSize: 18,
+                  fontWeight: 500,
+                  letterSpacing: "-0.012em",
+                  color: "var(--text-primary)",
+                }}
+              >
+                Old ideas that protect your money.
               </span>
             </div>
           </div>
           <ChevronDown
             size={16}
-            color={colors.body}
             style={{
               flexShrink: 0,
-              transform: didYouKnowOpen ? "rotate(180deg)" : "rotate(0deg)",
-              transition: "transform 0.18s ease",
+              transform: lessonsOpen ? "rotate(180deg)" : "rotate(0deg)",
+              transition: "transform 200ms var(--ease-soft)",
+              color: "var(--text-secondary)",
             }}
           />
         </button>
-        {didYouKnowOpen && (
-          <div style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(270px, 1fr))",
-            gap: space[4],
-          }}>
-            {EDUCATIONAL_FACTS.map((fact, i) => (
-              <Card
+        {lessonsOpen && (
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+              gap: 1,
+              background: "var(--border)",
+              borderBottom: "1px solid var(--border)",
+            }}
+          >
+            {LESSONS.map((fact, i) => (
+              <article
                 key={fact.title}
-                className={`raycast-slideUp raycast-stagger-${i + 1}`}
+                className={`stockex-rise stockex-rise-${i + 1}`}
                 style={{
-                  display: "grid", gap: space[3],
-                  padding: space[5],
-                  border: "1px solid rgba(255,255,255,0.06)",
+                  background: "var(--bg-sheet)",
+                  padding: "20px 22px 24px",
+                  display: "grid",
+                  gap: 12,
                 }}
               >
-                <div style={{
-                  width: 36, height: 36, borderRadius: "9px",
-                  background: "rgba(255,255,255,0.05)",
-                  border: "1px solid rgba(255,255,255,0.06)",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                }}>
-                  <fact.icon size={16} color={colors.primary} strokeWidth={1.75} />
+                <div
+                  style={{
+                    width: 32, height: 32,
+                    border: "1px solid var(--border)",
+                    borderRadius: 0,
+                    background: "transparent",
+                    color: "var(--accent)",
+                    display: "inline-flex",
+                    alignItems: "center", justifyContent: "center",
+                  }}
+                >
+                  <fact.icon size={16} strokeWidth={1.5} />
                 </div>
-                <h3 style={{ fontSize: "14px", fontWeight: 600, color: colors.ink, margin: 0 }}>
+                <h3
+                  style={{
+                    fontFamily: "var(--font-display)",
+                    fontSize: 17,
+                    fontWeight: 500,
+                    lineHeight: 1.25,
+                    letterSpacing: "-0.012em",
+                    color: "var(--text-primary)",
+                    margin: 0,
+                  }}
+                >
                   {fact.title}
                 </h3>
-                <p style={{ fontSize: 12, color: colors.body, lineHeight: 1.5, margin: 0 }}>
+                <p
+                  style={{
+                    margin: 0,
+                    fontSize: 13.5,
+                    lineHeight: 1.55,
+                    color: "var(--text-body)",
+                  }}
+                >
                   {fact.body}
                 </p>
-              </Card>
+              </article>
             ))}
           </div>
         )}
       </section>
 
-      {/* ════════════════ KEYBOARD SHORTCUTS HINT ════════════════ */}
-      <section style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
-        gap: space[2],
-        padding: space[5],
-        background: `linear-gradient(135deg, rgba(255,255,255,0.02) 0%, rgba(255,255,255,0.04) 100%)`,
-        border: `1px solid ${colors.hairline}`,
-        borderRadius: radius.lg,
-      }}>
+      {/* ════════════ SHORTCUTS ════════════ */}
+      <section
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+          gap: 1,
+          background: "var(--border)",
+          borderTop: "1px solid var(--border)",
+          borderBottom: "1px solid var(--border)",
+          padding: 1,
+        }}
+      >
         {[
-          { keys: ["⌘", "K"], desc: "Search" },
-          { keys: ["⌘", "1–6"], desc: "Desktop tutorial" },
-          { keys: ["R"], desc: "Refresh data" },
-          { keys: ["?"], desc: "All shortcuts" },
+          { keys: ["⌘", "K"], label: "Search a stock" },
+          { keys: ["R"],      label: "Refresh numbers" },
+          { keys: ["?"],      label: "All shortcuts" },
         ].map((shortcut) => (
-          <div key={shortcut.desc} style={{ display: "flex", alignItems: "center", gap: 8, padding: `${space[2]} ${space[2]}`, borderRadius: "8px", transition: "background 0.12s ease" }}>
-            <Keyboard size={12} style={{ color: colors.body, opacity: 0.4, flexShrink: 0 }} />
-            <div style={{ display: "flex", gap: 3, flexShrink: 0 }}>
+          <div
+            key={shortcut.label}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 10,
+              padding: "14px 18px",
+              background: "var(--bg-sheet)",
+            }}
+          >
+            <span style={{ display: "inline-flex", gap: 4 }}>
               {shortcut.keys.map((k) => (
-                <kbd key={k} style={{
-                  padding: "2px 6px", borderRadius: "4px",
-                  background: colors.surfaceElevated,
-                  border: `1px solid ${colors.hairline}`,
-                  fontSize: 10, fontWeight: 600, color: colors.ink,
-                  fontFamily: "inherit", lineHeight: 1.4,
-                }}>
+                <kbd
+                  key={k}
+                  style={{
+                    padding: "2px 7px",
+                    border: "1px solid var(--border)",
+                    borderRadius: 3,
+                    background: "var(--bg-page)",
+                    color: "var(--text-primary)",
+                    fontFamily: "var(--font-mono)",
+                    fontSize: 11,
+                    fontWeight: 600,
+                    lineHeight: 1.2,
+                    minWidth: 24,
+                    textAlign: "center",
+                  }}
+                >
                   {k}
                 </kbd>
               ))}
-            </div>
-            <span style={{ fontSize: 11, color: colors.body }}>{shortcut.desc}</span>
+            </span>
+            <span style={{ fontSize: 13, color: "var(--text-body)" }}>{shortcut.label}</span>
           </div>
         ))}
       </section>
 
-      {/* Responsive + Animations */}
       <style>{`
-        @keyframes raycastFadeUp {
-          from { opacity: 0; transform: translateY(8px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .raycast-slideUp {
-          animation: raycastFadeUp 0.35s ease both;
-        }
-        .raycast-stagger-1 { animation-delay: 0.02s; }
-        .raycast-stagger-2 { animation-delay: 0.05s; }
-        .raycast-stagger-3 { animation-delay: 0.08s; }
-        .raycast-stagger-4 { animation-delay: 0.11s; }
-        .raycast-stagger-5 { animation-delay: 0.14s; }
-        .raycast-stagger-6 { animation-delay: 0.17s; }
-        .raycast-stagger-7 { animation-delay: 0.19s; }
-        .raycast-stagger-8 { animation-delay: 0.21s; }
-        .raycast-stagger-9 { animation-delay: 0.23s; }
-        .raycast-stagger-10 { animation-delay: 0.25s; }
-        .raycast-stagger-11 { animation-delay: 0.27s; }
-        .raycast-stagger-12 { animation-delay: 0.29s; }
         @media ${media.mobile} {
-          h1 { font-size:${typography.h1.mobile.size} !important; }
-          h2 { font-size:${typography.h3.mobile.size} !important; }
-          .ai-insights-grid { grid-template-columns: 1fr !important; }
+          .eyebrow { letter-spacing: 0.10em; }
         }
       `}</style>
     </div>

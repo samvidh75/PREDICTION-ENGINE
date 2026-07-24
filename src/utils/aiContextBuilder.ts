@@ -77,11 +77,11 @@ function formatMarketContext(data: MarketContext): string {
   let context = `Company: ${data.ticker}`;
 
   if (data.currentPrice) {
-    context += `\nCurrent Price: ₹${data.currentPrice.toFixed(2)}`;
+    context += `\nCurrent Price: ₱${data.currentPrice.toFixed(2)}`;
   }
   if (data.change !== undefined && data.changePercent !== undefined) {
     const direction = data.change >= 0 ? '↑' : '↓';
-    context += `\n${direction} Change: ₹${Math.abs(data.change).toFixed(2)} (${Math.abs(data.changePercent).toFixed(2)}%)`;
+    context += `\n${direction} Change: ₱${Math.abs(data.change).toFixed(2)} (${Math.abs(data.changePercent).toFixed(2)}%)`;
   }
   if (data.pe) {
     context += `\nP/E Ratio: ${data.pe.toFixed(2)}`;
@@ -93,7 +93,7 @@ function formatMarketContext(data: MarketContext): string {
     context += `\nDebt-to-Equity: ${data.debtToEquity.toFixed(2)}`;
   }
   if (data.marketCap) {
-    context += `\nMarket Cap: ₹${(data.marketCap / 10000000000).toFixed(2)}Cr`;
+    context += `\nMarket Cap: ₱${(data.marketCap / 1000000000).toFixed(2)}B`;
   }
   if (data.lastUpdate) {
     context += `\nLast Updated: ${new Date(data.lastUpdate).toLocaleTimeString()}`;
@@ -119,7 +119,7 @@ function formatConversationContext(history: ChatMessage[]): string {
 }
 
 function buildSystemPrompt(_ticker: string, marketContext: string, conversationContext: string): string {
-  return `You are StockEX Encyclopedia, an expert financial analyst for Philippine equities.
+  return `You are StockEX Encyclopedia, an expert financial analyst for PSX equities.
 
 ROLE:
 - Provide accurate, educational financial analysis
@@ -147,7 +147,7 @@ OUTPUT FORMAT:
 
 export function enhanceUserQuery(query: string, marketData: MarketContext): string {
   if (marketData.currentPrice) {
-    return `${query}\n\n[CONTEXT: Currently trading at ₹${marketData.currentPrice}]`;
+    return `${query}\n\n[CONTEXT: Currently trading at ₱${marketData.currentPrice}]`;
   }
   return query;
 }

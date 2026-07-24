@@ -46,7 +46,7 @@ export default function CompanyResearchReport() {
           {report.companyName} ({report.symbol})
         </h1>
         <p style={{ fontSize: "14px", color: colors.textSecondary }}>
-          Sector: {report.sector} &middot; Generated: {new Date(report.generatedAt).toLocaleDateString("en-IN")}
+          Sector: {report.sector} &middot; Generated: {new Date(report.generatedAt).toLocaleDateString("en-PH")}
         </p>
       </section>
 
@@ -59,6 +59,8 @@ export default function CompanyResearchReport() {
             style={{
               padding: "16px",
               background: colors.card,
+              backdropFilter: "blur(20px) saturate(160%)",
+              WebkitBackdropFilter: "blur(20px) saturate(160%)",
               borderRadius: radius.md,
               border: `1px solid ${colors.border}`,
               boxShadow: shadows.card,

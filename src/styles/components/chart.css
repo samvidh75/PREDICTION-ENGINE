@@ -183,24 +183,24 @@
   font-size: 14px;
 }
 
-/* STAT CARD VARIANTS */
+/* STAT CARD VARIANTS — flat surfaces, no gradients */
 .stat-card-primary {
-  background: linear-gradient(135deg, var(--brand-light) 0%, #F9F0FF 100%);
-  border-color: var(--brand);
+  background: var(--bg-card);
+  border-color: var(--border-strong);
 }
 
 .stat-card-success {
-  background: linear-gradient(135deg, var(--green-light) 0%, #F5FFF9 100%);
+  background: var(--green-light);
   border-color: var(--green);
 }
 
 .stat-card-error {
-  background: linear-gradient(135deg, var(--red-light) 0%, rgba(255,99,99,0.08) 100%);
+  background: var(--red-light);
   border-color: var(--red);
 }
 
 .stat-card-warning {
-  background: linear-gradient(135deg, var(--amber-light) 0%, rgba(255,197,51,0.08) 100%);
+  background: var(--amber-light);
   border-color: var(--amber);
 }
 
@@ -319,12 +319,12 @@
   box-shadow: var(--shadow-card);
 }
 
-.heatmap-cell.level-0 { background-color: #EEF2FF; }
-.heatmap-cell.level-1 { background-color: #C7D2FE; }
-.heatmap-cell.level-2 { background-color: #A5B4FC; }
-.heatmap-cell.level-3 { background-color: #818CF8; }
-.heatmap-cell.level-4 { background-color: #6366F1; }
-.heatmap-cell.level-5 { background-color: #4F46E5; }
+.heatmap-cell.level-0 { background-color: var(--bg-chip); }
+.heatmap-cell.level-1 { background-color: rgba(255,107,74,0.20); }
+.heatmap-cell.level-2 { background-color: rgba(255,107,74,0.40); }
+.heatmap-cell.level-3 { background-color: rgba(255,107,74,0.60); }
+.heatmap-cell.level-4 { background-color: rgba(255,107,74,0.80); }
+.heatmap-cell.level-5 { background-color: var(--accent); }
 
 /* RESPONSIVE */
 @media (max-width: 767px) {

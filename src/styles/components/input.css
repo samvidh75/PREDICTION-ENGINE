@@ -1,8 +1,8 @@
 /* ============================================================================
-   FORM INPUTS — Stripe-quality form styling with Apple minimalism
+   FORM INPUTS — Editorial paper fields
+   Hairline rules, focus ring of fox-orange, ink numerals.
    ============================================================================ */
 
-/* INPUT TEXT */
 input[type="text"],
 input[type="email"],
 input[type="password"],
@@ -17,22 +17,21 @@ textarea,
 select {
   display: block;
   width: 100%;
-  padding: 12px 14px;
+  padding: 11px 14px;
+  font-family: var(--font-sans);
   font-size: 15px;
   font-weight: 400;
   line-height: 1.5;
-  color: var(--text-body);
-  background-color: var(--bg-card);
+  color: var(--text-primary);
+  background-color: var(--bg-sheet);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   transition:
-    border-color var(--t-base),
-    box-shadow var(--t-base),
-    background-color var(--t-base);
-  font-family: inherit;
+    border-color 200ms var(--ease-soft),
+    box-shadow 200ms var(--ease-soft),
+    background-color 200ms var(--ease-soft);
 }
 
-/* FOCUS STATE — Raycast white focus ring */
 input[type="text"]:focus,
 input[type="email"]:focus,
 input[type="password"]:focus,
@@ -45,240 +44,135 @@ input[type="datetime-local"]:focus,
 input[type="number"]:focus,
 textarea:focus,
 select:focus {
-  border-color: var(--border-focus);
-  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.15);
-  background-color: var(--bg-card-hover);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+  background-color: var(--bg-sheet);
+  outline: none;
 }
 
-/* ERROR STATE */
-input.error,
-input[aria-invalid="true"],
-textarea.error,
-textarea[aria-invalid="true"],
-select.error,
-select[aria-invalid="true"] {
+input.error, input[aria-invalid="true"],
+textarea.error, textarea[aria-invalid="true"],
+select.error, select[aria-invalid="true"] { border-color: var(--red); }
+
+input.error:focus, input[aria-invalid="true"]:focus,
+textarea.error:focus, textarea[aria-invalid="true"]:focus,
+select.error:focus, select[aria-invalid="true"]:focus {
   border-color: var(--red);
+  box-shadow: 0 0 0 3px var(--red-light);
+  outline: none;
 }
 
-input.error:focus,
-input[aria-invalid="true"]:focus,
-textarea.error:focus,
-textarea[aria-invalid="true"]:focus,
-select.error:focus,
-select[aria-invalid="true"]:focus {
-  border-color: var(--red);
-  box-shadow: 0 0 0 2px rgba(255, 59, 48, 0.2);
-}
-
-/* SUCCESS STATE */
-input.success,
-textarea.success,
-select.success {
+input.success, textarea.success, select.success { border-color: var(--green); }
+input.success:focus, textarea.success:focus, select.success:focus {
   border-color: var(--green);
+  box-shadow: 0 0 0 3px var(--green-light);
+  outline: none;
 }
 
-input.success:focus,
-textarea.success:focus,
-select.success:focus {
-  border-color: var(--green);
-  box-shadow: 0 0 0 2px rgba(89, 212, 153, 0.15);
-}
-
-/* DISABLED STATE */
-input:disabled,
-textarea:disabled,
-select:disabled {
+input:disabled, textarea:disabled, select:disabled {
   background-color: var(--bg-chip);
   color: var(--text-muted);
   cursor: not-allowed;
   opacity: 0.6;
 }
 
-/* READONLY STATE */
-input[readonly],
-textarea[readonly],
-select[readonly] {
+input[readonly], textarea[readonly], select[readonly] {
   background-color: var(--bg-chip);
   cursor: default;
 }
 
-/* PLACEHOLDER */
-input::placeholder,
-textarea::placeholder {
+input::placeholder, textarea::placeholder {
   color: var(--text-muted);
+  font-style: italic;
 }
 
-/* TEXTAREA */
 textarea {
   resize: vertical;
   min-height: 100px;
   font-family: inherit;
 }
 
-/* SELECT */
 select {
   appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23666666' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='none' stroke='%230E1116' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 12px center;
   padding-right: 36px;
   cursor: pointer;
 }
+select:disabled { opacity: 0.6; cursor: not-allowed; }
 
-select:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-/* CHECKBOX */
-input[type="checkbox"],
-input[type="radio"] {
+input[type="checkbox"], input[type="radio"] {
   width: 18px;
   height: 18px;
   margin: 0;
   cursor: pointer;
-  accent-color: var(--brand);
+  accent-color: var(--accent);
 }
+input[type="checkbox"]:disabled, input[type="radio"]:disabled { cursor: not-allowed; opacity: 0.6; }
 
-input[type="checkbox"]:disabled,
-input[type="radio"]:disabled {
-  cursor: not-allowed;
-  opacity: 0.6;
-}
-
-/* FILE INPUT */
-input[type="file"] {
-  padding: 8px 0;
-  border: none;
-}
-
+input[type="file"] { padding: 8px 0; border: none; }
 input[type="file"]::file-selector-button {
   padding: 8px 16px;
-  background-color: var(--bg-chip);
-  color: var(--text-body);
+  background-color: var(--bg-card);
+  color: var(--text-primary);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   cursor: pointer;
   font-weight: 500;
-  transition: all var(--t-base);
+  transition: all 200ms var(--ease-soft);
   margin-right: 12px;
 }
-
 input[type="file"]::file-selector-button:hover {
-  background-color: #0A0A0A;
+  background-color: var(--bg-card-hover);
   border-color: var(--border-strong);
 }
 
-/* FORM GROUP */
-.form-group {
-  margin-bottom: 20px;
-}
+.form-group { margin-bottom: 20px; }
+.form-group:last-child { margin-bottom: 0; }
 
-.form-group:last-child {
-  margin-bottom: 0;
-}
-
-/* LABEL */
 label {
   display: block;
   margin-bottom: 8px;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
   line-height: 1.4;
   color: var(--text-primary);
   cursor: pointer;
+  letter-spacing: 0.005em;
 }
 
-label.required::after {
-  content: " *";
-  color: var(--red);
-}
+label.required::after { content: " *"; color: var(--red); }
 
-/* HELP TEXT */
-.form-help,
-.form-error {
+.form-help, .form-error {
   display: block;
   margin-top: 6px;
   font-size: 13px;
   font-weight: 400;
   line-height: 1.4;
 }
+.form-help { color: var(--text-secondary); }
+.form-error { color: var(--red); }
+.form-success { color: var(--green); }
 
-.form-help {
-  color: var(--text-secondary);
-}
+.form-inline { display: flex; gap: 12px; align-items: flex-end; }
+.form-inline .form-group { margin-bottom: 0; flex: 1; }
 
-.form-error {
-  color: var(--red);
-}
+.form-horizontal .form-group { display: flex; gap: 12px; align-items: flex-start; }
+.form-horizontal label { flex: 0 0 120px; padding-top: 12px; margin-bottom: 0; }
+.form-horizontal .form-control { flex: 1; }
 
-.form-success {
-  color: var(--green);
-}
-
-/* INLINE FORM */
-.form-inline {
-  display: flex;
-  gap: 12px;
-  align-items: flex-end;
-}
-
-.form-inline .form-group {
-  margin-bottom: 0;
-  flex: 1;
-}
-
-/* HORIZONTAL FORM */
-.form-horizontal .form-group {
-  display: flex;
-  gap: 12px;
-  align-items: flex-start;
-}
-
-.form-horizontal label {
-  flex: 0 0 120px;
-  padding-top: 12px;
-  margin-bottom: 0;
-}
-
-.form-horizontal .form-control {
-  flex: 1;
-}
-
-/* RESPONSIVE */
 @media (max-width: 767px) {
-  input[type="text"],
-  input[type="email"],
-  input[type="password"],
-  input[type="url"],
-  input[type="tel"],
-  input[type="search"],
-  input[type="date"],
-  input[type="time"],
-  input[type="datetime-local"],
-  input[type="number"],
-  textarea,
-  select {
-    font-size: 16px; /* Prevent zoom on iOS */
+  input[type="text"], input[type="email"], input[type="password"],
+  input[type="url"], input[type="tel"], input[type="search"],
+  input[type="date"], input[type="time"], input[type="datetime-local"],
+  input[type="number"], textarea, select {
+    font-size: 16px;
     padding: 12px 14px;
     min-height: 44px;
   }
-
-  .form-inline {
-    flex-direction: column;
-  }
-
-  .form-inline .form-group {
-    width: 100%;
-  }
-
-  .form-horizontal {
-    flex-direction: column;
-  }
-
-  .form-horizontal label {
-    flex: none;
-    width: 100%;
-    padding-top: 0;
-  }
+  .form-inline { flex-direction: column; }
+  .form-inline .form-group { width: 100%; }
+  .form-horizontal { flex-direction: column; }
+  .form-horizontal label { flex: none; width: 100%; padding-top: 0; }
 }

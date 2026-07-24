@@ -109,9 +109,9 @@ export default function PremiumFeaturesShowcase() {
               </tr>
               <tr style={styles.priceRow}>
                 <td style={styles.featureName}>Monthly Price</td>
-                <td style={styles.tierData}>₹0</td>
-                <td style={styles.tierData}>₹299</td>
-                <td style={styles.tierData}>₹799</td>
+                <td style={styles.tierData}>₱0</td>
+                <td style={styles.tierData}>₱299</td>
+                <td style={styles.tierData}>₱799</td>
               </tr>
             </tbody>
           </table>
@@ -149,7 +149,7 @@ export default function PremiumFeaturesShowcase() {
       {/* CTA Section */}
       <div style={styles.ctaSection}>
         <h2 style={styles.ctaTitle}>Ready to Level Up?</h2>
-        <p style={styles.ctaText}>Start with Premium for ₹299/month and unlock all features</p>
+        <p style={styles.ctaText}>Start with Premium for ₱299/month and unlock all features</p>
         <button style={styles.ctaButton}>Upgrade Now</button>
       </div>
     </div>

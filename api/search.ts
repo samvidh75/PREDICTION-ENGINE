@@ -1,28 +1,20 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { PSE_STOCKS, PSE_SECTORS } from './_lib/data/universe.js';
 
-// List of major Indian stocks for search
-const INDIAN_STOCKS = [
-  { symbol: 'RELIANCE', name: 'Reliance Industries', sector: 'Energy' },
-  { symbol: 'TCS', name: 'Tata Consultancy Services', sector: 'IT' },
-  { symbol: 'INFY', name: 'Infosys', sector: 'IT' },
-  { symbol: 'WIPRO', name: 'Wipro', sector: 'IT' },
-  { symbol: 'HDFCBANK', name: 'HDFC Bank', sector: 'Banking' },
-  { symbol: 'ICICIBANK', name: 'ICICI Bank', sector: 'Banking' },
-  { symbol: 'AXISBANK', name: 'Axis Bank', sector: 'Banking' },
-  { symbol: 'KOTAKBANK', name: 'Kotak Mahindra Bank', sector: 'Banking' },
-  { symbol: 'SBIN', name: 'State Bank of India', sector: 'Banking' },
-  { symbol: 'MARUTI', name: 'Maruti Suzuki', sector: 'Automotive' },
-  { symbol: 'BAJAJFINSV', name: 'Bajaj Finserv', sector: 'Finance' },
-  { symbol: 'BHARTIARTL', name: 'Bharti Airtel', sector: 'Telecom' },
-  { symbol: 'HDFCLIFE', name: 'HDFC Life Insurance', sector: 'Insurance' },
-  { symbol: 'LTIM', name: 'LTIMindtree', sector: 'IT' },
-  { symbol: 'ASIANPAINT', name: 'Asian Paints', sector: 'Consumer' },
-  { symbol: 'SUNPHARMA', name: 'Sun Pharmaceutical', sector: 'Pharma' },
-  { symbol: 'APOLLOHOSP', name: 'Apollo Hospitals', sector: 'Healthcare' },
-  { symbol: 'NESTLEIND', name: 'Nestle India', sector: 'Consumer' },
-  { symbol: 'LT', name: 'Larsen & Toubro', sector: 'Engineering' },
-  { symbol: 'ULTRACEMCO', name: 'UltraTech Cement', sector: 'Cement' },
-];
+// Real PSE-listed common stocks, sourced from the live phisix feed
+// (see api/_lib/data/universe.ts for provenance). Sector is populated
+// for PSEi-30 members with a known best-effort classification; everything
+// else is labeled generically since precise sector data isn't in the feed.
+const symbolToSector = new Map<string, string>();
+for (const [sector, symbols] of Object.entries(PSE_SECTORS)) {
+  for (const symbol of symbols) symbolToSector.set(symbol, sector);
+}
+
+const PSE_SEARCH_STOCKS = PSE_STOCKS.map((stock) => ({
+  symbol: stock.symbol,
+  name: stock.name,
+  sector: symbolToSector.get(stock.symbol) ?? 'PSE Listed',
+}));
 
 // Simple fuzzy search scoring
 function fuzzyScore(target: string, query: string): number {
@@ -70,7 +62,7 @@ export default async function handler(
   }
 
   // Score all stocks
-  const scored = INDIAN_STOCKS.map(stock => ({
+  const scored = PSE_SEARCH_STOCKS.map(stock => ({
     ...stock,
     score: Math.max(
       fuzzyScore(stock.symbol.toLowerCase(), query),

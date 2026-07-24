@@ -31,7 +31,7 @@ export async function handleCreateCheckout(req: Request, res: Response): Promise
       return;
     }
 
-    if (!plan.active || plan.priceInr === 0) {
+    if (!plan.active || plan.pricePkr === 0) {
       res.status(400).json({ error: 'This plan cannot be purchased' });
       return;
     }
@@ -41,7 +41,7 @@ export async function handleCreateCheckout(req: Request, res: Response): Promise
     res.status(501).json({
       error: 'Payment provider not yet configured.',
       message: 'Checkout is coming soon. You will be redirected to Razorpay to complete payment.',
-      plan: { id: plan.id, name: plan.name, priceInr: plan.priceInr },
+      plan: { id: plan.id, name: plan.name, pricePkr: plan.pricePkr },
     });
   } catch (err) {
     console.error('[checkout] create error', err);

@@ -1,7 +1,7 @@
 /**
  * Live Quote Providers
- * Cascading fetch: IndianAPI → Groww → Yahoo Finance
- * Each provider has per-symbol rate limiting and retry
+ * Fetch: Yahoo Finance chart API (PSE-listed symbols use the .PS suffix)
+ * Rate limited per-symbol.
  */
 
 export interface Quote {
@@ -10,7 +10,7 @@ export interface Quote {
   bid: number;
   ask: number;
   volume: number;
-  source: 'indianapi' | 'groww' | 'yahoo';
+  source: 'yahoo';
   timestamp: number;
 }
 
@@ -27,113 +27,39 @@ async function checkRateLimit(symbol: string): Promise<boolean> {
 
 export class QuoteProvider {
   async fetchQuotes(symbols: string[]): Promise<Quote[]> {
-    try {
-      return await this.fetchFromIndianAPI(symbols);
-    } catch (err1) {
-      console.warn('[QuoteProvider] IndianAPI failed, trying Groww...', (err1 as Error).message);
-      try {
-        return await this.fetchFromGroww(symbols);
-      } catch (err2) {
-        console.warn('[QuoteProvider] Groww failed, trying Yahoo...', (err2 as Error).message);
-        return await this.fetchFromYahoo(symbols);
-      }
-    }
+    return this.fetchFromYahoo(symbols);
   }
 
-  private async fetchFromIndianAPI(symbols: string[]): Promise<Quote[]> {
-    const results: Quote[] = [];
-    const batchSize = 5;
-
-    for (let i = 0; i < symbols.length; i += batchSize) {
-      const batch = symbols.slice(i, i + batchSize);
-      const promises = batch.map(async (sym) => {
-        if (!(await checkRateLimit(sym))) return;
-        try {
-          const res = await fetch(
-            `https://stock.indianapi.in/stock?name=${encodeURIComponent(sym.toUpperCase())}`,
-            { headers: { 'Content-Type': 'application/json' }, signal: AbortSignal.timeout(5000) }
-          );
-          if (!res.ok) return;
-          const data = await res.json() as any;
-          const priceData = data.currentPrice || {};
-          const price = priceData.PSE || priceData.PSE || data.stockDetailsReusableData?.price;
-          if (price && price > 0) {
-            results.push({
-              symbol: sym.toUpperCase(),
-              price: Number(price),
-              bid: price * 0.999,
-              ask: price * 1.001,
-              volume: data.stockDetailsReusableData?.volume || 0,
-              source: 'indianapi',
-              timestamp: Date.now(),
-            });
-          }
-        } catch { /* skip individual failures */ }
-      });
-      await Promise.all(promises);
-    }
-    return results;
-  }
-
-  private async fetchFromGroww(symbols: string[]): Promise<Quote[]> {
+  private async fetchFromYahoo(symbols: string[]): Promise<Quote[]> {
     const results: Quote[] = [];
     for (const sym of symbols) {
       if (!(await checkRateLimit(sym))) continue;
       try {
         const res = await fetch(
-          `https://api.groww.in/v1/stocks/quote?symbol=${sym.toUpperCase()}`,
-          { signal: AbortSignal.timeout(5000) }
+          `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(sym)}.PS?interval=1d`,
+          {
+            headers: {
+              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+            },
+            signal: AbortSignal.timeout(5000),
+          }
         );
         if (!res.ok) continue;
         const data = await res.json() as any;
-        if (data.ltp && data.ltp > 0) {
+        const meta = data.chart?.result?.[0]?.meta;
+        if (meta?.regularMarketPrice) {
           results.push({
-            symbol: sym.toUpperCase(),
-            price: data.ltp,
-            bid: data.bid || data.ltp * 0.999,
-            ask: data.ask || data.ltp * 1.001,
-            volume: data.volume || 0,
-            source: 'groww',
+            symbol: sym,
+            price: meta.regularMarketPrice,
+            bid: meta.regularMarketPrice * 0.999,
+            ask: meta.regularMarketPrice * 1.001,
+            volume: meta.regularMarketVolume || 0,
+            source: 'yahoo',
             timestamp: Date.now(),
           });
         }
-      } catch { /* skip */ }
+      } catch { /* skip individual failures */ }
     }
-    return results;
-  }
-
-  private async fetchFromYahoo(symbols: string[]): Promise<Quote[]> {
-    const results: Quote[] = [];
-    try {
-      const query = symbols.map((s) => `${s}.NS`).join(',');
-      const res = await fetch(
-        `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(query)}`,
-        {
-          headers: {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-          },
-          signal: AbortSignal.timeout(5000),
-        }
-      );
-      if (!res.ok) return results;
-      const data = await res.json() as any;
-      if (data.chart?.result) {
-        for (const chart of data.chart.result) {
-          const meta = chart.meta;
-          if (meta?.regularMarketPrice) {
-            results.push({
-              symbol: meta.symbol.replace('.NS', ''),
-              price: meta.regularMarketPrice,
-              bid: meta.regularMarketPrice * 0.999,
-              ask: meta.regularMarketPrice * 1.001,
-              volume: meta.regularMarketVolume || 0,
-              source: 'yahoo',
-              timestamp: Date.now(),
-            });
-          }
-        }
-      }
-    } catch { /* skip */ }
     return results;
   }
 }

@@ -34,8 +34,8 @@ interface HistoricalResult {
 }
 
 const DOMAIN_MATRIX: Record<string, Array<{ key: string; domain: ProviderDomain }>> = {
-  INDIANAPI_KEY: [
-    { key: "indianapi", domain: "quote" },
+  PSXAPI_KEY: [
+    { key: "psxapi", domain: "quote" },
   ],
   JUGAD_DATA: [
     { key: "jugaad-data", domain: "quote" },
@@ -103,7 +103,7 @@ async function probeRbiMacro(): Promise<RbiMacroProbeResult> {
   try {
     const response = await fetch('https://www.rbi.org.in/Home.aspx', {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; StockStory/1.0; +https://stockstory-india.com)',
+        'User-Agent': 'Mozilla/5.0 (compatible; StockStory/1.0; +https://stockstory-ph.com)',
         Accept: 'text/html,application/xhtml+xml',
       },
     });
@@ -112,7 +112,7 @@ async function probeRbiMacro(): Promise<RbiMacroProbeResult> {
     }
     const html = await response.text();
     const hasPolicyRate = /Policy Repo Rate\s*:\s*\d+(?:\.\d+)?%/i.test(html);
-    const hasExchangeRate = /INR\s*\/\s*1\s*USD\s*:\s*\d+(?:\.\d+)?/i.test(html);
+    const hasExchangeRate = /PKR\s*\/\s*1\s*USD\s*:\s*\d+(?:\.\d+)?/i.test(html);
     return { healthy: hasPolicyRate && hasExchangeRate };
   } catch {
     return { healthy: false };
@@ -154,8 +154,8 @@ export class PublicMarketDataProviderBroker {
     }
 
     results.push({
-      provider: 'indianapi',
-      status: process.env.INDIANAPI_KEY ? 'healthy' : 'degraded',
+      provider: 'psxapi',
+      status: process.env.PSXAPI_KEY ? 'healthy' : 'degraded',
     });
 
     return results;
@@ -176,8 +176,8 @@ export class PublicMarketDataProviderBroker {
           healthy = domainHealthy(nsepython?.domains?.[probeKey]?.status);
         } else if (envKey === 'JUGAD_DATA') {
           healthy = domainHealthy(jugaad?.domains?.[domain]?.status);
-        } else if (envKey === 'INDIANAPI_KEY') {
-          healthy = Boolean(process.env.INDIANAPI_KEY);
+        } else if (envKey === 'PSXAPI_KEY') {
+          healthy = Boolean(process.env.PSXAPI_KEY);
         } else if (envKey === 'YAHOO') {
           healthy = domain === 'quote' || domain === 'historical' || domain === 'index';
         } else if (envKey === 'FUNDAMENTALS_AUTOMATIC') {

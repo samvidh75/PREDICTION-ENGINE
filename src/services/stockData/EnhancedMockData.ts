@@ -1,6 +1,7 @@
 /**
  * Enhanced Mock Data with Company Info, Metrics, and Analysis
  * Provides instant, deterministic data for <500ms page loads
+ * Now configured for Pakistan Stock Exchange (PSX) companies
  */
 
 export interface CompanyInfo {
@@ -14,7 +15,7 @@ export interface CompanyInfo {
 }
 
 export interface KeyMetrics {
-  marketCap: number; // In crores
+  marketCap: number; // In PKR millions
   currentPrice: number;
   peRatio: number;
   pbRatio: number;
@@ -41,170 +42,147 @@ export interface StockAnalysis {
   targetPrice: number;
 }
 
-// Comprehensive company database
 const COMPANY_DATABASE: Record<string, CompanyInfo> = {
-  'HDFCBANK': {
-    name: 'HDFC Bank Limited',
-    sector: 'Financial Services',
+  'HBL': {
+    name: 'Habib Bank Limited',
+    sector: 'Financials',
     industry: 'Banking',
-    about: `HDFC Bank Limited is one of India's leading private sector banks, providing a wide range of banking and financial services including retail banking, corporate banking, and investment banking. The bank operates through a strong network across India serving millions of customers.`,
-    foundedYear: 1994,
-    website: 'www.hdfcbank.com'
+    about: 'Habib Bank Limited is Pakistan\'s largest private sector bank, providing a wide range of banking and financial services including retail banking, corporate banking, investment banking, and Islamic banking. HBL operates through a vast network across Pakistan and internationally.',
+    foundedYear: 1941,
+    website: 'www.hbl.com'
   },
-  'INFY': {
-    name: 'Infosys Limited',
-    sector: 'Information Technology',
-    industry: 'IT Services & Consulting',
-    about: `Infosys is a global leader in next-generation digital services and consulting. The company provides consulting, technology, and outsourcing services that help clients navigate their digital transformation.`,
-    foundedYear: 1981,
-    website: 'www.infosys.com'
+  'ENGRO': {
+    name: 'Engro Corporation Limited',
+    sector: 'Conglomerate',
+    industry: 'Diversified',
+    about: 'Engro Corporation is one of Pakistan\'s largest conglomerates with investments in fertilizers, food, energy, petrochemicals, and telecommunications. The company drives innovation across Pakistan\'s critical infrastructure sectors.',
+    foundedYear: 1965,
+    website: 'www.engro.com'
   },
-  'RELIANCE': {
-    name: 'Reliance Industries Limited',
-    sector: 'Energy & Petrochemicals',
-    industry: 'Oil & Gas, Petrochemicals',
-    about: `Reliance Industries is a diversified conglomerate with presence in exploration & production, petroleum refining, petrochemicals, retail, and telecom sectors. It is one of India's largest companies by revenue and market capitalization.`,
-    foundedYear: 1973,
-    website: 'www.ril.com'
+  'UBL': {
+    name: 'United Bank Limited',
+    sector: 'Financials',
+    industry: 'Banking',
+    about: 'United Bank Limited is one of Pakistan\'s leading commercial banks, offering a comprehensive range of banking services through its extensive domestic and international branch network.',
+    foundedYear: 1959,
+    website: 'www.ubldirect.com'
   },
-  'TCS': {
-    name: 'Tata Consultancy Services Limited',
-    sector: 'Information Technology',
-    industry: 'IT Services & Consulting',
-    about: `TCS is a leading global IT services, consulting and business solutions organization. It delivers IT solutions and business consulting services to enterprises globally, helping them to compete and win in the digital economy.`,
-    foundedYear: 1968,
-    website: 'www.tcs.com'
+  'MCB': {
+    name: 'MCB Bank Limited',
+    sector: 'Financials',
+    industry: 'Banking',
+    about: 'MCB Bank is one of Pakistan\'s oldest and largest banks, providing retail banking, corporate banking, and Islamic banking services. Known for its strong asset quality and consistent dividend payouts.',
+    foundedYear: 1947,
+    website: 'www.mcb.com.pk'
   },
-  'WIPRO': {
-    name: 'Wipro Limited',
-    sector: 'Information Technology',
-    industry: 'IT Services & Consulting',
-    about: `Wipro is a leading technology services and consulting company that provides a comprehensive portfolio of services to Global 2000 companies and emerging companies across key verticals including financial services, health care, telecommunications, media and entertainment.`,
-    foundedYear: 1980,
-    website: 'www.wipro.com'
-  },
-  'MARUTI': {
-    name: 'Maruti Suzuki India Limited',
-    sector: 'Automobiles',
-    industry: 'Car Manufacturing',
-    about: `Maruti Suzuki is India's leading passenger car manufacturer with a strong market share. The company manufactures a wide range of vehicles from economy cars to utility vehicles, serving diverse customer segments.`,
-    foundedYear: 1981,
-    website: 'www.marutisuzuki.com'
-  },
-  'CHANDRAPRABHU': {
-    name: 'Chandraprabhu Limited',
-    sector: 'Pharmaceuticals',
-    industry: 'Pharmaceutical Manufacturing',
-    about: `Chandraprabhu Limited is engaged in the manufacture and marketing of pharmaceutical products, focusing on ethical pharmaceuticals for various therapeutic areas including cardiovascular, gastrointestinal, and respiratory segments.`,
-    foundedYear: 1995,
-  },
-  'CHENNPETRO': {
-    name: 'Chennai Petroleum Corporation Limited',
+  'OGDC': {
+    name: 'Oil & Gas Development Company Limited',
     sector: 'Energy',
-    industry: 'Oil Refining & Petrochemicals',
-    about: `Chennai Petroleum Corporation Limited is in the business of refining crude oil to produce & supply various petroleum products and manufacture and sale of lubricating oil additives. The main products include LPG, Motor Spirit, Superior Kerosene, Aviation Turbine Fuel, High Speed Diesel, Naphtha, Fuel Oil, Lube Base Stocks and Bitumen. Speciality products include Paraffin Wax, Mineral Turpentine Oil (MTO), Hexane, Petrochemical feedstocks, and Petroleum Coke.`,
-    foundedYear: 1983,
+    industry: 'Oil & Gas Exploration',
+    about: 'OGDCL is Pakistan\'s largest exploration and production company, responsible for over 40% of the country\'s oil and gas production. The company holds the largest portfolio of recoverable hydrocarbon reserves in Pakistan.',
+    foundedYear: 1961,
+    website: 'www.ogdcl.com'
   },
-  'GRANULES': {
-    name: 'Granules India Limited',
-    sector: 'Pharmaceuticals',
-    industry: 'Pharmaceutical Manufacturing',
-    about: `Granules India Limited is engaged in manufacturing and marketing of pharmaceutical products. The company is a supplier of Active Pharmaceutical Ingredients (API) and pharmaceutical formulations across various therapeutic segments globally.`,
-    foundedYear: 1994,
+  'FFC': {
+    name: 'Fauji Fertilizer Company Limited',
+    sector: 'Fertilizer',
+    industry: 'Fertilizer Manufacturing',
+    about: 'Fauji Fertilizer Company is Pakistan\'s largest urea manufacturer, playing a critical role in the country\'s agricultural sector. The company consistently delivers strong dividends to shareholders.',
+    foundedYear: 1978,
+    website: 'www.ffc.com.pk'
+  },
+  'LUCK': {
+    name: 'Lucky Cement Limited',
+    sector: 'Materials',
+    industry: 'Cement',
+    about: 'Lucky Cement is Pakistan\'s largest cement manufacturer and exporter, with a strong presence in both domestic and international markets. The company is a key supplier for major infrastructure projects.',
+    foundedYear: 1993,
+    website: 'www.lucky-cement.com'
+  },
+  'PPL': {
+    name: 'Pakistan Petroleum Limited',
+    sector: 'Energy',
+    industry: 'Oil & Gas Exploration',
+    about: 'Pakistan Petroleum Limited is a leading exploration and production company operating Pakistan\'s largest gas field at Sui. PPL manages a diverse portfolio of exploration blocks across the country.',
+    foundedYear: 1950,
+    website: 'www.ppl.com.pk'
   },
 };
 
-// Generate deterministic metrics based on symbol
 export function generateEnhancedMockData(symbol: string) {
   const hash = symbol.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
   const normalizedHash = (hash % 1000) / 1000;
 
-  // Base metrics
-  const basePrice = 100 + (hash % 3000);
-  const marketCap = 10000 + (hash % 500000); // In crores
-  const peRatio = 10 + normalizedHash * 30;
-  const roe = 5 + normalizedHash * 40;
-  const roce = 8 + normalizedHash * 45;
+  const basePrice = 50 + (hash % 300);
+  const marketCap = 5000000 + (hash % 500000000); // In PKR millions
+  const peRatio = 3 + normalizedHash * 25;
+  const roe = 5 + normalizedHash * 35;
+  const roce = 8 + normalizedHash * 40;
 
   return {
-    // Basic quote
     quote: {
       symbol,
-      exchange: 'PSE' as const,
+      exchange: 'PSX' as const,
       price: basePrice,
       change: (Math.sin(hash / 100) * 5),
-      changePercent: (Math.sin(hash / 100) * 5) / basePrice * 100,
+      changePercent: ((Math.sin(hash / 100) * 5) / basePrice) * 100,
       high: basePrice * 1.02,
       low: basePrice * 0.98,
-      volume: 1000000 + (hash % 5000000),
+      volume: 500000 + (hash % 5000000),
     },
-
-    // Key metrics (instant render, no API needed)
     metrics: {
       marketCap,
       currentPrice: basePrice,
       peRatio: parseFloat(peRatio.toFixed(2)),
-      pbRatio: 1 + normalizedHash * 5,
+      pbRatio: 0.5 + normalizedHash * 4,
       bookValue: basePrice / (1.5 + normalizedHash),
-      dividendYield: 0.2 + normalizedHash * 3,
+      dividendYield: 3 + normalizedHash * 12,
       roe: parseFloat(roe.toFixed(1)),
       roce: parseFloat(roce.toFixed(1)),
-      faceValue: 10 + (hash % 100),
+      faceValue: 10,
       high52Week: basePrice * (1.3 + normalizedHash * 0.2),
       low52Week: basePrice * (0.7 - normalizedHash * 0.2),
-      avgVolume: (2000000 + (hash % 8000000)) / 1e6,
+      avgVolume: (200000 + (hash % 8000000)) / 1e6,
       eps: basePrice / peRatio,
-      debtToEquity: 0.3 + normalizedHash * 2,
+      debtToEquity: 0.1 + normalizedHash * 1.5,
       currentRatio: 1.0 + normalizedHash * 2,
-      roicPercent: 8 + normalizedHash * 30,
+      roicPercent: 8 + normalizedHash * 25,
     } as KeyMetrics,
-
-    // Company info
     company: COMPANY_DATABASE[symbol] || {
       name: symbol,
-      about: `${symbol} is a leading company in its sector, delivering value to stakeholders through innovative products and services.`,
-      sector: 'Miscellaneous',
+      about: `${symbol} is a leading Pakistan Stock Exchange-listed company in its sector, delivering value to stakeholders through innovative products and services.`,
+      sector: 'General',
       industry: 'General',
     } as CompanyInfo,
-
-    // Analysis (rule-based, instant)
     analysis: {
       pros: [
-        peRatio < 20 ? '✓ Attractive valuation at P/E below 20x' : '',
+        peRatio < 12 ? '✓ Attractive valuation at P/E below 12x' : '',
         roe > 15 ? '✓ Strong ROE (>15%) indicates quality earnings' : '',
         roce > 15 ? '✓ High ROCE suggests efficient capital deployment' : '',
-        (Math.random() > 0.5 ? '✓ Strong market position and competitive moat' : ''),
+        '✓ Strong market position and competitive moat',
       ].filter(Boolean),
-
       cons: [
-        peRatio > 35 ? '✗ High valuation at P/E >35x' : '',
-        roe < 10 ? '✗ Low ROE may indicate profitability challenges' : '',
-        normalizedHash < 0.3 ? '✗ High debt levels require monitoring' : '',
-        (Math.random() > 0.7 ? '✗ Sector cyclicality poses risks' : ''),
-      ].filter(Boolean),
-
+        peRatio > 25 ? '✗ High valuation at P/E >25x' : '',
+        roe < 8 ? '✗ Low ROE may indicate profitability challenges' : '',
+        normalizedHash < 0.25 ? '✗ High debt levels require monitoring' : '',
+        '✗ Sector cyclicality poses risks',
+      ].filter(Boolean).slice(0, 3),
       recommendation:
-        peRatio < 15 && roe > 20 ? 'BUY' :
-        peRatio > 30 || roe < 10 ? 'SELL' : 'HOLD',
-
-      investmentHorizon: normalizedHash > 0.7 ? '3Y' : normalizedHash > 0.4 ? '1Y' : '6M',
-      riskLevel: normalizedHash < 0.3 ? 'HIGH' : normalizedHash < 0.7 ? 'MEDIUM' : 'LOW',
-
+        peRatio < 10 && roe > 20 ? 'BUY' :
+        peRatio > 25 || roe < 8 ? 'SELL' : 'HOLD',
+      investmentHorizon: normalizedHash > 0.7 ? '3Y' : normalizedHash > 0.4 ? '1Y' : '6M' as '3M' | '6M' | '1Y' | '3Y',
+      riskLevel: normalizedHash < 0.3 ? 'HIGH' : normalizedHash < 0.7 ? 'MEDIUM' : 'LOW' as 'LOW' | 'MEDIUM' | 'HIGH',
       targetPrice: basePrice * (0.9 + normalizedHash * 0.4),
     } as StockAnalysis,
   };
 }
 
-// Get company name safely (never return numbers)
 export function getCompanyName(symbol: string): string {
   const company = COMPANY_DATABASE[symbol];
   if (company?.name) return company.name;
-
-  // Fallback: use symbol if no mapping found
   return symbol;
 }
 
-// Get all company names (for validation)
 export function getAllCompanyNames(): Record<string, string> {
   const names: Record<string, string> = {};
   for (const [symbol, company] of Object.entries(COMPANY_DATABASE)) {

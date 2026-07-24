@@ -124,7 +124,7 @@ export default function TaxPlanner() {
 
       {!expanded && (
         <div style={{ marginTop: '8px', fontSize: '12px', color: '#666' }}>
-          Tax liability: ₹{summary.totalTax.toLocaleString('en-IN')} ({summary.effectiveTaxRate.toFixed(1)}%)
+          Tax liability: ₱{summary.totalTax.toLocaleString('en-PH')} ({summary.effectiveTaxRate.toFixed(1)}%)
         </div>
       )}
 
@@ -136,22 +136,22 @@ export default function TaxPlanner() {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', fontSize: '12px' }}>
               <div>
                 <div style={{ color: '#666' }}>Total Gains</div>
-                <div style={{ fontWeight: 'bold' }}>₹{summary.totalGains.toLocaleString('en-IN')}</div>
+                <div style={{ fontWeight: 'bold' }}>₱{summary.totalGains.toLocaleString('en-PH')}</div>
               </div>
               <div>
                 <div style={{ color: '#666' }}>Total Tax Liability</div>
-                <div style={{ fontWeight: 'bold', color: '#ea4335' }}>₹{summary.totalTax.toLocaleString('en-IN')}</div>
+                <div style={{ fontWeight: 'bold', color: '#ea4335' }}>₱{summary.totalTax.toLocaleString('en-PH')}</div>
               </div>
               <div>
                 <div style={{ color: '#666' }}>Short-term Gains (STCG)</div>
                 <div style={{ fontWeight: 'bold', fontSize: '11px' }}>
-                  ₹{summary.shortTermGains.toLocaleString('en-IN')} (Tax: ₹{summary.totalSTCGTax.toLocaleString('en-IN')})
+                  ₱{summary.shortTermGains.toLocaleString('en-PH')} (Tax: ₱{summary.totalSTCGTax.toLocaleString('en-PH')})
                 </div>
               </div>
               <div>
                 <div style={{ color: '#666' }}>Long-term Gains (LTCG)</div>
                 <div style={{ fontWeight: 'bold', fontSize: '11px' }}>
-                  ₹{summary.longTermGains.toLocaleString('en-IN')} (Tax: ₹{summary.totalLTCGTax.toLocaleString('en-IN')})
+                  ₱{summary.longTermGains.toLocaleString('en-PH')} (Tax: ₱{summary.totalLTCGTax.toLocaleString('en-PH')})
                 </div>
               </div>
               <div>
@@ -161,7 +161,7 @@ export default function TaxPlanner() {
               <div>
                 <div style={{ color: '#666' }}>Net Gains (After Tax)</div>
                 <div style={{ fontWeight: 'bold', color: summary.netGains > 0 ? '#34a853' : '#ea4335' }}>
-                  ₹{summary.netGains.toLocaleString('en-IN')}
+                  ₱{summary.netGains.toLocaleString('en-PH')}
                 </div>
               </div>
             </div>

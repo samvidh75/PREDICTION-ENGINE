@@ -1,31 +1,23 @@
 export const PROVIDER_URLS = {
-  INDIANAPI: {
-    QUOTE: 'https://stock.indianapi.in/stock',
-    HISTORICAL: 'https://stock.indianapi.in/historical_data',
-    FUNDAMENTALS: 'https://stock.indianapi.in/stock_fundamentals',
-  },
   YAHOO: {
     CHART: 'https://query1.finance.yahoo.com/v8/finance/chart',
     QUOTE_V7: 'https://query1.finance.yahoo.com/v7/finance/quote',
   },
-  SCREENER: {
-    BASE: 'https://www.screener.in/company',
-  },
-  UPSTOX: {
-    BASE: 'https://api.upstox.com/v2',
-    SANDBOX: 'https://sandbox-api.upstox.com/v2',
+  PSE: {
+    PORTAL: 'https://www.pse.com.ph',
+    API: 'https://phisix-api3.appspot.com',
   },
 };
 
-export const NIFTY_50_SYMBOLS = [
-  'RELIANCE', 'TCS', 'HDFCBANK', 'INFY', 'ICICIBANK',
-  'HINDUNILVR', 'ITC', 'SBIN', 'BHARTIARTL', 'KOTAKBANK',
-  'BAJFINANCE', 'LT', 'WIPRO', 'AXISBANK', 'TITAN',
-  'ASIANPAINT', 'MARUTI', 'SUNPHARMA', 'TATAMOTORS', 'NTPC',
-  'ULTRACEMCO', 'HCLTECH', 'POWERGRID', 'BAJAJFINSV', 'ONGC',
-  'ADANIPORTS', 'NESTLEIND', 'JSWSTEEL', 'TECHM', 'HDFCLIFE',
-  'SBILIFE', 'DMART', 'M&M', 'COALINDIA', 'BRITANNIA',
-  'BAJAJ-AUTO', 'EICHERMOT', 'GRASIM', 'TATASTEEL', 'DIVISLAB',
-  'DRREDDY', 'APOLLOHOSP', 'INDUSINDBK', 'HEROMOTOCO', 'CIPLA',
-  'ADANIENT', 'TRENT', 'HAL', 'BEL', 'BPCL',
+export const PSE_SYMBOLS = [
+  'SM', 'SMPH', 'AC', 'ALI', 'BDO',
+  'BPI', 'MBT', 'ICT', 'JFC', 'URC',
+  'AEV', 'MER', 'TEL', 'GLO', 'LTG',
+  'MPI', 'AGI', 'GTCAP', 'JGS', 'SECB',
+  'CNPF', 'EMI', 'WLCON', 'MONDE', 'PGOLD',
+  'RRHI', 'RLC', 'DMC', 'ACEN', 'BLOOM',
+  'AP', 'FGEN', 'MWIDE', 'ANI', 'CEB',
+  'DD', 'FLI', 'HLCM', 'IMI', 'MEG',
+  'NIKL', 'PCOR', 'PXP', 'ROCK', 'SCC',
+  'SSI', 'TFHI', 'VLL', 'CHP',
 ];

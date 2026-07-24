@@ -1,22 +1,22 @@
 // src/services/stocks/InternationalizationFramework.ts
 
-export type SupportedCurrency = 'INR' | 'USD' | 'GBP' | 'EUR';
+export type SupportedCurrency = 'PHP' | 'USD' | 'GBP' | 'EUR';
 
 export interface ExchangeConfig {
   exchangeName: string;
   currency: SupportedCurrency;
   symbolPrefix: string;
-  rateToINR: number;
+  rateToPHP: number;
 }
 
 export class InternationalizationFramework {
-  private static activeCurrency: SupportedCurrency = 'INR';
+  private static activeCurrency: SupportedCurrency = 'PHP';
 
   private static configs: Record<SupportedCurrency, ExchangeConfig> = {
-    INR: { exchangeName: 'PSE/PSE', currency: 'INR', symbolPrefix: '₹', rateToINR: 1.0 },
-    USD: { exchangeName: 'NASDAQ/NYSE', currency: 'USD', symbolPrefix: '$', rateToINR: 83.5 },
-    GBP: { exchangeName: 'LSE', currency: 'GBP', symbolPrefix: '£', rateToINR: 106.2 },
-    EUR: { exchangeName: 'Euronext', currency: 'EUR', symbolPrefix: '€', rateToINR: 90.8 },
+    PHP: { exchangeName: 'PSE', currency: 'PHP', symbolPrefix: '₱', rateToPHP: 1.0 },
+    USD: { exchangeName: 'NASDAQ/NYSE', currency: 'USD', symbolPrefix: '$', rateToPHP: 56.5 },
+    GBP: { exchangeName: 'LSE', currency: 'GBP', symbolPrefix: '£', rateToPHP: 71.0 },
+    EUR: { exchangeName: 'Euronext', currency: 'EUR', symbolPrefix: '€', rateToPHP: 61.0 },
   };
 
   public static setCurrency(curr: SupportedCurrency): void {
@@ -28,9 +28,9 @@ export class InternationalizationFramework {
     return this.configs[this.activeCurrency];
   }
 
-  public static formatPrice(priceInINR: number): string {
+  public static formatPrice(priceInPHP: number): string {
     const config = this.getActiveConfig();
-    const converted = priceInINR / config.rateToINR;
+    const converted = priceInPHP / config.rateToPHP;
     return `${config.symbolPrefix}${converted.toLocaleString('en-US', {
       maximumFractionDigits: 2,
       minimumFractionDigits: 2,

@@ -245,7 +245,7 @@ export class ScannerQueryParser {
       'bank', 'banks', 'banking', 'tech', 'technology', 'fmcg',
       'pharma', 'auto', 'insurance', 'utilities', 'sector',
       'with', 'and', 'or', 'the', 'that', 'for', 'stocks',
-      'companies', 'shares', 'india', 'nse', 'bse',
+      'companies', 'shares', 'pakistan', 'pse', 'pse',
       'improving', 'rising', 'compounders', 'leaders',
       'undervalued', 'overvalued', 'avoid', 'risk',
       'earnings', 'acceleration', 'turnaround', 'watch',

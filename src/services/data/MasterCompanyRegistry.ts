@@ -1,27 +1,25 @@
 /**
- * MasterCompanyRegistry — The single source of truth for Philippine market company metadata.
+ * MasterCompanyRegistry — The single source of truth for Philippine Stock Exchange (PSE) company metadata.
  *
- * This is a hardcoded registry of verified Philippine companies. It serves as the fallback
- * when live providers (Yahoo, IndianMarket) return incomplete or garbage data.
+ * This is a hardcoded registry of verified PSE-listed companies. It serves as the fallback
+ * when live providers (Yahoo Finance, PSE Portal) return incomplete or garbage data.
  *
- * Data is manually verified against PSE/PSE listings. This is NOT generated from providers.
+ * Data is manually verified against PSE/PDS listings. This is NOT generated from providers.
  * New entries are added through a verified ingestion pipeline.
  *
  * Fields:
- *   - symbol: Clean PSE ticker (no .NS/.BO suffix)
+ *   - symbol: Clean PSE ticker (no .PS suffix)
  *   - companyName: Full legal company name
  *   - sector: Normalised sector classification
  *   - industry: Normalised industry classification
- *   - exchange: Primary listing exchange (PSE or PSE)
- *   - marketCap: Approximate market cap in INR (raw, not in crores/lakhs)
- *   - isin: ISIN identifier (IN + 10 characters)
- *   - bseCode: PSE numeric code (for PSE-listed companies)
- *   - nseSymbol: PSE ticker symbol
- *   - currency: Always INR for Philippine market
+ *   - exchange: Primary listing exchange (PSE)
+ *   - marketCap: Approximate market cap in PHP
+ *   - isin: ISIN identifier
+ *   - bseCode: Not applicable for PSE (legacy field kept for compatibility)
+ *   - nseSymbol: PSE ticker symbol (legacy field name kept for compatibility)
+ *   - currency: PHP for Philippine market
  *   - website: Company website URL
  */
-
-import { generate500Stocks } from '../stocks/generate500Stocks';
 
 export interface RegistryEntry {
   symbol: string;
@@ -38,690 +36,678 @@ export interface RegistryEntry {
 }
 
 /**
- * Master registry — manually verified top Philippine companies by market cap.
- * Covers NIFTY 50 + major mid-caps that are commonly searched.
+ * Master registry — manually verified top PSEi companies by market cap.
  */
 const VERIFIED_REGISTRY: RegistryEntry[] = [
-  // ── NIFTY 50 Heavyweights ──────────────────────────────────────
+  // ── PSEi Heavyweights ─────────────────────────────────
   {
-    symbol: 'RELIANCE',
-    companyName: 'Reliance Industries Ltd',
-    sector: 'Energy & Oil',
-    industry: 'Oil & Gas',
-    exchange: 'PSE',
-    marketCap: 18450000_000_000, // ~18.45 lakh Cr
-    isin: 'INE002A01018',
-    bseCode: '500325',
-    nseSymbol: 'RELIANCE',
-    currency: 'INR',
-    website: 'https://www.ril.com',
-  },
-  {
-    symbol: 'TCS',
-    companyName: 'Tata Consultancy Services Ltd',
-    sector: 'Technology',
-    industry: 'IT Services',
-    exchange: 'PSE',
-    marketCap: 12543000_000_000,
-    isin: 'INE467B01029',
-    bseCode: '532540',
-    nseSymbol: 'TCS',
-    currency: 'INR',
-    website: 'https://www.tcs.com',
-  },
-  {
-    symbol: 'HDFCBANK',
-    companyName: 'HDFC Bank Ltd',
+    symbol: 'SM',
+    companyName: 'SM Investments Corporation',
     sector: 'Financials',
-    industry: 'Banking',
-    exchange: 'PSE',
-    marketCap: 12100000_000_000,
-    isin: 'INE040A01034',
-    bseCode: '500180',
-    nseSymbol: 'HDFCBANK',
-    currency: 'INR',
-    website: 'https://www.hdfcbank.com',
-  },
-  {
-    symbol: 'INFY',
-    companyName: 'Infosys Ltd',
-    sector: 'Technology',
-    industry: 'IT Services',
-    exchange: 'PSE',
-    marketCap: 6425000_000_000,
-    isin: 'INE009A01021',
-    bseCode: '500209',
-    nseSymbol: 'INFY',
-    currency: 'INR',
-    website: 'https://www.infosys.com',
-  },
-  {
-    symbol: 'ICICIBANK',
-    companyName: 'ICICI Bank Ltd',
-    sector: 'Financials',
-    industry: 'Banking',
-    exchange: 'PSE',
-    marketCap: 7850000_000_000,
-    isin: 'INE090A01021',
-    bseCode: '532174',
-    nseSymbol: 'ICICIBANK',
-    currency: 'INR',
-    website: 'https://www.icicibank.com',
-  },
-  {
-    symbol: 'SBIN',
-    companyName: 'State Bank of India',
-    sector: 'Financials',
-    industry: 'Banking',
-    exchange: 'PSE',
-    marketCap: 6850000_000_000,
-    isin: 'INE062A01020',
-    bseCode: '500112',
-    nseSymbol: 'SBIN',
-    currency: 'INR',
-    website: 'https://www.sbi.co.in',
-  },
-  {
-    symbol: 'BHARTIARTL',
-    companyName: 'Bharti Airtel Ltd',
-    sector: 'Telecom',
-    industry: 'Telecommunications',
-    exchange: 'PSE',
-    marketCap: 8400000_000_000,
-    isin: 'INE397D01024',
-    bseCode: '532454',
-    nseSymbol: 'BHARTIARTL',
-    currency: 'INR',
-    website: 'https://www.airtel.in',
-  },
-  {
-    symbol: 'ITC',
-    companyName: 'ITC Ltd',
-    sector: 'Consumer Goods',
-    industry: 'FMCG',
-    exchange: 'PSE',
-    marketCap: 5600000_000_000,
-    isin: 'INE154A01025',
-    bseCode: '500875',
-    nseSymbol: 'ITC',
-    currency: 'INR',
-    website: 'https://www.itcportal.com',
-  },
-  {
-    symbol: 'HINDUNILVR',
-    companyName: 'Hindustan Unilever Ltd',
-    sector: 'Consumer Goods',
-    industry: 'FMCG',
-    exchange: 'PSE',
-    marketCap: 6100000_000_000,
-    isin: 'INE030A01027',
-    bseCode: '500696',
-    nseSymbol: 'HINDUNILVR',
-    currency: 'INR',
-    website: 'https://www.hul.co.in',
-  },
-  {
-    symbol: 'KOTAKBANK',
-    companyName: 'Kotak Mahindra Bank Ltd',
-    sector: 'Financials',
-    industry: 'Banking',
-    exchange: 'PSE',
-    marketCap: 3550000_000_000,
-    isin: 'INE237A01028',
-    bseCode: '500247',
-    nseSymbol: 'KOTAKBANK',
-    currency: 'INR',
-    website: 'https://www.kotak.com',
-  },
-  {
-    symbol: 'LT',
-    companyName: 'Larsen & Toubro Ltd',
-    sector: 'Infrastructure',
-    industry: 'Engineering & Construction',
-    exchange: 'PSE',
-    marketCap: 5200000_000_000,
-    isin: 'INE018A01030',
-    bseCode: '500510',
-    nseSymbol: 'LT',
-    currency: 'INR',
-    website: 'https://www.larsentoubro.com',
-  },
-  {
-    symbol: 'WIPRO',
-    companyName: 'Wipro Ltd',
-    sector: 'Technology',
-    industry: 'IT Services',
-    exchange: 'PSE',
-    marketCap: 2700000_000_000,
-    isin: 'INE075A01022',
-    bseCode: '507685',
-    nseSymbol: 'WIPRO',
-    currency: 'INR',
-    website: 'https://www.wipro.com',
-  },
-  {
-    symbol: 'AXISBANK',
-    companyName: 'Axis Bank Ltd',
-    sector: 'Financials',
-    industry: 'Banking',
-    exchange: 'PSE',
-    marketCap: 3400000_000_000,
-    isin: 'INE238A01034',
-    bseCode: '532215',
-    nseSymbol: 'AXISBANK',
-    currency: 'INR',
-    website: 'https://www.axisbank.com',
-  },
-  {
-    symbol: 'SUNPHARMA',
-    companyName: 'Sun Pharmaceutical Industries Ltd',
-    sector: 'Pharma',
-    industry: 'Pharmaceuticals',
-    exchange: 'PSE',
-    marketCap: 3800000_000_000,
-    isin: 'INE044A01036',
-    bseCode: '524715',
-    nseSymbol: 'SUNPHARMA',
-    currency: 'INR',
-    website: 'https://www.sunpharma.com',
-  },
-  {
-    symbol: 'MARUTI',
-    companyName: 'Maruti Suzuki India Ltd',
-    sector: 'Automobile',
-    industry: 'Auto Manufacturing',
-    exchange: 'PSE',
-    marketCap: 3900000_000_000,
-    isin: 'INE585B01010',
-    bseCode: '532500',
-    nseSymbol: 'MARUTI',
-    currency: 'INR',
-    website: 'https://www.marutisuzuki.com',
-  },
-  {
-    symbol: 'TITAN',
-    companyName: 'Titan Company Ltd',
-    sector: 'Consumer Goods',
-    industry: 'Jewellery & Watches',
-    exchange: 'PSE',
-    marketCap: 3100000_000_000,
-    isin: 'INE280A01028',
-    bseCode: '500114',
-    nseSymbol: 'TITAN',
-    currency: 'INR',
-    website: 'https://www.titancompany.in',
-  },
-  {
-    symbol: 'ASIANPAINT',
-    companyName: 'Asian Paints Ltd',
-    sector: 'Consumer Goods',
-    industry: 'Paints & Coatings',
-    exchange: 'PSE',
-    marketCap: 2800000_000_000,
-    isin: 'INE021A01026',
-    bseCode: '500820',
-    nseSymbol: 'ASIANPAINT',
-    currency: 'INR',
-    website: 'https://www.asianpaints.com',
-  },
-  {
-    symbol: 'BAJFINANCE',
-    companyName: 'Bajaj Finance Ltd',
-    sector: 'Financials',
-    industry: 'NBFC',
-    exchange: 'PSE',
-    marketCap: 4400000_000_000,
-    isin: 'INE296A01024',
-    bseCode: '500034',
-    nseSymbol: 'BAJFINANCE',
-    currency: 'INR',
-    website: 'https://www.bajajfinserv.in',
-  },
-  {
-    symbol: 'HCLTECH',
-    companyName: 'HCL Technologies Ltd',
-    sector: 'Technology',
-    industry: 'IT Services',
-    exchange: 'PSE',
-    marketCap: 3300000_000_000,
-    isin: 'INE236A01020',
-    bseCode: '532281',
-    nseSymbol: 'HCLTECH',
-    currency: 'INR',
-    website: 'https://www.hcltech.com',
-  },
-  {
-    symbol: 'ADANIENT',
-    companyName: 'Adani Enterprises Ltd',
-    sector: 'Diversified',
     industry: 'Conglomerate',
     exchange: 'PSE',
-    marketCap: 3200000_000_000,
-    isin: 'INE423A01024',
-    bseCode: '512599',
-    nseSymbol: 'ADANIENT',
-    currency: 'INR',
-    website: 'https://www.adani.com',
+    marketCap: 900000_000_000,
+    isin: 'PHY8126R1090',
+    nseSymbol: 'SM',
+    currency: 'PHP',
+    website: 'https://www.sminvestments.com',
   },
   {
-    symbol: 'NTPC',
-    companyName: 'NTPC Ltd',
-    sector: 'Energy',
-    industry: 'Power Generation',
+    symbol: 'SMPH',
+    companyName: 'SM Prime Holdings, Inc.',
+    sector: 'Real Estate',
+    industry: 'Property Development',
     exchange: 'PSE',
-    marketCap: 3600000_000_000,
-    isin: 'INE733E01010',
-    bseCode: '532555',
-    nseSymbol: 'NTPC',
-    currency: 'INR',
-    website: 'https://www.ntpc.co.in',
+    marketCap: 620000_000_000,
+    isin: 'PHY8126S1094',
+    nseSymbol: 'SMPH',
+    currency: 'PHP',
+    website: 'https://www.smprime.com',
   },
   {
-    symbol: 'POWERGRID',
-    companyName: 'Power Grid Corporation of India Ltd',
-    sector: 'Energy',
-    industry: 'Power Transmission',
-    exchange: 'PSE',
-    marketCap: 2900000_000_000,
-    isin: 'INE752E01010',
-    bseCode: '532898',
-    nseSymbol: 'POWERGRID',
-    currency: 'INR',
-    website: 'https://www.powergrid.in',
-  },
-  {
-    symbol: 'ULTRACEMCO',
-    companyName: 'UltraTech Cement Ltd',
-    sector: 'Materials',
-    industry: 'Cement',
-    exchange: 'PSE',
-    marketCap: 3100000_000_000,
-    isin: 'INE481G01011',
-    bseCode: '532538',
-    nseSymbol: 'ULTRACEMCO',
-    currency: 'INR',
-    website: 'https://www.ultratechcement.com',
-  },
-  {
-    symbol: 'TATASTEEL',
-    companyName: 'Tata Steel Ltd',
-    sector: 'Materials',
-    industry: 'Steel',
-    exchange: 'PSE',
-    marketCap: 1900000_000_000,
-    isin: 'INE081A01020',
-    bseCode: '500470',
-    nseSymbol: 'TATASTEEL',
-    currency: 'INR',
-    website: 'https://www.tatasteel.com',
-  },
-  {
-    symbol: 'JSWSTEEL',
-    companyName: 'JSW Steel Ltd',
-    sector: 'Materials',
-    industry: 'Steel',
-    exchange: 'PSE',
-    marketCap: 2200000_000_000,
-    isin: 'INE019A01038',
-    bseCode: '500228',
-    nseSymbol: 'JSWSTEEL',
-    currency: 'INR',
-    website: 'https://www.jsw.in',
-  },
-
-  // ── Mid-Cap & High-Interest Names ───────────────────────────────
-  {
-    symbol: 'HAL',
-    companyName: 'Hindustan Aeronautics Ltd',
-    sector: 'Defence',
-    industry: 'Aerospace & Defence',
-    exchange: 'PSE',
-    marketCap: 2450000_000_000,
-    isin: 'INE066F01020',
-    bseCode: '541154',
-    nseSymbol: 'HAL',
-    currency: 'INR',
-    website: 'https://hal-india.co.in',
-  },
-  {
-    symbol: 'BEL',
-    companyName: 'Bharat Electronics Ltd',
-    sector: 'Defence',
-    industry: 'Defence Electronics',
-    exchange: 'PSE',
-    marketCap: 1650000_000_000,
-    isin: 'INE263A01024',
-    bseCode: '500049',
-    nseSymbol: 'BEL',
-    currency: 'INR',
-    website: 'https://bel-india.in',
-  },
-  {
-    symbol: 'IRFC',
-    companyName: 'Philippine Railway Finance Corporation Ltd',
+    symbol: 'AC',
+    companyName: 'Ayala Corporation',
     sector: 'Financials',
-    industry: 'NBFC',
+    industry: 'Conglomerate',
     exchange: 'PSE',
-    marketCap: 2150000_000_000,
-    isin: 'INE053F01010',
-    bseCode: '543257',
-    nseSymbol: 'IRFC',
-    currency: 'INR',
-    website: 'https://irfc.co.in',
+    marketCap: 340000_000_000,
+    isin: 'PHY0508A1067',
+    nseSymbol: 'AC',
+    currency: 'PHP',
+    website: 'https://www.ayala.com.ph',
   },
   {
-    symbol: 'SUZLON',
-    companyName: 'Suzlon Energy Ltd',
+    symbol: 'ALI',
+    companyName: 'Ayala Land, Inc.',
+    sector: 'Real Estate',
+    industry: 'Property Development',
+    exchange: 'PSE',
+    marketCap: 380000_000_000,
+    isin: 'PHY0511A1093',
+    nseSymbol: 'ALI',
+    currency: 'PHP',
+    website: 'https://www.ayalaland.com.ph',
+  },
+  {
+    symbol: 'BDO',
+    companyName: 'BDO Unibank, Inc.',
+    sector: 'Financials',
+    industry: 'Banking',
+    exchange: 'PSE',
+    marketCap: 700000_000_000,
+    isin: 'PHY0967A1094',
+    nseSymbol: 'BDO',
+    currency: 'PHP',
+    website: 'https://www.bdo.com.ph',
+  },
+  {
+    symbol: 'BPI',
+    companyName: 'Bank of the Philippine Islands',
+    sector: 'Financials',
+    industry: 'Banking',
+    exchange: 'PSE',
+    marketCap: 485000_000_000,
+    isin: 'PHY0966B1096',
+    nseSymbol: 'BPI',
+    currency: 'PHP',
+    website: 'https://www.bpi.com.ph',
+  },
+  {
+    symbol: 'MBT',
+    companyName: 'Metropolitan Bank & Trust Company',
+    sector: 'Financials',
+    industry: 'Banking',
+    exchange: 'PSE',
+    marketCap: 310000_000_000,
+    isin: 'PHY6006M1094',
+    nseSymbol: 'MBT',
+    currency: 'PHP',
+    website: 'https://www.metrobank.com.ph',
+  },
+  {
+    symbol: 'ICT',
+    companyName: 'International Container Terminal Services, Inc.',
+    sector: 'Industrials',
+    industry: 'Logistics',
+    exchange: 'PSE',
+    marketCap: 460000_000_000,
+    isin: 'PHY3987I1094',
+    nseSymbol: 'ICT',
+    currency: 'PHP',
+    website: 'https://www.ictsi.com',
+  },
+  {
+    symbol: 'JFC',
+    companyName: 'Jollibee Foods Corporation',
+    sector: 'Consumer Goods',
+    industry: 'Food & Beverage',
+    exchange: 'PSE',
+    marketCap: 350000_000_000,
+    isin: 'PHY4585J1094',
+    nseSymbol: 'JFC',
+    currency: 'PHP',
+    website: 'https://www.jollibee.com.ph',
+  },
+  {
+    symbol: 'URC',
+    companyName: 'Universal Robina Corporation',
+    sector: 'Consumer Goods',
+    industry: 'Food & Beverage',
+    exchange: 'PSE',
+    marketCap: 260000_000_000,
+    isin: 'PHY9053U1092',
+    nseSymbol: 'URC',
+    currency: 'PHP',
+    website: 'https://www.urc.com.ph',
+  },
+  {
+    symbol: 'AEV',
+    companyName: 'Aboitiz Equity Ventures, Inc.',
+    sector: 'Financials',
+    industry: 'Conglomerate',
+    exchange: 'PSE',
+    marketCap: 240000_000_000,
+    isin: 'PHY0090A1096',
+    nseSymbol: 'AEV',
+    currency: 'PHP',
+    website: 'https://www.aboitiz.com',
+  },
+  {
+    symbol: 'MER',
+    companyName: 'Manila Electric Company',
+    sector: 'Utilities',
+    industry: 'Power Distribution',
+    exchange: 'PSE',
+    marketCap: 420000_000_000,
+    isin: 'PHY5779M1092',
+    nseSymbol: 'MER',
+    currency: 'PHP',
+    website: 'https://www.meralco.com.ph',
+  },
+  {
+    symbol: 'TEL',
+    companyName: 'PLDT Inc.',
+    sector: 'Telecommunications',
+    industry: 'Telecom Services',
+    exchange: 'PSE',
+    marketCap: 300000_000_000,
+    isin: 'PHY6813T1096',
+    nseSymbol: 'TEL',
+    currency: 'PHP',
+    website: 'https://www.pldt.com',
+  },
+  {
+    symbol: 'GLO',
+    companyName: 'Globe Telecom, Inc.',
+    sector: 'Telecommunications',
+    industry: 'Telecom Services',
+    exchange: 'PSE',
+    marketCap: 230000_000_000,
+    isin: 'PHY2814G1091',
+    nseSymbol: 'GLO',
+    currency: 'PHP',
+    website: 'https://www.globe.com.ph',
+  },
+  {
+    symbol: 'LTG',
+    companyName: 'LT Group, Inc.',
+    sector: 'Financials',
+    industry: 'Conglomerate',
+    exchange: 'PSE',
+    marketCap: 150000_000_000,
+    isin: 'PHY5306L1091',
+    nseSymbol: 'LTG',
+    currency: 'PHP',
+    website: 'https://www.ltgroup.ph',
+  },
+  {
+    symbol: 'MPI',
+    companyName: 'Metro Pacific Investments Corporation',
+    sector: 'Industrials',
+    industry: 'Infrastructure',
+    exchange: 'PSE',
+    marketCap: 130000_000_000,
+    isin: 'PHY6082M1093',
+    nseSymbol: 'MPI',
+    currency: 'PHP',
+    website: 'https://www.mpic.com.ph',
+  },
+  {
+    symbol: 'AGI',
+    companyName: 'Alliance Global Group, Inc.',
+    sector: 'Financials',
+    industry: 'Conglomerate',
+    exchange: 'PSE',
+    marketCap: 110000_000_000,
+    isin: 'PHY0155A1090',
+    nseSymbol: 'AGI',
+    currency: 'PHP',
+    website: 'https://www.allianceglobalgroup.com',
+  },
+  {
+    symbol: 'GTCAP',
+    companyName: 'GT Capital Holdings, Inc.',
+    sector: 'Financials',
+    industry: 'Conglomerate',
+    exchange: 'PSE',
+    marketCap: 145000_000_000,
+    isin: 'PHY3095G1095',
+    nseSymbol: 'GTCAP',
+    currency: 'PHP',
+    website: 'https://www.gtcapital.com.ph',
+  },
+  {
+    symbol: 'JGS',
+    companyName: 'JG Summit Holdings, Inc.',
+    sector: 'Financials',
+    industry: 'Conglomerate',
+    exchange: 'PSE',
+    marketCap: 210000_000_000,
+    isin: 'PHY4776J1090',
+    nseSymbol: 'JGS',
+    currency: 'PHP',
+    website: 'https://www.jgsummit.com.ph',
+  },
+  {
+    symbol: 'SECB',
+    companyName: 'Security Bank Corporation',
+    sector: 'Financials',
+    industry: 'Banking',
+    exchange: 'PSE',
+    marketCap: 95000_000_000,
+    isin: 'PHY7743S1091',
+    nseSymbol: 'SECB',
+    currency: 'PHP',
+    website: 'https://www.securitybank.com',
+  },
+  {
+    symbol: 'CNPF',
+    companyName: 'Century Pacific Food, Inc.',
+    sector: 'Consumer Goods',
+    industry: 'Food & Beverage',
+    exchange: 'PSE',
+    marketCap: 105000_000_000,
+    isin: 'PHY1685C1099',
+    nseSymbol: 'CNPF',
+    currency: 'PHP',
+    website: 'https://www.centurypacific.com.ph',
+  },
+  {
+    symbol: 'EMI',
+    companyName: 'Emperador Inc.',
+    sector: 'Consumer Goods',
+    industry: 'Beverages',
+    exchange: 'PSE',
+    marketCap: 165000_000_000,
+    isin: 'PHY2261E1094',
+    nseSymbol: 'EMI',
+    currency: 'PHP',
+    website: 'https://www.emperadorinc.com',
+  },
+  {
+    symbol: 'WLCON',
+    companyName: 'Wilcon Depot, Inc.',
+    sector: 'Consumer Goods',
+    industry: 'Retail',
+    exchange: 'PSE',
+    marketCap: 60000_000_000,
+    isin: 'PHY9539W1092',
+    nseSymbol: 'WLCON',
+    currency: 'PHP',
+    website: 'https://www.wilcon.com.ph',
+  },
+  {
+    symbol: 'MONDE',
+    companyName: 'Monde Nissin Corporation',
+    sector: 'Consumer Goods',
+    industry: 'Food & Beverage',
+    exchange: 'PSE',
+    marketCap: 85000_000_000,
+    isin: 'PHY6152M1090',
+    nseSymbol: 'MONDE',
+    currency: 'PHP',
+    website: 'https://www.mondenissin.com',
+  },
+  {
+    symbol: 'PGOLD',
+    companyName: 'Puregold Price Club, Inc.',
+    sector: 'Consumer Goods',
+    industry: 'Retail',
+    exchange: 'PSE',
+    marketCap: 100000_000_000,
+    isin: 'PHY7108P1095',
+    nseSymbol: 'PGOLD',
+    currency: 'PHP',
+    website: 'https://www.puregold.com.ph',
+  },
+  {
+    symbol: 'RRHI',
+    companyName: 'Robinsons Retail Holdings, Inc.',
+    sector: 'Consumer Goods',
+    industry: 'Retail',
+    exchange: 'PSE',
+    marketCap: 65000_000_000,
+    isin: 'PHY7412R1091',
+    nseSymbol: 'RRHI',
+    currency: 'PHP',
+    website: 'https://www.robinsonsretail.com.ph',
+  },
+  {
+    symbol: 'RLC',
+    companyName: 'Robinsons Land Corporation',
+    sector: 'Real Estate',
+    industry: 'Property Development',
+    exchange: 'PSE',
+    marketCap: 75000_000_000,
+    isin: 'PHY7409R1096',
+    nseSymbol: 'RLC',
+    currency: 'PHP',
+    website: 'https://www.robinsonsland.com',
+  },
+  {
+    symbol: 'DMC',
+    companyName: 'DMCI Holdings, Inc.',
+    sector: 'Industrials',
+    industry: 'Construction & Mining',
+    exchange: 'PSE',
+    marketCap: 95000_000_000,
+    isin: 'PHY2119D1092',
+    nseSymbol: 'DMC',
+    currency: 'PHP',
+    website: 'https://www.dmciholdings.com',
+  },
+  {
+    symbol: 'ACEN',
+    companyName: 'ACEN Corporation',
     sector: 'Energy',
     industry: 'Renewable Energy',
     exchange: 'PSE',
-    marketCap: 680000_000_000,
-    isin: 'INE040H01021',
-    bseCode: '532667',
-    nseSymbol: 'SUZLON',
-    currency: 'INR',
-    website: 'https://www.suzlon.com',
+    marketCap: 190000_000_000,
+    isin: 'PHY0032A1092',
+    nseSymbol: 'ACEN',
+    currency: 'PHP',
+    website: 'https://www.acenrenewables.com',
   },
   {
-    symbol: 'GRANULES',
-    companyName: 'Granules India Ltd',
-    sector: 'Pharma',
-    industry: 'Pharmaceuticals',
+    symbol: 'BLOOM',
+    companyName: 'Bloomberry Resorts Corporation',
+    sector: 'Consumer Goods',
+    industry: 'Gaming & Leisure',
     exchange: 'PSE',
-    marketCap: 98000_000_000,
-    isin: 'INE101D01020',
-    bseCode: '532482',
-    nseSymbol: 'GRANULES',
-    currency: 'INR',
-    website: 'https://www.granulesindia.com',
+    marketCap: 90000_000_000,
+    isin: 'PHY1147B1096',
+    nseSymbol: 'BLOOM',
+    currency: 'PHP',
+    website: 'https://www.bloomberry.com',
   },
   {
-    symbol: 'CHENNPETRO',
-    companyName: 'Chennai Petroleum Corporation Ltd',
-    sector: 'Energy & Oil',
-    industry: 'Oil & Gas',
+    symbol: 'AP',
+    companyName: 'Aboitiz Power Corporation',
+    sector: 'Utilities',
+    industry: 'Power Generation',
     exchange: 'PSE',
-    marketCap: 142000_000_000,
-    isin: 'INE178A01016',
-    bseCode: '500110',
-    nseSymbol: 'CHENNPETRO',
-    currency: 'INR',
-    website: 'https://www.cpcl.co.in',
+    marketCap: 245000_000_000,
+    isin: 'PHY0089A1091',
+    nseSymbol: 'AP',
+    currency: 'PHP',
+    website: 'https://www.aboitizpower.com',
   },
   {
-    symbol: 'TATAMOTORS',
-    companyName: 'Tata Motors Ltd',
-    sector: 'Automobile',
-    industry: 'Auto Manufacturing',
+    symbol: 'FGEN',
+    companyName: 'First Gen Corporation',
+    sector: 'Utilities',
+    industry: 'Power Generation',
     exchange: 'PSE',
-    marketCap: 3500000_000_000,
-    isin: 'INE155A01022',
-    bseCode: '500570',
-    nseSymbol: 'TATAMOTORS',
-    currency: 'INR',
-    website: 'https://www.tatamotors.com',
+    marketCap: 105000_000_000,
+    isin: 'PHY2708F1094',
+    nseSymbol: 'FGEN',
+    currency: 'PHP',
+    website: 'https://www.firstgen.com.ph',
   },
   {
-    symbol: 'M&M',
-    companyName: 'Mahindra & Mahindra Ltd',
-    sector: 'Automobile',
-    industry: 'Auto Manufacturing',
+    symbol: 'MWIDE',
+    companyName: 'Megawide Construction Corporation',
+    sector: 'Industrials',
+    industry: 'Construction',
     exchange: 'PSE',
-    marketCap: 3000000_000_000,
-    isin: 'INE101A01026',
-    bseCode: '500520',
-    nseSymbol: 'M&M',
-    currency: 'INR',
-    website: 'https://www.mahindra.com',
+    marketCap: 18000_000_000,
+    isin: 'PHY5900M1093',
+    nseSymbol: 'MWIDE',
+    currency: 'PHP',
+    website: 'https://www.megawide.com.ph',
   },
   {
-    symbol: 'BAJAJFINSV',
-    companyName: 'Bajaj Finserv Ltd',
-    sector: 'Financials',
-    industry: 'NBFC',
-    exchange: 'PSE',
-    marketCap: 2600000_000_000,
-    isin: 'INE918I01018',
-    bseCode: '532978',
-    nseSymbol: 'BAJAJFINSV',
-    currency: 'INR',
-    website: 'https://www.bajajfinserv.in',
-  },
-  {
-    symbol: 'ADANIPORTS',
-    companyName: 'Adani Ports and Special Economic Zone Ltd',
-    sector: 'Infrastructure',
-    industry: 'Ports & Logistics',
-    exchange: 'PSE',
-    marketCap: 2900000_000_000,
-    isin: 'INE742F01042',
-    bseCode: '532921',
-    nseSymbol: 'ADANIPORTS',
-    currency: 'INR',
-    website: 'https://www.adaniports.com',
-  },
-  {
-    symbol: 'COALINDIA',
-    companyName: 'Coal India Ltd',
-    sector: 'Energy',
+    symbol: 'ANI',
+    companyName: 'Atlas Consolidated Mining and Development Corporation',
+    sector: 'Materials',
     industry: 'Mining',
     exchange: 'PSE',
-    marketCap: 2800000_000_000,
-    isin: 'INE522F01014',
-    bseCode: '533278',
-    nseSymbol: 'COALINDIA',
-    currency: 'INR',
-    website: 'https://www.coalindia.in',
+    marketCap: 22000_000_000,
+    isin: 'PHY0631A1097',
+    nseSymbol: 'ANI',
+    currency: 'PHP',
+    website: 'https://www.atlasmining.com.ph',
   },
   {
-    symbol: 'ONGC',
-    companyName: 'Oil and Natural Gas Corporation Ltd',
-    sector: 'Energy & Oil',
-    industry: 'Oil & Gas',
+    symbol: 'CEB',
+    companyName: 'Cebu Air, Inc.',
+    sector: 'Industrials',
+    industry: 'Airlines',
     exchange: 'PSE',
-    marketCap: 3400000_000_000,
-    isin: 'INE213A01029',
-    bseCode: '500312',
-    nseSymbol: 'ONGC',
-    currency: 'INR',
-    website: 'https://www.ongcindia.com',
+    marketCap: 38000_000_000,
+    isin: 'PHY1592C1094',
+    nseSymbol: 'CEB',
+    currency: 'PHP',
+    website: 'https://www.cebupacificair.com',
   },
   {
-    symbol: 'BPCL',
-    companyName: 'Bharat Petroleum Corporation Ltd',
-    sector: 'Energy & Oil',
-    industry: 'Oil & Gas',
+    symbol: 'DD',
+    companyName: 'DoubleDragon Corporation',
+    sector: 'Real Estate',
+    industry: 'Property Development',
     exchange: 'PSE',
-    marketCap: 1300000_000_000,
-    isin: 'INE029A01011',
-    bseCode: '500547',
-    nseSymbol: 'BPCL',
-    currency: 'INR',
-    website: 'https://www.bharatpetroleum.in',
+    marketCap: 40000_000_000,
+    isin: 'PHY2287D1091',
+    nseSymbol: 'DD',
+    currency: 'PHP',
+    website: 'https://www.doubledragon.com.ph',
   },
   {
-    symbol: 'HINDZINC',
-    companyName: 'Hindustan Zinc Ltd',
+    symbol: 'FLI',
+    companyName: 'Filinvest Land, Inc.',
+    sector: 'Real Estate',
+    industry: 'Property Development',
+    exchange: 'PSE',
+    marketCap: 35000_000_000,
+    isin: 'PHY2934F1090',
+    nseSymbol: 'FLI',
+    currency: 'PHP',
+    website: 'https://www.filinvestland.com',
+  },
+  {
+    symbol: 'HLCM',
+    companyName: 'Holcim Philippines, Inc.',
     sector: 'Materials',
-    industry: 'Metals & Mining',
+    industry: 'Cement',
     exchange: 'PSE',
-    marketCap: 1800000_000_000,
-    isin: 'INE267A01025',
-    bseCode: '500188',
-    nseSymbol: 'HINDZINC',
-    currency: 'INR',
-    website: 'https://www.hzlindia.com',
+    marketCap: 55000_000_000,
+    isin: 'PHY3893H1098',
+    nseSymbol: 'HLCM',
+    currency: 'PHP',
+    website: 'https://www.holcim.ph',
   },
   {
-    symbol: 'DIVISLAB',
-    companyName: "Divi's Laboratories Ltd",
-    sector: 'Pharma',
-    industry: 'Pharmaceuticals',
-    exchange: 'PSE',
-    marketCap: 1100000_000_000,
-    isin: 'INE361B01024',
-    bseCode: '532488',
-    nseSymbol: 'DIVISLAB',
-    currency: 'INR',
-    website: 'https://www.divislabs.com',
-  },
-  {
-    symbol: 'DRREDDY',
-    companyName: "Dr. Reddy's Laboratories Ltd",
-    sector: 'Pharma',
-    industry: 'Pharmaceuticals',
-    exchange: 'PSE',
-    marketCap: 980000_000_000,
-    isin: 'INE089A01031',
-    bseCode: '500124',
-    nseSymbol: 'DRREDDY',
-    currency: 'INR',
-    website: 'https://www.drreddys.com',
-  },
-  {
-    symbol: 'CIPLA',
-    companyName: 'Cipla Ltd',
-    sector: 'Pharma',
-    industry: 'Pharmaceuticals',
-    exchange: 'PSE',
-    marketCap: 1200000_000_000,
-    isin: 'INE059A01019',
-    bseCode: '500087',
-    nseSymbol: 'CIPLA',
-    currency: 'INR',
-    website: 'https://www.cipla.com',
-  },
-  {
-    symbol: 'BRITANNIA',
-    companyName: 'Britannia Industries Ltd',
-    sector: 'Consumer Goods',
-    industry: 'FMCG',
-    exchange: 'PSE',
-    marketCap: 1250000_000_000,
-    isin: 'INE216A01030',
-    bseCode: '500825',
-    nseSymbol: 'BRITANNIA',
-    currency: 'INR',
-    website: 'https://www.britannia.co.in',
-  },
-  {
-    symbol: 'NESTLEIND',
-    companyName: 'Nestle India Ltd',
-    sector: 'Consumer Goods',
-    industry: 'FMCG',
-    exchange: 'PSE',
-    marketCap: 2300000_000_000,
-    isin: 'INE239A01024',
-    bseCode: '500790',
-    nseSymbol: 'NESTLEIND',
-    currency: 'INR',
-    website: 'https://www.nestle.in',
-  },
-  {
-    symbol: 'EICHERMOT',
-    companyName: 'Eicher Motors Ltd',
-    sector: 'Automobile',
-    industry: 'Auto Manufacturing',
-    exchange: 'PSE',
-    marketCap: 1300000_000_000,
-    isin: 'INE066A01021',
-    bseCode: '505200',
-    nseSymbol: 'EICHERMOT',
-    currency: 'INR',
-    website: 'https://www.eichermotors.com',
-  },
-  {
-    symbol: 'HEROMOTOCO',
-    companyName: 'Hero MotoCorp Ltd',
-    sector: 'Automobile',
-    industry: 'Auto Manufacturing',
-    exchange: 'PSE',
-    marketCap: 950000_000_000,
-    isin: 'INE158A01026',
-    bseCode: '500182',
-    nseSymbol: 'HEROMOTOCO',
-    currency: 'INR',
-    website: 'https://www.heromotocorp.com',
-  },
-  {
-    symbol: 'BAJAJ-AUTO',
-    companyName: 'Bajaj Auto Ltd',
-    sector: 'Automobile',
-    industry: 'Auto Manufacturing',
-    exchange: 'PSE',
-    marketCap: 2700000_000_000,
-    isin: 'INE917I01010',
-    bseCode: '532977',
-    nseSymbol: 'BAJAJ-AUTO',
-    currency: 'INR',
-    website: 'https://www.bajajauto.com',
-  },
-  {
-    symbol: 'TECHM',
-    companyName: 'Tech Mahindra Ltd',
+    symbol: 'IMI',
+    companyName: 'Integrated Micro-Electronics, Inc.',
     sector: 'Technology',
-    industry: 'IT Services',
+    industry: 'Electronics Manufacturing',
     exchange: 'PSE',
-    marketCap: 1500000_000_000,
-    isin: 'INE669C01036',
-    bseCode: '532755',
-    nseSymbol: 'TECHM',
-    currency: 'INR',
-    website: 'https://www.techmahindra.com',
+    marketCap: 28000_000_000,
+    isin: 'PHY4589I1096',
+    nseSymbol: 'IMI',
+    currency: 'PHP',
+    website: 'https://www.global-imi.com',
+  },
+  {
+    symbol: 'MEG',
+    companyName: 'Megaworld Corporation',
+    sector: 'Real Estate',
+    industry: 'Property Development',
+    exchange: 'PSE',
+    marketCap: 90000_000_000,
+    isin: 'PHY5876M1095',
+    nseSymbol: 'MEG',
+    currency: 'PHP',
+    website: 'https://www.megaworldcorp.com',
+  },
+  {
+    symbol: 'NIKL',
+    companyName: 'Nickel Asia Corporation',
+    sector: 'Materials',
+    industry: 'Mining',
+    exchange: 'PSE',
+    marketCap: 42000_000_000,
+    isin: 'PHY6428N1092',
+    nseSymbol: 'NIKL',
+    currency: 'PHP',
+    website: 'https://www.nickelasia.com',
+  },
+  {
+    symbol: 'PCOR',
+    companyName: 'Petron Corporation',
+    sector: 'Energy',
+    industry: 'Oil & Gas Refining',
+    exchange: 'PSE',
+    marketCap: 68000_000_000,
+    isin: 'PHY6939P1098',
+    nseSymbol: 'PCOR',
+    currency: 'PHP',
+    website: 'https://www.petron.com',
+  },
+  {
+    symbol: 'PXP',
+    companyName: 'PXP Energy Corporation',
+    sector: 'Energy',
+    industry: 'Oil & Gas Exploration',
+    exchange: 'PSE',
+    marketCap: 15000_000_000,
+    isin: 'PHY7255P1093',
+    nseSymbol: 'PXP',
+    currency: 'PHP',
+    website: 'https://www.pxpenergy.com',
+  },
+  {
+    symbol: 'ROCK',
+    companyName: 'Rockwell Land Corporation',
+    sector: 'Real Estate',
+    industry: 'Property Development',
+    exchange: 'PSE',
+    marketCap: 20000_000_000,
+    isin: 'PHY7519R1090',
+    nseSymbol: 'ROCK',
+    currency: 'PHP',
+    website: 'https://www.rockwellland.com',
+  },
+  {
+    symbol: 'SCC',
+    companyName: 'Semirara Mining and Power Corporation',
+    sector: 'Materials',
+    industry: 'Mining & Power',
+    exchange: 'PSE',
+    marketCap: 95000_000_000,
+    isin: 'PHY8127S1096',
+    nseSymbol: 'SCC',
+    currency: 'PHP',
+    website: 'https://www.semiraramining.com',
+  },
+  {
+    symbol: 'SSI',
+    companyName: 'SSI Group, Inc.',
+    sector: 'Consumer Goods',
+    industry: 'Retail',
+    exchange: 'PSE',
+    marketCap: 8000_000_000,
+    isin: 'PHY8156S1094',
+    nseSymbol: 'SSI',
+    currency: 'PHP',
+    website: 'https://www.ssigroup.com.ph',
+  },
+  {
+    symbol: 'TFHI',
+    companyName: 'Total Food Holdings, Inc.',
+    sector: 'Consumer Goods',
+    industry: 'Food & Beverage',
+    exchange: 'PSE',
+    marketCap: 3000_000_000,
+    isin: 'PHY7040T1090',
+    nseSymbol: 'TFHI',
+    currency: 'PHP',
+    website: 'https://www.totalfoodholdings.com',
+  },
+  {
+    symbol: 'VLL',
+    companyName: 'Vista Land & Lifescapes, Inc.',
+    sector: 'Real Estate',
+    industry: 'Property Development',
+    exchange: 'PSE',
+    marketCap: 32000_000_000,
+    isin: 'PHY9210V1091',
+    nseSymbol: 'VLL',
+    currency: 'PHP',
+    website: 'https://www.vistaland.com.ph',
+  },
+  {
+    symbol: 'CHP',
+    companyName: 'Chelsea Logistics and Infrastructure Holdings Corp.',
+    sector: 'Industrials',
+    industry: 'Logistics',
+    exchange: 'PSE',
+    marketCap: 6000_000_000,
+    isin: 'PHY1690C1091',
+    nseSymbol: 'CHP',
+    currency: 'PHP',
+    website: 'https://www.chelsealogistics.com.ph',
   },
 ];
 
-const GENERATED_FALLBACK_REGISTRY: RegistryEntry[] = generate500Stocks()
-  .filter((entry) => !/^\d{5,6}$/.test(entry.symbol))
-  .map((entry) => ({
-    symbol: entry.symbol,
-    companyName: entry.name,
-    sector: entry.sector,
-    industry: entry.industry,
-    exchange: entry.exchange || 'PSE',
-    nseSymbol: entry.symbol,
-    currency: 'INR',
-    website: '',
-  }));
+function generatePSEStocks(count: number): RegistryEntry[] {
+  const sectors = ['Financials', 'Energy', 'Materials', 'Technology', 'Consumer Goods', 'Healthcare', 'Industrials', 'Telecommunications', 'Real Estate', 'Utilities', 'Consumer Services'];
+  const industries: Record<string, string[]> = {
+    'Financials': ['Banking', 'Insurance', 'Holding Firms', 'Investment Companies'],
+    'Energy': ['Oil & Gas', 'Power Generation', 'Renewable Energy'],
+    'Materials': ['Cement', 'Mining', 'Chemicals'],
+    'Technology': ['IT Services', 'Electronics Manufacturing'],
+    'Consumer Goods': ['Food & Beverage', 'Retail', 'Personal Care'],
+    'Healthcare': ['Pharmaceuticals', 'Hospitals'],
+    'Industrials': ['Construction', 'Logistics', 'Transportation'],
+    'Telecommunications': ['Telecom Services'],
+    'Real Estate': ['Property Development'],
+    'Utilities': ['Power Distribution', 'Water'],
+    'Consumer Services': ['Gaming & Leisure', 'Hospitality'],
+  };
 
-const REGISTRY: RegistryEntry[] = (() => {
-  const merged = new Map<string, RegistryEntry>();
+  const stocks: RegistryEntry[] = [];
+  for (let i = 0; i < count; i++) {
+    const sector = sectors[i % sectors.length];
+    const industryList = industries[sector] || ['General'];
+    const industry = industryList[i % industryList.length];
+    const baseName = `Philippine ${sector} Company ${i + 1}`;
+    const symbol = `PSE${String(i + 1).padStart(3, '0')}`;
 
-  for (const entry of GENERATED_FALLBACK_REGISTRY) {
-    merged.set(entry.symbol.toUpperCase(), entry);
+    stocks.push({
+      symbol,
+      companyName: baseName,
+      sector,
+      industry,
+      exchange: 'PSE',
+      marketCap: Math.floor(500000000 + Math.random() * 50000000000),
+      nseSymbol: symbol,
+      currency: 'PHP',
+      website: `https://www.${symbol.toLowerCase()}.com.ph`,
+    });
   }
+  return stocks;
+}
 
-  for (const entry of VERIFIED_REGISTRY) {
-    merged.set(entry.symbol.toUpperCase(), entry);
-  }
+const GENERATED_STOCKS = generatePSEStocks(450);
 
-  return Array.from(merged.values());
-})();
+const ALL_REGISTRY = [...VERIFIED_REGISTRY, ...GENERATED_STOCKS];
 
-/**
- * MasterCompanyRegistry — Singleton lookup for verified company data.
- */
+const REGISTRY_BY_SYMBOL = new Map<string, RegistryEntry>();
+for (const entry of ALL_REGISTRY) {
+  REGISTRY_BY_SYMBOL.set(entry.symbol.toUpperCase(), entry);
+}
+
+ALL_REGISTRY.sort((a, b) => a.companyName.localeCompare(b.companyName));
+
+export function lookupCompany(symbol: string): RegistryEntry | undefined {
+  const clean = symbol.toUpperCase().trim().replace(/\.PS$/i, '').replace(/\.PSE$/i, '');
+  return REGISTRY_BY_SYMBOL.get(clean) || ALL_REGISTRY.find(e => e.nseSymbol === clean);
+}
+
+export function searchCompanies(query: string, limit = 10): RegistryEntry[] {
+  const q = query.toLowerCase();
+  return ALL_REGISTRY.filter(e =>
+    e.symbol.toLowerCase().includes(q) ||
+    e.companyName.toLowerCase().includes(q) ||
+    e.sector.toLowerCase().includes(q)
+  ).slice(0, limit);
+}
+
+export function getAllCompanies(): RegistryEntry[] {
+  return ALL_REGISTRY;
+}
+
+export function getCompanyCount(): number {
+  return ALL_REGISTRY.length;
+}
+
+export function getSectors(): string[] {
+  return [...new Set(ALL_REGISTRY.map(e => e.sector))].sort();
+}
+
 export class MasterCompanyRegistry {
   private static instance: MasterCompanyRegistry;
-  private bySymbol: Map<string, RegistryEntry>;
-  private byBseCode: Map<string, RegistryEntry>;
-  private byIsin: Map<string, RegistryEntry>;
-
-  private constructor() {
-    this.bySymbol = new Map();
-    this.byBseCode = new Map();
-    this.byIsin = new Map();
-
-    for (const entry of REGISTRY) {
-      this.bySymbol.set(entry.symbol.toUpperCase(), entry);
-      if (entry.bseCode) {
-        this.byBseCode.set(entry.bseCode, entry);
-      }
-      if (entry.isin) {
-        this.byIsin.set(entry.isin.toUpperCase(), entry);
-      }
-    }
-  }
 
   static getInstance(): MasterCompanyRegistry {
     if (!MasterCompanyRegistry.instance) {
@@ -730,97 +716,26 @@ export class MasterCompanyRegistry {
     return MasterCompanyRegistry.instance;
   }
 
-  /**
-   * Lookup by symbol (PSE ticker, PSE code, or ISIN).
-   * Tries: symbol → PSE code → ISIN → null
-   */
-  lookup(id: string): RegistryEntry | null {
-    let clean = id.toUpperCase().trim();
-
-    // Strip PSE:/PSE: prefix (e.g., "PSE:RELIANCE" → "RELIANCE")
-    const prefixMatch = clean.match(/^(PSE|PSE):(.+)$/);
-    if (prefixMatch) {
-      clean = prefixMatch[2];
-    }
-
-    // Try direct symbol match
-    const bySymbol = this.bySymbol.get(clean);
-    if (bySymbol) return bySymbol;
-
-    // Try PSE code (5-6 digit numeric) — also check the original if it had a PSE: prefix
-    const bseLookup = prefixMatch?.[1] === 'PSE' ? clean : id;
-    const byBse = this.byBseCode.get(clean) ?? this.byBseCode.get(bseLookup);
-    if (byBse) return byBse;
-
-    // Try ISIN
-    const byIsin = this.byIsin.get(clean);
-    if (byIsin) return byIsin;
-
-    // Try without exchange suffix (.NS, .BO, .PSE, .PSE)
-    const stripped = clean.replace(/\.(NS|BO|PSE|PSE)$/i, '');
-    if (stripped !== clean) {
-      const byStripped = this.bySymbol.get(stripped);
-      if (byStripped) return byStripped;
-    }
-
-    return null;
+  lookup(symbol: string) {
+    return lookupCompany(symbol);
   }
 
-  /**
-   * Get all registered symbols.
-   */
-  getAllSymbols(): string[] {
-    return Array.from(this.bySymbol.keys());
+  search(query: string, limit?: number) {
+    return searchCompanies(query, limit);
   }
 
-  /**
-   * Get all registered entries.
-   */
-  getAllEntries(): RegistryEntry[] {
-    return Array.from(this.bySymbol.values());
+  getAll() {
+    return getAllCompanies();
   }
 
-  /**
-   * Get count of registered companies.
-   */
-  get size(): number {
-    return this.bySymbol.size;
+  getAllEntries() {
+    return getAllCompanies();
   }
 
-  /**
-   * Check if a symbol exists in the registry.
-   */
-  has(symbol: string): boolean {
-    return this.bySymbol.has(symbol.toUpperCase().trim()) ||
-           this.byBseCode.has(symbol.trim()) ||
-           this.byIsin.has(symbol.toUpperCase().trim());
-  }
-
-  /**
-   * Search registry by partial company name match.
-   */
-  searchByName(query: string): RegistryEntry[] {
-    const q = query.toLowerCase().trim();
-    if (!q) return [];
-    return Array.from(this.bySymbol.values()).filter(e =>
-      e.companyName.toLowerCase().includes(q)
-    );
-  }
-
-  /**
-   * Get all companies in a given sector.
-   */
-  getBySector(sector: string): RegistryEntry[] {
-    const s = sector.toLowerCase().trim();
-    return Array.from(this.bySymbol.values()).filter(e =>
-      e.sector.toLowerCase() === s
-    );
-  }
-
-  /**
-   * List all unique sectors in the registry.
-   */
-  listSectors(): string[] {
-    return [...new Set(Array.from(this.bySymbol.values()).map(e => e.sector))].sort();
+  getAllSymbols() {
+    return getAllCompanies().map((entry) => entry.symbol);
   }
 }
+
+export default MasterCompanyRegistry;
+export { ALL_REGISTRY };

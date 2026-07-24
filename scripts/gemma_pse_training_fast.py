@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
-Fast Gemma 2B PSE Training - CPU Optimized
+Fast Gemma 2B PSE Training - CPU Optimized with Cascading Failure Fixes
 Skips bitsandbytes, uses minimal memory footprint
+Includes resource cleanup, garbage collection, and periodic checkpointing
 """
 
 import torch
@@ -10,6 +11,7 @@ import logging
 import sys
 import time
 import os
+import gc
 from datetime import datetime
 from pathlib import Path
 
@@ -23,6 +25,17 @@ logging.basicConfig(
     ]
 )
 logger = logging.getLogger(__name__)
+
+# Resource monitoring helper
+def log_memory_usage(label=""):
+    try:
+        import psutil
+        process = psutil.Process(os.getpid())
+        rss_mb = process.memory_info().rss / 1024 / 1024
+        logger.info(f"[Memory {label}] RSS: {rss_mb:.1f} MB")
+        return rss_mb
+    except:
+        pass
 
 def main():
     logger.info("="*80)
@@ -96,11 +109,11 @@ def main():
         logger.error(f"❌ Model loading failed: {e}")
         return False
 
-    # Step 5: Setup LoRA
+    # Step 5: Setup LoRA (minimal config to prevent resource leaks)
     logger.info("\n⚙️  Configuring LoRA...")
     lora_config = LoraConfig(
-        r=8,  # Reduced from 16 for faster training
-        lora_alpha=16,
+        r=4,  # Reduced from 8 to prevent resource accumulation
+        lora_alpha=8,  # Reduced from 16
         target_modules=["q_proj", "v_proj"],
         lora_dropout=0.05,
         bias="none",
@@ -108,9 +121,10 @@ def main():
     )
 
     model = get_peft_model(model, lora_config)
+    model.gradient_checkpointing_enable()
     trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
     total_params = sum(p.numel() for p in model.parameters())
-    logger.info(f"✅ LoRA configured")
+    logger.info(f"✅ LoRA configured with gradient checkpointing")
     logger.info(f"   Trainable: {trainable_params:,} / {total_params:,} ({100*trainable_params/total_params:.1f}%)")
 
     # Step 6: Tokenize
@@ -119,7 +133,7 @@ def main():
         outputs = tokenizer(
             examples['text'],
             truncation=True,
-            max_length=512,
+            max_length=256,  # Reduced from 512 to save GPU memory
             padding='max_length',
         )
         outputs['labels'] = outputs['input_ids'].copy()
@@ -140,19 +154,25 @@ def main():
 
     training_args = TrainingArguments(
         output_dir="./gemma_pse_model",
-        num_train_epochs=1,  # Reduced from 3 for faster training
-        per_device_train_batch_size=1,  # Minimal batch size for CPU
+        num_train_epochs=1,
+        per_device_train_batch_size=1,
         gradient_accumulation_steps=4,
         warmup_steps=50,
         weight_decay=0.01,
         logging_dir='./logs',
-        logging_steps=5,
-        save_steps=50,
-        save_total_limit=2,
+        logging_steps=2,
+        save_steps=20,
+        save_total_limit=1,
         learning_rate=2e-4,
-        fp16=False,  # Use 32-bit on CPU
+        fp16=True,  # Mixed precision for GPU
         seed=42,
         report_to="none",
+        dataloader_num_workers=0,
+        dataloader_pin_memory=True,  # OK on GPU
+        remove_unused_columns=True,
+        optim="adamw_8bit",  # 8-bit optimizer to save memory
+        max_grad_norm=1.0,  # Prevent gradient explosion
+        gradient_checkpointing=True,  # Save memory during backprop
     )
 
     data_collator = DataCollatorForLanguageModeling(
@@ -160,14 +180,26 @@ def main():
         mlm=False,
     )
 
+    # Custom callback for resource cleanup
+    from transformers import TrainerCallback
+    class ResourceCleanupCallback(TrainerCallback):
+        def on_step_end(self, args, state, control, **kwargs):
+            if state.global_step % 5 == 0:
+                gc.collect()
+                torch.cuda.empty_cache() if torch.cuda.is_available() else None
+                if state.global_step % 20 == 0:
+                    log_memory_usage(f"Step {state.global_step}")
+
     trainer = Trainer(
         model=model,
         args=training_args,
         train_dataset=tokenized_dataset,
         data_collator=data_collator,
+        callbacks=[ResourceCleanupCallback()],
     )
 
     start_time = time.time()
+    log_memory_usage("Start")
     try:
         trainer.train()
         elapsed = time.time() - start_time
@@ -175,6 +207,7 @@ def main():
         logger.info("✅ TRAINING COMPLETE!")
         logger.info("="*80)
         logger.info(f"⏱️  Training time: {elapsed/3600:.2f} hours")
+        log_memory_usage("End")
 
         # Save model
         logger.info("\n💾 Saving model...")
@@ -182,11 +215,19 @@ def main():
         tokenizer.save_pretrained("./gemma_pse_model_final")
         logger.info("✅ Model saved to: ./gemma_pse_model_final")
 
+        # Cleanup resources
+        del trainer, model, tokenizer, dataset, tokenized_dataset
+        gc.collect()
+        torch.cuda.empty_cache() if torch.cuda.is_available() else None
+
         return True
     except Exception as e:
         logger.error(f"❌ Training failed: {e}")
         import traceback
         traceback.print_exc()
+        # Cleanup even on error
+        gc.collect()
+        torch.cuda.empty_cache() if torch.cuda.is_available() else None
         return False
 
 if __name__ == '__main__':

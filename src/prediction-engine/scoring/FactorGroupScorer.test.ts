@@ -535,7 +535,7 @@ describe('classifyScore', () => {
 describe('evaluateMissingData', () => {
   const sampleDefs: FeatureDefinition[] = [
     {
-      id: 'close', label: 'Close Price', family: 'price_return', unit: 'INR',
+      id: 'close', label: 'Close Price', family: 'price_return', unit: 'PKR',
       sourceTable: 'prices', sourceField: 'close', required: true,
       defaultAvailability: 0.95, nullPolicy: 'reject_group',
       transform: 'identity', directionality: 'neutral',

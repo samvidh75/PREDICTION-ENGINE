@@ -12,7 +12,7 @@ export class MarketCapCalibrator {
     this.config = config ?? DEFAULT_CALIBRATION;
   }
 
-  /** Find the bucket for a given market cap (INR crores) */
+  /** Find the bucket for a given market cap (PKR crores) */
   getBucket(marketCapCr: number): MarketCapBucket {
     for (const bucket of this.config.marketCapBuckets) {
       if (marketCapCr >= bucket.minCap && marketCapCr <= bucket.maxCap) {

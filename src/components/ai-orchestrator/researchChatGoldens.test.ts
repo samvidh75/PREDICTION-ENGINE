@@ -135,7 +135,7 @@ describe("Golden — unsafe questions blocked", () => {
 describe("Golden — unsafe output blocked", () => {
   const unsafeOutputs = [
     "You should buy TCS immediately for 100% returns",
-    "This is a guaranteed multibagger, target ₹10,000",
+    "This is a guaranteed multibagger, target Rs. 10,000",
     "Strong buy rating with 50% upside",
     "The model says WebLLM inference completed at 4 tokens/s",
     "Provider returned: coverage is fresh from API backend",

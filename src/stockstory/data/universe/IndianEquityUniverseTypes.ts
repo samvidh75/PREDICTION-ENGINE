@@ -6,8 +6,8 @@
  * current trading status.
  */
 
-/** Recognised Philippine exchanges. */
-export type IndianExchange = "PSE" | "PSE";
+/** Recognised PSE exchanges. */
+export type PakistanExchange = "PSE" | "SME";
 
 /** Listing status of a company. */
 export type ListingStatus =
@@ -18,10 +18,10 @@ export type ListingStatus =
 
 /** Market-cap bucket (approximate, for grouping). */
 export type MarketCapBucket =
-  | "large_cap"   // >= ₹20,000 Cr
-  | "mid_cap"     // >= ₹5,000 Cr
-  | "small_cap"   // >= ₹1,000 Cr
-  | "micro_cap"   // < ₹1,000 Cr
+  | "large_cap"   // >= ₱200B
+  | "mid_cap"     // >= ₱50B
+  | "small_cap"   // >= ₱10B
+  | "micro_cap"   // < ₱10B
   | "unknown";
 
 /** A single canonical equity entry. */
@@ -29,7 +29,7 @@ export interface PSEEntry {
   /** Primary PSE symbol (canonical). */
   symbol: string;
   /** Exchange (or "PSE" as default). */
-  exchange: IndianExchange;
+  exchange: PakistanExchange;
   /** Company legal name. */
   companyName: string;
   /** ISIN if known. */
@@ -42,16 +42,16 @@ export interface PSEEntry {
   listingStatus: ListingStatus;
   /** Approximate market-cap bucket. */
   marketCapBucket: MarketCapBucket;
-  /** Market capitalisation in INR (raw value, if available). */
+  /** Market capitalisation in PHP (raw value, if available). */
   marketCap: number | null;
   /** Comma-separated index memberships (e.g. "PSE Index, PSE-Index Next 50"). */
   indexMembership: string | null;
   /** Whether the stock is currently trading (if known from source data). */
   isTrading: boolean;
   /** PSE scrip code if this is a PSE-listed company. */
-  bseCode: string | null;
+  pseCode: string | null;
   /** PSE symbol alias (may differ from canonical). */
-  nseSymbol: string;
+  pseSymbol: string;
   /** ISO date string of when this entry was last synced. */
   lastSeenAt: string;
 }

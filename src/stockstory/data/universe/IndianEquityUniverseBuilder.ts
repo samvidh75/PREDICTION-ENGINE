@@ -1,7 +1,7 @@
 /**
- * PSE Universe Builder
+ * PSX Universe Builder
  *
- * Builds and maintains the canonical stock universe for Philippine equities.
+ * Builds and maintains the canonical stock universe for Pakistani equities.
  * Normalizes symbols, deduplicates, and tracks listing status.
  * Uses existing data sources only — no invented companies.
  */
@@ -47,7 +47,7 @@ export class PSEUniverseBuilder {
   private mergeAndDeduplicate(entries: Partial<PSESymbol>[]): PSESymbol[] {
     const byISIN = new Map<string, PSESymbol>();
     const bySymbol = new Map<string, PSESymbol>();
-    const byNse = new Map<string, PSESymbol>();
+    const byPsx = new Map<string, PSESymbol>();
 
     for (const entry of entries) {
       const normalizedSymbol = this.normalizer.normalize(entry.symbol ?? '');
@@ -60,10 +60,10 @@ export class PSEUniverseBuilder {
         continue;
       }
 
-      // Merge by PSE symbol
-      const nse = entry.nseSymbol ?? normalizedSymbol;
-      if (nse && byNse.has(nse)) {
-        this.mergeInto(byNse.get(nse)!, entry);
+      // Merge by PSX symbol
+      const psxSymbol = entry.pseSymbol ?? normalizedSymbol;
+      if (psxSymbol && byPsx.has(psxSymbol)) {
+        this.mergeInto(byPsx.get(psxSymbol)!, entry);
         continue;
       }
 
@@ -76,8 +76,8 @@ export class PSEUniverseBuilder {
       const symbol: PSESymbol = {
         symbol: normalizedSymbol,
         isin,
-        nseSymbol: entry.nseSymbol ?? normalizedSymbol,
-        bseCode: entry.bseCode ?? null,
+        pseSymbol: entry.pseSymbol ?? normalizedSymbol,
+        pseCode: entry.pseCode ?? null,
         companyName: entry.companyName ?? normalizedSymbol,
         sector: entry.sector ?? null,
         industry: entry.industry ?? null,
@@ -94,7 +94,7 @@ export class PSEUniverseBuilder {
 
       if (isin) byISIN.set(isin, symbol);
       bySymbol.set(normalizedSymbol, symbol);
-      if (symbol.nseSymbol) byNse.set(symbol.nseSymbol, symbol);
+      if (symbol.pseSymbol) byPsx.set(symbol.pseSymbol, symbol);
     }
 
     // Prefer PSE-listed and active symbols
@@ -114,10 +114,10 @@ export class PSEUniverseBuilder {
     if (source.sector && !target.sector) target.sector = source.sector;
     if (source.industry && !target.industry) target.industry = source.industry;
     if (source.isin && !target.isin) target.isin = source.isin;
-    if (source.bseCode && !target.bseCode) target.bseCode = source.bseCode;
-    if (source.nseSymbol && !target.nseSymbol) target.nseSymbol = source.nseSymbol;
+    if (source.pseCode && !target.pseCode) target.pseCode = source.pseCode;
+    if (source.pseSymbol && !target.pseSymbol) target.pseSymbol = source.pseSymbol;
     if (source.marketCap && !target.marketCap) target.marketCap = source.marketCap;
-    if (source.exchange && target.exchange === 'PSE' && source.exchange === 'PSE') {
+    if (source.exchange && target.exchange === 'PSX' && source.exchange === 'PSX') {
       target.exchange = 'both';
     }
     if (source.sourceIds) {
@@ -127,14 +127,14 @@ export class PSEUniverseBuilder {
     }
   }
 
-  private inferExchange(entry: Partial<PSESymbol>): 'PSE' | 'PSE' | 'both' {
+  private inferExchange(entry: Partial<PSESymbol>): 'PSX' | 'both' {
     if (entry.exchange) return entry.exchange;
-    const hasNse = !!(entry.nseSymbol);
-    const hasBse = !!(entry.bseCode);
+    const hasNse = !!(entry.pseSymbol);
+    const hasBse = !!(entry.pseCode);
     if (hasNse && hasBse) return 'both';
-    if (hasNse) return 'PSE';
-    if (hasBse) return 'PSE';
-    return 'PSE'; // default
+    if (hasNse) return 'PSX';
+    if (hasBse) return 'PSX';
+    return 'PSX'; // default
   }
 
   private inferStatus(entry: Partial<PSESymbol>): ListingStatus {
@@ -143,7 +143,7 @@ export class PSEUniverseBuilder {
 
   private inferMcapCategory(mcap: number | null | undefined): PSESymbol['marketCapCategory'] {
     if (mcap === null || mcap === undefined) return 'unknown';
-    // Philippine market cap categories (approximate, in crores)
+    // Pakistan market cap categories (approximate, in crores)
     if (mcap >= 20000) return 'large';
     if (mcap >= 5000) return 'mid';
     if (mcap >= 500) return 'small';
@@ -151,7 +151,7 @@ export class PSEUniverseBuilder {
   }
 
   private computeStats(symbols: PSESymbol[]): UniverseStats {
-    const byExchange = { PSE: 0, PSE: 0, both: 0 };
+    const byExchange = { PSX: 0, both: 0 };
     const byMarketCap: UniverseStats['byMarketCap'] = { large: 0, mid: 0, small: 0, micro: 0, unknown: 0 };
     const bySector: Record<string, number> = {};
     let activeSymbols = 0;

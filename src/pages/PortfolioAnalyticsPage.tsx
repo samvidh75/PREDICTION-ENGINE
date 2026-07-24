@@ -15,7 +15,7 @@ interface Holding {
 }
 
 function formatCurrency(n: number): string {
-  return "₹" + n.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return "₱" + n.toLocaleString("en-PH", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
 function formatPct(n: number): string {

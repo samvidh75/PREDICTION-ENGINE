@@ -37,8 +37,8 @@ export async function buildPortfolioContext(userId: string = 'default'): Promise
 
     // Generate risk analysis
     let riskAnalysis = `Portfolio Overview:\n`;
-    riskAnalysis += `- Invested: ₹${stats.totalInvested.toLocaleString('en-IN')}\n`;
-    riskAnalysis += `- Current Value: ₹${stats.currentValue.toLocaleString('en-IN')}\n`;
+    riskAnalysis += `- Invested: ₱${stats.totalInvested.toLocaleString('en-PH')}\n`;
+    riskAnalysis += `- Current Value: ₱${stats.currentValue.toLocaleString('en-PH')}\n`;
     riskAnalysis += `- Total Return: ${stats.totalReturnPercent > 0 ? '+' : ''}${stats.totalReturnPercent.toFixed(2)}%\n`;
     riskAnalysis += `- Holdings: ${stats.holdings.length} stocks\n`;
 

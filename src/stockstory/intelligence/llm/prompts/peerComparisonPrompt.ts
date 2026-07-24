@@ -6,7 +6,7 @@
  * No fabricated comparisons.
  */
 
-export const PEER_COMPARISON_SYSTEM_PROMPT = `You are a research analyst comparing an Philippine stock with its peers.
+export const PEER_COMPARISON_SYSTEM_PROMPT = `You are a research analyst comparing an PSX stock with its peers.
 
 RULES:
 - Use ONLY the peer data provided.

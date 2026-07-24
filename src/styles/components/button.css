@@ -1,92 +1,80 @@
 /* ============================================================================
-   BUTTONS — Raycast design: pure black, white CTA pill, no shadows
+   BUTTONS — Masthead editorial
+   Dark CTA on paper. Soft hairline secondaries. Fox-orange link variant.
    ============================================================================ */
 
-/* BASE BUTTON */
-button,
-.button,
-[role="button"] {
+button, .button, [role="button"] {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 0 16px;
-  height: 36px;
+  padding: 0 18px;
+  height: 38px;
   font-size: 14px;
   font-weight: 500;
   line-height: 1;
   border: none;
   border-radius: var(--radius-md);
   cursor: pointer;
-  transition: background-color var(--t-fast), color var(--t-fast), border-color var(--t-fast);
+  transition: background-color 180ms var(--ease-soft),
+              color 180ms var(--ease-soft),
+              border-color 180ms var(--ease-soft),
+              transform 180ms var(--ease-soft);
   text-decoration: none;
   white-space: nowrap;
   user-select: none;
   outline: none;
   position: relative;
   font-family: inherit;
+  letter-spacing: -0.005em;
 }
 
-button:disabled,
-.button:disabled,
-[role="button"]:disabled {
-  opacity: 0.4;
+button:disabled, .button:disabled, [role="button"]:disabled {
+  opacity: 0.45;
   cursor: not-allowed;
   pointer-events: none;
 }
 
-/* SIZE VARIANTS */
-.button-lg {
-  padding: 0 24px;
-  height: 44px;
-  font-size: 15px;
-}
+/* sizes */
+.button-lg { padding: 0 24px; height: 46px; font-size: 15px; border-radius: 8px; }
+.button-md { padding: 0 16px; height: 36px; font-size: 14px; }
+.button-sm { padding: 0 12px; height: 28px; font-size: 13px; border-radius: 5px; }
 
-.button-md {
-  padding: 0 16px;
-  height: 36px;
-  font-size: 14px;
-}
-
-.button-sm {
-  padding: 0 12px;
-  height: 28px;
-  font-size: 13px;
-}
-
-/* PRIMARY — White CTA pill (Raycast convention) */
+/* PRIMARY — deep ink pill on paper */
 .button-primary,
 button:not([class*="button-"]):not([class*="ghost"]):not([class*="danger"]):not([class*="secondary"]) {
   background-color: var(--brand);
   color: var(--text-inverse);
+  border: 1px solid var(--brand);
 }
 
 .button-primary:hover:not(:disabled),
 button:not([class*="button-"]):not([class*="ghost"]):not([class*="danger"]):not([class*="secondary"]):hover:not(:disabled) {
-  background-color: var(--brand-dark);
+  background-color: var(--brand-light);
+  border-color: var(--brand-light);
 }
 
 .button-primary:active:not(:disabled),
 button:not([class*="button-"]):not([class*="ghost"]):not([class*="danger"]):not([class*="secondary"]):active:not(:disabled) {
-  background-color: #d0d0d0;
+  background-color: var(--brand-light);
+  transform: translateY(1px);
 }
 
 .button-primary:focus-visible,
 button:not([class*="button-"]):not([class*="ghost"]):not([class*="danger"]):not([class*="secondary"]):focus-visible {
-  outline: 2px solid var(--brand);
-  outline-offset: 2px;
+  outline: none;
+  box-shadow: 0 0 0 3px var(--accent-soft);
 }
 
-/* SECONDARY — Hairline border on surface */
+/* SECONDARY — paper card with hairline */
 .button-secondary {
-  background-color: transparent;
-  color: var(--text-body);
+  background-color: var(--bg-sheet);
+  color: var(--text-primary);
   border: 1px solid var(--border);
 }
 
 .button-secondary:hover:not(:disabled) {
-  background-color: var(--bg-chip);
-  color: var(--text-primary);
+  background-color: var(--bg-card);
   border-color: var(--border-strong);
 }
 
@@ -94,14 +82,15 @@ button:not([class*="button-"]):not([class*="ghost"]):not([class*="danger"]):not(
   background-color: var(--bg-card-hover);
 }
 
-/* TERTIARY — Fill on surface-elevated */
+/* TERTIARY — quiet word-mark button */
 .button-tertiary {
-  background-color: var(--bg-card-hover);
+  background-color: transparent;
   color: var(--text-body);
+  border: 1px solid transparent;
 }
 
 .button-tertiary:hover:not(:disabled) {
-  background-color: var(--bg-chip);
+  background-color: var(--bg-card);
   color: var(--text-primary);
 }
 
@@ -109,67 +98,59 @@ button:not([class*="button-"]):not([class*="ghost"]):not([class*="danger"]):not(
 .button-danger {
   background-color: var(--red-light);
   color: var(--red);
+  border: 1px solid var(--red-light);
 }
+.button-danger:hover:not(:disabled) { background-color: rgba(155,46,31,0.22); }
 
-.button-danger:hover:not(:disabled) {
-  background-color: rgba(255,107,107,0.25);
-}
-
-/* LINK — Inline text with accent */
+/* LINK — soft underline with fox-orange hover */
 .button-link {
   background-color: transparent;
-  color: var(--brand);
+  color: var(--text-primary);
   padding: 0;
   height: auto;
   font-weight: 500;
+  border-radius: 0;
+  border-bottom: 1px solid var(--border-strong);
+}
+.button-link:hover:not(:disabled) {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
 }
 
-.button-link:hover:not(:disabled) {
-  color: var(--brand-dark);
-  text-decoration: underline;
+/* ACCENT (CTA secondary color — fox-orange) */
+.button-accent {
+  background-color: transparent;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+}
+.button-accent:hover:not(:disabled) {
+  background-color: var(--accent);
+  color: var(--text-inverse);
 }
 
 /* ICON BUTTON */
 .button-icon {
-  width: 36px;
-  height: 36px;
+  width: 38px;
+  height: 38px;
   padding: 0;
   border-radius: var(--radius-md);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  background-color: transparent;
+  color: var(--text-body);
+  border: 1px solid transparent;
 }
-
-.button-icon.button-lg {
-  width: 44px;
-  height: 44px;
+.button-icon:hover:not(:disabled) {
+  background-color: var(--bg-card);
+  color: var(--text-primary);
+  border-color: var(--border);
 }
+.button-icon.button-lg { width: 46px; height: 46px; }
+.button-icon.button-sm { width: 28px; height: 28px; }
 
-.button-icon.button-sm {
-  width: 28px;
-  height: 28px;
-}
+.button svg, .button i { width: 16px; height: 16px; display: inline-block; }
+.button-icon svg, .button-icon i { width: 18px; height: 18px; }
 
-/* ICON SPACING */
-.button svg,
-.button i {
-  width: 16px;
-  height: 16px;
-  display: inline-block;
-}
-
-.button-icon svg,
-.button-icon i {
-  width: 18px;
-  height: 18px;
-}
-
-/* LOADING STATE */
-.button.is-loading {
-  opacity: 0.7;
-  cursor: not-allowed;
-}
-
+/* LOADING */
+.button.is-loading { opacity: 0.7; cursor: not-allowed; }
 .button.is-loading::after {
   content: "";
   display: inline-block;
@@ -181,20 +162,10 @@ button:not([class*="button-"]):not([class*="ghost"]):not([class*="danger"]):not(
   animation: spin 0.6s linear infinite;
 }
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
+@keyframes spin { to { transform: rotate(360deg); } }
 
-/* FULL WIDTH */
-.button-full {
-  width: 100%;
-}
+.button-full { width: 100%; }
 
-/* RESPONSIVE */
 @media (max-width: 767px) {
-  button,
-  .button,
-  [role="button"] {
-   min-height: 44px;
-  }
+  button, .button, [role="button"] { min-height: 44px; }
 }

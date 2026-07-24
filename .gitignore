@@ -107,3 +107,4 @@ stockex_merged_model/
 *.safetensors
 *.pt
 checkpoint-*/
+._*

@@ -14,7 +14,7 @@
  *   8. Capped exponential backoff with jitter for retries
  *
  * Usage:
- *   const result = await broker.execute('indianapi', 'quote', 'RELIANCE', {
+ *   const result = await broker.execute('psxapi', 'quote', 'RELIANCE', {
  *     token: 'secret'  // ← stripped from key, not logged
  *   }, async () => {
  *     return await fetch('https://api.example.com/...');
@@ -47,7 +47,7 @@ export class ProviderRequestBroker {
   /**
    * Execute a provider request through the broker.
    *
-   * @param provider  - Provider name (e.g. 'indianapi', 'yahoo')
+   * @param provider  - Provider name (e.g. 'psxapi', 'yahoo')
    * @param operation - Operation type
    * @param symbol    - Symbol to fetch
    * @param params    - Parameters (secrets stripped before hashing)

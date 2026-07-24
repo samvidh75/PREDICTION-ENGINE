@@ -74,7 +74,7 @@ class StockMarketIntelligence {
 
   private getMarketStatus(): MarketInsight {
     return {
-      response: `📊 Market Status Update\n\n✓ Philippine market showing resilience with selective opportunities\n• PSE-Index50: Trading near all-time highs (~24,500)\n• PSE Composite: Strong momentum in auto and bank sectors\n• Market Cap: ₹420 lakh crore (strong)\n• FII Activity: Mixed (watch RBI policy)\n\n💡 Best Performing: IT, FMCG, Pharma\n⚠️ Watch Out: Metals, PSU Banking (cyclical)\n\nTop Opportunities: Value plays in mid-caps and small-caps with strong fundamentals`,
+      response: `📊 Market Status Update\n\n✓ PSX market showing resilience with selective opportunities\n• PSE-Index50: Trading near all-time highs (~24,500)\n• PSE Composite: Strong momentum in auto and bank sectors\n• Market Cap: ₱420 lakh crore (strong)\n• FII Activity: Mixed (watch RBI policy)\n\n💡 Best Performing: IT, FMCG, Pharma\n⚠️ Watch Out: Metals, PSU Banking (cyclical)\n\nTop Opportunities: Value plays in mid-caps and small-caps with strong fundamentals`,
       confidence: 0.92,
       category: 'market-info',
       suggestedFollowUp: 'Which sectors interest you? I can suggest specific stocks.'
@@ -99,7 +99,7 @@ class StockMarketIntelligence {
     const quality = metrics.roe > 20 && metrics.roce > 20 ? 'High Quality' : metrics.roe > 15 ? 'Good' : 'Monitor';
 
     return {
-      response: `📈 ${symbol} Deep Analysis\n\nValuation: ${valuation} (P/E: ${metrics.peRatio.toFixed(1)}x)\nQuality: ${quality} (ROE: ${metrics.roe.toFixed(1)}%, ROCE: ${metrics.roce.toFixed(1)}%)\n\n✅ Strengths:\n${analysis.pros.slice(0, 3).join('\n')}\n\n⚠️ Risks:\n${analysis.cons.slice(0, 3).join('\n')}\n\n🎯 Recommendation: ${analysis.recommendation}\nTarget Price: ₹${analysis.targetPrice.toFixed(2)}\nInvestment Horizon: ${analysis.investmentHorizon}`,
+      response: `📈 ${symbol} Deep Analysis\n\nValuation: ${valuation} (P/E: ${metrics.peRatio.toFixed(1)}x)\nQuality: ${quality} (ROE: ${metrics.roe.toFixed(1)}%, ROCE: ${metrics.roce.toFixed(1)}%)\n\n✅ Strengths:\n${analysis.pros.slice(0, 3).join('\n')}\n\n⚠️ Risks:\n${analysis.cons.slice(0, 3).join('\n')}\n\n🎯 Recommendation: ${analysis.recommendation}\nTarget Price: ₱${analysis.targetPrice.toFixed(2)}\nInvestment Horizon: ${analysis.investmentHorizon}`,
       confidence: 0.85,
       category: 'stock-analysis',
       suggestedFollowUp: 'How does this fit your portfolio? Want to compare with peers?'

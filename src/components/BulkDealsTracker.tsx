@@ -50,7 +50,7 @@ export function BulkDealsTracker() {
     ExportUtils.toCSV(
       ['Date', 'Symbol', 'Company', 'Type', 'Buyer', 'Seller', 'Quantity', 'Price', 'Value'],
       deals.map(d => [
-        new Date(d.tradeDate).toLocaleDateString('en-IN'),
+        new Date(d.tradeDate).toLocaleDateString('en-PH'),
         d.symbol, d.companyName, d.dealType.toUpperCase(),
         d.buyer, d.seller, d.quantity, d.price, d.value,
       ]),
@@ -59,15 +59,15 @@ export function BulkDealsTracker() {
   };
 
   const formatValue = (v: number) => {
-    if (v >= 10000000) return '\u20B9' + (v / 10000000).toFixed(1) + 'Cr';
-    if (v >= 100000) return '\u20B9' + (v / 100000).toFixed(1) + 'L';
-    return '\u20B9' + v.toLocaleString('en-IN');
+    if (v >= 1_000_000_000) return '₱' + (v / 1_000_000_000).toFixed(1) + 'B';
+    if (v >= 1_000_000) return '₱' + (v / 1_000_000).toFixed(1) + 'M';
+    return '₱' + v.toLocaleString('en-PH');
   };
 
   const formatQuantity = (q: number) => {
-    if (q >= 10000000) return (q / 10000000).toFixed(1) + 'Cr';
-    if (q >= 100000) return (q / 100000).toFixed(1) + 'L';
-    return q.toLocaleString('en-IN');
+    if (q >= 1_000_000_000) return (q / 1_000_000_000).toFixed(1) + 'B';
+    if (q >= 1_000_000) return (q / 1_000_000).toFixed(1) + 'M';
+    return q.toLocaleString('en-PH');
   };
 
   const totalValue = deals.reduce((s, d) => s + d.value, 0);
@@ -147,7 +147,7 @@ export function BulkDealsTracker() {
             ) : deals.map(deal => (
               <tr key={deal.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
                 <td style={{ padding: '10px 8px', color: '#a0a0a0', whiteSpace: 'nowrap' }}>
-                  {new Date(deal.tradeDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
+                  {new Date(deal.tradeDate).toLocaleDateString('en-PH', { day: 'numeric', month: 'short' })}
                 </td>
                 <td style={{ padding: '10px 8px', fontWeight: 600, color: '#fff' }}>{deal.symbol}</td>
                 <td style={{ padding: '10px 8px' }}>
@@ -163,7 +163,7 @@ export function BulkDealsTracker() {
                 <td style={{ padding: '10px 8px', color: '#22c55e', fontSize: '12px' }}>{deal.buyer}</td>
                 <td style={{ padding: '10px 8px', color: '#ef4444', fontSize: '12px' }}>{deal.seller}</td>
                 <td style={{ padding: '10px 8px', textAlign: 'right', color: '#fff' }}>{formatQuantity(deal.quantity)}</td>
-                <td style={{ padding: '10px 8px', textAlign: 'right', color: '#fff' }}>{'\u20B9'}{deal.price.toFixed(1)}</td>
+                <td style={{ padding: '10px 8px', textAlign: 'right', color: '#fff' }}>{'₱'}{deal.price.toFixed(1)}</td>
                 <td style={{ padding: '10px 8px', textAlign: 'right', color: '#f59e0b', fontWeight: 600 }}>{formatValue(deal.value)}</td>
               </tr>
             ))}
@@ -173,7 +173,7 @@ export function BulkDealsTracker() {
 
       <div style={{ marginTop: '20px', padding: '12px', background: 'rgba(255,255,255,0.03)', borderRadius: '8px', fontSize: '12px', color: '#a0a0a0' }}>
         <p style={{ margin: 0 }}>
-          <strong>About Block &amp; Bulk Deals:</strong> A block deal involves minimum {'\u20B9'}10 Cr or 5 lakh shares traded in a single transaction. Bulk deals are disclosed by exchanges when {'>'}0.5% of equity changes hands.
+          <strong>About Block &amp; Bulk Deals:</strong> A block sale involves a minimum of {'₱'}10M or 100,000 shares traded in a single transaction. Bulk deals are disclosed by the exchange when {'>'}0.5% of equity changes hands.
         </p>
       </div>
     </div>

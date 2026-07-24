@@ -34,7 +34,7 @@ const IMPACT_COLORS: Record<string, string> = {
 function formatDate(dateStr: string): string {
   try {
     const d = new Date(dateStr);
-    return d.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
+    return d.toLocaleDateString("en-PH", { day: "numeric", month: "short", year: "numeric" });
   } catch {
     return dateStr.slice(0, 10);
   }
@@ -187,9 +187,9 @@ export function EvidenceSummaryPanel({ pack, aggregate, title }: EvidenceSummary
             <EvidenceCategory
               kind="result_event"
               items={aggregate.resultEvents.items.map((i) => ({
-                label: `${i.period}: Rev ₹${(i.revenue ?? 0) / 1e7}Cr${i.revenueGrowthYoy != null ? ` (${i.revenueGrowthYoy >= 0 ? "+" : ""}${(i.revenueGrowthYoy * 100).toFixed(1)}%)` : ""}`,
+                label: `${i.period}: Rev ₱${((i.revenue ?? 0) / 1e6).toFixed(1)}M${i.revenueGrowthYoy != null ? ` (${i.revenueGrowthYoy >= 0 ? "+" : ""}${(i.revenueGrowthYoy * 100).toFixed(1)}%)` : ""}`,
                 date: i.filingDate,
-                detail: i.netProfit != null ? `Net Profit ₹${(i.netProfit ?? 0) / 1e7}Cr${i.profitGrowthYoy != null ? ` (${i.profitGrowthYoy >= 0 ? "+" : ""}${(i.profitGrowthYoy * 100).toFixed(1)}%)` : ""}` : undefined,
+                detail: i.netProfit != null ? `Net Profit ₱${((i.netProfit ?? 0) / 1e6).toFixed(1)}M${i.profitGrowthYoy != null ? ` (${i.profitGrowthYoy >= 0 ? "+" : ""}${(i.profitGrowthYoy * 100).toFixed(1)}%)` : ""}` : undefined,
               }))}
               defaultOpen={allOpen}
             />
@@ -204,7 +204,7 @@ export function EvidenceSummaryPanel({ pack, aggregate, title }: EvidenceSummary
         </div>
 
         <div style={{ fontSize: "11px", color: colors.textTertiary }}>
-          Data retrieved at {new Date(aggregate.retrievedAt).toLocaleTimeString("en-IN")}
+          Data retrieved at {new Date(aggregate.retrievedAt).toLocaleTimeString("en-PH")}
         </div>
       </Panel>
     );
@@ -253,7 +253,7 @@ export function EvidenceSummaryPanel({ pack, aggregate, title }: EvidenceSummary
       </div>
 
       <div style={{ fontSize: "11px", color: colors.textTertiary }}>
-        Retrieved at {new Date(pack.retrievedAt).toLocaleTimeString("en-IN")}
+        Retrieved at {new Date(pack.retrievedAt).toLocaleTimeString("en-PH")}
       </div>
     </Panel>
   );

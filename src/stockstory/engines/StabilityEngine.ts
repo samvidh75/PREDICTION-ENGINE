@@ -126,7 +126,7 @@ export class StabilityEngine {
     let marketCapSizeScore = 50;
     const marketCap = isFiniteNumber(financials.marketCap);
     if (marketCap !== null && marketCap > 0) {
-      const mcapCr = marketCap; // in crores (INR)
+      const mcapCr = marketCap; // in crores (PKR)
       const logMcap = Math.log10(mcapCr);
       // Continuous log10 scaling: ~10 Cr (log10≈1) → 5, 1L Cr (log10=5) → 81, ~1M Cr (log10=6) → 100
       marketCapSizeScore = clampScore((logMcap - 1) / 5 * 95 + 5);

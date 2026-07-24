@@ -86,7 +86,7 @@ export default function WatchlistWebSocket({
                 {tick.ticker}
               </span>
               <span className="text-slate-200 tabular-nums">
-                ₹{tick.price.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                ₱{tick.price.toLocaleString("en-PH", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </span>
               <span
                 className={`w-16 text-right tabular-nums ${

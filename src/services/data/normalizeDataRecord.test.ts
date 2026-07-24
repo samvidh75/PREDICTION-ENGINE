@@ -13,7 +13,7 @@ const ISO_PATTERN = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
 
 describe("data record normalization", () => {
   it("normalizes exchange-style symbols and rejects malformed symbols", () => {
-    expect(normalizeAdapterSymbol(" nse:reliance.ns ")).toBe("RELIANCE");
+    expect(normalizeAdapterSymbol(" pse:bdo.ps ")).toBe("BDO");
     expect(normalizeAdapterSymbol("bad symbol")).toBeNull();
   });
 

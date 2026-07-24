@@ -2,8 +2,8 @@
 // from all providers and feeds UnifiedPredictionEngine.
 //
 // DEPLOYMENT NOTE — required env vars:
-//   Server-side (Render/Fastify): INDIANAPI_KEY env var
-//   Render/Fastify: INDIANAPI_KEY, UPSTOX_ACCESS_TOKEN
+//   Server-side (Render/Fastify): PSXAPI_KEY env var
+//   Render/Fastify: PSXAPI_KEY, UPSTOX_ACCESS_TOKEN
 // Historical price data is fetched via /api/historical/:symbol (backend proxy)
 // to avoid browser CORS blocks on direct Yahoo Finance requests.
 
@@ -26,10 +26,10 @@ export interface PipelineResult {
     volume: number | null;
     weekHigh52: number | null;
     weekLow52: number | null;
-    exchange: 'PSE' | 'PSE' | null;
+    exchange: 'PSE' | null;
     marketCap: number | null;
     lastTradeTime: string | null;
-    source: 'indianapi' | 'yahoo' | null;
+    source: 'psxapi' | 'yahoo' | null;
   };
   fundamentals: {
     peRatio: number | null;
@@ -53,7 +53,7 @@ export interface PipelineResult {
     interestCoverage: number | null;
     beta: number | null;
     bookValue: number | null;
-    fundamentalSource: 'screener' | 'indianapi' | 'upstox' | 'partial' | null;
+    fundamentalSource: 'screener' | 'psxapi' | 'upstox' | 'partial' | null;
     fundamentalFreshnessDays: number | null;
   };
   technicals: TechnicalSnapshot;
@@ -95,7 +95,7 @@ function finiteOrNull(v: unknown): number | null {
   return Number.isFinite(n) ? n : null;
 }
 
-function normalizeExchange(ex: string | undefined): 'PSE' | 'PSE' | null {
+function normalizeExchange(ex: string | undefined): 'PSE' | null {
   if (!ex) return null;
   const u = ex.toUpperCase();
   if (u.includes('PSE') || u.includes('NATIONAL')) return 'PSE';
@@ -154,7 +154,7 @@ export async function runCompanyDataPipeline(symbol: string): Promise<PipelineRe
   ]);
 
   // ── Price layer ─────────────────────────────────────────────────────────────
-  let priceSource: 'indianapi' | 'yahoo' | null = null;
+  let priceSource: 'psxapi' | 'yahoo' | null = null;
   let priceCurrent: number | null = null;
   let priceChange: number | null = null;
   let priceChangeAbs: number | null = null;
@@ -164,7 +164,7 @@ export async function runCompanyDataPipeline(symbol: string): Promise<PipelineRe
   let priceVolume: number | null = null;
   let weekHigh52: number | null = null;
   let weekLow52: number | null = null;
-  let exchange: 'PSE' | 'PSE' | null = null;
+  let exchange: 'PSE' | null = null;
   let marketCap: number | null = null;
   let lastTradeTime: string | null = null;
 
@@ -176,7 +176,7 @@ export async function runCompanyDataPipeline(symbol: string): Promise<PipelineRe
     priceVolume = finiteOrNull(q.volume ?? null);
     exchange = normalizeExchange(q.exchange);
     lastTradeTime = q.updatedAt ?? q.retrievedAt ?? null;
-    priceSource = 'indianapi';
+    priceSource = 'psxapi';
   } else {
     pipelineErrors.push(`Price fetch failed: ${(quoteSettled as PromiseRejectedResult).reason?.message ?? 'unknown'}`);
   }
@@ -268,14 +268,14 @@ export async function runCompanyDataPipeline(symbol: string): Promise<PipelineRe
   const fcfYield = rawFcfYield;
 
   // Determine fundamental source
-  let fundamentalSource: 'screener' | 'indianapi' | 'upstox' | 'partial' | null = null;
+  let fundamentalSource: 'screener' | 'psxapi' | 'upstox' | 'partial' | null = null;
   const hasSomeFinancials = peRatio !== null || roe !== null || revenueGrowth !== null;
   if (hasSomeFinancials) {
     const hasScreenerFields = roe !== null || debtToEquity !== null || revenueGrowth !== null;
     const hasValuationFields = peRatio !== null || pbRatio !== null;
     if (hasScreenerFields && hasValuationFields) fundamentalSource = 'partial';
     else if (hasScreenerFields) fundamentalSource = 'screener';
-    else if (hasValuationFields) fundamentalSource = 'indianapi';
+    else if (hasValuationFields) fundamentalSource = 'psxapi';
   }
 
   // ── Technicals layer ────────────────────────────────────────────────────────

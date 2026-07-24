@@ -9,7 +9,7 @@ export interface StockMatch {
   similarity: number;
 }
 
-// Philippine stocks - PSE, PSE, and SME listed companies
+// PSX stocks - PSE, PSE, and SME listed companies
 export const STOCK_DATABASE: StockMatch[] = [
   // Large Cap (PSE)
   { symbol: 'TCS', name: 'Tata Consultancy Services', similarity: 1 },

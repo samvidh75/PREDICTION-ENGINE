@@ -135,7 +135,7 @@ export class RazorpayPaymentProvider implements PaymentProvider {
   async createCheckout(req: CreateCheckoutRequest): Promise<CheckoutSession> {
     const plan = getPlan(req.planId);
     if (!plan) throw new Error(`Plan "${req.planId}" not found`);
-    if (plan.priceInr === 0) throw new Error("Cannot create checkout for free plan");
+    if (plan.pricePkr === 0) throw new Error("Cannot create checkout for free plan");
 
     const client = getRazorpayClient();
 
@@ -172,15 +172,15 @@ export class RazorpayPaymentProvider implements PaymentProvider {
   async createOrder(req: CreateCheckoutRequest): Promise<CheckoutSession> {
     const plan = getPlan(req.planId);
     if (!plan) throw new Error(`Plan "${req.planId}" not found`);
-    if (plan.priceInr === 0) throw new Error("Cannot create order for free plan");
+    if (plan.pricePkr === 0) throw new Error("Cannot create order for free plan");
 
     const client = getRazorpayClient();
-    const amountInPaise = plan.priceInr * 100;
+    const amountInPaise = plan.pricePkr * 100;
     const receipt = `eq_${req.userId.slice(0, 12)}_${Date.now()}`;
 
     const order = await client.orders.create({
       amount: amountInPaise,
-      currency: "INR",
+      currency: "PKR",
       receipt,
       notes: {
         userId: req.userId,
@@ -249,7 +249,7 @@ export class RazorpayPaymentProvider implements PaymentProvider {
 
     const client = getRazorpayClient();
 
-    const amountInPaise = plan.priceInr * 100;
+    const amountInPaise = plan.pricePkr * 100;
 
     const razorpayPlan = await client.plans.create({
       period: "monthly" as const,
@@ -257,7 +257,7 @@ export class RazorpayPaymentProvider implements PaymentProvider {
       item: {
         name: `StockEX - ${plan.name}`,
         amount: amountInPaise,
-        currency: "INR",
+        currency: "PKR",
         description: `${plan.name} — ${plan.highlights.slice(0, 2).join(", ")}`,
       },
       notes: {

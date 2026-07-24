@@ -72,8 +72,8 @@ export class SmartQueryParser {
     }
 
     const mcapPatterns = [
-      /market\s*cap\s*(?:over|greater than|>|above)\s*(?:₹\s*)?(\d+(?:\.\d+)?)\s*([lct])?/i,
-      /m\.?cap\s*(?:over|greater than|>)\s*₹\s*(\d+(?:\.\d+)?)\s*([lct])?/i,
+      /market\s*cap\s*(?:over|greater than|>|above)\s*(?:₱\s*)?(\d+(?:\.\d+)?)\s*([lct])?/i,
+      /m\.?cap\s*(?:over|greater than|>)\s*₱\s*(\d+(?:\.\d+)?)\s*([lct])?/i,
     ];
 
     for (const pattern of mcapPatterns) {

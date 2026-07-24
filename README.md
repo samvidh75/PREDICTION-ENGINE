@@ -1,118 +1,207 @@
-# Equity Lens — 100% Free AI Platform
-
-## Cost Breakdown
-
-| Component | Cost | Notes |
-|-----------|------|-------|
-| Frontend | Rs 0 | Vercel free tier |
-| Database | Rs 0 | Supabase 500MB free |
-| AI (Browser) | Rs 0 | Transformers.js, open-source |
-| AI (Fallback) | Rs 0 | Groq free tier |
-| Monitoring | Rs 0 | Client-side only |
-
-**Total: Rs 0/month**
-
-## Architecture
-
-```
-User Browser
-  Regex Parser (instant, offline)
-  Transformers.js (browser AI, offline)
-  Groq API (fallback only)
-Database (Supabase, Rs 0)
-CDN (Vercel, Rs 0)
-```
-
-## Performance
-
-- Regex queries: < 50ms (80% of traffic)
-- Browser AI: 50-500ms (15% of traffic)
-- API fallback: 500-2000ms (5% of traffic)
-
+---
+base_model: google/gemma-2b-it
+library_name: peft
+pipeline_tag: text-generation
+tags:
+- base_model:adapter:google/gemma-2b-it
+- lora
+- transformers
 ---
 
-A cinematic financial intelligence operating system focused on market storytelling, educational analytics, probabilistic intelligence systems, and institutional-grade UX.
+# Model Card for Model ID
 
-## Platform Direction
+<!-- Provide a quick summary of what the model is/does. -->
 
-Equity Lens is evolving from a prototype-stage financial dashboard into a scalable market intelligence ecosystem.
 
-## Refactor Goals
 
-- modular feature architecture
-- scalable services layer
-- reusable telemetry systems
-- performance optimisation
-- cleaner information hierarchy
-- calmer institutional UX
-- responsive layouts
-- Healthometer architecture
-- storytelling-driven analytics
+## Model Details
 
-## Planned Architecture
+### Model Description
 
-```txt
-src/
-  app/
-  features/
-  systems/
-  services/
-  telemetry/
-  intelligence/
-  storytelling/
-  shared/
-```
+<!-- Provide a longer summary of what this model is. -->
 
-## F5 Unified Prediction Engine
 
-The F5 unified prediction engine consolidates all scoring into a single authoritative engine (`UnifiedPredictionEngine`), replacing the previous three-path system.
 
-### Key Files
+- **Developed by:** [More Information Needed]
+- **Funded by [optional]:** [More Information Needed]
+- **Shared by [optional]:** [More Information Needed]
+- **Model type:** [More Information Needed]
+- **Language(s) (NLP):** [More Information Needed]
+- **License:** [More Information Needed]
+- **Finetuned from model [optional]:** [More Information Needed]
 
-| File | Purpose |
-|---|---|
-| `src/prediction-engine/UnifiedPredictionEngine.ts` | Authoritative scoring engine |
-| `src/prediction-engine/types.ts` | Type definitions for input/output |
-| `src/prediction-engine/scoring/FactorGroupScorer.ts` | Per-group breakpoint-based scoring |
-| `src/prediction-engine/scoring/CompositeScorer.ts` | Weighted composite + risk dampening |
-| `src/prediction-engine/scoring/ConfidenceScorer.ts` | Confidence formula (completeness/freshness/provider) |
-| `src/prediction-engine/scoring/ClassificationScorer.ts` | Classification thresholds |
-| `src/prediction-engine/scoring/MissingDataPolicy.ts` | Null/fabrication policy enforcement |
-| `src/prediction-engine/features/FeatureRegistry.ts` | 117-feature catalog with metadata |
-| `src/prediction-engine/adapters/ScoreSnapshotAdapter.ts` | Adapter for scoreEngine.ts bridge |
-| `src/prediction-engine/adapters/PredictionFactoryAdapter.ts` | Adapter for PredictionFactory bridge |
-| `scripts/shadow-compare-unified-engine.ts` | Shadow mode comparison script |
-| `scripts/audit-unified-feature-coverage.ts` | Feature coverage audit script |
+### Model Sources [optional]
 
-### Feature Flags
+<!-- Provide the basic links for the model. -->
 
-| Flag | Default | Description |
-|---|---|---|
-| `UNIFIED_PREDICTION_ENGINE_ENABLED` | `false` | Master switch for unified engine as authoritative scorer |
-| `UNIFIED_PREDICTION_ENGINE_SHADOW_MODE` | `false` | Enable shadow comparison mode (no writes) |
-| `F5_SCORE_SNAPSHOT_DELEGATE` | `false` | Delegate `scoreSnapshot()` to unified engine |
-| `F5_PREDICTION_FACTORY_DELEGATE` | `false` | Delegate `PredictionFactory` to unified engine |
-| `CONFIRM_UNIFIED_ENGINE_APPLY` | `false` | Confirmation gate for apply mode |
-| `UNIFIED_ENGINE_MODEL_VERSION` | `unified-v1.0.0` | Model version identifier |
+- **Repository:** [More Information Needed]
+- **Paper [optional]:** [More Information Needed]
+- **Demo [optional]:** [More Information Needed]
 
-### How to Enable
+## Uses
 
-1. **Shadow mode** (compare old vs new without affecting output):
-   ```bash
-   export UNIFIED_PREDICTION_ENGINE_SHADOW_MODE=true
-   npx tsx scripts/shadow-compare-unified-engine.ts --symbols RELIANCE,TCS,INFY
-   ```
+<!-- Address questions around how the model is intended to be used, including the foreseeable users of the model and those affected by the model. -->
 
-2. **Active delegation** (use unified engine as scorer):
-   ```bash
-   export UNIFIED_PREDICTION_ENGINE_ENABLED=true
-   export F5_SCORE_SNAPSHOT_DELEGATE=true     # for scoreSnapshot path
-   export F5_PREDICTION_FACTORY_DELEGATE=true  # for PredictionFactory path
-   ```
+### Direct Use
 
-3. **Run audit**:
-   ```bash
-   npx tsx scripts/audit-unified-feature-coverage.ts
-   ```
+<!-- This section is for the model use without fine-tuning or plugging into a larger ecosystem/app. -->
 
-See `reports/f5-unified-prediction-engine/` for detailed analysis, migration plan, shadow mode comparison, feature coverage, test evidence, and the final verdict.
+[More Information Needed]
+
+### Downstream Use [optional]
+
+<!-- This section is for the model use when fine-tuned for a task, or when plugged into a larger ecosystem/app -->
+
+[More Information Needed]
+
+### Out-of-Scope Use
+
+<!-- This section addresses misuse, malicious use, and uses that the model will not work well for. -->
+
+[More Information Needed]
+
+## Bias, Risks, and Limitations
+
+<!-- This section is meant to convey both technical and sociotechnical limitations. -->
+
+[More Information Needed]
+
+### Recommendations
+
+<!-- This section is meant to convey recommendations with respect to the bias, risk, and technical limitations. -->
+
+Users (both direct and downstream) should be made aware of the risks, biases and limitations of the model. More information needed for further recommendations.
+
+## How to Get Started with the Model
+
+Use the code below to get started with the model.
+
+[More Information Needed]
+
+## Training Details
+
+### Training Data
+
+<!-- This should link to a Dataset Card, perhaps with a short stub of information on what the training data is all about as well as documentation related to data pre-processing or additional filtering. -->
+
+[More Information Needed]
+
+### Training Procedure
+
+<!-- This relates heavily to the Technical Specifications. Content here should link to that section when it is relevant to the training procedure. -->
+
+#### Preprocessing [optional]
+
+[More Information Needed]
+
+
+#### Training Hyperparameters
+
+- **Training regime:** [More Information Needed] <!--fp32, fp16 mixed precision, bf16 mixed precision, bf16 non-mixed precision, fp16 non-mixed precision, fp8 mixed precision -->
+
+#### Speeds, Sizes, Times [optional]
+
+<!-- This section provides information about throughput, start/end time, checkpoint size if relevant, etc. -->
+
+[More Information Needed]
+
+## Evaluation
+
+<!-- This section describes the evaluation protocols and provides the results. -->
+
+### Testing Data, Factors & Metrics
+
+#### Testing Data
+
+<!-- This should link to a Dataset Card if possible. -->
+
+[More Information Needed]
+
+#### Factors
+
+<!-- These are the things the evaluation is disaggregating by, e.g., subpopulations or domains. -->
+
+[More Information Needed]
+
+#### Metrics
+
+<!-- These are the evaluation metrics being used, ideally with a description of why. -->
+
+[More Information Needed]
+
+### Results
+
+[More Information Needed]
+
+#### Summary
+
+
+
+## Model Examination [optional]
+
+<!-- Relevant interpretability work for the model goes here -->
+
+[More Information Needed]
+
+## Environmental Impact
+
+<!-- Total emissions (in grams of CO2eq) and additional considerations, such as electricity usage, go here. Edit the suggested text below accordingly -->
+
+Carbon emissions can be estimated using the [Machine Learning Impact calculator](https://mlco2.github.io/impact#compute) presented in [Lacoste et al. (2019)](https://arxiv.org/abs/1910.09700).
+
+- **Hardware Type:** [More Information Needed]
+- **Hours used:** [More Information Needed]
+- **Cloud Provider:** [More Information Needed]
+- **Compute Region:** [More Information Needed]
+- **Carbon Emitted:** [More Information Needed]
+
+## Technical Specifications [optional]
+
+### Model Architecture and Objective
+
+[More Information Needed]
+
+### Compute Infrastructure
+
+[More Information Needed]
+
+#### Hardware
+
+[More Information Needed]
+
+#### Software
+
+[More Information Needed]
+
+## Citation [optional]
+
+<!-- If there is a paper or blog post introducing the model, the APA and Bibtex information for that should go in this section. -->
+
+**BibTeX:**
+
+[More Information Needed]
+
+**APA:**
+
+[More Information Needed]
+
+## Glossary [optional]
+
+<!-- If relevant, include terms and calculations in this section that can help readers understand the model or model card. -->
+
+[More Information Needed]
+
+## More Information [optional]
+
+[More Information Needed]
+
+## Model Card Authors [optional]
+
+[More Information Needed]
+
+## Model Card Contact
+
+[More Information Needed]
+### Framework versions
+
+- PEFT 0.19.1

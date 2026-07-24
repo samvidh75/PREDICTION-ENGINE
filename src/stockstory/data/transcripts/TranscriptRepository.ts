@@ -2,7 +2,7 @@
  * Transcript Repository
  *
  * Manages conference call transcripts, Q&A extraction,
- * and topic/sentiment analysis for Philippine equities.
+ * and topic/sentiment analysis for PSX equities.
  */
 
 import type {

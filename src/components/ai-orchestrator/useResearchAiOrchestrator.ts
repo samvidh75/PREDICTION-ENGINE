@@ -226,8 +226,8 @@ export function buildNarrativeBullets(items: string[]): string {
 /* ── Helpers for deterministic reply ─────────────────────── */
 
 function formatPrice(price: number): string {
-  if (price === 0) return '₹0.00';
-  return `₹${price.toLocaleString('en-IN', {
+  if (price === 0) return '₱0.00';
+  return `₱${price.toLocaleString('en-PH', {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   })}`;

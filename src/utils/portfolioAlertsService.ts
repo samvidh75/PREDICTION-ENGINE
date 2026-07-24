@@ -65,7 +65,7 @@ class PortfolioAlertsService {
           type: 'price_target',
           ticker: holding.ticker,
           title: `${holding.ticker} moved ${direction} ${Math.abs(changePercent).toFixed(1)}%`,
-          message: `${holding.ticker} is now at ₹${holding.currentPrice.toFixed(2)} from buy price ₹${holding.buyPrice}`,
+          message: `${holding.ticker} is now at ₱${holding.currentPrice.toFixed(2)} from buy price ₱${holding.buyPrice}`,
           severity,
           timestamp: Date.now(),
           actionable: true,

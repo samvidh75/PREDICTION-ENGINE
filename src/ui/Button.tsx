@@ -85,6 +85,7 @@ export function Button({
   return (
     <button
       {...props}
+      className="stockex-glass-btn"
       style={{
         minHeight: sizeStyles.minHeight,
         minWidth: size === "sm" ? "36px" : "44px",
@@ -100,11 +101,12 @@ export function Button({
         justifyContent: "center",
         gap: "8px",
         cursor: "pointer",
-        transition: `background ${animation.fast}, border-color ${animation.fast}, color ${animation.fast}, box-shadow ${animation.fast}, transform ${animation.fast}`,
+        transition: `background ${animation.fast}, border-color ${animation.fast}, color ${animation.fast}, box-shadow ${animation.fast}, transform 320ms cubic-bezier(0.34, 1.56, 0.64, 1)`,
         userSelect: "none",
         WebkitFontSmoothing: "antialiased",
-        backdropFilter: "blur(18px)",
-        WebkitBackdropFilter: "blur(18px)",
+        backdropFilter: "blur(20px) saturate(160%)",
+        WebkitBackdropFilter: "blur(20px) saturate(160%)",
+        willChange: "transform",
         ...base,
         ...style,
       }}
@@ -113,7 +115,7 @@ export function Button({
         e.currentTarget.style.borderColor = hover.borderColor;
         e.currentTarget.style.color = hover.color;
         e.currentTarget.style.boxShadow = hover.boxShadow ?? "";
-        e.currentTarget.style.transform = hover.transform ?? "translateY(0)";
+        e.currentTarget.style.transform = hover.transform ?? "translateY(0) scale(1)";
         props.onMouseEnter?.(e);
       }}
       onMouseLeave={(e) => {
@@ -121,8 +123,18 @@ export function Button({
         e.currentTarget.style.borderColor = base.border.replace("1px solid ", "");
         e.currentTarget.style.color = base.color;
         e.currentTarget.style.boxShadow = base.boxShadow ?? "";
-        e.currentTarget.style.transform = "translateY(0)";
+        e.currentTarget.style.transform = "translateY(0) scale(1)";
         props.onMouseLeave?.(e);
+      }}
+      onMouseDown={(e) => {
+        // A quick physical "press" — the useanimations.com button feel:
+        // an immediate compress followed by a springy overshoot on release.
+        e.currentTarget.style.transform = "scale(0.955)";
+        props.onMouseDown?.(e);
+      }}
+      onMouseUp={(e) => {
+        e.currentTarget.style.transform = hover.transform ?? "translateY(0) scale(1)";
+        props.onMouseUp?.(e);
       }}
     >
       {children}

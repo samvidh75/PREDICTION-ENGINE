@@ -36,7 +36,7 @@ describe('Events Engine', () => {
       pendingDeals: ['Partnership discussions'],
       lastUpdated: new Date(),
       fiscalYear: 2026,
-      currency: 'INR',
+      currency: 'PKR',
     };
 
     const result = await engine.analyze(metrics);
@@ -55,7 +55,7 @@ describe('Events Engine', () => {
       bearishEventCount: 0,
       lastUpdated: new Date(),
       fiscalYear: 2026,
-      currency: 'INR',
+      currency: 'PKR',
     };
 
     const result = await engine.analyze(metrics);
@@ -90,7 +90,7 @@ describe('Events Engine', () => {
       eventCount90Days: 2,
       lastUpdated: new Date(),
       fiscalYear: 2026,
-      currency: 'INR',
+      currency: 'PKR',
     };
 
     const result = await engine.analyze(metrics);
@@ -116,7 +116,7 @@ describe('Events Engine', () => {
       eventCount90Days: 1,
       lastUpdated: new Date(),
       fiscalYear: 2026,
-      currency: 'INR',
+      currency: 'PKR',
     };
 
     const result = await engine.analyze(metrics);
@@ -146,7 +146,7 @@ describe('Events Engine', () => {
       eventCount90Days: 1,
       lastUpdated: new Date(),
       fiscalYear: 2026,
-      currency: 'INR',
+      currency: 'PKR',
     };
 
     const result = await engine.analyze(metrics);
@@ -197,7 +197,7 @@ describe('Events Engine', () => {
       eventCount90Days: 2,
       lastUpdated: new Date(),
       fiscalYear: 2026,
-      currency: 'INR',
+      currency: 'PKR',
     };
 
     const result = await engine.analyze(metrics);

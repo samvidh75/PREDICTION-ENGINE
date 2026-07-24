@@ -1,32 +1,38 @@
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
-import { Home, Search, Star, LayoutGrid, Shield, MessageCircle, TrendingUp, ChevronDown } from "lucide-react";
-import { NavLink, Link, useNavigate } from "react-router-dom";
+import { Home as HomeIcon, Search as SearchIcon, Star, LayoutGrid, Shield, MessageCircle, TrendingUp, ChevronDown } from "lucide-react";
+import { NavLink, Link, useNavigate, useLocation } from "react-router-dom";
+import { AnimatePresence, motion } from "framer-motion";
 import { colors, typography, space, radius, layout, components, shadows, animation } from "../design/tokens";
 import { BrandMark } from "../components/BrandMark";
 import { ResearchProfileModal } from "../components/ResearchProfileModal";
 import { useKeyboardShortcuts, KeyboardHelpOverlay } from "../hooks/useKeyboardShortcuts";
 import { FloatingAiAssistant } from "../components/FloatingAiAssistant";
 
+/* ============================================================================
+   AppShell — Editorial masthead chrome for the authenticated workspace.
+
+   Paper canvas, hairline rules, fox-orange accent, no glassmorphism.
+   ============================================================================ */
+
 const NAV = [
-  { to: "/", label: "Home", icon: Home },
-  { to: "/scanner", label: "Scanner", icon: Search },
-  { to: "/sectors", label: "Sectors", icon: LayoutGrid },
-  { to: "/watchlist", label: "Watchlist", icon: Star },
-  { to: "/portfolio", label: "Portfolio", icon: TrendingUp },
+  { to: "/",           label: "Home",       icon: HomeIcon },
+  { to: "/scanner",    label: "Scanner",    icon: SearchIcon },
+  { to: "/sectors",    label: "Sectors",    icon: LayoutGrid },
+  { to: "/watchlist",  label: "Watchlist",  icon: Star },
+  { to: "/portfolio",  label: "Portfolio",  icon: TrendingUp },
 ] as const;
 
-const MOBILE_NAV = NAV.filter((item) => item.label !== "Sectors");
+const MOBILE_NAV = NAV;
 
 const SECONDARY_NAV = [
-  { to: "/relative-strength", label: "R. Strength", icon: TrendingUp },
-  { to: "/chat", label: "AI Chat", icon: MessageCircle },
-
-  { to: "/trust", label: "Trust & Safety", icon: Shield },
+  { to: "/chat",  label: "AI Chat",  icon: MessageCircle },
+  { to: "/trust", label: "Trust",    icon: Shield },
 ] as const;
 
 export function AppShell({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
+  const location = useLocation();
   const [helpOpen, setHelpOpen] = useState(false);
   const [showFeedbackFab, setShowFeedbackFab] = useState(() => document.body.dataset.onboardingActive !== "true");
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
@@ -36,9 +42,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       'toggle-help': () => setHelpOpen((o) => !o),
       'toggle-compare': () => navigate('/compare'),
       'toggle-track': () => navigate('/watchlist'),
-      'escape': () => {
-        setHelpOpen(false);
-      },
+      'escape': () => { setHelpOpen(false); },
     },
   });
 
@@ -46,11 +50,9 @@ export function AppShell({ children }: { children: ReactNode }) {
     const syncFeedbackFab = () => {
       setShowFeedbackFab(document.body.dataset.onboardingActive !== "true");
     };
-
     syncFeedbackFab();
     const observer = new MutationObserver(syncFeedbackFab);
     observer.observe(document.body, { attributes: true, attributeFilter: ["data-onboarding-active"] });
-
     return () => observer.disconnect();
   }, []);
 
@@ -63,123 +65,75 @@ export function AppShell({ children }: { children: ReactNode }) {
         minHeight: "100vh",
       }}
     >
+      {/* Quiet ambient glow, shared across every workspace page */}
+      <div className="stockex-ambient-field" aria-hidden="true">
+        <div className="stockex-ambient-glow" />
+        <div className="stockex-ambient-glow-secondary" />
+      </div>
+
       {/* DESKTOP SIDEBAR */}
       <aside className="rail">
         <NavLink to="/" style={brandLinkStyle}>
           <span style={brandBadgeStyle}>
-            <BrandMark size={52} />
+            <BrandMark size={44} />
             <span style={brandWordmarkStyle}>StockEx</span>
           </span>
         </NavLink>
-        <nav style={navStackStyle} aria-label="Primary">
-          {NAV.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              className={({ isActive }) => `nav-link${isActive ? " is-active" : ""}`}
-            >
-              <item.icon size={20} strokeWidth={1.75} />
-              <span>{item.label}</span>
-            </NavLink>
-          ))}
-        </nav>
-        <div style={{ marginTop: space[4], paddingTop: space[4], borderTop: `1px solid ${colors.border}` }}>
-          <p style={{ fontSize: typography.caption.desktop.size, color: colors.textSecondary, margin: `0 0 ${space[2]} 0`, paddingLeft: space[3], fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em" }}>
-            Resources
-          </p>
-          <nav style={navStackStyle} aria-label="Resources">
-            {SECONDARY_NAV.slice(0, 2).map((item) => (
+
+        <div style={{ padding: `0 ${space[3]} ${space[3]}`, borderBottom: `1px solid ${colors.hairline}` }}>
+          <p style={sectionLabelStyle}>Read & research</p>
+          <nav style={navStackStyle} aria-label="Primary">
+            {NAV.map((item) => (
               <NavLink
                 key={item.to}
                 to={item.to}
                 className={({ isActive }) => `nav-link${isActive ? " is-active" : ""}`}
               >
-                <item.icon size={20} strokeWidth={1.75} />
+                <item.icon size={18} strokeWidth={1.6} />
                 <span>{item.label}</span>
               </NavLink>
             ))}
           </nav>
-
-          {/* More Menu */}
-          <button
-            aria-label="Toggle more features menu"
-            onClick={() => setMoreMenuOpen(!moreMenuOpen)}
-            style={{
-              width: '100%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: space[2],
-              padding: `${space[2]} ${space[3]}`,
-              marginTop: space[2],
-              borderRadius: `${radius.md}`,
-              border: 'none',
-              background: moreMenuOpen ? `rgba(255,255,255,0.08)` : 'transparent',
-              color: colors.textSecondary,
-              fontSize: typography.body.desktop.size,
-              fontWeight: 500,
-              cursor: 'pointer',
-              transition: `all ${animation.standard}`,
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = `rgba(255,255,255,0.08)`;
-              e.currentTarget.style.color = colors.textPrimary;
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = moreMenuOpen ? `rgba(255,255,255,0.08)` : 'transparent';
-              e.currentTarget.style.color = colors.textSecondary;
-            }}
-          >
-            <span>More Features</span>
-            <ChevronDown size={16} style={{ transform: moreMenuOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: `transform ${animation.standard}` }} />
-          </button>
-
-          {/* More Menu Items */}
-          {moreMenuOpen && (
-            <nav style={{ ...navStackStyle, marginTop: space[2] }} aria-label="More">
-              {SECONDARY_NAV.slice(2).map((item) => (
-                <NavLink
-                  key={item.to}
-                  to={item.to}
-                  className={({ isActive }) => `nav-link${isActive ? " is-active" : ""}`}
-                  onClick={() => setMoreMenuOpen(false)}
-                >
-                  <item.icon size={20} strokeWidth={1.75} />
-                  <span>{item.label}</span>
-                </NavLink>
-              ))}
-            </nav>
-          )}
         </div>
-        <div style={{
-          marginTop: "auto",
-          display: "flex",
-          flexDirection: "column",
-          gap: space[3],
-          paddingTop: space[4],
-          borderTop: `1px solid ${colors.border}`,
-        }}>
-          <Link to="/changelog" className="nav-link" style={{ gap: space[2] }}>
+
+        <div style={{ padding: `${space[4]} ${space[3]} ${space[2]}` }}>
+          <p style={sectionLabelStyle}>Tools</p>
+          <nav style={navStackStyle} aria-label="Tools">
+            {SECONDARY_NAV.map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                className={({ isActive }) => `nav-link${isActive ? " is-active" : ""}`}
+              >
+                <item.icon size={18} strokeWidth={1.6} />
+                <span>{item.label}</span>
+              </NavLink>
+            ))}
+          </nav>
+        </div>
+
+        <div style={footerBlockStyle}>
+          <Link to="/changelog" className="nav-link" style={footerLinkStyle}>
             <span>What's New</span>
           </Link>
           <NavLink
             to="/watchlist"
             className={({ isActive }) => `nav-link${isActive ? " is-active" : ""}`}
-            style={{ gap: space[2] }}
+            style={footerLinkStyle}
           >
             <span>Alerts</span>
           </NavLink>
-          <div style={{ display: "flex", justifyContent: "center" }}>
+          <div style={{ display: "flex", justifyContent: "center", paddingTop: space[2] }}>
             <ResearchProfileModal />
           </div>
         </div>
       </aside>
 
       {/* MOBILE TOP BAR */}
-      <header className="mobile-brand" style={{ justifyContent: "space-between" }}>
+      <header className="mobile-brand">
         <NavLink to="/" style={mobileBrandLinkStyle}>
           <span style={mobileBrandBadgeStyle}>
-            <BrandMark size={40} />
+            <BrandMark size={32} />
             <span style={mobileBrandWordmarkStyle}>StockEx</span>
           </span>
         </NavLink>
@@ -196,7 +150,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             to={item.to}
             className={({ isActive }) => `tab-link${isActive ? " is-active" : ""}`}
           >
-            <item.icon size={22} strokeWidth={1.5} />
+            <item.icon size={20} strokeWidth={1.5} />
             <span>{item.label}</span>
           </NavLink>
         ))}
@@ -204,21 +158,35 @@ export function AppShell({ children }: { children: ReactNode }) {
 
       {/* CONTENT */}
       <main className="content">
-        {children}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={location.pathname}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+          >
+            {children}
+          </motion.div>
+        </AnimatePresence>
         <footer style={{
-          marginTop: "20px",
-          paddingTop: "8px",
-          borderTop: `1px solid ${colors.border}`,
-          fontSize: "8px",
+          marginTop: "32px",
+          paddingTop: "16px",
+          borderTop: `1px solid ${colors.hairline}`,
+          fontSize: "11px",
           color: colors.textSecondary,
-          lineHeight: "1.35",
+          lineHeight: "1.5",
+          display: "flex",
+          justifyContent: "space-between",
+          flexWrap: "wrap",
+          gap: "8px",
         }}>
-          <p style={{ margin: 0 }}>
-            © 2026 StockEx. <strong>Not PSE-listed.</strong>{" "}
-            <Link to="/trust" style={{ color: colors.textSecondary, textDecoration: "none" }}>
-              Terms and conditions
-            </Link>
-          </p>
+          <span>
+            © 2026 StockEx · Independent research, not financial advice.
+          </span>
+          <Link to="/trust" style={{ color: colors.textSecondary, textDecoration: "none" }}>
+            Terms and conditions
+          </Link>
         </footer>
       </main>
 
@@ -232,120 +200,122 @@ export function AppShell({ children }: { children: ReactNode }) {
         .rail { display:none; }
         .rail .nav-link,
         .tab-link {
-          color:${colors.textSecondary};
-          text-decoration:none;
-          text-decoration-line:none;
-          display:flex;
-          align-items:center;
-          justify-content:center;
-          gap:${space[2]};
-          transition:color ${animation.standard};
+          color: ${colors.textSecondary};
+          text-decoration: none;
+          text-decoration-line: none;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          transition: color 200ms ${animation.standard}, background 200ms ${animation.standard};
         }
         .rail .nav-link {
-          min-height:${components.button.heightDesktop};
-          justify-content:flex-start;
-          border-radius:${radius.md};
-          padding:0 ${space[3]};
-          font-size:${typography.body.desktop.size};
-          font-weight:500;
-          color:${colors.textSecondary};
+          min-height: 36px;
+          justify-content: flex-start;
+          border-radius: ${radius.md};
+          padding: 0 ${space[3]};
+          font-size: 13px;
+          font-weight: 500;
+          color: ${colors.body};
+          position: relative;
         }
+        .rail .nav-link .icon-box,
+        .rail .nav-link svg { color: ${colors.textSecondary}; }
         .rail .nav-link.is-active {
-          color:${colors.primary};
-          background:${colors.hairlineStrong};
+          color: ${colors.textPrimary};
+          background: ${colors.hairlineSoft};
+        }
+        .rail .nav-link.is-active::before {
+          content: "";
+          position: absolute;
+          left: -8px; top: 8px; bottom: 8px;
+          width: 2px;
+          background: ${colors.accentRed};
+          border-radius: 1px;
         }
         .rail .nav-link:hover {
-          color:${colors.textPrimary};
+          color: ${colors.textPrimary};
+          background: ${colors.hairlineSoft};
         }
+        .rail .nav-link:hover svg { color: ${colors.textPrimary}; }
 
         /* ===== MOBILE BRAND BAR ===== */
         .mobile-brand {
           display:flex;
           align-items:center;
           height:${components.navBar.heightDesktop};
-          padding:0 ${layout.pagePaddingMobile};
-          border-bottom:${layout.borderWidth} solid ${colors.border};
-          background:${colors.backdropGlassmorphic};
-          backdrop-filter:blur(20px);
-          -webkit-backdrop-filter:blur(20px);
+          padding: 0 16px;
+          border-bottom: 2px solid ${colors.textPrimary};
+          background: ${colors.page};
+          position: sticky; top: 0; z-index: 20;
         }
 
         /* ===== MOBILE TAB BAR ===== */
         .tabbar {
           position:fixed;
-          bottom:0;
-          left:0;
-          right:0;
+          bottom:0; left:0; right:0;
           height:${components.navBar.heightMobile};
           display:grid;
-          grid-template-columns:repeat(${MOBILE_NAV.length}, minmax(0, 1fr));
-          border-top:${layout.borderWidth} solid ${colors.border};
-          background:${colors.backdropGlassmorphic};
-          backdrop-filter:blur(20px);
-          -webkit-backdrop-filter:blur(20px);
-          z-index:10;
-          padding-bottom:env(safe-area-inset-bottom);
+          grid-template-columns: repeat(${MOBILE_NAV.length}, minmax(0, 1fr));
+          border-top: 1px solid ${colors.hairline};
+          background: ${colors.page};
+          z-index: 20;
+          padding-bottom: env(safe-area-inset-bottom);
         }
         .tab-link {
-          flex-direction:column;
-          font-size:${typography.caption.desktop.size};
-          font-weight:500;
-          line-height:${typography.caption.desktop.line};
-          gap:2px;
-          min-width:0;
-          padding:0 ${space[1]};
-          text-decoration:none;
-          text-decoration-line:none;
-          -webkit-tap-highlight-color:transparent;
+          flex-direction: column;
+          font-size: 10px;
+          font-weight: 600;
+          line-height: 1.3;
+          letter-spacing: 0.02em;
+          gap: 2px;
+          min-width: 0;
+          padding: 0 4px;
+          text-decoration: none;
+          text-decoration-line: none;
+          -webkit-tap-highlight-color: transparent;
+          color: ${colors.textSecondary};
         }
         .tab-link.is-active {
-          color:${colors.primary};
+          color: ${colors.accentRed};
         }
-        .tab-link:hover,
-        .tab-link:focus,
-        .tab-link:focus-visible,
-        .tab-link:active {
-          text-decoration:none;
+        .tab-link:hover, .tab-link:focus,
+        .tab-link:focus-visible, .tab-link:active {
+          text-decoration: none;
         }
 
         /* ===== CONTENT ===== */
         .content {
-          padding:${layout.pagePaddingMobile};
-          padding-bottom:calc(${components.navBar.heightMobile} + 6px + env(safe-area-inset-bottom, 0px));
-          width:100%;
-          overflow-x:hidden;
+          padding: 16px;
+          padding-bottom: calc(${components.navBar.heightMobile} + 6px + env(safe-area-inset-bottom, 0px));
+          width: 100%;
+          overflow-x: hidden;
+          font-variant-numeric: lining-nums;
+          position: relative;
+          z-index: 1;
         }
 
-        @media (min-width:768px) {
+        @media (min-width: 768px) {
           .mobile-brand { display:none; }
           .rail {
             display:flex;
             flex-direction:column;
             width:${layout.sidebarWidth};
             position:fixed;
-            top:0;
-            bottom:0;
-            border-right:${layout.borderWidth} solid ${colors.border};
-            padding:${space[6]};
-            background:${colors.backdropGlassmorphic};
-            backdrop-filter:blur(24px);
-            -webkit-backdrop-filter:blur(24px);
+            top:0; bottom:0;
+            border-right: 1px solid ${colors.hairline};
+            padding: 16px 0;
+            background: ${colors.page};
             overflow-y:auto;
           }
           .tabbar { display:none; }
           .content {
             margin-left:${layout.sidebarWidth};
             width:auto;
-            padding:${layout.pagePaddingDesktop};
-            padding-bottom:${layout.pagePaddingDesktop};
-            max-width:${layout.contentMaxWidth};
+            padding: ${layout.pagePaddingDesktop};
+            padding-bottom: ${layout.pagePaddingDesktop};
+            max-width: ${layout.contentMaxWidth};
             overflow-x:hidden;
           }
-        }
-        /* ===== FEEDBACK FAB ANIMATION ===== */
-        @keyframes fadeSlideIn {
-          from { opacity: 0; transform: translateY(8px) scale(0.97); }
-          to   { opacity: 1; transform: translateY(0) scale(1); }
         }
       `}</style>
     </div>
@@ -355,26 +325,25 @@ export function AppShell({ children }: { children: ReactNode }) {
 const brandLinkStyle = {
   color: colors.textPrimary,
   textDecoration: "none",
-  marginBottom: space[8],
   display: "inline-flex",
   alignItems: "center",
+  padding: `0 ${space[3]} ${space[4]}`,
+  borderBottom: `2px solid ${colors.textPrimary}`,
 } as const;
 
 const brandBadgeStyle = {
   display: "inline-flex",
   alignItems: "center",
   gap: space[3],
-  padding: `${space[2]} ${space[3]}`,
-  borderRadius: radius.xl,
-  border: `1px solid ${colors.hairline}`,
-  background: "linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)",
-  boxShadow: shadows.elevated,
+  padding: `${space[2]} 0`,
 } as const;
 
 const brandWordmarkStyle = {
+  fontFamily: '"Fraunces", "Source Serif Pro", Georgia, serif',
   fontSize: "18px",
-  fontWeight: 750,
-  letterSpacing: "-0.03em",
+  fontWeight: 500,
+  fontStyle: "italic",
+  letterSpacing: "-0.015em",
   lineHeight: 1,
   color: colors.textPrimary,
 } as const;
@@ -382,8 +351,41 @@ const brandWordmarkStyle = {
 const navStackStyle = {
   display: "flex",
   flexDirection: "column" as const,
-  gap: space[1],
+  gap: 2,
 };
+
+const sectionLabelStyle = {
+  fontSize: "10.5px",
+  fontWeight: 600,
+  color: colors.accentRed,
+  margin: `0 0 ${space[2]} 0`,
+  paddingLeft: space[3],
+  textTransform: "uppercase" as const,
+  letterSpacing: "0.10em",
+  fontFamily: typography.fontFamily,
+};
+
+const footerBlockStyle = {
+  marginTop: "auto",
+  display: "flex",
+  flexDirection: "column" as const,
+  gap: 4,
+  paddingTop: space[4],
+  borderTop: `1px solid ${colors.hairline}`,
+  padding: `${space[4]} ${space[3]} ${space[2]}`,
+};
+
+const footerLinkStyle = {
+  display: "flex",
+  alignItems: "center",
+  gap: space[2],
+  fontSize: 13,
+  fontWeight: 500,
+  color: colors.body,
+  textDecoration: "none",
+  padding: `${space[2]} ${space[3]}`,
+  borderRadius: radius.md,
+} as const;
 
 const mobileBrandLinkStyle = {
   color: colors.textPrimary,
@@ -397,15 +399,14 @@ const mobileBrandBadgeStyle = {
   alignItems: "center",
   gap: space[2],
   padding: `${space[1]} ${space[2]}`,
-  borderRadius: radius.lg,
-  border: `1px solid ${colors.hairline}`,
-  background: "linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)",
 } as const;
 
 const mobileBrandWordmarkStyle = {
-  fontSize: "16px",
-  fontWeight: 750,
-  letterSpacing: "-0.03em",
+  fontFamily: '"Fraunces", "Source Serif Pro", Georgia, serif',
+  fontSize: "17px",
+  fontWeight: 500,
+  fontStyle: "italic",
+  letterSpacing: "-0.015em",
   lineHeight: 1,
   color: colors.textPrimary,
 } as const;

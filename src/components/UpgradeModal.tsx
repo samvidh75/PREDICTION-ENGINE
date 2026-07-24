@@ -279,7 +279,7 @@ export default function UpgradeModal({ isOpen, onClose, reason = 'advanced-analy
         >
           <TrendingUp size={16} color="#22c55e" />
           <div style={{ fontSize: '13px', color: colors.body, flex: 1 }}>
-            <span style={{ fontWeight: 600, color: colors.ink }}>Premium Plan:</span> ₹299/month
+            <span style={{ fontWeight: 600, color: colors.ink }}>Premium Plan:</span> ₱299/month
           </div>
           <span
             style={{

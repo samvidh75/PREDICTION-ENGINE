@@ -184,12 +184,12 @@ export default function InsiderTrackingPanel({ ticker }: { ticker: string }) {
             <p style={s.details}>
               Volume:{" "}
               <strong style={s.valueGreen}>
-                {f.shares_quantity.toLocaleString("en-IN")} shares
+                {f.shares_quantity.toLocaleString("en-PH")} shares
               </strong>
               {" "}&bull;{" "}
               Value:{" "}
               <strong>
-                ₹{Number(f.transaction_value_inr).toLocaleString("en-IN")}
+                ₱{Number(f.transaction_value_inr).toLocaleString("en-PH")}
               </strong>
             </p>
 

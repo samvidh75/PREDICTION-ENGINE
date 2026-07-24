@@ -152,7 +152,7 @@ export class MarketDataFetcher {
 
   private async fetchYFinance(symbol: string): Promise<FetchResult | null> {
     try {
-      const ticker = `${symbol}.NS`;
+      const ticker = `${symbol}.PS`;
       const res = await fetch(`https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d`, {
         signal: AbortSignal.timeout(5000),
       });

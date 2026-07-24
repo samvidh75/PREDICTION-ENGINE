@@ -32,6 +32,8 @@ export default function SimpleStockChart({
       <div
         style={{
           backgroundColor: colors.surface,
+          backdropFilter: "blur(20px) saturate(160%)",
+          WebkitBackdropFilter: "blur(20px) saturate(160%)",
           borderRadius: '8px',
           padding: '24px',
           border: `1px solid ${colors.border}`,
@@ -56,6 +58,8 @@ export default function SimpleStockChart({
     <div
       style={{
         backgroundColor: colors.surface,
+        backdropFilter: "blur(20px) saturate(160%)",
+        WebkitBackdropFilter: "blur(20px) saturate(160%)",
         borderRadius: '8px',
         padding: '24px',
         border: `1px solid ${colors.border}`,
@@ -81,7 +85,7 @@ export default function SimpleStockChart({
                 {barChar}
               </span>
               <span style={{ width: '50px', fontSize: '11px', color: colors.textSecondary }}>
-                ₹{candle.close.toFixed(2)}
+                ₱{candle.close.toFixed(2)}
               </span>
             </div>
           );
@@ -99,6 +103,8 @@ export default function SimpleStockChart({
           style={{
             display: 'block',
             backgroundColor: colors.canvas,
+            backdropFilter: "blur(20px) saturate(160%)",
+            WebkitBackdropFilter: "blur(20px) saturate(160%)",
             padding: '8px 12px',
             borderRadius: '4px',
             marginTop: '8px',

@@ -86,6 +86,8 @@ function ConnectionsList({ refreshKey }: { refreshKey: number }) {
             key={conn.id}
             style={{
               background: colors.canvas,
+              backdropFilter: "blur(20px) saturate(160%)",
+              WebkitBackdropFilter: "blur(20px) saturate(160%)",
               borderRadius: radius.md,
               padding: space[3],
               border: `1px solid ${colors.hairline}`,
@@ -97,7 +99,7 @@ function ConnectionsList({ refreshKey }: { refreshKey: number }) {
             <div style={{ fontFamily: typography.fontFamily, fontSize: 12 }}>
               <div style={{ color: colors.textPrimary, fontWeight: 700 }}>{brokerMeta?.name ?? conn.broker}</div>
               <div style={{ color: colors.textTertiary, fontSize: 10, marginTop: 2 }}>
-                {conn.status} &middot; Connected {new Date(conn.created_at).toLocaleDateString("en-IN")}
+                {conn.status} &middot; Connected {new Date(conn.created_at).toLocaleDateString("en-PH")}
               </div>
             </div>
             <button
@@ -153,6 +155,8 @@ function BrokerConnectContent() {
     <div
       style={{
         background: colors.surface,
+        backdropFilter: "blur(20px) saturate(160%)",
+        WebkitBackdropFilter: "blur(20px) saturate(160%)",
         border: `1px solid ${colors.hairline}`,
         borderRadius: radius.xl,
         padding: space[5],
@@ -181,6 +185,8 @@ function BrokerConnectContent() {
             key={broker.id}
             style={{
               background: colors.canvas,
+              backdropFilter: "blur(20px) saturate(160%)",
+              WebkitBackdropFilter: "blur(20px) saturate(160%)",
               borderRadius: radius.md,
               padding: space[3],
               border: `1px solid ${colors.hairline}`,

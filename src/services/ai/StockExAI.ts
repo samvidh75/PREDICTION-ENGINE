@@ -1,5 +1,5 @@
 /**
- * StockEx AI - ChatGPT of Philippine Stock Market
+ * StockEx AI - ChatGPT of PSX Stock Market
  * Advanced market intelligence with deep financial analysis
  * Real data integration + perceived intelligence through simulated thinking
  */
@@ -156,21 +156,21 @@ class StockExAI {
 
     const response = `📈 **Technical Analysis: ${symbol}**\n\n` +
       `**Current Setup**
-• Price Level: ₹${data.metrics.marketCap}
-• Support 1: ₹${(data.metrics.marketCap * 0.95).toFixed(0)}
-• Support 2: ₹${(data.metrics.marketCap * 0.90).toFixed(0)}
-• Resistance 1: ₹${(data.metrics.marketCap * 1.05).toFixed(0)}
-• Resistance 2: ₹${(data.metrics.marketCap * 1.10).toFixed(0)}\n\n` +
+• Price Level: ₱${data.metrics.marketCap}
+• Support 1: ₱${(data.metrics.marketCap * 0.95).toFixed(0)}
+• Support 2: ₱${(data.metrics.marketCap * 0.90).toFixed(0)}
+• Resistance 1: ₱${(data.metrics.marketCap * 1.05).toFixed(0)}
+• Resistance 2: ₱${(data.metrics.marketCap * 1.10).toFixed(0)}\n\n` +
 
       `**Chart Patterns**
-• Trend: Uptrend intact above ₹${(data.metrics.marketCap * 0.95).toFixed(0)}
+• Trend: Uptrend intact above ₱${(data.metrics.marketCap * 0.95).toFixed(0)}
 • Moving Averages: Price above 50/200 DMA (bullish)
 • Volume: Above average (strong conviction)
 • Momentum: RSI 55-65 (neutral to bullish)\n\n` +
 
       `**Key Levels to Watch**
-🟢 Breakout: Above ₹${(data.metrics.marketCap * 1.08).toFixed(0)} = Next target ₹${(data.metrics.marketCap * 1.15).toFixed(0)}
-🔴 Breakdown: Below ₹${(data.metrics.marketCap * 0.92).toFixed(0)} = Stop at ₹${(data.metrics.marketCap * 0.88).toFixed(0)}\n\n` +
+🟢 Breakout: Above ₱${(data.metrics.marketCap * 1.08).toFixed(0)} = Next target ₱${(data.metrics.marketCap * 1.15).toFixed(0)}
+🔴 Breakdown: Below ₱${(data.metrics.marketCap * 0.92).toFixed(0)} = Stop at ₱${(data.metrics.marketCap * 0.88).toFixed(0)}\n\n` +
 
       `**Trading Strategy**
 1. **For Longs**: Entry on dip to support, target resistance
@@ -219,7 +219,7 @@ class StockExAI {
         return `**${i + 1}. ${stock.symbol}** ⭐⭐⭐⭐
 📊 Valuation: P/E ${data.metrics.peRatio.toFixed(2)}x (vs market 18x)
 💪 Quality: ROE ${data.metrics.roe.toFixed(1)}% | ROCE ${data.metrics.roce.toFixed(1)}%
-🎯 Target: ₹${data.analysis.targetPrice.toFixed(2)} (${((data.analysis.targetPrice - 100) / 100 * 100).toFixed(1)}% upside)
+🎯 Target: ₱${data.analysis.targetPrice.toFixed(2)} (${((data.analysis.targetPrice - 100) / 100 * 100).toFixed(1)}% upside)
 📅 Horizon: ${data.analysis.investmentHorizon}
 💭 Thesis: ${data.analysis.pros[0]}\n`;
       }).join('\n') +
@@ -290,10 +290,10 @@ ${analysis.pros.map(p => `✓ ${p}`).join('\n')}\n\n` +
 ${analysis.cons.map(c => `✗ ${c}`).join('\n')}\n\n` +
 
       `**Recommendation: ${analysis.recommendation}**
-Target Price: ₹${analysis.targetPrice.toFixed(2)}
+Target Price: ₱${analysis.targetPrice.toFixed(2)}
 Upside: ${((analysis.targetPrice - 100) / 100 * 100).toFixed(1)}%
 Horizon: ${analysis.investmentHorizon}
-Entry Price: ₹${(100 * 0.95).toFixed(2)} (5% dip)\n\n` +
+Entry Price: ₱${(100 * 0.95).toFixed(2)} (5% dip)\n\n` +
 
       `**Next Catalysts**
 📅 Q3 results
@@ -337,7 +337,7 @@ Price-to-Earnings = Market Price ÷ Earnings Per Share
 • P/E 18-25: Growth premium (higher expectations)
 • P/E >25: Expensive (priced for perfection)
 
-🎯 Philippine Context:
+🎯 PSX Context:
 • PSE Index avg: 18-22x
 • Small cap avg: 20-25x
 • Quality stocks: 20-30x justified by ROE
@@ -366,7 +366,7 @@ ROE = Net Profit ÷ Shareholder Equity
 • 15-20%: Good, solid business
 • >20%: Excellent, best-in-class
 
-💎 Philippine Best ROE:
+💎 PSX Best ROE:
 HDFC Bank: 18-20% (banking)
 MARUTI: 15-18% (auto)
 TCS: 15-17% (IT services)
@@ -391,7 +391,7 @@ Annual cash return = Dividend Yield × Share Price
 
 📊 Yield Calculation:
 Dividend Yield = Annual Dividend ÷ Current Price
-• 3% yield on ₹100 share = ₹3 annual income
+• 3% yield on ₱100 share = ₱3 annual income
 
 📈 Yield Levels:
 • 0-2%: Growth focus, limited income
@@ -399,7 +399,7 @@ Dividend Yield = Annual Dividend ÷ Current Price
 • 4-6%: High income (possible maturity/decline)
 • >6%: Very high (might be risky)
 
-🇮🇳 Philippine Dividend Stars:
+🇮🇳 PSX Dividend Stars:
 HDFC Bank: 1-1.5% (growth priority)
 Power Grid: 4-5% (stable utility)
 NTPC: 5-6% (PSU dividend)
@@ -614,7 +614,7 @@ Ask me "Analyze [SECTOR]" or "Compare [STOCK] vs [STOCK]"`;
 
   private async handleDefault(): Promise<AIResponse> {
     const response = `🤖 **StockEx AI - Your Personal Market Analyst**\n\n` +
-      `I'm designed to be your ChatGPT for Philippine stock market analysis.\n\n` +
+      `I'm designed to be your ChatGPT for PSX stock market analysis.\n\n` +
 
       `**What I Can Do:**\n\n` +
 

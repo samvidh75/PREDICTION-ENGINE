@@ -72,7 +72,7 @@ export async function registerIntelligenceContextRoutes(
     if (!symbol) return reply.status(400).send({ error: 'symbol required' });
 
     try {
-      const newsUrl = `https://query1.finance.yahoo.com/v1/finance/search?q=${encodeURIComponent(symbol)}&lang=en-IN&region=IN&quotesCount=0&newsCount=8`;
+      const newsUrl = `https://query1.finance.yahoo.com/v1/finance/search?q=${encodeURIComponent(symbol)}&lang=en-PH&region=IN&quotesCount=0&newsCount=8`;
       let articles: { headline: string; source: string; time: string; link?: string }[] = [];
       try {
         const resp = await fetch(newsUrl, { headers: { 'User-Agent': 'Mozilla/5.0' } });

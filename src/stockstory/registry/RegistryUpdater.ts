@@ -22,8 +22,8 @@ export interface MasterSecurityEntry {
   symbol: string;
   company_name: string;
   isin: string;
-  nse_symbol: string | null;
-  bse_symbol: string | null;
+  pse_symbol: string | null;
+  pse_symbol2: string | null;
   sector: string | null;
   industry: string | null;
   market_cap_category: 'Large Cap' | 'Mid Cap' | 'Small Cap' | 'Unknown';
@@ -52,7 +52,7 @@ export interface RegistryUpdateResult {
 /**
  * PSE symbol master response shape (from PSE pse-daily CSV or API).
  */
-interface NseSymbolEntry {
+interface PseSymbolEntry {
   SYMBOL: string;
   ISIN: string;
   SERIES: string; // EQ, BE, etc.
@@ -63,7 +63,7 @@ interface NseSymbolEntry {
 /**
  * PSE equity master response shape.
  */
-interface BseSymbolEntry {
+interface PseSymbolEntry2 {
   scrip_code: string;
   scrip_id: string;
   isin: string;
@@ -93,8 +93,8 @@ export class RegistryUpdater {
     this.auditLog = [];
     this.log('RegistryUpdater: starting daily update');
 
-    const nseSymbols = await this.fetchNseMaster();
-    const bseSymbols = await this.fetchBseMaster();
+    const nseSymbols = await this.fetchPseMaster();
+    const bseSymbols = await this.fetchPseMaster2();
 
     if (nseSymbols.length === 0 && bseSymbols.length === 0) {
       this.log('WARNING: Both PSE and PSE fetches returned empty. Skipping update.');
@@ -145,14 +145,14 @@ export class RegistryUpdater {
    * Fetch PSE symbol master from public pse-daily endpoint.
    * Falls back gracefully if network or parsing fails.
    */
-  private async fetchNseMaster(): Promise<NseSymbolEntry[]> {
+  private async fetchPseMaster(): Promise<PseSymbolEntry[]> {
     this.log('Fetching PSE master...');
     try {
       // Primary: PSE securities CSV (public, no auth)
-      // URL: https://archives.nseindia.com/content/equities/EQUITY_L.csv
+      // URL: https://archives.pse.com.pk/content/equities/EQUITY_L.csv
       // Columns: SYMBOL, NAME OF COMPANY, SERIES, DATE OF LISTING, PAID UP VALUE,
       //           MARKET LOT, ISIN NUMBER, FACE VALUE
-      const response = await fetch('https://archives.nseindia.com/content/equities/EQUITY_L.csv', {
+      const response = await fetch('https://archives.pse.com.pk/content/equities/EQUITY_L.csv', {
         headers: {
           'User-Agent': 'Mozilla/5.0',
           'Accept': 'text/csv',
@@ -164,7 +164,7 @@ export class RegistryUpdater {
       }
 
       const csv = await response.text();
-      const entries = this.parseNseCsv(csv);
+      const entries = this.parsePseCsv(csv);
       this.log(`PSE master: ${entries.length} symbols fetched`);
       return entries;
     } catch (err: any) {
@@ -174,9 +174,9 @@ export class RegistryUpdater {
   }
 
   /**
-   * Parse PSE EQUITY_L.csv into NseSymbolEntry[].
+   * Parse PSE EQUITY_L.csv into PseSymbolEntry[].
    */
-  private parseNseCsv(csv: string): NseSymbolEntry[] {
+  private parsePseCsv(csv: string): PseSymbolEntry[] {
     const lines = csv.split('\n');
     if (lines.length < 2) return [];
 
@@ -195,7 +195,7 @@ export class RegistryUpdater {
       return [];
     }
 
-    const entries: NseSymbolEntry[] = [];
+    const entries: PseSymbolEntry[] = [];
     for (let i = 1; i < lines.length; i++) {
       const line = lines[i].trim();
       if (!line) continue;
@@ -223,13 +223,13 @@ export class RegistryUpdater {
   /**
    * Fetch PSE equity master as fallback.
    */
-  private async fetchBseMaster(): Promise<BseSymbolEntry[]> {
+  private async fetchPseMaster2(): Promise<PseSymbolEntry2[]> {
     this.log('Fetching PSE master...');
     try {
       // PSE publically lists equity data at:
-      // https://www.bseindia.com/download/PSE_EQ.zip (contains CSV)
+      // https://www.pse.com.pk/download/PSE_EQ.zip (contains CSV)
       // For now, attempt simplified CSV URL
-      const response = await fetch('https://www.bseindia.com/download/BhavCopy/Equity/EQ_ISINCODE_latest.zip', {
+      const response = await fetch('https://www.pse.com.pk/download/BhavCopy/Equity/EQ_ISINCODE_latest.zip', {
         headers: {
           'User-Agent': 'Mozilla/5.0',
         },
@@ -253,28 +253,28 @@ export class RegistryUpdater {
    * Merge PSE + PSE data into a unified exchange symbol map.
    */
   private mergeExchangeData(
-    nse: NseSymbolEntry[],
-    bse: BseSymbolEntry[],
-  ): Map<string, { isin: string; nse_symbol: string | null; bse_symbol: string | null }> {
-    const merged = new Map<string, { isin: string; nse_symbol: string | null; bse_symbol: string | null }>();
+    nse: PseSymbolEntry[],
+    bse: PseSymbolEntry2[],
+  ): Map<string, { isin: string; pse_symbol: string | null; pse_symbol2: string | null }> {
+    const merged = new Map<string, { isin: string; pse_symbol: string | null; pse_symbol2: string | null }>();
 
     for (const entry of nse) {
       merged.set(entry.SYMBOL, {
         isin: entry.ISIN,
-        nse_symbol: entry.SYMBOL,
-        bse_symbol: null,
+        pse_symbol: entry.SYMBOL,
+        pse_symbol2: null,
       });
     }
 
     for (const entry of bse) {
       const existing = merged.get(entry.scrip_id);
       if (existing) {
-        existing.bse_symbol = String(entry.scrip_code);
+        existing.pse_symbol2 = String(entry.scrip_code);
       } else {
         merged.set(entry.scrip_id, {
           isin: entry.isin,
-          nse_symbol: null,
-          bse_symbol: String(entry.scrip_code),
+          pse_symbol: null,
+          pse_symbol2: String(entry.scrip_code),
         });
       }
     }
@@ -286,7 +286,7 @@ export class RegistryUpdater {
    * Detect symbols in exchange data not in our registry → NEW LISTINGS.
    */
   private detectNewListings(
-    exchangeSymbols: Map<string, { isin: string; nse_symbol: string | null; bse_symbol: string | null }>,
+    exchangeSymbols: Map<string, { isin: string; pse_symbol: string | null; pse_symbol2: string | null }>,
   ): MasterSecurityEntry[] {
     const newEntries: MasterSecurityEntry[] = [];
     for (const [symbol, data] of exchangeSymbols) {
@@ -305,8 +305,8 @@ export class RegistryUpdater {
           symbol,
           company_name: symbol, // Will need enrichment from metadata provider
           isin: data.isin,
-          nse_symbol: data.nse_symbol,
-          bse_symbol: data.bse_symbol,
+          pse_symbol: data.pse_symbol,
+          pse_symbol2: data.pse_symbol2,
           sector: null,
           industry: null,
           market_cap_category: 'Unknown',
@@ -323,17 +323,17 @@ export class RegistryUpdater {
    * Detect symbols in our registry not on exchange → DELISTINGS.
    */
   private detectDelistings(
-    exchangeSymbols: Map<string, { isin: string; nse_symbol: string | null; bse_symbol: string | null }>,
+    exchangeSymbols: Map<string, { isin: string; pse_symbol: string | null; pse_symbol2: string | null }>,
   ): Set<string> {
     const delistedSymbols = new Set<string>();
     for (const [symbol, entry] of this.currentRegistry) {
       if (entry.listing_status === 'Delisted' || entry.listing_status === 'Merged') continue;
 
-      const onNse = entry.nse_symbol ? exchangeSymbols.has(entry.nse_symbol) : false;
-      const onBse = entry.bse_symbol ? exchangeSymbols.has(entry.bse_symbol) : false;
+      const onNse = entry.pse_symbol ? exchangeSymbols.has(entry.pse_symbol) : false;
+      const onBse = entry.pse_symbol2 ? exchangeSymbols.has(entry.pse_symbol2) : false;
 
       if (!onNse && !onBse) {
-        this.log(`Delisting detected: ${symbol} (PSE: ${entry.nse_symbol}, PSE: ${entry.bse_symbol})`);
+        this.log(`Delisting detected: ${symbol} (PSE: ${entry.pse_symbol}, PSE: ${entry.pse_symbol2})`);
         this.changeLog.push({
           type: 'delisting',
           old_value: symbol,
@@ -354,7 +354,7 @@ export class RegistryUpdater {
    * the ticker changed.
    */
   private detectSymbolChanges(
-    exchangeSymbols: Map<string, { isin: string; nse_symbol: string | null; bse_symbol: string | null }>,
+    exchangeSymbols: Map<string, { isin: string; pse_symbol: string | null; pse_symbol2: string | null }>,
   ): Map<string, string> {
     // Build ISIN → exchange symbol map
     const isinToExchangeSymbol = new Map<string, string>();
@@ -365,7 +365,7 @@ export class RegistryUpdater {
     const symbolChanges = new Map<string, string>();
     for (const [registrySymbol, entry] of this.currentRegistry) {
       const exchangeSymbol = isinToExchangeSymbol.get(entry.isin);
-      if (exchangeSymbol && exchangeSymbol !== registrySymbol && exchangeSymbol !== entry.nse_symbol) {
+      if (exchangeSymbol && exchangeSymbol !== registrySymbol && exchangeSymbol !== entry.pse_symbol) {
         this.log(`Symbol change: ${registrySymbol} → ${exchangeSymbol} (ISIN: ${entry.isin})`);
         this.changeLog.push({
           type: 'symbol_change',
@@ -386,7 +386,7 @@ export class RegistryUpdater {
    * Cross-reference with delistings to distinguish merger from simple delisting.
    */
   private detectMergers(
-    exchangeSymbols: Map<string, { isin: string; nse_symbol: string | null; bse_symbol: string | null }>,
+    exchangeSymbols: Map<string, { isin: string; pse_symbol: string | null; pse_symbol2: string | null }>,
   ): Set<string> {
     const activeIsins = new Set<string>();
     for (const [, data] of exchangeSymbols) {
@@ -414,11 +414,11 @@ export class RegistryUpdater {
 
   /**
    * Detect company name changes using metadata provider enrichment.
-   * This requires supplementary metadata fetch (Yahoo/IndianAPI).
+   * This requires supplementary metadata fetch (Yahoo/PSXAPI).
    * For now, placeholder with extensibility point.
    */
   private detectNameChanges(
-    _exchangeSymbols: Map<string, { isin: string; nse_symbol: string | null; bse_symbol: string | null }>,
+    _exchangeSymbols: Map<string, { isin: string; pse_symbol: string | null; pse_symbol2: string | null }>,
   ): Map<string, string> {
     // Name changes require metadata provider enrichment.
     // This method exists as an extensibility point for future implementation.
@@ -444,7 +444,7 @@ export class RegistryUpdater {
         const updatedEntry: MasterSecurityEntry = {
           ...entry,
           symbol: newSymbol,
-          nse_symbol: newSymbol,
+          pse_symbol: newSymbol,
           last_verified: new Date().toISOString().split('T')[0],
           data_sources: [...entry.data_sources, 'RegistryUpdater — symbol change'],
         };

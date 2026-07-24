@@ -12,7 +12,7 @@ export function buildResearchReport(
     sector,
     generatedAt: new Date().toISOString(),
     sections,
-    disclaimer: "This research report is for informational purposes only. It does not constitute investment advice. Lensory India does not provide buy/sell recommendations. Consult a PSE-listed investment advisor before making investment decisions.",
+    disclaimer: "This research report is for informational purposes only. It does not constitute investment advice. Lensory Pakistan does not provide buy/sell recommendations. Consult a PSE-listed investment advisor before making investment decisions.",
   };
 }
 
@@ -54,7 +54,7 @@ export function reportToMarkdown(report: CompanyResearchReport): string {
   const lines: string[] = [];
   lines.push(`# ${report.companyName} (${report.symbol}) — Research Report`);
   lines.push(`**Sector:** ${report.sector}`);
-  lines.push(`**Generated:** ${new Date(report.generatedAt).toLocaleDateString("en-IN")}`);
+  lines.push(`**Generated:** ${new Date(report.generatedAt).toLocaleDateString("en-PH")}`);
   lines.push("");
   for (const section of report.sections) {
     lines.push(`## ${section.title}`);

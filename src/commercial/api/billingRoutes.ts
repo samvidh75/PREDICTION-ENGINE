@@ -71,7 +71,7 @@ export default async function registerBillingRoutes(server: FastifyInstance) {
           return reply.status(404).send({ error: `Plan "${planId}" not found` });
         }
 
-        if (!plan.active || plan.priceInr === 0) {
+        if (!plan.active || plan.pricePkr === 0) {
           return reply.status(400).send({ error: "This plan cannot be purchased" });
         }
 
@@ -101,7 +101,7 @@ export default async function registerBillingRoutes(server: FastifyInstance) {
                          amount_paid = EXCLUDED.amount_paid,
                          current_period_start = EXCLUDED.current_period_start,
                          current_period_end = EXCLUDED.current_period_end`,
-          [uid, planId, plan.tier, "active", session.sessionId, periodStart, periodEnd, plan.priceInr * 100]
+          [uid, planId, plan.tier, "active", session.sessionId, periodStart, periodEnd, plan.pricePkr * 100]
         );
 
         // Return data the frontend needs:
@@ -114,11 +114,11 @@ export default async function registerBillingRoutes(server: FastifyInstance) {
           mode: session.mode ?? "subscription",
           provider: "razorpay",
           key: process.env.VITE_RAZORPAY_KEY_ID ?? process.env.RAZORPAY_KEY_ID ?? "",
-          amount: plan.priceInr * 100,
-          currency: "INR",
+          amount: plan.pricePkr * 100,
+          currency: "PKR",
           name: "StockEX",
           description: plan.name,
-          plan: { id: plan.id, name: plan.name, tier: plan.tier, priceInr: plan.priceInr },
+          plan: { id: plan.id, name: plan.name, tier: plan.tier, pricePkr: plan.pricePkr },
         });
       } catch (err: any) {
         req.log.error({ err }, "create checkout error");
@@ -282,7 +282,7 @@ export default async function registerBillingRoutes(server: FastifyInstance) {
                   payment.order_id ?? "",
                   payment.id ?? "",
                   payment.amount ?? 0,
-                  payment.currency ?? "INR",
+                  payment.currency ?? "PKR",
                   JSON.stringify(event.raw),
                 ]
               );
@@ -312,7 +312,7 @@ export default async function registerBillingRoutes(server: FastifyInstance) {
                 payment?.order_id ?? "",
                 payment?.id ?? "",
                 payment?.amount ?? 0,
-                payment?.currency ?? "INR",
+                payment?.currency ?? "PKR",
                 JSON.stringify(event.raw),
               ]
             );
@@ -372,7 +372,7 @@ export default async function registerBillingRoutes(server: FastifyInstance) {
                   payment?.order_id ?? "",
                   payment?.id ?? "",
                   payment?.amount ?? 0,
-                  payment?.currency ?? "INR",
+                  payment?.currency ?? "PKR",
                   JSON.stringify(event.raw),
                 ]
               );

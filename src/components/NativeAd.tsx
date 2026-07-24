@@ -1,7 +1,7 @@
 /**
  * NativeAd — Sponsored content slot for positions 3 & 7 in news feeds.
  * 
- * CPM model: ₹50-100 per 1K impressions. Labeled "SPONSORED" per SEC guidelines.
+ * CPM model: ₱50-100 per 1K impressions. Labeled "SPONSORED" per SEC guidelines.
  * Premium subscribers see no ads (FeatureGate checks subscription tier).
  * 
  * Spec ref: Section "Native Advertising" — ad positions 3 & 7.
@@ -32,7 +32,7 @@ const AD_INVENTORY = [
     id: "ad-2",
     sponsor: "Smallcase",
     headline: "Invest in curated stock baskets",
-    body: "Professionally managed portfolios. Start with as little as ₹5,000.",
+    body: "Professionally managed portfolios. Start with as little as ₱5,000.",
     cta: "Explore Smallcases →",
     url: "https://www.smallcase.com/?ref=stockstory",
     logo: "S",
@@ -41,7 +41,7 @@ const AD_INVENTORY = [
     id: "ad-3",
     sponsor: "Groww",
     headline: "Invest in Mutual Funds — 0% commission",
-    body: "Direct plans, zero commission. Start SIP from ₹500/month.",
+    body: "Direct plans, zero commission. Start SIP from ₱500/month.",
     cta: "Start Investing →",
     url: "https://groww.in/?ref=stockstory",
     logo: "G",
@@ -59,7 +59,7 @@ const AD_INVENTORY = [
     id: "ad-5",
     sponsor: "INDmoney",
     headline: "Track all your investments in one app",
-    body: "Stocks, MFs, FD, EPF, NPS — everything. Free portfolio tracker for Philippine investors.",
+    body: "Stocks, MFs, FD, EPF, NPS — everything. Free portfolio tracker for PSX investors.",
     cta: "Download INDmoney →",
     url: "https://indmoney.onelink.me/Rb36?ref=stockstory",
     logo: "IN",
@@ -129,6 +129,8 @@ export function NativeAd({ position, compact = false }: NativeAdProps) {
           cursor: "pointer",
           padding: "12px 16px",
           background: colors.surface,
+          backdropFilter: "blur(20px) saturate(160%)",
+          WebkitBackdropFilter: "blur(20px) saturate(160%)",
           borderRadius: radius.md,
           border: `1px solid ${colors.hairline}`,
           display: "flex",
@@ -192,6 +194,8 @@ export function NativeAd({ position, compact = false }: NativeAdProps) {
         cursor: "pointer",
         padding: "16px 20px",
         background: colors.surface,
+        backdropFilter: "blur(20px) saturate(160%)",
+        WebkitBackdropFilter: "blur(20px) saturate(160%)",
         borderRadius: radius.lg,
         border: `1px solid ${colors.hairline}`,
         transition: `all ${animation.fast}`,

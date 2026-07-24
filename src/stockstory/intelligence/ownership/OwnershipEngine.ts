@@ -1,7 +1,7 @@
 /**
  * Ownership Intelligence Engine
  *
- * Analyses shareholding patterns for Philippine listed companies.
+ * Analyses shareholding patterns for PSX listed companies.
  * Tracks promoter, institutional, FII, DII, retail, and public holdings.
  * Identifies ownership changes that may signal thesis changes.
  */

@@ -17,7 +17,7 @@ export function EnhancedScreener() {
 
   // Fetch live quotes for selected symbols
   const { quotes, loading, error } = useQuotes(
-    selectedSymbols.map((s) => (s.endsWith('.NS') ? s : `${s}.NS`)),
+    selectedSymbols.map((s) => (s.endsWith('.PS') ? s : `${s}.PS`)),
     5000, // 5-second refresh
   );
 
@@ -103,7 +103,7 @@ export function EnhancedScreener() {
               {Array.from(quotes.values()).map((quote) => (
                 <tr key={quote.symbol} style={{ borderBottom: '1px solid #eee', backgroundColor: quote.cached ? '#fffef0' : '#fff' }}>
                   <td style={{ padding: '12px', fontWeight: 'bold' }}>{quote.symbol}</td>
-                  <td style={{ padding: '12px', textAlign: 'right' }}>₹{quote.price.toFixed(2)}</td>
+                  <td style={{ padding: '12px', textAlign: 'right' }}>₱{quote.price.toFixed(2)}</td>
                   <td
                     style={{
                       padding: '12px',
@@ -120,7 +120,7 @@ export function EnhancedScreener() {
                   </td>
                   <td style={{ padding: '12px', textAlign: 'center', fontSize: '12px' }}>
                     {quote.bid !== undefined && quote.ask !== undefined
-                      ? `₹${quote.bid.toFixed(0)}-${quote.ask.toFixed(0)}`
+                      ? `₱${quote.bid.toFixed(0)}-${quote.ask.toFixed(0)}`
                       : '—'}
                   </td>
                   <td

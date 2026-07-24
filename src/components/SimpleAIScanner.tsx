@@ -86,6 +86,8 @@ export default function SimpleAIScanner() {
             }}
             style={{
               backgroundColor: colors.surface,
+              backdropFilter: "blur(20px) saturate(160%)",
+              WebkitBackdropFilter: "blur(20px) saturate(160%)",
               borderRadius: '8px',
               padding: '12px',
               border: `1px solid ${colors.border}`,
@@ -133,6 +135,8 @@ export default function SimpleAIScanner() {
               marginTop: '8px',
               height: '4px',
               backgroundColor: colors.canvas,
+              backdropFilter: "blur(20px) saturate(160%)",
+              WebkitBackdropFilter: "blur(20px) saturate(160%)",
               borderRadius: '2px',
               overflow: 'hidden',
             }}>

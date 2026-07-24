@@ -2,7 +2,7 @@ export function formatNumber(val: number | string | null | undefined): string {
   if (val === null || val === undefined || val === "") return "—";
   const num = Number(val);
   if (isNaN(num) || !isFinite(num)) return "—";
-  return num.toLocaleString("en-IN");
+  return num.toLocaleString("en-PH");
 }
 
 export function formatPercentage(val: number | string | null | undefined): string {
@@ -14,25 +14,24 @@ export function formatPercentage(val: number | string | null | undefined): strin
   return `${sign}${finalVal.toFixed(2)}%`;
 }
 
-export function formatINR(val: number | string | null | undefined, compact = false): string {
+export function formatPHP(val: number | string | null | undefined, compact = false): string {
   if (val === null || val === undefined || val === "") return "—";
   const num = Number(val);
   if (isNaN(num) || !isFinite(num)) return "—";
 
   if (compact) {
-    if (num >= 10000000) {
-      return `₹${(num / 10000000).toFixed(2)} Cr`;
+    if (Math.abs(num) >= 1_000_000_000) {
+      return `₱${(num / 1_000_000_000).toFixed(2)}B`;
     }
-    if (num >= 100000) {
-      return `₹${(num / 100000).toFixed(2)} L`;
+    if (Math.abs(num) >= 1_000_000) {
+      return `₱${(num / 1_000_000).toFixed(2)}M`;
+    }
+    if (Math.abs(num) >= 1_000) {
+      return `₱${(num / 1_000).toFixed(2)}K`;
     }
   }
 
-  return num.toLocaleString("en-IN", {
-    style: "currency",
-    currency: "INR",
-    maximumFractionDigits: 2,
-  });
+  return `₱${num.toLocaleString("en-PH", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
 
 export function normalizeDate(val: string | number | Date | null | undefined): string {

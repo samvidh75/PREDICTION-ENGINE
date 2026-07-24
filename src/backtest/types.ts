@@ -30,7 +30,7 @@ export interface SnapshotInventory {
 
 // ─── Benchmark ──────────────────────────────────────────────────
 
-export type BenchmarkIndex = 'NIFTY50' | 'NIFTY100' | 'NIFTY500' | 'EQUAL_WEIGHT_UNIVERSE';
+export type BenchmarkIndex = 'PSEI' | 'PSEI_TOP_10' | 'PSE_ALL' | 'EQUAL_WEIGHT_UNIVERSE';
 
 export interface BenchmarkMetrics {
   cagr: number;            // Compound Annual Growth Rate (%)
@@ -61,7 +61,7 @@ export interface StrategyResult {
   strategy: StrategyType;
   rebalance: RebalanceFrequency;
   metrics: BenchmarkMetrics;
-  alpha: number;            // Excess return vs NIFTY500 (%)
+  alpha: number;            // Excess return vs KSEALL (%)
   trackingError: number;
   informationRatio: number;
   turnover: number;         // Average portfolio turnover per rebalance
@@ -182,7 +182,7 @@ export interface SurvivorshipBiasResult {
 // ─── Alpha Calculation ─────────────────────────────────────────
 
 export interface AlphaResult {
-  benchmark: 'NIFTY50' | 'NIFTY500';
+  benchmark: 'KSE100' | 'KSEALL';
   excessReturn: number;      // Annualized excess return (%)
   alpha: number;             // Jensen's Alpha
   beta: number;              // Market sensitivity

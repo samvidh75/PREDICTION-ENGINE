@@ -2,16 +2,16 @@ import { describe, it, expect } from 'vitest';
 import { normalizeTicker, inferExchange, inferSegment, isBseCode } from '../symbols/IndianSymbolNormalizer';
 
 describe('normalizeTicker', () => {
-  it('strips .NS suffix', () => {
-    expect(normalizeTicker('RELIANCE.NS')).toBe('RELIANCE');
+  it('strips .PS suffix', () => {
+    expect(normalizeTicker('BDO.PS')).toBe('BDO');
   });
 
   it('strips .PSE suffix', () => {
     expect(normalizeTicker('TCS.PSE')).toBe('TCS');
   });
 
-  it('strips .BO suffix (PSE)', () => {
-    expect(normalizeTicker('500325.BO')).toBe('500325');
+  it('strips .PSE suffix (numeric code)', () => {
+    expect(normalizeTicker('500325.PSE')).toBe('500325');
   });
 
   it('strips -EQ suffix', () => {
@@ -40,7 +40,7 @@ describe('normalizeTicker', () => {
   });
 
   it('trims whitespace', () => {
-    expect(normalizeTicker('  TCS.NS  ')).toBe('TCS');
+    expect(normalizeTicker('  TCS.PS  ')).toBe('TCS');
   });
 
   it('handles already-clean tickers', () => {

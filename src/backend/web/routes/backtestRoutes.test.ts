@@ -29,7 +29,7 @@ function strategyResult(overrides: Partial<StrategyResult> = {}): StrategyResult
 
 function benchmarkResult(overrides: Partial<BenchmarkResult> = {}): BenchmarkResult {
   return {
-    index: 'NIFTY500',
+    index: 'PSE_ALL',
     periodStart: '2025-01-01',
     periodEnd: '2025-12-31',
     constituents: 500,
@@ -64,7 +64,7 @@ describe('registerBacktestRoutes', () => {
         rebalance: 'MONTHLY',
         startDate: '2025-01-01',
         endDate: '2025-12-31',
-        benchmark: 'NIFTY500',
+        benchmark: 'PSE_ALL',
       },
     });
 
@@ -72,7 +72,7 @@ describe('registerBacktestRoutes', () => {
     const body = res.json();
     expect(body.relativePerformance.alphaVsBenchmark).toBe(0.06);
     expect(body.strategyResult.strategy).toBe('TOP_20');
-    expect(body.benchmarkResult.index).toBe('NIFTY500');
+    expect(body.benchmarkResult.index).toBe('PSE_ALL');
   });
 
   it('validates bad run requests', async () => {

@@ -38,14 +38,14 @@ export function PortfolioDashboard({ summary }: { summary: PortfolioSummary }) {
             Portfolio Value
           </div>
           <div style={{ fontSize: "32px", fontWeight: 700, color: colors.ink, lineHeight: 1.1 }}>
-            ₹{summary.totalValue.toLocaleString("en-IN")}
+            ₱{summary.totalValue.toLocaleString("en-PH")}
           </div>
           <div style={{ display: "flex", gap: "16px", marginTop: "8px" }}>
             <span style={{ color: isPositive ? colors.marketGreen : colors.marketRed, fontSize: typography.bodyMd.size }}>
               {isPositive ? "+" : ""}{summary.dayChangePct.toFixed(2)}% today
             </span>
             <span style={{ color: colors.mute, fontSize: typography.bodyMd.size }}>
-              Invested: ₹{summary.invested.toLocaleString("en-IN")}
+              Invested: ₱{summary.invested.toLocaleString("en-PH")}
             </span>
           </div>
         </div>
@@ -57,7 +57,7 @@ export function PortfolioDashboard({ summary }: { summary: PortfolioSummary }) {
           fontWeight: 600,
           fontSize: typography.bodyMd.size,
         }}>
-          {isPositive ? "+" : ""}₹{summary.dayChange.toLocaleString("en-IN")}
+          {isPositive ? "+" : ""}₱{summary.dayChange.toLocaleString("en-PH")}
         </div>
       </div>
 
@@ -99,8 +99,8 @@ export function PortfolioDashboard({ summary }: { summary: PortfolioSummary }) {
               <tr key={h.symbol} style={{ fontSize: typography.bodyMd.size, color: colors.body, borderBottom: `1px solid ${colors.hairline}` }}>
                 <td style={{ padding: "12px", fontWeight: 600, color: colors.ink }}>{h.symbol}</td>
                 <td style={{ padding: "12px" }}>{h.quantity}</td>
-                <td style={{ padding: "12px" }}>₹{h.avgPrice.toFixed(2)}</td>
-                <td style={{ padding: "12px", color: holdingPositive ? colors.marketGreen : colors.marketRed }}>₹{h.ltp.toFixed(2)}</td>
+                <td style={{ padding: "12px" }}>₱{h.avgPrice.toFixed(2)}</td>
+                <td style={{ padding: "12px", color: holdingPositive ? colors.marketGreen : colors.marketRed }}>₱{h.ltp.toFixed(2)}</td>
                 <td style={{ padding: "12px", color: holdingPositive ? colors.marketGreen : colors.marketRed }}>
                   {holdingPositive ? "+" : ""}{h.dayChangePct.toFixed(2)}%
                 </td>
@@ -108,7 +108,7 @@ export function PortfolioDashboard({ summary }: { summary: PortfolioSummary }) {
                   {h.totalReturnPct >= 0 ? "+" : ""}{h.totalReturnPct.toFixed(1)}%
                 </td>
                 <td style={{ padding: "12px", fontWeight: 600, color: h.pnl >= 0 ? colors.marketGreen : colors.marketRed }}>
-                  ₹{Math.abs(h.pnl).toLocaleString("en-IN")}
+                  ₱{Math.abs(h.pnl).toLocaleString("en-PH")}
                 </td>
                 <td style={{ padding: "12px" }}>{h.weight.toFixed(1)}%</td>
               </tr>

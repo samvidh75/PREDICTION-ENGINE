@@ -7,7 +7,7 @@ export interface Holding {
   id: string;
   ticker: string;
   quantity: number;
-  buyPrice: number; // INR
+  buyPrice: number; // PKR
   buyDate: number; // timestamp
   notes?: string;
 }

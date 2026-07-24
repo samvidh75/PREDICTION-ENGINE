@@ -1,181 +1,170 @@
 // ============================================================================
-// PREDICTION-ENGINE DESIGN TOKENS — PURE BLACK RAYCAST DESIGN SYSTEM
-// Pure #000000 canvas, #0A0A0A cards, #141414 hover, Inter ss03 typography
+// PREDICTION-ENGINE DESIGN TOKENS — RAYCAST-INSPIRED DARK THEME
+// Pure black canvas, high-contrast white ink, one vivid red-orange accent.
+// Apple-grade restraint: single typeface (Inter), no gradients, no drop
+// shadows — elevation comes from a black→near-black surface ladder.
+// Mirrors src/styles/tokens.css 1:1. Every export name is preserved so the
+// rest of the codebase (which reads these via inline `style={{ ... }}`)
+// keeps compiling and re-themes automatically.
 // ============================================================================
 
-// COLOR TOKENS — Pure black Raycast palette
-// Reference: DESIGN LEARNING 1 — Unified Design System
-// 3 core colors: Black (#000000), White (#FFFFFF), Red (#FF6B6B)
-// Everything else is shades of gray for hierarchy
+// ── COLORS ─────────────────────────────────────────────────────────────
 export const colors = {
-  // Brand — White CTA pill on black (Raycast convention)
-  primary:        '#ffffff',    // White CTA pill background
-  primaryPressed: '#e8e8e8',   // Pressed white CTA
-  onPrimary:      '#000000',   // Black text on white CTA — only black text in system
+  // Brand — white CTA pill on black (Raycast convention)
+  primary:        '#FFFFFF',
+  primaryPressed: '#E8E8E8',
+  onPrimary:      '#000000',
 
-  // Text — Pure black spec (5-step gray hierarchy)
-  ink:            '#ffffff',   // Primary headlines on pure black canvas (contrast 21:1)
-  body:           '#a0a0a0',   // Default paragraph / inline-link color (contrast 8:1)
-  charcoal:       '#c0c0c0',   // Brighter body where ink reads too soft
-  mute:           '#999999',   // Metadata, footer links, secondary captions (WCAG AA: 4.5:1)
-  ash:            '#585858',   // Disabled text, lowest emphasis
-  stone:          '#404040',   // Least-emphasis caption / disabled icon
-  onDark:         '#ffffff',   // Interactive-state primary text (button label, focused tab)
-  onDarkMute:     'rgba(255,255,255,0.65)',  // Translucent secondary on dark
+  // Text hierarchy on black
+  ink:            '#FFFFFF',   // Primary headlines / body (contrast 21:1)
+  body:           '#B4B4B4',   // Default paragraph / inline-link
+  charcoal:       '#D6D6D6',   // Stronger body emphasis
+  mute:           '#8C8C8C',   // Metadata, secondary captions
+  ash:            '#6B6B6B',   // Disabled text, lowest emphasis
+  stone:          '#4A4A4A',   // Least-emphasis caption / disabled icon
+  onDark:         '#FFFFFF',   // Interactive-state primary text
+  onDarkMute:     'rgba(255,255,255,0.65)',
 
-  // Surface ladder — 4-step elevation from pure black
-  canvas:           '#000000', // Page background — pure black (Principle 1)
-  surface:          '#0D0D0D', // Card / elevated panel — almost black
-  surfaceElevated:  '#141414', // Hover states, button-tertiary, text-input
-  surfaceCard:      '#1A1A1A', // Active/pressed, app icon tiles, keycap fill
-  buttonFg:         '#222222', // Rare deep card variant (featured pricing tier)
+  // Surface ladder — near-black elevation steps. Panel surfaces (everything
+  // but the page canvas itself) are translucent glass tints, not flat fills —
+  // this is the one consistent elevation language across the whole app.
+  canvas:           '#000000', // Page background — pure black, stays opaque
+  surface:          'rgba(18, 18, 20, 0.55)',  // Card / elevated panel — glass
+  surfaceElevated:  'rgba(26, 26, 28, 0.62)',  // Hover states, lifted interiors — glass
+  surfaceCard:      'rgba(30, 30, 32, 0.68)',  // Active/pressed cards, tile fills — glass
+  buttonFg:         '#222222', // Rare deep surface variant
 
-  // Backdrop / overlay tokens — structural glassmorphism
-  backdropClear:       'rgba(0,0,0,0)',      // Transparent (animation transitions)
-  backdropModal:       'rgba(0,0,0,0.4)',    // Modal sheet backdrop
-  backdropHeavy:       'rgba(0,0,0,0.5)',    // Heavy modal / drawer backdrop
-  backdropGlassmorphic:'rgba(0,0,0,0.85)',   // Sticky nav / header with blur
-  backdropFooter:      'rgba(20,20,20,0.85)', // Floating footer bar
-  backdropMuted:       'rgba(112,112,112,0.12)', // Neutral badge / chip bg
+  // Glass — shared translucency tokens for the app's elevation system.
+  glassBg:          'rgba(18, 18, 20, 0.55)',
+  glassBgStrong:    'rgba(22, 22, 24, 0.72)',
+  glassBorder:      'rgba(255, 255, 255, 0.09)',
+  glassBorderTop:   'rgba(255, 255, 255, 0.14)',
+  glassBlur:        'blur(20px) saturate(160%)',
 
-  // Borders (hairline 1px) — sharper on pure black
-  hairline:       '#1A1A1A',
-  hairlineSoft:   'rgba(255,255,255,0.06)',
-  hairlineStrong: 'rgba(255,255,255,0.12)',
+  // Backdrop / overlay tokens
+  backdropClear:       'rgba(0,0,0,0)',
+  backdropModal:       'rgba(0,0,0,0.5)',
+  backdropHeavy:       'rgba(0,0,0,0.65)',
+  backdropGlassmorphic:'rgba(0,0,0,0.85)',
+  backdropFooter:      'rgba(13,13,13,0.92)',
+  backdropMuted:       'rgba(255,255,255,0.06)',
 
-  // Brand accent — Raycast red (the ONLY action color)
-  accentRed:        '#FF6B6B',  // Raycast red — CTAs, emphasis, action (Principle 1)
-  accentRedSoft:    'rgba(255,107,107,0.15)',
-  accentRedStrong:  'rgba(255,107,107,0.25)',
-  accentBlue:       '#57c1ff',
-  accentBlueSoft:   'rgba(87,193,255,0.15)',
-  accentYellow:     '#ffc533',
-  accentYellowSoft: 'rgba(255,197,51,0.15)',
+  // Borders — sharp hairlines on black
+  hairline:       '#1F1F1F',
+  hairlineSoft:   'rgba(255,255,255,0.08)',
+  hairlineStrong: 'rgba(255,255,255,0.16)',
 
-  // Market semantic colors — used ONLY for market signals (Principle 1.5)
-  // Distinct from brand red: brand red = action, marketRed = bearish
-  marketGreen:       '#34C759',  // Bullish, positive, up (iOS green)
-  marketGreenSoft:   'rgba(52,199,89,0.15)',
-  marketRed:         '#FF3B30',  // Bearish, negative, down (iOS red)
-  marketRedSoft:     'rgba(255,59,48,0.15)',
-  marketOrange:      '#FF9500',  // Neutral, caution, watch (iOS orange)
-  marketOrangeSoft:  'rgba(255,149,0,0.15)',
+  // Brand accent — Raycast red-orange. The ONLY accent color.
+  accentRed:        '#FF6B4A',
+  accentRedSoft:    'rgba(255,107,74,0.14)',
+  accentRedStrong:  'rgba(255,107,74,0.26)',
+  accentBlue:       '#57C1FF',
+  accentBlueSoft:   'rgba(87,193,255,0.14)',
+  accentYellow:     '#FF9500',
+  accentYellowSoft: 'rgba(255,149,0,0.14)',
 
-  // Accent green — distinct from market green (market = signals, accent = UI)
-  accentGreen:      '#59d499',
-  accentGreenSoft:  'rgba(89,212,153,0.15)',
+  // Market semantic colors — used ONLY for market signals
+  // (distinct from brand accent: accent = UI, market = signals)
+  marketGreen:       '#34C759', // Bullish (positive)
+  marketGreenSoft:   'rgba(52,199,89,0.14)',
+  marketRed:         '#FF3B30', // Bearish (negative)
+  marketRedSoft:     'rgba(255,59,48,0.14)',
+  marketOrange:      '#FF9500', // Neutral, caution
+  marketOrangeSoft:  'rgba(255,149,0,0.14)',
 
-  // Brand gradient — red diagonal-stripe hero
-  heroStripeStart: '#FF6B6B',
-  heroStripeEnd:   '#b0151e',
+  accentGreen:       '#34C759',
+  accentGreenSoft:   'rgba(52,199,89,0.14)',
+
+  // Legacy gradient anchors retained so old code paths still render
+  heroStripeStart: '#FF6B4A',
+  heroStripeEnd:   '#B0301A',
   keyBgStart:      '#1A1A1A',
   keyBgEnd:        '#0D0D0D',
 
-  // Legacy semantic aliases (for existing component compatibility)
+  // Semantic aliases — kept for backward compatibility
   success:         '#34C759',
-  danger:          '#FF6B6B',
-  warning:         '#ffc533',
+  danger:          '#FF3B30',
+  warning:         '#FF9500',
   page:            '#000000',
   card:            '#0D0D0D',
-  textPrimary:     '#ffffff',
-  textSecondary:   '#a0a0a0',
-  textTertiary:    '#707070',
-  border:          '#1A1A1A',
-  separator:       '#1A1A1A',
-  fill:            '#141414',
-  bgSecondary:     '#141414',
+  textPrimary:     '#FFFFFF',
+  textSecondary:   '#B4B4B4',
+  textTertiary:    '#8C8C8C',
+  border:          '#1F1F1F',
+  separator:       '#1F1F1F',
+  fill:            '#161616',
+  bgSecondary:     '#161616',
 } as const;
 
-// TYPOGRAPHY — Inter with Apple-style fallbacks and ss03 stylistic set
+// ── TYPOGRAPHY ─────────────────────────────────────────────────────────
+// One typeface, three weights of intent: Inter carries everything (display,
+// body, UI); JetBrains Mono keeps figures aligned in tables and tickers.
 export const typography = {
-  fontFamily: '-apple-system, BlinkMacSystemFont, \'SF Pro Display\', \'SF Pro Text\', \'Segoe UI\', Roboto, Helvetica, Arial, sans-serif',
-  fontFeature: '"calt", "kern", "liga", "ss03"',
+  fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+  displayFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", sans-serif',
+  monoFamily:    '"JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
+  fontFeature:   '"calt", "kern", "liga", "ss03"',
 
-  displayXl: { size: '64px', weight: 600, line: '1.1', track: '0' },
-  displayLg: { size: '56px', weight: 500, line: '1.17', track: '0.2px' },
-  headingXl: { size: '24px', weight: 500, line: '1.6', track: '0.2px' },
-  headingLg: { size: '22px', weight: 500, line: '1.15', track: '0' },
-  headingMd: { size: '20px', weight: 500, line: '1.4', track: '0.2px' },
-  headingSm: { size: '18px', weight: 500, line: '1.4', track: '0.2px' },
-  bodyLg:    { size: '18px', weight: 400, line: '1.6', track: '0' },
-  bodyMd:    { size: '16px', weight: 400, line: '1.6', track: '0' },
-  bodyStrong:{ size: '16px', weight: 500, line: '1.4', track: '0.2px' },
-  bodySm:    { size: '14px', weight: 400, line: '1.6', track: '0' },
-  bodySmStrong: { size: '14px', weight: 500, line: '1.6', track: '0.2px' },
-  captionMd: { size: '13px', weight: 400, line: '1.4', track: '0.1px' },
-  captionSm: { size: '12px', weight: 400, line: '1.5', track: '0.4px' },
-  linkMd:    { size: '16px', weight: 500, line: '1.4', track: '0.3px' },
-  buttonMd:  { size: '14px', weight: 500, line: '1.6', track: '0.2px' },
+  displayXl: { size: '64px', weight: 600, line: '1.05', track: '-0.02em' },
+  displayLg: { size: '56px', weight: 600, line: '1.08', track: '-0.015em' },
+  headingXl: { size: '24px', weight: 600, line: '1.3',  track: '-0.01em' },
+  headingLg: { size: '22px', weight: 600, line: '1.2',  track: '-0.01em' },
+  headingMd: { size: '20px', weight: 600, line: '1.35', track: '0.2px'  },
+  headingSm: { size: '18px', weight: 600, line: '1.4',  track: '0.2px'  },
+  bodyLg:    { size: '18px', weight: 400, line: '1.6',  track: '0'      },
+  bodyMd:    { size: '16px', weight: 400, line: '1.6',  track: '0'      },
+  bodyStrong:{ size: '16px', weight: 500, line: '1.45', track: '0.2px'  },
+  bodySm:    { size: '14px', weight: 400, line: '1.55', track: '0'      },
+  bodySmStrong:{ size: '14px', weight: 500, line: '1.55', track: '0.2px'},
+  captionMd: { size: '13px', weight: 400, line: '1.45', track: '0.1px'  },
+  captionSm: { size: '12px', weight: 400, line: '1.4',  track: '0.4px'  },
+  linkMd:    { size: '16px', weight: 500, line: '1.4',  track: '0.3px'  },
+  buttonMd:  { size: '14px', weight: 500, line: '1.4',  track: '0.2px'  },
 
-  // Backward compat aliases
-  h1: { desktop: { size: '64px', weight: 600, line: '1.1', track: '0' },
-        mobile: { size: '40px', weight: 600, line: '1.1', track: '0' } },
-  h2: { desktop: { size: '24px', weight: 500, line: '1.6', track: '0.2px' },
-        mobile: { size: '20px', weight: 500, line: '1.4', track: '0.2px' } },
-  h3: { desktop: { size: '18px', weight: 500, line: '1.4', track: '0.2px' },
-        mobile: { size: '16px', weight: 500, line: '1.4', track: '0.2px' } },
-  body: { desktop: { size: '16px', weight: 400, line: '1.6', track: '0' },
-          mobile: { size: '15px', weight: 400, line: '1.6', track: '0' } },
-  callout: { desktop: { size: '14px', weight: 400, line: '1.6', track: '0' },
-             mobile: { size: '14px', weight: 400, line: '1.6', track: '0' } },
-  caption: { desktop: { size: '12px', weight: 400, line: '1.5', track: '0.4px' },
-             mobile: { size: '12px', weight: 400, line: '1.5', track: '0.4px' } },
-  micro: { desktop: { size: '11px', weight: 600, line: '1.3', track: '0.04em', uppercase: true },
-           mobile: { size: '11px', weight: 600, line: '1.3', track: '0.04em', uppercase: true } },
+  // Backward-compat aliases — older callers (mobile vs desktop) keep working
+  h1: { desktop: { size: '64px', weight: 600, line: '1.05', track: '-0.02em' },
+        mobile:  { size: '40px', weight: 600, line: '1.05', track: '-0.02em' } },
+  h2: { desktop: { size: '24px', weight: 600, line: '1.3',  track: '-0.01em' },
+        mobile:  { size: '20px', weight: 600, line: '1.35', track: '-0.01em' } },
+  h3: { desktop: { size: '18px', weight: 600, line: '1.4',  track: '0.2px'   },
+        mobile:  { size: '16px', weight: 600, line: '1.4',  track: '0.2px'   } },
+  body: { desktop: { size: '16px', weight: 400, line: '1.6', track: '0'     },
+          mobile:  { size: '15px', weight: 400, line: '1.6', track: '0'     } },
+  callout: { desktop: { size: '14px', weight: 400, line: '1.55', track: '0'   },
+             mobile:  { size: '14px', weight: 400, line: '1.55', track: '0'   } },
+  caption: { desktop: { size: '12px', weight: 400, line: '1.45', track: '0.4px' },
+            mobile:  { size: '12px', weight: 400, line: '1.45', track: '0.4px' } },
+  micro: { desktop: { size: '11px', weight: 600, line: '1.3', track: '0.06em', uppercase: true },
+           mobile:  { size: '11px', weight: 600, line: '1.3', track: '0.06em', uppercase: true } },
 } as const;
 
-// SPACING — Strict 8px grid system (Principle 3)
-// Rule: every spacing value must be a multiple of 8px
-// ✅ OK: 4, 8, 12, 16, 24, 32, 40, 48, 64, 80, 96
-// ⚠️ Rare: 12px, 20px (only for specific reasons)
-// ❌ Never: 13px, 17px, 23px (random numbers)
+// ── SPACING — 8px grid (unchanged) ─────────────────────────────────────
 export const space = {
-  0:   '0px',
-  1:   '4px',
-  2:   '8px',
-  3:   '12px',
-  4:   '16px',
-  5:   '20px',
-  6:   '24px',
-  8:   '32px',
-  10:  '40px',
-  12:  '48px',
-  16:  '64px',
-  20:  '80px',
+  0:   '0px',  1:   '4px',   2:   '8px',   3:   '12px',
+  4:   '16px', 5:   '20px',  6:   '24px',  8:   '32px',
+  10:  '40px', 12:  '48px',  16:  '64px',  20:  '80px',
   24:  '96px',
-  xxs: '2px',
-  xs:  '4px',
-  sm:  '8px',
-  md:  '16px',
-  lg:  '24px',
-  xl:  '32px',
-  xxl: '48px',
-  section: '96px',
+  xxs: '2px',  xs:  '4px',   sm:  '8px',   md:  '16px',
+  lg:  '24px', xl:  '32px',  xxl: '48px',  section: '96px',
 } as const;
 
-// RADIUS — Raycast multi-radius system
+// ── RADIUS — Raycast multi-radius system ───────────────────────────────
 export const radius = {
-  none: '0px',
-  xs:   '4px',
-  sm:   '6px',
-  md:   '8px',
-  lg:   '10px',
-  xl:   '16px',
-  full: '9999px',
+  none: '0px', xs: '4px', sm: '6px', md: '8px', lg: '12px', xl: '18px', full: '9999px',
 } as const;
 
-// LAYOUT
+// ── LAYOUT (unchanged structure) ───────────────────────────────────────
 export const layout = {
-  sidebarWidth:       '256px',
+  sidebarWidth:       '240px',
   contentMaxWidth:    '1200px',
   pagePaddingMobile:  '16px',
   pagePaddingDesktop: '32px',
   sectionGapMobile:   '40px',
-  sectionGapDesktop:  '96px',
+  sectionGapDesktop:  '88px',
   borderWidth:        '1px',
 } as const;
 
-// COMPONENT DIMENSIONS — Raycast spec
+// ── COMPONENT DIMENSIONS ───────────────────────────────────────────────
 export const components = {
   input: {
     height:   '36px',
@@ -187,8 +176,8 @@ export const components = {
     paddingX:      '16px',
   },
   navBar: {
-    heightDesktop: '56px',
-    heightMobile:  '56px',
+    heightDesktop: '52px',
+    heightMobile:  '52px',
   },
   card: {
     paddingMobile:  '16px',
@@ -196,40 +185,36 @@ export const components = {
   },
 } as const;
 
-// BREAKPOINTS
+// ── BREAKPOINTS ────────────────────────────────────────────────────────
 export const breakpoints = {
-  mobile: 480,
-  tablet: 768,
-  desktop: 1024,
-  desktopLg: 1280,
-  desktopXl: 1440,
+  mobile: 480, tablet: 768, desktop: 1024, desktopLg: 1280, desktopXl: 1440,
 } as const;
 
-// SHADOWS — No drop shadows in Raycast. Elevation via surface ladder.
+// ── SHADOWS — no drop shadows; elevation via surface ladder ────────────
 export const shadows = {
   card:     'none',
-  elevated: 'none',
+  elevated: '0 24px 60px -28px rgba(0,0,0,0.6)',
   nav:      'none',
   none:     'none',
 } as const;
 
-// ANIMATION — Consistent Raycast easing (Principle 7)
-// One easing curve for EVERY animation: cubic-bezier(0.34, 1.56, 0.64, 1)
-// Subtle, fast (150-300ms), consistent
-// Never use different easing curves
+// ── ANIMATION — multiple curves with intent ─────────────────────────────
 export const animation = {
-  spring:    '0.2s cubic-bezier(0.34, 1.56, 0.64, 1)',  // Standard (200ms)
-  fast:      '0.15s cubic-bezier(0.34, 1.56, 0.64, 1)', // Fast (150ms)
-  slow:      '0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',  // Slow (300ms)
-  standard:  '0.2s cubic-bezier(0.34, 1.56, 0.64, 1)',  // Backward compat
+  spring:    '0.22s cubic-bezier(0.32, 1.4, 0.6, 1)',   // Slight overshoot for popovers / selects
+  fast:      '0.15s cubic-bezier(0.4, 0, 0.2, 1)',      // Crisp hover / press
+  slow:      '0.4s cubic-bezier(0.16, 1, 0.3, 1)',      // Add/dismiss, marquee ramp
+  standard:  '0.2s cubic-bezier(0.32, 1.4, 0.6, 1)',     // Backward-compat
+  paper:     '0.5s cubic-bezier(0.2, 0.7, 0.1, 1)',      // Long, decisive pauses (section transitions)
+  marquee:   '40s linear',                                // Constant ticker flow
+  draw:      '1.2s cubic-bezier(0.7, 0, 0.3, 1)',        // Stroke-draw / line reveal
+  counter:   '0.9s cubic-bezier(0.2, 0.85, 0.35, 1)',   // Number ticker easing
 } as const;
 
-// MEDIA QUERY HELPERS
+// ── MEDIA ──────────────────────────────────────────────────────────────
 export const media = {
   mobile:  `(max-width: ${breakpoints.mobile}px)`,
   tablet:  `(max-width: ${breakpoints.tablet}px)`,
   desktop: `(min-width: ${breakpoints.desktop}px)`,
 } as const;
 
-// Bundle export for convenience
 export default { colors, typography, space, radius, layout, components, breakpoints, shadows, animation, media };

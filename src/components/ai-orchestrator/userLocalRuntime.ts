@@ -32,7 +32,7 @@ function buildPrompt(request: ResearchAiRequest): string {
     'CONTEXT:',
     ...(context.narrative ?? []),
     '',
-    `Sector: ${context.sector ?? ''} | Price: ₹${formatPrice(context.currentPrice)} (${(context.changePercent ?? 0) >= 0 ? '+' : ''}${formatPrice(context.changePercent)}%)`,
+    `Sector: ${context.sector ?? ''} | Price: ₱${formatPrice(context.currentPrice)} (${(context.changePercent ?? 0) >= 0 ? '+' : ''}${formatPrice(context.changePercent)}%)`,
     '',
     'Risks:',
     ...((context.risksToReview ?? []).length > 0

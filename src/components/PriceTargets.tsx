@@ -15,7 +15,7 @@
 import { Target, TrendingUp, Minus, TrendingDown } from "lucide-react";
 import { colors, radius, animation } from "../design/tokens";
 import { formatNumber } from "../services/ui/dataFormatting";
-import { formatPercent } from "../services/ui/indianNumberFormat";
+import { formatPercent } from "../services/ui/phNumberFormat";
 
 interface PriceTarget {
   scenario: "bull" | "base" | "bear";
@@ -110,6 +110,8 @@ export function PriceTargets({ currentPrice = 342.50 }: { currentPrice?: number 
         style={{
           padding: "12px 16px",
           background: colors.surface,
+          backdropFilter: "blur(20px) saturate(160%)",
+          WebkitBackdropFilter: "blur(20px) saturate(160%)",
           borderRadius: radius.md,
           border: `1px solid ${colors.hairline}`,
           display: "flex",
@@ -120,7 +122,7 @@ export function PriceTargets({ currentPrice = 342.50 }: { currentPrice?: number 
       >
         <span style={{ fontSize: "13px", color: colors.textSecondary }}>Current Price (CMP)</span>
         <span style={{ fontSize: "20px", fontWeight: 700, color: colors.textPrimary }}>
-          ₹{formatNumber(currentPrice)}
+          ₱{formatNumber(currentPrice)}
         </span>
       </div>
 
@@ -158,7 +160,7 @@ export function PriceTargets({ currentPrice = 342.50 }: { currentPrice?: number 
                 </div>
                 <div style={{ textAlign: "right" }}>
                   <div style={{ fontSize: "22px", fontWeight: 700, color: colors.textPrimary }}>
-                    ₹{formatNumber(target.price)}
+                    ₱{formatNumber(target.price)}
                   </div>
                   <div
                     style={{
@@ -185,6 +187,8 @@ export function PriceTargets({ currentPrice = 342.50 }: { currentPrice?: number 
                     style={{
                       padding: "3px 8px",
                       background: colors.surface,
+                      backdropFilter: "blur(20px) saturate(160%)",
+                      WebkitBackdropFilter: "blur(20px) saturate(160%)",
                       borderRadius: radius.full,
                       fontSize: "11px",
                       color: colors.textSecondary,

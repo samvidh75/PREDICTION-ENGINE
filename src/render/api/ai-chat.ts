@@ -21,7 +21,7 @@ const STOCK_KNOWLEDGE_BASE: Record<string, string> = {
   'pe ratio': `P/E Ratio = Price per share ÷ Earnings per share. Shows how much investors pay per rupee of earnings.
 • Low P/E doesn't always mean undervalued
 • Check alongside ROE, debt, and growth rates
-• Philippine mid-caps average 15-20x P/E
+• PSX mid-caps average 15-20x P/E
 • Compare with sector peers and historical average`,
 
   'roe': `ROE = Net Profit ÷ Shareholder Equity. Measures profit generated per rupee of equity.
@@ -98,7 +98,7 @@ export async function aiChatHandler(
 
     // Default helpful response
     reply.send({
-      response: `Ask about: P/E ratio, ROE, Debt/Equity ratio, Dividend strategy, Growth metrics, or Valuation methods. I can help you analyze Philippine stocks!`,
+      response: `Ask about: P/E ratio, ROE, Debt/Equity ratio, Dividend strategy, Growth metrics, or Valuation methods. I can help you analyze PSX stocks!`,
       confidence: 0.8,
       source: 'server',
     } as ChatResponse);

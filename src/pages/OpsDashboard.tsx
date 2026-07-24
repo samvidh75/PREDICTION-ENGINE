@@ -55,7 +55,7 @@ function fmtBytes(bytes: number): string {
 }
 
 function fmtInr(paise: number): string {
-  return new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(paise / 100);
+  return new Intl.NumberFormat("en-PH", { style: "currency", currency: "PKR", maximumFractionDigits: 0 }).format(paise / 100);
 }
 
 // ── Styles ────────────────────────────────────────────────────────────────────
@@ -80,6 +80,8 @@ const styles = {
   },
   card: {
     background: colors.surface,
+    backdropFilter: "blur(20px) saturate(160%)",
+    WebkitBackdropFilter: "blur(20px) saturate(160%)",
     border: `1px solid ${colors.hairline}`,
     borderRadius: radius.md,
     padding: space[5],
@@ -149,6 +151,8 @@ const styles = {
   },
   passwordCard: {
     background: colors.surface,
+    backdropFilter: "blur(20px) saturate(160%)",
+    WebkitBackdropFilter: "blur(20px) saturate(160%)",
     border: `1px solid ${colors.hairline}`,
     borderRadius: radius.md,
     padding: space[8],
@@ -160,6 +164,8 @@ const styles = {
     width: "100%",
     padding: `${space[3]} ${space[4]}`,
     background: colors.surfaceElevated,
+    backdropFilter: "blur(20px) saturate(160%)",
+    WebkitBackdropFilter: "blur(20px) saturate(160%)",
     border: `1px solid ${colors.hairline}`,
     borderRadius: radius.sm,
     color: colors.ink,

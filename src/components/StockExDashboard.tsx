@@ -92,6 +92,8 @@ export default function StockExDashboard({ userId, hasProTier }: StockExDashboar
       <div
         style={{
           background: colors.surface,
+          backdropFilter: "blur(20px) saturate(160%)",
+          WebkitBackdropFilter: "blur(20px) saturate(160%)",
           border: `1px solid ${colors.charcoal}`,
           padding: space[8],
           borderRadius: radius.lg,
@@ -144,6 +146,8 @@ export default function StockExDashboard({ userId, hasProTier }: StockExDashboar
 
   const cardStyle: React.CSSProperties = {
     background: colors.surface,
+    backdropFilter: "blur(20px) saturate(160%)",
+    WebkitBackdropFilter: "blur(20px) saturate(160%)",
     border: `1px solid ${colors.charcoal}`,
     padding: space[4],
     borderRadius: radius.sm,
@@ -178,6 +182,8 @@ export default function StockExDashboard({ userId, hasProTier }: StockExDashboar
           onChange={(e) => setTicker(e.target.value)}
           style={{
             background: colors.surface,
+            backdropFilter: "blur(20px) saturate(160%)",
+            WebkitBackdropFilter: "blur(20px) saturate(160%)",
             border: `1px solid ${colors.charcoal}`,
             borderRadius: radius.sm,
             color: colors.textPrimary,
@@ -205,6 +211,8 @@ export default function StockExDashboard({ userId, hasProTier }: StockExDashboar
             style={{
               width: "100%",
               background: colors.canvas,
+              backdropFilter: "blur(20px) saturate(160%)",
+              WebkitBackdropFilter: "blur(20px) saturate(160%)",
               height: 4,
               borderRadius: radius.full,
               marginTop: space[2],

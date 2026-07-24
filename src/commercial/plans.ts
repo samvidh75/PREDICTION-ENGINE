@@ -7,8 +7,8 @@
  *
  * Tiers:
  *   free       → Basic stock health, 1 watchlist, manual refresh
- *   plus       → Unlimited watchlists, alerts, daily digest (₹99/mo)
- *   pro        → Advanced search, peer comparison, CSV export (₹299/mo)
+ *   plus       → Unlimited watchlists, alerts, daily digest (₱99/mo)
+ *   pro        → Advanced search, peer comparison, CSV export (₱299/mo)
  *
  * "Investor" and "Professional" from the legacy DB migration are
  * mapped to "plus" and "pro" for cleaner product naming.
@@ -53,8 +53,8 @@ export interface Plan {
   /** Display name e.g. "Free", "Research Plus" */
   name: string;
   tier: PlanTier;
-  /** Monthly price in INR (0 for free) */
-  priceInr: number;
+  /** Monthly price in PKR (0 for free) */
+  pricePkr: number;
   /** Feature keys this plan unlocks */
   features: FeatureKey[];
   /** Human-readable feature list for the pricing page */
@@ -77,7 +77,7 @@ const PLANS: Plan[] = [
     id: 'plan_free',
     name: 'Free',
     tier: 'free',
-    priceInr: 0,
+    pricePkr: 0,
     features: [
       'stock_health_basic',
       'factor_breakdown',
@@ -103,7 +103,7 @@ const PLANS: Plan[] = [
     id: 'plan_plus_99',
     name: 'Research Plus',
     tier: 'plus',
-    priceInr: 99,
+    pricePkr: 99,
     features: [
       'stock_health_basic',
       'factor_breakdown',
@@ -135,7 +135,7 @@ const PLANS: Plan[] = [
     id: 'plan_pro_299',
     name: 'Research Pro',
     tier: 'pro',
-    priceInr: 299,
+    pricePkr: 299,
     features: [
       'stock_health_basic',
       'factor_breakdown',

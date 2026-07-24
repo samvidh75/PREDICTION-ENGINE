@@ -39,8 +39,8 @@ export class CompanyIdentityResolver {
     }
 
     // 2. Look up via alias resolver
-    const nseSymbol = this.aliasResolver.toCanonical(key);
-    if (!nseSymbol) {
+    const pseSymbol = this.aliasResolver.toCanonical(key);
+    if (!pseSymbol) {
       return {
         identity: null,
         confidence: 0,
@@ -51,7 +51,7 @@ export class CompanyIdentityResolver {
 
     // 3. In production, this would query a DB-backed identity registry.
     //    The following returns a placeholder for known PSE-like symbols.
-    const identity = this.fetchIdentity(nseSymbol);
+    const identity = this.fetchIdentity(pseSymbol);
     if (!identity) {
       return {
         identity: null,
@@ -88,7 +88,7 @@ export class CompanyIdentityResolver {
 
   private extractKey(source: ResolutionSource): string | null {
     switch (source.kind) {
-      case "nse_symbol":
+      case "pse_symbol":
         return normalizeSymbol(source.symbol);
       case "bse_code":
         return source.code;
@@ -104,7 +104,7 @@ export class CompanyIdentityResolver {
   /**
    * Fetch identity from registry. Placeholder — real impl queries DB.
    */
-  private fetchIdentity(nseSymbol: string): CompanyIdentity | null {
+  private fetchIdentity(pseSymbol: string): CompanyIdentity | null {
     // In production, this queries the identity_registry table.
     // For now return null, which triggers "not-found" resolution.
     return null;
@@ -127,7 +127,7 @@ export class CompanyIdentityResolver {
         leftValue: identity.isin,
         rightValue: source.value.toUpperCase(),
         severity: "error",
-        description: `ISIN mismatch for ${identity.nseSymbol}: registry says ${identity.isin}, source says ${source.value.toUpperCase()}`,
+        description: `ISIN mismatch for ${identity.pseSymbol}: registry says ${identity.isin}, source says ${source.value.toUpperCase()}`,
       });
     }
     return conflicts;

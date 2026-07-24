@@ -78,8 +78,8 @@ class AdvancedMarketAI {
         return `**${i + 1}. ${stock.symbol}**
 • Recommendation: ${stock.analysis.recommendation}
 • P/E: ${stock.metrics.peRatio.toFixed(2)}x | ROE: ${stock.metrics.roe.toFixed(1)}%
-• Market Cap: ₹${stock.metrics.marketCap.toFixed(0)}Cr
-• Target Price: ₹${stock.analysis.targetPrice.toFixed(2)}
+• Market Cap: ₱${(stock.metrics.marketCap / 10).toFixed(0)}M
+• Target Price: ₱${stock.analysis.targetPrice.toFixed(2)}
 • Horizon: ${stock.analysis.investmentHorizon}
 ${stock.analysis.pros.slice(0, 2).map(p => `  ✓ ${p}`).join('\n')}`;
       }).join('\n\n') +
@@ -118,17 +118,17 @@ ${stock.analysis.pros.slice(0, 2).map(p => `  ✓ ${p}`).join('\n')}`;
     const response = `📊 **Detailed Analysis: ${symbol}**\n\n` +
       `**Valuation**: ${valuationStatus} at P/E ${metrics.peRatio.toFixed(2)}x\n` +
       `**Quality**: ${qualityStatus} (ROE ${metrics.roe.toFixed(1)}%, ROCE ${metrics.roce.toFixed(1)}%)\n` +
-      `**Market Cap**: ₹${metrics.marketCap.toFixed(0)}Cr\n\n` +
+      `**Market Cap**: ₱${(metrics.marketCap / 10).toFixed(0)}M\n\n` +
       `**Investment Thesis**\n` +
       `${analysis.pros.map(p => `✓ ${p}`).join('\n')}\n\n` +
       `**Key Risks**\n` +
       `${analysis.cons.map(c => `✗ ${c}`).join('\n')}\n\n` +
       `**Valuation Metrics**\n` +
       `• P/E Ratio: ${metrics.peRatio.toFixed(2)}x (Industry avg: 18-22x)\n` +
-      `• Book Value: ₹${metrics.bookValue.toFixed(2)}\n` +
+      `• Book Value: ₱${metrics.bookValue.toFixed(2)}\n` +
       `• Dividend Yield: ${metrics.dividendYield.toFixed(2)}%\n` +
       `• Debt/Equity: ${metrics.debtToEquity.toFixed(2)}x\n\n` +
-      `**Recommendation**: ${analysis.recommendation} | Target: ₹${analysis.targetPrice.toFixed(2)} | Horizon: ${analysis.investmentHorizon}`;
+      `**Recommendation**: ${analysis.recommendation} | Target: ₱${analysis.targetPrice.toFixed(2)} | Horizon: ${analysis.investmentHorizon}`;
 
     return {
       response,
@@ -154,7 +154,7 @@ ${stock.analysis.pros.slice(0, 2).map(p => `  ✓ ${p}`).join('\n')}`;
         `• Shows what investors pay for every rupee of earnings\n` +
         `• Low P/E (10-15x): May be undervalued or risky\n` +
         `• High P/E (25-35x): Growth potential or overvalued\n` +
-        `• Typical Philippine market: 15-22x\n\n` +
+        `• Typical PSX market: 15-22x\n\n` +
         `Don't rely on P/E alone - always check:\n` +
         `• Company growth rate\n` +
         `• Return on equity (ROE)\n` +
@@ -175,7 +175,7 @@ ${stock.analysis.pros.slice(0, 2).map(p => `  ✓ ${p}`).join('\n')}`;
         `Dividend Yield = Annual Dividend ÷ Stock Price\n\n` +
         `What it means:\n` +
         `• How much income you get from holding the stock\n` +
-        `• 2-4% is typical for Philippine blue-chips\n` +
+        `• 2-4% is typical for PSX blue-chips\n` +
         `• >5% may indicate value trap\n\n` +
         `Best dividend stocks:\n` +
         `• Consistent payout for 5+ years\n` +
@@ -273,11 +273,11 @@ ${stock.analysis.pros.slice(0, 2).map(p => `  ✓ ${p}`).join('\n')}`;
       `**Sector Deep Dives**\n` +
       `🏦 Banking: NPA stress easing, credit growth 8-10%\n` +
       `💻 IT: Digital transformation cycle, AI adoption\n` +
-      `🏭 Manufacturing: PLI scheme benefits, capex cycle\n` +
+      `🏭 Manufacturing: Reshoring & export incentive benefits, capex cycle\n` +
       `💊 Pharma: Margin expansion on pricing power\n\n` +
       `**Emerging Opportunities**\n` +
       `• Semiconductor supply chain localization\n` +
-      `• Green energy transition (INR 10+ lakh Cr capex)\n` +
+      `• Green energy transition (₱1T+ capex pipeline)\n` +
       `• EV ecosystem (charging, batteries)\n` +
       `• Digital payments and fintech\n\n` +
       `**Research Tools**\n` +

@@ -142,7 +142,7 @@ export class SECFilter {
       'It does not constitute investment advice, a recommendation, or an offer to buy or sell any security.',
       'This is a model-generated analysis based on historical data and quantitative factors.',
       'Past performance does not guarantee future results.',
-      'Please consult a Philippine SEC-registered investment adviser before making any investment decisions.',
+      'Please consult a PSX SEC-registered investment adviser before making any investment decisions.',
       'Retail investors should conduct their own research and assess their personal risk tolerance.',
     ].join(' ');
   }

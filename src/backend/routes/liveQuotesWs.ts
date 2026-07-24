@@ -1,6 +1,6 @@
 /**
  * WebSocket live quote server
- * Streams real-time quotes from IndianAPI, fallback to Groww/Yahoo
+ * Streams real-time quotes from Yahoo Finance (PSE-listed symbols)
  *
  * Clients: frontend subscribes to symbols, receives 500ms updates
  * Path: /api/quotes/ws

@@ -20,7 +20,7 @@ function parseArgs() {
   };
 }
 
-const SYMBOLS = ['RELIANCE', 'TCS', 'INFY', 'HDFCBANK', 'ITC', 'WIPRO', 'LT', 'AXISBANK', 'SBIN', 'MARUTI'];
+const SYMBOLS = ['HBL', 'ENGRO', 'SYS', 'UBL', 'NESTLE', 'LUCK', 'FFC', 'POL', 'OGDC', 'HUBC'];
 
 async function main() {
   const opts = parseArgs();

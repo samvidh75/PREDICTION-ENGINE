@@ -1,22 +1,43 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { execSync } from "node:child_process";
 import type { Plugin, ViteDevServer } from "vite";
 
 const root = path.dirname(fileURLToPath(import.meta.url));
 const snapshotModule = path.resolve(root, "src/lib/stockResearchSnapshot.ts");
 
-// Symbol aliases for common shortforms
-const symbolAliases: Record<string, string> = {
-  "HDFC": "HDFCBANK",
-  "ICICI": "ICICIBANK",
-  "AXIS": "AXISBANK",
-  "KOTAK": "KOTAKBANK",
-  "INDUSIND": "INDUSINDBK",
-};
-
 async function loadSnapshot(server: ViteDevServer) {
   return server.ssrLoadModule(snapshotModule) as Promise<typeof import("./src/lib/stockResearchSnapshot")>;
+}
+
+// Minimal VercelRequest/VercelResponse shim so the real serverless
+// functions (api/search.ts, api/stock/[symbol].ts) can run unmodified
+// under Vite's dev middleware — this is what makes `npm run dev` serve
+// the exact same PSE data path as production, instead of a parallel
+// hand-maintained mock pipeline that can drift out of sync with it.
+async function callVercelHandler(
+  server: ViteDevServer,
+  modulePath: string,
+  req: any,
+  res: any,
+  extraQuery: Record<string, string> = {},
+) {
+  const mod = (await server.ssrLoadModule(modulePath)) as { default: (req: any, res: any) => Promise<void> };
+  const parsed = new URL(req.url ?? "", "http://localhost");
+  const query: Record<string, string> = { ...extraQuery };
+  for (const [key, value] of parsed.searchParams) query[key] = value;
+
+  const vercelRes = {
+    statusCode: 200,
+    setHeader: (name: string, value: string) => res.setHeader(name, value),
+    status(code: number) { this.statusCode = code; return this; },
+    json(body: unknown) {
+      res.statusCode = this.statusCode;
+      res.setHeader("Content-Type", "application/json");
+      res.end(JSON.stringify(body));
+    },
+  };
+
+  await mod.default({ method: req.method, query }, vercelRes);
 }
 
 export function localApiPlugin(): Plugin {
@@ -38,185 +59,19 @@ export function localApiPlugin(): Plugin {
             return;
           }
 
-          // ── Search ──────────────────────────────────────────
+          // ── Search — delegates to the real api/search.ts handler, so
+          // dev mode searches the same real PSE universe as production. ──
           if (url.startsWith("/api/search")) {
-            const parsed = new URL(url, "http://localhost");
-            const query = parsed.searchParams.get("q") ?? "";
-            const limit = Number(parsed.searchParams.get("limit") ?? 20);
-            const { searchPersistedStocks, getPersistedUniverseCount } = await loadSnapshot(server);
-            const results = await searchPersistedStocks(query, limit);
-            const totalUniverse = await getPersistedUniverseCount();
-            res.setHeader("Content-Type", "application/json");
-            res.end(JSON.stringify({ query, totalUniverse, results }));
+            await callVercelHandler(server, path.resolve(root, "api/search.ts"), req, res);
             return;
           }
 
-          // ── Stock Detail (LIVE DATA FIRST, snapshot fallback) ──
+          // ── Stock Detail — delegates to the real api/stock/[symbol].ts
+          // handler (real phisix PSE prices, no fabricated fundamentals). ──
           if (url.startsWith("/api/stock")) {
             const parsed = new URL(url, "http://localhost");
-            let symbol = (parsed.searchParams.get("symbol") ?? decodeURIComponent(url.replace("/api/stock/", "").split("?")[0] ?? "")).toUpperCase();
-
-            // Resolve symbol aliases
-            symbol = symbolAliases[symbol] || symbol;
-
-            const { getPersistedStockResearch } = await loadSnapshot(server);
-            const research = await getPersistedStockResearch(symbol).catch(() => null) as any;
-
-            // Fetch LIVE data via child_process (guaranteed to work in any Node.js context)
-            let livePrice: any = null;
-            let liveFundamentals: any = null;
-            let liveHistory: any = null;
-            let liveNews: any = null;
-            let liveFinancials: any = null;
-            let liveShareholding: any = null;
-            let sourceLabel = 'snapshot';
-
-            try {
-              const script = path.resolve(root, 'scripts/fetch-yahoo-quote.cjs');
-              const raw = execSync(`node "${script}" "${symbol}"`, { timeout: 15000, encoding: 'utf-8' });
-              const parsed = JSON.parse(raw.trim());
-              if (parsed.price) {
-                livePrice = parsed;
-                sourceLabel = 'yahoo';
-              }
-            } catch { /* yahoo script failed */ }
-
-            if (livePrice) {
-              // Layer 2: Real fundamentals via yfinance Python (most reliable)
-              try {
-                const script = path.resolve(root, 'scripts/fetch-python-fundamentals.cjs');
-                const raw = execSync(`node "${script}" "${symbol}"`, { timeout: 25000, encoding: 'utf-8' });
-                const parsed = JSON.parse(raw.trim());
-                if (parsed.pe || parsed.pb || parsed.roe) {
-                  liveFundamentals = parsed;
-                }
-              } catch { /* fundamentals script failed */ }
-
-              // Fallback: snapshot fundamentals if yfinance failed
-              if (!liveFundamentals && research) {
-                liveFundamentals = {
-                  pe: research.pe ?? null,
-                  pb: research.pb ?? null,
-                  eps: research.eps ?? null,
-                  dividendYield: research.dividendYield ?? null,
-                  roe: research.roe ?? null,
-                  debtToEquity: research.debtToEquity ?? null,
-                  revenueGrowth: research.revenueGrowth ?? null,
-                };
-              }
-
-              try {
-                const script = path.resolve(root, 'scripts/fetch-yahoo-history.cjs');
-                const raw = execSync(`node "${script}" "${symbol}"`, { timeout: 15000, encoding: 'utf-8' });
-                liveHistory = JSON.parse(raw.trim());
-              } catch { /* history script failed */ }
-
-              try {
-                const script = path.resolve(root, 'scripts/fetch-yfinance-news.cjs');
-                const raw = execSync(`node "${script}" "${symbol}"`, { timeout: 25000, encoding: 'utf-8' });
-                liveNews = JSON.parse(raw.trim());
-              } catch { /* yfinance news failed */
-                try {
-                  const script2 = path.resolve(root, 'scripts/fetch-yahoo-news.cjs');
-                  const raw2 = execSync(`node "${script2}" "${symbol}"`, { timeout: 10000, encoding: 'utf-8' });
-                  liveNews = JSON.parse(raw2.trim());
-                } catch { /* yahoo news also failed */ }
-              }
-
-              // Layer 5: Real financial statements via yfinance Python
-              try {
-                const script = path.resolve(root, 'scripts/fetch-yfinance-financials.cjs');
-                const raw = execSync(`node "${script}" "${symbol}"`, { timeout: 30000, encoding: 'utf-8' });
-                const parsed = JSON.parse(raw.trim());
-                if (parsed.financials?.annual?.revenue?.length || parsed.info?.revenue) {
-                  liveFinancials = parsed.financials;
-                }
-              } catch { /* financials script failed */ }
-
-              // Layer 6: Real shareholding via Screener.in scraper
-              try {
-                const script = path.resolve(root, 'scripts/screener-shareholding.cjs');
-                const raw = execSync(`node "${script}" "${symbol}"`, { timeout: 20000, encoding: 'utf-8' });
-                const parsed = JSON.parse(raw.trim());
-                if (Array.isArray(parsed) && parsed.length > 0 && parsed[0].promoter) {
-                  liveShareholding = parsed;
-                }
-              } catch { /* shareholding script failed */ }
-            }
-
-            const useLive = livePrice !== null;
-            const price = useLive ? livePrice.price : (research?.price ?? 0);
-            const marketCapCr = useLive ? livePrice.marketCap : (research?.marketCap ?? 0);
-
-            let dcf = null;
-            try {
-              const { dcfValuationService } = await import("./src/services/valuation/DCFValuationService.ts");
-              const pe = useLive ? (liveFundamentals?.pe ?? 20) : (research?.pe ?? 20);
-              const de = useLive ? (liveFundamentals?.debtToEquity ?? 0.5) : (research?.debtToEquity ?? 0.5);
-              const roe = useLive ? (liveFundamentals?.roe ?? 10) : (research?.roe ?? 10);
-              const revGrowth = useLive ? (liveFundamentals?.revenueGrowth ?? 12) / 100 : Math.max(0.02, (research?.revenueGrowth ?? 12) / 100);
-              const netMargin = Math.max(0.02, roe / 500);
-              const yfinanceRev = liveFundamentals?.revenue ? Math.round(liveFundamentals.revenue / 10000000) : 0;
-              const annualRev = research?.financials?.annual?.revenue || [];
-              const snapshotRev = annualRev.length > 0 ? annualRev[annualRev.length - 1].value : 0;
-              const revenue = yfinanceRev || snapshotRev || Math.round((marketCapCr || 100000) / (pe / 10));
-              const netDebt = (marketCapCr || 100000) * (de / (1 + de)) * 0.3;
-              const cashEq = (marketCapCr || 100000) * 0.05;
-              const sharesOut = price > 0 ? ((marketCapCr || 100000) * 10000000) / price : 100000000;
-              const result = dcfValuationService.estimateFromFinancials(
-                revenue * 10000000, netMargin, revGrowth,
-                (marketCapCr || 100000) * 10000000, netDebt * 10000000, cashEq * 10000000, sharesOut, price
-              );
-              dcf = {
-                fairValuePerShare: result.fairValuePerShare, currentPrice: result.currentPrice,
-                upside: result.upside, assessment: result.assessment,
-                impliedReturn: result.impliedReturn, enterpriseValue: result.enterpriseValue,
-                equityValue: result.equityValue, terminalValue: result.terminalValue, years: result.years,
-              };
-            } catch { /* DCF optional */ }
-
-            let priceHistory = research?.priceHistory || {};
-            if (liveHistory && liveHistory.length > 0) {
-              priceHistory = {
-                '1W': liveHistory.slice(-7).map((p: any) => ({ label: p.date.slice(5), price: p.close })),
-                '1M': liveHistory.slice(-30).map((p: any) => ({ label: p.date.slice(5), price: p.close })),
-                '3M': liveHistory.slice(-90).map((p: any) => ({ label: p.date.slice(5), price: p.close })),
-                '1Y': liveHistory.slice(-365).map((p: any) => ({ label: p.date.slice(5), price: p.close })),
-                '5Y': liveHistory.map((p: any) => ({ label: p.date.slice(5), price: p.close })),
-              };
-            }
-
-            const liveCompanyName = liveFundamentals?.companyName || research?.companyName || symbol;
-            const liveSector = liveFundamentals?.sector || research?.sector || 'Diversified';
-            const liveIndustry = liveFundamentals?.industry || research?.industry || 'General';
-            const payload = {
-              symbol: research?.symbol || symbol,
-              companyName: liveCompanyName,
-              exchange: 'NSE', sector: liveSector, industry: liveIndustry,
-              price: { current: price, changeAbs: useLive ? livePrice.change : (research?.change ?? 0), changePercent: useLive ? livePrice.changePercent : (research?.changePercent ?? 0), marketCap: marketCapCr || (liveFundamentals?.marketCap ? Math.round(liveFundamentals.marketCap / 10000000 * 100) / 100 : null) },
-              fundamentals: { pe: liveFundamentals?.pe ?? null, industryPe: research?.industryPe ?? null, pb: liveFundamentals?.pb ?? null, dividendYield: liveFundamentals?.dividendYield ?? null, eps: liveFundamentals?.eps ?? null },
-              roe: liveFundamentals?.roe ?? null,
-              debtToEquity: liveFundamentals?.debtToEquity ?? null,
-              revenueGrowth: liveFundamentals?.revenueGrowth ?? null,
-              profitGrowth: liveFundamentals?.profitGrowth ?? null,
-              returnOnAssets: liveFundamentals?.returnOnAssets ?? null,
-              rsi: research?.rsi ?? null,
-              scores: research?.scores ?? null, confidenceMeter: research?.confidenceMeter ?? null,
-              timeline: research?.timeline ?? null, whatChanged: research?.whatChanged ?? null,
-              sectorRelative: research?.sectorRelative ?? null,
-              description: research?.description || `${symbol} operates in the ${liveSector} sector.`,
-              companyProfile: { founded: research?.founded || '', ceo: '', hq: 'India', employees: research?.employees || '', website: '', isin: '', businessSegments: research?.businessSegments || ['Diversified'] },
-              priceHistory,
-              financials: liveFinancials || research?.financials || null,
-              shareholding: liveShareholding || research?.shareholding || null,
-              news: liveNews || research?.news || [],
-              thesis: research?.thesis || null,
-              dataSources: { price: sourceLabel, fundamentals: liveFundamentals?.pe ? 'yfinance' : 'snapshot', history: liveHistory ? 'yahoo_finance' : 'snapshot', news: liveNews ? 'yfinance' : 'snapshot', financials: liveFinancials?.annual?.revenue?.length ? 'yfinance' : 'snapshot', shareholding: liveShareholding ? 'screener_in' : 'snapshot' },
-              dcf,
-            };
-
-            res.setHeader("Content-Type", "application/json");
-            res.end(JSON.stringify(payload));
+            const symbol = (parsed.searchParams.get("symbol") ?? decodeURIComponent(url.replace("/api/stock/", "").split("?")[0] ?? "")).toUpperCase();
+            await callVercelHandler(server, path.resolve(root, "api/stock/[symbol].ts"), req, res, { symbol });
             return;
           }
 
@@ -320,7 +175,7 @@ export function localApiPlugin(): Plugin {
                 risk: { volatility: (synData as any)?.volatility, debtToEquity: (synData as any)?.debtToEquity, currentRatio: (synData as any)?.currentRatio, interestCoverage: (synData as any)?.interestCoverage, lastUpdated: new Date() },
                 sector: { stockPE: (synData as any)?.pe, stockROE: (synData as any)?.roe, sectorName: (synData as any)?.sector, lastUpdated: new Date() },
                 news: { articles: [], lastUpdated: new Date() },
-                events: { events: [], lastUpdated: new Date(), fiscalYear: 2025, currency: 'INR' },
+                events: { events: [], lastUpdated: new Date(), fiscalYear: 2025,               currency: 'PKR'  },
                 rag: { patterns: [], knowledgeItems: [], macroSignals: [], lastUpdated: new Date() },
               };
               const result = await orchestrator.analyzeStock(inputs);

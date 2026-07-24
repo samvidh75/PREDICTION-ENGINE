@@ -6,7 +6,7 @@ import { useQuotes } from '../hooks/useQuote';
  * Replace [symbols] with actual stock list to see live price updates.
  */
 export function QuoteDemo() {
-  const [symbols, setSymbols] = useState(['RELIANCE.NS', 'TCS.NS', 'INFY.NS']);
+  const [symbols, setSymbols] = useState(['BDO.PS', 'JFC.PS', 'SM.PS']);
   const { quotes, loading, error, refresh } = useQuotes(symbols, 5000);
 
   const handleAddSymbol = () => {
@@ -49,7 +49,7 @@ export function QuoteDemo() {
               <tr key={quote.symbol}>
                 <td style={{ border: '1px solid #ddd', padding: '8px' }}>{quote.symbol}</td>
                 <td style={{ border: '1px solid #ddd', padding: '8px' }}>
-                  ₹{quote.price.toFixed(2)}
+                  ₱{quote.price.toFixed(2)}
                 </td>
                 <td
                   style={{

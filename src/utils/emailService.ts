@@ -105,7 +105,7 @@ class EmailService {
             </ul>
 
             <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 8px; margin: 20px 0; text-align: center;">
-              <h2 style="margin: 0;">Just ₹299/month</h2>
+              <h2 style="margin: 0;">Just ₱299/month</h2>
               <p style="margin: 10px 0; font-size: 14px;">That's 10 rupees a day for enterprise-grade analysis</p>
               <a href="https://stockex.com/upgrade" style="background: white; color: #667eea; padding: 12px 32px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: 600; margin-top: 10px;">
                 Upgrade Now

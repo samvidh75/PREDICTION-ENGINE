@@ -24,6 +24,7 @@ const EXCHANGE_NORMALISE: Record<string, 'PSE'> = {
   'bse': 'PSE',
   'bsesme': 'PSE',
   'nsedata': 'PSE',
+  'psx': 'PSE',
 };
 
 export class DataIntegrityEngine {
@@ -80,6 +81,7 @@ export class DataIntegrityEngine {
 
     if (/bse/i.test(key)) return 'PSE';
     if (/nse/i.test(key)) return 'PSE';
+    if (/psx/i.test(key)) return 'PSE';
     return undefined;
   }
 

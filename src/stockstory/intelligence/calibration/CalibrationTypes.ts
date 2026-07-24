@@ -8,7 +8,7 @@
 export interface CalibrationConfig {
   /** Sector-specific adjustment factors */
   sectorOverrides: Record<string, SectorCalibration>;
-  /** Market-cap bucket thresholds (INR crores) */
+  /** Market-cap bucket thresholds (PKR crores) */
   marketCapBuckets: MarketCapBucket[];
   /** Risk calibration parameters */
   risk: RiskCalibration;
@@ -51,9 +51,9 @@ export interface MarketCapBucket {
 }
 
 export interface RiskCalibration {
-  /** Default risk-free rate (India 10Y bond yield) */
+  /** Default risk-free rate (Pakistan 10Y bond yield) */
   riskFreeRate: number;
-  /** Equity risk premium for India */
+  /** Equity risk premium for Pakistan */
   equityRiskPremium: number;
   /** Country risk premium */
   countryRiskPremium: number;
@@ -79,7 +79,7 @@ export interface TechnicalCalibration {
 }
 
 export interface ValuationCalibration {
-  /** DCF default growth rate for India */
+  /** DCF default growth rate for Pakistan */
   dcfGrowthRate: number;
   /** Terminal growth rate */
   terminalGrowthRate: number;
@@ -98,7 +98,7 @@ export interface EvidenceCalibration {
   minUniqueSources: number;
 }
 
-/** Default calibration for Philippine equities */
+/** Default calibration for PSX equities */
 export const DEFAULT_CALIBRATION: CalibrationConfig = {
   sectorOverrides: {
     'Banking': {

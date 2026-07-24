@@ -198,7 +198,7 @@ class BrowserLLM {
 
     if (query.includes('pe') || query.includes('price to earning')) {
       return {
-        text: 'P/E Ratio = Price per share ÷ Earnings per share. Shows how much investors pay per rupee of earnings. Low P/E doesn\'t mean cheap - check ROE, debt, and growth. Philippine mid-caps average 15-20x P/E.',
+        text: 'P/E Ratio = Price per share ÷ Earnings per share. Shows how much investors pay per rupee of earnings. Low P/E doesn\'t mean cheap - check ROE, debt, and growth. PSX mid-caps average 15-20x P/E.',
         confidence: 0.95,
         tokens: 45,
       };

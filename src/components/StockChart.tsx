@@ -171,6 +171,8 @@ export default function StockChart({
       <div
         style={{
           backgroundColor: colors.surface,
+          backdropFilter: "blur(20px) saturate(160%)",
+          WebkitBackdropFilter: "blur(20px) saturate(160%)",
           borderRadius: '8px',
           padding: '24px',
           border: `1px solid ${colors.border}`,
@@ -190,6 +192,8 @@ export default function StockChart({
         flexDirection: 'column',
         gap: '16px',
         backgroundColor: colors.surface,
+        backdropFilter: "blur(20px) saturate(160%)",
+        WebkitBackdropFilter: "blur(20px) saturate(160%)",
         borderRadius: '8px',
         padding: '16px',
         border: `1px solid ${colors.border}`,

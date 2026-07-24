@@ -3,18 +3,18 @@ import { colors, typography, layout } from "../design/tokens";
 const SECTIONS = [
   {
     id: "what-we-are",
-    title: "What StockEX India Is",
-    content: "StockEX India is a structured equity research platform. We provide scorecards, theses, risk assessments, scenario analysis, and peer comparisons for listed Philippine equities."
+    title: "What StockEX Is",
+    content: "StockEX is a structured equity research platform. We provide scorecards, theses, risk assessments, scenario analysis, and peer comparisons for listed PSX equities."
   },
   {
     id: "what-we-are-not",
-    title: "What StockEX India Is Not",
+    title: "What StockEX Is Not",
     content: "We do not provide portfolio management services. We are not a trading platform or brokerage."
   },
   {
     id: "research-only",
     title: "Research-Only Policy",
-    content: "Every feature on StockEX India is designed for research purposes. Scorecards are for relative comparison within our framework."
+    content: "Every feature on StockEX is designed for research purposes. Scorecards are for relative comparison within our framework."
   },
   {
     id: "data-sources",
@@ -29,7 +29,7 @@ const SECTIONS = [
   {
     id: "conflicts",
     title: "Conflicts of Interest",
-    content: "StockEX India does not accept compensation from listed companies for research. We do not engage in paid promotions of stocks."
+    content: "StockEX does not accept compensation from listed companies for research. We do not engage in paid promotions of stocks."
   },
   {
     id: "feedback",
@@ -49,7 +49,7 @@ export default function Trust() {
           Trust and Disclosures
         </h1>
         <p style={{ fontSize: typography.body.desktop.size, color: colors.textSecondary, lineHeight: 1.6 }}>
-          What StockEX India is, what it is not, and what you can expect from our research. Transparency is a design principle.
+          What StockEX is, what it is not, and what you can expect from our research. Transparency is a design principle.
         </p>
       </section>
 
@@ -71,7 +71,7 @@ export default function Trust() {
       </div>
 
       <footer className="raycast-stagger-4" style={{ animationDelay: "0.3s", marginTop: "48px", paddingTop: "24px", borderTop: `1px solid ${colors.border}`, fontSize: "13px", color: colors.textSecondary }}>
-        <p>StockEX India research overview.</p>
+        <p>StockEX research overview.</p>
       </footer>
     </main>
   );

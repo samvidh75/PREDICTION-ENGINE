@@ -1,17 +1,13 @@
 /* ============================================================================
-   BASELINE — Reset + Raycast dark canvas defaults
+   BASELINE — Reset + Raycast-dark canvas defaults
    ============================================================================ */
 
-/* RESET */
-*,
-*::before,
-*::after {
+*, *::before, *::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-/* ROOT */
 html {
   scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
@@ -20,16 +16,31 @@ html {
 body {
   width: 100%;
   height: 100%;
-  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  font-feature-settings: "calt", "kern", "liga", "ss03";
+  font-family: var(--font-sans);
+  font-feature-settings: "calt", "kern", "liga", "ss01";
   font-size: 16px;
   line-height: 1.6;
-  color: #a0a0a0;
-  background-color: #000000;
+  color: var(--text-primary);
+  background-color: var(--bg-page);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums;
+}
+
+/* Extremely subtle film grain on the black canvas — a single repeating SVG
+   noise tile at very low opacity. Gives the pure-black surface a bit of
+   depth without becoming a texture / gimmick (Raycast restraint). */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' seed='7'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.05 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  background-size: 160px 160px;
+  opacity: 0.4;
+  mix-blend-mode: overlay;
 }
 
 #root {
@@ -39,7 +50,6 @@ body {
   height: 100%;
 }
 
-/* STRUCTURAL */
 main {
   flex: 1;
   width: 100%;
@@ -49,30 +59,243 @@ article, aside, footer, header, nav, section {
   display: block;
 }
 
-/* TEXT ELEMENTS */
 a {
   color: var(--brand);
   text-decoration: none;
-  transition: color var(--t-base);
+  text-underline-offset: 3px;
+  text-decoration-color: rgba(14,17,22,0.30);
+  transition: color var(--t-fast), text-decoration-color var(--t-fast);
 }
 
 a:hover {
-  color: var(--brand-dark);
+  color: var(--accent);
   text-decoration: underline;
+  text-decoration-color: var(--accent);
 }
 
 a:active {
-  color: var(--brand-dark);
+  color: var(--accent);
 }
 
-abbr {
-  text-decoration: underline dotted;
-  cursor: help;
+/* ============================================================================
+   MOTION PRIMITIVES — fluid entrance + liquid ambient drift
+   Used across landing sections. Restrained (Raycast), but real (Apple).
+   ============================================================================ */
+
+@keyframes stockex-pulse-dot {
+  0%, 100% { opacity: 1;   transform: scale(1); }
+  50%      { opacity: 0.35; transform: scale(0.72); }
 }
 
-address {
-  font-style: normal;
+@keyframes stockex-rise-in {
+  from { opacity: 0; transform: translateY(14px) scale(0.985); filter: blur(6px); }
+  to   { opacity: 1; transform: translateY(0)     scale(1);     filter: blur(0); }
 }
+
+.stockex-rise {
+  opacity: 0;
+  animation: stockex-rise-in 720ms var(--ease-draw, cubic-bezier(0.16,1,0.3,1)) forwards;
+}
+.stockex-rise-1 { animation-delay: 60ms; }
+.stockex-rise-2 { animation-delay: 120ms; }
+.stockex-rise-3 { animation-delay: 180ms; }
+.stockex-rise-4 { animation-delay: 240ms; }
+.stockex-rise-5 { animation-delay: 300ms; }
+.stockex-rise-6 { animation-delay: 360ms; }
+
+/* Scroll-reveal — sections fade/rise into place as they enter the viewport. */
+.stockex-reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 780ms cubic-bezier(0.16,1,0.3,1), transform 780ms cubic-bezier(0.16,1,0.3,1);
+  will-change: opacity, transform;
+}
+.stockex-reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Central micro-animation behind the (now much shorter) headline — a
+   breathing core, a slowly rotating soft arc of light, and a few orbiting
+   points. One hue throughout (the accent), nothing spins fast or flashes —
+   this is meant to be looked at, not noticed. Apple/Raycast restraint:
+   layered motion, single color, no gradients elsewhere on the page. */
+@keyframes stockex-beam-breathe {
+  0%, 100% { transform: translate(-50%, -50%) scale(1);    opacity: 0.5; }
+  50%      { transform: translate(-50%, -50%) scale(1.16); opacity: 0.8; }
+}
+@keyframes stockex-beam-rotate {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to   { transform: translate(-50%, -50%) rotate(360deg); }
+}
+@keyframes stockex-beam-orbit-a {
+  from { transform: translate(-50%, -50%) rotate(0deg) translateX(150px) rotate(0deg); }
+  to   { transform: translate(-50%, -50%) rotate(360deg) translateX(150px) rotate(-360deg); }
+}
+@keyframes stockex-beam-orbit-b {
+  from { transform: translate(-50%, -50%) rotate(0deg) translateX(210px) rotate(0deg); }
+  to   { transform: translate(-50%, -50%) rotate(-360deg) translateX(210px) rotate(360deg); }
+}
+@keyframes stockex-beam-orbit-c {
+  from { transform: translate(-50%, -50%) rotate(0deg) translateX(268px) rotate(0deg); }
+  to   { transform: translate(-50%, -50%) rotate(360deg) translateX(268px) rotate(-360deg); }
+}
+@keyframes stockex-beam-ring-pulse {
+  0%, 100% { transform: translate(-50%, -50%) scale(0.96); opacity: 0.22; }
+  50%      { transform: translate(-50%, -50%) scale(1.05); opacity: 0.4;  }
+}
+@keyframes stockex-beam-drift {
+  0%   { transform: translate(-50%, -50%) translate(-2.5%, -1.5%); }
+  50%  { transform: translate(-50%, -50%) translate(2.5%, 1.5%);   }
+  100% { transform: translate(-50%, -50%) translate(-2.5%, -1.5%); }
+}
+
+.stockex-beam-field {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.stockex-beam {
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  width: min(40vw, 460px);
+  height: min(40vw, 460px);
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,107,74,0.46) 0%, rgba(255,107,74,0.16) 45%, rgba(255,107,74,0) 72%);
+  filter: blur(36px);
+  animation: stockex-beam-breathe 6s ease-in-out infinite;
+}
+.stockex-beam-arc {
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  width: min(46vw, 540px);
+  height: min(46vw, 540px);
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, rgba(255,107,74,0) 0%, rgba(255,107,74,0.5) 8%, rgba(255,107,74,0) 22%, rgba(255,107,74,0) 100%);
+  filter: blur(18px);
+  animation: stockex-beam-rotate 18s linear infinite;
+}
+.stockex-beam-orbit {
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent, #FF6B4A);
+  box-shadow: 0 0 10px 2px rgba(255,107,74,0.7);
+}
+.stockex-beam-orbit.a { animation: stockex-beam-orbit-a 14s linear infinite; opacity: 0.8; }
+.stockex-beam-orbit.b { animation: stockex-beam-orbit-b 20s linear infinite; opacity: 0.5; width: 4px; height: 4px; }
+.stockex-beam-orbit.c { animation: stockex-beam-orbit-c 26s linear infinite; opacity: 0.35; width: 3px; height: 3px; }
+
+/* Outer ring — slowest layer, pure texture, gives the beam field depth
+   without adding visual weight near the headline. */
+.stockex-beam-ring {
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  width: min(58vw, 660px);
+  height: min(58vw, 660px);
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  border: 1px solid rgba(255,107,74,0.18);
+  animation: stockex-beam-ring-pulse 9s ease-in-out infinite, stockex-beam-drift 32s ease-in-out infinite;
+}
+
+@media (max-width: 640px) {
+  .stockex-beam-orbit.c { display: none; }
+  .stockex-beam-ring { width: min(80vw, 420px); height: min(80vw, 420px); }
+}
+
+/* Load-in — headline/lede/CTA fade and rise into place once, on mount.
+   This is the "text slowly appears as it loads" motion. */
+@keyframes stockex-load-in-kf {
+  from { opacity: 0; transform: translateY(16px); filter: blur(4px); }
+  to   { opacity: 1; transform: translateY(0);    filter: blur(0); }
+}
+.stockex-load-in {
+  opacity: 0;
+  animation: stockex-load-in-kf 900ms cubic-bezier(0.16,1,0.3,1) forwards;
+}
+
+@keyframes stockex-scroll-cue {
+  0%, 100% { transform: translateY(0);   opacity: 0.55; }
+  50%      { transform: translateY(6px); opacity: 1;    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stockex-rise, .stockex-reveal, .stockex-load-in {
+    animation: none !important;
+    transition: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+  }
+  .stockex-beam, .stockex-beam-arc, .stockex-beam-orbit, .stockex-beam-ring { animation: none !important; }
+}
+
+/* ── App-wide ambient layer ──────────────────────────────────────────────
+   One quiet, continuously-drifting glow shared by every workspace page
+   (Scanner, Stock detail, Watchlist, Portfolio, ...) — much dimmer and
+   slower than the landing hero's beam. The point is texture, not a focal
+   point: it should read as "the canvas is alive" without ever competing
+   with data. Mounted once in the app shells, not per-page. */
+@keyframes stockex-ambient-drift {
+  0%   { transform: translate(-50%, -50%) translate(-4%, -3%) scale(1);    }
+  50%  { transform: translate(-50%, -50%) translate(4%, 3%)  scale(1.08); }
+  100% { transform: translate(-50%, -50%) translate(-4%, -3%) scale(1);    }
+}
+.stockex-ambient-field {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.stockex-ambient-glow {
+  position: absolute;
+  left: 82%;
+  top: 8%;
+  width: min(60vw, 760px);
+  height: min(60vw, 760px);
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,107,74,0.10) 0%, rgba(255,107,74,0.03) 45%, rgba(255,107,74,0) 72%);
+  filter: blur(60px);
+  animation: stockex-ambient-drift 46s ease-in-out infinite;
+}
+/* Second layer — opposite corner, slower, dimmer. Two glows drifting at
+   different speeds read as depth rather than a single obvious loop. */
+.stockex-ambient-glow-secondary {
+  position: absolute;
+  left: 12%;
+  top: 78%;
+  width: min(46vw, 560px);
+  height: min(46vw, 560px);
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,107,74,0.06) 0%, rgba(255,107,74,0.02) 45%, rgba(255,107,74,0) 72%);
+  filter: blur(70px);
+  animation: stockex-ambient-drift 68s ease-in-out infinite reverse;
+}
+
+@media (max-width: 640px) {
+  .stockex-ambient-glow-secondary { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stockex-ambient-glow, .stockex-ambient-glow-secondary { animation: none !important; }
+}
+
+abbr { text-decoration: underline dotted; cursor: help; }
+address { font-style: normal; }
 
 code, kbd, pre, samp {
   font-family: var(--font-mono);
@@ -83,6 +306,8 @@ code {
   background-color: var(--bg-chip);
   border-radius: var(--radius-sm);
   padding: 2px 6px;
+  color: var(--text-primary);
+  border: 1px solid var(--border-soft);
 }
 
 pre {
@@ -91,125 +316,57 @@ pre {
   padding: 16px;
   overflow-x: auto;
   line-height: 1.5;
+  border: 1px solid var(--border);
 }
 
-pre code {
-  background: none;
-  padding: 0;
-}
+pre code { background: none; padding: 0; border: none; }
 
-/* LISTS */
-ol, ul {
-  margin: 16px 0;
-  padding-left: 24px;
-}
+ol, ul { margin: 16px 0; padding-left: 24px; }
+li { margin: 4px 0; }
+dl { margin: 16px 0; }
+dt { font-weight: 600; margin-top: 8px; }
+dd { margin-left: 24px; margin-bottom: 8px; color: var(--text-secondary); }
 
-li {
-  margin: 4px 0;
-}
-
-dl {
-  margin: 16px 0;
-}
-
-dt {
-  font-weight: 600;
-  margin-top: 8px;
-}
-
-dd {
-  margin-left: 24px;
-  margin-bottom: 8px;
-  color: var(--text-secondary);
-}
-
-/* BLOCKQUOTE */
 blockquote {
   margin: 16px 0;
-  padding-left: 16px;
-  border-left: 3px solid var(--border-strong);
-  color: var(--text-secondary);
+  padding: 12px 20px;
+  border-left: 3px solid var(--accent);
+  color: var(--text-primary);
+  background: var(--bg-card);
   font-style: italic;
 }
 
-/* IMAGES */
-img {
-  max-width: 100%;
-  height: auto;
-  display: block;
-}
+img { max-width: 100%; height: auto; display: block; }
+svg { max-width: 100%; height: auto; }
 
-svg {
-  max-width: 100%;
-  height: auto;
-}
-
-/* FORMS */
-button,
-input,
-optgroup,
-select,
-textarea {
+button, input, optgroup, select, textarea {
   font-family: inherit;
   font-size: inherit;
   line-height: inherit;
   color: inherit;
 }
 
-button,
-select {
-  text-transform: none;
-}
+button, select { text-transform: none; }
 
-button {
-  cursor: pointer;
-  border: none;
-  background: none;
+button { cursor: pointer; border: none; background: none; outline: none; }
+button:disabled, input:disabled, textarea:disabled, select:disabled { cursor: not-allowed; opacity: 0.6; }
+
+input, textarea, select {
   outline: none;
-}
-
-button:disabled,
-input:disabled,
-textarea:disabled,
-select:disabled {
-  cursor: not-allowed;
-  opacity: 0.6;
-}
-
-input,
-textarea,
-select {
-  outline: none;
-  transition: border-color var(--t-base), box-shadow var(--t-base);
+  transition: border-color var(--t-fast), box-shadow var(--t-fast);
+  background: var(--bg-sheet);
 }
 
 input::-webkit-outer-spin-button,
-input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
+input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+input[type="number"] { -moz-appearance: textfield; }
 
-input[type="number"] {
-  -moz-appearance: textfield;
-}
-
-textarea {
-  resize: vertical;
-  vertical-align: top;
-}
+textarea { resize: vertical; vertical-align: top; }
 
 input[type="search"]::-webkit-search-cancel-button,
-input[type="search"]::-webkit-search-decoration {
-  -webkit-appearance: none;
-}
+input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; }
 
-/* TABLES */
-table {
-  border-collapse: collapse;
-  border-spacing: 0;
-  width: 100%;
-}
-
+table { border-collapse: collapse; border-spacing: 0; width: 100%; }
 th {
   text-align: left;
   font-weight: 600;
@@ -217,42 +374,46 @@ th {
   border-bottom: 2px solid var(--border);
   background-color: var(--bg-chip);
 }
-
 td {
   padding: 12px;
   border-bottom: 1px solid var(--border);
 }
+tr:last-child td { border-bottom: none; }
 
-tr:last-child td {
-  border-bottom: none;
-}
-
-/* HR */
 hr {
   border: none;
   border-top: 1px solid var(--border);
   margin: 24px 0;
 }
 
-/* DETAILS/SUMMARY */
-details {
-  cursor: pointer;
+details { cursor: pointer; }
+summary { outline: none; user-select: none; }
+summary:hover { color: var(--accent); }
+
+/* Selection — picked up from the brand accent */
+::selection {
+  background: var(--accent);
+  color: var(--bg-page);
 }
 
-summary {
-  outline: none;
-  user-select: none;
+/* Scrollbar — paper-friendly */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
 }
-
-summary:hover {
-  color: var(--text-primary);
+*::-webkit-scrollbar { width: 10px; height: 10px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
 }
+*::-webkit-scrollbar-thumb:hover { background: var(--text-muted); background-clip: padding-box; }
 
-/* REDUCED MOTION — respect OS accessibility setting */
+/* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
+  *, *::before, *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
@@ -260,14 +421,7 @@ summary:hover {
   }
 }
 
-/* RESPONSIVE */
 @media (max-width: 767px) {
-  body {
-    font-size: 15px;
-    padding-bottom: 64px; /* Room for bottom nav */
-  }
-
-  ol, ul {
-    padding-left: 20px;
-  }
+  body { font-size: 15px; padding-bottom: 64px; }
+  ol, ul { padding-left: 20px; }
 }

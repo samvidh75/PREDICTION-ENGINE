@@ -18,8 +18,8 @@ export interface SectorIntelligenceProfile {
   /** Sector-level risks */
   risks: SectorRisk[];
 
-  /** Philippine market specific context */
-  indiaContext: IndiaSectorContext;
+  /** PSX market specific context */
+  indiaContext: PakistanSectorContext;
 
   /** Aggregate scores */
   aggregate: SectorAggregate;
@@ -53,7 +53,7 @@ export interface SectorRisk {
   description: string;
 }
 
-export interface IndiaSectorContext {
+export interface PakistanSectorContext {
   /** Government focus areas (PLI, infrastructure, digitization) */
   governmentSupport: 'strong' | 'moderate' | 'weak' | 'unclear';
   /** Formalisation benefit */

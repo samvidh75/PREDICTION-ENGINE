@@ -47,7 +47,7 @@ const VALID_STRATEGIES: StrategyType[] = [
 ];
 
 const VALID_REBALANCES: RebalanceFrequency[] = ['WEEKLY', 'MONTHLY', 'QUARTERLY'];
-const VALID_BENCHMARKS: BenchmarkIndex[] = ['NIFTY50', 'NIFTY100', 'NIFTY500', 'EQUAL_WEIGHT_UNIVERSE'];
+const VALID_BENCHMARKS: BenchmarkIndex[] = ['PSEI', 'PSEI_TOP_10', 'PSE_ALL', 'EQUAL_WEIGHT_UNIVERSE'];
 
 function isStrategyType(value: unknown): value is StrategyType {
   return typeof value === 'string' && VALID_STRATEGIES.includes(value as StrategyType);
@@ -71,7 +71,7 @@ function parseRunBacktestBody(body: unknown): { ok: true; value: Required<RunBac
   const rebalance = payload.rebalance ?? 'MONTHLY';
   const startDate = payload.startDate ?? '';
   const endDate = payload.endDate ?? '';
-  const benchmark = payload.benchmark ?? 'NIFTY500';
+  const benchmark = payload.benchmark ?? 'PSE_ALL';
 
   if (!isStrategyType(strategy)) return { ok: false, error: 'Invalid strategy' };
   if (!isRebalanceFrequency(rebalance)) return { ok: false, error: 'Invalid rebalance frequency' };

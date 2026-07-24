@@ -16,7 +16,7 @@ import { normalizeSymbol, isValidSymbol } from "../universe/SymbolNormalizer.ts"
 // ---------------------------------------------------------------------------
 
 export interface AliasEntry {
-  /** The alias value (e.g. "RELIANCE.NS", "500325", "INE002A01018"). */
+  /** The alias value (e.g. "RELIANCE.PSX", "500325", "INE002A01018"). */
   value: string;
 
   /** The canonical PSE symbol this alias points to. */

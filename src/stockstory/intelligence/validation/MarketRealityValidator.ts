@@ -2,7 +2,7 @@
  * Market Reality Validator
  * Phase 3 — Validates that intelligence outputs reference real symbols,
  * correct market caps, valid sectors, and survive a reality check against
- * the known universe of Philippine equities.
+ * the known universe of PSX equities.
  */
 import { BaseValidator } from './IntelligenceValidationRunner';
 import type {
@@ -99,7 +99,7 @@ const SECTOR_MAP: Record<string, string> = {
   SHREECEM: 'Cement',
 };
 
-/** Approximate market cap ranges (INR crores) as of 2024 */
+/** Approximate market cap ranges (PKR crores) as of 2024 */
 const MARKET_CAP_RANGES: Record<string, { min: number; max: number }> = {
   RELIANCE: { min: 1800000, max: 2200000 },
   TCS: { min: 1400000, max: 1700000 },
@@ -181,7 +181,7 @@ export class MarketRealityValidator extends BaseValidator {
           severity: 'warning',
           module: this.id,
           symbol,
-          reason: `Market cap outlier: claimed ₹${claimedCap}cr, expected range ₹${knownCap.min}cr–₹${knownCap.max}cr`,
+          reason: `Market cap outlier: claimed ₱${claimedCap}cr, expected range ₱${knownCap.min}cr–₱${knownCap.max}cr`,
           recommendedFix: 'Verify market cap from latest exchange data or allow if legitimately changed',
           detectedAt: new Date().toISOString(),
         });

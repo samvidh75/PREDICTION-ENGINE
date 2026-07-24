@@ -3,7 +3,7 @@
  * always know whether data is real, cached, or model-derived.
  *
  * Every data point returned by the API includes a `dataSource` field:
- *   - 'nse_direct'     — Fetched live from Philippine Stock Exchange
+ *   - 'nse_direct'     — Fetched live from PSX Stock Exchange
  *   - 'bse_direct'     — Fetched live from PSE India
  *   - 'yahoo_finance'  — Fetched live from Yahoo Finance
  *   - 'google_finance' — Fetched live from Google Finance
@@ -22,7 +22,7 @@ export type DataSource =
   | 'screener_in'
   | 'tradingview'
   | 'upstox'
-  | 'indianapi'
+  | 'psxapi'
   | 'cache'
   | 'derived'
   | 'synthetic'
@@ -46,7 +46,7 @@ export const SOURCE_METADATA: Record<DataSource, DataSourceInfo> = {
   screener_in: { source: 'screener_in', label: 'Screener.in', badgeColor: '#f59e0b', badgeBg: 'rgba(245,158,11,0.15)', isRealTime: false, confidence: 'high', latency: '<3s' },
   tradingview: { source: 'tradingview', label: 'TradingView', badgeColor: '#3b82f6', badgeBg: 'rgba(59,130,246,0.15)', isRealTime: true, confidence: 'high', latency: '<1s' },
   upstox: { source: 'upstox', label: 'Upstox API', badgeColor: '#8b5cf6', badgeBg: 'rgba(139,92,246,0.15)', isRealTime: true, confidence: 'high', latency: '<1s' },
-  indianapi: { source: 'indianapi', label: 'PhilippineAPI', badgeColor: '#8b5cf6', badgeBg: 'rgba(139,92,246,0.15)', isRealTime: true, confidence: 'medium', latency: '<3s' },
+  indianapi: { source: 'psxapi', label: 'PSXAPI', badgeColor: '#8b5cf6', badgeBg: 'rgba(139,92,246,0.15)', isRealTime: true, confidence: 'medium', latency: '<3s' },
   cache: { source: 'cache', label: 'Cached', badgeColor: '#a0a0a0', badgeBg: 'rgba(160,160,160,0.15)', isRealTime: false, confidence: 'high', latency: '<1ms' },
   derived: { source: 'derived', label: 'Model-Derived', badgeColor: '#f59e0b', badgeBg: 'rgba(245,158,11,0.15)', isRealTime: false, confidence: 'medium', latency: '<10ms' },
   synthetic: { source: 'synthetic', label: 'Estimated', badgeColor: '#ef4444', badgeBg: 'rgba(239,68,68,0.15)', isRealTime: false, confidence: 'low', latency: '<1ms' },

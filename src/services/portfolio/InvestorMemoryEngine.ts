@@ -98,8 +98,13 @@ export class InvestorMemoryEngine {
     fetch(`/api/investor-state?uid=${uid}`)
       .then(res => res.json())
       .then((state: any) => {
+        // Only hydrate from the backend if nothing local exists yet — this
+        // fire-and-forget sync can resolve arbitrarily late (well after
+        // page load), and unconditionally overwriting would clobber any
+        // local writes that happened in the meantime.
+        const key = this.getStorageKey();
+        if (window.localStorage.getItem(key)) return;
         if (state && state.memory && Object.keys(state.memory).length > 0) {
-          const key = this.getStorageKey();
           window.localStorage.setItem(key, JSON.stringify(state.memory));
           window.dispatchEvent(new Event("memorychange"));
         }

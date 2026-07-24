@@ -1,6 +1,6 @@
 /**
  * Live quote providers for WebSocket streaming.
- * Source: PSE API (primary), Groww API (fallback)
+ * Source: Yahoo Finance chart API (PSE-listed symbols use the .PS suffix)
  */
 
 export interface LiveQuote {
@@ -11,7 +11,7 @@ export interface LiveQuote {
   volume: number;
   openInterest?: number;
   timestamp: number;
-  source: 'nse' | 'groww';
+  source: 'pse' | 'yahoo';
   lastUpdate: number;
 }
 
@@ -31,35 +31,33 @@ async function checkRateLimit(symbol: string): Promise<boolean> {
 export async function fetchLiveQuotePSE(symbol: string): Promise<LiveQuote | null> {
   if (!await checkRateLimit(symbol)) return null;
 
-  const nseSymbol = symbol.includes('-') ? symbol : `${symbol}-EQ`;
-
   try {
     const response = await fetch(
-      `https://www.nseindia.com/api/quote-equity?symbol=${nseSymbol}`,
+      `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}.PS?interval=1d`,
       {
         headers: {
-          'Referer': 'https://www.nseindia.com/',
           'User-Agent': 'Mozilla/5.0'
         }
       }
     );
 
     if (!response.ok) {
-      console.warn(`PSE returned ${response.status} for ${symbol}`);
+      console.warn(`PSE quote fetch returned ${response.status} for ${symbol}`);
       return null;
     }
 
     const data = (await response.json()) as any;
+    const meta = data?.chart?.result?.[0]?.meta;
+    if (!meta) return null;
 
     return {
       symbol,
-      price: data.priceInfo?.lastPrice || 0,
-      bid: data.priceInfo?.bidPrice || 0,
-      ask: data.priceInfo?.askPrice || 0,
-      volume: data.priceInfo?.totalTradedVolume || 0,
-      openInterest: data.priceInfo?.openInterest || undefined,
-      timestamp: data.priceInfo?.lastUpdateTime || Date.now(),
-      source: 'nse',
+      price: meta.regularMarketPrice || 0,
+      bid: meta.regularMarketPrice * 0.999 || 0,
+      ask: meta.regularMarketPrice * 1.001 || 0,
+      volume: meta.regularMarketVolume || 0,
+      timestamp: meta.regularMarketTime || Date.now(),
+      source: 'pse',
       lastUpdate: Date.now()
     };
   } catch (err) {
@@ -68,30 +66,32 @@ export async function fetchLiveQuotePSE(symbol: string): Promise<LiveQuote | nul
   }
 }
 
-export async function fetchLiveQuoteGroww(symbol: string): Promise<LiveQuote | null> {
+export async function fetchLiveQuoteYahoo(symbol: string): Promise<LiveQuote | null> {
   if (!await checkRateLimit(symbol)) return null;
 
   try {
     const response = await fetch(
-      `https://api.groww.in/v1/stocks/quote?symbol=${symbol}`
+      `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}.PS?interval=1d`
     );
 
     if (!response.ok) return null;
 
     const data = (await response.json()) as any;
+    const meta = data?.chart?.result?.[0]?.meta;
+    if (!meta) return null;
 
     return {
       symbol,
-      price: data.ltp || 0,
-      bid: data.bid || 0,
-      ask: data.ask || 0,
-      volume: data.volume || 0,
-      timestamp: data.timestamp || Date.now(),
-      source: 'groww',
+      price: meta.regularMarketPrice || 0,
+      bid: meta.regularMarketPrice * 0.999 || 0,
+      ask: meta.regularMarketPrice * 1.001 || 0,
+      volume: meta.regularMarketVolume || 0,
+      timestamp: meta.regularMarketTime || Date.now(),
+      source: 'yahoo',
       lastUpdate: Date.now()
     };
   } catch (err) {
-    console.error(`Groww fetch error for ${symbol}:`, err);
+    console.error(`Yahoo fetch error for ${symbol}:`, err);
     return null;
   }
 }

@@ -122,12 +122,12 @@ describe('sanitizeChatOutput', () => {
   });
 
   it('removes target price', () => {
-    const out = sanitizeChatOutput('The target price is ₹1,500.');
+    const out = sanitizeChatOutput('The target price is Rs. 1,500.');
     expect(out).not.toContain('target price');
   });
 
   it('returns fallback when everything is stripped', () => {
-    const out = sanitizeChatOutput('you should buy i recommend strong buy target price ₹500');
+    const out = sanitizeChatOutput('you should buy i recommend strong buy target price Rs. 500');
     expect(out).toContain('research context');
   });
 });

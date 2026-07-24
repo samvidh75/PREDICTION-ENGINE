@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { toast } from "sonner";
 import { Bell, Plus, Trash2, ToggleLeft, ToggleRight, AlertTriangle, Activity, Percent, Hash, Waves, TrendingUp, TrendingDown, BarChart3, Volume2 } from "lucide-react";
 import { Card, CardLabel } from "../ui/Card";
 import { Button } from "../ui/Button";
@@ -30,7 +31,7 @@ function getConditionIcon(condition: AlertConditionType) {
 
 function formatDate(d: string | null): string {
   if (!d) return "Never";
-  return new Date(d).toLocaleDateString("en-IN", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+  return new Date(d).toLocaleDateString("en-PH", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
 }
 
 export default function AlertPage() {
@@ -58,28 +59,33 @@ export default function AlertPage() {
     if (!symbol) { setFormError("Enter a symbol"); return; }
     if (isNaN(value) || value <= 0) { setFormError("Enter a valid value"); return; }
 
+    const label = formLabel.trim() || `${symbol} - ${formCondition.replace(/_/g, " ")}`;
     alertEngine.addAlert({
       symbol,
       condition: formCondition,
       value,
       repeat: formRepeat,
-      label: formLabel.trim() || `${symbol} - ${formCondition.replace(/_/g, " ")}`,
+      label,
       enabled: true,
     });
 
     setFormSymbol(""); setFormValue(""); setFormLabel("");
     setShowForm(false);
     loadAlerts();
+    toast.success(`Alert set — ${label}`);
   };
 
   const handleDelete = (id: string) => {
+    const removed = alerts.find((a) => a.id === id);
     alertEngine.removeAlert(id);
     loadAlerts();
+    toast(removed ? `Removed — ${removed.label}` : "Alert removed");
   };
 
   const handleToggle = (alert: AlertDefinition) => {
     alertEngine.updateAlert(alert.id, { enabled: !alert.enabled });
     loadAlerts();
+    toast(alert.enabled ? `Paused — ${alert.label}` : `Resumed — ${alert.label}`);
   };
 
   return (

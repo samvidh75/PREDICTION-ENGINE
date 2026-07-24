@@ -1,6 +1,6 @@
 /**
  * Real-time News Service
- * Fetches market news and sentiment for Philippine stocks
+ * Fetches market news and sentiment for PSX stocks
  * - News from multiple sources
  * - Sentiment analysis (positive/negative/neutral)
  * - Ticker-specific filtering

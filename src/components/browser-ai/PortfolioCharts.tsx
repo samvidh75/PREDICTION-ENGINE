@@ -137,7 +137,7 @@ export default function PortfolioCharts() {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '20px' }}>
         <div style={{ padding: '12px', backgroundColor: '#f5f5f5', borderRadius: '6px' }}>
           <div style={{ fontSize: '11px', color: '#666', marginBottom: '4px' }}>Total Invested</div>
-          <div style={{ fontSize: '16px', fontWeight: 'bold' }}>₹{(stats.totalInvested / 100000).toFixed(2)}L</div>
+          <div style={{ fontSize: '16px', fontWeight: 'bold' }}>₱{(stats.totalInvested / 100000).toFixed(2)}L</div>
         </div>
         <div
           style={{
@@ -154,7 +154,7 @@ export default function PortfolioCharts() {
               color: stats.totalReturn > 0 ? '#34a853' : '#ea4335',
             }}
           >
-            ₹{(stats.currentValue / 100000).toFixed(2)}L
+            ₱{(stats.currentValue / 100000).toFixed(2)}L
           </div>
         </div>
         <div
@@ -185,7 +185,7 @@ export default function PortfolioCharts() {
               color: stats.totalReturn > 0 ? '#34a853' : '#ea4335',
             }}
           >
-            {stats.totalReturn > 0 ? '+' : ''}₹{(stats.totalReturn / 100000).toFixed(2)}L
+            {stats.totalReturn > 0 ? '+' : ''}₱{(stats.totalReturn / 100000).toFixed(2)}L
           </div>
         </div>
       </div>
@@ -217,11 +217,11 @@ export default function PortfolioCharts() {
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', fontSize: '11px', color: '#666' }}>
                 <div>
                   <div>Qty: {holding.quantity}</div>
-                  <div>Buy: ₹{holding.buyPrice}</div>
+                  <div>Buy: ₱{holding.buyPrice}</div>
                 </div>
                 <div>
-                  <div>Current: ₹{holding.currentPrice.toFixed(2)}</div>
-                  <div>Value: ₹{(holding.currentValue / 100000).toFixed(2)}L</div>
+                  <div>Current: ₱{holding.currentPrice.toFixed(2)}</div>
+                  <div>Value: ₱{(holding.currentValue / 100000).toFixed(2)}L</div>
                 </div>
               </div>
               <div style={{ marginTop: '6px', fontSize: '10px', color: '#999' }}>

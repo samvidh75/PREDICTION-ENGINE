@@ -2,11 +2,11 @@ export const METHODOLOGY_SECTIONS = [
   {
     id: "overview",
     title: "Methodology Overview",
-    content: "StockStory India uses a comprehensive, multi-factor framework to evaluate and score Philippine equities based on fundamental, technical, and market data.",
+    content: "StockStory Pakistan uses a comprehensive, multi-factor framework to evaluate and score PSX equities based on fundamental, technical, and market data.",
     subsections: [
       {
         title: "Data Sources",
-        content: "We aggregate data from Philippine stock exchanges (PSE, PSE), regulatory filings, broker APIs, and verified financial databases.",
+        content: "We aggregate data from PSX stock exchanges (PSE, PSE), regulatory filings, broker APIs, and verified financial databases.",
       },
       {
         title: "Update Frequency",

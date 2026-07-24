@@ -1,8 +1,8 @@
 /**
- * InsiderActivity — displays insider trading disclosures from PSE/PSE.
+ * InsiderActivity — displays insider trading disclosures from the PSE.
  * 
- * Shows: transaction type (buy/sell), value, persona (promoter/director/KMP),
- * conviction impact assessment, and SEC filing date.
+ * Shows: transaction type (buy/sell), value, persona (director/officer/substantial shareholder),
+ * conviction impact assessment, and disclosure filing date.
  * 
  * Spec ref: Section "Insider Activity Tracker"
  */
@@ -13,27 +13,27 @@ import { colors, radius, animation } from "../design/tokens";
 
 interface InsiderTransaction {
   id: string;
-  date: string;          // SEC filing date
-  persona: string;       // "Promoter", "Director", "KMP", "Promoter Group"
+  date: string;          // disclosure filing date
+  persona: string;       // "Director", "Officer", "Key Officer", "Substantial Shareholder"
   name: string;
   type: "buy" | "sell";
   shares: number;
   pricePerShare: number;
-  totalValue: number;    // in crores
+  totalValue: number;    // in millions (₱)
   convictionSignal: "strong-bullish" | "bullish" | "neutral" | "bearish" | "strong-bearish";
   reason?: string;       // SEC-filed reason
 }
 
-// Mock data — production fetches from PSE/PSE bulk deal APIs
+// Mock data — production fetches from PSE bulk deal disclosures
 const MOCK_INSIDER_DATA: InsiderTransaction[] = [
   {
     id: "ins-1",
     date: "2025-06-15",
-    persona: "Promoter",
-    name: "Ramesh Agarwal",
+    persona: "Director",
+    name: "Ramon Ang",
     type: "buy",
     shares: 500000,
-    pricePerShare: 342.50,
+    pricePerShare: 34.50,
     totalValue: 17.13,
     convictionSignal: "strong-bullish",
     reason: "Confidence in company's growth trajectory",
@@ -41,11 +41,11 @@ const MOCK_INSIDER_DATA: InsiderTransaction[] = [
   {
     id: "ins-2",
     date: "2025-06-10",
-    persona: "Director",
-    name: "Priya Sharma",
+    persona: "Officer",
+    name: "Maria Santos",
     type: "buy",
     shares: 25000,
-    pricePerShare: 338.75,
+    pricePerShare: 33.75,
     totalValue: 0.85,
     convictionSignal: "bullish",
     reason: "Personal investment",
@@ -53,11 +53,11 @@ const MOCK_INSIDER_DATA: InsiderTransaction[] = [
   {
     id: "ins-3",
     date: "2025-05-28",
-    persona: "KMP",
-    name: "Vikram Patel",
+    persona: "Key Officer",
+    name: "Jose Cuenca",
     type: "sell",
     shares: 15000,
-    pricePerShare: 345.00,
+    pricePerShare: 34.50,
     totalValue: 0.52,
     convictionSignal: "neutral",
     reason: "Personal financial planning",
@@ -65,11 +65,11 @@ const MOCK_INSIDER_DATA: InsiderTransaction[] = [
   {
     id: "ins-4",
     date: "2025-05-15",
-    persona: "Promoter Group",
-    name: "Agarwal Family Trust",
+    persona: "Substantial Shareholder",
+    name: "Ayala Family Trust",
     type: "sell",
     shares: 200000,
-    pricePerShare: 330.00,
+    pricePerShare: 33.00,
     totalValue: 6.60,
     convictionSignal: "bearish",
     reason: "Portfolio rebalancing",
@@ -84,14 +84,14 @@ const SIGNAL_CONFIG: Record<InsiderTransaction["convictionSignal"], { label: str
   "strong-bearish": { label: "Strong Bearish", color: colors.marketRed, bg: colors.marketRedSoft },
 };
 
-function formatCrores(value: number): string {
-  if (value >= 1) return `₹${value.toFixed(1)} Cr`;
-  return `₹${(value * 100).toFixed(0)} L`;
+function formatMillions(value: number): string {
+  if (value >= 1) return `₱${value.toFixed(2)}M`;
+  return `₱${(value * 1000).toFixed(0)}K`;
 }
 
 function formatShares(shares: number): string {
-  if (shares >= 100000) return `${(shares / 100000).toFixed(1)}L`;
-  if (shares >= 1000) return `${(shares / 1000).toFixed(0)}K`;
+  if (shares >= 1_000_000) return `${(shares / 1_000_000).toFixed(1)}M`;
+  if (shares >= 1_000) return `${(shares / 1_000).toFixed(0)}K`;
   return shares.toString();
 }
 
@@ -139,6 +139,8 @@ export function InsiderActivity() {
                 gap: "12px",
                 padding: "12px 14px",
                 background: colors.surface,
+                backdropFilter: "blur(20px) saturate(160%)",
+                WebkitBackdropFilter: "blur(20px) saturate(160%)",
                 borderRadius: radius.md,
                 border: `1px solid ${colors.hairline}`,
                 transition: `all ${animation.fast}`,
@@ -182,6 +184,8 @@ export function InsiderActivity() {
                       fontWeight: 500,
                       color: colors.textSecondary,
                       background: colors.surfaceCard,
+                      backdropFilter: "blur(20px) saturate(160%)",
+                      WebkitBackdropFilter: "blur(20px) saturate(160%)",
                       padding: "1px 6px",
                       borderRadius: radius.full,
                     }}
@@ -191,8 +195,8 @@ export function InsiderActivity() {
                 </div>
                 <div style={{ fontSize: "12px", color: colors.textSecondary }}>
                   {txn.type === "buy" ? "Bought" : "Sold"}{" "}
-                  {formatShares(txn.shares)} shares @ ₹{txn.pricePerShare} ·{" "}
-                  {formatCrores(txn.totalValue)}
+                  {formatShares(txn.shares)} shares @ ₱{txn.pricePerShare} ·{" "}
+                  {formatMillions(txn.totalValue)}
                 </div>
                 {txn.reason && (
                   <div style={{ fontSize: "11px", color: colors.textTertiary, marginTop: "2px", fontStyle: "italic" }}>
@@ -218,7 +222,7 @@ export function InsiderActivity() {
 
               {/* Date */}
               <div style={{ fontSize: "11px", color: colors.textTertiary, whiteSpace: "nowrap" }}>
-                {new Date(txn.date).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}
+                {new Date(txn.date).toLocaleDateString("en-PH", { day: "numeric", month: "short" })}
               </div>
             </div>
           );
@@ -231,6 +235,8 @@ export function InsiderActivity() {
           marginTop: "12px",
           padding: "8px 12px",
           background: colors.surface,
+          backdropFilter: "blur(20px) saturate(160%)",
+          WebkitBackdropFilter: "blur(20px) saturate(160%)",
           borderRadius: radius.sm,
           display: "flex",
           alignItems: "center",

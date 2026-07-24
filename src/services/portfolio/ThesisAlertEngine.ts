@@ -123,7 +123,7 @@ export const ThesisAlertEngine = {
         symbol,
         type: 'PRICE_ABOVE_TARGET',
         severity: 'high',
-        message: `${symbol} at ₹${price} — near target ₹${thesis.targetPrice}. Review thesis.`,
+        message: `${symbol} at ₱${price} — near target ₱${thesis.targetPrice}. Review thesis.`,
         createdAt: new Date().toISOString(),
         dismissed: false,
       });
@@ -142,7 +142,7 @@ export const ThesisAlertEngine = {
         symbol,
         type: 'STOP_LOSS_BREACH',
         severity: 'high',
-        message: `${symbol} at ₹${price} — breached stop-loss ₹${thesis.stopLoss}. Consider reviewing position.`,
+        message: `${symbol} at ₱${price} — breached stop-loss ₱${thesis.stopLoss}. Consider reviewing position.`,
         createdAt: new Date().toISOString(),
         dismissed: false,
       });
@@ -153,7 +153,7 @@ export const ThesisAlertEngine = {
         symbol,
         type: 'STOP_LOSS_APPROACHING',
         severity: 'medium',
-        message: `${symbol} at ₹${price} — approaching stop-loss ₹${thesis.stopLoss}. Monitor closely.`,
+        message: `${symbol} at ₱${price} — approaching stop-loss ₱${thesis.stopLoss}. Monitor closely.`,
         createdAt: new Date().toISOString(),
         dismissed: false,
       });

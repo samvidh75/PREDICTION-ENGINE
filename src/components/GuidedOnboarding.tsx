@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ArrowRight, CheckCircle2, Cpu, Eye, Radar, ShieldCheck, Sparkles } from "lucide-react";
+import { ArrowRight, BarChart3, Bookmark, CheckCircle2, Cpu, Eye, Flame, Radar, Search, ShieldCheck, Sparkles } from "lucide-react";
 import { animation, colors, radius, space, typography } from "../design/tokens";
 
 // ── Glassmorphism design helpers ────────────────────────────────────────────
@@ -9,13 +9,13 @@ const glassBorderLight = `1px solid rgba(255,255,255,0.04)`;
 const glassBg = 'rgba(20,20,20,0.55)';        // frosted card surface
 const glassBgLight = 'rgba(255,255,255,0.03)'; // subtle glass fill
 const glassBgIcon = 'rgba(255,255,255,0.05)';  // icon container bg
-const glassAccent = '#818cf8';                 // indigo glass accent for icons
+const glassAccent = '#FF6B4A';                 // theme accent for icons (was stray indigo)
 const ink = '#ffffff';
 const body = '#a0a0a0';
 const mute = '#707070';
 const charcoal = '#c0c0c0';
 const stone = '#404040';
-const accentRed = '#FF6B6B';
+const accentRed = '#FF6B4A';
 
 // Terminal-style font for the onboarding wizard
 const monoFont = typography.fontFamily;
@@ -26,7 +26,7 @@ interface GuidedOnboardingProps {
 
 type Step = 1 | 2 | 3 | 4 | 5;
 
-const DEFAULT_TICKERS = ["RELIANCE", "TCS", "SBIN", "INFY", "TATAMOTORS"];
+const DEFAULT_TICKERS = ["BDO", "JFC", "AC", "SM", "TEL"];
 const STORAGE_KEY = "ss_guided_onboarding_config_v1";
 
 interface ScannerConfig {
@@ -463,23 +463,23 @@ export default function GuidedOnboarding({ onComplete }: GuidedOnboardingProps) 
               {[
                 {
                   title: "Scanner",
-                  desc: "Pre-built screens for Quality, Growth, Value. Each preset ranks stocks by composite health scores.",
-                  icon: "🔍",
+                  desc: "Ready-made screens for Quality, Growth, and Value. Each one ranks stocks by an overall health score.",
+                  icon: Search,
                 },
                 {
-                  title: "Stock Pages",
-                  desc: "Detailed view with price charts, fundamentals, peer comparison, and GPU order-flow delta.",
-                  icon: "📊",
+                  title: "Stock pages",
+                  desc: "A full view for one company: price chart, fundamentals, and how it compares to its peers.",
+                  icon: BarChart3,
                 },
                 {
                   title: "Watchlist",
-                  desc: "Your tracked names with real-time prices via WebSocket streaming.",
-                  icon: "📋",
+                  desc: "The names you're tracking, with live prices as they move.",
+                  icon: Bookmark,
                 },
                 {
-                  title: "F&O Scanner",
-                  desc: "Put-Call ratio, Max Pain, and OI wall concentrations for options traders (Pro-tier).",
-                  icon: "🔥",
+                  title: "Options scanner",
+                  desc: "Positioning signals for options traders — where the market expects a stock to land (Pro).",
+                  icon: Flame,
                 },
               ].map((item) => (
                 <div key={item.title} style={{
@@ -488,7 +488,7 @@ export default function GuidedOnboarding({ onComplete }: GuidedOnboardingProps) 
                   background: glassBgLight, border: glassBorder,
                   backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)",
                 }}>
-                  <span style={{ fontSize: 16, flexShrink: 0 }}>{item.icon}</span>
+                  <item.icon size={16} style={{ flexShrink: 0, color: glassAccent, marginTop: 2 }} />
                   <div>
                     <span style={{ fontSize: 13, fontWeight: 600, color: charcoal }}>{item.title}</span>
                     <p style={{ margin: `${space[1]} 0 0 0`, fontSize: 11, color: body, lineHeight: 1.4 }}>
@@ -527,7 +527,7 @@ export default function GuidedOnboarding({ onComplete }: GuidedOnboardingProps) 
                   Your starting watchlist is ready
                 </h2>
                 <p style={{ margin: `${space[1]} 0 0 0`, color: body, fontSize: 13 }}>
-                  We have pre-loaded a focused India watchlist so your first view is useful immediately.
+                  We have pre-loaded a focused PSX watchlist so your first view is useful immediately.
                 </p>
               </div>
             </div>

@@ -74,8 +74,8 @@ export class ProviderValidation {
     md += `| --- | --- | --- | --- | --- |\n`;
 
     for (const r of results) {
-      const yStr = r.yahooPrice !== null ? `₹${r.yahooPrice.toFixed(2)}` : 'N/A';
-      const iStr = r.indianMarketPrice !== null ? `₹${r.indianMarketPrice.toFixed(2)}` : 'N/A';
+      const yStr = r.yahooPrice !== null ? `₱${r.yahooPrice.toFixed(2)}` : 'N/A';
+      const iStr = r.indianMarketPrice !== null ? `₱${r.indianMarketPrice.toFixed(2)}` : 'N/A';
       const varStr = r.variance > 0 ? `${r.variance.toFixed(2)}%` : '-';
       md += `| **${r.symbol}** | ${yStr} | ${iStr} | ${varStr} | ${r.status} |\n`;
     }

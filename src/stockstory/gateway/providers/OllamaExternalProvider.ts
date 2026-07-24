@@ -76,7 +76,7 @@ Provide a structured research narrative covering: investment thesis, bull case, 
   }
 
   parseScannerQuery(query: string): ScannerQueryPlan {
-    const prompt = `Convert this natural-language scanner query into structured stock filters for the Philippine market (PSE/PSE).
+    const prompt = `Convert this natural-language scanner query into structured stock filters for the PSX market (PSE/PSE).
 
 Query: "${query}"
 
@@ -122,7 +122,7 @@ Old value: ${input.oldValue ?? 'N/A'}
 New value: ${input.newValue ?? 'N/A'}
 Context: ${input.context}
 
-Provide a concise 1-2 sentence explanation for an Philippine retail investor.`;
+Provide a concise 1-2 sentence explanation for an PSX retail investor.`;
 
     try {
       return this.generate(prompt);
@@ -137,7 +137,7 @@ Provide a concise 1-2 sentence explanation for an Philippine retail investor.`;
       return `No recent news items available for ${input.symbol}.`;
     }
 
-    const prompt = `Summarize the following news items for ${input.symbol} in 2-3 sentences for an Philippine retail investor.
+    const prompt = `Summarize the following news items for ${input.symbol} in 2-3 sentences for an PSX retail investor.
 
 News items:
 ${input.news.map((n, i) => `${i + 1}. ${n}`).join('\n')}
@@ -159,12 +159,12 @@ Focus on: earnings impact, regulatory changes, competitive developments, and sec
     const { symbols, scores, factorComparison } = input;
     if (symbols.length < 2) return 'Select at least two companies for comparison.';
 
-    const prompt = `Compare these Philippine stocks: ${symbols.join(', ')}
+    const prompt = `Compare these PSX stocks: ${symbols.join(', ')}
 
 Scores (out of 100): ${JSON.stringify(scores)}
 Factor comparison: ${JSON.stringify(factorComparison)}
 
-Provide a 2-3 sentence comparison highlighting the strongest and weakest performer across key factors, for an Philippine retail investor.`;
+Provide a 2-3 sentence comparison highlighting the strongest and weakest performer across key factors, for an PSX retail investor.`;
 
     try {
       return this.generate(prompt);

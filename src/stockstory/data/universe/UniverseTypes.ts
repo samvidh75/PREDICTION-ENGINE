@@ -1,7 +1,7 @@
 /**
  * PSE Universe Types
  *
- * Defines the canonical stock universe structure for Philippine equities.
+ * Defines the canonical stock universe structure for PSX equities.
  * Every stock in the system must trace back to this universe.
  */
 
@@ -10,8 +10,8 @@ export type ListingStatus = 'active' | 'suspended' | 'delisted' | 'merged' | 'un
 export interface PSESymbol {
   symbol: string;
   isin: string | null;
-  nseSymbol: string | null;
-  bseCode: string | null;
+  pseSymbol: string | null;
+  pseCode: string | null;
   companyName: string;
   sector: string | null;
   industry: string | null;

@@ -166,7 +166,7 @@ function StickyHeader({ symbol, price, changeAbs, changePercent, trendColor }: {
         </span>
         <PriceFlash value={price}>
         <span style={{ color: colors.textPrimary, fontSize: "16px", fontWeight: 600 }}>
-            ₹{formatNumber(price)}
+            ₱{formatNumber(price)}
           </span>
         </PriceFlash>
         <span style={{ color: trendColor, fontSize: "13px", fontWeight: 500, display: "inline-flex", alignItems: "center", gap: "4px" }}>
@@ -184,7 +184,6 @@ function StickyHeader({ symbol, price, changeAbs, changePercent, trendColor }: {
 
 // ── Hero Section (centred, massive price) ────────────────────────
 function HeroSection({ stock, isUp, trendColor }: { stock: StockResearchDetail; isUp: boolean; trendColor: string }) {
-  const convictionEmoji = stock.confidenceMeter >= 75 ? "🔥" : stock.confidenceMeter >= 60 ? "📈" : stock.confidenceMeter >= 40 ? "👀" : "⚠️";
   const convictionLabel = stock.confidenceMeter >= 80 ? "Very Healthy" : stock.confidenceMeter >= 65 ? "Healthy" : stock.confidenceMeter >= 50 ? "Watch" : stock.confidenceMeter >= 35 ? "Needs Review" : "Risk Rising";
   const convictionColor = stock.confidenceMeter >= 65 ? colors.success : stock.confidenceMeter >= 50 ? colors.warning : stock.confidenceMeter >= 35 ? colors.marketOrange : colors.danger;
   return (
@@ -194,7 +193,7 @@ function HeroSection({ stock, isUp, trendColor }: { stock: StockResearchDetail; 
         <span style={{ color: colors.textSecondary, fontSize: "14px", fontWeight: 500 }}>{stock.companyName}</span>
       </div>
       <div style={{ fontSize: useResponsiveValue("40px", "64px"), fontWeight: 700, color: colors.textPrimary, lineHeight: "1.1", letterSpacing: "-0.02em", display: "flex", alignItems: "center", justifyContent: "center", gap: "12px" }}>
-        <PriceFlash value={stock.price.current}>₹{formatNumber(stock.price.current)}</PriceFlash>
+        <PriceFlash value={stock.price.current}>₱{formatNumber(stock.price.current)}</PriceFlash>
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: "12px", marginTop: "12px", flexWrap: "wrap", justifyContent: "center" }}>
         <div style={{ color: trendColor, fontSize: "18px", fontWeight: 600, display: "inline-flex", alignItems: "center", gap: "6px" }}>
@@ -207,11 +206,11 @@ function HeroSection({ stock, isUp, trendColor }: { stock: StockResearchDetail; 
           background: `${convictionColor}14`, fontSize: "13px", fontWeight: 600,
           color: convictionColor,
         }}>
-          <span>{convictionEmoji}</span><span>{convictionLabel}</span>
+          <span>{convictionLabel}</span>
         </div>
       </div>
       <div style={{ fontSize: "13px", color: colors.textSecondary, marginTop: "10px" }}>
-        Market Cap: ₹{formatNumber(Math.round(stock.price.marketCap))} Cr
+        Market Cap: ₱{formatNumber(Math.round(stock.price.marketCap / 1_000_000))}M
       </div>
     </section>
   );
@@ -224,6 +223,31 @@ function Healthometer({ score, confidence, stance, timeline, factorScores }: {
   const circumference = 2 * Math.PI * 54;
   const strokeDashoffset = circumference - (score / 100) * circumference;
   const ringColor = score >= 75 ? colors.success : score >= 50 ? colors.warning : colors.danger;
+
+  // One-shot sweep-in on first mount only. After that, render the live score
+  // directly — this stays correct even if `score` updates rapidly from a
+  // polling/live-price source, unlike a naive "animate from previous prop"
+  // approach that can get stuck mid-tween if the value changes faster than
+  // the animation completes.
+  const [displayScore, setDisplayScore] = useState(0);
+  const hasSweptRef = useRef(false);
+  useEffect(() => {
+    if (hasSweptRef.current) { setDisplayScore(Math.round(score)); return; }
+    hasSweptRef.current = true;
+    const target = Math.round(score);
+    const totalFrames = 45;
+    let frame = 0;
+    let raf: number;
+    const tick = () => {
+      frame++;
+      const progress = Math.min(frame / totalFrames, 1);
+      const easeOut = 1 - Math.pow(1 - progress, 3);
+      setDisplayScore(Math.round(target * easeOut));
+      if (progress < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [score]);
   const previousScore = timeline[timeline.length - 2]?.health ?? score;
   const trend = score > previousScore ? "improving" : score < previousScore ? "declining" : "stable";
   const trendLabel = trend === "improving" ? "IMPROVING" : trend === "declining" ? "DECLINING" : "STABLE";
@@ -241,20 +265,46 @@ function Healthometer({ score, confidence, stance, timeline, factorScores }: {
     <Card className="stock-healthometer-card">
       <CardLabel>Healthometer Score</CardLabel>
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "20px" }}>
-        <div style={{ position: "relative", width: "120px", height: "120px" }}>
-          <svg width="120" height="120" viewBox="0 0 120 120" style={{ transform: "rotate(-90deg)" }}>
-            <circle cx="60" cy="60" r="54" fill="none" stroke={colors.border} strokeWidth="8" />
-            <circle cx="60" cy="60" r="54" fill="none" stroke={ringColor} strokeWidth="8"
+        <div style={{ position: "relative", width: "132px", height: "132px" }}>
+          <svg width="132" height="132" viewBox="0 0 132 132" style={{ transform: "rotate(-90deg)" }}>
+            <defs>
+              <linearGradient id="healthometer-arc-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor={ringColor} stopOpacity="0.55" />
+                <stop offset="100%" stopColor={ringColor} stopOpacity="1" />
+              </linearGradient>
+              <filter id="healthometer-glow" x="-60%" y="-60%" width="220%" height="220%">
+                <feGaussianBlur stdDeviation="4" result="blur" />
+                <feMerge>
+                  <feMergeNode in="blur" />
+                  <feMergeNode in="SourceGraphic" />
+                </feMerge>
+              </filter>
+            </defs>
+            {/* Tick marks at 0/25/50/75/100 — Apple-Watch-activity-ring language */}
+            {[0, 25, 50, 75, 100].map((tick) => {
+              const angle = (tick / 100) * 360;
+              const rad = (angle * Math.PI) / 180;
+              const x1 = 66 + 60 * Math.cos(rad);
+              const y1 = 66 + 60 * Math.sin(rad);
+              const x2 = 66 + 54 * Math.cos(rad);
+              const y2 = 66 + 54 * Math.sin(rad);
+              return <line key={tick} x1={x1} y1={y1} x2={x2} y2={y2} stroke={colors.hairlineStrong} strokeWidth="1.5" />;
+            })}
+            <circle cx="66" cy="66" r="54" fill="none" stroke={colors.border} strokeWidth="8" />
+            <circle cx="66" cy="66" r="54" fill="none" stroke="url(#healthometer-arc-gradient)" strokeWidth="8"
               strokeDasharray={circumference} strokeDashoffset={strokeDashoffset}
               strokeLinecap="round"
-              style={{ transition: "stroke-dashoffset 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)" }}
+              filter="url(#healthometer-glow)"
+              style={{ transition: "stroke-dashoffset 1.1s cubic-bezier(0.16, 1, 0.3, 1)" }}
             />
           </svg>
           <div style={{
             position: "absolute", top: 0, left: 0, right: 0, bottom: 0,
             display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
           }}>
-            <span style={{ fontSize: "32px", fontWeight: 700, color: colors.textPrimary, lineHeight: "1" }}>{Math.round(score)}</span>
+            <span style={{ fontSize: "34px", fontWeight: 700, color: colors.textPrimary, lineHeight: "1", fontFeatureSettings: typography.fontFeature }}>
+              {displayScore}
+            </span>
             <span style={{ fontSize: "11px", color: colors.textSecondary, marginTop: "2px" }}>/100</span>
           </div>
         </div>
@@ -561,8 +611,8 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
   }, []);
   // Native ads
   const nativeAdSlots = [
-    { type: "ad" as const, id: "ad1", data: { icon: "📈", title: "Track your portfolio like a pro", subtitle: "Get timely alerts and expert analysis", cta: "Try StockEX Pro →" } },
-    { type: "ad" as const, id: "ad2", data: { icon: "🎯", title: "AI-powered stock screening", subtitle: "Find the next multi-bagger before the crowd", cta: "Start free trial →" } },
+    { type: "ad" as const, id: "ad1", data: { icon: "P", title: "Track your portfolio like a pro", subtitle: "Get timely alerts and expert analysis", cta: "Try StockEX Pro" } },
+    { type: "ad" as const, id: "ad2", data: { icon: "S", title: "Smart stock screening", subtitle: "Find the next multi-bagger before the crowd", cta: "Start free trial" } },
   ];
   const newsFeedWithAds = (filteredNews ?? []).reduce<Array<{ type: "news" | "ad"; id: string; data: any }>>((acc, item, idx) => {
     if (item) {
@@ -631,11 +681,35 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
       {/* ── Hero Section ── */}
       <div ref={heroRef}>
         <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "12px" }}>
-          <button onClick={() => navigate(-1)} style={{
-            border: "none", background: "transparent", padding: 0, display: "inline-flex", alignItems: "center",
-            gap: "6px", color: colors.textSecondary, cursor: "pointer", fontSize: "13px",
-          }}>
-            <ArrowLeft size={16} /><span>Back</span>
+          <button
+            onClick={() => navigate(-1)}
+            style={{
+              border: `1px solid ${colors.glassBorder}`,
+              background: colors.glassBg,
+              backdropFilter: colors.glassBlur,
+              WebkitBackdropFilter: colors.glassBlur,
+              boxShadow: `inset 0 1px 0 ${colors.glassBorderTop}`,
+              padding: "6px 12px",
+              borderRadius: radius.full,
+              display: "inline-flex", alignItems: "center",
+              gap: "6px", color: colors.textSecondary, cursor: "pointer", fontSize: "13px", fontWeight: 500,
+              transition: "background 180ms ease, border-color 180ms ease, color 180ms ease, transform 280ms cubic-bezier(0.34, 1.56, 0.64, 1)",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = colors.glassBorderTop;
+              e.currentTarget.style.background = colors.glassBgStrong;
+              e.currentTarget.style.color = colors.textPrimary;
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = colors.glassBorder;
+              e.currentTarget.style.background = colors.glassBg;
+              e.currentTarget.style.color = colors.textSecondary;
+              e.currentTarget.style.transform = "scale(1)";
+            }}
+            onMouseDown={(e) => { e.currentTarget.style.transform = "scale(0.955)"; }}
+            onMouseUp={(e) => { e.currentTarget.style.transform = "scale(1)"; }}
+          >
+            <ArrowLeft size={15} /><span>Back</span>
           </button>
         </div>
         <HeroSection stock={stock} isUp={isUp} trendColor={trendColor} />
@@ -653,7 +727,7 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
             }}>
               {gpuDelta.signal.replace(/_/g, " ")}
             </strong>
-            <span style={{ color: colors.textTertiary }}>({gpuDelta.delta.toLocaleString("en-IN")})</span>
+            <span style={{ color: colors.textTertiary }}>({gpuDelta.delta.toLocaleString("en-PH")})</span>
           </div>
         )}
       </div>
@@ -680,7 +754,7 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
               aria-label="Advanced charting with technical indicators"
               onClick={() => {/* TODO: Open advanced chart modal */}}
               style={{ padding: "6px 14px", borderRadius: radius.full, border: `1px solid ${colors.primary}`, cursor: "pointer", fontSize: "12px", fontWeight: 500, background: `${colors.primary}20`, color: colors.primary }}>
-              📊 Advanced Chart
+              Bar / Candle
             </button>
           </div>
           <div style={{ display: "flex", gap: "4px", width: "100%" }}>
@@ -738,33 +812,49 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
         </section>
       ) : null}
 
-      {/* ── Key Metrics Grid ── */}
+      {/* ── Key Metrics Grid — grouped by theme instead of one flat wall of numbers ── */}
       <Card className="stock-metrics-card raycast-slideUp" style={{ animationDelay: "0.15s", animationFillMode: "both" }}>
         <CardLabel>Key metrics</CardLabel>
-        <div className="stock-metric-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "16px" }}>
-          <MetricCard label="Market Cap" value={stock.price.marketCap != null ? `₹${formatNumber(Math.round(stock.price.marketCap))} Cr` : "—"} />
+
+        <div style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.04em", textTransform: "uppercase", color: colors.textSecondary, marginTop: "4px", marginBottom: "10px" }}>
+          Size &amp; valuation
+        </div>
+        <div className="stock-metric-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "16px", marginBottom: "20px" }}>
+          <MetricCard label="Market Cap" value={stock.price.marketCap != null ? `₱${formatNumber(Math.round(stock.price.marketCap / 1_000_000))}M` : "—"} />
           <MetricCard label="PE (TTM)" value={formatDecimal(fundamentals.pe, 1)}
             trend={fundamentals.pe != null && fundamentals.pe < 20 ? "up" : fundamentals.pe != null && fundamentals.pe > 30 ? "down" : "neutral"}
             subtitle={fundamentals.industryPe != null ? `Sector: ${formatDecimal(fundamentals.industryPe, 1)}` : sectorRelMap["pe"] ? `Sector: ${sectorRelMap["pe"]}` : undefined} />
           <MetricCard label="PB Ratio" value={formatDecimal(fundamentals.pb, 1)}
             trend={fundamentals.pb != null && fundamentals.pb < 3 ? "up" : fundamentals.pb != null && fundamentals.pb > 5 ? "down" : "neutral"} />
+          <MetricCard label="Dividend Yield" value={fundamentals.dividendYield != null ? `${formatDecimal(fundamentals.dividendYield, 2)}%` : "—"}
+            trend={fundamentals.dividendYield != null && fundamentals.dividendYield > 1 ? "up" : "neutral"} />
+        </div>
+
+        <div style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.04em", textTransform: "uppercase", color: colors.textSecondary, marginBottom: "10px" }}>
+          Profitability &amp; growth
+        </div>
+        <div className="stock-metric-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "16px", marginBottom: "20px" }}>
           <MetricCard label="ROE" value={stock.roe != null ? `${formatDecimal(stock.roe, 1)}%` : "—"}
             trend={stock.roe != null && stock.roe > 15 ? "up" : stock.roe != null ? "down" : "neutral"}
             subtitle={sectorRelMap["roe"] ? `Sector: ${sectorRelMap["roe"]}` : undefined} />
-          <MetricCard label="Debt/Equity" value={formatDecimal(stock.debtToEquity, 2)}
-            trend={stock.debtToEquity != null && stock.debtToEquity < 0.5 ? "up" : stock.debtToEquity != null && stock.debtToEquity > 1 ? "down" : "neutral"} />
-          <MetricCard label="Dividend Yield" value={fundamentals.dividendYield != null ? `${formatDecimal(fundamentals.dividendYield, 2)}%` : "—"}
-            trend={fundamentals.dividendYield != null && fundamentals.dividendYield > 1 ? "up" : "neutral"} />
           <MetricCard label="Revenue Growth" value={stock.revenueGrowth != null ? `${formatDecimal(stock.revenueGrowth, 1)}%` : "—"}
             trend={stock.revenueGrowth != null && stock.revenueGrowth > 10 ? "up" : stock.revenueGrowth != null ? "down" : "neutral"}
             subtitle={sectorRelMap["revenue growth"] ? `Sector: ${sectorRelMap["revenue growth"]}` : undefined} />
           <MetricCard label="Profit Growth" value={stock.profitGrowth != null ? `${formatDecimal(stock.profitGrowth, 1)}%` : "—"}
             trend={stock.profitGrowth != null && stock.profitGrowth > 10 ? "up" : stock.profitGrowth != null ? "down" : "neutral"} />
-          <MetricCard label="EPS (TTM)" value={fundamentals.eps != null ? `₹${formatDecimal(fundamentals.eps, 1)}` : "—"} />
+          <MetricCard label="EPS (TTM)" value={fundamentals.eps != null ? `₱${formatDecimal(fundamentals.eps, 1)}` : "—"} />
+        </div>
+
+        <div style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.04em", textTransform: "uppercase", color: colors.textSecondary, marginBottom: "10px" }}>
+          Risk &amp; price range
+        </div>
+        <div className="stock-metric-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "16px" }}>
+          <MetricCard label="Debt/Equity" value={formatDecimal(stock.debtToEquity, 2)}
+            trend={stock.debtToEquity != null && stock.debtToEquity < 0.5 ? "up" : stock.debtToEquity != null && stock.debtToEquity > 1 ? "down" : "neutral"} />
           <MetricCard label="RSI (14)" value={stock.rsi != null ? String(stock.rsi) : "—"}
             trend={stock.rsi != null && stock.rsi >= 30 && stock.rsi <= 70 ? "neutral" : "down"} />
-          <MetricCard label="52W High" value={fundamentals.high52w != null ? `₹${formatNumber(fundamentals.high52w)}` : "—"} />
-          <MetricCard label="52W Low" value={fundamentals.low52w != null ? `₹${formatNumber(fundamentals.low52w)}` : "—"} />
+          <MetricCard label="52W High" value={fundamentals.high52w != null ? `₱${formatNumber(fundamentals.high52w)}` : "—"} />
+          <MetricCard label="52W Low" value={fundamentals.low52w != null ? `₱${formatNumber(fundamentals.low52w)}` : "—"} />
         </div>
       </Card>      {/* ── Company Identity ── */}
       <Card className="stock-company-card raycast-slideUp" style={{ animationDelay: "0.2s", animationFillMode: "both" }}>
@@ -780,7 +870,6 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
           <Stat label="Exchange" value={stock.exchange} />
           <Stat label="Sector" value={stock.sector} />
           <Stat label="Industry" value={stock.industry} />
-          <Stat label="Listed on" value="PSE, PSE" />
         </div>
         <div style={{ display: "flex", gap: "16px", fontSize: "13px", flexWrap: "wrap" }}>
           <a href="#" style={{ color: colors.primary, textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "4px" }}>
@@ -828,14 +917,14 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
                 <Tooltip
                   contentStyle={{ backgroundColor: colors.card, border: `1px solid ${colors.border}`, borderRadius: "6px" }}
                   labelStyle={{ color: colors.textPrimary }}
-                  formatter={(value: any) => `₹${value.toLocaleString()} Cr`}
+                  formatter={(value: any) => `₱${value.toLocaleString()}M`}
                 />
                 <Bar dataKey="value" fill={colors.primary} isAnimationActive={false} />
               </LazyBarChart>
             </ResponsiveContainer>
           </div>
         </ChartErrorBoundary>
-        <p style={{ color: colors.textSecondary, fontSize: "12px", marginTop: "12px" }}>All values in ₹ Cr</p>
+        <p style={{ color: colors.textSecondary, fontSize: "12px", marginTop: "12px" }}>All values in ₱M</p>
       </Card>
 
       {/* ── Shareholdings ── */}
@@ -898,7 +987,13 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
                   background: colors.card, cursor: "pointer",
                   transition: "border-color 0.15s ease",
                 }}>
-                  <span style={{ fontSize: "24px", flexShrink: 0 }}>{entry.data.icon}</span>
+                  <span style={{
+                    width: "36px", height: "36px", borderRadius: "8px", flexShrink: 0,
+                    background: colors.hairlineSoft,
+                    display: "inline-flex", alignItems: "center", justifyContent: "center",
+                    fontSize: "15px", fontWeight: 700, color: colors.primary,
+                    letterSpacing: "0",
+                  }}>{entry.data.icon}</span>
                   <div style={{ display: "grid", gap: "3px", flex: 1 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                       <span style={{ fontSize: "10px", fontWeight: 600, color: colors.textTertiary, textTransform: "uppercase", letterSpacing: "0.06em" }}>SPONSORED</span>
@@ -954,13 +1049,13 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
               <p style={{ color: colors.textPrimary, fontSize: "14px", lineHeight: "1.5" }}>{stock.thesis.bullCase}</p>
             </div>
             <div style={{ padding: "12px", backgroundColor: `${colors.danger}15`, borderRadius: "6px", borderLeft: `3px solid ${colors.danger}` }}>
-              <div style={{ color: colors.danger, fontSize: "12px", fontWeight: "600", marginBottom: "8px", textTransform: "uppercase" }}>⚠ Risks</div>
+               <div style={{ color: colors.danger, fontSize: "12px", fontWeight: "600", marginBottom: "8px", textTransform: "uppercase" }}>Risks</div>
               <p style={{ color: colors.textPrimary, fontSize: "14px", lineHeight: "1.5" }}>{stock.thesis.bearCase}</p>
             </div>
           </div>
 
           <div style={{ padding: "12px", backgroundColor: `${colors.warning}15`, borderRadius: "6px", borderLeft: `3px solid ${colors.warning}` }}>
-            <div style={{ color: colors.warning, fontSize: "12px", fontWeight: "600", marginBottom: "8px", textTransform: "uppercase" }}>👁 Watch</div>
+            <div style={{ color: colors.warning, fontSize: "12px", fontWeight: "600", marginBottom: "8px", textTransform: "uppercase" }}>Watch</div>
             <p style={{ color: colors.textPrimary, fontSize: "14px", lineHeight: "1.5" }}>{stock.thesis.whatToWatch}</p>
           </div>
         </div>
@@ -972,19 +1067,19 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
       {/* ── AI Analysis ── */}
       {aiLoading && (
         <Card className="stock-panel-card raycast-slideUp">
-          <CardLabel>AI Analysis</CardLabel>
+          <CardLabel>Research Analysis</CardLabel>
           <div style={{ display: "flex", alignItems: "center", gap: "10px", padding: "16px 0" }}>
             <div className="raycast-spinner" style={{ width: "16px", height: "16px", border: `2px solid ${colors.border}`, borderTopColor: colors.primary, borderRadius: "50%" }} />
-            <span style={{ color: colors.textSecondary, fontSize: "14px" }}>Generating AI analysis…</span>
+            <span style={{ color: colors.textSecondary, fontSize: "14px" }}>Generating analysis…</span>
           </div>
         </Card>
       )}
       {aiError && (
         <Card className="stock-panel-card raycast-slideUp" style={{ borderLeft: `3px solid ${colors.warning}` }}>
           <div style={{ display: "flex", alignItems: "flex-start", gap: "12px" }}>
-            <span style={{ color: colors.warning, fontSize: "18px", marginTop: "2px" }}>⚠️</span>
+            <span style={{ color: colors.warning, fontSize: "18px", marginTop: "2px", fontWeight: 700 }}>!</span>
             <div style={{ display: "grid", gap: "4px", flex: 1 }}>
-              <div style={{ color: colors.warning, fontSize: "13px", fontWeight: "600" }}>AI Analysis Error</div>
+              <div style={{ color: colors.warning, fontSize: "13px", fontWeight: "600" }}>Analysis Error</div>
               <div style={{ color: colors.textSecondary, fontSize: "13px" }}>{aiError}</div>
             </div>
           </div>
@@ -992,7 +1087,7 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
       )}
       {ai && !aiLoading && (
         <Card className="stock-ai-card raycast-slideUp">
-          <CardLabel>AI Analysis</CardLabel>
+          <CardLabel>Research Analysis</CardLabel>
           <div style={{ display: "grid", gap: "12px" }}>
             <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
               <div style={{
@@ -1039,18 +1134,20 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
         opacity: showFooter ? 1 : 0,
         pointerEvents: showFooter ? "auto" : "none",
       }}>
-        <InteractiveButton onClick={() => setIsBrokerOpen(true)} variant="primary" style={{ minWidth: "150px", justifyContent: "center" }}>
-          <TrendingUp size={15} /> Trade via {selectedBroker ?? "Broker"}
-        </InteractiveButton>
+        {selectedBroker && (
+          <InteractiveButton onClick={() => setIsBrokerOpen(true)} variant="primary" style={{ minWidth: "150px", justifyContent: "center" }}>
+            <TrendingUp size={15} /> Trade via {selectedBroker}
+          </InteractiveButton>
+        )}
       </div>
 
       {/* ── Broker Handoff Modal ── */}
-      {isBrokerOpen && (
+      {isBrokerOpen && availableBrokers[0] && (
         <BrokerHandoffModal
           broker={availableBrokers[0]}
           stockSymbol={stock.symbol}
           direction="long"
-          rationale={ai?.bullCase ?? "Based on AI analysis"}
+          rationale={ai?.bullCase ?? "Based on current signals"}
           confidence={stock.scores.quality ?? 70}
           onClose={() => setIsBrokerOpen(false)}
         />

@@ -87,7 +87,7 @@ class PaymentService {
           key: this.razorpayKey,
           order_id: orderId,
           amount,
-          currency: 'INR',
+          currency: 'PKR',
           name: 'StockEx Premium',
           description: `${options.plan.charAt(0).toUpperCase() + options.plan.slice(1)} Subscription`,
           image: '/stockex-logo.png', // Add your logo

@@ -138,7 +138,7 @@ export class CorporateActionEventMapper {
     switch (action.kind) {
       case 'dividend': {
         const amount = action.details?.amount
-          ? ` of ₹${action.details.amount} per share`
+          ? ` of ₱${action.details.amount} per share`
           : action.details?.percentage
             ? ` of ${action.details.percentage}%`
             : '';
@@ -155,7 +155,7 @@ export class CorporateActionEventMapper {
       case 'rights':
         return `${symbol} announced a rights issue${action.details?.ratio ? ` in ratio ${action.details.ratio}` : ''}.`;
       case 'buyback':
-        return `${symbol} announced a buyback${action.details?.price ? ` at ₹${action.details.price} per share` : ''}.`;
+        return `${symbol} announced a buyback${action.details?.price ? ` at ₱${action.details.price} per share` : ''}.`;
       case 'merger':
         return `${symbol} announced a merger${action.details?.ratio ? ` (swap ratio: ${action.details.ratio})` : ''}.`;
       case 'demerger':

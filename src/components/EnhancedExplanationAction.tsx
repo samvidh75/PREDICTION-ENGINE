@@ -24,6 +24,8 @@ const BUTTON_STYLE: import("react").CSSProperties = {
   borderRadius: "8px",
   border: `1px solid ${colors.hairline}`,
   background: colors.surface,
+  backdropFilter: "blur(20px) saturate(160%)",
+  WebkitBackdropFilter: "blur(20px) saturate(160%)",
   color: colors.textSecondary,
   fontSize: "13px",
   fontWeight: 500,
@@ -36,6 +38,8 @@ const BUTTON_STYLE: import("react").CSSProperties = {
 const BUTTON_HOVER: import("react").CSSProperties = {
   ...BUTTON_STYLE,
   background: colors.surfaceElevated,
+  backdropFilter: "blur(20px) saturate(160%)",
+  WebkitBackdropFilter: "blur(20px) saturate(160%)",
   borderColor: colors.hairlineStrong,
   color: colors.textPrimary,
 };
@@ -124,6 +128,8 @@ export function EnhancedExplanationAction({
             minWidth: "260px",
             maxWidth: "360px",
             background: colors.surface,
+            backdropFilter: "blur(20px) saturate(160%)",
+            WebkitBackdropFilter: "blur(20px) saturate(160%)",
             border: `1px solid ${colors.hairlineStrong}`,
             borderRadius: "12px",
             padding: space[3],

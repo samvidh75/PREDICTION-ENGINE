@@ -46,7 +46,7 @@ export class RAGEngine {
     // Query multiple facets
     const patterns = vs.query(`${symbol} business pattern financial ratios`, 5);
     const competitors = vs.query(`${symbol} competitors sector ${sector}`, 5);
-    const macro = vs.query(`macroeconomics ${sector} sector India`, 5);
+    const macro = vs.query(`macroeconomics ${sector} sector Pakistan`, 5);
 
     const allResults = [...patterns, ...competitors, ...macro];
     const coverage = allResults.length > 0

@@ -53,7 +53,7 @@ export function SubscriptionCard({
       const session = await resp.json() as {
         sessionId: string;
         checkoutUrl: string;
-        plan: { priceInr: number };
+        plan: { pricePkr: number };
       };
 
       if (typeof window.Razorpay !== "undefined") {
@@ -61,7 +61,7 @@ export function SubscriptionCard({
           key: import.meta.env.VITE_RAZORPAY_KEY_ID,
           subscription_id: session.sessionId,
           name: "StockEX",
-          description: `Research ${planId === "plan_pro_299" ? "Pro" : "Plus"} — ₹${session.plan.priceInr}/mo`,
+          description: `Research ${planId === "plan_pro_299" ? "Pro" : "Plus"} — ₱${session.plan.pricePkr}/mo`,
           image: "/logo.png",
           handler: () => {
             onActivated?.();
@@ -140,7 +140,7 @@ export function SubscriptionCard({
           fontFamily: typography.fontFamily,
           margin: `${space[1]} 0 0 0`,
         }}>
-          ₹{price} / month &middot; Cancel anytime
+          ₱{price} / month &middot; Cancel anytime
         </p>
       </div>
 

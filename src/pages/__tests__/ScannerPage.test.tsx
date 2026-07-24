@@ -103,7 +103,7 @@ describe('ScannerPage accessibility integration', () => {
     fireEvent.mouseEnter(row);
 
     await waitFor(() => {
-      expect(screen.getByText('AI Factor Breakdown')).toBeTruthy();
+      expect(screen.getByText('Factor Breakdown')).toBeTruthy();
     });
 
     const renderedText = document.body.textContent ?? '';
@@ -121,13 +121,13 @@ describe('ScannerPage accessibility integration', () => {
     fireEvent.click(row);
 
     await waitFor(() => {
-      expect(screen.getByText('AI Factor Breakdown')).toBeTruthy();
+      expect(screen.getByText('Factor Breakdown')).toBeTruthy();
     });
 
     // Mouse leave should NOT hide the panel since it's selected
     fireEvent.mouseLeave(row);
 
-    expect(screen.getByText('AI Factor Breakdown')).toBeTruthy();
+    expect(screen.getByText('Factor Breakdown')).toBeTruthy();
 
     const renderedText = document.body.textContent ?? '';
     expect(renderedText).not.toMatch(unsafePublicCopy);
@@ -159,7 +159,7 @@ describe('ScannerPage accessibility integration', () => {
     fireEvent.focus(row);
 
     await waitFor(() => {
-      expect(screen.getByText('AI Factor Breakdown')).toBeTruthy();
+      expect(screen.getByText('Factor Breakdown')).toBeTruthy();
     });
 
     const renderedText = document.body.textContent ?? '';
@@ -177,7 +177,7 @@ describe('ScannerPage accessibility integration', () => {
     fireEvent.keyDown(row, { key: 'Enter' });
 
     await waitFor(() => {
-      expect(screen.getByText('AI Factor Breakdown')).toBeTruthy();
+      expect(screen.getByText('Factor Breakdown')).toBeTruthy();
     });
 
     const renderedText = document.body.textContent ?? '';
@@ -195,7 +195,7 @@ describe('ScannerPage accessibility integration', () => {
     fireEvent.keyDown(row, { key: ' ' });
 
     await waitFor(() => {
-      expect(screen.getByText('AI Factor Breakdown')).toBeTruthy();
+      expect(screen.getByText('Factor Breakdown')).toBeTruthy();
     });
   });
 
@@ -222,7 +222,7 @@ describe('ScannerPage accessibility integration', () => {
     });
 
     // No AI detail panel before interaction
-    expect(screen.queryByText('AI Factor Breakdown')).toBeNull();
+    expect(screen.queryByText('Factor Breakdown')).toBeNull();
 
     const renderedText = document.body.textContent ?? '';
     expect(renderedText).not.toMatch(unsafePublicCopy);

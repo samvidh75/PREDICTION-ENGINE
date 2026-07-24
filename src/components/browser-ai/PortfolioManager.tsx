@@ -159,7 +159,7 @@ export default function PortfolioManager({ onPortfolioChange }: PortfolioManager
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '8px' }}>
             <input
               type="number"
-              placeholder="Buy Price (₹)"
+              placeholder="Buy Price (₱)"
               value={formData.buyPrice}
               onChange={(e) => setFormData({ ...formData, buyPrice: e.target.value })}
               style={{ padding: '6px', border: '1px solid #ccc', borderRadius: '4px', fontSize: '12px' }}
@@ -198,12 +198,12 @@ export default function PortfolioManager({ onPortfolioChange }: PortfolioManager
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', fontSize: '12px' }}>
             <div>
               <div style={{ color: '#999' }}>Invested</div>
-              <div style={{ fontWeight: 'bold' }}>₹{(stats.totalInvested / 100000).toFixed(2)}L</div>
+              <div style={{ fontWeight: 'bold' }}>₱{(stats.totalInvested / 100000).toFixed(2)}L</div>
             </div>
             <div>
               <div style={{ color: '#999' }}>Current Value</div>
               <div style={{ fontWeight: 'bold', color: stats.totalReturn > 0 ? '#34a853' : '#ea4335' }}>
-                ₹{(stats.currentValue / 100000).toFixed(2)}L
+                ₱{(stats.currentValue / 100000).toFixed(2)}L
               </div>
             </div>
             <div>
@@ -248,7 +248,7 @@ export default function PortfolioManager({ onPortfolioChange }: PortfolioManager
               >
                 <div>
                   <div style={{ fontWeight: 'bold' }}>{holding.ticker}</div>
-                  <div style={{ fontSize: '11px', color: '#999' }}>{holding.quantity} @ ₹{holding.buyPrice}</div>
+                  <div style={{ fontSize: '11px', color: '#999' }}>{holding.quantity} @ ₱{holding.buyPrice}</div>
                 </div>
                 <div style={{ textAlign: 'right' }}>
                   {stat && (

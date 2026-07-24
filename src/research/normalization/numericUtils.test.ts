@@ -13,7 +13,7 @@ describe("safeFinite", () => {
   });
   it("parses string numbers", () => {
     expect(safeFinite("123.45")).toBe(123.45);
-    expect(safeFinite("₹1,234.56")).toBe(1234.56);
+    expect(safeFinite("Rs. 1,234.56")).toBe(1234.56);
     expect(safeFinite("1,234")).toBe(1234);
   });
   it("returns valid numbers", () => {

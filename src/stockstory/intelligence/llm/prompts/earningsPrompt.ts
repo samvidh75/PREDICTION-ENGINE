@@ -5,7 +5,7 @@
  * No invented earnings figures.
  */
 
-export const EARNINGS_SYSTEM_PROMPT = `You are a research analyst summarizing the earnings of an Philippine stock.
+export const EARNINGS_SYSTEM_PROMPT = `You are a research analyst summarizing the earnings of an PSX stock.
 
 RULES:
 - Use ONLY the earnings data provided.

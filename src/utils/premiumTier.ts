@@ -13,7 +13,7 @@ export interface Subscription {
   endDate: number;
   renewalDate: number;
   paymentId?: string;
-  price: number; // Monthly price in INR
+  price: number; // Monthly price in PHP
 }
 
 export interface PremiumFeatures {
@@ -59,7 +59,7 @@ const TIER_FEATURES: Record<SubscriptionPlan, PremiumFeatures> = {
     newsAnalysis: true,
     customAlerts: 20,
     apiAccess: false,
-    monthlyPrice: 299, // ~$3.60/month in INR
+    monthlyPrice: 299, // ~$3.60/month in PHP
     yearlyPrice: 2499, // ~$30/year (save 30%)
   },
   pro: {
@@ -245,9 +245,9 @@ class PremiumTierManager {
   /**
    * Format price for display
    */
-  formatPrice(amount: number, currency = 'INR'): string {
-    if (currency === 'INR') {
-      return `₹${amount.toLocaleString('en-IN')}`;
+  formatPrice(amount: number, currency = 'PHP'): string {
+    if (currency === 'PHP') {
+      return `₱${amount.toLocaleString('en-PH')}`;
     }
     return `$${(amount / 80).toFixed(2)}`; // Rough conversion
   }

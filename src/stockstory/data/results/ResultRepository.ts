@@ -2,7 +2,7 @@
  * Result Repository
  *
  * Stores quarterly results and computes YoY/QoQ comparisons.
- * All values are in INR crores unless noted otherwise.
+ * All values are in PKR crores unless noted otherwise.
  */
 
 import type {

@@ -30,7 +30,7 @@ function toSymbolRecord(row: Record<string, unknown>): SymbolRecord {
 }
 
 /**
- * Retrieve a symbol record by its canonical symbol (e.g., "RELIANCE.NS").
+ * Retrieve a symbol record by its canonical symbol (e.g., "BDO.PS").
  * Returns null if not found.
  */
 export const getSymbol = async (symbol: string): Promise<SymbolRecord | null> => {

@@ -162,7 +162,7 @@ describe('GROUP B — Feature Engine Write Test', () => {
     await runCanonicalSchema(db);
 
     const insert = db.prepare(
-      `IPSERT OR IGNORE INTO daily_prices (symbol, trade_date, open, high, low, close, adjusted_close, volume)
+      `INSERT OR IGNORE INTO daily_prices (symbol, trade_date, open, high, low, close, adjusted_close, volume)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
     );
     const baseDate = new Date('2025-01-02');
@@ -188,7 +188,7 @@ describe('GROUP B — Feature Engine Write Test', () => {
 
   it('can insert a feature_snapshot with canonical columns', () => {
     const stmt = db.prepare(
-      `IPSERT INTO feature_snapshots (
+      `INSERT INTO feature_snapshots (
         symbol, trade_date, rsi, macd, macd_signal, macd_histogram,
         adx, atr, bollinger_width, momentum, volatility, relative_strength,
         moving_average_distance, trend_strength
@@ -208,7 +208,7 @@ describe('GROUP B — Feature Engine Write Test', () => {
 
   it('primary key (symbol, trade_date) enforces uniqueness', () => {
     const stmt = db.prepare(
-      `IPSERT INTO feature_snapshots (
+      `INSERT INTO feature_snapshots (
         symbol, trade_date, rsi, macd, macd_signal, macd_histogram,
         adx, atr, bollinger_width, momentum, volatility, relative_strength,
         moving_average_distance, trend_strength
@@ -230,22 +230,22 @@ describe('GROUP C — Factor Engine Write Test', () => {
     dbDir = path.dirname(tmp.path);
     await runCanonicalSchema(db);
 
-    const insSym = db.prepare(`IPSERT OR IGNORE INTO symbols (symbol, exchange, company_name, sector, industry) VALUES (?, ?, ?, ?, ?)`);
+    const insSym = db.prepare(`INSERT OR IGNORE INTO symbols (symbol, exchange, company_name, sector, industry) VALUES (?, ?, ?, ?, ?)`);
     insSym.bind(['RELIANCE', 'PSE', 'Reliance Industries Ltd', 'Energy', 'Oil & Gas']);
     insSym.step();
     insSym.free();
 
-    const insFin = db.prepare(`IPSERT OR IGNORE INTO financial_snapshots (symbol, period_end, pe_ratio, dividend_yield, beta, eps) VALUES (?, ?, ?, ?, ?, ?)`);
+    const insFin = db.prepare(`INSERT OR IGNORE INTO financial_snapshots (symbol, period_end, pe_ratio, dividend_yield, beta, eps) VALUES (?, ?, ?, ?, ?, ?)`);
     insFin.bind(['RELIANCE', '2025-03-31', 25.0, 1.5, 1.2, 100]);
     insFin.step();
     insFin.free();
 
-    const insFeat = db.prepare(`IPSERT OR IGNORE INTO feature_snapshots (symbol, trade_date, rsi, macd, macd_signal, macd_histogram, adx, atr, bollinger_width, momentum, volatility, relative_strength, moving_average_distance, trend_strength) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`);
+    const insFeat = db.prepare(`INSERT OR IGNORE INTO feature_snapshots (symbol, trade_date, rsi, macd, macd_signal, macd_histogram, adx, atr, bollinger_width, momentum, volatility, relative_strength, moving_average_distance, trend_strength) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`);
     insFeat.bind(['RELIANCE', '2025-03-15', 55.0, 1.2, 0.8, 0.4, 25.0, 15.0, 0.05, 0.03, 0.25, 0.01, 0.02, 0.015]);
     insFeat.step();
     insFeat.free();
 
-    const insPrice = db.prepare(`IPSERT OR IGNORE INTO daily_prices (symbol, trade_date, open, high, low, close, volume) VALUES (?, ?, ?, ?, ?, ?, ?)`);
+    const insPrice = db.prepare(`INSERT OR IGNORE INTO daily_prices (symbol, trade_date, open, high, low, close, volume) VALUES (?, ?, ?, ?, ?, ?, ?)`);
     insPrice.bind(['RELIANCE', '2025-03-15', 2500, 2520, 2480, 2510, 1000000]);
     insPrice.step();
     insPrice.free();
@@ -260,7 +260,7 @@ describe('GROUP C — Factor Engine Write Test', () => {
 
   it('can insert a factor_snapshot with canonical columns', () => {
     const stmt = db.prepare(
-      `IPSERT INTO factor_snapshots (
+      `INSERT INTO factor_snapshots (
         symbol, trade_date, quality_factor, value_factor, growth_factor,
         momentum_factor, risk_factor, sector_strength_factor, factor_score, explanations
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
@@ -350,7 +350,7 @@ describe('GROUP G — Database Adapter Health Check', () => {
 });
 
 describe('GROUP H — Env Configuration', () => {
-  const PROD_ORIGIN = "https://stockstory-india.com";
+  const PROD_ORIGIN = "https://stockstory-ph.com";
 
   function parseOrigins(rawEnv: string): string[] {
     const allowedOrigins: string[] = [PROD_ORIGIN];
@@ -365,7 +365,7 @@ describe('GROUP H — Env Configuration', () => {
 
   it('EXTRA_ALLOWED_ORIGINS parses comma-separated values', () => {
     const origins = parseOrigins('https://preview.example.com,https://admin.example.com');
-    expect(origins).toContain('https://stockstory-india.com');
+    expect(origins).toContain('https://stockstory-ph.com');
     expect(origins).toContain('https://preview.example.com');
     expect(origins).toContain('https://admin.example.com');
   });
@@ -378,8 +378,8 @@ describe('GROUP H — Env Configuration', () => {
   });
 
   it('EXTRA_ALLOWED_ORIGINS deduplicates including canonical origin', () => {
-    const origins = parseOrigins('https://stockstory-india.com,https://admin.example.com');
-    const count = origins.filter(o => o === 'https://stockstory-india.com').length;
+    const origins = parseOrigins('https://stockstory-ph.com,https://admin.example.com');
+    const count = origins.filter(o => o === 'https://stockstory-ph.com').length;
     expect(count).toBe(1);
     expect(origins).toContain('https://admin.example.com');
   });

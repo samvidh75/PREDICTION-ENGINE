@@ -63,7 +63,7 @@ export class MasterCompanyRegistryV2 {
         industry: row.industry,
         exchange: row.exchange,
         marketCap,
-        currency: 'INR',
+        currency: 'PKR',
         isin: row.isin,
         bseCode: null, // Resolves as part of lookup mapping V2
         nseSymbol: row.symbol,

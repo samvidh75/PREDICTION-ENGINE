@@ -4,10 +4,10 @@ import { Card, CardLabel } from "../ui/Card";
 import { colors, typography, radius } from "../design/tokens";
 import { optionsChainService, type OptionContract, type OptionsChain } from "../services/options/OptionsChainService";
 
-const SAMPLE_SYMBOLS = ["NIFTY", "BANKNIFTY", "RELIANCE", "TCS", "HDFCBANK", "INFY", "ICICIBANK", "SBIN", "BHARTIARTL", "ITC"];
+const SAMPLE_SYMBOLS = ["HBL", "ENGRO", "UBL", "MCB", "OGDC", "PPL", "FFC", "LUCK", "HUBC", "EFERT"];
 
 function formatNumber(n: number, digits = 2): string {
-  return n.toLocaleString("en-IN", { minimumFractionDigits: digits, maximumFractionDigits: digits });
+  return n.toLocaleString("en-PH", { minimumFractionDigits: digits, maximumFractionDigits: digits });
 }
 
 function contractColor(contract: OptionContract, underlying: number): string {
@@ -33,7 +33,7 @@ function contractBg(contract: OptionContract, underlying: number): string {
 }
 
 export default function OptionsChainPage() {
-  const [symbol, setSymbol] = useState("NIFTY");
+  const [symbol, setSymbol] = useState("HBL");
   const [query, setQuery] = useState("");
   const [searchResults, setSearchResults] = useState<typeof SAMPLE_SYMBOLS>([]);
   const [chain, setChain] = useState<OptionsChain | null>(null);
@@ -281,7 +281,7 @@ export default function OptionsChainPage() {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 12 }}>
           <Card style={{ padding: "14px 16px" }}>
             <CardLabel>Underlying</CardLabel>
-            <span style={{ fontSize: 20, fontWeight: 700, color: colors.textPrimary }}>₹{formatNumber(underlyingPrice, 0)}</span>
+            <span style={{ fontSize: 20, fontWeight: 700, color: colors.textPrimary }}>₱{formatNumber(underlyingPrice, 0)}</span>
           </Card>
           <Card style={{ padding: "14px 16px" }}>
             <CardLabel>PCR (OI)</CardLabel>
@@ -295,15 +295,15 @@ export default function OptionsChainPage() {
           </Card>
           <Card style={{ padding: "14px 16px" }}>
             <CardLabel>Max Pain</CardLabel>
-            <span style={{ fontSize: 20, fontWeight: 700, color: colors.warning }}>₹{chain.maxPain}</span>
+            <span style={{ fontSize: 20, fontWeight: 700, color: colors.warning }}>₱{chain.maxPain}</span>
           </Card>
           <Card style={{ padding: "14px 16px" }}>
             <CardLabel>Total Call OI</CardLabel>
-            <span style={{ fontSize: 16, fontWeight: 600, color: colors.marketGreen }}>{(chain.totalCallOI / 10000000).toFixed(1)}Cr</span>
+            <span style={{ fontSize: 16, fontWeight: 600, color: colors.marketGreen }}>{(chain.totalCallOI / 1000000).toFixed(1)}M</span>
           </Card>
           <Card style={{ padding: "14px 16px" }}>
             <CardLabel>Total Put OI</CardLabel>
-            <span style={{ fontSize: 16, fontWeight: 600, color: colors.marketRed }}>{(chain.totalPutOI / 10000000).toFixed(1)}Cr</span>
+            <span style={{ fontSize: 16, fontWeight: 600, color: colors.marketRed }}>{(chain.totalPutOI / 1000000).toFixed(1)}M</span>
           </Card>
           <Card style={{ padding: "14px 16px" }}>
             <CardLabel>Expiry</CardLabel>

@@ -1,11 +1,11 @@
 /**
  * CompanyIdentityTypes — types for company identity resolution.
  *
- * Represents the canonical identity of a listed Philippine company,
+ * Represents the canonical identity of a listed PSX company,
  * built from real source data only. All optional fields nullable.
  */
 
-import type { IndianExchange, ListingStatus } from "../universe/PSEUniverseTypes.ts";
+import type { PakistanExchange, ListingStatus } from "../universe/PSEUniverseTypes.ts";
 
 // ---------------------------------------------------------------------------
 // Core identity type
@@ -13,10 +13,10 @@ import type { IndianExchange, ListingStatus } from "../universe/PSEUniverseTypes
 
 export interface CompanyIdentity {
   /** Primary PSE symbol (canonical key). */
-  nseSymbol: string;
+  pseSymbol: string;
 
   /** PSE scrip code, if available. */
-  bseCode?: string | null;
+  pseCode?: string | null;
 
   /** 12-character ISIN, if available. */
   isin?: string | null;
@@ -37,7 +37,7 @@ export interface CompanyIdentity {
   websiteUrl?: string | null;
 
   /** Primary exchange. */
-  exchange: IndianExchange;
+  exchange: PakistanExchange;
 
   /** Current listing status. */
   listingStatus: ListingStatus;
@@ -57,11 +57,11 @@ export interface CompanyIdentity {
 // ---------------------------------------------------------------------------
 
 export interface CompanyAlias {
-  /** The alias value (e.g. "RELIANCE.NS", "500325", "INE002A01018"). */
+  /** The alias value (e.g. "RELIANCE.PSX", "500325", "INE002A01018"). */
   value: string;
 
   /** Kind of alias. */
-  kind: "nse" | "bse" | "isin" | "previous_symbol" | "short_name";
+  kind: "pse" | "pse" | "isin" | "previous_symbol" | "short_name";
 
   /** Optional human-readable label. */
   label?: string;
@@ -104,7 +104,7 @@ export interface IdentityConflict {
 // ---------------------------------------------------------------------------
 
 export type ResolutionSource =
-  | { kind: "nse_symbol"; symbol: string }
+  | { kind: "pse_symbol"; symbol: string }
   | { kind: "bse_code"; code: string }
   | { kind: "isin"; value: string }
   | { kind: "alias"; value: string }

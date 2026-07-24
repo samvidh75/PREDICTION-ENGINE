@@ -10,10 +10,10 @@ export interface LiquidityMetrics {
   symbol: string;
   /** Average daily trading volume in number of shares */
   avgDailyVolume: number;
-  /** Average daily trade value in INR (crores recommended) */
-  avgDailyValueCrores: number;
-  /** Market capitalisation in INR crores */
-  marketCapCrores: number;
+  /** Average daily trade value in PHP millions */
+  avgDailyValueMillions: number;
+  /** Market capitalisation in PHP millions */
+  marketCapMillions: number;
   /** Number of trading days in the measurement window */
   periodDays: number;
   /** Free‑float percentage (if known) */

@@ -13,20 +13,23 @@ interface PriceFlashProps {
  */
 export function PriceFlash({ value, children, className = "" }: PriceFlashProps) {
   const prev = useRef(value);
-  const [flashing, setFlashing] = useState(false);
+  const [flashClass, setFlashClass] = useState<"" | "raycast-greenFlash" | "raycast-redFlash">("");
 
   useEffect(() => {
     if (prev.current !== value) {
+      const prevNum = typeof prev.current === "number" ? prev.current : parseFloat(String(prev.current));
+      const nextNum = typeof value === "number" ? value : parseFloat(String(value));
+      const isUp = !Number.isNaN(prevNum) && !Number.isNaN(nextNum) ? nextNum >= prevNum : true;
       prev.current = value;
-      setFlashing(true);
-      const timer = setTimeout(() => setFlashing(false), 500);
+      setFlashClass(isUp ? "raycast-greenFlash" : "raycast-redFlash");
+      const timer = setTimeout(() => setFlashClass(""), 500);
       return () => clearTimeout(timer);
     }
   }, [value]);
 
   return (
     <span
-      className={`${className}${flashing ? " raycast-greenFlash" : ""}`}
+      className={`${className}${flashClass ? ` ${flashClass}` : ""}`}
       style={{ borderRadius: "4px", transition: "background-color 0.15s ease" }}
     >
       {children}

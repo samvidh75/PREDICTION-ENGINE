@@ -58,11 +58,13 @@ const headerStyle: React.CSSProperties = {
   position: 'sticky' as const,
   top: 0,
   background: colors.surface,
+  backdropFilter: "blur(20px) saturate(160%)",
+  WebkitBackdropFilter: "blur(20px) saturate(160%)",
 };
 
 function formatPrice(v: number | null, decimals = 2): string {
   if (v === null || v === undefined) return '—';
-  return `₹${v.toFixed(decimals)}`;
+  return `₱${v.toFixed(decimals)}`;
 }
 
 function formatPct(v: number | null): string {
@@ -130,6 +132,8 @@ export function PrecisionPortfolioTable({ userId }: PrecisionPortfolioTableProps
     <div
       style={{
         background: colors.surface,
+        backdropFilter: "blur(20px) saturate(160%)",
+        WebkitBackdropFilter: "blur(20px) saturate(160%)",
         border: `1px solid ${colors.hairline}`,
         borderRadius: radius.xl,
         overflow: 'hidden',

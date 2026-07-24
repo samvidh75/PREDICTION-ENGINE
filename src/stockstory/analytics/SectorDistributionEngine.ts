@@ -2,7 +2,7 @@
  * Sector Distribution Engine
  * 
  * Generates sector-specific distributions for percentile scoring.
- * Uses Philippine market empirical reference data as fallback distributions
+ * Uses PSX market empirical reference data as fallback distributions
  * when live data is unavailable.
  * 
  * Each distribution has: P10, P25, P50, P75, P90
@@ -12,7 +12,7 @@ import { PercentileEngine, type Distribution } from '../scoring/PercentileEngine
 import { SectorPercentileEngine, type PercentileMetric } from '../scoring/SectorPercentileEngine';
 import type { SectorType } from '../sectors/SectorWeightEngine';
 
-// ─── Reference Distributions (Philippine Market Empirical Data) ───────
+// ─── Reference Distributions (PSX Market Empirical Data) ───────
 
 interface MetricDistribution {
   p10: number;
@@ -25,7 +25,7 @@ interface MetricDistribution {
 type SectorDistributions = Record<PercentileMetric, MetricDistribution>;
 
 /**
- * Philippine market reference distributions.
+ * PSX market reference distributions.
  * These are empirically derived from PSE-listed company data (2024-2025).
  * Used as fallback when live database queries are unavailable.
  * 

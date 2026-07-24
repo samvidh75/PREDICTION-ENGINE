@@ -62,7 +62,7 @@
 }
 
 .tag-primary:hover {
-  background-color: #DDE5F7;
+  background-color: var(--brand-tint);
 }
 
 .tag-success {
@@ -72,7 +72,8 @@
 }
 
 .tag-success:hover {
-  background-color: #E1F7ED;
+  background-color: var(--green-light);
+  filter: brightness(1.3);
 }
 
 .tag-error {
@@ -82,7 +83,8 @@
 }
 
 .tag-error:hover {
-  background-color: #FEE8E6;
+  background-color: var(--red-light);
+  filter: brightness(1.3);
 }
 
 .tag-warning {

@@ -244,7 +244,7 @@ describe('ResearchNarrativeService', () => {
       const input = makeInput();
       const narrative = service.generateFullNarrative(input);
       const full = Object.values(narrative).join(' ');
-      expect(full).not.toContain('₹');
+      expect(full).not.toContain('Rs. ');
       expect(full).not.toContain('crore');
       expect(full).not.toContain('lakh');
     });

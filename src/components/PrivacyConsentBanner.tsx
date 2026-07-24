@@ -52,6 +52,8 @@ const bannerStyle: React.CSSProperties = {
   gap: space[4],
   padding: `${space[3]} ${space[6]}`,
   background: colors.surface,
+  backdropFilter: "blur(20px) saturate(160%)",
+  WebkitBackdropFilter: "blur(20px) saturate(160%)",
   fontSize: typography.body.desktop.size,
   flexWrap: "wrap",
   fontFamily: typography.fontFamily,

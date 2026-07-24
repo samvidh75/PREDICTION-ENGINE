@@ -2,7 +2,7 @@
  * Company Identity Types
  *
  * Canonical representation of a company and its identifiers
- * across all Philippine market exchanges, registrars, and regulatory bodies.
+ * across all PSX market exchanges, registrars, and regulatory bodies.
  */
 
 export interface CompanyIdentity {
@@ -56,7 +56,7 @@ export interface CompanyIdentity {
 }
 
 export interface ExchangeListing {
-  exchange: 'PSE' | 'PSE';
+  exchange: 'PSE';
   symbol: string;
   series: string;
   isin: string | null;
@@ -95,7 +95,7 @@ export interface StockToCompanyMapping {
   symbol: string;
   companyId: string;
   isPrimary: boolean;
-  exchange: 'PSE' | 'PSE';
+  exchange: 'PSE';
   validFrom: string | null;
   validTo: string | null;
 }

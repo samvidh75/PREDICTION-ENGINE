@@ -39,7 +39,7 @@ function makeSamplePack(overrides?: Partial<EventEvidencePack>): EventEvidencePa
       id: 'ev-4',
       kind: 'news_headline',
       label: 'TCS announces share buyback',
-      detail: 'Board approves ₹12,000 Cr buyback',
+      detail: 'Board approves Rs. 12,000 Cr buyback',
       impact: 'positive',
       date: '2026-03-28',
       source: 'Moneycontrol',

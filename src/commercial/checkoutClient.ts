@@ -32,7 +32,7 @@ export interface CreateCheckoutResult {
   sessionId?: string;
   checkoutUrl?: string;
   error?: string;
-  plan?: { id: string; name: string; priceInr: number };
+  plan?: { id: string; name: string; pricePkr: number };
 }
 
 export async function createCheckout(

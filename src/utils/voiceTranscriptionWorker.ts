@@ -24,7 +24,7 @@ function initializeSpeechRecognition(): any {
   recognition = new SpeechRecognition();
   recognition.continuous = false;
   recognition.interimResults = true;
-  recognition.lang = 'en-IN'; // Philippine English
+  recognition.lang = 'en-PH'; // Philippine English
 
   return recognition;
 }
@@ -46,7 +46,7 @@ async function transcribeAudioWithWebSpeech(audioBase64: string, duration: numbe
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         audio: audioBase64,
-        language: 'en-IN',
+        language: 'en-PH',
         duration,
       }),
     });
@@ -56,7 +56,7 @@ async function transcribeAudioWithWebSpeech(audioBase64: string, duration: numbe
       return {
         text: data.text || '',
         confidence: data.confidence || 0.8,
-        language: 'en-IN',
+        language: 'en-PH',
         duration,
       };
     }
@@ -68,7 +68,7 @@ async function transcribeAudioWithWebSpeech(audioBase64: string, duration: numbe
   return {
     text: '',
     confidence: 0,
-    language: 'en-IN',
+    language: 'en-PH',
     duration,
   };
 }

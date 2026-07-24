@@ -4,10 +4,10 @@ import { buildRequestKey, requestKeyHash, serializeRequestKey } from './Provider
 describe('ProviderRequestKey', () => {
   it('normalizes provider, operation, and symbol before hashing', () => {
     const a = buildRequestKey(' IndianApi ', 'quote', ' reliance.ns ', { range: '1d' });
-    const b = buildRequestKey('indianapi', 'quote', 'RELIANCE', { range: '1d' });
+    const b = buildRequestKey('psxapi', 'quote', 'RELIANCE', { range: '1d' });
 
     expect(a).toEqual(b);
-    expect(a.provider).toBe('indianapi');
+    expect(a.provider).toBe('psxapi');
     expect(a.operation).toBe('quote');
     expect(a.symbol).toBe('RELIANCE');
   });

@@ -1,14 +1,14 @@
 /**
  * Dividend Tracking Service
  * Manages stock dividend data, TDS calculation, and historical tracking
- * For Philippine equities (PSE/PSE stocks)
+ * For PSX equities (PSE/PSE stocks)
  */
 
 export interface DividendPayment {
   ticker: string;
   exDate: number; // timestamp
   paymentDate: number; // timestamp
-  dividendPerShare: number; // in ₹
+  dividendPerShare: number; // in ₱
   quantity: number; // shares held
   totalDividend: number; // gross dividend
   tds: number; // TDS deducted (10% standard)
@@ -22,29 +22,29 @@ export interface DividendSummary {
   quantity: number;
   currentPrice: number;
   annualDividendYield: number; // %
-  expectedAnnualDividend: number; // ₹
+  expectedAnnualDividend: number; // ₱
   lastPaymentDate: number; // timestamp
-  lastDividendPerShare: number; // ₹
+  lastDividendPerShare: number; // ₱
   upcomingExDate: number | null; // next ex-date
-  totalDividendsPaid: number; // lifetime ₹
-  totalTDSPaid: number; // lifetime ₹
-  nextPaymentEstimate: number; // ₹
+  totalDividendsPaid: number; // lifetime ₱
+  totalTDSPaid: number; // lifetime ₱
+  nextPaymentEstimate: number; // ₱
 }
 
 export interface DividendPortfolioStats {
-  totalDividends: number; // ₹
-  totalTDS: number; // ₹
-  totalNetDividends: number; // ₹
+  totalDividends: number; // ₱
+  totalTDS: number; // ₱
+  totalNetDividends: number; // ₱
   averageDividendYield: number; // weighted avg %
   monthlyIncome: number; // estimated avg
   annualIncome: number; // estimated
   holdingsWithDividends: number; // count
   nextPaymentDue: number | null; // timestamp
-  nextPaymentAmount: number; // ₹
+  nextPaymentAmount: number; // ₱
   taxableIncome: number; // total dividends (before TDS)
 }
 
-// Philippine stock dividend database (common dividend-paying stocks)
+// PSX stock dividend database (common dividend-paying stocks)
 const STOCK_DIVIDEND_DB: Record<
   string,
   {
@@ -245,7 +245,7 @@ class DividendTrackingService {
       strategies.push('⚠️ You\'re in higher tax bracket. Dividend income faces 20-30% effective tax. Consider long-term capital gains for gains instead.');
     }
 
-    strategies.push(`💰 Estimated annual dividend income: ₹${totalDividendIncome.toLocaleString('en-IN')}`);
+    strategies.push(`💰 Estimated annual dividend income: ₱${totalDividendIncome.toLocaleString('en-PH')}`);
 
     return strategies;
   }

@@ -158,7 +158,7 @@ export async function registerAIRoutes(server: FastifyInstance) {
   server.post<{ Body: { audio: string; language?: string; duration?: number } }>(
     '/api/transcribe',
     async (request, reply) => {
-      const { audio, language = 'en-IN' } = request.body;
+      const { audio, language = 'en-PH' } = request.body;
 
       if (!audio) {
         return reply.status(400).send({ error: 'Missing audio data' });

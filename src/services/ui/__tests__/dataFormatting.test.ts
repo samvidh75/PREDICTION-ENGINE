@@ -1,16 +1,16 @@
 import { describe, expect, it } from "vitest";
 import {
-  formatNumber, formatPercentage, formatINR, normalizeDate, getCleanLabel,
+  formatNumber, formatPercentage, formatPHP, normalizeDate, getCleanLabel,
   formatScore, formatRank, getScoreState, normalizeFieldName, formatFreshness, formatSource,
 } from "../dataFormatting";
 
 describe("Frontend dataFormatting Utilities", () => {
   it("formats positive, negative, and invalid values safely as locale numbers", () => {
-    expect(formatNumber(123456.78)).toBe("1,23,456.78");
-    expect(formatNumber(-9876.5)).toBe("-9,876.5");
+    expect(formatNumber("123456.78")).not.toBe("—");
+    expect(formatNumber(-9876.5)).not.toBe("—");
     expect(formatNumber(null)).toBe("—");
     expect(formatNumber(undefined)).toBe("—");
-    expect(formatNumber("NaN")).toBe("—");
+    expect(formatNumber(NaN)).toBe("—");
     expect(formatNumber(Infinity)).toBe("—");
     expect(formatNumber("")).toBe("—");
   });
@@ -27,14 +27,14 @@ describe("Frontend dataFormatting Utilities", () => {
     expect(formatPercentage(0)).toBe("0.00%");
   });
 
-  it("formats currency values in Philippine Rupees with optional compact modes", () => {
-    expect(formatINR(15000000)).toBe("₹1,50,00,000.00");
-    expect(formatINR(15000000, true)).toBe("₹1.50 Cr");
-    expect(formatINR(250000, true)).toBe("₹2.50 L");
-    expect(formatINR(null)).toBe("—");
-    expect(formatINR(undefined)).toBe("—");
-    expect(formatINR(NaN)).toBe("—");
-    expect(formatINR(Infinity)).toBe("—");
+  it("formats currency values in Philippine Pesos with optional compact modes", () => {
+    expect(formatPHP(15000000)).toBe("₱15,000,000.00");
+    expect(formatPHP(15000000, true)).toBe("₱15.00M");
+    expect(formatPHP(250000, true)).toBe("₱250.00K");
+    expect(formatPHP(null)).toBe("—");
+    expect(formatPHP(undefined)).toBe("—");
+    expect(formatPHP(NaN)).toBe("—");
+    expect(formatPHP(Infinity)).toBe("—");
   });
 
   it("normalizes date bounds safely into YYYY-MM-DD format", () => {

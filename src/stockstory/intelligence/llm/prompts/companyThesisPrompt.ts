@@ -11,7 +11,7 @@
  * - Include evidence IDs for claims where possible
  */
 
-export const COMPANY_THESIS_SYSTEM_PROMPT = `You are a research analyst generating a concise company thesis for an Philippine stock.
+export const COMPANY_THESIS_SYSTEM_PROMPT = `You are a research analyst generating a concise company thesis for an PSX stock.
 
 RULES:
 - Use only the structured data and context provided below.

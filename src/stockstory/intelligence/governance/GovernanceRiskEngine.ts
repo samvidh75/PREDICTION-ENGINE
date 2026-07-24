@@ -1,8 +1,8 @@
 /**
  * Governance Risk Engine
  *
- * Evaluates corporate governance risk for Philippine listed companies.
- * Key Philippine governance indicators: promoter holding, pledged shares,
+ * Evaluates corporate governance risk for PSX listed companies.
+ * Key PSX governance indicators: promoter holding, pledged shares,
  * auditor changes, related-party transactions, board composition.
  *
  * All assessments are evidence-bound — no qualitative claims without data.
@@ -253,7 +253,7 @@ export class GovernanceRiskEngine {
       flags.push({
         severity: 'medium',
         category: 'esop',
-        description: `ESOP dilution of ${r.esopDilution}% — above typical Philippine market levels.`,
+        description: `ESOP dilution of ${r.esopDilution}% — above typical PSX market levels.`,
         evidenceSource: 'esopDilution',
       });
     }

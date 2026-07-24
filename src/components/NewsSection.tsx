@@ -6,6 +6,7 @@
  */
 
 import { useEffect, useState } from 'react';
+import { Newspaper, TrendingUp, TrendingDown, Minus, Star, Users } from 'lucide-react';
 import { newsService, NewsItem } from '../services/news/NewsService';
 import { colors } from '../design/tokens';
 
@@ -71,6 +72,8 @@ export default function NewsSection({ symbol }: NewsSectionProps) {
   return (
     <div style={{
       background: colors.surface,
+      backdropFilter: "blur(20px) saturate(160%)",
+      WebkitBackdropFilter: "blur(20px) saturate(160%)",
       border: `1px solid ${colors.border}`,
       borderRadius: '8px',
       padding: 'clamp(12px, 3vw, 16px)',
@@ -83,8 +86,8 @@ export default function NewsSection({ symbol }: NewsSectionProps) {
         alignItems: 'center',
         marginBottom: '12px'
       }}>
-        <h3 style={{ margin: '0', fontSize: '14px', fontWeight: '600' }}>
-          📰 Latest News & Sentiment
+        <h3 style={{ margin: '0', fontSize: '14px', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <Newspaper size={14} /> Latest News
         </h3>
         <button
           onClick={loadNews}
@@ -144,8 +147,8 @@ function NewsCard({ item, onAffiliateClick }: { item: NewsItem; onAffiliateClick
   const sentimentColor = item.sentiment === 'positive' ? '#22c55e' :
     item.sentiment === 'negative' ? '#ef4444' : colors.textSecondary;
 
-  const sentimentEmoji = item.sentiment === 'positive' ? '📈' :
-    item.sentiment === 'negative' ? '📉' : '📊';
+  const SentimentIcon = item.sentiment === 'positive' ? TrendingUp :
+    item.sentiment === 'negative' ? TrendingDown : Minus;
 
   const handleClick = () => {
     onAffiliateClick();
@@ -160,6 +163,8 @@ function NewsCard({ item, onAffiliateClick }: { item: NewsItem; onAffiliateClick
       style={{
         display: 'block',
         background: colors.canvas,
+        backdropFilter: "blur(20px) saturate(160%)",
+        WebkitBackdropFilter: "blur(20px) saturate(160%)",
         border: `1px solid ${colors.border}`,
         borderRadius: '6px',
         padding: 'clamp(8px, 2vw, 12px)',
@@ -185,11 +190,9 @@ function NewsCard({ item, onAffiliateClick }: { item: NewsItem; onAffiliateClick
         marginBottom: '6px'
       }}>
         {item.isSponsored ? (
-          <span style={{ color: '#ffc533', fontSize: '14px' }}>💰</span>
+          <Star size={14} style={{ color: '#ffc533', flexShrink: 0, marginTop: 2 }} />
         ) : (
-          <span style={{ color: sentimentColor, fontSize: '14px' }}>
-            {sentimentEmoji}
-          </span>
+          <SentimentIcon size={14} style={{ color: sentimentColor, flexShrink: 0, marginTop: 2 }} />
         )}
         <div style={{ flex: 1 }}>
           <div style={{
@@ -219,8 +222,9 @@ function NewsCard({ item, onAffiliateClick }: { item: NewsItem; onAffiliateClick
         fontSize: '11px',
         color: colors.textSecondary
       }}>
-        <span style={{ fontWeight: '500' }}>
-          {item.isSponsored ? `🤝 ${item.source}` : item.source}
+        <span style={{ fontWeight: '500', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+          {item.isSponsored && <Users size={11} />}
+          {item.source}
         </span>
         <span>{formatTimeAgo(item.publishedAt)}</span>
       </div>
@@ -235,7 +239,7 @@ function NewsCard({ item, onAffiliateClick }: { item: NewsItem; onAffiliateClick
           color: '#ffc533',
           fontWeight: '500'
         }}>
-          💡 Sponsored: Click to learn more (affiliate link)
+          Sponsored — this link may earn us a commission
         </div>
       )}
     </a>

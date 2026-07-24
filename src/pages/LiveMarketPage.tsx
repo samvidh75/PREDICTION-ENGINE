@@ -5,16 +5,16 @@ import { Button } from "../ui/Button";
 import { colors, typography, radius } from "../design/tokens";
 import { livePriceStream, type LiveTick, type StreamStatus } from "../services/market/LivePriceStream";
 
-const SAMPLE_SYMBOLS = ["RELIANCE", "TCS", "HDFCBANK", "INFY", "ICICIBANK", "SBIN", "BHARTIARTL", "ITC", "WIPRO", "AXISBANK", "LT", "HINDUNILVR"];
+const SAMPLE_SYMBOLS = ["HBL", "ENGRO", "UBL", "MCB", "OGDC", "PPL", "FFC", "LUCK", "HUBC", "EFERT", "MARI", "PSO"];
 
 function formatCurrency(n: number): string {
-  return "₹" + n.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return "₱" + n.toLocaleString("en-PH", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
 function formatVolume(n: number): string {
   if (n >= 10000000) return (n / 10000000).toFixed(1) + "Cr";
   if (n >= 100000) return (n / 100000).toFixed(1) + "L";
-  return n.toLocaleString("en-IN");
+  return n.toLocaleString("en-PH");
 }
 
 function statusColor(status: StreamStatus): string {

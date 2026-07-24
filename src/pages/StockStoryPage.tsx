@@ -29,6 +29,8 @@ export default function StockStoryPage() {
     <div style={{
       width: '100%',
       backgroundColor: colors.canvas,
+      backdropFilter: "blur(20px) saturate(160%)",
+      WebkitBackdropFilter: "blur(20px) saturate(160%)",
       color: colors.textPrimary,
       fontFamily: 'system-ui, -apple-system, sans-serif',
       overflow: 'hidden',
@@ -120,7 +122,7 @@ export default function StockStoryPage() {
           marginLeft: 'auto',
           marginRight: 'auto',
         }}>
-          We're building the research platform for Philippine stock investors who believe in data-driven decisions.
+          We're building the research platform for PSX stock investors who believe in data-driven decisions.
         </p>
       </div>
 
@@ -162,6 +164,8 @@ export default function StockStoryPage() {
               style={{
                 padding: '24px',
                 backgroundColor: colors.surface,
+                backdropFilter: "blur(20px) saturate(160%)",
+                WebkitBackdropFilter: "blur(20px) saturate(160%)",
                 borderRadius: '12px',
                 border: `1px solid ${colors.border}`,
                 ...fadeInUp,
@@ -214,6 +218,8 @@ export default function StockStoryPage() {
               style={{
                 padding: '20px',
                 backgroundColor: colors.surface,
+                backdropFilter: "blur(20px) saturate(160%)",
+                WebkitBackdropFilter: "blur(20px) saturate(160%)",
                 borderRadius: '12px',
                 border: `1px solid ${colors.border}`,
                 textAlign: 'center',
@@ -377,7 +383,7 @@ export default function StockStoryPage() {
         fontSize: '12px',
       }}>
         <p style={{ margin: '0' }}>
-          StockEx PSE — Research platform for Philippine Stock Exchange. Not financial advice. Educational purposes only.
+          StockEx PSE — Research platform for PSX Stock Exchange. Not financial advice. Educational purposes only.
         </p>
       </div>
     </div>

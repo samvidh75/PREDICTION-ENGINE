@@ -16,7 +16,7 @@ class ReportGenerator {
    * Generate HTML report (downloadable)
    */
   generateHTML(report: AnalysisReport): string {
-    const formattedDate = report.timestamp.toLocaleDateString('en-IN', {
+    const formattedDate = report.timestamp.toLocaleDateString('en-PH', {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
@@ -194,7 +194,7 @@ class ReportGenerator {
   downloadText(report: AnalysisReport): void {
     const text = `
 ${report.title}
-Generated: ${report.timestamp.toLocaleDateString('en-IN')}
+Generated: ${report.timestamp.toLocaleDateString('en-PH')}
 
 STOCKS ANALYZED:
 ${report.stocks.map((s) => `• ${s}`).join('\n')}

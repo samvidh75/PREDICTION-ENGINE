@@ -27,21 +27,21 @@ function buildDeterministicResponse(symbol: string, sector: string, metrics: Rec
   const de = Number(metrics.debt_to_equity);
   const sma50 = Number(metrics.sma_50).toFixed(3);
   const sma200 = Number(metrics.sma_200).toFixed(3);
-  const mcap = String(metrics.market_cap_display || '0.000 Cr (Pending Ingestion)');
+  const mcap = String(metrics.market_cap_display || '₱0M (Pending Ingestion)');
   const trend = String(metrics.trend_state || 'CONSOLIDATION_RANGE');
   const lines = DETERMINISTIC_FALLBACKS[trend] || DETERMINISTIC_FALLBACKS.CONSOLIDATION_RANGE;
   const line = lines[Math.floor(Math.random() * lines.length)];
   const fundamentalsBlock = pe !== 0 || de !== 0
     ? `P/E at ${pe.toFixed(3)}x, D/E at ${de.toFixed(3)}`
     : `fundamental ratios are pending synchronization`;
-  return `${symbol} (${sector || 'exchange pending'}, ${mcap}) is at INR ${price} and ${line}. Key metrics: RSI-14 at ${rsi}, ${fundamentalsBlock}, SMA-50 at INR ${sma50}, SMA-200 at INR ${sma200}.`;
+  return `${symbol} (${sector || 'exchange pending'}, ${mcap}) is at ₱${price} and ${line}. Key metrics: RSI-14 at ${rsi}, ${fundamentalsBlock}, SMA-50 at ₱${sma50}, SMA-200 at ₱${sma200}.`;
 }
 
 function buildSystemContextPrompt(symbol: string, metrics: Record<string, number | string>): string {
   const dataMode = String(metrics.data_mode || 'UNKNOWN');
   const fundamentalsAvailable = Number(metrics.pe_ratio) !== 0 || Number(metrics.debt_to_equity) !== 0;
   const sector = String(metrics.sector || 'exchange pending');
-  const mcap = String(metrics.market_cap_display || '0.000 Cr (Pending Ingestion)');
+  const mcap = String(metrics.market_cap_display || '₱0M (Pending Ingestion)');
 
   const dataConfidenceTag = dataMode === 'POSTGRES_CACHE'
     ? 'CACHED SNAPSHOT RUNTIME: Active data compiled via historical end-of-day rows. Live market sync pending.'
@@ -50,10 +50,10 @@ function buildSystemContextPrompt(symbol: string, metrics: Record<string, number
       : 'Data source status unknown. Treat values as indicative.';
 
   const header = `System Notice: ${dataConfidenceTag}\n\n[CRITICAL FINANCIAL MATRIX]`;
-  const priceLine = `- Live Price Close: INR ${Number(metrics.current_price).toFixed(3)}`;
+  const priceLine = `- Live Price Close: ₱${Number(metrics.current_price).toFixed(3)}`;
   const mcapLine = `- Market Cap Scale: ${mcap}`;
-  const sma50Line = `- 50-Day SMA Support: INR ${Number(metrics.sma_50).toFixed(3)}`;
-  const sma200Line = `- 200-Day SMA Floor: INR ${Number(metrics.sma_200).toFixed(3)}`;
+  const sma50Line = `- 50-Day SMA Support: ₱${Number(metrics.sma_50).toFixed(3)}`;
+  const sma200Line = `- 200-Day SMA Floor: ₱${Number(metrics.sma_200).toFixed(3)}`;
   const rsiLine = `- Relative Strength Index (RSI-14): ${Number(metrics.rsi_14).toFixed(3)}`;
   const trendLine = `- Momentum Trajectory Flag: ${metrics.trend_state}`;
 
@@ -120,7 +120,7 @@ async function callCloudflare(systemPrompt: string, userPrompt: string): Promise
 export async function agentChatRoutes(fastify: FastifyInstance) {
   fastify.post('/api/v1/chat/agent-interpreter', async (req: FastifyRequest, reply: FastifyReply) => {
     const { ticker, prompt } = req.body as { ticker: string; prompt: string };
-    const symbol = ticker.toUpperCase().replace('.NS', '').replace('.BO', '').trim();
+    const symbol = ticker.toUpperCase().replace('.PS', '').trim();
 
     try {
       const { stdout } = await execPromise(`python3 scripts/python/slm_math_runtime.py --ticker ${symbol}`);

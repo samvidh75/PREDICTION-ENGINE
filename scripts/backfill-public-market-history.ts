@@ -7,18 +7,18 @@ export {};
  * Dry-run by default, --apply required to write.
  *
  * Usage:
- *   npx tsx scripts/backfill-public-market-history.ts --symbols=RELIANCE,TCS --from=2024-01-01 --to=2024-12-31
- *   npx tsx scripts/backfill-public-market-history.ts --symbols=RELIANCE --from=2023-01-01 --to=2024-12-31 --provider=yahoo
- *   npx tsx scripts/backfill-public-market-history.ts --symbols=RELIANCE,TCS --from=2024-01-01 --to=2024-12-31 --apply --batch-size=3 --delay-ms=500
- *   npx tsx scripts/backfill-public-market-history.ts --universe=nifty50 --from=2024-06-01 --to=2024-12-31 --dry-run
+ *   npx tsx scripts/backfill-public-market-history.ts --symbols=HBL,ENGRO --from=2024-01-01 --to=2024-12-31
+ *   npx tsx scripts/backfill-public-market-history.ts --symbols=HBL --from=2023-01-01 --to=2024-12-31 --provider=yahoo
+ *   npx tsx scripts/backfill-public-market-history.ts --symbols=HBL,ENGRO --from=2024-01-01 --to=2024-12-31 --apply --batch-size=3 --delay-ms=500
+ *   npx tsx scripts/backfill-public-market-history.ts --universe=kse100 --from=2024-06-01 --to=2024-12-31 --dry-run
  */
 
 import { dbAdapter } from "../src/db/DatabaseAdapter";
-import { NIFTY50_SYMBOLS } from "../src/backtest/BenchmarkEngine";
+import { KSE100_SYMBOLS } from "../src/backtest/BenchmarkEngine";
 import { ProviderBroker } from "../src/providers/marketData/providerBroker";
 import type { ProviderId } from "../src/providers/marketData/types";
 
-const VALID_PROVIDERS = new Set(["auto", "jugaad-data", "nsepython", "yahoo"]);
+const VALID_PROVIDERS = new Set(["auto", "psx", "yahoo"]);
 
 interface CliOptions {
   symbols: string[];
@@ -55,10 +55,10 @@ function parseArgs(): CliOptions {
   let symbols: string[];
   if (symbolArg) {
     symbols = [...new Set(symbolArg.split(",").map((s) => s.trim().toUpperCase()).filter(Boolean))];
-  } else if (universe === "nifty50") {
-    symbols = [...NIFTY50_SYMBOLS];
+  } else if (universe === "kse100") {
+    symbols = [...KSE100_SYMBOLS];
   } else {
-    console.error("ERROR: Use --symbols=RELIANCE,TCS, --universe=nifty50, or --symbols=<csv>");
+    console.error("ERROR: Use --symbols=HBL,ENGRO, --universe=kse100, or --symbols=<csv>");
     process.exit(1);
   }
 

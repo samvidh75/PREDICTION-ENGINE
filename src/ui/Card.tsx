@@ -4,10 +4,10 @@ import { colors, typography, radius, animation } from "../design/tokens";
 type CardVariant = "default" | "elevated" | "command" | "store";
 
 const CARD_STYLES: Record<CardVariant, { background: string; border: string }> = {
-  default:  { background: colors.canvas, border: `1px solid ${colors.hairline}` },
-  elevated: { background: colors.surface, border: `1px solid ${colors.hairline}` },
+  default:  { background: colors.surface, border: `1px solid ${colors.glassBorder}` },
+  elevated: { background: colors.surfaceElevated, border: `1px solid ${colors.glassBorder}` },
   command:  { background: "transparent", border: `1px solid ${colors.hairline}` },
-  store:    { background: colors.surfaceCard, border: `1px solid ${colors.hairline}` },
+  store:    { background: colors.surfaceCard, border: `1px solid ${colors.glassBorder}` },
 };
 
 export function Card({
@@ -30,6 +30,9 @@ export function Card({
       style={{
         background: v.background,
         border: v.border,
+        boxShadow: variant === "command" ? undefined : `inset 0 1px 0 ${colors.glassBorderTop}`,
+        backdropFilter: variant === "command" ? undefined : colors.glassBlur,
+        WebkitBackdropFilter: variant === "command" ? undefined : colors.glassBlur,
         borderRadius: radius.md,
         padding: "24px",
         cursor: onClick ? "pointer" : undefined,

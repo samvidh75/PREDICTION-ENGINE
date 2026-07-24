@@ -73,7 +73,7 @@ const REQUIRED_PROD_SECRETS = [
   { key: "COOKIE_SECRET", minLen: 32, hint: "openssl rand -base64 64" },
   { key: "DATABASE_URL", minLen: 20, hint: "Neon PostgreSQL connection string" },
   { key: "FIREBASE_PRIVATE_KEY", minLen: 50, hint: "Firebase Admin private key" },
-  { key: "INDIANAPI_KEY", minLen: 10, hint: "API key from stock.indianapi.in" },
+  { key: "PSXAPI_KEY", minLen: 10, hint: "API key from api.psx.com.pk" },
 ];
 
 function validateCredentials(isProduction: boolean): string[] {
@@ -114,8 +114,8 @@ async function bootstrap() {
   // ── CORS: allow the production domain + Render origin ──────────────
   await server.register(cors, {
     origin: [
-      "https://stockstory-india.com",
-      "https://www.stockstory-india.com",
+      "https://stockstory-ph.com",
+      "https://www.stockstory-ph.com",
       SELF_ORIGIN,
       ...(process.env.EXTRA_ALLOWED_ORIGINS?.split(",").map(s => s.trim()) ?? []),
     ],

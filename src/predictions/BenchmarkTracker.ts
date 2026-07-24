@@ -1,94 +1,69 @@
 /**
  * BenchmarkTracker — TRACK-32 Phase 8
  *
- * Tracks benchmark index levels (NIFTY 50, NIFTY 100, NIFTY 500)
- * on a daily basis. Stores observations in the benchmark_observations table
- * and provides query methods for retrieval.
+ * Tracks PSEi benchmark index levels on a daily basis using the PSE price
+ * data pipeline. Benchmark levels are critical for computing
+ * forward-validated alpha (excess return vs. market).
  *
- * Benchmark levels are critical for computing forward-validated alpha
- * (excess return vs. market) and for contextualizing prediction performance.
+ * NOTE: the underlying `benchmark_observations` table and this file's
+ * lookup keys ('KSE100'/'KSE30'/'KSEALLSHARE') still use their original
+ * column/symbol names. Renaming them requires a DB migration plus updating
+ * whatever ingestion job writes rows with those symbol values — deferred
+ * rather than guessed at here.
  */
 
 import pool from '../db/index';
 import type { BenchmarkObservation } from './types';
 
 export class BenchmarkTracker {
-  /**
-   * Record a benchmark observation for a given date.
-   *
-   * Fetches NIFTY 50, NIFTY 100, and NIFTY 500 closing prices from daily_prices.
-   * Inserts into benchmark_observations table.
-   * Returns the created observation.
-   */
   async recordObservation(date: string): Promise<BenchmarkObservation> {
-    // Fetch benchmark index closes from daily_prices
-    // Index symbols: NIFTY 50, NIFTY 100, NIFTY 500
-    const indices = ['NIFTY 50', 'NIFTY 100', 'NIFTY 500'];
+    const indices = ['KSE100', 'KSE30', 'KSEALLSHARE'];
 
     const result = await pool.query(
-      `SELECT symbol, close
-       FROM daily_prices
-       WHERE symbol = ANY($1)
-         AND trade_date = $2`,
+      `SELECT symbol, close FROM daily_prices WHERE symbol = ANY($1) AND trade_date = $2`,
       [indices, date]
     );
 
-    // Build a map from symbol → close price
     const priceMap: Record<string, number> = {};
     for (const row of result.rows) {
       priceMap[row.symbol] = Number(row.close);
     }
 
-    const pse-index50 = priceMap['NIFTY 50'] ?? null;
-    const pse-index100 = priceMap['NIFTY 100'] ?? null;
-    const pse-index500 = priceMap['NIFTY 500'] ?? null;
+    const kse100 = priceMap['KSE100'] ?? null;
+    const kse30 = priceMap['KSE30'] ?? null;
+    const kseAll = priceMap['KSEALLSHARE'] ?? null;
 
-    // Insert into benchmark_observations (upsert on observed_date)
     const insertResult = await pool.query(
-      `IPSERT INTO benchmark_observations (observed_date, pse-index50, pse-index100, pse-index500)
+      `INSERT INTO benchmark_observations (observed_date, kse100, kse30, kse_allshare)
        VALUES ($1, $2, $3, $4)
        ON CONFLICT (observed_date) DO UPDATE SET
-         pse-index50 = EXCLUDED.pse-index50,
-         pse-index100 = EXCLUDED.pse-index100,
-         pse-index500 = EXCLUDED.pse-index500,
-         recorded_at = NOW()
-       RETURNING observed_date, pse-index50, pse-index100, pse-index500, recorded_at`,
-      [date, pse-index50, pse-index100, pse-index500]
+         kse100 = EXCLUDED.kse100, kse30 = EXCLUDED.kse30,
+         kse_allshare = EXCLUDED.kse_allshare, recorded_at = NOW()
+       RETURNING observed_date, kse100, kse30, kse_allshare, recorded_at`,
+      [date, kse100, kse30, kseAll]
     );
 
     const row = insertResult.rows[0];
-
     return {
-      date: row.observed_date instanceof Date
-        ? row.observed_date.toISOString().split('T')[0]
-        : String(row.observed_date),
-      pse-index50: row.pse-index50 !== null ? Number(row.pse-index50) : 0,
-      pse-index100: row.pse-index100 !== null ? Number(row.pse-index100) : 0,
-      pse-index500: row.pse-index500 !== null ? Number(row.pse-index500) : 0,
+      date: row.observed_date instanceof Date ? row.observed_date.toISOString().split('T')[0] : String(row.observed_date),
+      psei: row.kse100 !== null ? Number(row.kse100) : 0,
+      pseiTop10: row.kse30 !== null ? Number(row.kse30) : 0,
+      pseAll: row.kse_allshare !== null ? Number(row.kse_allshare) : 0,
     };
   }
 
-  /**
-   * Get benchmark observations between from and to dates (inclusive).
-   * Returns observations ordered by date ascending for time-series analysis.
-   */
   async getObservations(from: string, to: string): Promise<BenchmarkObservation[]> {
     const result = await pool.query(
-      `SELECT observed_date, pse-index50, pse-index100, pse-index500
-       FROM benchmark_observations
-       WHERE observed_date >= $1
-         AND observed_date <= $2
-       ORDER BY observed_date ASC`,
+      `SELECT observed_date, kse100, kse30, kse_allshare FROM benchmark_observations
+       WHERE observed_date >= $1 AND observed_date <= $2 ORDER BY observed_date ASC`,
       [from, to]
     );
 
     return result.rows.map(row => ({
-      date: row.observed_date instanceof Date
-        ? row.observed_date.toISOString().split('T')[0]
-        : String(row.observed_date),
-      pse-index50: row.pse-index50 !== null ? Number(row.pse-index50) : 0,
-      pse-index100: row.pse-index100 !== null ? Number(row.pse-index100) : 0,
-      pse-index500: row.pse-index500 !== null ? Number(row.pse-index500) : 0,
+      date: row.observed_date instanceof Date ? row.observed_date.toISOString().split('T')[0] : String(row.observed_date),
+      psei: row.kse100 !== null ? Number(row.kse100) : 0,
+      pseiTop10: row.kse30 !== null ? Number(row.kse30) : 0,
+      pseAll: row.kse_allshare !== null ? Number(row.kse_allshare) : 0,
     }));
   }
 }

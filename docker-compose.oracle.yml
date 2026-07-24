@@ -1,23 +1,40 @@
-# StockStory India — Oracle VM Deployment (Backend + Ollama)
-# Frontend stays on Vercel. Database stays on Neon.
-# Uses Caddy for auto SSL (port 443).
+# ─────────────────────────────────────────────────────────────────────────────
+# StockStory India — Oracle Cloud Free Tier (ARM Ampere A1) Deployment
+# Stack: Fastify API + Python Market Data + Ollama LLM + Caddy SSL
+# Frontend (Vite SPA) is served by the Fastify server itself.
+# Database (Neon PostgreSQL) and Cache (Upstash Redis) remain external.
+#
+# Oracle Free Tier resources:
+#   Ampere A1 ARM: up to 4 OCPU / 24 GB RAM (no time limit)
+#   Boot volume: up to 200 GB (free)
+#   Outbound data: 10 TB/month (free)
+#
+# Usage:
+#   sudo docker compose -f docker-compose.oracle.yml up -d --build
+# ─────────────────────────────────────────────────────────────────────────────
 
 services:
 
-  # ── Fastify Backend API ──────────────────────────────────────────
+  # ── Fastify Backend API (Node.js / TypeScript) ─────────────────────
   api:
     build:
       context: .
+      dockerfile: Dockerfile
       target: runner
+    image: stockstory-api:oracle
     container_name: stockstory_api
     restart: unless-stopped
-    env_file: .env.production
+    env_file: .env.oracle
     environment:
       NODE_ENV: production
       PORT: "4001"
       HOST: "0.0.0.0"
+      # ── LLM Backend ──
       OLLAMA_URL: http://ollama:11434
-      SGLANG_URL: ""
+      LOCAL_AI_ENABLED: "true"
+      # ── Python Market Data URL (internal) ──
+      PYTHON_MARKET_DATA_URL: http://market-data:8000
+      # ── Feature Flags ──
       ENABLE_RESEARCH_BOT: "true"
       ENABLE_SCORE_EXPLANATIONS: "true"
       ENABLE_STOCK_SNAPSHOTS: "true"
@@ -27,6 +44,8 @@ services:
     expose:
       - "4001"
     depends_on:
+      market-data:
+        condition: service_started
       ollama:
         condition: service_healthy
     networks:
@@ -36,9 +55,56 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 30s
+      start_period: 45s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          memory: 768M
+        reservations:
+          memory: 256M
 
-  # ── Ollama (Free LLM Inference) ───────────────────────────────────
+  # ── Python Market Data Microservice (FastAPI) ──────────────────────
+  market-data:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.market-data
+    image: stockstory-market-data:oracle
+    container_name: stockstory_market_data
+    restart: unless-stopped
+    env_file: .env.oracle
+    environment:
+      PYTHONUNBUFFERED: "1"
+      MARKET_DATA_DB_PATH: /app/data/market_data.db
+    expose:
+      - "8000"
+    networks:
+      - stockstory_net
+    volumes:
+      - market_data:/app/data
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          memory: 384M
+        reservations:
+          memory: 128M
+
+  # ── Ollama (Local LLM Inference) ───────────────────────────────────
   ollama:
     image: ollama/ollama:latest
     container_name: stockstory_ollama
@@ -46,6 +112,8 @@ services:
     environment:
       OLLAMA_HOST: 0.0.0.0
       OLLAMA_KEEP_ALIVE: 24h
+      OLLAMA_NUM_PARALLEL: "2"
+      OLLAMA_MAX_QUEUE: "8"
     volumes:
       - ollama_data:/root/.ollama
     expose:
@@ -55,17 +123,22 @@ services:
     healthcheck:
       test: ["CMD", "ollama", "list"]
       interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 60s
+      timeout: 15s
+      retries: 5
+      start_period: 120s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "2"
     deploy:
       resources:
-        reservations:
-          memory: 4G
         limits:
-          memory: 8G
+          memory: 6G
+        reservations:
+          memory: 2G
 
-  # ── Caddy (Auto SSL Reverse Proxy) ────────────────────────────────
+  # ── Caddy (Auto SSL Reverse Proxy) ─────────────────────────────────
   caddy:
     image: caddy:alpine
     container_name: stockstory_caddy
@@ -77,10 +150,23 @@ services:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data
       - caddy_config:/config
+      - ./logs/caddy:/var/log/caddy
     depends_on:
-      - api
+      api:
+        condition: service_healthy
     networks:
       - stockstory_net
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+        reservations:
+          memory: 64M
 
 networks:
   stockstory_net:
@@ -92,4 +178,6 @@ volumes:
   caddy_data:
     driver: local
   caddy_config:
+    driver: local
+  market_data:
     driver: local

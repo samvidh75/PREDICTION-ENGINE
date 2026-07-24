@@ -88,7 +88,7 @@ export default function DividendTracker() {
             'No dividend income tracked'
           ) : (
             <>
-              Annual: ₹{stats.annualIncome.toLocaleString('en-IN')} | Yield: {stats.averageDividendYield.toFixed(2)}%
+              Annual: ₱{stats.annualIncome.toLocaleString('en-PH')} | Yield: {stats.averageDividendYield.toFixed(2)}%
             </>
           )}
         </div>
@@ -118,25 +118,25 @@ export default function DividendTracker() {
                   <div>
                     <div style={{ color: '#666' }}>Total Dividends</div>
                     <div style={{ fontWeight: 'bold', fontSize: '14px' }}>
-                      ₹{stats.totalDividends.toLocaleString('en-IN')}
+                      ₱{stats.totalDividends.toLocaleString('en-PH')}
                     </div>
                   </div>
                   <div>
                     <div style={{ color: '#666' }}>TDS Deducted (10%)</div>
                     <div style={{ fontWeight: 'bold', fontSize: '14px', color: '#ea4335' }}>
-                      ₹{stats.totalTDS.toLocaleString('en-IN')}
+                      ₱{stats.totalTDS.toLocaleString('en-PH')}
                     </div>
                   </div>
                   <div>
                     <div style={{ color: '#666' }}>Net After TDS</div>
                     <div style={{ fontWeight: 'bold', fontSize: '14px', color: '#34a853' }}>
-                      ₹{stats.totalNetDividends.toLocaleString('en-IN')}
+                      ₱{stats.totalNetDividends.toLocaleString('en-PH')}
                     </div>
                   </div>
                   <div>
                     <div style={{ color: '#666' }}>Monthly Income</div>
                     <div style={{ fontWeight: 'bold', fontSize: '14px' }}>
-                      ₹{stats.monthlyIncome.toLocaleString('en-IN')}
+                      ₱{stats.monthlyIncome.toLocaleString('en-PH')}
                     </div>
                   </div>
                   <div>
@@ -157,8 +157,8 @@ export default function DividendTracker() {
                     📅 Next Dividend Payment
                   </div>
                   <div style={{ fontSize: '12px', color: '#0d47a1' }}>
-                    Due: {new Date(stats.nextPaymentDue).toLocaleDateString('en-IN')} | Amount: ₹
-                    {stats.nextPaymentAmount.toLocaleString('en-IN')}
+                    Due: {new Date(stats.nextPaymentDue).toLocaleDateString('en-PH')} | Amount: ₱
+                    {stats.nextPaymentAmount.toLocaleString('en-PH')}
                   </div>
                 </div>
               )}
@@ -203,7 +203,7 @@ export default function DividendTracker() {
                       lineHeight: '1.4',
                     }}
                   >
-                    💰 Your total dividend income (₹{stats.taxableIncome.toLocaleString('en-IN')}) will be added to your total income for ITR filing.
+                    💰 Your total dividend income (₱{stats.taxableIncome.toLocaleString('en-PH')}) will be added to your total income for ITR filing.
                   </div>
                 </div>
               </div>

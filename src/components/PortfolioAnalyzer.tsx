@@ -88,6 +88,8 @@ function PortfolioContent({ userId }: { userId: string }) {
     <div
       style={{
         background: colors.surface,
+        backdropFilter: "blur(20px) saturate(160%)",
+        WebkitBackdropFilter: "blur(20px) saturate(160%)",
         border: `1px solid ${colors.hairline}`,
         borderRadius: radius.xl,
         padding: space[5],
@@ -119,7 +121,7 @@ function PortfolioContent({ userId }: { userId: string }) {
           }}
         >
           Calculated over verified ledger transactions &middot; Total Capital:{" "}
-          \u20b9{grandTotalInvestment.toLocaleString("en-IN")}
+          \u20b9{grandTotalInvestment.toLocaleString("en-PH")}
         </p>
       </div>
 
@@ -149,6 +151,8 @@ function PortfolioContent({ userId }: { userId: string }) {
                 key={item.ticker}
                 style={{
                   background: colors.canvas,
+                  backdropFilter: "blur(20px) saturate(160%)",
+                  WebkitBackdropFilter: "blur(20px) saturate(160%)",
                   borderRadius: radius.lg,
                   padding: space[3],
                   border: `1px solid ${colors.hairline}`,

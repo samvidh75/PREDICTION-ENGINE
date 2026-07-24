@@ -1,10 +1,11 @@
 import { useEffect, useState, type ComponentType } from "react";
 import { BrowserRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Toaster } from "sonner";
 import { AuthProvider } from "./context/AuthContext";
 import { AppRoutes } from "./app/routes";
 import { ScrollToTop } from "./app/ScrollToTop";
-import { CommandPalette } from "./components/CommandPalette";
+import { SuccessCheck } from "./ui/SuccessCheck";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -70,8 +71,26 @@ export default function App() {
           <ScrollToTop />
           {LiveAlertSentinel ? <LiveAlertSentinel /> : null}
           {FloatingAIButton ? <FloatingAIButton /> : null}
-          <CommandPalette />
           <AppRoutes />
+          <Toaster
+            theme="dark"
+            position="bottom-right"
+            gap={10}
+            icons={{ success: <SuccessCheck size={18} /> }}
+            toastOptions={{
+              style: {
+                background: "rgba(18, 18, 20, 0.85)",
+                backdropFilter: "blur(20px) saturate(160%)",
+                WebkitBackdropFilter: "blur(20px) saturate(160%)",
+                border: "1px solid rgba(255,255,255,0.09)",
+                boxShadow: "inset 0 1px 0 rgba(255,255,255,0.14)",
+                color: "#FFFFFF",
+                fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", sans-serif',
+                fontSize: "13px",
+                borderRadius: "10px",
+              },
+            }}
+          />
         </BrowserRouter>
       </AuthProvider>
     </QueryClientProvider>

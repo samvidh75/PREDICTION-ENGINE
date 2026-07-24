@@ -61,6 +61,8 @@ export default function OptionsChainScanner({ ticker }: OptionsChainScannerProps
 
   const cardStyle: React.CSSProperties = {
     background: colors.surface,
+    backdropFilter: "blur(20px) saturate(160%)",
+    WebkitBackdropFilter: "blur(20px) saturate(160%)",
     border: `1px solid ${colors.charcoal}`,
     borderRadius: radius.lg,
     padding: space[5],
@@ -133,6 +135,8 @@ export default function OptionsChainScanner({ ticker }: OptionsChainScannerProps
           <div
             style={{
               background: colors.canvas,
+              backdropFilter: "blur(20px) saturate(160%)",
+              WebkitBackdropFilter: "blur(20px) saturate(160%)",
               padding: space[3],
               borderRadius: radius.sm,
               border: `1px solid ${colors.charcoal}`,
@@ -155,6 +159,8 @@ export default function OptionsChainScanner({ ticker }: OptionsChainScannerProps
           <div
             style={{
               background: colors.canvas,
+              backdropFilter: "blur(20px) saturate(160%)",
+              WebkitBackdropFilter: "blur(20px) saturate(160%)",
               padding: space[3],
               borderRadius: radius.sm,
               border: `1px solid ${colors.charcoal}`,
@@ -177,6 +183,8 @@ export default function OptionsChainScanner({ ticker }: OptionsChainScannerProps
           <div
             style={{
               background: colors.canvas,
+              backdropFilter: "blur(20px) saturate(160%)",
+              WebkitBackdropFilter: "blur(20px) saturate(160%)",
               padding: space[3],
               borderRadius: radius.sm,
               border: `1px solid ${colors.charcoal}`,
@@ -217,6 +225,8 @@ export default function OptionsChainScanner({ ticker }: OptionsChainScannerProps
                 key={idx}
                 style={{
                   background: colors.canvas,
+                  backdropFilter: "blur(20px) saturate(160%)",
+                  WebkitBackdropFilter: "blur(20px) saturate(160%)",
                   padding: `${space[2]} ${space[3]}`,
                   borderRadius: radius.sm,
                   border: `1px solid ${colors.charcoal}`,
@@ -243,7 +253,7 @@ export default function OptionsChainScanner({ ticker }: OptionsChainScannerProps
                       margin: `${space[1]} 0 0 0`,
                     }}
                   >
-                    Chg in OI: {strike.change_in_oi.toLocaleString("en-IN")}
+                    Chg in OI: {strike.change_in_oi.toLocaleString("en-PH")}
                   </p>
                 </div>
                 <span
@@ -253,7 +263,7 @@ export default function OptionsChainScanner({ ticker }: OptionsChainScannerProps
                     color: colors.textSecondary,
                   }}
                 >
-                  OI: {strike.open_interest.toLocaleString("en-IN")}
+                  OI: {strike.open_interest.toLocaleString("en-PH")}
                 </span>
               </div>
             );

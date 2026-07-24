@@ -33,7 +33,7 @@ export interface StockResearchSummary {
 
 export interface StockResearchDetail extends StockResearchSummary {
   companyName: string;
-  exchangeBadge: "PSE" | "NSE";
+  exchangeBadge: "PSX" | "PSE";
   founded: string;
   ceo: string;
   hq: string;
@@ -359,15 +359,15 @@ function buildPriceHistory(symbol: string, price: number): StockResearchDetail["
       if (cfg.label === "day") {
         const d = new Date(now);
         d.setDate(d.getDate() - (cfg.count - 1 - i));
-        label = d.toLocaleDateString("en-IN", { day: "2-digit", month: "short" });
+        label = d.toLocaleDateString("en-PH", { day: "2-digit", month: "short" });
       } else if (cfg.label === "week") {
         const d = new Date(now);
         d.setDate(d.getDate() - (cfg.count - 1 - i) * 7);
-        label = d.toLocaleDateString("en-IN", { day: "2-digit", month: "short" });
+        label = d.toLocaleDateString("en-PH", { day: "2-digit", month: "short" });
       } else if (cfg.label === "mon") {
         const d = new Date(now);
         d.setMonth(d.getMonth() - (cfg.count - 1 - i));
-        label = d.toLocaleDateString("en-IN", { month: "short", year: "2-digit" });
+        label = d.toLocaleDateString("en-PH", { month: "short", year: "2-digit" });
       } else {
         // quarterly
         const d = new Date(now);
@@ -383,9 +383,9 @@ function buildPriceHistory(symbol: string, price: number): StockResearchDetail["
 function buildFinancialSeries(summary: StockResearchSummary): StockResearchDetail["financials"] {
   const { symbol, marketCap, price, eps, sector } = summary;
   // Derive realistic financials from fundamentals
-  // Estimate shares outstanding (in Cr) from marketCap / price
+  // Estimate shares outstanding (in millions) from marketCap / price
   const sharesCr = price > 0 ? marketCap / price : marketCap / 100;
-  // Net Profit (₹ Cr) = EPS * shares — use EPS if available, else estimate from marketCap
+  // Net Profit (₱M) = EPS * shares — use EPS if available, else estimate from marketCap
   const currentProfit = eps != null && eps > 0
     ? round(eps * sharesCr, 0)
     : round(marketCap / 220, 0);
@@ -531,30 +531,30 @@ function buildNews(stock: StockResearchSummary): StockResearchDetail["news"] {
     },
     {
       headline: `${stock.sector} research points to a changing sector backdrop`,
-      source: "Mint",
+      source: "Business Recorder",
       time: "5h ago",
-      link: "https://www.livemint.com/market",
+      link: "https://www.brecorder.com/markets",
       publishedAt: new Date(now - 5 * 60 * 60 * 1000).toISOString(),
     },
     {
       headline: `What changed in valuation context for ${stock.symbol}`,
-      source: "ET Markets",
+      source: "Dawn Markets",
       time: "1d ago",
-      link: "https://economictimes.indiatimes.com/markets",
+      link: "https://www.dawn.com/business/markets",
       publishedAt: new Date(now - 24 * 60 * 60 * 1000).toISOString(),
     },
     {
       headline: `${stock.name} stays on watchlists after recent results`,
-      source: "Business Standard",
+      source: "The News Business",
       time: "2d ago",
-      link: "https://www.business-standard.com/markets",
+      link: "https://www.thenews.com.pk/business",
       publishedAt: new Date(now - 48 * 60 * 60 * 1000).toISOString(),
     },
     {
       headline: `${stock.industry} trends continue to influence research conviction`,
-      source: "CNBC TV18",
+      source: "KSE Market Watch",
       time: "3d ago",
-      link: "https://www.cnbctv18.com/market",
+      link: "https://www.psx.com.pk/market",
       publishedAt: new Date(now - 72 * 60 * 60 * 1000).toISOString(),
     },
   ];
@@ -715,23 +715,23 @@ export function getScannerStocks(scanType: "quality" | "value" | "momentum" | "s
 
 // Symbol aliases for common shortforms (e.g., user types "HDFC" → search for "HDFCBANK")
 const symbolAliases: Record<string, string> = {
-  "HDFC": "HDFCBANK",
-  "ICICI": "ICICIBANK",
-  "AXIS": "AXISBANK",
-  "KOTAK": "KOTAKBANK",
-  "INDUSIND": "INDUSINDBK",
-  "SBIN": "SBIN",
-  "PNB": "PNBHOUSING",
-  "BOB": "BANKBARODA",
+  "HBL": "HBL",
+  "UBL": "UBL",
+  "NBP": "NBP",
+  "BAHL": "BAHL",
+  "BAFL": "BAFL",
+  "MCB": "MCB",
+  "ENGRO": "ENGRO",
+  "LUCK": "LUCK",
 };
 
 // Real company profile data for major stocks
 const companyProfiles: Record<string, { founded: string; ceo: string; hq: string; employees: string; website: string }> = {
-  "TCS": { founded: "1974", ceo: "K Krithivasan", hq: "Mumbai", employees: "614,000", website: "www.tcs.com" },
-  "INFY": { founded: "1981", ceo: "Salil Parekh", hq: "Bengaluru", employees: "345,000", website: "www.infosys.com" },
-  "RELIANCE": { founded: "1973", ceo: "Mukesh Ambani", hq: "Mumbai", employees: "450,000", website: "www.ril.com" },
-  "SBIN": { founded: "1806", ceo: "Dinesh Khara", hq: "Mumbai", employees: "245,000", website: "www.sbi.co.in" },
-  "HDFCBANK": { founded: "1994", ceo: "Sashidhar Jagdishan", hq: "Mumbai", employees: "315,000", website: "www.hdfcbank.com" },
+  "HBL": { founded: "1941", ceo: "Muhammad Aurangzeb", hq: "Karachi", employees: "15,000", website: "www.hbl.com" },
+  "UBL": { founded: "1959", ceo: "Shazad G. Dada", hq: "Karachi", employees: "13,000", website: "www.ubldirect.com" },
+  "ENGRO": { founded: "1965", ceo: "Aliuddin Ansari", hq: "Karachi", employees: "8,500", website: "www.engro.com" },
+  "LUCK": { founded: "1993", ceo: "Muhammad Ali Tabba", hq: "Karachi", employees: "5,200", website: "www.lucky-cement.com" },
+  "MCB": { founded: "1947", ceo: "S. M. Muneer", hq: "Karachi", employees: "12,000", website: "www.mcb.com.pk" },
 };
 
 export function getStockResearch(symbol: string): StockResearchDetail | null {
@@ -758,15 +758,15 @@ export function getStockResearch(symbol: string): StockResearchDetail | null {
   const profile = companyProfiles[summary.symbol.toUpperCase()] || {
     founded: `${1980 + (hash(`${summary.symbol}:founded`) % 35)}`,
     ceo: "Management team",
-    hq: "India",
-    employees: `${Math.round(seeded(`${summary.symbol}:employees`, 1800, 82000, 0)).toLocaleString("en-IN")}`,
+    hq: "Pakistan",
+    employees: `${Math.round(seeded(`${summary.symbol}:employees`, 1800, 82000, 0)).toLocaleString("en-PH")}`,
     website: `www.${summary.symbol.toLowerCase()}.com`,
   };
 
   return {
     ...summary,
     companyName: summary.name,
-    exchangeBadge: summary.exchange === "PSE" ? "PSE" : "NSE",
+    exchangeBadge: "PSX",
     founded: profile.founded,
     ceo: profile.ceo,
     hq: profile.hq,

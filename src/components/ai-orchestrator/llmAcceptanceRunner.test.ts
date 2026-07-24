@@ -109,7 +109,7 @@ describe("evaluateAnswerQuality", () => {
 
   it("sanitizes (rejects) forbidden output", () => {
     const result = evaluateAnswerQuality(
-      "You should buy TCS and hold for target of ₹4000.",
+      "You should buy TCS and hold for target of Rs. 4000.",
       "TCS price data",
     );
     expect(result.confidence).toBe("low");

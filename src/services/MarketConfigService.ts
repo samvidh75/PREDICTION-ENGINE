@@ -157,12 +157,12 @@ export class MarketConfigService {
     const status = await this.getMarketStatus();
     if (status.isOpen) return `Live prices (market open until 3:30 PM IST)`;
     if (status.dayStatus === 'weekend' || status.dayStatus === 'holiday') {
-      return `Market ${status.dayStatus}. Next open: ${status.nextOpenTime.toLocaleDateString('en-IN')}`;
+      return `Market ${status.dayStatus}. Next open: ${status.nextOpenTime.toLocaleDateString('en-PH')}`;
     }
     const snapshot = await this.getMarketSnapshot();
     if (snapshot) {
       const t = new Date(snapshot.timestamp);
-      return `Market closed. Snapshot from ${t.toLocaleTimeString('en-IN')} IST`;
+      return `Market closed. Snapshot from ${t.toLocaleTimeString('en-PH')} IST`;
     }
     return 'Market closed. No recent snapshot available.';
   }

@@ -403,6 +403,8 @@ export default function AdvancedScanner() {
               height: 38,
               padding: "0 12px 0 34px",
               background: colors.surfaceElevated,
+              backdropFilter: "blur(20px) saturate(160%)",
+              WebkitBackdropFilter: "blur(20px) saturate(160%)",
               border: `1px solid ${colors.hairline}`,
               borderRadius: radius.md,
               color: colors.ink,
@@ -421,6 +423,8 @@ export default function AdvancedScanner() {
             height: 38,
             padding: "0 28px 0 12px",
             background: colors.surfaceElevated,
+            backdropFilter: "blur(20px) saturate(160%)",
+            WebkitBackdropFilter: "blur(20px) saturate(160%)",
             border: `1px solid ${colors.hairline}`,
             borderRadius: radius.md,
             color: colors.ink,
@@ -500,6 +504,8 @@ export default function AdvancedScanner() {
                 padding: "10px 16px",
                 borderBottom: `1px solid ${colors.hairline}`,
                 background: colors.surface,
+                backdropFilter: "blur(20px) saturate(160%)",
+                WebkitBackdropFilter: "blur(20px) saturate(160%)",
               }}
             >
               <HeaderCell label="Symbol" sortKey="symbol" current={sortKey} dir={sortDir} onClick={toggleSort} />
@@ -672,9 +678,9 @@ export default function AdvancedScanner() {
               value={flagHint(selectedStock.scannerFlag)}
               valueColor={colors.mute}
             />
-            <DetailRow label="Current Price" value={`₹${selectedStock.price.toLocaleString()}`} />
-            <DetailRow label="Upper Band" value={`₹${selectedStock.upperBand.toLocaleString()}`} />
-            <DetailRow label="Lower Band" value={`₹${selectedStock.lowerBand.toLocaleString()}`} />
+            <DetailRow label="Current Price" value={`₱${selectedStock.price.toLocaleString()}`} />
+            <DetailRow label="Upper Band" value={`₱${selectedStock.upperBand.toLocaleString()}`} />
+            <DetailRow label="Lower Band" value={`₱${selectedStock.lowerBand.toLocaleString()}`} />
             <DetailRow
               label="MACD"
               value={selectedStock.macd > 0 ? `+${selectedStock.macd.toFixed(4)}` : selectedStock.macd.toFixed(4)}

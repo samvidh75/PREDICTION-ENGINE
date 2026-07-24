@@ -3,7 +3,7 @@ import { ensureWorker, requestExplanation, getStatus, unloadWorker } from "./bro
 export const SMOKE_TEST_ASSET = "HEALTHYTAT";
 
 export const SMOKE_TEST_CONTEXT =
-  "Asset: HEALTHYTAT | Price: ₹420 (Day Change: -4.5%) | " +
+  "Asset: HEALTHYTAT | Price: ₱420 (Day Change: -4.5%) | " +
   "P/E Ratio: 12.4 | Debt/Equity: 2.1 | Promoter Pledging: 65% | " +
   'News/Auditor Log: "Statutory auditors have resigned mid-term citing ' +
   'inability to verify off-balance sheet transactions with group shell companies."';

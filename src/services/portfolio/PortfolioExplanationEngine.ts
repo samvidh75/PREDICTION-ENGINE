@@ -51,7 +51,7 @@ export class PortfolioExplanationEngine {
       .filter(h => h.pnlPercent !== undefined)
       .sort((a, b) => (b.pnlPercent ?? 0) - (a.pnlPercent ?? 0))
       .slice(0, count)
-      .map(h => `${h.symbol}: +${h.pnlPercent?.toFixed(1)}% (₹${((h.lastPrice ?? h.averagePrice) * h.quantity).toLocaleString('en-IN')})`);
+      .map(h => `${h.symbol}: +${h.pnlPercent?.toFixed(1)}% (₱${((h.lastPrice ?? h.averagePrice) * h.quantity).toLocaleString('en-PH')})`);
   }
 
   /** Find weakest holdings (worst PnL%) */
@@ -60,7 +60,7 @@ export class PortfolioExplanationEngine {
       .filter(h => h.pnlPercent !== undefined)
       .sort((a, b) => (a.pnlPercent ?? 0) - (b.pnlPercent ?? 0))
       .slice(0, count)
-      .map(h => `${h.symbol}: ${h.pnlPercent?.toFixed(1)}% (₹${((h.lastPrice ?? h.averagePrice) * h.quantity).toLocaleString('en-IN')})`);
+      .map(h => `${h.symbol}: ${h.pnlPercent?.toFixed(1)}% (₱${((h.lastPrice ?? h.averagePrice) * h.quantity).toLocaleString('en-PH')})`);
   }
 
   /** Identify top risks */

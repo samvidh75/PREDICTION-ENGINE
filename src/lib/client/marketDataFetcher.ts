@@ -46,7 +46,7 @@ export class ClientMarketDataFetcher {
 
   constructor() {
     const providers = [
-      'YFinance', 'PhilippineAPI', 'Groww', 'PSEIndia', 'Screener', 'Moneycontrol',
+      'YFinance', 'PSXAPI', 'Groww', 'PSX', 'Screener', 'Moneycontrol',
     ];
     for (const name of providers) {
       this.providerHealth.set(name, {
@@ -173,9 +173,9 @@ export class ClientMarketDataFetcher {
   private async tryFetch(symbol: string): Promise<FetchResult | null> {
     const providers: Array<{ name: string; fn: (sym: string) => Promise<FetchResult | null> }> = [
       { name: 'YFinance', fn: this.fetchYFinance.bind(this) },
-      { name: 'PSEIndia', fn: this.fetchPSEIndia.bind(this) },
+      { name: 'PSX', fn: this.fetchPSX.bind(this) },
       { name: 'Groww', fn: this.fetchGroww.bind(this) },
-      { name: 'PhilippineAPI', fn: this.fetchIndianAPI.bind(this) },
+      { name: 'PSXAPI', fn: this.fetchPSXAPI.bind(this) },
       { name: 'Screener', fn: this.fetchScreener.bind(this) },
       { name: 'Moneycontrol', fn: this.fetchMoneycontrol.bind(this) },
     ];
@@ -200,7 +200,7 @@ export class ClientMarketDataFetcher {
 
   private async fetchYFinance(symbol: string): Promise<FetchResult | null> {
     try {
-      const ticker = `${symbol}.NS`;
+      const ticker = `${symbol}.KAR`;
       const res = await fetch(
         `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d`,
         { signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) }
@@ -228,10 +228,10 @@ export class ClientMarketDataFetcher {
     }
   }
 
-  private async fetchIndianAPI(symbol: string): Promise<FetchResult | null> {
+  private async fetchPSXAPI(symbol: string): Promise<FetchResult | null> {
     try {
       const res = await fetch(
-        `https://data.indianapi.in/nse/quote/${symbol.toUpperCase()}`,
+        `https://dps.psx.com.pk/api/quote/${symbol.toUpperCase()}`,
         { signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) }
       );
       if (!res.ok) return null;
@@ -279,17 +279,17 @@ export class ClientMarketDataFetcher {
     }
   }
 
-  private async fetchPSEIndia(symbol: string): Promise<FetchResult | null> {
+  private async fetchPSX(symbol: string): Promise<FetchResult | null> {
     try {
       const ticker = symbol.toUpperCase();
       const res = await fetch(
-        `https://www.nseindia.com/api/quote-equity?symbol=${ticker}`,
+        `https://dps.psx.com.pk/api/quote?symbol=${ticker}`,
         {
           signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
           headers: {
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)',
             'Accept': 'application/json',
-            'Referer': 'https://www.nseindia.com/',
+            'Referer': 'https://dps.psx.com.pk/',
           },
         }
       );
@@ -347,7 +347,7 @@ export class ClientMarketDataFetcher {
   private async fetchMoneycontrol(symbol: string): Promise<FetchResult | null> {
     try {
       const res = await fetch(
-        `https://priceapi.moneycontrol.com/pricefeed/notapplicable/inidicesindia/in%2B${symbol.toUpperCase()}`,
+        `https://dps.psx.com.pk/api/marketdata/${symbol.toUpperCase()}`,
         {
           signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
           headers: {

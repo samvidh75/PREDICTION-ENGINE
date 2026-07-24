@@ -30,9 +30,9 @@ function computeGrowth(data: FinancialDataPoint[]): number | null {
 }
 
 function formatValue(v: number): string {
-  if (Math.abs(v) >= 10000000) return `${(v / 10000000).toFixed(1)}Cr`;
-  if (Math.abs(v) >= 100000) return `${(v / 100000).toFixed(1)}L`;
-  if (Math.abs(v) >= 1000) return `${(v / 1000).toFixed(1)}K`;
+  if (Math.abs(v) >= 1_000_000_000) return `${(v / 1_000_000_000).toFixed(1)}B`;
+  if (Math.abs(v) >= 1_000_000) return `${(v / 1_000_000).toFixed(1)}M`;
+  if (Math.abs(v) >= 1_000) return `${(v / 1_000).toFixed(1)}K`;
   return v.toFixed(0);
 }
 
@@ -92,8 +92,8 @@ export function FinancialChart({ annualRevenue, annualProfit, annualEbitda, quar
 
   const handleExport = () => {
     ExportUtils.toCSV(
-      ['Period', `${metric.charAt(0).toUpperCase() + metric.slice(1)} (₹ Cr)`],
-      data.map(d => [d.period, (d.value / 10000000).toFixed(2)]),
+      ['Period', `${metric.charAt(0).toUpperCase() + metric.slice(1)} (₱M)`],
+      data.map(d => [d.period, (d.value / 1_000_000).toFixed(2)]),
       `${symbol}_${metric}_${periodMode}`
     );
   };

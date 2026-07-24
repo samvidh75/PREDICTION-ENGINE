@@ -6,15 +6,16 @@ export function finiteNumberOrNull(value: unknown): number | null {
   return num;
 }
 
-const INDIAN_NUMBER_REGEX = /^\(?[₹₨$€£¥]?\s*[\d,]+(?:\.\d+)?\s*(?:Cr(?:ore)?|Lac(?:kh?)?|%)?\s*\)?$/i;
-const CRORE_SUFFIX = /cr(?:ore)?$/i;
-const LAKH_SUFFIX = /(?:lac(?:kh?)?|lakh?)$/i;
+const PH_NUMBER_REGEX = /^\(?[₱$€£¥]?\s*[\d,]+(?:\.\d+)?\s*(?:[BMK]|%)?\s*\)?$/i;
+const BILLION_SUFFIX = /b$/i;
+const MILLION_SUFFIX = /m$/i;
+const THOUSAND_SUFFIX = /k$/i;
 const PERCENT_SUFFIX = /%$/;
 const PARENS_NEGATIVE = /^\((.+)\)$/;
 const DASH_LIKE = /^[—–-]$/;
 const NA_LIKE = /^(n\/?a|n\/?d|n\/?a\/?s|null|undefined)$/i;
 
-export function parseIndianNumber(raw: string): number | null {
+export function parsePhilippineNumber(raw: string): number | null {
   if (raw == null) return null;
   let s = String(raw).trim();
   if (!s || DASH_LIKE.test(s) || NA_LIKE.test(s)) return null;
@@ -31,15 +32,18 @@ export function parseIndianNumber(raw: string): number | null {
     s = s.slice(1).trim();
   }
 
-  s = s.replace(/[₹₨$€£¥]/g, '').trim();
+  s = s.replace(/[₱$€£¥]/g, '').trim();
 
   let multiplier = 1;
-  if (CRORE_SUFFIX.test(s)) {
-    multiplier = 10_000_000;
-    s = s.replace(CRORE_SUFFIX, '').trim();
-  } else if (LAKH_SUFFIX.test(s)) {
-    multiplier = 100_000;
-    s = s.replace(LAKH_SUFFIX, '').trim();
+  if (BILLION_SUFFIX.test(s)) {
+    multiplier = 1_000_000_000;
+    s = s.replace(BILLION_SUFFIX, '').trim();
+  } else if (MILLION_SUFFIX.test(s)) {
+    multiplier = 1_000_000;
+    s = s.replace(MILLION_SUFFIX, '').trim();
+  } else if (THOUSAND_SUFFIX.test(s)) {
+    multiplier = 1_000;
+    s = s.replace(THOUSAND_SUFFIX, '').trim();
   }
 
   const isPercent = PERCENT_SUFFIX.test(s);
@@ -63,14 +67,14 @@ export function parsePercentageFraction(raw: string): number | null {
   if (!s || DASH_LIKE.test(s) || NA_LIKE.test(s)) return null;
   if (!PERCENT_SUFFIX.test(s)) return null;
 
-  const num = parseIndianNumber(s);
+  const num = parsePhilippineNumber(s);
   if (num == null) return null;
 
   return num / 100;
 }
 
-export function parseCurrencyToInr(raw: string): number | null {
-  return parseIndianNumber(raw);
+export function parseCurrencyToPhp(raw: string): number | null {
+  return parsePhilippineNumber(raw);
 }
 
 const MONTH_NAMES: Record<string, string> = {
@@ -98,7 +102,7 @@ export function parseDateOrNull(raw: string): string | null {
   return d.toISOString().split('T')[0];
 }
 
-const EXCHANGE_SUFFIX = /\.(NS|BO|PSE|PSE)$/i;
+const EXCHANGE_SUFFIX = /\.(PS|PSE)$/i;
 
 export function normalizeSymbol(symbol: string): string {
   return symbol.trim().replace(EXCHANGE_SUFFIX, '').toUpperCase();
@@ -109,6 +113,7 @@ export function normalizeExchange(exchange: string): string {
   if (s === 'nse' || s === 'national stock exchange') return 'PSE';
   if (s === 'bse' || s === 'bombay stock exchange') return 'PSE';
   if (s === 'pse' || s === 'philippine stock exchange') return 'PSE';
+  if (s === 'psx' || s === 'pakistan stock exchange') return 'PSE';
   return exchange.trim();
 }
 

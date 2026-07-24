@@ -1,7 +1,7 @@
 /**
  * Stock Universe Ingestion
  *
- * Maintains the master list of Philippine stocks tracked by Lensory.
+ * Maintains the master list of PSX stocks tracked by Lensory.
  * Uses existing repo providers (DB symbols table, PSE/PSE sources).
  * Does NOT invent companies — uses only data from existing sources.
  */
@@ -10,7 +10,7 @@ import type { JobOptions, JobResult, IngestionJob } from './IngestionTypes';
 
 export interface StockUniverseEntry {
   symbol: string;
-  exchange: 'PSE' | 'PSE';
+  exchange: 'PSE';
   companyName: string | null;
   sector: string | null;
   industry: string | null;

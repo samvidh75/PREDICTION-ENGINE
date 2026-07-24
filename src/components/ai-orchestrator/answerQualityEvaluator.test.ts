@@ -100,7 +100,7 @@ describe("Answer quality — Guardrails", () => {
   });
 
   it("G2: removes speculative price targets", () => {
-    const speculative = "I predict the price will reach ₹10,000 by next month. This is a guaranteed winner.";
+    const speculative = "I predict the price will reach Rs. 10,000 by next month. This is a guaranteed winner.";
     const { sanitized } = applyGuardrails(speculative, makeContext());
     expect(sanitized).not.toContain("guaranteed");
     expect(sanitized).not.toContain("will reach");

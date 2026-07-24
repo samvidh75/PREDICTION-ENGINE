@@ -79,6 +79,8 @@ export function OptionsFlow() {
             fontWeight: 600,
             color: colors.textTertiary,
             background: colors.surfaceCard,
+            backdropFilter: "blur(20px) saturate(160%)",
+            WebkitBackdropFilter: "blur(20px) saturate(160%)",
             padding: "2px 6px",
             borderRadius: radius.full,
             textTransform: "uppercase",
@@ -96,6 +98,8 @@ export function OptionsFlow() {
           style={{
             padding: "14px",
             background: colors.surface,
+            backdropFilter: "blur(20px) saturate(160%)",
+            WebkitBackdropFilter: "blur(20px) saturate(160%)",
             borderRadius: radius.md,
             border: `1px solid ${colors.hairline}`,
           }}
@@ -123,6 +127,8 @@ export function OptionsFlow() {
           style={{
             padding: "14px",
             background: colors.surface,
+            backdropFilter: "blur(20px) saturate(160%)",
+            WebkitBackdropFilter: "blur(20px) saturate(160%)",
             borderRadius: radius.md,
             border: `1px solid ${colors.hairline}`,
           }}
@@ -143,6 +149,8 @@ export function OptionsFlow() {
           style={{
             padding: "14px",
             background: colors.surface,
+            backdropFilter: "blur(20px) saturate(160%)",
+            WebkitBackdropFilter: "blur(20px) saturate(160%)",
             borderRadius: radius.md,
             border: `1px solid ${colors.hairline}`,
           }}
@@ -151,7 +159,7 @@ export function OptionsFlow() {
             Max Pain
           </div>
           <div style={{ fontSize: "22px", fontWeight: 700, color: colors.textPrimary, marginBottom: "2px" }}>
-            ₹{d.maxPain}
+            ₱{d.maxPain}
           </div>
           <div style={{ fontSize: "12px", fontWeight: 500, color: maxPainDelta > 0 ? colors.marketGreen : colors.marketRed }}>
             {maxPainDelta > 0 ? "+" : ""}{safeDecimal(maxPainDelta, 1)}% vs CMP
@@ -163,6 +171,8 @@ export function OptionsFlow() {
           style={{
             padding: "14px",
             background: colors.surface,
+            backdropFilter: "blur(20px) saturate(160%)",
+            WebkitBackdropFilter: "blur(20px) saturate(160%)",
             borderRadius: radius.md,
             border: `1px solid ${colors.hairline}`,
           }}
@@ -184,6 +194,8 @@ export function OptionsFlow() {
         style={{
           padding: "12px 14px",
           background: colors.surface,
+          backdropFilter: "blur(20px) saturate(160%)",
+          WebkitBackdropFilter: "blur(20px) saturate(160%)",
           borderRadius: radius.md,
           border: `1px solid ${colors.hairline}`,
           display: "flex",
@@ -197,14 +209,14 @@ export function OptionsFlow() {
         </div>
         <div>
           <span style={{ fontSize: "12px", color: colors.textTertiary }}>Highest Call OI: </span>
-          <span style={{ fontSize: "13px", fontWeight: 600, color: colors.marketRed }}>₹{d.highestCallOI}</span>
+          <span style={{ fontSize: "13px", fontWeight: 600, color: colors.marketRed }}>₱{d.highestCallOI}</span>
           <span style={{ fontSize: "11px", color: colors.textTertiary, marginLeft: "4px" }}>
             (resistance)
           </span>
         </div>
         <div>
           <span style={{ fontSize: "12px", color: colors.textTertiary }}>Highest Put OI: </span>
-          <span style={{ fontSize: "13px", fontWeight: 600, color: colors.marketGreen }}>₹{d.highestPutOI}</span>
+          <span style={{ fontSize: "13px", fontWeight: 600, color: colors.marketGreen }}>₱{d.highestPutOI}</span>
           <span style={{ fontSize: "11px", color: colors.textTertiary, marginLeft: "4px" }}>
             (support)
           </span>

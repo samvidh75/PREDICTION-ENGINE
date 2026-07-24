@@ -54,26 +54,26 @@ export const envSchema = {
   COOKIE_SECRET: { type: "string", description: "Cookie signing secret (required in production)" },
 
   // ── Firebase Admin SDK ──
-  FIREBASE_PROJECT_ID: { type: "string", default: "stockstory-india", description: "Firebase project ID" },
+  FIREBASE_PROJECT_ID: { type: "string", default: "stockstory-pakistan", description: "Firebase project ID" },
   FIREBASE_CLIENT_EMAIL: { type: "string", description: "Firebase admin client email" },
   FIREBASE_PRIVATE_KEY: { type: "string", description: "Firebase admin private key (with \\n escapes)" },
   FIREBASE_USE_APPLICATION_DEFAULT_CREDENTIALS: { type: "boolean", default: false, description: "Use ADC instead of explicit credentials" },
 
   // ── Provider Credentials ──
-  INDIANAPI_KEY: { type: "string", description: "IndianAPI.in API key" },
-  INDIANAPI_BASE_URL: { type: "string", default: "https://stock.indianapi.in", description: "IndianAPI base URL" },
-  INDIANAPI_TIMEOUT_MS: { type: "number", default: 10_000, description: "IndianAPI request timeout" },
+  PSXAPI_KEY: { type: "string", description: "PSX API key" },
+  PSXAPI_BASE_URL: { type: "string", default: "https://api.psx.com.pk", description: "PSX API base URL" },
+  PSXAPI_TIMEOUT_MS: { type: "number", default: 10_000, description: "PSX API request timeout" },
 
-  // ── IndianAPI Premium ──
-  INDIANAPI_PREMIUM_ENABLED: { type: "boolean", default: false, description: "Enable IndianAPI premium data" },
-  INDIANAPI_PREMIUM_API_KEY: { type: "string", description: "IndianAPI premium API key" },
-  INDIANAPI_PREMIUM_BASE_URL: { type: "string", default: "https://analyst.indianapi.in", description: "IndianAPI premium base URL" },
-  INDIANAPI_PREMIUM_TIMEOUT_MS: { type: "number", default: 15_000, description: "IndianAPI premium timeout" },
-  INDIANAPI_PREMIUM_CONCURRENCY: { type: "number", default: 20, description: "IndianAPI premium concurrency" },
-  INDIANAPI_PREMIUM_RATE_LIMIT_PER_MINUTE: { type: "number", default: 300, description: "IndianAPI premium rate limit" },
-  INDIANAPI_PREMIUM_HISTORY_ENABLED: { type: "boolean", default: true, description: "Enable historical data from IndianAPI premium" },
-  INDIANAPI_PREMIUM_SCAN_ENABLED: { type: "boolean", default: false, description: "Enable scan from IndianAPI premium" },
-  INDIANAPI_PREMIUM_CACHE_TTL_SECONDS: { type: "number", default: 300, description: "IndianAPI premium cache TTL" },
+  // ── PSX API Premium ──
+  PSXAPI_PREMIUM_ENABLED: { type: "boolean", default: false, description: "Enable PSX API premium data" },
+  PSXAPI_PREMIUM_API_KEY: { type: "string", description: "PSX API premium API key" },
+  PSXAPI_PREMIUM_BASE_URL: { type: "string", default: "https://analyst.psx.com.pk", description: "PSX API premium base URL" },
+  PSXAPI_PREMIUM_TIMEOUT_MS: { type: "number", default: 15_000, description: "PSX API premium timeout" },
+  PSXAPI_PREMIUM_CONCURRENCY: { type: "number", default: 20, description: "PSX API premium concurrency" },
+  PSXAPI_PREMIUM_RATE_LIMIT_PER_MINUTE: { type: "number", default: 300, description: "PSX API premium rate limit" },
+  PSXAPI_PREMIUM_HISTORY_ENABLED: { type: "boolean", default: true, description: "Enable historical data from PSX API premium" },
+  PSXAPI_PREMIUM_SCAN_ENABLED: { type: "boolean", default: false, description: "Enable scan from PSX API premium" },
+  PSXAPI_PREMIUM_CACHE_TTL_SECONDS: { type: "number", default: 300, description: "PSX API premium cache TTL" },
 
   // ── Upstox ──
   UPSTOX_SANDBOX_ENABLED: { type: "boolean", default: false, description: "Route Upstox calls to sandbox" },
@@ -138,9 +138,9 @@ export const envSchema = {
 
   // ── Frontend (VITE_) ──
   VITE_FIREBASE_API_KEY: { type: "string", description: "Firebase web API key" },
-  VITE_FIREBASE_AUTH_DOMAIN: { type: "string", default: "stockstory-india.firebaseapp.com", description: "Firebase auth domain" },
-  VITE_FIREBASE_PROJECT_ID: { type: "string", default: "stockstory-india", description: "Firebase project ID" },
-  VITE_FIREBASE_STORAGE_BUCKET: { type: "string", default: "stockstory-india.firebasestorage.app", description: "Firebase storage bucket" },
+  VITE_FIREBASE_AUTH_DOMAIN: { type: "string", default: "stockstory-pakistan.firebaseapp.com", description: "Firebase auth domain" },
+  VITE_FIREBASE_PROJECT_ID: { type: "string", default: "stockstory-pakistan", description: "Firebase project ID" },
+  VITE_FIREBASE_STORAGE_BUCKET: { type: "string", default: "stockstory-pakistan.firebasestorage.app", description: "Firebase storage bucket" },
   VITE_FIREBASE_MESSAGING_SENDER_ID: { type: "string", description: "Firebase messaging sender ID" },
   VITE_FIREBASE_APP_ID: { type: "string", description: "Firebase app ID" },
   VITE_SCREENER_ENABLED: { type: "boolean", default: true, description: "Enable screener page" },

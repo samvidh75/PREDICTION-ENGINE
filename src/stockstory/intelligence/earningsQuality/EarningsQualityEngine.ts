@@ -6,7 +6,7 @@
  * - Margin stability
  * - One-time items
  * - Revenue recognition
- * - Provision adequacy (Philippine banking/NBFC specific)
+ * - Provision adequacy (PSX banking/NBFC specific)
  */
 
 import type { IntelligenceInput } from '../../types';

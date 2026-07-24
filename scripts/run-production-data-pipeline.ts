@@ -14,17 +14,17 @@ import { FeatureEngine } from '../src/services/FeatureEngine';
 import { FactorEngine } from '../src/services/FactorEngine';
 import { predictionFactory } from '../src/predictions/PredictionFactory';
 import { ProviderCoordinator } from '../src/services/providers/ProviderCoordinator';
-import { IndianMarketProvider } from '../src/services/providers/IndianMarketProvider';
+import { PSXMarketProvider } from '../src/services/providers/PSXMarketProvider';
 import { YahooProvider } from '../src/services/providers/YahooProvider';
 import type { FinancialSnapshot } from '../src/services/data/types';
 
 const DEFAULT_SYMBOLS = [
-  'RELIANCE', 'TCS', 'INFY', 'HDFCBANK', 'ICICIBANK', 'BHARTIARTL',
-  'SBIN', 'ITC', 'LT', 'AXISBANK', 'KOTAKBANK', 'HINDUNILVR',
-  'MARUTI', 'SUNPHARMA', 'BAJFINANCE', 'HCLTECH', 'WIPRO',
-  'ASIANPAINT', 'ULTRACEMCO', 'TITAN', 'NTPC', 'POWERGRID',
-  'M&M', 'ADANIENT', 'ADANIPORTS', 'TATASTEEL', 'JSWSTEEL',
-  'COALINDIA', 'ONGC', 'NESTLEIND', 'TECHM',
+  'ENGRO', 'HBL', 'UBL', 'MCB', 'SYS', 'OGDC',
+  'PPL', 'FFC', 'LUCK', 'HUBC', 'NESTLE', 'POL',
+  'MEBL', 'SEARL', 'BAFL', 'DGKC', 'INDU',
+  'COLG', 'UNILEVER', 'PSO', 'EFERT', 'FABL',
+  'ABL', 'BOP', 'KAPCO', 'HASCOL', 'ISL',
+  'GLAXO', 'TRG', 'HCAR', 'MUGHAL',
 ];
 
 interface PipelineOptions {
@@ -271,11 +271,11 @@ class ProductionPipeline {
       } catch {
         // Fallback names for known symbols
         const fallbackNames: Record<string, { name: string; sector: string; industry: string }> = {
-          RELIANCE: { name: 'Reliance Industries Limited', sector: 'Energy & Oil', industry: 'Oil & Gas' },
-          TCS: { name: 'Tata Consultancy Services Limited', sector: 'Technology', industry: 'IT Services' },
-          INFY: { name: 'Infosys Limited', sector: 'Technology', industry: 'IT Services' },
-          HDFCBANK: { name: 'HDFC Bank Limited', sector: 'Financials', industry: 'Banking' },
-          ICICIBANK: { name: 'ICICI Bank Limited', sector: 'Financials', industry: 'Banking' },
+          ENGRO: { name: 'Engro Corporation Limited', sector: 'Energy & Chemicals', industry: 'Conglomerate' },
+          HBL: { name: 'Habib Bank Limited', sector: 'Financials', industry: 'Banking' },
+          UBL: { name: 'United Bank Limited', sector: 'Financials', industry: 'Banking' },
+          SYS: { name: 'Systems Limited', sector: 'Technology', industry: 'IT Services' },
+          OGDC: { name: 'Oil & Gas Development Company', sector: 'Energy & Oil', industry: 'Oil & Gas' },
         };
         const fallback = fallbackNames[symbol];
         if (fallback) {
@@ -292,7 +292,7 @@ class ProductionPipeline {
 
       await pool.query(
         `INSERT INTO symbols (symbol, exchange, company_name, sector, industry, listing_status)
-         VALUES ($1, 'NSE', $2, $3, $4, 'Active')
+         VALUES ($1, 'PSX', $2, $3, $4, 'Active')
          ON CONFLICT (symbol) DO UPDATE SET
            company_name = EXCLUDED.company_name,
            sector = COALESCE(NULLIF(EXCLUDED.sector, ''), symbols.sector),

@@ -15,7 +15,7 @@ class PortfolioExportService {
    * Export to CSV format
    */
   exportToCSV(holdings: Array<{ ticker: string; quantity: number; buyPrice: number; currentPrice: number; allocation: number; gain: number; gainPercent: number }>, totals: { invested: number; value: number; return: number; returnPercent: number }): ExportFormat {
-    let csv = 'Ticker,Quantity,Buy Price (₹),Current Price (₹),Investment (₹),Current Value (₹),Gain/Loss (₹),Return %,Allocation %\n';
+    let csv = 'Ticker,Quantity,Buy Price (₱),Current Price (₱),Investment (₱),Current Value (₱),Gain/Loss (₱),Return %,Allocation %\n';
 
     holdings.forEach((h) => {
       const investment = h.quantity * h.buyPrice;
@@ -137,16 +137,16 @@ class PortfolioExportService {
   <div class="summary">
     <div class="metric">
       <div class="metric-label">Total Invested</div>
-      <div class="metric-value">₹${totals.invested.toLocaleString('en-IN')}</div>
+      <div class="metric-value">₱${totals.invested.toLocaleString('en-PH')}</div>
     </div>
     <div class="metric">
       <div class="metric-label">Current Value</div>
-      <div class="metric-value">₹${totals.value.toLocaleString('en-IN')}</div>
+      <div class="metric-value">₱${totals.value.toLocaleString('en-PH')}</div>
     </div>
     <div class="metric">
       <div class="metric-label">Total Gain/Loss</div>
       <div class="metric-value ${totals.return > 0 ? 'positive' : 'negative'}">
-        ${totals.return > 0 ? '+' : ''}₹${totals.return.toLocaleString('en-IN')}
+        ${totals.return > 0 ? '+' : ''}₱${totals.return.toLocaleString('en-PH')}
       </div>
     </div>
     <div class="metric">
@@ -179,12 +179,12 @@ class PortfolioExportService {
         <tr>
           <td><strong>${h.ticker}</strong></td>
           <td>${h.quantity}</td>
-          <td>₹${h.buyPrice.toFixed(2)}</td>
-          <td>₹${h.currentPrice.toFixed(2)}</td>
-          <td>₹${(h.quantity * h.buyPrice).toLocaleString('en-IN')}</td>
-          <td>₹${(h.quantity * h.currentPrice).toLocaleString('en-IN')}</td>
+          <td>₱${h.buyPrice.toFixed(2)}</td>
+          <td>₱${h.currentPrice.toFixed(2)}</td>
+          <td>₱${(h.quantity * h.buyPrice).toLocaleString('en-PH')}</td>
+          <td>₱${(h.quantity * h.currentPrice).toLocaleString('en-PH')}</td>
           <td class="${h.gain > 0 ? 'positive' : 'negative'}">
-            ${h.gain > 0 ? '+' : ''}₹${h.gain.toLocaleString('en-IN')}
+            ${h.gain > 0 ? '+' : ''}₱${h.gain.toLocaleString('en-PH')}
           </td>
           <td class="${h.gainPercent > 0 ? 'positive' : 'negative'}">
             ${h.gainPercent > 0 ? '+' : ''}${h.gainPercent.toFixed(2)}%
@@ -198,7 +198,7 @@ class PortfolioExportService {
   </table>
 
   <div class="timestamp">
-    Report generated on ${new Date().toLocaleString('en-IN')}
+    Report generated on ${new Date().toLocaleString('en-PH')}
   </div>
 </body>
 </html>

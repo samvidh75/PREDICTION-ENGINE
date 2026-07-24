@@ -50,7 +50,7 @@ function generateMockBars(startDate: string, endDate: string): PriceBar[] {
 }
 
 function formatCurrency(n: number): string {
-  return "₹" + n.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return "₱" + n.toLocaleString("en-PH", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
 function formatPct(n: number): string {
@@ -144,7 +144,7 @@ export default function BacktestPage() {
               />
             </div>
             <div style={{ flex: "0 1 120px" }}>
-              <span style={{ fontSize: 11, color: colors.textTertiary, display: "block", marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.04em" }}>Capital (₹)</span>
+              <span style={{ fontSize: 11, color: colors.textTertiary, display: "block", marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.04em" }}>Capital (₱)</span>
               <input type="number" value={initialCapital} onChange={(e) => setInitialCapital(e.target.value)}
                 style={{ height: 36, width: "100%", borderRadius: radius.md, border: `1px solid ${colors.border}`, padding: "0 12px", fontSize: 13, color: colors.textPrimary, background: colors.surface, outline: "none", boxSizing: "border-box" }}
               />

@@ -97,7 +97,7 @@ export const EnhancedStockDetails: React.FC<EnhancedStockDetailsProps> = ({
           <div>
             <div style={{ fontSize: "12px", color: "#666" }}>Current Price</div>
             <div style={{ fontSize: "18px", fontWeight: "600" }}>
-              ₹{stockData.price?.current?.toFixed(2) || "N/A"}
+              ₱{stockData.price?.current?.toFixed(2) || "N/A"}
             </div>
           </div>
           <div>
@@ -302,10 +302,10 @@ function FundamentalsTab({ data }: { data: any }) {
             <strong>PCF Ratio:</strong> {f?.pcf?.toFixed(2)}
           </div>
           <div>
-            <strong>EPS:</strong> ₹{f?.eps?.toFixed(2)}
+            <strong>EPS:</strong> ₱{f?.eps?.toFixed(2)}
           </div>
           <div>
-            <strong>Book Value:</strong> ₹{f?.bookValue?.toFixed(2)}
+            <strong>Book Value:</strong> ₱{f?.bookValue?.toFixed(2)}
           </div>
         </div>
       </div>
@@ -567,8 +567,8 @@ function AlertsTab({ symbol }: { symbol: string }) {
 
 function formatMarketCap(marketCap: number | undefined): string {
   if (!marketCap) return "N/A";
-  if (marketCap >= 1e12) return `₹${(marketCap / 1e12).toFixed(1)}T`;
-  if (marketCap >= 1e9) return `₹${(marketCap / 1e9).toFixed(1)}B`;
-  if (marketCap >= 1e6) return `₹${(marketCap / 1e6).toFixed(1)}M`;
-  return `₹${marketCap.toFixed(0)}`;
+  if (marketCap >= 1e12) return `₱${(marketCap / 1e12).toFixed(1)}T`;
+  if (marketCap >= 1e9) return `₱${(marketCap / 1e9).toFixed(1)}B`;
+  if (marketCap >= 1e6) return `₱${(marketCap / 1e6).toFixed(1)}M`;
+  return `₱${marketCap.toFixed(0)}`;
 }

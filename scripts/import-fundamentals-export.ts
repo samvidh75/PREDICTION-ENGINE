@@ -169,7 +169,7 @@ function parseCsvLine(line: string): string[] {
 
 function parseNumeric(val: string | undefined): number | null {
   if (!val || val.trim() === "") return null;
-  const cleaned = val.replace(/[₹,$%\s,]/g, "").trim();
+  const cleaned = val.replace(/[Rs,$%\s,]/g, "").trim();
   const num = Number(cleaned);
   if (!Number.isFinite(num)) return null;
   return num;
@@ -194,7 +194,7 @@ function normalizeRow(raw: Record<string, string>, source: string): ImportRow {
     companyName: row.companyName || undefined,
     periodEndDate: row.periodEndDate || "",
     periodType,
-    currency: row.currency || "INR",
+    currency: row.currency || "PKR",
     unit: row.unit || "unspecified",
     revenue: parseNumeric(row.revenue),
     operatingProfit: parseNumeric(row.operatingProfit),

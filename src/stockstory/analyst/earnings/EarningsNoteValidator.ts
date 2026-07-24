@@ -28,7 +28,7 @@ export class EarningsNoteValidator {
       }
     }
 
-    const numericPattern = /₹[\d,]+|\d+\.\d+%/g;
+    const numericPattern = /₱[\d,]+|\d+\.\d+%/g;
     const claims = note.resultSnapshot.match(numericPattern) ?? [];
     if (claims.length > 0 && note.limitations.some((l) => l.includes('metrics'))) {
       errors.push('Unsupported numeric claims with missing metrics.');

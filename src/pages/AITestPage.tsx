@@ -106,6 +106,8 @@ export default function AITestPage() {
           <div
             style={{
               background: colors.surface,
+              backdropFilter: "blur(20px) saturate(160%)",
+              WebkitBackdropFilter: "blur(20px) saturate(160%)",
               border: `1px solid ${colors.border}`,
               borderRadius: '12px',
               padding: space[4],
@@ -128,6 +130,8 @@ export default function AITestPage() {
                   borderRadius: '8px',
                   border: `1px solid ${colors.border}`,
                   background: colors.canvas,
+                  backdropFilter: "blur(20px) saturate(160%)",
+                  WebkitBackdropFilter: "blur(20px) saturate(160%)",
                   color: colors.ink,
                   fontSize: '13px',
                   fontFamily: 'monospace',
@@ -163,6 +167,8 @@ export default function AITestPage() {
             <div
               style={{
                 background: colors.surface,
+                backdropFilter: "blur(20px) saturate(160%)",
+                WebkitBackdropFilter: "blur(20px) saturate(160%)",
                 border: `1px solid ${colors.border}`,
                 borderRadius: '12px',
                 padding: space[4],
@@ -212,6 +218,8 @@ export default function AITestPage() {
           <div
             style={{
               background: colors.surface,
+              backdropFilter: "blur(20px) saturate(160%)",
+              WebkitBackdropFilter: "blur(20px) saturate(160%)",
               border: `1px solid ${colors.border}`,
               borderRadius: '12px',
               padding: space[4],
@@ -234,6 +242,8 @@ export default function AITestPage() {
                   borderRadius: '8px',
                   border: `1px solid ${colors.border}`,
                   background: colors.canvas,
+                  backdropFilter: "blur(20px) saturate(160%)",
+                  WebkitBackdropFilter: "blur(20px) saturate(160%)",
                   color: colors.ink,
                   fontSize: '13px',
                 }}
@@ -270,6 +280,8 @@ export default function AITestPage() {
             <div
               style={{
                 background: colors.surface,
+                backdropFilter: "blur(20px) saturate(160%)",
+                WebkitBackdropFilter: "blur(20px) saturate(160%)",
                 border: `1px solid ${colors.border}`,
                 borderRadius: '12px',
                 padding: space[4],

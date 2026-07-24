@@ -34,6 +34,8 @@ const TRIGGER_CLOSED: import("react").CSSProperties = {
 const TRIGGER_OPEN: import("react").CSSProperties = {
   ...TRIGGER_CLOSED,
   background: colors.surfaceElevated,
+  backdropFilter: "blur(20px) saturate(160%)",
+  WebkitBackdropFilter: "blur(20px) saturate(160%)",
   borderColor: colors.hairlineStrong,
 };
 
@@ -153,6 +155,8 @@ export function ResearchAiSurfaceTrigger({
             minWidth: "240px",
             maxWidth: "340px",
             background: colors.surface,
+            backdropFilter: "blur(20px) saturate(160%)",
+            WebkitBackdropFilter: "blur(20px) saturate(160%)",
             border: `1px solid ${colors.hairlineStrong}`,
             borderRadius: "12px",
             padding: space[3],

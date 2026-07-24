@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import {
   finiteNumberOrNull,
-  parseIndianNumber,
+  parsePhilippineNumber,
   parsePercentageFraction,
-  parseCurrencyToInr,
+  parseCurrencyToPhp,
   parseDateOrNull,
   normalizeSymbol,
   normalizeExchange,
@@ -32,18 +32,18 @@ describe('finiteNumberOrNull', () => {
   });
 });
 
-describe('parseIndianNumber', () => {
+describe('parsePhilippineNumber', () => {
   it.each([
-    { input: '1,23,456', expected: 123456 },
-    { input: '12,34,567', expected: 1234567 },
-    { input: '1,23,45,678', expected: 12345678 },
-    { input: '₹ 1,234 Cr', expected: 12340000000 },
-    { input: '₹ 1,23,456 Cr', expected: 1234560000000 },
-    { input: '₹500 Cr', expected: 5000000000 },
-    { input: '2.5 Cr', expected: 25000000 },
-    { input: '2.5 crore', expected: 25000000 },
-    { input: '1.25 lakh', expected: 125000 },
-    { input: '1.25 Lac', expected: 125000 },
+    { input: '123,456', expected: 123456 },
+    { input: '1,234,567', expected: 1234567 },
+    { input: '12,345,678', expected: 12345678 },
+    { input: '₱1,234B', expected: 1234000000000 },
+    { input: '₱123,456M', expected: 123456000000 },
+    { input: '₱500M', expected: 500000000 },
+    { input: '2.5M', expected: 2500000 },
+    { input: '2.5B', expected: 2500000000 },
+    { input: '1.25K', expected: 1250 },
+    { input: '1.25k', expected: 1250 },
     { input: '12.4%', expected: 12.4 },
     { input: '—', expected: null },
     { input: '–', expected: null },
@@ -54,11 +54,11 @@ describe('parseIndianNumber', () => {
     { input: '', expected: null },
     { input: '   ', expected: null },
     { input: '(1,234)', expected: -1234 },
-    { input: '(₹ 100 Cr)', expected: -1000000000 },
+    { input: '(₱100M)', expected: -100000000 },
     { input: '-500', expected: -500 },
-    { input: '₹ 0 Cr', expected: 0 },
+    { input: '₱0M', expected: 0 },
   ])('returns $expected for "$input"', ({ input, expected }) => {
-    expect(parseIndianNumber(input)).toBe(expected);
+    expect(parsePhilippineNumber(input)).toBe(expected);
   });
 });
 
@@ -82,16 +82,16 @@ describe('parsePercentageFraction', () => {
   });
 });
 
-describe('parseCurrencyToInr', () => {
+describe('parseCurrencyToPhp', () => {
   it.each([
-    { input: '₹ 1,234 Cr', expected: 12340000000 },
-    { input: '₹ 500 Cr', expected: 5000000000 },
-    { input: '(₹ 100 Cr)', expected: -1000000000 },
-    { input: '1,23,456', expected: 123456 },
+    { input: '₱1,234M', expected: 1234000000 },
+    { input: '₱500M', expected: 500000000 },
+    { input: '(₱100M)', expected: -100000000 },
+    { input: '123,456', expected: 123456 },
     { input: '—', expected: null },
     { input: '', expected: null },
   ])('returns $expected for "$input"', ({ input, expected }) => {
-    expect(parseCurrencyToInr(input)).toBe(expected);
+    expect(parseCurrencyToPhp(input)).toBe(expected);
   });
 });
 
@@ -111,12 +111,11 @@ describe('parseDateOrNull', () => {
 
 describe('normalizeSymbol', () => {
   it.each([
-    { input: 'RELIANCE.NS', expected: 'RELIANCE' },
-    { input: 'TCS.BO', expected: 'TCS' },
-    { input: 'INFY.PSE', expected: 'INFY' },
-    { input: 'HDFC.PSE', expected: 'HDFC' },
-    { input: 'hdfcbank', expected: 'HDFCBANK' },
-    { input: '  tata motors.NS  ', expected: 'TATA MOTORS' },
+    { input: 'BDO.PS', expected: 'BDO' },
+    { input: 'JFC.PS', expected: 'JFC' },
+    { input: 'AC.PSE', expected: 'AC' },
+    { input: 'sm', expected: 'SM' },
+    { input: '  ayala corp.PS  ', expected: 'AYALA CORP' },
   ])('returns $expected for "$input"', ({ input, expected }) => {
     expect(normalizeSymbol(input)).toBe(expected);
   });

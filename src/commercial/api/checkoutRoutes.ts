@@ -48,7 +48,7 @@ export async function registerCheckoutRoutes(fastify: FastifyInstance): Promise<
       return reply.status(404).send({ error: `Plan "${planId}" not found` });
     }
 
-    if (!plan.active || plan.priceInr === 0) {
+    if (!plan.active || plan.pricePkr === 0) {
       return reply.status(400).send({ error: "This plan cannot be purchased" });
     }
 
@@ -56,7 +56,7 @@ export async function registerCheckoutRoutes(fastify: FastifyInstance): Promise<
       const session = await provider.createCheckout({
         planId,
         planName: plan.name,
-        amount: plan.priceInr,
+        amount: plan.pricePkr,
         userId,
         successUrl: successUrl ?? `${req.headers.origin}/billing/success`,
         cancelUrl: cancelUrl ?? `${req.headers.origin}/pricing`,
@@ -66,7 +66,7 @@ export async function registerCheckoutRoutes(fastify: FastifyInstance): Promise<
         sessionId: session.sessionId,
         checkoutUrl: session.checkoutUrl,
         provider: session.provider,
-        plan: { id: plan.id, name: plan.name, priceInr: plan.priceInr },
+        plan: { id: plan.id, name: plan.name, pricePkr: plan.pricePkr },
       });
     } catch (err) {
       req.log.error({ err }, "Checkout creation failed");

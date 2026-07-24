@@ -27,7 +27,7 @@ export function resolveEncyclopediaPlaceholders(
 ): string {
   let result = template
     .replace('{ticker}', data.ticker)
-    .replace('{market_cap}', `Rs${data.marketCapCr.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`)
+    .replace('{market_cap}', `Rs${data.marketCapCr.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`)
     .replace('{pe_ratio}', String(data.peRatio))
     .replace('{de_ratio}', String(data.debtToEquity))
     .replace('{pledge_pct}', String(data.pledgePct));

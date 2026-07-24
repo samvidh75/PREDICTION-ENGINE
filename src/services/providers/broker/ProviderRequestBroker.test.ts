@@ -114,7 +114,7 @@ describe('ProviderRequestBroker', () => {
     const staleResults = await Promise.all([
       broker.execute('test', 'quote', 'RELIANCE', { token: 'secret' }, fetcher),
       broker.execute('test', 'quote', 'RELIANCE', { token: 'another-secret' }, fetcher),
-      broker.execute('test', 'quote', 'RELIANCE.NS', { token: 'third-secret' }, fetcher),
+      broker.execute('test', 'quote', 'RELIANCE.PSX', { token: 'third-secret' }, fetcher),
     ]);
 
     expect(staleResults).toEqual([

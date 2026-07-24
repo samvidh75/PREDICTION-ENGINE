@@ -10,6 +10,8 @@ export default function TrendingStocksWidget() {
         style={{
           padding: '24px',
           backgroundColor: colors.surface,
+          backdropFilter: "blur(20px) saturate(160%)",
+          WebkitBackdropFilter: "blur(20px) saturate(160%)",
           borderRadius: '8px',
           border: `1px solid ${colors.border}`,
         }}
@@ -45,6 +47,8 @@ export default function TrendingStocksWidget() {
       style={{
         padding: '24px',
         backgroundColor: colors.surface,
+        backdropFilter: "blur(20px) saturate(160%)",
+        WebkitBackdropFilter: "blur(20px) saturate(160%)",
         borderRadius: '8px',
         border: `1px solid ${colors.border}`,
         marginTop: '24px',
@@ -95,6 +99,8 @@ export default function TrendingStocksWidget() {
                 alignItems: 'center',
                 padding: '12px',
                 backgroundColor: colors.canvas,
+                backdropFilter: "blur(20px) saturate(160%)",
+                WebkitBackdropFilter: "blur(20px) saturate(160%)",
                 borderRadius: '6px',
                 borderLeft: `3px solid ${idx < 3 ? '#fbbf24' : colors.border}`,
               }}
@@ -109,7 +115,7 @@ export default function TrendingStocksWidget() {
               </div>
               <div style={{ textAlign: 'right' }}>
                 <p style={{ margin: '0 0 4px 0', fontWeight: '600', fontSize: '14px' }}>
-                  ₹{stock.price.toFixed(2)}
+                  ₱{stock.price.toFixed(2)}
                 </p>
                 <p
                   style={{

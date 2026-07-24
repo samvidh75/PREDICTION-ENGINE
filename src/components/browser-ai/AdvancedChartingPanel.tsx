@@ -102,7 +102,7 @@ export default function AdvancedChartingPanel() {
               ))}
             </div>
             <div style={{ marginTop: '8px', fontSize: '11px', color: '#666' }}>
-              Support: ₹{signal.supportLevel.toFixed(2)} | Resistance: ₹{signal.resistanceLevel.toFixed(2)}
+              Support: ₱{signal.supportLevel.toFixed(2)} | Resistance: ₱{signal.resistanceLevel.toFixed(2)}
             </div>
           </div>
 
@@ -219,15 +219,15 @@ export default function AdvancedChartingPanel() {
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px', fontSize: '11px', marginBottom: '8px' }}>
                 <div>
                   <div style={{ color: '#666', marginBottom: '4px' }}>Upper Band</div>
-                  <div style={{ fontWeight: 'bold', color: '#ea4335' }}>₹{indicators.bollingerBands.upper.toFixed(2)}</div>
+                  <div style={{ fontWeight: 'bold', color: '#ea4335' }}>₱{indicators.bollingerBands.upper.toFixed(2)}</div>
                 </div>
                 <div>
                   <div style={{ color: '#666', marginBottom: '4px' }}>Middle (SMA)</div>
-                  <div style={{ fontWeight: 'bold' }}>₹{indicators.bollingerBands.middle.toFixed(2)}</div>
+                  <div style={{ fontWeight: 'bold' }}>₱{indicators.bollingerBands.middle.toFixed(2)}</div>
                 </div>
                 <div>
                   <div style={{ color: '#666', marginBottom: '4px' }}>Lower Band</div>
-                  <div style={{ fontWeight: 'bold', color: '#34a853' }}>₹{indicators.bollingerBands.lower.toFixed(2)}</div>
+                  <div style={{ fontWeight: 'bold', color: '#34a853' }}>₱{indicators.bollingerBands.lower.toFixed(2)}</div>
                 </div>
               </div>
               <div style={{ fontSize: '10px', color: '#666' }}>
@@ -248,19 +248,19 @@ export default function AdvancedChartingPanel() {
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '8px', fontSize: '11px', marginBottom: '8px' }}>
                 <div>
                   <div style={{ color: '#666', marginBottom: '4px' }}>SMA 20</div>
-                  <div style={{ fontWeight: 'bold' }}>₹{indicators.movingAverages.sma20.toFixed(2)}</div>
+                  <div style={{ fontWeight: 'bold' }}>₱{indicators.movingAverages.sma20.toFixed(2)}</div>
                 </div>
                 <div>
                   <div style={{ color: '#666', marginBottom: '4px' }}>SMA 50</div>
-                  <div style={{ fontWeight: 'bold' }}>₹{indicators.movingAverages.sma50.toFixed(2)}</div>
+                  <div style={{ fontWeight: 'bold' }}>₱{indicators.movingAverages.sma50.toFixed(2)}</div>
                 </div>
                 <div>
                   <div style={{ color: '#666', marginBottom: '4px' }}>EMA 12</div>
-                  <div style={{ fontWeight: 'bold' }}>₹{indicators.movingAverages.ema12.toFixed(2)}</div>
+                  <div style={{ fontWeight: 'bold' }}>₱{indicators.movingAverages.ema12.toFixed(2)}</div>
                 </div>
                 <div>
                   <div style={{ color: '#666', marginBottom: '4px' }}>EMA 26</div>
-                  <div style={{ fontWeight: 'bold' }}>₹{indicators.movingAverages.ema26.toFixed(2)}</div>
+                  <div style={{ fontWeight: 'bold' }}>₱{indicators.movingAverages.ema26.toFixed(2)}</div>
                 </div>
               </div>
               <div style={{ fontSize: '10px', color: '#666' }}>

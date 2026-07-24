@@ -12,7 +12,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { TrendingUp, TrendingDown, BarChart3, Target, RefreshCw } from "lucide-react";
 import { colors, radius, typography, space } from "../design/tokens";
-import { formatIndianMoney, formatPercent } from "../services/ui/indianNumberFormat";
+import { formatPhilippineMoney, formatPercent } from "../services/ui/phNumberFormat";
 import { authenticatedFetchJSON, authenticatedPost } from "../services/auth/authenticatedFetch";
 
 // ── Type Contracts ──────────────────────────────────────────────────
@@ -59,6 +59,8 @@ interface TradeLogPayload {
 const styles: Record<string, React.CSSProperties> = {
   container: {
     background: colors.surface,
+    backdropFilter: "blur(20px) saturate(160%)",
+    WebkitBackdropFilter: "blur(20px) saturate(160%)",
     borderRadius: radius.md,
     border: `1px solid ${colors.stone}`,
     padding: "24px",
@@ -87,6 +89,8 @@ const styles: Record<string, React.CSSProperties> = {
   },
   statCard: {
     background: colors.surfaceElevated,
+    backdropFilter: "blur(20px) saturate(160%)",
+    WebkitBackdropFilter: "blur(20px) saturate(160%)",
     borderRadius: radius.sm,
     padding: "14px 16px",
     border: `1px solid ${colors.stone}`,
@@ -144,7 +148,7 @@ const styles: Record<string, React.CSSProperties> = {
 function formatPnl(value: number | null): string {
   if (value == null) return "—";
   const prefix = value >= 0 ? "+" : "";
-  return `${prefix}${formatIndianMoney(value)}`;
+  return `${prefix}${formatPhilippineMoney(value)}`;
 }
 
 function formatPnlClass(value: number | null): string | undefined {
@@ -243,7 +247,7 @@ export function TradingJournal(): JSX.Element {
           </div>
           <div style={styles.statCard}>
             <div style={styles.statLabel}>Deployed Capital</div>
-            <div style={styles.statValue}>{formatIndianMoney(stats.deployedCapital)}</div>
+            <div style={styles.statValue}>{formatPhilippineMoney(stats.deployedCapital)}</div>
           </div>
           <div style={styles.statCard}>
             <div style={styles.statLabel}>Avg Return</div>
@@ -275,6 +279,8 @@ export function TradingJournal(): JSX.Element {
               ...styles.refreshBtn,
               margin: "16px auto 0",
               background: colors.surfaceElevated,
+              backdropFilter: "blur(20px) saturate(160%)",
+              WebkitBackdropFilter: "blur(20px) saturate(160%)",
             }}
             onClick={handleLogSampleTrade}
           >
@@ -312,9 +318,9 @@ export function TradingJournal(): JSX.Element {
                         <TrendingDown size={14} color={colors.danger} />
                       )}
                     </td>
-                    <td style={styles.td}>{formatIndianMoney(trade.entry_price)}</td>
+                    <td style={styles.td}>{formatPhilippineMoney(trade.entry_price)}</td>
                     <td style={styles.td}>
-                      {trade.exit_price != null ? formatIndianMoney(trade.exit_price) : "—"}
+                      {trade.exit_price != null ? formatPhilippineMoney(trade.exit_price) : "—"}
                     </td>
                     <td style={styles.td}>{trade.quantity}</td>
                     <td style={{ ...styles.td, ...(pnlClass ? styles[pnlClass] : {}) }}>

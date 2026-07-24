@@ -6,6 +6,7 @@
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev"],
       "port": 5173,
+      "autoPort": true,
       "description": "React + TypeScript frontend dev server with Vite (Port 5173)"
     },
     {
@@ -28,6 +29,13 @@
       "runtimeArgs": ["run", "typecheck"],
       "port": null,
       "description": "Run TypeScript type checking for frontend and backend"
+    },
+    {
+      "name": "raycast-ui-preview",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["serve", "raycast-ui", "-l", "4321"],
+      "port": 4321,
+      "description": "Static server for the standalone Raycast-style UI prototype"
     }
   ]
 }

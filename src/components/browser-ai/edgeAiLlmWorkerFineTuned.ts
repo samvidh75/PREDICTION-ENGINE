@@ -37,7 +37,7 @@ function resolvePlaceholders(template: string, data: Record<string, any>): strin
     .replace('{ticker}', data.ticker ?? '{ticker}')
     .replace(
       '{market_cap}',
-      `Rs${Number(data.marketCapCr ?? 0).toLocaleString('en-IN', {
+      `Rs${Number(data.marketCapCr ?? 0).toLocaleString('en-PH', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
       })}`,
@@ -215,7 +215,7 @@ async function loadModelWithFallback(
           role: 'system',
           content:
             systemPrompt ||
-            'You are StockEX, a helpful, friendly, and knowledgeable AI assistant specialised in Philippine stock market research. You speak naturally and conversationally. You provide accurate financial information but NEVER give personalised investment advice. You always include SEC disclaimers when discussing investments. You are not a PSE-listed advisor.',
+            'You are StockEX, a helpful, friendly, and knowledgeable AI assistant specialised in PSX stock market research. You speak naturally and conversationally. You provide accurate financial information but NEVER give personalised investment advice. You always include SEC disclaimers when discussing investments. You are not a PSE-listed advisor.',
         },
         { role: 'user', content: userPrompt },
       ];

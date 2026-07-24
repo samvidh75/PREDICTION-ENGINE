@@ -16,7 +16,7 @@ export default function Watchlist() {
   });
 
   const { quotes } = useQuotes(
-    symbols.map(s => s.endsWith('.NS') ? s : `${s}.NS`),
+    symbols.map(s => s.endsWith('.PS') ? s : `${s}.PS`),
     5000
   );
 
@@ -42,6 +42,8 @@ export default function Watchlist() {
     <div style={{
       padding: space?.[4] || '24px',
       backgroundColor: colors.surface,
+      backdropFilter: "blur(20px) saturate(160%)",
+      WebkitBackdropFilter: "blur(20px) saturate(160%)",
       borderRadius: "8px",
       marginTop: "24px"
     }}>
@@ -81,7 +83,7 @@ export default function Watchlist() {
         <div style={{ display: "flex", flexDirection: "column", gap: space?.[2] || '12px' }}>
           {symbols.map(symbol => {
             const quote = Array.from(quotes.values()).find(
-              q => q.symbol.replace('.NS', '') === symbol
+              q => q.symbol.replace('.PS', '') === symbol
             );
 
             return (
@@ -112,7 +114,7 @@ export default function Watchlist() {
 
                 <div style={{ textAlign: "right" }}>
                   <p style={{ margin: 0, fontWeight: "600", fontSize: '14px' }}>
-                    {quote ? `₹${quote.price.toFixed(2)}` : '--'}
+                    {quote ? `₱${quote.price.toFixed(2)}` : '--'}
                   </p>
                   <p style={{
                     margin: "4px 0 0 0",

@@ -1,7 +1,7 @@
 /**
  * Alias Resolver
  *
- * Handles Philippine company name aliases:
+ * Handles PSX company name aliases:
  * - Full names → abbreviations (HDFC Bank → HDFCBANK)
  * - Old names → new names (after mergers/acquisitions)
  * - Common misspellings and variants
@@ -37,7 +37,7 @@ export class AliasResolver {
     return Array.from(this.aliasMap.get(upper) ?? []);
   }
 
-  /** Load known Philippine market aliases */
+  /** Load known PSX market aliases */
   loadKnownAliases(): void {
     // Full name → symbol
     this.addAlias('TCS', 'TATA CONSULTANCY SERVICES');

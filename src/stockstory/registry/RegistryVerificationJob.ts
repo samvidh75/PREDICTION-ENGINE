@@ -168,14 +168,14 @@ export class RegistryVerificationJob {
   }
 
   private async checkInconsistentMappings(): Promise<void> {
-    // Check where nse_symbol and symbol don't match (normalized vs raw)
+    // Check where pse_symbol and symbol don't match (normalized vs raw)
     const result = await pool.query(
-      `SELECT symbol, nse_symbol, bse_symbol, exchange
+      `SELECT symbol, pse_symbol, pse_symbol2, exchange
        FROM master_security_registry
        WHERE listing_status = 'Active'
          AND (
-           (exchange = 'PSE' AND nse_symbol IS NOT NULL AND nse_symbol != symbol)
-           OR (exchange = 'PSE' AND bse_symbol IS NOT NULL AND bse_symbol != symbol)
+           (exchange = 'PSE' AND pse_symbol IS NOT NULL AND pse_symbol != symbol)
+           OR (exchange = 'PSE' AND pse_symbol2 IS NOT NULL AND pse_symbol2 != symbol)
          )`
     );
     for (const row of result.rows) {
@@ -183,7 +183,7 @@ export class RegistryVerificationJob {
         symbol: row.symbol,
         issue: 'Inconsistent exchange mapping',
         severity: 'low',
-        details: `Exchange ${row.exchange}: symbol="${row.symbol}", nse="${row.nse_symbol}", bse="${row.bse_symbol}".`,
+        details: `Exchange ${row.exchange}: symbol="${row.symbol}", nse="${row.pse_symbol}", bse="${row.pse_symbol2}".`,
       });
     }
   }

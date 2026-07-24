@@ -1,6 +1,6 @@
 /**
  * PSE Provider Integration Test
- * Tests real data fetching from Philippine Stock Exchange
+ * Tests real data fetching from the Philippine Stock Exchange
  */
 
 import { pseClient } from '../clients/PSEClient';
@@ -8,12 +8,12 @@ import { providerAggregator } from '../clients/ProviderAggregator';
 
 // Sample PSE stocks for testing
 const TEST_PSE_STOCKS = [
-  'TCS.BO',      // Tata Consultancy Services (Large cap)
-  'INFY.BO',     // Infosys (Large cap)
-  'RELIANCE.BO', // Reliance Industries (Large cap)
-  'HDFC.BO',     // HDFC Bank (Large cap)
-  'ITC.BO',      // ITC (Mid cap)
-  'BAJAJFINSV.BO', // Bajaj Finserv (Mid cap)
+  'BDO.PS',   // BDO Unibank (Large cap)
+  'JFC.PS',   // Jollibee Foods (Large cap)
+  'SM.PS',    // SM Investments (Large cap)
+  'AC.PS',    // Ayala Corporation (Large cap)
+  'TEL.PS',   // PLDT (Mid cap)
+  'GLO.PS',   // Globe Telecom (Mid cap)
 ];
 
 async function testPSEProvider() {
@@ -42,7 +42,7 @@ async function testPSEProvider() {
 
         results.push({
           symbol,
-          provider: 'bse',
+          provider: 'pse',
           price: bseResult.quote.price,
           exchange: bseResult.quote.exchange,
           responseTime,
@@ -75,7 +75,7 @@ async function testPSEProvider() {
   if (results.length > 0) {
     console.log(`\n💰 Price Sample:`);
     for (const r of results.slice(0, 3)) {
-      console.log(`  ${r.symbol}: ₹${r.price.toFixed(2)} (${r.responseTime}ms)`);
+      console.log(`  ${r.symbol}: ₱${r.price.toFixed(2)} (${r.responseTime}ms)`);
     }
   }
 

@@ -1,7 +1,10 @@
 export function safeFinite(value: unknown): number | null {
   if (value === null || value === undefined) return null;
   if (typeof value === "string") {
-    const cleaned = value.replace(/[₹,%\s,]/g, "");
+    // Strip the "Rs." currency prefix (and bare "Rs"), then thousands
+    // separators/percent/whitespace — but never the decimal point itself,
+    // which a bare `.` inside a character class would otherwise also match.
+    const cleaned = value.replace(/Rs\.?/gi, "").replace(/[,%\s]/g, "");
     const parsed = parseFloat(cleaned);
     return Number.isFinite(parsed) ? parsed : null;
   }

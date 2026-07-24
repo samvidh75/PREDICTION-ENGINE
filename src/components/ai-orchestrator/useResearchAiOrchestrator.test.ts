@@ -75,7 +75,7 @@ describe('buildDeterministicReply', () => {
   it('returns a general reply for unrecognised questions', () => {
     const reply = buildDeterministicReply(makeContext(), 'What is the weather today?');
     expect(reply).toContain('TestCorp');
-    expect(reply).toContain('₹1,450.50');
+    expect(reply).toContain('₱1,450.50');
   });
 
   it('returns risks reply for questions about risks', () => {
@@ -90,7 +90,7 @@ describe('buildDeterministicReply', () => {
 
   it('returns valuation reply for valuation questions', () => {
     const reply = buildDeterministicReply(makeContext(), 'Is the stock overvalued?');
-    expect(reply).toContain('₹1,450.50');
+    expect(reply).toContain('₱1,450.50');
   });
 
   it('returns watchlist reply for upcoming/outlook questions', () => {
@@ -121,7 +121,7 @@ describe('buildDeterministicReply', () => {
   it('uses currency-aware price formatting', () => {
     const ctx = makeContext({ currentPrice: 50000, changePercent: 0 });
     const reply = buildDeterministicReply(ctx, 'price?');
-    expect(reply).toContain('₹50,000.00');
+    expect(reply).toContain('₱50,000.00');
   });
 });
 

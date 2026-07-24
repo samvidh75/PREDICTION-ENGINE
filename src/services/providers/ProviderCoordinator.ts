@@ -5,18 +5,11 @@ import { NewsProvider, NewsItem } from './NewsProvider';
 import { FinancialProvider } from './FinancialProvider';
 import { StockQuote, CompanyMetadata, HistoricalPoint, FinancialSnapshot } from '../data/types';
 import { YahooProvider } from './YahooProvider';
-import { IndianMarketProvider } from './IndianMarketProvider';
-import { IndianApiFinancialProvider } from './IndianApiFinancialProvider';
 import { GoogleNewsRssProvider } from './GoogleNewsRssProvider';
-import { UpstoxFundamentalsProvider } from './UpstoxFundamentalsProvider';
-import { ScreenerProvider } from './ScreenerProvider';
-import { MoneycontrolFinancialsProvider } from './MoneycontrolFinancialsProvider';
-import { MarketHours } from '../market/MarketHours';
 
 import { ProviderHealthMonitor } from './ProviderHealthMonitor';
 import { DataFlowTracer } from '../audit/DataFlowTracer';
 import ProviderCircuitBreaker from './ProviderCircuitBreaker';
-import { loadAuthorizedProviderConfig } from './authorization/ProviderAuthorization';
 import { ProviderQuotaMonitor } from '../scheduler/ProviderQuotaMonitor';
 
 const REQUIRED_SCORING_FIELDS = new Set([
@@ -56,56 +49,13 @@ export class ProviderCoordinator {
     this.healthMonitor = new ProviderHealthMonitor();
     this.tracer = new DataFlowTracer();
 
-    // ── Price/Metadata/History: yfinance → upstox → indianapi (last fallback) ──
-    // yfinance (v8 chart) is best for live prices. Upstox has market quotes.
-    // IndianAPI is the last-resort fallback for everything.
+    // ── Price/Metadata/History/Financials: yfinance (PSE tickers use the .PS suffix) ──
     const yahoo = new YahooProvider();
     this.circuitBreakers.set(yahoo, new ProviderCircuitBreaker({ failureThreshold: 3, openTimeoutMs: 60_000 }));
     this.priceProviders.push(yahoo);
     this.metadataProviders.push(yahoo);
     this.historicalProviders.push(yahoo);
-
-    const indian = new IndianMarketProvider();
-    this.circuitBreakers.set(indian, new ProviderCircuitBreaker({ failureThreshold: 3, openTimeoutMs: 60_000 }));
-    this.priceProviders.push(indian);
-    this.metadataProviders.push(indian);
-    this.historicalProviders.push(indian);
-
-    // ── Financials: screener.in → upstox → indianapi (last fallback) ──
-    // Screener.in scrapes the best fundamentals. Upstox (Analytics Token) is
-    // the API-backed fallback. IndianAPI is the absolute last resort.
-    const authorizedConfig = loadAuthorizedProviderConfig();
-    if (authorizedConfig.screener.enabled) {
-      const screener = new ScreenerProvider(authorizedConfig.screener);
-      this.circuitBreakers.set(screener, new ProviderCircuitBreaker({ failureThreshold: 3, openTimeoutMs: 60_000 }));
-      this.financialProviders.push(screener);
-    }
-
-    const upstoxFundamentals = new UpstoxFundamentalsProvider(() => {
-      if (typeof window !== 'undefined') {
-        return window.localStorage.getItem('upstox_access_token') ?? null;
-      }
-      if (typeof process !== 'undefined') {
-        const isSandbox = process.env.UPSTOX_SANDBOX_ENABLED === 'true' || process.env.UPSTOX_SANDBOX_MODE === 'true';
-        if (isSandbox) {
-          return process.env.UPSTOX_SANDBOX_ACCESS_TOKEN ?? null;
-        }
-        return process.env.UPSTOX_ACCESS_TOKEN ?? process.env.VITE_UPSTOX_ACCESS_TOKEN ?? null;
-      }
-      return null;
-    });
-    this.circuitBreakers.set(upstoxFundamentals, new ProviderCircuitBreaker({ failureThreshold: 3, openTimeoutMs: 60_000 }));
-    this.financialProviders.push(upstoxFundamentals);
-
-    if (authorizedConfig.moneycontrol.enabled) {
-      const moneycontrolFinancials = new MoneycontrolFinancialsProvider(authorizedConfig.moneycontrol);
-      this.circuitBreakers.set(moneycontrolFinancials, new ProviderCircuitBreaker({ failureThreshold: 3, openTimeoutMs: 60_000 }));
-      this.financialProviders.push(moneycontrolFinancials);
-    }
-
-    const indianApiFinancials = new IndianApiFinancialProvider();
-    this.circuitBreakers.set(indianApiFinancials, new ProviderCircuitBreaker({ failureThreshold: 3, openTimeoutMs: 60_000 }));
-    this.financialProviders.push(indianApiFinancials);
+    this.financialProviders.push(yahoo);
 
     // ── News ────────────────────────────────────────────────────
     const googleNews = new GoogleNewsRssProvider();

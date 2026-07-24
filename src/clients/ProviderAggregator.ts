@@ -1,7 +1,6 @@
 import type { UnifiedQuote, BatchQuoteRequest, BatchQuoteResponse } from './types';
 import { yfinanceClient } from './YFinanceClient';
 import { pseClient } from './PSEClient';
-import { screenerClient } from './ScreenerClient';
 import { browserCache } from './BrowserCache';
 import { providerHealthMonitor } from '../services/health/ProviderHealthMonitor';
 
@@ -10,8 +9,7 @@ export interface PriceValidation {
   price: number; // median
   providers: {
     yfinance?: number;
-    jugasad?: number;
-    screener?: number;
+    pse?: number;
   };
   outliers: Array<{ provider: string; price: number; deviation: number }>;
   confidence: number; // 0-100
@@ -19,12 +17,13 @@ export interface PriceValidation {
 }
 
 /**
- * Aggregates multiple data providers with intelligent fallback.
- * Default order: yfinance (fastest) → jugasad (live PSE wrapper) → screener.in (fallback)
+ * Aggregates PSE data providers with intelligent fallback.
+ * Default order: pse (phisix — real PSE prices) → yfinance (fallback, see
+ * PSEClient.ts for why Yahoo's ".PSE" suffix is unreliable).
  * Returns first successful response within timeout.
  */
 export class ProviderAggregator {
-  private readonly defaultPreference = ['yfinance', 'jugasad', 'screener'];
+  private readonly defaultPreference = ['pse', 'yfinance'];
 
   /**
    * Get a quote from the best available provider.
@@ -42,13 +41,9 @@ export class ProviderAggregator {
       return { ...cached, cached: true };
     }
 
-    // All available providers
-    // Order: PSE first (most common), then PSE, then international
     const allProviders = [
-      { name: 'jugasad', fetch: () => pseClient.fetchQuote(symbol, false) },
-      { name: 'bse', fetch: () => pseClient.fetchQuote(symbol) },
+      { name: 'pse', fetch: () => pseClient.fetchQuote(symbol, false) },
       { name: 'yfinance', fetch: () => yfinanceClient.fetchQuote(symbol, false) },
-      { name: 'screener', fetch: () => screenerClient.fetchQuote(symbol, false) },
     ];
 
     // Sort by preference order
@@ -135,8 +130,7 @@ export class ProviderAggregator {
   async validatePrice(symbol: string): Promise<PriceValidation> {
     const providers = [
       { name: 'yfinance', client: yfinanceClient },
-      { name: 'jugasad', client: pseClient },
-      { name: 'screener', client: screenerClient },
+      { name: 'pse', client: pseClient },
     ];
 
     const priceMap: { [key: string]: number } = {};
@@ -187,16 +181,14 @@ export class ProviderAggregator {
     }
 
     // Calculate confidence (0-100)
-    const confidence =
-      prices.length === 3 ? 100 : prices.length === 2 ? 85 : prices.length === 1 ? 60 : 0;
+    const confidence = prices.length === 2 ? 100 : prices.length === 1 ? 65 : 0;
 
     return {
       symbol,
       price: Math.round(median * 100) / 100,
       providers: {
         yfinance: priceMap['yfinance'],
-        jugasad: priceMap['jugasad'],
-        screener: priceMap['screener'],
+        pse: priceMap['pse'],
       },
       outliers,
       confidence,

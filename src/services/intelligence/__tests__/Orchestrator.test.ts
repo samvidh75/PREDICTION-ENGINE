@@ -80,7 +80,7 @@ function makeInputs(overrides: Partial<AllEngineInputs> = {}): AllEngineInputs {
       ],
       nextEarningsDate: new Date(Date.now() + 30 * 86400000),
       eventCount90Days: 2, bullishEventCount: 2, bearishEventCount: 0,
-      lastUpdated: new Date(), fiscalYear: 2025, currency: 'INR',
+      lastUpdated: new Date(), fiscalYear: 2025, currency: 'PKR',
     } satisfies AllEngineInputs['events'],
     rag: {
       patterns: [

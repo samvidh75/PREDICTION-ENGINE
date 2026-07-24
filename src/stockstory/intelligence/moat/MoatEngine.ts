@@ -1,8 +1,8 @@
 /**
  * Moat Engine
  *
- * Assesses economic moat (sustainable competitive advantage) for Philippine companies.
- * Uses Porter's Five Forces framework adapted for Philippine markets.
+ * Assesses economic moat (sustainable competitive advantage) for PSX companies.
+ * Uses Porter's Five Forces framework adapted for PSX markets.
  * Deterministic rules based on financial data — no qualitative claims without evidence.
  */
 
@@ -152,7 +152,7 @@ export class MoatEngine {
       }
     }
 
-    // Regulatory barriers (India-specific)
+    // Regulatory barriers (Pakistan-specific)
     const regName = (s.name || '').toLowerCase();
     if (regName.includes('bank') || regName.includes('insurance') || regName.includes('telecom')) {
       score += 15;

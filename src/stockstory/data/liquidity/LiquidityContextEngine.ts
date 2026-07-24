@@ -17,13 +17,13 @@ export class LiquidityContextEngine {
    *
    * Scoring thresholds (for a 20‑day window):
    * - Volume: < 10K shares/day → 0, > 1M → 100
-   * - Value:  < 1 Cr/day → 0, > 100 Cr → 100
-   * - Market cap: < 100 Cr → 0, > 10_000 Cr → 100
+   * - Value:  < ₱10M/day → 0, > ₱1,000M → 100
+   * - Market cap: < ₱1,000M → 0, > ₱100,000M → 100
    */
   private computeScore(metrics: LiquidityMetrics): number {
     const volumeScore = Math.min(100, Math.max(0, (metrics.avgDailyVolume / 1_000_000) * 100));
-    const valueScore = Math.min(100, Math.max(0, (metrics.avgDailyValueCrores / 100) * 100));
-    const marketCapScore = Math.min(100, Math.max(0, (metrics.marketCapCrores / 10_000) * 100));
+    const valueScore = Math.min(100, Math.max(0, (metrics.avgDailyValueMillions / 1_000) * 100));
+    const marketCapScore = Math.min(100, Math.max(0, (metrics.marketCapMillions / 100_000) * 100));
 
     return Math.round((volumeScore + valueScore + marketCapScore) / 3);
   }
@@ -35,8 +35,8 @@ export class LiquidityContextEngine {
       score: this.computeScore(metrics),
       dimensions: {
         volumeScore: Math.min(100, Math.max(0, (metrics.avgDailyVolume / 1_000_000) * 100)),
-        valueScore: Math.min(100, Math.max(0, (metrics.avgDailyValueCrores / 100) * 100)),
-        marketCapScore: Math.min(100, Math.max(0, (metrics.marketCapCrores / 10_000) * 100)),
+        valueScore: Math.min(100, Math.max(0, (metrics.avgDailyValueMillions / 1_000) * 100)),
+        marketCapScore: Math.min(100, Math.max(0, (metrics.marketCapMillions / 100_000) * 100)),
       },
       asOf: metrics.asOf,
     };
@@ -63,15 +63,15 @@ export class LiquidityContextEngine {
    */
   getCaution(metrics: LiquidityMetrics): LiquidityCaution | undefined {
     const reasons: string[] = [];
-    const mc = metrics.marketCapCrores;
+    const mc = metrics.marketCapMillions;
     const vol = metrics.avgDailyVolume;
-    const val = metrics.avgDailyValueCrores;
+    const val = metrics.avgDailyValueMillions;
 
-    if (mc < 500) {
-      reasons.push('Market capitalisation below 500 Cr (microcap / smallcap)');
+    if (mc < 5_000) {
+      reasons.push('Market capitalisation below ₱5,000M (microcap / smallcap)');
     }
-    if (val < 1) {
-      reasons.push('Average daily trade value below 1 Cr');
+    if (val < 10) {
+      reasons.push('Average daily trade value below ₱10M');
     }
     if (vol < 25_000) {
       reasons.push('Average daily volume below 25,000 shares');

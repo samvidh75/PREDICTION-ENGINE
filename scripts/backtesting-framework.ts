@@ -40,28 +40,27 @@ interface CompanyProfile {
 }
 
 const PROFILES: CompanyProfile[] = [
-  // ── NIFTY 50 ──
-  { symbol: 'RELIANCE', name: 'Reliance Industries', sector: 'Energy & Oil', peRatio: 25, pbRatio: 2.2, roe: 0.09, roic: 0.07, revenueGrowth: 0.08, epsGrowth: 0.05, debtToEquity: 0.65, currentRatio: 1.2, grossMargin: 0.18, operatingMargin: 0.15, fcfYield: 0.02, evEbitda: 14, beta: 1.15, marketCap: 1845000, dividendYield: 0.30 },
-  { symbol: 'TCS', name: 'Tata Consultancy Services', sector: 'Technology', peRatio: 28, pbRatio: 12.0, roe: 0.48, roic: 0.42, revenueGrowth: 0.12, epsGrowth: 0.10, debtToEquity: 0.02, currentRatio: 3.5, grossMargin: 0.38, operatingMargin: 0.25, fcfYield: 0.04, evEbitda: 18, beta: 0.75, marketCap: 1254300, dividendYield: 2.00 },
-  { symbol: 'INFY', name: 'Infosys', sector: 'Technology', peRatio: 22, pbRatio: 7.5, roe: 0.35, roic: 0.30, revenueGrowth: 0.10, epsGrowth: 0.09, debtToEquity: 0.01, currentRatio: 3.8, grossMargin: 0.35, operatingMargin: 0.23, fcfYield: 0.04, evEbitda: 14, beta: 0.70, marketCap: 642500, dividendYield: 2.40 },
-  { symbol: 'HDFCBANK', name: 'HDFC Bank', sector: 'Financials', peRatio: 19, pbRatio: 3.0, roe: 0.17, roic: 0.04, revenueGrowth: 0.18, epsGrowth: 0.15, debtToEquity: 8.0, currentRatio: 0.90, grossMargin: 0.05, operatingMargin: 0.30, fcfYield: -0.01, evEbitda: 20, beta: 0.85, marketCap: 1210000, dividendYield: 1.10 },
-  { symbol: 'ICICIBANK', name: 'ICICI Bank', sector: 'Financials', peRatio: 17, pbRatio: 2.8, roe: 0.17, roic: 0.04, revenueGrowth: 0.20, epsGrowth: 0.25, debtToEquity: 7.5, currentRatio: 0.85, grossMargin: 0.05, operatingMargin: 0.28, fcfYield: 0.00, evEbitda: 22, beta: 0.90, marketCap: 785000, dividendYield: 1.20 },
-  { symbol: 'SBIN', name: 'State Bank of India', sector: 'Financials', peRatio: 10, pbRatio: 1.5, roe: 0.15, roic: 0.03, revenueGrowth: 0.14, epsGrowth: 0.40, debtToEquity: 13.0, currentRatio: 0.70, grossMargin: 0.04, operatingMargin: 0.22, fcfYield: 0.01, evEbitda: 18, beta: 1.00, marketCap: 685000, dividendYield: 1.50 },
-  { symbol: 'ITC', name: 'ITC', sector: 'Consumer Goods', peRatio: 26, pbRatio: 7.0, roe: 0.28, roic: 0.22, revenueGrowth: 0.06, epsGrowth: 0.08, debtToEquity: 0.01, currentRatio: 4.0, grossMargin: 0.52, operatingMargin: 0.36, fcfYield: 0.04, evEbitda: 18, beta: 0.60, marketCap: 560000, dividendYield: 3.50 },
-  { symbol: 'ASIANPAINT', name: 'Asian Paints', sector: 'Consumer Goods', peRatio: 55, pbRatio: 15.0, roe: 0.28, roic: 0.24, revenueGrowth: 0.10, epsGrowth: 0.12, debtToEquity: 0.05, currentRatio: 2.5, grossMargin: 0.42, operatingMargin: 0.18, fcfYield: 0.02, evEbitda: 32, beta: 0.65, marketCap: 280000, dividendYield: 0.90 },
-  { symbol: 'NESTLEIND', name: 'Nestle India', sector: 'Consumer Goods', peRatio: 65, pbRatio: 40.0, roe: 0.60, roic: 0.45, revenueGrowth: 0.12, epsGrowth: 0.15, debtToEquity: 0.05, currentRatio: 2.0, grossMargin: 0.55, operatingMargin: 0.22, fcfYield: 0.02, evEbitda: 38, beta: 0.50, marketCap: 230000, dividendYield: 1.50 },
-  { symbol: 'TITAN', name: 'Titan Company', sector: 'Consumer Goods', peRatio: 80, pbRatio: 30.0, roe: 0.30, roic: 0.22, revenueGrowth: 0.22, epsGrowth: 0.20, debtToEquity: 0.40, currentRatio: 2.2, grossMargin: 0.28, operatingMargin: 0.12, fcfYield: 0.01, evEbitda: 45, beta: 0.70, marketCap: 310000, dividendYield: 0.40 },
-  { symbol: 'MARUTI', name: 'Maruti Suzuki', sector: 'Automobile', peRatio: 25, pbRatio: 4.5, roe: 0.14, roic: 0.11, revenueGrowth: 0.12, epsGrowth: 0.15, debtToEquity: 0.05, currentRatio: 1.8, grossMargin: 0.22, operatingMargin: 0.10, fcfYield: 0.03, evEbitda: 14, beta: 0.95, marketCap: 390000, dividendYield: 1.00 },
-  { symbol: 'TATAMOTORS', name: 'Tata Motors', sector: 'Automobile', peRatio: 15, pbRatio: 3.0, roe: 0.15, roic: 0.08, revenueGrowth: 0.18, epsGrowth: 0.30, debtToEquity: 1.8, currentRatio: 0.90, grossMargin: 0.28, operatingMargin: 0.10, fcfYield: 0.02, evEbitda: 8, beta: 1.30, marketCap: 350000, dividendYield: 0.40 },
-  { symbol: 'SUNPHARMA', name: 'Sun Pharmaceutical', sector: 'Pharma', peRatio: 32, pbRatio: 5.0, roe: 0.16, roic: 0.12, revenueGrowth: 0.10, epsGrowth: 0.12, debtToEquity: 0.25, currentRatio: 2.5, grossMargin: 0.65, operatingMargin: 0.25, fcfYield: 0.03, evEbitda: 18, beta: 0.70, marketCap: 380000, dividendYield: 1.20 },
-  { symbol: 'DRREDDY', name: "Dr. Reddy's Laboratories", sector: 'Pharma', peRatio: 25, pbRatio: 4.0, roe: 0.16, roic: 0.12, revenueGrowth: 0.10, epsGrowth: 0.15, debtToEquity: 0.10, currentRatio: 3.0, grossMargin: 0.55, operatingMargin: 0.20, fcfYield: 0.03, evEbitda: 15, beta: 0.60, marketCap: 98000, dividendYield: 0.80 },
-  { symbol: 'NTPC', name: 'NTPC', sector: 'Energy', peRatio: 12, pbRatio: 1.5, roe: 0.12, roic: 0.07, revenueGrowth: 0.08, epsGrowth: 0.10, debtToEquity: 1.5, currentRatio: 1.0, grossMargin: 0.35, operatingMargin: 0.25, fcfYield: 0.03, evEbitda: 8, beta: 0.85, marketCap: 360000, dividendYield: 3.00 },
-  { symbol: 'ONGC', name: 'ONGC', sector: 'Energy & Oil', peRatio: 6, pbRatio: 0.9, roe: 0.15, roic: 0.10, revenueGrowth: 0.05, epsGrowth: -0.05, debtToEquity: 0.40, currentRatio: 1.5, grossMargin: 0.45, operatingMargin: 0.30, fcfYield: 0.08, evEbitda: 4, beta: 0.85, marketCap: 340000, dividendYield: 5.00 },
-  { symbol: 'TATASTEEL', name: 'Tata Steel', sector: 'Materials', peRatio: 10, pbRatio: 1.5, roe: 0.08, roic: 0.05, revenueGrowth: -0.05, epsGrowth: -0.20, debtToEquity: 0.80, currentRatio: 0.90, grossMargin: 0.28, operatingMargin: 0.10, fcfYield: 0.03, evEbitda: 6, beta: 1.40, marketCap: 190000, dividendYield: 1.50 },
-  { symbol: 'BAJFINANCE', name: 'Bajaj Finance', sector: 'Financials', peRatio: 30, pbRatio: 7.0, roe: 0.22, roic: 0.06, revenueGrowth: 0.25, epsGrowth: 0.22, debtToEquity: 4.5, currentRatio: 1.8, grossMargin: 0.10, operatingMargin: 0.45, fcfYield: -0.03, evEbitda: 35, beta: 1.20, marketCap: 440000, dividendYield: 0.30 },
-  { symbol: 'YESBANK', name: 'Yes Bank', sector: 'Financials', peRatio: 35, pbRatio: 0.8, roe: 0.02, roic: 0.01, revenueGrowth: -0.10, epsGrowth: 0.50, debtToEquity: 12.0, currentRatio: 0.60, grossMargin: 0.04, operatingMargin: 0.05, fcfYield: -0.05, evEbitda: 40, beta: 1.80, marketCap: 28000, dividendYield: 0.00 },
-  { symbol: 'IDEA', name: 'Vodafone Idea', sector: 'Telecom', peRatio: -5, pbRatio: -2.0, roe: -0.20, roic: -0.08, revenueGrowth: -0.05, epsGrowth: 0.20, debtToEquity: -5.0, currentRatio: 0.30, grossMargin: 0.50, operatingMargin: -0.15, fcfYield: -0.10, evEbitda: 25, beta: 1.90, marketCap: 65000, dividendYield: 0.00 },
-  { symbol: 'PNB', name: 'Punjab National Bank', sector: 'Financials', peRatio: 8, pbRatio: 0.7, roe: 0.06, roic: 0.02, revenueGrowth: 0.05, epsGrowth: 0.50, debtToEquity: 14.0, currentRatio: 0.55, grossMargin: 0.04, operatingMargin: 0.12, fcfYield: -0.02, evEbitda: 35, beta: 1.20, marketCap: 90000, dividendYield: 0.50 },
+  // ── KSE 100 ──
+  { symbol: 'ENGRO', name: 'Engro Corporation', sector: 'Energy & Chemicals', peRatio: 22, pbRatio: 2.0, roe: 0.16, roic: 0.10, revenueGrowth: 0.12, epsGrowth: 0.10, debtToEquity: 0.55, currentRatio: 1.3, grossMargin: 0.22, operatingMargin: 0.18, fcfYield: 0.03, evEbitda: 12, beta: 1.10, marketCap: 380000, dividendYield: 3.50 },
+  { symbol: 'SYS', name: 'Systems Limited', sector: 'Technology', peRatio: 30, pbRatio: 10.0, roe: 0.45, roic: 0.38, revenueGrowth: 0.18, epsGrowth: 0.15, debtToEquity: 0.02, currentRatio: 3.0, grossMargin: 0.35, operatingMargin: 0.22, fcfYield: 0.04, evEbitda: 16, beta: 0.70, marketCap: 250000, dividendYield: 1.80 },
+  { symbol: 'AVN', name: 'Avanceon', sector: 'Technology', peRatio: 20, pbRatio: 6.0, roe: 0.30, roic: 0.25, revenueGrowth: 0.15, epsGrowth: 0.12, debtToEquity: 0.03, currentRatio: 3.5, grossMargin: 0.32, operatingMargin: 0.20, fcfYield: 0.03, evEbitda: 12, beta: 0.75, marketCap: 85000, dividendYield: 1.50 },
+  { symbol: 'HBL', name: 'Habib Bank Limited', sector: 'Financials', peRatio: 8, pbRatio: 1.2, roe: 0.18, roic: 0.05, revenueGrowth: 0.15, epsGrowth: 0.12, debtToEquity: 10.0, currentRatio: 0.85, grossMargin: 0.05, operatingMargin: 0.32, fcfYield: 0.00, evEbitda: 18, beta: 0.90, marketCap: 320000, dividendYield: 6.50 },
+  { symbol: 'UBL', name: 'United Bank Limited', sector: 'Financials', peRatio: 7, pbRatio: 1.0, roe: 0.16, roic: 0.04, revenueGrowth: 0.14, epsGrowth: 0.18, debtToEquity: 9.0, currentRatio: 0.80, grossMargin: 0.05, operatingMargin: 0.30, fcfYield: 0.01, evEbitda: 16, beta: 0.85, marketCap: 194000, dividendYield: 7.00 },
+  { symbol: 'MCB', name: 'MCB Bank Limited', sector: 'Financials', peRatio: 9, pbRatio: 1.8, roe: 0.22, roic: 0.06, revenueGrowth: 0.16, epsGrowth: 0.20, debtToEquity: 8.5, currentRatio: 0.90, grossMargin: 0.05, operatingMargin: 0.35, fcfYield: 0.01, evEbitda: 14, beta: 0.80, marketCap: 310000, dividendYield: 5.50 },
+  { symbol: 'NESTLE', name: 'Nestle Pakistan', sector: 'Consumer Goods', peRatio: 35, pbRatio: 12.0, roe: 0.55, roic: 0.40, revenueGrowth: 0.10, epsGrowth: 0.12, debtToEquity: 0.05, currentRatio: 2.2, grossMargin: 0.50, operatingMargin: 0.24, fcfYield: 0.03, evEbitda: 22, beta: 0.55, marketCap: 280000, dividendYield: 2.50 },
+  { symbol: 'COLG', name: 'Colgate-Palmolive Pakistan', sector: 'Consumer Goods', peRatio: 28, pbRatio: 18.0, roe: 0.60, roic: 0.45, revenueGrowth: 0.12, epsGrowth: 0.14, debtToEquity: 0.02, currentRatio: 2.5, grossMargin: 0.48, operatingMargin: 0.20, fcfYield: 0.03, evEbitda: 18, beta: 0.55, marketCap: 120000, dividendYield: 2.00 },
+  { symbol: 'UNILEVER', name: 'Unilever Pakistan', sector: 'Consumer Goods', peRatio: 45, pbRatio: 35.0, roe: 0.65, roic: 0.50, revenueGrowth: 0.08, epsGrowth: 0.10, debtToEquity: 0.01, currentRatio: 2.0, grossMargin: 0.52, operatingMargin: 0.22, fcfYield: 0.02, evEbitda: 28, beta: 0.50, marketCap: 230000, dividendYield: 1.80 },
+  { symbol: 'INDU', name: 'Indus Motor Company', sector: 'Automobile', peRatio: 10, pbRatio: 2.5, roe: 0.25, roic: 0.18, revenueGrowth: 0.08, epsGrowth: 0.10, debtToEquity: 0.10, currentRatio: 2.0, grossMargin: 0.18, operatingMargin: 0.12, fcfYield: 0.05, evEbitda: 6, beta: 0.85, marketCap: 120000, dividendYield: 5.00 },
+  { symbol: 'HCAR', name: 'Honda Atlas Cars', sector: 'Automobile', peRatio: 12, pbRatio: 2.0, roe: 0.18, roic: 0.12, revenueGrowth: 0.10, epsGrowth: 0.12, debtToEquity: 0.20, currentRatio: 1.5, grossMargin: 0.15, operatingMargin: 0.08, fcfYield: 0.04, evEbitda: 7, beta: 0.90, marketCap: 75000, dividendYield: 4.00 },
+  { symbol: 'SEARL', name: 'The Searle Company', sector: 'Pharma', peRatio: 15, pbRatio: 2.0, roe: 0.18, roic: 0.14, revenueGrowth: 0.15, epsGrowth: 0.14, debtToEquity: 0.30, currentRatio: 2.0, grossMargin: 0.50, operatingMargin: 0.20, fcfYield: 0.03, evEbitda: 10, beta: 0.65, marketCap: 45000, dividendYield: 1.50 },
+  { symbol: 'GLAXO', name: 'GlaxoSmithKline Pakistan', sector: 'Pharma', peRatio: 14, pbRatio: 2.5, roe: 0.20, roic: 0.15, revenueGrowth: 0.10, epsGrowth: 0.12, debtToEquity: 0.05, currentRatio: 3.5, grossMargin: 0.45, operatingMargin: 0.18, fcfYield: 0.04, evEbitda: 10, beta: 0.55, marketCap: 55000, dividendYield: 3.00 },
+  { symbol: 'HUBC', name: 'Hub Power Company', sector: 'Energy', peRatio: 6, pbRatio: 0.8, roe: 0.18, roic: 0.10, revenueGrowth: 0.12, epsGrowth: 0.15, debtToEquity: 0.60, currentRatio: 1.2, grossMargin: 0.40, operatingMargin: 0.30, fcfYield: 0.10, evEbitda: 4, beta: 0.75, marketCap: 90000, dividendYield: 8.00 },
+  { symbol: 'OGDC', name: 'Oil & Gas Development Co', sector: 'Energy & Oil', peRatio: 5, pbRatio: 0.7, roe: 0.20, roic: 0.12, revenueGrowth: 0.08, epsGrowth: 0.05, debtToEquity: 0.10, currentRatio: 3.0, grossMargin: 0.55, operatingMargin: 0.35, fcfYield: 0.12, evEbitda: 3, beta: 0.70, marketCap: 180000, dividendYield: 9.00 },
+  { symbol: 'ISL', name: 'International Steels', sector: 'Materials', peRatio: 8, pbRatio: 1.2, roe: 0.15, roic: 0.10, revenueGrowth: 0.08, epsGrowth: 0.10, debtToEquity: 0.40, currentRatio: 1.2, grossMargin: 0.18, operatingMargin: 0.12, fcfYield: 0.06, evEbitda: 5, beta: 1.10, marketCap: 35000, dividendYield: 4.00 },
+  { symbol: 'MEBL', name: 'Meezan Bank Limited', sector: 'Financials', peRatio: 10, pbRatio: 2.0, roe: 0.25, roic: 0.06, revenueGrowth: 0.22, epsGrowth: 0.25, debtToEquity: 7.0, currentRatio: 0.95, grossMargin: 0.05, operatingMargin: 0.40, fcfYield: 0.00, evEbitda: 14, beta: 0.85, marketCap: 110000, dividendYield: 4.50 },
+  { symbol: 'BAFL', name: 'Bank Alfalah Limited', sector: 'Financials', peRatio: 6, pbRatio: 0.6, roe: 0.12, roic: 0.03, revenueGrowth: 0.12, epsGrowth: 0.15, debtToEquity: 9.5, currentRatio: 0.75, grossMargin: 0.04, operatingMargin: 0.22, fcfYield: -0.01, evEbitda: 16, beta: 1.00, marketCap: 75000, dividendYield: 5.00 },
+  { symbol: 'PTC', name: 'Pakistan Telecommunication Co', sector: 'Telecom', peRatio: 15, pbRatio: 0.8, roe: 0.06, roic: 0.03, revenueGrowth: 0.02, epsGrowth: -0.05, debtToEquity: 0.30, currentRatio: 1.5, grossMargin: 0.35, operatingMargin: 0.10, fcfYield: 0.05, evEbitda: 8, beta: 0.80, marketCap: 55000, dividendYield: 4.00 },
+  { symbol: 'BOP', name: 'Bank of Punjab', sector: 'Financials', peRatio: 5, pbRatio: 0.5, roe: 0.10, roic: 0.03, revenueGrowth: 0.08, epsGrowth: 0.20, debtToEquity: 10.0, currentRatio: 0.70, grossMargin: 0.04, operatingMargin: 0.18, fcfYield: -0.01, evEbitda: 20, beta: 1.10, marketCap: 40000, dividendYield: 2.50 },
 ];
 
 // ── Snapshot dates ────────────────────────────────────────────────
@@ -92,7 +91,7 @@ function timeShiftProfile(p: CompanyProfile, monthsAgo: number): CompanyProfile 
 }
 
 // ── Simulated forward returns (methodology demonstration) ──────────
-// In production: pull actual price data from NSE/BSE.
+// In production: pull actual price data from PSX.
 // Here: use a structural model based on financial quality.
 function simulateForwardReturn(profile: CompanyProfile, healthScore: number, monthsAgo: number): number {
   const monthsForward = monthsAgo; // how many months from snapshot to now
@@ -708,7 +707,7 @@ phase7 += `
 | Factor correlation testing | ✅ Complete | — |
 | Sector-level testing | ✅ Complete | — |
 | Confidence validation | ✅ Complete | — |
-| Real price data | ⚠️ Simulated | Connect NSE/BSE price DB |
+| Real price data | ⚠️ Simulated | Connect PSX price DB |
 | Real historical financials | ⚠️ Simulated | Connect financial statement DB |
 | Survivorship bias handling | ⚠️ Not implemented | Add delisted companies to dataset |
 | Statistical significance tests | ⚠️ Not implemented | Add t-tests for spread significance |
@@ -720,7 +719,7 @@ phase7 += `
 1. **Reweighting:** Increase weight of ${factorResults[0].factor} (strongest predictor). Review ${factorResults[factorResults.length - 1].factor} (weakest).
 2. **Sector models:** Build sector-specific models for sectors with weak health-return correlation.
 3. **Confidence filter:** Use confidence as a noise filter, not a return predictor.
-4. **Real data:** Prioritize integration with NSE/BSE historical price database.
+4. **Real data:** Prioritize integration with PSX historical price database.
 5. **Statistical rigor:** Add formal hypothesis tests (t-test, Sharpe ratio) for top-bottom spread significance.
 
 ---

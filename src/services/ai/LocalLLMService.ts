@@ -241,7 +241,7 @@ class LocalLLMService {
    */
   private buildAnalysisPrompt(symbol: string, metrics: Record<string, any>, query: string): string {
     return `
-You are a financial analyst expert in Philippine stocks.
+You are a financial analyst expert in PSX stocks.
 
 Stock: ${symbol}
 Metrics: ${JSON.stringify(metrics, null, 2)}

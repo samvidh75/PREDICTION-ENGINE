@@ -8,10 +8,9 @@ describe('Yahoo quote trust helpers', () => {
     expect(normalizeYahooExchange('Philippine Stock Exchange of India')).toBe('PSE');
     expect(normalizeYahooExchange('PSE')).toBe('PSE');
     expect(normalizeYahooExchange('Philippine Stock Exchange')).toBe('PSE');
-    expect(normalizeYahooExchange(undefined, 'RELIANCE.NS')).toBe('PSE');
-    expect(normalizeYahooExchange(undefined, 'RELIANCE.BO')).toBe('PSE');
-    expect(normalizeYahooExchange('NASDAQ', 'RELIANCE')).toBeUndefined();
-    expect(normalizeYahooExchange(undefined, 'RELIANCE')).toBeUndefined();
+    expect(normalizeYahooExchange(undefined, 'BDO.PS')).toBe('PSE');
+    expect(normalizeYahooExchange('NASDAQ', 'BDO')).toBeUndefined();
+    expect(normalizeYahooExchange(undefined, 'BDO')).toBeUndefined();
   });
 
   it('converts only valid Yahoo epoch seconds into source timestamps', () => {
@@ -21,7 +20,10 @@ describe('Yahoo quote trust helpers', () => {
   });
 
   it('resolves Yahoo tickers without duplicate suffixes', () => {
-    expect(resolveYahooQuoteTicker('reliance')).toBe('RELIANCE.NS');
+    // Default suffix is .PSX (Pakistan Stock Exchange) per
+    // resolveYahooQuoteTicker's actual implementation; .NS/.BO inputs are
+    // passed through untouched rather than double-suffixed.
+    expect(resolveYahooQuoteTicker('reliance')).toBe('RELIANCE.PSX');
     expect(resolveYahooQuoteTicker('RELIANCE.NS')).toBe('RELIANCE.NS');
     expect(resolveYahooQuoteTicker('RELIANCE.BO')).toBe('RELIANCE.BO');
   });

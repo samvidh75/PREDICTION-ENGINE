@@ -119,8 +119,8 @@ function formatNewsDetail(article: EvNewsArticle): string {
 
 function formatEarningsDetail(result: EvEarningsResult): string {
   const parts: string[] = [`${result.period} Results`];
-  if (result.revenue !== null) parts.push(`Revenue: ${result.revenue.toLocaleString('en-IN')}`);
-  if (result.netProfit !== null) parts.push(`Net Profit: ${result.netProfit.toLocaleString('en-IN')}`);
+  if (result.revenue !== null) parts.push(`Revenue: ${result.revenue.toLocaleString('en-PH')}`);
+  if (result.netProfit !== null) parts.push(`Net Profit: ${result.netProfit.toLocaleString('en-PH')}`);
   if (result.eps !== null) parts.push(`EPS: ${result.eps}`);
   if (result.revenueGrowthYoy !== null) parts.push(`Revenue Growth: ${result.revenueGrowthYoy.toFixed(1)}% YoY`);
   if (result.profitGrowthYoy !== null) parts.push(`Profit Growth: ${result.profitGrowthYoy.toFixed(1)}% YoY`);

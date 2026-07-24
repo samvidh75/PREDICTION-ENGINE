@@ -174,7 +174,7 @@ export class StatementIngestionPipeline {
          $23, $24, $25,
          $26, $27, $28,
          $29, $30,
-         $31, 'INR'
+         $31, 'PKR'
        )
        ON CONFLICT (symbol, period_end, period_type) DO UPDATE SET
          total_assets = COALESCE(EXCLUDED.total_assets, financial_statements.total_assets),

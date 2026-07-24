@@ -594,9 +594,9 @@ export interface TrendlyneStatusResponse {
 // ── Data Source Tags ─────────────────────────────────────────────────
 
 export type DataSourceTag =
-  | 'indianapi_price'
+  | 'psxapi_price'
   | 'yahoo_price'
-  | 'indianapi_financials'
+  | 'psxapi_financials'
   | 'screener'
   | 'upstox'
   | 'computed'
@@ -604,7 +604,7 @@ export type DataSourceTag =
 
 // ── Priority rules (documented) ──────────────────────────────────────
 // PRICE fields:           Provider A (indianapi) > Provider B (yahoo)
-// VALUATION ratios:       Provider C (indianapi_financials) > Provider D (screener) > null
+// VALUATION ratios:       Provider C (psxapi_financials) > Provider D (screener) > null
 // QUALITY/GROWTH/STABLE:  Provider D (screener) > Provider E (upstox) > null
 // TECHNICALS:             always computed from Yahoo historical, never from providers
 

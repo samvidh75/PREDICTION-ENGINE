@@ -97,7 +97,7 @@ export interface IntelligenceResult {
 // ============= TECHNICAL METRICS INPUT =============
 export interface TechnicalMetrics {
   // Price Data
-  currentPrice: number;         // Current stock price (₹)
+  currentPrice: number;         // Current stock price (₱)
 
   // Moving Averages
   ma50?: number;               // 50-day MA

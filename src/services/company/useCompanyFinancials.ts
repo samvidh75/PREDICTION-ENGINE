@@ -110,7 +110,7 @@ export function formatMarketCap(value: number | null | undefined): { exact: stri
     return { exact: "Unavailable", words: "Unavailable" };
   }
   return {
-    exact: formatINRWithCommas(value),
+    exact: formatPHPWithCommas(value),
     words: formatCompactRupees(value),
   };
 }
@@ -128,26 +128,23 @@ export function formatRatio(value: number | null | undefined): string {
 
 function formatCompactRupees(value: number): string {
   const abs = Math.abs(value);
-  if (abs >= 1e12) {
-    const lakhC = value / 1e12;
-    return `₹${lakhC.toFixed(2)} lakh crore`;
+  if (abs >= 1e9) {
+    return `₱${(value / 1e9).toFixed(2)}B`;
   }
-  if (abs >= 1e7) {
-    const crore = value / 1e7;
-    return `₹${crore.toFixed(2)} crore`;
+  if (abs >= 1e6) {
+    return `₱${(value / 1e6).toFixed(2)}M`;
   }
-  if (abs >= 1e5) {
-    const lakh = value / 1e5;
-    return `₹${lakh.toFixed(2)} lakh`;
+  if (abs >= 1e3) {
+    return `₱${(value / 1e3).toFixed(2)}K`;
   }
-  return `₹${Math.round(value).toLocaleString(undefined)}`;
+  return `₱${Math.round(value).toLocaleString(undefined)}`;
 }
 
-function formatINRWithCommas(value: number): string {
+function formatPHPWithCommas(value: number): string {
   const isNeg = value < 0;
   const abs = Math.abs(Math.round(value));
   const s = abs.toString();
-  if (s.length <= 3) return `${isNeg ? "-" : ""}₹${s}`;
+  if (s.length <= 3) return `${isNeg ? "-" : ""}₱${s}`;
 
   const last3 = s.slice(-3);
   const rest = s.slice(0, -3);
@@ -163,5 +160,5 @@ function formatINRWithCommas(value: number): string {
     i += take;
   }
 
-  return `${isNeg ? "-" : ""}₹${groups.join(",")},${last3}`;
+  return `${isNeg ? "-" : ""}₱${groups.join(",")},${last3}`;
 }

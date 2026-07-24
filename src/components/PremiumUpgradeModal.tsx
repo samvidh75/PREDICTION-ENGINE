@@ -118,7 +118,7 @@ export default function PremiumUpgradeModal({
             <div style={styles.pricingGrid}>
               <div style={styles.pricingCard}>
                 <div style={styles.planName}>Premium</div>
-                <div style={styles.price}>₹299<span style={styles.period}>/mo</span></div>
+                <div style={styles.price}>₱299<span style={styles.period}>/mo</span></div>
                 <button
                   style={styles.upgradeBtn}
                   onClick={() => setStep('contact')}
@@ -130,7 +130,7 @@ export default function PremiumUpgradeModal({
               <div style={{ ...styles.pricingCard, ...styles.proCard }}>
                 <div style={styles.badge}>RECOMMENDED</div>
                 <div style={styles.planName}>Pro</div>
-                <div style={styles.price}>₹799<span style={styles.period}>/mo</span></div>
+                <div style={styles.price}>₱799<span style={styles.period}>/mo</span></div>
                 <button
                   style={styles.upgradeBtn}
                   onClick={() => setStep('contact')}
@@ -183,14 +183,14 @@ export default function PremiumUpgradeModal({
                 onClick={() => handleUpgrade('premium')}
                 disabled={upgrading}
               >
-                {upgrading ? 'Processing...' : 'Upgrade to Premium (₹299)'}
+                {upgrading ? 'Processing...' : 'Upgrade to Premium (₱299)'}
               </button>
               <button
                 style={styles.upgradeBtn}
                 onClick={() => handleUpgrade('pro')}
                 disabled={upgrading}
               >
-                {upgrading ? 'Processing...' : 'Upgrade to Pro (₹799)'}
+                {upgrading ? 'Processing...' : 'Upgrade to Pro (₱799)'}
               </button>
               <button
                 style={styles.backBtn}
