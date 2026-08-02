@@ -1,0 +1,33 @@
+<!-- @dsCard group="PREDICTION-ENGINE / OptionsChain" -->
+<style>
+  :root { --canvas:#000; --ink:#FFF; --body:#B4B4B4; --mute:#8C8C8C; --hairline:#1F1F1F; --green:#34C759; --red:#FF3B30; --yellow:#FF9500; --bg-sheet: rgba(18,18,20,0.55); }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--canvas); font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Inter",sans-serif; color:var(--ink); }
+  .page { width: 1040px; padding: 32px; display: grid; gap: 20px; }
+  h1 { font-size: 28px; font-weight: 700; margin: 0; }
+  .toolbar { display: flex; gap: 10px; align-items: center; }
+  .sym-select { padding: 8px 14px; border: 1px solid var(--hairline); border-radius: 6px; font-size: 13px; background: var(--bg-sheet); }
+  .expiry { padding: 8px 14px; border: 1px solid var(--hairline); border-radius: 6px; font-size: 13px; color: var(--mute); }
+  table { width: 100%; border-collapse: collapse; }
+  th { text-align: center; font-size: 11px; color: var(--mute); text-transform: uppercase; padding: 8px; border-bottom: 1px solid var(--hairline); }
+  td { padding: 8px; font-size: 12.5px; text-align: center; border-bottom: 1px solid var(--hairline); }
+  .strike { font-weight: 700; background: var(--bg-sheet); }
+  .ce-itm { background: rgba(52,199,89,0.12); color: var(--green); }
+  .pe-itm { background: rgba(52,199,89,0.12); color: var(--green); }
+  .atm { background: rgba(255,149,0,0.14); color: var(--yellow); }
+  .otm { color: var(--red); }
+</style>
+<div class="page">
+  <h1>Options Chain</h1>
+  <div class="toolbar"><div class="sym-select">HBL</div><div class="expiry">Expiry: 26 Sep 2026</div></div>
+  <table>
+    <thead><tr><th colspan="3">Calls</th><th>Strike</th><th colspan="3">Puts</th></tr>
+      <tr><th>OI</th><th>IV</th><th>LTP</th><th></th><th>LTP</th><th>IV</th><th>OI</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="ce-itm">12.4k</td><td class="ce-itm">28.4%</td><td class="ce-itm">18.20</td><td class="strike">120</td><td class="otm">2.10</td><td class="otm">31.2%</td><td class="otm">8.1k</td></tr>
+      <tr><td class="atm">9.8k</td><td class="atm">26.1%</td><td class="atm">9.40</td><td class="strike">125</td><td class="atm">6.30</td><td class="atm">27.5%</td><td class="atm">10.4k</td></tr>
+      <tr><td class="otm">6.2k</td><td class="otm">24.8%</td><td class="otm">3.80</td><td class="strike">130</td><td class="pe-itm">12.90</td><td class="pe-itm">29.0%</td><td class="pe-itm">11.7k</td></tr>
+    </tbody>
+  </table>
+</div>

@@ -1,0 +1,74 @@
+import { cacheService } from './CacheService';
+import logger from '../config/logger';
+
+interface BatchItem<T> {
+  key: string;
+  executor: () => Promise<T>;
+  resolve: (value: T) => void;
+  reject: (error: any) => void;
+  addedAt: number;
+}
+
+export class BatchQueue {
+  private queue = new Map<string, BatchItem<any>>();
+  private timer: ReturnType<typeof setTimeout> | null = null;
+  private batchDuration = Math.max(10000, Math.min(120000, parseInt(process.env.BATCH_QUEUE_DURATION_MS || '120000', 10)));
+
+  async enqueue<T>(key: string, executor: () => Promise<T>): Promise<T> {
+    return new Promise((resolve, reject) => {
+      const existing = this.queue.get(key);
+      if (existing) {
+        resolve(existing.resolve as unknown as T);
+        return;
+      }
+
+      this.queue.set(key, { key, executor, resolve, reject, addedAt: Date.now() });
+      logger.debug({ key, queueSize: this.queue.size }, '[BatchQueue] Queued request');
+
+      if (!this.timer) {
+        logger.debug({ batchDurationMs: this.batchDuration }, '[BatchQueue] Timer started');
+        this.timer = setTimeout(() => this.processBatch(), this.batchDuration);
+      }
+    });
+  }
+
+  private async processBatch(): Promise<void> {
+    if (this.queue.size === 0) {
+      this.timer = null;
+      return;
+    }
+
+    const items = Array.from(this.queue.values());
+    const uniqueKeys = new Set(items.map(i => i.key));
+    logger.debug({ items: items.length, uniqueKeys: uniqueKeys.size }, '[BatchQueue] Processing batch');
+
+    this.queue.clear();
+    this.timer = null;
+
+    const results = await Promise.allSettled(items.map(item => item.executor()));
+
+    for (let i = 0; i < items.length; i++) {
+      const result = results[i];
+      if (result.status === 'fulfilled') {
+        items[i].resolve(result.value);
+      } else {
+        items[i].reject(result.reason);
+      }
+    }
+    logger.debug('[BatchQueue] Batch done');
+  }
+
+  async flush(): Promise<void> {
+    if (this.timer) {
+      clearTimeout(this.timer);
+      this.timer = null;
+    }
+    await this.processBatch();
+  }
+
+  getQueueSize(): number {
+    return this.queue.size;
+  }
+}
+
+export const batchQueue = new BatchQueue();

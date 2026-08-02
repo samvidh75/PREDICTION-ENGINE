@@ -1,0 +1,35 @@
+{
+  "enabled": true,
+  "defaultLimits": {
+    "windowMs": 60000,
+    "maxRequests": 60
+  },
+  "routes": {
+    "/api/predictions": {
+      "windowMs": 60000,
+      "maxRequests": 30
+    },
+    "/api/trust": {
+      "windowMs": 60000,
+      "maxRequests": 60
+    },
+    "/api/company": {
+      "windowMs": 60000,
+      "maxRequests": 120
+    },
+    "/api/auth": {
+      "windowMs": 60000,
+      "maxRequests": 10
+    }
+  },
+  "abuseProtection": {
+    "maxFailedAuth": 5,
+    "blockDurationMs": 900000,
+    "maxRequestsPerIpPerMin": 100
+  },
+  "logging": {
+    "requestLogging": true,
+    "errorLogging": true,
+    "performanceMetrics": true
+  }
+}

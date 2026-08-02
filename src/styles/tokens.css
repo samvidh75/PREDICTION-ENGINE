@@ -1,0 +1,146 @@
+/* ============================================================================
+   DESIGN TOKENS — RAYCAST-INSPIRED DARK THEME (CSS mirror of src/design/tokens.ts)
+   Pure black canvas, high-contrast white ink, one vivid red-orange accent.
+   Apple-grade restraint: no gradients, no drop shadows, one accent color.
+   ============================================================================ */
+
+:root {
+  /* ── Surface ladder — near-black elevation steps ───────────────────── */
+  --bg-page:        #000000;
+  --bg-card:        #0D0D0D;
+  --bg-card-hover:  #161616;
+  --bg-chip:        #141414;
+  --bg-sheet:       #0A0A0A;
+  --bg-paper-deep:  #1A1A1A;
+
+  /* ── Brand / CTA — white pill on black (Raycast convention) ───────── */
+  --brand:          #FFFFFF;
+  --brand-light:    #F2F2F2;
+  --brand-dark:     #E8E8E8;
+  --brand-ink:      #000000;
+
+  /* ── Market semantic colors (signals only) ─────────────────────────── */
+  --market-green:        #34C759;
+  --market-green-light:  rgba(52,199,89,0.14);
+  --market-red:          #FF3B30;
+  --market-red-light:    rgba(255,59,48,0.14);
+  --market-orange:       #FF9500;
+  --market-orange-light: rgba(255,149,0,0.14);
+
+  /* ── UI semantic accents ───────────────────────────────────────────── */
+  --green:          #34C759;
+  --green-light:    rgba(52,199,89,0.14);
+  --red:            #FF3B30;
+  --red-light:      rgba(255,59,48,0.14);
+  --amber:          #FF9500;
+  --amber-light:    rgba(255,149,0,0.14);
+
+  /* ── Signature accent — Raycast red-orange. The ONLY accent color ──── */
+  --accent:         #FF6B4A;
+  --accent-soft:    rgba(255,107,74,0.14);
+  --accent-strong:  rgba(255,107,74,0.26);
+  --accent-ink:     #000000;
+
+  /* ── Text hierarchy (high contrast on black) ───────────────────────── */
+  --text-primary:   #FFFFFF;
+  --text-body:      #B4B4B4;
+  --text-secondary: #8C8C8C;
+  --text-muted:     #6B6B6B;
+  --text-inverse:   #000000;
+  --text-rule:      #232323;
+
+  /* ── Borders — bright enough hairlines to actually read against black ─ */
+  --border:         #2A2A2A;
+  --border-strong:  rgba(255,255,255,0.22);
+  --border-soft:    rgba(255,255,255,0.12);
+  --border-focus:   #FFFFFF;
+
+  /* ── Typography — Inter everywhere. A financial data product reads as
+     serious and legible in one clean sans, not mixed with a display serif. */
+  --font-sans:      -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Inter", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font:           var(--font-sans);
+  --font-mono:      "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --font-display:   -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", sans-serif;
+  --font-serif:     var(--font-display);
+
+  /* ── Radius — Raycast multi-radius system ──────────────────────────── */
+  --radius-sm:      6px;
+  --radius-md:      8px;
+  --radius-lg:      12px;
+  --radius-xl:      18px;
+
+  /* ── Shadows — none in flat spec; elevation via surface ladder ─────── */
+  --shadow-card:    none;
+  --shadow-raised:  0 24px 60px -28px rgba(0,0,0,0.6);
+  --shadow-modal:   0 24px 60px -28px rgba(0,0,0,0.7);
+
+  /* ── Animation — multiple intent-tuned curves ──────────────────────── */
+  --ease-raycast:   cubic-bezier(0.32, 1.4, 0.6, 1);
+  --ease-soft:      cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-paper:     cubic-bezier(0.2, 0.7, 0.1, 1);
+  --ease-draw:      cubic-bezier(0.7, 0, 0.3, 1);
+  --t-fast:         150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --t-base:         220ms cubic-bezier(0.32, 1.4, 0.6, 1);
+  --t-slow:         400ms cubic-bezier(0.16, 1, 0.3, 1);
+  --t-draw:         1200ms cubic-bezier(0.7, 0, 0.3, 1);
+
+  /* ── Aliases ───────────────────────────────────────────────────────── */
+  --page:           var(--bg-page);
+  --chip:           var(--bg-chip);
+  --surface:        var(--bg-card);
+  --surface-hover:  var(--bg-card-hover);
+  --surface-sheet:  var(--bg-sheet);
+  --surface-paper-deep: var(--bg-paper-deep);
+
+  --brand-hover:    var(--brand-dark);
+  --brand-tint:     rgba(255,255,255,0.06);
+
+  --text-900:       var(--text-primary);
+  --text-700:       var(--text-body);
+  --text-500:       var(--text-secondary);
+  --text-300:       var(--text-muted);
+
+  --green-text:     #34C759;
+  --red-text:       #FF3B30;
+  --amber-text:     #FF9500;
+  --accent-text:    #FF6B4A;
+
+  --sh-card:        var(--shadow-card);
+  --sh-raised:      var(--shadow-raised);
+  --sh-float:       var(--shadow-modal);
+  --sh-focus:       0 0 0 3px rgba(255,255,255,0.14);
+
+  --r-xs:           var(--radius-sm);
+  --r-md:           var(--radius-md);
+  --r-lg:           var(--radius-lg);
+
+  /* ── Strict 8px grid ──────────────────────────────────────────────── */
+  --sp-1:           4px;
+  --sp-2:           8px;
+  --sp-3:           12px;
+  --sp-4:           16px;
+  --sp-6:           24px;
+  --sp-8:           32px;
+  --sp-10:          40px;
+  --sp-12:          48px;
+  --sp-16:          64px;
+  --sp-20:          80px;
+  --sp-24:          96px;
+
+  --sz-2xs:         11px;
+  --sz-sm:          13px;
+  --sz-base:        15px;
+  --sz-lg:          17px;
+  --sz-xl:          21px;
+  --sz-2xl:         26px;
+  --sz-3xl:         32px;
+
+  /* ── Glass — the one consistent elevation language across the app.
+     Frosted dark panes with a hairline top-edge highlight, Apple/Raycast
+     translucency style. Used for nav, cards, buttons, overlays. ─────── */
+  --glass-bg:          rgba(24, 24, 26, 0.78);
+  --glass-bg-strong:   rgba(32, 32, 34, 0.9);
+  --glass-border:      rgba(255, 255, 255, 0.14);
+  --glass-border-top:  rgba(255, 255, 255, 0.24);
+  --glass-blur:        20px;
+}

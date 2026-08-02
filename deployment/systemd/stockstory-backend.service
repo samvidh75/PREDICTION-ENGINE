@@ -1,0 +1,22 @@
+[Unit]
+Description=StockStory Backend
+After=network.target
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/home/ubuntu/PREDICTION-ENGINE
+ExecStart=/usr/bin/npx tsx src/render/startServer.ts
+Restart=always
+RestartSec=5
+Environment="NODE_ENV=production"
+Environment="PORT=4001"
+Environment="HOST=0.0.0.0"
+Environment="SGLANG_INTELLIGENCE_URL=http://localhost:11434"
+Environment="DB_ADAPTER=sqlite"
+Environment="ALLOW_SQLITE_IN_PRODUCTION=true"
+Environment="ALLOW_SQLITE_FALLBACK=true"
+Environment="SQLITE_DB_PATH=data/stockstory.db"
+
+[Install]
+WantedBy=multi-user.target

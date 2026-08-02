@@ -1,0 +1,109 @@
+# render.yaml
+# Render Blueprint — StockEX backend
+# Architecture:
+#   Frontend (SPA) → Vercel
+#   Backend (API) → Render
+#   Database → Neon (PostgreSQL)
+#   Cache → Upstash (Redis)
+# Deploys the backend API service on Render.
+#
+# ── Required Environment Variables (set in Render Dashboard) ───────────
+#   DATABASE_URL    → Neon PostgreSQL connection string
+#   COOKIE_SECRET   → openssl rand -base64 64
+#   VERCEL_API_URL  → URL of the Vercel deployment hosting /api/* (optional)
+#
+# ── Optional ───────────────────────────────────────────────────────────
+#   REDIS_URL       → Upstash Redis free tier (for rate limiting + cache)
+#   GROQ_API_KEY    → Groq LLM API key (free, for AI analysis features)
+
+services:
+  - type: web
+    name: stockstory-api
+    runtime: node
+    region: singapore
+    plan: free
+    branch: main
+    buildCommand: npm ci --include=dev && npm run render:build
+    startCommand: npm run render:start
+    healthCheckPath: /healthz
+    autoDeploy: true
+
+    envVars:
+      # ── Runtime ────────────────────────────────────────────────────────
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: 22.12.0
+      - key: HOST
+        value: 0.0.0.0
+      - key: PORT
+        value: 10000
+      - key: LOG_LEVEL
+        value: info
+      - key: TZ
+        value: Asia/Manila
+      - key: NODE_OPTIONS
+        value: --max-old-space-size=512
+
+      # ── Self origin (for CORS when accessed via onrender.com domain) ──
+      - key: SELF_ORIGIN
+        sync: false
+
+      # ── Database (PostgreSQL via Neon free tier) ───────────────────────
+      - key: DATABASE_URL
+        sync: false
+
+      - key: DB_ADAPTER
+        value: auto
+      - key: ALLOW_SQLITE_FALLBACK
+        value: "true"
+      - key: ALLOW_SQLITE_IN_PRODUCTION
+        value: "true"
+      - key: FORCE_MIGRATIONS
+        value: "true"
+
+      # ── Security ───────────────────────────────────────────────────────
+      - key: COOKIE_SECRET
+        sync: false
+
+      # ── CORS ───────────────────────────────────────────────────────────
+      - key: EXTRA_ALLOWED_ORIGINS
+        value: https://stockstory-ph.com,https://www.stockstory-ph.com
+
+      # ── Redis (optional — backend uses in-memory cache when absent) ────
+      - key: REDIS_URL
+        sync: false
+
+      # ── LLM / AI (specialized trained models) ──────────────────────────
+      - key: MODELS_PATH
+        value: /app/models
+      - key: AUTO_GUARDIAN_ENABLED
+        value: "true"
+      - key: SGLANG_URL
+        sync: false
+      - key: OLLAMA_URL
+        sync: false
+      - key: LOCAL_AI_ENABLED
+        value: "false"
+      - key: ENABLE_RESEARCH_BOT
+        value: "true"
+      - key: ENABLE_SCORE_EXPLANATIONS
+        value: "true"
+      - key: ENABLE_STOCK_SNAPSHOTS
+        value: "true"
+      - key: ENABLE_STOCK_COMPARISON
+        value: "true"
+      - key: ENABLE_SCANNER_THESES
+        value: "true"
+      - key: ENABLE_THESIS_TRACKING
+        value: "true"
+
+      # ── Firebase (optional — required for auth) ────────────────────────
+      - key: FIREBASE_PROJECT_ID
+        sync: false
+      - key: FIREBASE_CLIENT_EMAIL
+        sync: false
+      - key: FIREBASE_PRIVATE_KEY
+        sync: false
+      - key: FIREBASE_USE_APPLICATION_DEFAULT_CREDENTIALS
+        sync: false

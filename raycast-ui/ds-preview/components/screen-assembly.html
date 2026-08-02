@@ -1,0 +1,80 @@
+<!-- @dsCard group="Screens" -->
+<style>
+  :root {
+    --bg-base: #0b0b0c; --bg-card: #121214; --bg-card-alt: #1c1c1e; --bg-elevated: #2c2c2e;
+    --border-hairline: #2c2c2e;
+    --text-primary: #f4f4f5; --text-secondary: #a1a1aa; --text-muted: #71717a;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg-base); font-family: -apple-system, Inter, sans-serif; color: var(--text-primary); }
+  .app { display: flex; flex-direction: column; width: 720px; height: 520px; }
+
+  .command-bar { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 1px solid var(--border-hairline); }
+  .search { flex: 1; font-size: 14px; color: var(--text-muted); }
+
+  .main { display: flex; flex: 1; min-height: 0; }
+
+  .sidebar { width: 200px; flex-shrink: 0; border-right: 1px solid var(--border-hairline); padding: 12px 8px; }
+  .section-label { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-muted); padding: 0 8px 6px; }
+  .nav-link { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 8px; font-size: 14px; color: var(--text-secondary); margin-bottom: 2px; }
+  .nav-link.active { background: var(--bg-card-alt); color: var(--text-primary); }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--text-primary); opacity: 0; }
+  .nav-link.active .dot { opacity: 0.7; }
+
+  .results { flex: 1; overflow: auto; padding: 12px; }
+  .row { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; border-radius: 12px; border: 1px solid transparent; margin-bottom: 4px; }
+  .row.selected { background: var(--bg-card); border-color: var(--border-hairline); }
+  .row-left { display: flex; align-items: center; gap: 12px; }
+  .icon { width: 28px; height: 28px; border-radius: 8px; background: var(--bg-card-alt); border: 1px solid var(--border-hairline); }
+  .title { font-size: 14px; line-height: 1.2; }
+  .subtitle { font-size: 12px; color: var(--text-muted); line-height: 1.2; }
+  .kbd { display: inline-flex; padding: 2px 6px; font-size: 11px; font-weight: 500; border-radius: 8px; background: var(--bg-card-alt); border: 1px solid var(--border-hairline); color: var(--text-secondary); }
+
+  .footer { display: flex; align-items: center; justify-content: space-between; padding: 8px 16px; border-top: 1px solid var(--border-hairline); font-size: 12px; color: var(--text-muted); }
+  .hints { display: flex; gap: 16px; }
+  .hint { display: flex; gap: 4px; align-items: center; }
+</style>
+<div class="app">
+  <div class="command-bar">
+    <span class="search">Search for apps and commands…</span>
+    <kbd class="kbd">⌘K</kbd>
+  </div>
+  <div class="main">
+    <div class="sidebar">
+      <div class="section-label">Navigation</div>
+      <a class="nav-link active"><span class="dot"></span>All Commands</a>
+      <a class="nav-link">Applications</a>
+      <a class="nav-link">Extensions</a>
+      <a class="nav-link">Snippets</a>
+      <div class="section-label" style="margin-top:16px">Recent</div>
+      <a class="nav-link">Clipboard History</a>
+      <a class="nav-link">Window Management</a>
+    </div>
+    <div class="results">
+      <div class="section-label">Suggestions</div>
+      <div class="row selected">
+        <div class="row-left"><div class="icon"></div><div><div class="title">Search Files</div><div class="subtitle">System</div></div></div>
+        <kbd class="kbd">↵</kbd>
+      </div>
+      <div class="row">
+        <div class="row-left"><div class="icon"></div><div><div class="title">Toggle Dark Mode</div><div class="subtitle">Preferences</div></div></div>
+        <kbd class="kbd">⌘D</kbd>
+      </div>
+      <div class="row">
+        <div class="row-left"><div class="icon"></div><div><div class="title">Create Snippet</div><div class="subtitle">Snippets</div></div></div>
+        <kbd class="kbd">⌘N</kbd>
+      </div>
+      <div class="row">
+        <div class="row-left"><div class="icon"></div><div><div class="title">Window: Left Half</div><div class="subtitle">Window Management</div></div></div>
+        <kbd class="kbd">⌥←</kbd>
+      </div>
+    </div>
+  </div>
+  <div class="footer">
+    <span>Raycast</span>
+    <div class="hints">
+      <span class="hint">Open Application <kbd class="kbd">↵</kbd></span>
+      <span class="hint">Actions <kbd class="kbd">⌘K</kbd></span>
+    </div>
+  </div>
+</div>

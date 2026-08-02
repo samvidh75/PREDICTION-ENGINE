@@ -1,0 +1,16 @@
+export { computeResearchConviction } from "./engine/researchEngine";
+export { buildCompanyResearch } from "./engine/companyResearchEngine";
+export { runScanner, SCANNER_PRESETS } from "./scanner/scannerEngine";
+export { compareCompanies } from "./compare/compareEngine";
+export { trackThesis } from "./watchlist/watchlistEngine";
+export { monitorPortfolio } from "./portfolio/portfolioEngine";
+export { generateAlerts } from "./alerts/alertsEngine";
+export { ENGINE_VERSION, DEFAULT_WEIGHTS, validateWeights } from "./engine/scoringMethodology";
+export type { ResearchConvictionScore, ConvictionLabel } from "./engine/researchEngine";
+export type { CompanyResearchInput, CompanyResearchOutput } from "./engine/companyResearchEngine";
+export type { ScannerPreset, ScannerCompanyInput } from "./scanner/scannerEngine";
+export type { CompareInput } from "./compare/compareEngine";
+export type { ThesisTrackingInput } from "./watchlist/watchlistEngine";
+export type { PortfolioHoldingInput } from "./portfolio/portfolioEngine";
+export type { AlertTriggerInput } from "./alerts/alertsEngine";
+export type * from "./contracts/productContracts";

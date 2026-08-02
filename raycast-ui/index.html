@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Raycast-Style Command UI — Static Layout</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="./styles/tokens.css" />
+<link rel="stylesheet" href="./styles/layout.css" />
+</head>
+<body class="bg-[#0b0b0c] text-[#f4f4f5] font-sans antialiased h-screen overflow-hidden">
+
+  <div class="flex flex-col h-full">
+
+    <!-- Command Bar -->
+    <header class="shrink-0 border-b border-[#2c2c2e] bg-[#0b0b0c]/80 backdrop-blur-xl">
+      <div class="flex items-center gap-3 px-4 py-3 max-w-5xl mx-auto">
+        <svg class="w-4 h-4 text-[#a1a1aa]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input
+          id="command-input"
+          type="text"
+          placeholder="Search for apps and commands…"
+          class="flex-1 bg-transparent text-sm placeholder:text-[#71717a] focus:outline-none"
+        />
+        <kbd class="px-1.5 py-0.5 text-[11px] rounded-[8px] bg-[#1c1c1e] border border-[#2c2c2e] text-[#a1a1aa]">⌘K</kbd>
+      </div>
+    </header>
+
+    <!-- Main -->
+    <div class="flex flex-1 min-h-0 max-w-5xl mx-auto w-full">
+
+      <!-- Sidebar -->
+      <aside class="w-56 shrink-0 border-r border-[#2c2c2e] py-3 px-2 hidden sm:block">
+        <p class="px-2 pb-1.5 text-[11px] font-medium uppercase tracking-wide text-[#71717a]">Navigation</p>
+        <nav class="space-y-0.5">
+          <a class="nav-link flex items-center gap-2 px-2 py-1.5 rounded-[8px] bg-[#1c1c1e] text-sm text-[#f4f4f5] transition-colors duration-100 ease-out focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#f4f4f5]/40" href="#" data-active="true">
+            <span class="w-1.5 h-1.5 rounded-full bg-[#f4f4f5]/70"></span> All Commands
+          </a>
+          <a class="nav-link flex items-center gap-2 px-2 py-1.5 rounded-[8px] text-sm text-[#a1a1aa] hover:bg-[#121214] hover:text-[#f4f4f5] transition-colors duration-100 ease-out focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#f4f4f5]/40" href="#">
+            <span class="w-1.5 h-1.5 rounded-full bg-transparent"></span> Applications
+          </a>
+          <a class="nav-link flex items-center gap-2 px-2 py-1.5 rounded-[8px] text-sm text-[#a1a1aa] hover:bg-[#121214] hover:text-[#f4f4f5] transition-colors duration-100 ease-out focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#f4f4f5]/40" href="#">
+            <span class="w-1.5 h-1.5 rounded-full bg-transparent"></span> Extensions
+          </a>
+          <a class="nav-link flex items-center gap-2 px-2 py-1.5 rounded-[8px] text-sm text-[#a1a1aa] hover:bg-[#121214] hover:text-[#f4f4f5] transition-colors duration-100 ease-out focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#f4f4f5]/40" href="#">
+            <span class="w-1.5 h-1.5 rounded-full bg-transparent"></span> Snippets
+          </a>
+        </nav>
+
+        <p class="px-2 pt-4 pb-1.5 text-[11px] font-medium uppercase tracking-wide text-[#71717a]">Recent</p>
+        <nav class="space-y-0.5">
+          <a class="nav-link flex items-center gap-2 px-2 py-1.5 rounded-[8px] text-sm text-[#a1a1aa] hover:bg-[#121214] hover:text-[#f4f4f5] transition-colors duration-100 ease-out focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#f4f4f5]/40" href="#">Clipboard History</a>
+          <a class="nav-link flex items-center gap-2 px-2 py-1.5 rounded-[8px] text-sm text-[#a1a1aa] hover:bg-[#121214] hover:text-[#f4f4f5] transition-colors duration-100 ease-out focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#f4f4f5]/40" href="#">Window Management</a>
+        </nav>
+      </aside>
+
+      <!-- Results / Fluid viewport container -->
+      <main class="relative flex-1 min-h-0 overflow-hidden">
+
+        <!-- 3D fluid background: WebGL shader canvas, CSS gradient is the no-WebGL fallback -->
+        <div id="raycast-fluid-viewport" class="absolute inset-0 z-0 bg-[#0b0b0c] overflow-hidden">
+          <div class="fluid-placeholder absolute inset-0 opacity-[0.08]"></div>
+          <canvas id="fluid-canvas" class="absolute inset-0 w-full h-full opacity-0 transition-opacity duration-700 ease-out"></canvas>
+        </div>
+
+        <!-- Result list panel -->
+        <div class="relative z-10 h-full overflow-y-auto px-3 py-3">
+          <p class="px-2 pb-1.5 text-[11px] font-medium uppercase tracking-wide text-[#71717a]">Suggestions</p>
+
+          <ul id="result-list" class="space-y-1">
+            <li class="result-item flex items-center justify-between px-3 py-2 rounded-[12px] border border-transparent transition-colors duration-100 ease-out cursor-pointer focus-visible:outline-none" tabindex="0" data-index="0">
+              <div class="flex items-center gap-3">
+                <div class="w-7 h-7 rounded-[8px] bg-[#1c1c1e] border border-[#2c2c2e]"></div>
+                <div>
+                  <p class="text-sm text-[#f4f4f5] leading-tight">Search Files</p>
+                  <p class="text-xs text-[#71717a] leading-tight">System</p>
+                </div>
+              </div>
+              <kbd class="px-1.5 py-0.5 text-[11px] rounded-[8px] bg-[#1c1c1e] border border-[#2c2c2e] text-[#a1a1aa]">↵</kbd>
+            </li>
+
+            <li class="result-item flex items-center justify-between px-3 py-2 rounded-[12px] border border-transparent transition-colors duration-100 ease-out cursor-pointer focus-visible:outline-none" tabindex="0" data-index="1">
+              <div class="flex items-center gap-3">
+                <div class="w-7 h-7 rounded-[8px] bg-[#1c1c1e] border border-[#2c2c2e]"></div>
+                <div>
+                  <p class="text-sm text-[#f4f4f5] leading-tight">Toggle Dark Mode</p>
+                  <p class="text-xs text-[#71717a] leading-tight">Preferences</p>
+                </div>
+              </div>
+              <kbd class="px-1.5 py-0.5 text-[11px] rounded-[8px] bg-[#1c1c1e] border border-[#2c2c2e] text-[#a1a1aa]">⌘D</kbd>
+            </li>
+
+            <li class="result-item flex items-center justify-between px-3 py-2 rounded-[12px] border border-transparent transition-colors duration-100 ease-out cursor-pointer focus-visible:outline-none" tabindex="0" data-index="2">
+              <div class="flex items-center gap-3">
+                <div class="w-7 h-7 rounded-[8px] bg-[#1c1c1e] border border-[#2c2c2e]"></div>
+                <div>
+                  <p class="text-sm text-[#f4f4f5] leading-tight">Create Snippet</p>
+                  <p class="text-xs text-[#71717a] leading-tight">Snippets</p>
+                </div>
+              </div>
+              <kbd class="px-1.5 py-0.5 text-[11px] rounded-[8px] bg-[#1c1c1e] border border-[#2c2c2e] text-[#a1a1aa]">⌘N</kbd>
+            </li>
+
+            <li class="result-item flex items-center justify-between px-3 py-2 rounded-[12px] border border-transparent transition-colors duration-100 ease-out cursor-pointer focus-visible:outline-none" tabindex="0" data-index="3">
+              <div class="flex items-center gap-3">
+                <div class="w-7 h-7 rounded-[8px] bg-[#1c1c1e] border border-[#2c2c2e]"></div>
+                <div>
+                  <p class="text-sm text-[#f4f4f5] leading-tight">Window: Left Half</p>
+                  <p class="text-xs text-[#71717a] leading-tight">Window Management</p>
+                </div>
+              </div>
+              <kbd class="px-1.5 py-0.5 text-[11px] rounded-[8px] bg-[#1c1c1e] border border-[#2c2c2e] text-[#a1a1aa]">⌥←</kbd>
+            </li>
+          </ul>
+        </div>
+      </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="shrink-0 border-t border-[#2c2c2e] bg-[#0b0b0c]/80 backdrop-blur-xl">
+      <div class="flex items-center justify-between px-4 py-2 max-w-5xl mx-auto text-xs text-[#71717a]">
+        <div class="flex items-center gap-2">
+          <span class="w-4 h-4 rounded-[6px] bg-[#1c1c1e] border border-[#2c2c2e] inline-block"></span>
+          Raycast
+        </div>
+        <div class="flex items-center gap-4">
+          <span class="flex items-center gap-1">Open Application <kbd class="px-1.5 py-0.5 rounded-[8px] bg-[#1c1c1e] border border-[#2c2c2e]">↵</kbd></span>
+          <span class="flex items-center gap-1">Actions <kbd class="px-1.5 py-0.5 rounded-[8px] bg-[#1c1c1e] border border-[#2c2c2e]">⌘K</kbd></span>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script src="./scripts/keyboard-nav.js" defer></script>
+  <script src="./scripts/fluid-canvas.js" defer></script>
+</body>
+</html>

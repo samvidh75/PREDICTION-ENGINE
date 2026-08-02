@@ -1,0 +1,23 @@
+{
+  "name": "stockstory-model-worker",
+  "version": "1.0.0",
+  "description": "Cloudflare Worker for StockStory Indian stock market SLM inference",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "deploy:staging": "wrangler deploy --env staging",
+    "deploy:prod": "wrangler deploy --env production",
+    "deploy:model": "wrangler pages project create stockstory-model-weights --production-branch main || true && npx wrangler pages deploy ./model-weights --project-name stockstory-model-weights",
+    "tail": "wrangler tail",
+    "logs": "wrangler tail --format pretty",
+    "test": "echo 'No tests yet'"
+  },
+  "dependencies": {
+    "wrangler": "^4.0.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250401.0",
+    "typescript": "^5.5.0"
+  }
+}

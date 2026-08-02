@@ -1,0 +1,32 @@
+<!-- @dsCard group="PREDICTION-ENGINE / Compare" -->
+<style>
+  :root {
+    --canvas:#000; --ink:#FFF; --body:#B4B4B4; --mute:#8C8C8C; --hairline:#1F1F1F;
+    --green:#34C759; --red:#FF3B30; --bg-sheet: rgba(18,18,20,0.55);
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--canvas); font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Inter",sans-serif; color:var(--ink); }
+  .page { width: 390px; padding: 16px; display: grid; gap: 14px; }
+  h1 { font-size: 22px; font-weight: 600; letter-spacing: -0.02em; margin: 0; }
+  .tabs { display: flex; gap: 4px; overflow-x: auto; }
+  .tab { padding: 6px 12px; font-size: 12px; color: var(--mute); border-radius: 6px; flex-shrink: 0; white-space: nowrap; }
+  .tab.active { background: var(--ink); color: #000; font-weight: 600; }
+  .card { background: var(--bg-sheet); border: 1px solid var(--hairline); border-radius: 8px; padding: 14px; }
+  .metric-row { display: flex; justify-content: space-between; padding: 8px 0; border-top: 1px solid var(--hairline); font-size: 12.5px; }
+  .metric-row:first-of-type { border-top: none; }
+  .label { color: var(--body); }
+  .vals { display: flex; gap: 10px; }
+  .best { color: var(--green); font-weight: 600; }
+  .worst { color: var(--red); }
+</style>
+<div class="page">
+  <h1>Compare</h1>
+  <div class="tabs">
+    <div class="tab active">Valuation</div><div class="tab">Quality</div><div class="tab">Growth</div>
+  </div>
+  <div class="card">
+    <div class="metric-row"><span class="label">P/E (BDO / AC / SM)</span><span class="vals"><span class="best">9.4</span><span>14.2</span><span class="worst">18.1</span></span></div>
+    <div class="metric-row"><span class="label">Div Yield</span><span class="vals"><span class="best">4.1%</span><span>2.3%</span><span class="worst">1.1%</span></span></div>
+    <div class="metric-row"><span class="label">D/E</span><span class="vals"><span class="best">0.42</span><span>0.68</span><span class="worst">0.91</span></span></div>
+  </div>
+</div>

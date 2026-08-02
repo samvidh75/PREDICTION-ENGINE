@@ -1,0 +1,134 @@
+# Temporary files
+.tmp/
+
+# Dependencies
+node_modules/
+
+# Build outputs (Vite builds from source during deploy)
+dist/
+build/
+.next/
+coverage/
+playwright-report/
+test-results/
+.turbo/
+.vite/
+.parcel-cache/
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.prod
+.env.vercel
+.env.vercel.preview
+.env.production
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.log
+*.trace
+*.zip
+
+# Generated operational reports
+reports/agent/
+
+# IDE & OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Firebase
+.firebase/
+
+# Vite
+vite.config.ts.timestamp-*
+
+# TypeScript
+*.tsbuildinfo
+
+# SQLite
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+data/snapshots/
+data/backups/
+
+# Temporary files
+.cache/
+tmp/
+temp/
+.tmp.driveupload/
+task.md
+walkthrough.md
+implementation_plan.md
+
+# Local artifact archive
+archive/local-artifacts/
+temp_*.ps1
+
+# Generated/artifact directories (may appear from code generation)
+src/components/src/
+.vercel
+.env*
+!.env.example
+!.env.production.example
+.playwright-mcp/
+
+# Local reference dumps containing real secret values — never commit these
+ALL_ENV_VARIABLES_WITH_VALUES.txt
+COMPLETE_ENV_VARIABLES.txt
+FINAL_ENV_VARIABLES_PERFECT.txt
+cloudflare-env.txt
+cloudflare-login.md
+cloudflare-after-login.md
+godaddy-*.md
+oci-*.md
+
+# Personal audio transcripts unrelated to this project
+*.transcript.txt
+
+# Local machine-specific scheduler config (hardcoded local file paths)
+deployment/scheduler-config.env
+
+# Stray artifacts
+dashboard.png
+opencode.json
+:memory*
+scripts/dump-keymetrics.ts
+scripts/test-indianapi-keys.ts
+reports/frontend-rebuild/*
+reports/track-8d/*
+:memory*
+artifacts/
+tmp-debug.html
+:memory:*
+.tmp.drivedownload/
+.aider*
+*.png
+stockstory-demo
+__pycache__/
+data/chroma_db/
+data/training_dataset/
+stockex_merged_model/
+*.safetensors
+*.pt
+checkpoint-*/
+._*
+opencode.old.json*
+opencode.json.save
+*.jsonc.save
+.!*
+tokenizer.json
+tokenizer_config.json
+gemma_pse_model_final/
+*.safetensors

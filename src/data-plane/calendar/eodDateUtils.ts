@@ -1,0 +1,51 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// Phase 21A — EOD date utilities
+//
+// Date helpers shared by the EOD ingestion pipeline, refresh scheduler, and
+// precompute engines.
+// ─────────────────────────────────────────────────────────────────────────────
+
+import { pseTradingCalendar } from './PSETradingCalendar';
+
+/**
+ * Get the "EOD date" — the most recent completed trading day.
+ * Between 09:30 and 15:30 PHT the EOD date is the previous trading day
+ * (today's session hasn't closed yet).  After 15:30 it is today.
+ */
+export function getEodDate(now: Date = new Date()): string {
+  const cal = pseTradingCalendar;
+  const phtMs = (now.getTime() + 8 * 60 * 60 * 1000) % (24 * 60 * 60 * 1000);
+  const closeMs = 15 * 60 * 60 * 1000 + 30 * 60 * 1000;
+
+  if (cal.isTradingDay(now) && phtMs >= closeMs) {
+    // Market closed today — EOD date is today
+    return now.toISOString().slice(0, 10);
+  }
+
+  // Before close or not a trading day — previous trading day
+  return cal.previousTradingDay(now).toISOString().slice(0, 10);
+}
+
+/**
+ * Format a Date to 'YYYY-MM-DD' (UTC).
+ */
+export function fmtDate(d: Date): string {
+  return d.toISOString().slice(0, 10);
+}
+
+/**
+ * Parse 'YYYY-MM-DD' to a Date at 00:00:00 UTC.
+ */
+export function parseDate(s: string): Date {
+  // Strip any time component so we always get midnight UTC
+  const datePart = s.includes('T') ? s.split('T')[0] : s;
+  return new Date(`${datePart}T00:00:00.000Z`);
+}
+
+/**
+ * Get a human-readable week day name.
+ */
+export function weekDayName(date: Date | string): string {
+  const d = typeof date === 'string' ? parseDate(date) : date;
+  return ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][d.getUTCDay()];
+}

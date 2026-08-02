@@ -1,0 +1,35 @@
+<!-- @dsCard group="PREDICTION-ENGINE / AIChat" -->
+<style>
+  :root { --canvas:#000; --ink:#FFF; --body:#B4B4B4; --mute:#8C8C8C; --hairline:#1F1F1F; --accent:#FF6B4A; --bg-sheet: rgba(18,18,20,0.55); --bg-card: rgba(26,26,28,0.62); }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--canvas); font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Inter",sans-serif; color:var(--ink); }
+  .page { width: 780px; padding: 32px; display: grid; gap: 20px; }
+  h1 { font-size: 26px; font-weight: 700; margin: 0; }
+  .suggestions { display: flex; flex-wrap: wrap; gap: 8px; }
+  .sugg { padding: 8px 14px; border: 1px solid var(--hairline); border-radius: 8px; font-size: 12.5px; color: var(--body); background: var(--bg-sheet); }
+  .msgs { display: grid; gap: 14px; }
+  .msg { display: flex; gap: 10px; max-width: 80%; }
+  .msg.user { justify-self: end; flex-direction: row-reverse; }
+  .avatar { width: 28px; height: 28px; border-radius: 50%; background: var(--bg-card); border: 1px solid var(--hairline); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 13px; color: var(--accent); }
+  .bubble { background: var(--bg-sheet); border: 1px solid var(--hairline); border-radius: 10px; padding: 12px 14px; font-size: 13.5px; line-height: 1.55; }
+  .msg.user .bubble { background: var(--ink); color: #000; border: none; }
+  .input-row { display: flex; gap: 10px; }
+  .input { flex: 1; height: 48px; border: 1px solid var(--hairline); background: var(--bg-sheet); border-radius: 8px; padding: 0 16px; color: var(--ink); font-size: 14px; }
+  .send { width: 48px; height: 48px; background: var(--ink); color: #000; border-radius: 8px; border: none; display: flex; align-items: center; justify-content: center; }
+</style>
+<div class="page">
+  <h1>Research Assistant</h1>
+  <div class="suggestions">
+    <div class="sugg">Analyze Reliance Industries — bull vs bear case</div>
+    <div class="sugg">Compare TCS vs Infosys on valuation</div>
+    <div class="sugg">What's driving the IT sector's momentum today?</div>
+  </div>
+  <div class="msgs">
+    <div class="msg user"><div class="avatar">U</div><div class="bubble">What's driving the IT sector's momentum today?</div></div>
+    <div class="msg"><div class="avatar">✦</div><div class="bubble">IT services names are re-rating on stronger-than-expected deal wins this quarter, with margin commentary suggesting cost discipline is holding even as wage inflation picks up. TCS and Infosys both flagged accelerating discretionary spend from BFSI clients.</div></div>
+  </div>
+  <div class="input-row">
+    <input class="input" placeholder="Ask a research question…" />
+    <div class="send">→</div>
+  </div>
+</div>

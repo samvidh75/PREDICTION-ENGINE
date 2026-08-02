@@ -1,0 +1,97 @@
+- generic [ref=f10e9]:
+  - banner [ref=f10e10]:
+    - img [ref=f10e12]
+    - generic [ref=f10e15]:
+      - button "English" [ref=f10e16] [cursor=pointer]:
+        - img [ref=f10e17]
+        - generic [ref=f10e19]:
+          - text: English
+          - img [ref=f10e20]
+      - link "Sign up" [ref=f10e22] [cursor=pointer]:
+        - /url: /sign-up
+        - generic [ref=f10e24]: Sign up
+  - main [ref=f10e27]:
+    - generic [ref=f10e30]:
+      - generic [ref=f10e32]:
+        - heading "Sign in to Cloudflare" [level=1] [ref=f10e34]
+        - generic [ref=f10e36]:
+          - generic [ref=f10e37]:
+            - generic [ref=f10e38]:
+              - button "Continue with Google" [ref=f10e40] [cursor=pointer]:
+                - img [ref=f10e41]
+                - generic [ref=f10e48]: Google
+              - button "Continue with Apple" [ref=f10e50] [cursor=pointer]:
+                - img [ref=f10e51]
+                - generic [ref=f10e54]: Apple
+              - button "Continue with GitHub" [ref=f10e56] [cursor=pointer]:
+                - img [ref=f10e57]
+                - generic [ref=f10e63]: GitHub
+            - button "Continue with SSO" [ref=f10e64] [cursor=pointer]:
+              - img [ref=f10e65]
+              - generic [ref=f10e68]: Continue with SSO
+          - generic [ref=f10e71]: or
+          - generic [ref=f10e73]:
+            - generic [ref=f10e74]:
+              - generic [ref=f10e76]:
+                - generic [ref=f10e79]: Email
+                - textbox "Email" [ref=f10e80]: samvidh75@gmail.com
+              - generic [ref=f10e83]:
+                - generic [ref=f10e86]: Password
+                - generic [ref=f10e87]:
+                  - textbox "Password" [ref=f10e89]: Samvidh@1506
+                  - button "Show" [ref=f10e90] [cursor=pointer]:
+                    - img [ref=f10e91]
+              - alert [ref=f10e135]:
+                - img [ref=f10e136]
+                - generic [ref=f10e138]: Incorrect email or password.
+            - button "Sign in" [ref=f10e95] [cursor=pointer]:
+              - generic [ref=f10e99]: Sign in
+        - generic [ref=f10e100]:
+          - generic [ref=f10e101]:
+            - paragraph [ref=f10e102]: Don't have an account?
+            - button "Sign up" [ref=f10e103] [cursor=pointer]
+          - paragraph [ref=f10e104]:
+            - text: Forgot your
+            - link "email" [ref=f10e105] [cursor=pointer]:
+              - /url: /forgot-email
+            - text: or
+            - link "password" [ref=f10e106] [cursor=pointer]:
+              - /url: /forgot-password
+            - text: "?"
+      - paragraph [ref=f10e111]:
+        - text: By continuing, I agree to Cloudflare's
+        - link "terms" [ref=f10e112] [cursor=pointer]:
+          - /url: https://www.cloudflare.com/subscriptionagreement/
+        - text: ","
+        - link "privacy policy" [ref=f10e113] [cursor=pointer]:
+          - /url: https://www.cloudflare.com/privacypolicy/
+        - text: ", and"
+        - link "cookie policy" [ref=f10e114] [cursor=pointer]:
+          - /url: https://www.cloudflare.com/cookie-policy/
+        - text: .
+  - contentinfo [ref=f10e115]:
+    - list [ref=f10e117]:
+      - listitem [ref=f10e118]:
+        - link "Support" [ref=f10e119] [cursor=pointer]:
+          - /url: https://support.cloudflare.com
+      - listitem [ref=f10e120]:
+        - link "System status" [ref=f10e121] [cursor=pointer]:
+          - /url: https://www.cloudflarestatus.com
+      - listitem [ref=f10e122]:
+        - link "Careers" [ref=f10e123] [cursor=pointer]:
+          - /url: https://www.cloudflare.com/careers/
+      - listitem [ref=f10e124]:
+        - link "Terms of Use" [ref=f10e125] [cursor=pointer]:
+          - /url: https://www.cloudflare.com/website-terms/
+      - listitem [ref=f10e126]:
+        - link "Report Security Issues" [ref=f10e127] [cursor=pointer]:
+          - /url: https://www.cloudflare.com/disclosure/
+      - listitem [ref=f10e128]:
+        - link "Privacy Policy" [ref=f10e129] [cursor=pointer]:
+          - /url: https://www.cloudflare.com/privacypolicy/
+      - listitem [ref=f10e130]:
+        - button "A blue and white pill with a checkmark and an x, representing privacy choices Cookie Preferences" [ref=f10e131] [cursor=pointer]:
+          - img "A blue and white pill with a checkmark and an x, representing privacy choices" [ref=f10e132]
+          - text: Cookie Preferences
+      - listitem [ref=f10e133]:
+        - generic [ref=f10e134]: © 2026 Cloudflare, Inc.

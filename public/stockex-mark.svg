@@ -1,0 +1,43 @@
+<svg width="512" height="512" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="StockEx" role="img">
+  <title>StockEx</title>
+  <!-- Paper tile with hairline rule -->
+  <rect x="2.5" y="2.5" width="75" height="75" rx="14" fill="#F2EEE6"/>
+  <rect x="2.5" y="2.5" width="75" height="75" rx="14" fill="none" stroke="#0E1116" stroke-width="1.25" stroke-opacity="0.85"/>
+
+  <!-- Editorial caption: a small dateline at the top -->
+  <line x1="12" y1="14" x2="40" y2="14" stroke="#0E1116" stroke-width="1.4" stroke-linecap="round"/>
+  <line x1="44" y1="14" x2="56" y2="14" stroke="#0E1116" stroke-width="1.4" stroke-linecap="round" stroke-opacity="0.4"/>
+
+  <!-- Bold serif italic "S" — the wordmark starts here -->
+  <path
+    d="M40 27.6C37.7 27.6 35.9 28.6 34.7 30.6C33.5 32.6 32.9 35.2 32.9 38.4V39.5C32.9 42.7 33.6 45.3 34.9 47.2C36.3 49.2 38.1 50.1 40.5 50.1C42.1 50.1 43.5 49.7 44.7 48.9C45.9 48.1 46.9 47 47.5 45.4L43.7 43.5C43.2 45.0 42.0 45.7 40.3 45.7C38.9 45.7 37.7 44.9 36.9 43.4C36.1 41.8 35.7 39.7 35.7 37.2C35.7 34.8 36.1 32.9 36.9 31.6C37.7 30.3 38.8 29.6 40.2 29.6C41.5 29.6 42.6 30.2 43.3 31.2L47.0 28.7C46.2 27.6 45.0 26.8 43.5 26.3C42.4 25.9 41.3 25.7 40 25.7"
+    fill="#0E1116"
+  />
+
+  <!-- Bottom: an ascending paper "rule" — the price line -->
+  <path
+    d="M12 60 L24 60 L32 53 L42 45 L52 38 L60 33"
+    fill="none"
+    stroke="#0E1116"
+    stroke-width="2.2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+
+  <!-- The break point: a fox-orange accent segment signaling change -->
+  <path
+    d="M48 39.5 L60 33"
+    fill="none"
+    stroke="#B6432A"
+    stroke-width="2.6"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+
+  <!-- Apex data point -->
+  <circle cx="60" cy="33" r="3.25" fill="#B6432A"/>
+  <circle cx="60" cy="33" r="1.15" fill="#F2EEE6"/>
+
+  <!-- Tiny timestamp tick on the chart -->
+  <line x1="22.5" y1="60" x2="22.5" y2="63" stroke="#0E1116" stroke-width="1" stroke-opacity="0.5"/>
+</svg>

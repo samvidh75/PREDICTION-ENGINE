@@ -1,0 +1,43 @@
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--bg-elevated) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--bg-elevated);
+  border-radius: var(--radius-sm);
+}
+
+/* Phase 3: low-opacity placeholder for the future fluid canvas */
+.fluid-placeholder {
+  background: radial-gradient(circle at 30% 30%, #3a3a3d, transparent 60%),
+              radial-gradient(circle at 70% 70%, #2c2c2e, transparent 55%);
+  background-size: 200% 200%;
+  animation: fluid-drift 18s ease-in-out infinite;
+  filter: blur(40px);
+}
+
+@keyframes fluid-drift {
+  0%   { background-position: 0% 0%, 100% 100%; }
+  50%  { background-position: 100% 50%, 0% 50%; }
+  100% { background-position: 0% 0%, 100% 100%; }
+}
+
+/* Active keyboard-selected result row */
+.result-item[data-selected="true"] {
+  background-color: var(--bg-card);
+  border-color: var(--border-hairline);
+}
+
+.result-item:hover {
+  background-color: var(--bg-card);
+}
+
+.nav-link[data-active="true"] {
+  background-color: var(--bg-card-alt);
+  color: var(--text-primary);
+}

@@ -1,0 +1,29 @@
+<!-- @dsCard group="PREDICTION-ENGINE / Watchlist" -->
+<style>
+  :root {
+    --canvas:#000; --ink:#FFF; --body:#B4B4B4; --mute:#8C8C8C; --hairline:#1F1F1F;
+    --green:#34C759; --blue:#57C1FF; --yellow:#FF9500; --red:#FF3B30;
+    --bg-sheet: rgba(18,18,20,0.55);
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--canvas); font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Inter",sans-serif; color:var(--ink); }
+  .page { width: 1040px; padding: 32px; display: grid; gap: 20px; }
+  h1 { font-size: 32px; font-weight: 600; letter-spacing: -0.02em; margin: 0; }
+  .card { background: var(--bg-sheet); border: 1px solid var(--hairline); border-radius: 8px; }
+  .row { display: grid; grid-template-columns: 100px 1fr 160px 120px; align-items: center; padding: 14px 20px; border-top: 1px solid var(--hairline); }
+  .row:first-of-type { border-top: none; }
+  .sym { font-weight: 600; font-size: 14px; }
+  .name { color: var(--body); font-size: 13px; }
+  .status { font-size: 12px; display: flex; align-items: center; gap: 6px; }
+  .dot { width: 6px; height: 6px; border-radius: 50%; }
+  .conviction { justify-self: end; font-size: 12px; padding: 3px 10px; border-radius: 12px; border: 1px solid var(--hairline); color: var(--mute); }
+</style>
+<div class="page">
+  <h1>Watchlist</h1>
+  <div class="card">
+    <div class="row"><div class="sym">BDO</div><div class="name">BDO Unibank</div><div class="status"><span class="dot" style="background:var(--green)"></span>Strengthening</div><div class="conviction">High conviction</div></div>
+    <div class="row"><div class="sym">JFC</div><div class="name">Jollibee Foods</div><div class="status"><span class="dot" style="background:var(--yellow)"></span>Needs review</div><div class="conviction">Watching</div></div>
+    <div class="row"><div class="sym">AC</div><div class="name">Ayala Corp</div><div class="status"><span class="dot" style="background:var(--blue)"></span>Stable</div><div class="conviction">High conviction</div></div>
+    <div class="row"><div class="sym">TEL</div><div class="name">PLDT Inc.</div><div class="status"><span class="dot" style="background:var(--red)"></span>Weakening</div><div class="conviction">Trim candidate</div></div>
+  </div>
+</div>

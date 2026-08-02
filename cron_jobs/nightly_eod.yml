@@ -1,0 +1,11 @@
+# Deploy to Railway as a scheduled job
+version: 1
+name: nightly-eod-sync
+command: python scripts/python/nightly_eod_sync.py
+
+# Run daily at 4:30 PM IST (11:00 AM UTC)
+schedule: "0 11 * * *"
+
+environment:
+  - DATABASE_URL=$DATABASE_URL
+  - UPSTOX_API_KEY=$UPSTOX_API_KEY

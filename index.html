@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en-PH">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5, user-scalable=yes" />
+
+    <!-- ── Security Headers ─────────────────────────────────────────────── -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https:; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' https: data:; connect-src 'self' https: wss:; upgrade-insecure-requests;" />
+    <meta http-equiv="Strict-Transport-Security" content="max-age=31536000; includeSubDomains" />
+    <meta http-equiv="X-Frame-Options" content="DENY" />
+    <!-- (X-Frame-Options must be set via HTTP headers, not meta. Kept here for legacy crawlers.) -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block" />
+    <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
+    <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()" />
+
+    <!-- ── Primary SEO ──────────────────────────────────────────────────── -->
+    <title>StockEx — PSE Stock Research Platform</title>
+    <meta name="description" content="StockEx is a research desk for Philippine Stock Exchange equities. We score every PSE-listed stock on what actually matters — earnings, debt, growth, momentum, downside — and put the change in plain words before you invest." />
+    <meta name="keywords" content="pse stock research, psei analysis, philippine stock research, pse stock analysis, pse equity research platform, best pse analysis tool, psei stock research, ai stock analysis philippines, bdo stock research, jfc analysis, philippine stock market ai" />
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large" />
+    <link rel="canonical" href="https://stockstory-ph.com/" />
+
+    <!-- ── Typography — Inter for UI, Fraunces for editorial headlines, JetBrains Mono for data ─ -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300..800&family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,400..500&family=JetBrains+Mono:wght@400;500;600&display=swap"
+    />
+
+    <!-- ── Google Search Console ────────────────────────────────────────── -->
+    <meta name="google-site-verification" content="WnKlTQpoqijYSd0gZeEU9fczCAZZddxpfuI4jYYzCEc" />
+
+    <!-- ── Analytics ────────────────────────────────────────────────────── -->
+    <link rel="dns-prefetch" href="https://www.google-analytics.com" />
+
+    <!-- ── Favicon / Icons (critical for Google search snippet) ─────────── -->
+    <link rel="icon" href="/favicon.ico?v=20260705" type="image/x-icon" />
+    <link rel="icon" href="/favicon.svg?v=20260705" type="image/svg+xml" sizes="any" />
+    <link rel="icon" href="/favicon-32.png?v=20260705" type="image/png" sizes="32x32" />
+    <link rel="icon" href="/logo-512.png?v=20260705" type="image/png" sizes="512x512" />
+    <link rel="shortcut icon" href="/favicon.ico?v=20260705" type="image/x-icon" />
+    <link rel="apple-touch-icon" href="/logo-512.png?v=20260705" />
+    <meta name="msapplication-TileColor" content="#000000" />
+    <meta name="msapplication-TileImage" content="/logo-512.png?v=20260705" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="color-scheme" content="dark" />
+
+    <!-- ── Open Graph (controls how your site appears on Google/FB) ─────── -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="StockEx" />
+    <meta property="og:title" content="StockEx — PSE Stock Research Platform" />
+    <meta property="og:description" content="A research desk for Philippine Stock Exchange equities. Plain-language scores on earnings, debt, growth, momentum, and downside — before you invest." />
+    <meta property="og:url" content="https://stockstory-ph.com/" />
+    <meta property="og:image" content="https://stockstory-ph.com/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:alt" content="StockEx — Philippine Stock Exchange research platform" />
+    <meta property="og:locale" content="en_PH" />
+
+    <!-- ── Twitter Card ─────────────────────────────────────────────────── -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@StockExPH" />
+    <meta name="twitter:title" content="StockEx — PSE Stock Research Platform" />
+    <meta name="twitter:description" content="A research desk for Philippine Stock Exchange equities. Plain-language scores before you invest." />
+    <meta name="twitter:image" content="https://stockstory-ph.com/og-image.png" />
+    <meta name="twitter:image:alt" content="StockEx research desk for Philippine Stock Exchange equities" />
+
+    <!-- ── PWA ──────────────────────────────────────────────────────────── -->
+    <meta name="application-name" content="STOCKEX" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="STOCKEX" />
+    <link rel="manifest" href="/manifest.json" />
+
+    <!-- ── Google Analytics (GA4) — deferred until after load/idle ─────── -->
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+
+      function loadAnalytics() {
+        if (window.__stockexGaLoaded) return;
+        window.__stockexGaLoaded = true;
+        const gaScript = document.createElement('script');
+        gaScript.src = 'https://www.googletagmanager.com/gtag/js?id=G-ZX8Y4BFK6Z';
+        gaScript.async = true;
+        document.head.appendChild(gaScript);
+        gtag('js', new Date());
+        gtag('config', 'G-ZX8Y4BFK6Z', { send_page_view: true, cookie_flags: 'max-age=7200;secure;samesite=none' });
+      }
+
+      function deferAnalytics() {
+        if ('requestIdleCallback' in window) {
+          window.requestIdleCallback(loadAnalytics, { timeout: 4000 });
+          return;
+        }
+        window.setTimeout(loadAnalytics, 2500);
+      }
+
+      if (document.readyState === 'complete') {
+        deferAnalytics();
+      } else {
+        window.addEventListener('load', deferAnalytics, { once: true });
+      }
+    </script>
+
+    <!-- ── Structured Data: Organization + WebSite + Sitelinks Search ───── -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "STOCKEX",
+        "url": "https://stockstory-india.com",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://stockstory-ph.com/stockex-mark.svg",
+          "width": 512,
+          "height": 512
+        },
+        "description": "AI-powered equity research platform for Philippine Stock Exchange. Proprietary scoring across 5 dimensions.",
+        "sameAs": [
+          "https://twitter.com/STOCKEXPH"
+        ],
+        "founder": {
+          "@type": "Person",
+          "name": "STOCKEX Team"
+        }
+      }
+    </script>
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "STOCKEX",
+        "url": "https://stockstory-ph.com/",
+        "description": "AI-powered equity research platform for Philippine Stock Exchange",
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": {
+            "@type": "EntryPoint",
+            "urlTemplate": "https://stockstory-ph.com/search?q={search_term_string}"
+          },
+          "query-input": "required name=search_term_string"
+        }
+      }
+    </script>
+
+    <!-- ── Breadcrumb JSON-LD ───────────────────────────────────────────── -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://stockstory-ph.com/" },
+          { "@type": "ListItem", "position": 2, "name": "Stock Research", "item": "https://stockstory-ph.com/scanner" },
+          { "@type": "ListItem", "position": 3, "name": "AI Scores", "item": "https://stockstory-ph.com/stock/BDO" }
+        ]
+      }
+    </script>
+  </head>
+  <body>
+    <script>
+      // Suppress non-critical console errors during page load (external API 401s, etc)
+      const originalError = console.error;
+      console.error = function(...args) {
+        const errorStr = String(args[0] || '').toLowerCase();
+        // Suppress non-critical provider 401 errors, WebSocket DNS errors, and other non-critical failures
+        if (errorStr.includes('net::err_name_not_resolved') ||
+            errorStr.includes('401') || errorStr.includes('websocket')) {
+          return; // Silently suppress non-critical external API errors
+        }
+        originalError.apply(console, args);
+      };
+    </script>
+    <div id="root">
+      <div id="app-loading" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;background:#000000;color:#ffffff;font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;gap:18px;text-align:center;padding:24px;">
+        <div style="width:60px;height:60px;border-radius:16px;background:#0D0D0D;border:1px solid rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;position:relative;">
+          <svg width="40" height="40" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M40 27C37.7 27 35.9 28 34.7 30C33.5 32 32.9 34.6 32.9 37.8V38.9C32.9 42.1 33.6 44.7 34.9 46.6C36.3 48.6 38.1 49.5 40.5 49.5C42.1 49.5 43.5 49.1 44.7 48.3C45.9 47.5 46.9 46.4 47.5 44.8L43.7 42.9C43.2 44.4 42 45.1 40.3 45.1C38.9 45.1 37.7 44.3 36.9 42.8C36.1 41.2 35.7 39.1 35.7 36.6C35.7 34.2 36.1 32.3 36.9 31C37.7 29.7 38.8 29 40.2 29C41.5 29 42.6 29.6 43.3 30.6L47 28.1C46.2 27 45 26.2 43.5 25.7C42.4 25.3 41.3 25.1 40 25.1" fill="#ffffff"/>
+            <path d="M16 56 L28 56 L36 49 L46 41 L56 34 L64 29" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M52 36.5 L64 29" fill="none" stroke="#FF6B4A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="64" cy="29" r="3" fill="#FF6B4A"/>
+            <circle cx="64" cy="29" r="1" fill="#000000"/>
+          </svg>
+        </div>
+        <div style="font-size:20px;font-weight:600;letter-spacing:-0.02em;">StockEx</div>
+        <div style="font-size:13px;color:#8c8c8c;max-width:320px;line-height:1.5;">Reading the tape before you do…</div>
+        <div style="width:160px;height:2px;border-radius:1px;background:rgba(255,255,255,0.10);overflow:hidden;margin-top:6px;">
+          <div style="width:40%;height:100%;border-radius:1px;background:#FF6B4A;animation:loadingPulse 1.4s cubic-bezier(0.2,0.7,0.1,1) infinite;"></div>
+        </div>
+        <style>
+          @keyframes loadingPulse { 0%{transform:translateX(-100%)} 100%{transform:translateX(360%)} }
+          #root:not(:empty) #app-loading { display:none !important; }
+        </style>
+      </div>
+    </div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

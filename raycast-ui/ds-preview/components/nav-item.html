@@ -1,0 +1,26 @@
+<!-- @dsCard group="Components" -->
+<style>
+  :root {
+    --bg-base: #0b0b0c;
+    --bg-card-alt: #1c1c1e;
+    --text-primary: #f4f4f5;
+    --text-secondary: #a1a1aa;
+  }
+  body { margin: 0; background: var(--bg-base); font-family: -apple-system, Inter, sans-serif; }
+  .stage { display: flex; gap: 24px; padding: 32px; }
+  .nav-link {
+    display: flex; align-items: center; gap: 8px;
+    padding: 6px 8px; border-radius: 8px;
+    font-size: 14px; color: var(--text-secondary);
+  }
+  .nav-link[data-state="hover"], .nav-link[data-state="active"] {
+    background: var(--bg-card-alt); color: var(--text-primary);
+  }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--text-primary); opacity: 0; }
+  .nav-link[data-state="active"] .dot { opacity: 0.7; }
+</style>
+<div class="stage">
+  <a class="nav-link" data-state="default"><span class="dot"></span>All Commands</a>
+  <a class="nav-link" data-state="hover"><span class="dot"></span>All Commands</a>
+  <a class="nav-link" data-state="active"><span class="dot"></span>All Commands</a>
+</div>

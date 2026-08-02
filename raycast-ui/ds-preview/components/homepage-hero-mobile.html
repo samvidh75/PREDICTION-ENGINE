@@ -1,0 +1,45 @@
+<!-- @dsCard group="PREDICTION-ENGINE / HomePage" -->
+<style>
+  :root {
+    --canvas: #000000; --ink: #FFFFFF; --body: #B4B4B4; --mute: #8C8C8C;
+    --hairline: #1F1F1F; --accent: #FF6B4A;
+    --bg-sheet: rgba(18,18,20,0.55);
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--canvas); font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", sans-serif; color: var(--ink); }
+  .page { width: 390px; padding: 32px 20px; display: grid; gap: 28px; justify-items: center; text-align: center; }
+  h1 { font-size: 34px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.05; margin: 0; }
+  .subline { font-size: 14px; color: var(--body); margin: 0; }
+  .cta-row { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .cta-btn { display: inline-flex; align-items: center; gap: 6px; padding: 13px 24px; background: var(--ink); color: #000; border-radius: 6px; font-size: 14px; font-weight: 600; border: none; width: 100%; max-width: 280px; justify-content: center; }
+  .cta-hint { color: var(--mute); font-size: 11.5px; font-family: 'SF Mono', monospace; }
+  .search-box { position: relative; width: 100%; }
+  .search-box input { width: 100%; height: 48px; border: 1px solid var(--hairline); background: var(--bg-sheet); border-radius: 4px; padding: 0 16px 0 42px; font-size: 15px; color: var(--ink); }
+  .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--mute); font-size: 14px; }
+  .research-btn { width: 100%; margin-top: 10px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 48px; background: var(--ink); color: #000; border-radius: 4px; font-size: 14px; font-weight: 600; border: none; }
+  .chips { display: grid; gap: 8px; width: 100%; }
+  .chip { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border: 1px solid var(--hairline); border-radius: 8px; background: var(--bg-sheet); text-align: left; }
+  .chip-icon { color: var(--accent); flex-shrink: 0; }
+  .chip-label { font-size: 13px; font-weight: 500; }
+  .chip-desc { font-size: 11px; color: var(--mute); }
+</style>
+<div class="page">
+  <h1>Know before you invest.</h1>
+  <p class="subline">A quiet research desk for PSE equities.</p>
+  <div class="cta-row">
+    <button class="cta-btn">Find a stock →</button>
+    <span class="cta-hint">or press ⌘ K</span>
+  </div>
+  <div style="width:100%">
+    <div class="search-box">
+      <span class="search-icon">⌕</span>
+      <input placeholder="Type a company…" />
+    </div>
+    <button class="research-btn">Research it →</button>
+  </div>
+  <div class="chips">
+    <div class="chip"><span class="chip-icon">↗</span><div><div class="chip-label">Companies that compound</div><div class="chip-desc">Steady earners, low debt</div></div></div>
+    <div class="chip"><span class="chip-icon">⚡</span><div><div class="chip-label">Companies that are growing</div><div class="chip-desc">Sales and profit on the rise</div></div></div>
+    <div class="chip"><span class="chip-icon">◎</span><div><div class="chip-label">Companies that look cheap</div><div class="chip-desc">Trading below what they're worth</div></div></div>
+  </div>
+</div>

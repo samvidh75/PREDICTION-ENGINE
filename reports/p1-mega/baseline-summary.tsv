@@ -1,0 +1,18 @@
+command	exit_code	duration_seconds	log
+npm ci	0	6	reports/p1-mega/logs/npm_ci.log
+npm run lint	1	6	reports/p1-mega/logs/npm_run_lint.log
+npm run typecheck:frontend	2	4	reports/p1-mega/logs/npm_run_typecheck_frontend.log
+npm run typecheck:backend	2	1	reports/p1-mega/logs/npm_run_typecheck_backend.log
+npm run typecheck:all	2	4	reports/p1-mega/logs/npm_run_typecheck_all.log
+npm run test:unit	1	3	reports/p1-mega/logs/npm_run_test_unit.log
+npm run test:integration:sqlite	0	1	reports/p1-mega/logs/npm_run_test_integration_sqlite.log
+npm run validate:schema	1	0	reports/p1-mega/logs/npm_run_validate_schema.log
+npm run validate:query-schema	1	0	reports/p1-mega/logs/npm_run_validate_query-schema.log
+npm run validate:distributions	0	1	reports/p1-mega/logs/npm_run_validate_distributions.log
+npm run validate:data-integrity	1	0	reports/p1-mega/logs/npm_run_validate_data-integrity.log
+npm run validate:hygiene	1	0	reports/p1-mega/logs/npm_run_validate_hygiene.log
+npm run test:coverage	1	2	reports/p1-mega/logs/npm_run_test_coverage.log
+npm run build:vercel	2	3	reports/p1-mega/logs/npm_run_build_vercel.log
+npm run build:backend	2	1	reports/p1-mega/logs/npm_run_build_backend.log
+npm run compile:backend	2	2	reports/p1-mega/logs/npm_run_compile_backend.log
+npm audit --omit=dev --audit-level=high	0	1	reports/p1-mega/logs/npm_audit_--omit_dev_--audit-level_high.log

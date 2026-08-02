@@ -1,0 +1,29 @@
+name: CI — Typecheck & Build
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Compile backend
+        run: npm run compile:backend
+
+      - name: Typecheck frontend
+        run: npm run typecheck:frontend
+
+      - name: Notify
+        run: echo "✅ Build passed — Render blueprint auto-deploys from main"

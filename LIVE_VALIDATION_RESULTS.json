@@ -1,0 +1,55 @@
+{
+  "symbols": [
+    {
+      "symbol": "RELIANCE",
+      "price": false,
+      "metadata": false,
+      "history": false,
+      "provider": "Yahoo",
+      "error": "Cannot read properties of undefined (reading 'recordUsage')",
+      "timestamp": "2026-06-02T16:58:15.828Z"
+    },
+    {
+      "symbol": "TCS",
+      "price": false,
+      "metadata": false,
+      "history": false,
+      "provider": "Yahoo",
+      "error": "Cannot read properties of undefined (reading 'recordUsage')",
+      "timestamp": "2026-06-02T16:58:15.922Z"
+    },
+    {
+      "symbol": "HDFCBANK",
+      "price": false,
+      "metadata": false,
+      "history": false,
+      "provider": "Yahoo",
+      "error": "Cannot read properties of undefined (reading 'recordUsage')",
+      "timestamp": "2026-06-02T16:58:15.979Z"
+    },
+    {
+      "symbol": "INFY",
+      "price": false,
+      "metadata": false,
+      "history": false,
+      "provider": "Yahoo",
+      "error": "Cannot read properties of undefined (reading 'recordUsage')",
+      "timestamp": "2026-06-02T16:58:15.980Z"
+    },
+    {
+      "symbol": "HAL",
+      "price": false,
+      "metadata": false,
+      "history": false,
+      "provider": "Yahoo",
+      "error": "Cannot read properties of undefined (reading 'recordUsage')",
+      "timestamp": "2026-06-02T16:58:15.980Z"
+    }
+  ],
+  "blocker": {
+    "type": "Gateway not wired",
+    "details": "ProviderCoordinator.invokeChain() calls this.tracer.recordUsage(...), but no tracer field is declared or initialized. The live validation path fails before any provider returns data."
+  },
+  "source": "scripts/liveProviderValidation.ts",
+  "status": "failed"
+}

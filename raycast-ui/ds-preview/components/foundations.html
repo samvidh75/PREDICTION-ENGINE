@@ -1,0 +1,29 @@
+<!-- @dsCard group="Foundations" -->
+<style>
+  :root {
+    --bg-base: #0b0b0c; --bg-card: #121214; --bg-card-alt: #1c1c1e; --bg-elevated: #2c2c2e;
+    --text-primary: #f4f4f5; --text-secondary: #a1a1aa; --text-muted: #71717a;
+  }
+  body { margin: 0; background: var(--bg-base); font-family: -apple-system, Inter, sans-serif; padding: 32px; }
+  h3 { color: var(--text-primary); font-size: 14px; font-weight: 500; margin: 0 0 12px; }
+  .row { display: flex; gap: 16px; margin-bottom: 32px; }
+  .swatch { width: 96px; }
+  .swatch .box { width: 96px; height: 64px; border-radius: 8px; }
+  .swatch .label { font-size: 11px; color: var(--text-muted); margin-top: 8px; }
+  .radius-box { width: 64px; height: 64px; background: var(--bg-card-alt); }
+</style>
+<h3>Color</h3>
+<div class="row">
+  <div class="swatch"><div class="box" style="background:var(--bg-base)"></div><div class="label">bg/base</div></div>
+  <div class="swatch"><div class="box" style="background:var(--bg-card)"></div><div class="label">bg/card</div></div>
+  <div class="swatch"><div class="box" style="background:var(--bg-card-alt)"></div><div class="label">bg/card-alt</div></div>
+  <div class="swatch"><div class="box" style="background:var(--bg-elevated)"></div><div class="label">bg/elevated</div></div>
+  <div class="swatch"><div class="box" style="background:var(--text-primary)"></div><div class="label">text/primary</div></div>
+  <div class="swatch"><div class="box" style="background:var(--text-secondary)"></div><div class="label">text/secondary</div></div>
+  <div class="swatch"><div class="box" style="background:var(--text-muted)"></div><div class="label">text/muted</div></div>
+</div>
+<h3>Radius</h3>
+<div class="row">
+  <div class="swatch"><div class="radius-box" style="border-radius:8px"></div><div class="label">radius/sm — 8px</div></div>
+  <div class="swatch"><div class="radius-box" style="border-radius:12px"></div><div class="label">radius/md — 12px</div></div>
+</div>

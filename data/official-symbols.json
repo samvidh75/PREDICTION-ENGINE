@@ -1,0 +1,395 @@
+{
+  "generatedAt": "2026-07-29T11:05:20.069Z",
+  "sources": [
+    "PSE official listings",
+    "Static representative PSE universe (see scripts/sync-official-symbols.ts)"
+  ],
+  "totalUniverse": 55,
+  "entries": [
+    {
+      "symbol": "SM",
+      "name": "SM Investments Corporation",
+      "exchange": "PSE",
+      "sector": "Banking & Finance",
+      "industry": "Banking"
+    },
+    {
+      "symbol": "SMPH",
+      "name": "SM Prime Holdings Inc.",
+      "exchange": "PSE",
+      "sector": "Food & Beverage",
+      "industry": "Food Processing"
+    },
+    {
+      "symbol": "AC",
+      "name": "Ayala Corporation",
+      "exchange": "PSE",
+      "sector": "Food & Beverage",
+      "industry": "Food Processing"
+    },
+    {
+      "symbol": "ALI",
+      "name": "Ayala Land Inc.",
+      "exchange": "PSE",
+      "sector": "Energy & Utilities",
+      "industry": "Power Generation"
+    },
+    {
+      "symbol": "BDO",
+      "name": "BDO Unibank Inc.",
+      "exchange": "PSE",
+      "sector": "Banking & Finance",
+      "industry": "Banking"
+    },
+    {
+      "symbol": "BPI",
+      "name": "Bank of the Philippine Islands",
+      "exchange": "PSE",
+      "sector": "Banking & Finance",
+      "industry": "Banking"
+    },
+    {
+      "symbol": "MBT",
+      "name": "Metropolitan Bank & Trust Company",
+      "exchange": "PSE",
+      "sector": "Banking & Finance",
+      "industry": "Banking"
+    },
+    {
+      "symbol": "ICT",
+      "name": "iPeople Inc.",
+      "exchange": "PSE",
+      "sector": "Energy & Utilities",
+      "industry": "Power Generation"
+    },
+    {
+      "symbol": "JFC",
+      "name": "Jollibee Foods Corporation",
+      "exchange": "PSE",
+      "sector": "Food & Beverage",
+      "industry": "Food Processing"
+    },
+    {
+      "symbol": "URC",
+      "name": "Universal Robina Corporation",
+      "exchange": "PSE",
+      "sector": "Energy & Utilities",
+      "industry": "Power Generation"
+    },
+    {
+      "symbol": "AEV",
+      "name": "Aboitiz Equity Ventures Inc.",
+      "exchange": "PSE",
+      "sector": "Banking & Finance",
+      "industry": "Banking"
+    },
+    {
+      "symbol": "MER",
+      "name": "Meralco",
+      "exchange": "PSE",
+      "sector": "Mining & Metals",
+      "industry": "Mining"
+    },
+    {
+      "symbol": "TEL",
+      "name": "Philippine Long Distance Telephone Co.",
+      "exchange": "PSE",
+      "sector": "Transportation & Logistics",
+      "industry": "Transportation"
+    },
+    {
+      "symbol": "GLO",
+      "name": "Globe Telecom Inc.",
+      "exchange": "PSE",
+      "sector": "Telecommunications",
+      "industry": "Telecom Services"
+    },
+    {
+      "symbol": "LTG",
+      "name": "LT Group Inc.",
+      "exchange": "PSE",
+      "sector": "Property & Real Estate",
+      "industry": "Real Estate Development"
+    },
+    {
+      "symbol": "MPI",
+      "name": "Metro Pacific Investments Corporation",
+      "exchange": "PSE",
+      "sector": "Banking & Finance",
+      "industry": "Banking"
+    },
+    {
+      "symbol": "AGI",
+      "name": "Alliance Global Group Inc.",
+      "exchange": "PSE",
+      "sector": "Transportation & Logistics",
+      "industry": "Transportation"
+    },
+    {
+      "symbol": "GTCAP",
+      "name": "GT Capital Holdings Inc.",
+      "exchange": "PSE",
+      "sector": "Banking & Finance",
+      "industry": "Banking"
+    },
+    {
+      "symbol": "JGS",
+      "name": "JG Summit Holdings Inc.",
+      "exchange": "PSE",
+      "sector": "Mining & Metals",
+      "industry": "Mining"
+    },
+    {
+      "symbol": "SECB",
+      "name": "Security Bank Corporation",
+      "exchange": "PSE",
+      "sector": "Banking & Finance",
+      "industry": "Banking"
+    },
+    {
+      "symbol": "CNPF",
+      "name": "Century Pacific Food Inc.",
+      "exchange": "PSE",
+      "sector": "Food & Beverage",
+      "industry": "Food Processing"
+    },
+    {
+      "symbol": "EMI",
+      "name": "Emperador Inc.",
+      "exchange": "PSE",
+      "sector": "Transportation & Logistics",
+      "industry": "Transportation"
+    },
+    {
+      "symbol": "WLCON",
+      "name": "Wilcon Depot Inc.",
+      "exchange": "PSE",
+      "sector": "Retail & Services",
+      "industry": "Retail"
+    },
+    {
+      "symbol": "MONDE",
+      "name": "Monde Nissin Corporation",
+      "exchange": "PSE",
+      "sector": "Property & Real Estate",
+      "industry": "Real Estate Development"
+    },
+    {
+      "symbol": "PGOLD",
+      "name": "Puregold Price Club Inc.",
+      "exchange": "PSE",
+      "sector": "Mining & Metals",
+      "industry": "Mining"
+    },
+    {
+      "symbol": "RRHI",
+      "name": "Robinsons Retail Holdings Inc.",
+      "exchange": "PSE",
+      "sector": "Retail & Services",
+      "industry": "Retail"
+    },
+    {
+      "symbol": "RLC",
+      "name": "Robinsons Land Corporation",
+      "exchange": "PSE",
+      "sector": "Construction & Infrastructure",
+      "industry": "Construction"
+    },
+    {
+      "symbol": "DMC",
+      "name": "DMCI Holdings Inc.",
+      "exchange": "PSE",
+      "sector": "Food & Beverage",
+      "industry": "Food Processing"
+    },
+    {
+      "symbol": "ACEN",
+      "name": "Aboitiz Power Corporation",
+      "exchange": "PSE",
+      "sector": "Energy & Utilities",
+      "industry": "Power Generation"
+    },
+    {
+      "symbol": "BLOOM",
+      "name": "Bloomberry Resorts Corporation",
+      "exchange": "PSE",
+      "sector": "Property & Real Estate",
+      "industry": "Real Estate Development"
+    },
+    {
+      "symbol": "AP",
+      "name": "Aboitiz Power Corporation",
+      "exchange": "PSE",
+      "sector": "Energy & Utilities",
+      "industry": "Power Generation"
+    },
+    {
+      "symbol": "FGEN",
+      "name": "First Gen Corporation",
+      "exchange": "PSE",
+      "sector": "Mining & Metals",
+      "industry": "Mining"
+    },
+    {
+      "symbol": "MWIDE",
+      "name": "Megawide Construction Corporation",
+      "exchange": "PSE",
+      "sector": "Construction & Infrastructure",
+      "industry": "Construction"
+    },
+    {
+      "symbol": "ANI",
+      "name": "Aboitiz Networks Inc.",
+      "exchange": "PSE",
+      "sector": "Manufacturing",
+      "industry": "Conglomerate"
+    },
+    {
+      "symbol": "CEB",
+      "name": "Cebu Pacific Air Corporation",
+      "exchange": "PSE",
+      "sector": "Food & Beverage",
+      "industry": "Food Processing"
+    },
+    {
+      "symbol": "DD",
+      "name": "DoubleDragon Corporation",
+      "exchange": "PSE",
+      "sector": "Manufacturing",
+      "industry": "Conglomerate"
+    },
+    {
+      "symbol": "FLI",
+      "name": "Filinvest Development Corporation",
+      "exchange": "PSE",
+      "sector": "Transportation & Logistics",
+      "industry": "Transportation"
+    },
+    {
+      "symbol": "HLCM",
+      "name": "HLCM Holdings Inc.",
+      "exchange": "PSE",
+      "sector": "Food & Beverage",
+      "industry": "Food Processing"
+    },
+    {
+      "symbol": "IMI",
+      "name": "Integrated Microelectronics Inc.",
+      "exchange": "PSE",
+      "sector": "Telecommunications",
+      "industry": "Telecom Services"
+    },
+    {
+      "symbol": "MEG",
+      "name": "Megaworld Corporation",
+      "exchange": "PSE",
+      "sector": "Retail & Services",
+      "industry": "Retail"
+    },
+    {
+      "symbol": "NIKL",
+      "name": "Nickel Asia Corporation",
+      "exchange": "PSE",
+      "sector": "Mining & Metals",
+      "industry": "Mining"
+    },
+    {
+      "symbol": "PCOR",
+      "name": "Power Sector Assets & Liabilities Management",
+      "exchange": "PSE",
+      "sector": "Energy & Utilities",
+      "industry": "Power Generation"
+    },
+    {
+      "symbol": "PXP",
+      "name": "PXP Energy Corporation",
+      "exchange": "PSE",
+      "sector": "Energy & Utilities",
+      "industry": "Power Generation"
+    },
+    {
+      "symbol": "ROCK",
+      "name": "Rockwell Land Corporation",
+      "exchange": "PSE",
+      "sector": "Telecommunications",
+      "industry": "Telecom Services"
+    },
+    {
+      "symbol": "SCC",
+      "name": "Semirara Mining & Power Corporation",
+      "exchange": "PSE",
+      "sector": "Energy & Utilities",
+      "industry": "Power Generation"
+    },
+    {
+      "symbol": "SSI",
+      "name": "SSI Group Inc.",
+      "exchange": "PSE",
+      "sector": "Transportation & Logistics",
+      "industry": "Transportation"
+    },
+    {
+      "symbol": "TFHI",
+      "name": "Top Frontier Investment Holdings Inc.",
+      "exchange": "PSE",
+      "sector": "Transportation & Logistics",
+      "industry": "Transportation"
+    },
+    {
+      "symbol": "VLL",
+      "name": "Vista Land & Lifescapes Inc.",
+      "exchange": "PSE",
+      "sector": "Mining & Metals",
+      "industry": "Mining"
+    },
+    {
+      "symbol": "CHP",
+      "name": "Chinabank",
+      "exchange": "PSE",
+      "sector": "Banking & Finance",
+      "industry": "Banking"
+    },
+    {
+      "symbol": "ALHI",
+      "name": "Alphaland Holdings Inc.",
+      "exchange": "PSE",
+      "sector": "Manufacturing",
+      "industry": "Conglomerate"
+    },
+    {
+      "symbol": "APC",
+      "name": "Aboitiz Power Corporation",
+      "exchange": "PSE",
+      "sector": "Energy & Utilities",
+      "industry": "Power Generation"
+    },
+    {
+      "symbol": "BSC",
+      "name": "Bayer CropScience",
+      "exchange": "PSE",
+      "sector": "Manufacturing",
+      "industry": "Conglomerate"
+    },
+    {
+      "symbol": "CLC",
+      "name": "Concrete Aggregates Corporation",
+      "exchange": "PSE",
+      "sector": "Banking & Finance",
+      "industry": "Banking"
+    },
+    {
+      "symbol": "DIZ",
+      "name": "Dizon Co. Ltd.",
+      "exchange": "PSE",
+      "sector": "Property & Real Estate",
+      "industry": "Real Estate Development"
+    },
+    {
+      "symbol": "LBC",
+      "name": "LBC Express Inc.",
+      "exchange": "PSE",
+      "sector": "Transportation & Logistics",
+      "industry": "Transportation"
+    }
+  ]
+}

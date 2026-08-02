@@ -1,0 +1,47 @@
+<!-- @dsCard group="PREDICTION-ENGINE / StockDetail" -->
+<style>
+  :root {
+    --canvas:#000; --ink:#FFF; --body:#B4B4B4; --mute:#8C8C8C; --hairline:#1F1F1F;
+    --accent:#FF6B4A; --green:#34C759;
+    --bg-sheet: rgba(18,18,20,0.55); --bg-card: rgba(26,26,28,0.62);
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--canvas); font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Inter",sans-serif; color:var(--ink); }
+  .page { width: 1040px; padding: 32px; display: grid; gap: 24px; }
+  .header { display: flex; justify-content: space-between; align-items: flex-start; }
+  .sym-block h1 { margin: 0; font-size: 32px; font-weight: 600; letter-spacing: -0.02em; }
+  .sym-block .name { color: var(--body); font-size: 14px; }
+  .price-block { text-align: right; }
+  .price { font-size: 32px; font-weight: 600; }
+  .change { color: var(--green); font-size: 15px; }
+  .timeframes { display: flex; gap: 4px; }
+  .tf { padding: 6px 12px; border-radius: 6px; font-size: 13px; color: var(--mute); border: 1px solid transparent; }
+  .tf.active { background: var(--bg-sheet); border-color: var(--hairline); color: var(--ink); }
+  .chart-card { height: 340px; background: var(--bg-sheet); border: 1px solid var(--hairline); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--mute); font-size: 13px; }
+  .news-card { background: var(--bg-sheet); border: 1px solid var(--hairline); border-radius: 8px; padding: 20px; }
+  .news-card h3 { margin: 0 0 12px; font-size: 13px; font-weight: 600; color: var(--mute); text-transform: uppercase; letter-spacing: 0.04em; }
+  .news-row { padding: 10px 0; border-top: 1px solid var(--hairline); font-size: 13px; }
+  .news-row:first-of-type { border-top: none; }
+  .news-row .meta { color: var(--mute); font-size: 11px; }
+</style>
+<div class="page">
+  <div class="header">
+    <div class="sym-block">
+      <h1>BDO</h1>
+      <div class="name">BDO Unibank, Inc.</div>
+    </div>
+    <div class="price-block">
+      <div class="price">₱142.50</div>
+      <div class="change">+2.80 (+2.0%)</div>
+    </div>
+  </div>
+  <div class="timeframes">
+    <div class="tf">1D</div><div class="tf">5D</div><div class="tf active">1M</div><div class="tf">3M</div><div class="tf">1Y</div>
+  </div>
+  <div class="chart-card">Price chart — 1M</div>
+  <div class="news-card">
+    <h3>News</h3>
+    <div class="news-row">BDO reports steady loan growth in Q2 earnings call<div class="meta">2 hours ago · Reuters</div></div>
+    <div class="news-row">Analysts maintain buy rating ahead of dividend announcement<div class="meta">1 day ago · BusinessWorld</div></div>
+  </div>
+</div>

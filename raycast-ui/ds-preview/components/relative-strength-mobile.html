@@ -1,0 +1,27 @@
+<!-- @dsCard group="PREDICTION-ENGINE / RelativeStrength" -->
+<style>
+  :root { --canvas:#000; --ink:#FFF; --body:#B4B4B4; --mute:#8C8C8C; --hairline:#1F1F1F; --green:#34C759; --red:#FF3B30; --bg-sheet: rgba(18,18,20,0.55); }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--canvas); font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Inter",sans-serif; color:var(--ink); }
+  .page { width: 390px; padding: 16px; display: grid; gap: 14px; }
+  h1 { font-size: 22px; font-weight: 700; margin: 0; }
+  .sectors { display: flex; gap: 6px; overflow-x: auto; }
+  .sector-chip { padding: 6px 11px; border: 1px solid var(--hairline); border-radius: 6px; font-size: 11.5px; color: var(--mute); flex-shrink: 0; white-space: nowrap; }
+  .sector-chip.active { background: var(--ink); color: #000; font-weight: 600; }
+  .row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-top: 1px solid var(--hairline); }
+  .row:first-of-type { border-top: none; }
+  .rank { font-weight: 700; width: 20px; font-size: 13px; }
+  .sym { font-weight: 600; font-size: 13px; }
+  .name { color: var(--mute); font-size: 11px; }
+  .chg-up { color: var(--green); margin-left: auto; font-size: 12px; }
+  .chg-down { color: var(--red); margin-left: auto; font-size: 12px; }
+</style>
+<div class="page">
+  <h1>Relative Strength</h1>
+  <div class="sectors"><div class="sector-chip active">All Sectors</div><div class="sector-chip">IT Services</div><div class="sector-chip">Banking</div></div>
+  <div>
+    <div class="row"><span class="rank">1</span><div><div class="sym">TCS</div><div class="name">Tata Consultancy</div></div><span class="chg-up">▲ 2</span></div>
+    <div class="row"><span class="rank">2</span><div><div class="sym">BDO</div><div class="name">BDO Unibank</div></div><span class="chg-up">▲ 1</span></div>
+    <div class="row"><span class="rank">3</span><div><div class="sym">INFY</div><div class="name">Infosys</div></div><span class="chg-down">▼ 1</span></div>
+  </div>
+</div>

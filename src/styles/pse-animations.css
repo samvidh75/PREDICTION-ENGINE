@@ -1,0 +1,176 @@
+/* ────────────────────────────────────────────────────────────────────────
+   PSE Trading Dashboard — Price Flash & Micro-interactions
+   ──────────────────────────────────────────────────────────────────────── */
+
+/* Price flash — green for up, red for down */
+@keyframes pse-flash-green {
+  0%   { background-color: rgba(52, 199, 89, 0.25); }
+  100% { background-color: transparent; }
+}
+@keyframes pse-flash-red {
+  0%   { background-color: rgba(255, 59, 48, 0.25); }
+  100% { background-color: transparent; }
+}
+
+.pse-flash-up {
+  animation: pse-flash-green 0.6s ease-out;
+}
+.pse-flash-down {
+  animation: pse-flash-red 0.6s ease-out;
+}
+
+/* Live indicator pulse */
+@keyframes pse-live-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.5; transform: scale(0.8); }
+}
+.pse-live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #34C759;
+  animation: pse-live-pulse 2s ease-in-out infinite;
+  display: inline-block;
+}
+
+/* Price change ticker */
+@keyframes pse-ticker-up {
+  0%   { transform: translateY(0); opacity: 1; }
+  50%  { transform: translateY(-4px); opacity: 0.7; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+@keyframes pse-ticker-down {
+  0%   { transform: translateY(0); opacity: 1; }
+  50%  { transform: translateY(4px); opacity: 0.7; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+/* Order book flash */
+@keyframes pse-order-flash {
+  0%   { background-color: rgba(255, 107, 74, 0.15); }
+  100% { background-color: transparent; }
+}
+.pse-order-update {
+  animation: pse-order-flash 0.4s ease-out;
+}
+
+/* Volume bar animation */
+@keyframes pse-volume-fill {
+  from { width: 0; }
+}
+.pse-volume-bar {
+  animation: pse-volume-fill 0.5s ease-out;
+}
+
+/* Table row shimmer on new data */
+@keyframes pse-row-shimmer {
+  0%   { background-color: rgba(255, 255, 255, 0.06); }
+  100% { background-color: transparent; }
+}
+.pse-row-new {
+  animation: pse-row-shimmer 0.8s ease-out;
+}
+
+/* Stat counter tick */
+@keyframes pse-count-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.pse-stat-enter {
+  animation: pse-count-up 0.3s ease-out;
+}
+
+/* Zerodha-style watchlist hover */
+.pse-watchlist-row {
+  transition: background-color 0.15s ease;
+}
+.pse-watchlist-row:hover {
+  background-color: rgba(255, 255, 255, 0.04);
+}
+
+/* PSE page transitions */
+@keyframes pse-page-enter {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.pse-page-enter {
+  animation: pse-page-enter 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* PSE card entrance stagger */
+@keyframes pse-card-enter {
+  from { opacity: 0; transform: translateY(16px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.pse-card-enter {
+  animation: pse-card-enter 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  opacity: 0;
+}
+.pse-card-enter:nth-child(1) { animation-delay: 0ms; }
+.pse-card-enter:nth-child(2) { animation-delay: 60ms; }
+.pse-card-enter:nth-child(3) { animation-delay: 120ms; }
+.pse-card-enter:nth-child(4) { animation-delay: 180ms; }
+.pse-card-enter:nth-child(5) { animation-delay: 240ms; }
+.pse-card-enter:nth-child(6) { animation-delay: 300ms; }
+.pse-card-enter:nth-child(7) { animation-delay: 360ms; }
+.pse-card-enter:nth-child(8) { animation-delay: 420ms; }
+
+/* Price change badge animations */
+.pse-change-badge {
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-family: 'SF Mono', 'JetBrains Mono', monospace;
+}
+.pse-change-badge.positive {
+  color: #34C759;
+  background: rgba(52, 199, 89, 0.1);
+}
+.pse-change-badge.negative {
+  color: #FF3B30;
+  background: rgba(255, 59, 48, 0.1);
+}
+
+/* Zerodha-style depth meter */
+.pse-depth-bar {
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+.pse-depth-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+/* Screen flash on market open */
+@keyframes pse-screen-flash {
+  0%   { background-color: rgba(52, 199, 89, 0.05); }
+  100% { background-color: transparent; }
+}
+.pse-market-open {
+  animation: pse-screen-flash 1s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pse-flash-up,
+  .pse-flash-down,
+  .pse-live-dot,
+  .pse-order-update,
+  .pse-volume-bar,
+  .pse-row-new,
+  .pse-stat-enter,
+  .pse-page-enter,
+  .pse-card-enter,
+  .pse-market-open {
+    animation: none !important;
+  }
+  .pse-change-badge {
+    transition: none;
+  }
+}

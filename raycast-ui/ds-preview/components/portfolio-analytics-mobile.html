@@ -1,0 +1,24 @@
+<!-- @dsCard group="PREDICTION-ENGINE / PortfolioAnalytics" -->
+<style>
+  :root { --canvas:#000; --ink:#FFF; --body:#B4B4B4; --mute:#8C8C8C; --hairline:#1F1F1F; --green:#34C759; --bg-sheet: rgba(18,18,20,0.55); }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--canvas); font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Inter",sans-serif; color:var(--ink); }
+  .page { width: 390px; padding: 16px; display: grid; gap: 14px; }
+  h1 { font-size: 20px; font-weight: 700; margin: 0; }
+  .stat-card { background: var(--bg-sheet); border: 1px solid var(--hairline); border-radius: 10px; padding: 14px; }
+  .stat-label { font-size: 10.5px; color: var(--mute); }
+  .stat-value { font-size: 19px; font-weight: 600; margin-top: 3px; }
+  .up { color: var(--green); }
+  .row { display: flex; justify-content: space-between; padding: 9px 0; border-top: 1px solid var(--hairline); font-size: 12.5px; }
+  .row:first-of-type { border-top: none; }
+  .sym { font-weight: 600; }
+</style>
+<div class="page">
+  <h1>Portfolio Analytics</h1>
+  <div class="stat-card"><div class="stat-label">XIRR</div><div class="stat-value up">+22.4%</div></div>
+  <div>
+    <div class="row"><span class="sym">RELIANCE</span><span class="up">+21.6%</span></div>
+    <div class="row"><span class="sym">TCS</span><span class="up">+7.0%</span></div>
+    <div class="row"><span class="sym">HDFCBANK</span><span class="up">+9.9%</span></div>
+  </div>
+</div>

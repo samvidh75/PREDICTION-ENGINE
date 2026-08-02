@@ -1,0 +1,26 @@
+<!-- @dsCard group="PREDICTION-ENGINE / OpsDashboard" -->
+<style>
+  :root { --canvas:#000; --ink:#FFF; --body:#B4B4B4; --mute:#8C8C8C; --hairline:#1F1F1F; --green:#34C759; --red:#FF3B30; --bg-sheet: rgba(18,18,20,0.55); }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--canvas); font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Inter",sans-serif; color:var(--ink); }
+  .page { width: 390px; padding: 16px; display: grid; gap: 14px; }
+  h1 { font-size: 20px; font-weight: 700; margin: 0; display: flex; align-items: center; gap: 8px; }
+  .lock { font-size: 11px; color: var(--mute); font-weight: 400; border: 1px solid var(--hairline); padding: 2px 8px; border-radius: 6px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .stat-card { background: var(--bg-sheet); border: 1px solid var(--hairline); border-radius: 10px; padding: 14px; }
+  .stat-label { font-size: 10px; color: var(--mute); text-transform: uppercase; }
+  .stat-value { font-size: 18px; font-weight: 600; margin-top: 4px; }
+  .card { background: var(--bg-sheet); border: 1px solid var(--hairline); border-radius: 10px; padding: 14px; }
+  .card h3 { margin: 0 0 8px; font-size: 11px; color: var(--mute); text-transform: uppercase; }
+  .pill-row { display: flex; justify-content: space-between; padding: 7px 0; border-top: 1px solid var(--hairline); font-size: 12px; }
+  .pill-row:first-of-type { border-top: none; }
+  .ok { color: var(--green); }
+</style>
+<div class="page">
+  <h1>Ops Dashboard <span class="lock">🔒</span></h1>
+  <div class="grid">
+    <div class="stat-card"><div class="stat-label">Uptime</div><div class="stat-value">14d 6h</div></div>
+    <div class="stat-card"><div class="stat-label">LLM Calls</div><div class="stat-value">8,412</div></div>
+  </div>
+  <div class="card"><h3>Subscriptions</h3><div class="pill-row"><span>Free</span><span>2,840</span></div><div class="pill-row"><span>Plus</span><span>312</span></div></div>
+</div>

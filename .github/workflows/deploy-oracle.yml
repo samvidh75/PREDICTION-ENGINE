@@ -1,0 +1,51 @@
+name: Deploy to Oracle VM
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'reports/**'
+      - 'docs/**'
+      - '*.md'
+      - 'stockex_*'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: github.repository == 'samvidh75/PREDICTION-ENGINE'
+    
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup known hosts
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.ORACLE_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H ${{ secrets.ORACLE_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy via SSH
+        run: |
+          ssh ubuntu@${{ secrets.ORACLE_HOST }} << 'EOF'
+            set -e
+            cd /home/ubuntu/stockstory
+
+            # Pull latest code
+            git pull origin main
+
+            # Build and restart containers
+            sudo docker compose -f docker-compose.oracle.yml build --no-cache api
+            sudo docker compose -f docker-compose.oracle.yml up -d --force-recreate api
+
+            # Prune old images
+            sudo docker image prune -f
+
+            echo "Deploy complete"
+          EOF
+
+      - name: Health check
+        run: |
+          sleep 15
+          curl -fsS -o /dev/null -w "%{http_code}" \
+            https://${{ secrets.ORACLE_DOMAIN }}/healthz || \
+            echo "Warning: Health check failed (service may still be starting)"

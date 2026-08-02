@@ -1,0 +1,3 @@
+symbol,company_name,period_end_date,period_type,currency,unit,revenue,operating_profit,net_profit,eps,book_value,debt,equity,roe,roce,debt_to_equity,operating_margin,net_margin,pe_ratio,pb_ratio,revenue_growth,profit_growth,operating_cash_flow,free_cash_flow,source_label,source_url
+RELIANCE,Reliance Industries Limited,2026-03-31,annual,INR,crore,700000,120000,80000,120,1800,250000,1100000,12.5,14.2,0.23,17.1,11.4,25.3,3.2,8.5,12.1,90000,65000,screener_export,https://www.screener.in/company/RELIANCE/
+TCS,Tata Consultancy Services Limited,2026-03-31,annual,INR,crore,240000,62000,48000,130,500,5000,85000,38.5,42.1,0.06,25.8,20.0,32.0,12.8,10.2,8.5,55000,48000,screener_export,https://www.screener.in/company/TCS/

@@ -1,0 +1,41 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "dev-frontend",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "port": 5173,
+      "autoPort": true,
+      "description": "React + TypeScript frontend dev server with Vite (Port 5173)"
+    },
+    {
+      "name": "dev-websocket",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev:websocket"],
+      "port": 8080,
+      "description": "WebSocket server for real-time PSE stock data (Port 8080)"
+    },
+    {
+      "name": "build-frontend",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "build:frontend"],
+      "port": null,
+      "description": "Build production frontend bundle"
+    },
+    {
+      "name": "typecheck",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "typecheck"],
+      "port": null,
+      "description": "Run TypeScript type checking for frontend and backend"
+    },
+    {
+      "name": "raycast-ui-preview",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["serve", "raycast-ui", "-l", "4321"],
+      "port": 4321,
+      "description": "Static server for the standalone Raycast-style UI prototype"
+    }
+  ]
+}

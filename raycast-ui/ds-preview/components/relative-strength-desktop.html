@@ -1,0 +1,35 @@
+<!-- @dsCard group="PREDICTION-ENGINE / RelativeStrength" -->
+<style>
+  :root { --canvas:#000; --ink:#FFF; --body:#B4B4B4; --mute:#8C8C8C; --hairline:#1F1F1F; --green:#34C759; --red:#FF3B30; --bg-sheet: rgba(18,18,20,0.55); }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--canvas); font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Inter",sans-serif; color:var(--ink); }
+  .page { width: 900px; padding: 32px; display: grid; gap: 20px; }
+  h1 { font-size: 28px; font-weight: 700; margin: 0; }
+  .sectors { display: flex; gap: 6px; flex-wrap: wrap; }
+  .sector-chip { padding: 6px 12px; border: 1px solid var(--hairline); border-radius: 6px; font-size: 12px; color: var(--mute); }
+  .sector-chip.active { background: var(--ink); color: #000; font-weight: 600; }
+  table { width: 100%; border-collapse: collapse; }
+  th { text-align: left; font-size: 11px; color: var(--mute); text-transform: uppercase; padding: 10px; border-bottom: 1px solid var(--hairline); }
+  td { padding: 10px; font-size: 13px; border-bottom: 1px solid var(--hairline); }
+  .rank { font-weight: 700; width: 28px; }
+  .sym { font-weight: 600; }
+  .chg-up { color: var(--green); } .chg-down { color: var(--red); }
+</style>
+<div class="page">
+  <h1>Relative Strength</h1>
+  <div class="sectors">
+    <div class="sector-chip active">All Sectors</div>
+    <div class="sector-chip">IT Services</div>
+    <div class="sector-chip">Banking</div>
+    <div class="sector-chip">Pharma</div>
+  </div>
+  <table>
+    <thead><tr><th>#</th><th>Symbol</th><th>Company</th><th>Sector</th><th>Quality</th><th>Momentum</th><th>Δ Rank</th></tr></thead>
+    <tbody>
+      <tr><td class="rank">1</td><td class="sym">TCS</td><td>Tata Consultancy</td><td>IT Services</td><td>94</td><td>88</td><td class="chg-up">▲ 2</td></tr>
+      <tr><td class="rank">2</td><td class="sym">BDO</td><td>BDO Unibank</td><td>Banking</td><td>92</td><td>78</td><td class="chg-up">▲ 1</td></tr>
+      <tr><td class="rank">3</td><td class="sym">INFY</td><td>Infosys</td><td>IT Services</td><td>90</td><td>82</td><td class="chg-down">▼ 1</td></tr>
+      <tr><td class="rank">4</td><td class="sym">SM</td><td>SM Investments</td><td>Retail</td><td>89</td><td>83</td><td>—</td></tr>
+    </tbody>
+  </table>
+</div>

@@ -1,0 +1,28 @@
+<!-- @dsCard group="PREDICTION-ENGINE / Portfolio" -->
+<style>
+  :root {
+    --canvas:#000; --ink:#FFF; --body:#B4B4B4; --mute:#8C8C8C; --hairline:#1F1F1F;
+    --green:#34C759; --red:#FF3B30; --bg-sheet: rgba(18,18,20,0.55);
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--canvas); font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Inter",sans-serif; color:var(--ink); }
+  .page { width: 390px; padding: 16px; display: grid; gap: 14px; }
+  h1 { font-size: 22px; font-weight: 600; letter-spacing: -0.02em; margin: 0; }
+  .stat-card { background: var(--bg-sheet); border: 1px solid var(--hairline); border-radius: 8px; padding: 16px; }
+  .stat-label { font-size: 11px; color: var(--mute); }
+  .stat-value { font-size: 22px; font-weight: 600; margin-top: 4px; }
+  .up { color: var(--green); }
+  .row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-top: 1px solid var(--hairline); font-size: 13px; }
+  .row:first-of-type { border-top: none; }
+  .sym { font-weight: 600; }
+  .meta { color: var(--mute); font-size: 11px; }
+</style>
+<div class="page">
+  <h1>Portfolio</h1>
+  <div class="stat-card"><div class="stat-label">Total Value</div><div class="stat-value">Rs. 3,842,110.00</div><div class="up" style="font-size:12px;margin-top:2px">+Rs. 28,450.00 (+0.74%)</div></div>
+  <div class="stat-card">
+    <div class="row"><div><div class="sym">BDO</div><div class="meta">500 sh · Rs. 128.40 avg</div></div><span class="up">+Rs. 6,150</span></div>
+    <div class="row"><div><div class="sym">AC</div><div class="meta">200 sh · Rs. 612.00 avg</div></div><span style="color:var(--red)">-Rs. 3,800</span></div>
+    <div class="row"><div><div class="sym">SM</div><div class="meta">150 sh · Rs. 892.00 avg</div></div><span class="up">+Rs. 8,250</span></div>
+  </div>
+</div>

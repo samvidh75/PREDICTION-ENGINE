@@ -1,0 +1,25 @@
+<!-- @dsCard group="PREDICTION-ENGINE / AIChat" -->
+<style>
+  :root { --canvas:#000; --ink:#FFF; --body:#B4B4B4; --mute:#8C8C8C; --hairline:#1F1F1F; --accent:#FF6B4A; --bg-sheet: rgba(18,18,20,0.55); --bg-card: rgba(26,26,28,0.62); }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--canvas); font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Inter",sans-serif; color:var(--ink); }
+  .page { width: 390px; padding: 16px; display: grid; gap: 14px; }
+  h1 { font-size: 20px; font-weight: 700; margin: 0; }
+  .msgs { display: grid; gap: 10px; }
+  .msg { display: flex; gap: 8px; max-width: 88%; }
+  .msg.user { justify-self: end; flex-direction: row-reverse; }
+  .avatar { width: 24px; height: 24px; border-radius: 50%; background: var(--bg-card); border: 1px solid var(--hairline); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--accent); }
+  .bubble { background: var(--bg-sheet); border: 1px solid var(--hairline); border-radius: 10px; padding: 10px 12px; font-size: 12.5px; line-height: 1.5; }
+  .msg.user .bubble { background: var(--ink); color: #000; border: none; }
+  .input-row { display: flex; gap: 8px; }
+  .input { flex: 1; height: 44px; border: 1px solid var(--hairline); background: var(--bg-sheet); border-radius: 8px; padding: 0 14px; color: var(--ink); font-size: 13px; }
+  .send { width: 44px; height: 44px; background: var(--ink); color: #000; border-radius: 8px; border: none; }
+</style>
+<div class="page">
+  <h1>Research Assistant</h1>
+  <div class="msgs">
+    <div class="msg user"><div class="avatar">U</div><div class="bubble">IT sector momentum today?</div></div>
+    <div class="msg"><div class="avatar">✦</div><div class="bubble">IT services names are re-rating on stronger deal wins this quarter, with cost discipline holding despite wage inflation.</div></div>
+  </div>
+  <div class="input-row"><input class="input" placeholder="Ask a question…" /><div class="send">→</div></div>
+</div>

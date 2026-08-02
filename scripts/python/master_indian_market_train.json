@@ -1,0 +1,437 @@
+[
+  {
+    "instruction": "Evaluate corporate governance and fundamental sustainability for an Indian equity.",
+    "input": "Ticker: RELIANCE | Sector: Energy/Telco/Retail | P/E: 32.4 | Debt/Equity: 0.8 | Promoter Pledging: 0% | ROCE: 16.2% | Revenue Growth: 12% | Auditor Commentary: Standard audit opinion. All entities consolidated.",
+    "output": "RELIANCE maintains moderate fundamental positioning with balanced financial leverage. Operational metrics are within acceptable ranges for the sector.Calculated Healthometer: 68/100. Risk: Moderate."
+  },
+  {
+    "instruction": "Evaluate corporate governance and fundamental sustainability for an Indian equity.",
+    "input": "Ticker: TATAMOTORS | Sector: Auto | P/E: 28.5 | Debt/Equity: 1.2 | Promoter Pledging: 0% | ROCE: 14.8% | Revenue Growth: 18% | Auditor Commentary: Audit opinion unqualified. JLR subsidiary audited separately.",
+    "output": "TATAMOTORS maintains moderate fundamental positioning with balanced financial leverage. Operational metrics are within acceptable ranges for the sector.Calculated Healthometer: 68/100. Risk: Moderate."
+  },
+  {
+    "instruction": "Evaluate corporate governance and fundamental sustainability for an Indian equity.",
+    "input": "Ticker: ADANIENT | Sector: Diversified | P/E: 45.2 | Debt/Equity: 1.8 | Promoter Pledging: 52.4% | ROCE: 8.5% | Revenue Growth: 22% | Auditor Commentary: Auditor noted multi-layered shell entities handling capital distribution streams.",
+    "output": "ADANIENT exhibits critical corporate governance warnings. High promoter pledging (52.4%) and adverse auditor commentary signals high probability of institutional capital flight.Calculated Healthometer: 25/100. Risk: Severe."
+  },
+  {
+    "instruction": "Evaluate corporate governance and fundamental sustainability for an Indian equity.",
+    "input": "Ticker: HDFCBANK | Sector: Banking | P/E: 18.2 | Debt/Equity: 0.4 | Promoter Pledging: 0% | ROCE: 14.5% | Revenue Growth: 16% | Auditor Commentary: Clean audit report. Provisioning coverage maintained at 74%.",
+    "output": "HDFCBANK maintains moderate fundamental positioning with balanced financial leverage. Operational metrics are within acceptable ranges for the sector.Calculated Healthometer: 68/100. Risk: Moderate."
+  },
+  {
+    "instruction": "Evaluate corporate governance and fundamental sustainability for an Indian equity.",
+    "input": "Ticker: INFY | Sector: IT | P/E: 22.1 | Debt/Equity: 0.1 | Promoter Pledging: 0% | ROCE: 32.4% | Revenue Growth: 5% | Auditor Commentary: Auditor notes no material discrepancies. Revenue recognition policy consistent.",
+    "output": "INFY demonstrates a stable fundamental core with strong capital efficiency. Return on capital employed at 32.4% with unencumbered promoter equity holding structures.Calculated Healthometer: 85/100. Risk: Managed."
+  },
+  {
+    "instruction": "Evaluate corporate governance and fundamental sustainability for an Indian equity.",
+    "input": "Ticker: TCS | Sector: IT | P/E: 26.3 | Debt/Equity: 0.05 | Promoter Pledging: 0% | ROCE: 48.2% | Revenue Growth: 8% | Auditor Commentary: Clean audit with robust internal financial controls.",
+    "output": "TCS demonstrates a stable fundamental core with strong capital efficiency. Return on capital employed at 48.2% with unencumbered promoter equity holding structures.Calculated Healthometer: 85/100. Risk: Managed."
+  },
+  {
+    "instruction": "Evaluate corporate governance and fundamental sustainability for an Indian equity.",
+    "input": "Ticker: SBIN | Sector: Banking | P/E: 9.6 | Debt/Equity: 0.6 | Promoter Pledging: 0% | ROCE: 12.2% | Revenue Growth: 14% | Auditor Commentary: Audit flagged agri-loan slippages due to uneven monsoon. CET-1 at 13.6%.",
+    "output": "SBIN exhibits critical corporate governance warnings. adverse auditor commentary signals high probability of institutional capital flight.Calculated Healthometer: 25/100. Risk: Severe."
+  },
+  {
+    "instruction": "Evaluate corporate governance and fundamental sustainability for an Indian equity.",
+    "input": "Ticker: VEDL | Sector: Metals | P/E: 12.8 | Debt/Equity: 1.5 | Promoter Pledging: 38.2% | ROCE: 18.5% | Revenue Growth: 8% | Auditor Commentary: Auditor draws attention to related party transactions with promoter group entities.",
+    "output": "VEDL exhibits critical corporate governance warnings. adverse auditor commentary signals high probability of institutional capital flight.Calculated Healthometer: 25/100. Risk: Severe."
+  },
+  {
+    "instruction": "Evaluate corporate governance and fundamental sustainability for an Indian equity.",
+    "input": "Ticker: PAYTM | Sector: Fintech | P/E: 0 | Debt/Equity: 0.2 | Promoter Pledging: 0% | ROCE: -5.2% | Revenue Growth: -15% | Auditor Commentary: Auditor highlights going concern uncertainty due to regulatory restrictions on payments bank.",
+    "output": "PAYTM exhibits critical corporate governance warnings. adverse auditor commentary signals high probability of institutional capital flight.Calculated Healthometer: 25/100. Risk: Severe."
+  },
+  {
+    "instruction": "Evaluate corporate governance and fundamental sustainability for an Indian equity.",
+    "input": "Ticker: DMART | Sector: Retail | P/E: 72.3 | Debt/Equity: 0.0 | Promoter Pledging: 0% | ROCE: 22.8% | Revenue Growth: 12% | Auditor Commentary: Clean audit. Cash-rich balance sheet with zero debt.",
+    "output": "DMART demonstrates a stable fundamental core with strong capital efficiency. Return on capital employed at 22.8% with unencumbered promoter equity holding structures.Calculated Healthometer: 85/100. Risk: Managed."
+  },
+  {
+    "instruction": "Evaluate corporate governance and fundamental sustainability for an Indian equity.",
+    "input": "Ticker: LT | Sector: Infrastructure | P/E: 32.5 | Debt/Equity: 0.3 | Promoter Pledging: 0% | ROCE: 18.2% | Revenue Growth: 20% | Auditor Commentary: Auditor notes order book execution risk on international projects.",
+    "output": "LT maintains moderate fundamental positioning with balanced financial leverage. Operational metrics are within acceptable ranges for the sector.Calculated Healthometer: 68/100. Risk: Moderate."
+  },
+  {
+    "instruction": "Evaluate corporate governance and fundamental sustainability for an Indian equity.",
+    "input": "Ticker: JUBLFOOD | Sector: QSR | P/E: 55.2 | Debt/Equity: 0.6 | Promoter Pledging: 0% | ROCE: 12.5% | Revenue Growth: 6% | Auditor Commentary: Audit notes increasing store payback period and franchisee profitability concerns.",
+    "output": "JUBLFOOD maintains moderate fundamental positioning with balanced financial leverage. Operational metrics are within acceptable ranges for the sector.Calculated Healthometer: 68/100. Risk: Moderate."
+  },
+  {
+    "instruction": "Evaluate corporate governance and fundamental sustainability for an Indian equity.",
+    "input": "Ticker: ZOMATO | Sector: Internet | P/E: 0 | Debt/Equity: 0.0 | Promoter Pledging: 0% | ROCE: -2.1% | Revenue Growth: 62% | Auditor Commentary: First-time PAT positive. Auditor notes competition risks in quick-commerce.",
+    "output": "ZOMATO maintains moderate fundamental positioning with balanced financial leverage. Operational metrics are within acceptable ranges for the sector.Calculated Healthometer: 68/100. Risk: Moderate."
+  },
+  {
+    "instruction": "Evaluate corporate governance and fundamental sustainability for an Indian equity.",
+    "input": "Ticker: HINDALCO | Sector: Metals | P/E: 14.5 | Debt/Equity: 1.2 | Promoter Pledging: 0% | ROCE: 11.5% | Revenue Growth: -3% | Auditor Commentary: Audit notes impact of LME price volatility on inventory valuation.",
+    "output": "HINDALCO maintains moderate fundamental positioning with balanced financial leverage. Operational metrics are within acceptable ranges for the sector.Calculated Healthometer: 68/100. Risk: Moderate."
+  },
+  {
+    "instruction": "Evaluate corporate governance and fundamental sustainability for an Indian equity.",
+    "input": "Ticker: ICICIBANK | Sector: Banking | P/E: 17.8 | Debt/Equity: 0.3 | Promoter Pledging: 0% | ROCE: 15.8% | Revenue Growth: 18% | Auditor Commentary: Best-in-class asset quality report. Provision coverage at 80%.",
+    "output": "ICICIBANK maintains moderate fundamental positioning with balanced financial leverage. Operational metrics are within acceptable ranges for the sector.Calculated Healthometer: 68/100. Risk: Moderate."
+  },
+  {
+    "instruction": "Evaluate corporate governance and fundamental sustainability for an Indian equity.",
+    "input": "Ticker: MARUTI | Sector: Auto | P/E: 28.5 | Debt/Equity: 0.1 | Promoter Pledging: 0% | ROCE: 19.8% | Revenue Growth: 11% | Auditor Commentary: Clean audit. Strong operating cash flows with capex for EV transition.",
+    "output": "MARUTI shows solid fundamentals with efficient capital allocation and clean audit assurance. Calculated Healthometer: 78/100. Risk: Low."
+  },
+  {
+    "instruction": "Evaluate corporate governance and fundamental sustainability for an Indian equity.",
+    "input": "Ticker: ITC | Sector: FMCG/Cigarettes | P/E: 25.2 | Debt/Equity: 0.0 | Promoter Pledging: 0% | ROCE: 28.5% | Revenue Growth: 7% | Auditor Commentary: Clean audit with consistent dividend payout for 15 consecutive years.",
+    "output": "ITC demonstrates a stable fundamental core with strong capital efficiency. Return on capital employed at 28.5% with unencumbered promoter equity holding structures.Calculated Healthometer: 85/100. Risk: Managed."
+  },
+  {
+    "instruction": "Evaluate corporate governance and fundamental sustainability for an Indian equity.",
+    "input": "Ticker: TATASTEEL | Sector: Metals | P/E: 22.1 | Debt/Equity: 1.8 | Promoter Pledging: 0% | ROCE: 9.5% | Revenue Growth: -5% | Auditor Commentary: Audit flagged impact of EU carbon border tax on export profitability.",
+    "output": "TATASTEEL exhibits critical corporate governance warnings. adverse auditor commentary signals high probability of institutional capital flight.Calculated Healthometer: 25/100. Risk: Severe."
+  },
+  {
+    "instruction": "Evaluate corporate governance and fundamental sustainability for an Indian equity.",
+    "input": "Ticker: ASIANPAINT | Sector: Consumer | P/E: 48.2 | Debt/Equity: 0.05 | Promoter Pledging: 0% | ROCE: 35.2% | Revenue Growth: 9% | Auditor Commentary: Clean audit with strong internal financial controls and stable margins.",
+    "output": "ASIANPAINT demonstrates a stable fundamental core with strong capital efficiency. Return on capital employed at 35.2% with unencumbered promoter equity holding structures.Calculated Healthometer: 85/100. Risk: Managed."
+  },
+  {
+    "instruction": "Evaluate corporate governance and fundamental sustainability for an Indian equity.",
+    "input": "Ticker: TITAN | Sector: Consumer/Retail | P/E: 62.3 | Debt/Equity: 0.08 | Promoter Pledging: 0% | ROCE: 28.8% | Revenue Growth: 18% | Auditor Commentary: Clean audit. Management commentary confident about jewellery demand outlook.",
+    "output": "TITAN demonstrates a stable fundamental core with strong capital efficiency. Return on capital employed at 28.8% with unencumbered promoter equity holding structures.Calculated Healthometer: 85/100. Risk: Managed."
+  },
+  {
+    "instruction": "Evaluate corporate governance and fundamental sustainability for an Indian equity.",
+    "input": "Ticker: SUNPHARMA | Sector: Pharma | P/E: 22.5 | Debt/Equity: 0.4 | Promoter Pledging: 0% | ROCE: 16.8% | Revenue Growth: 14% | Auditor Commentary: Clean audit. USFDA compliance status normal. R&D pipeline progressing.",
+    "output": "SUNPHARMA shows solid fundamentals with efficient capital allocation and clean audit assurance. Calculated Healthometer: 78/100. Risk: Low."
+  },
+  {
+    "instruction": "Analyze technical price structures and institutional order flow anomalies on the NSE.",
+    "input": "Ticker: RELIANCE | Sector: Energy | Last Price: 2490 | Volume Expansion: 2.6x | Delivery %: 72% | Order Flow: Institutional block deal detected via NSE co-location server window tracking.",
+    "output": "RELIANCE indicates significant institutional accumulation. The 2.6x volume breakout is directly validated by block deal footprints and high delivery percentage (72%), confirming a strong structural support floor. Calculated Healthometer: 82/100. Conviction: Strong."
+  },
+  {
+    "instruction": "Analyze technical price structures and institutional order flow anomalies on the NSE.",
+    "input": "Ticker: TATAMOTORS | Sector: Auto | Last Price: 920 | Volume Expansion: 1.8x | Delivery %: 68% | Order Flow: FII bought 2.3M shares via bulk deal. Delivery volume at 68%.",
+    "output": "TATAMOTORS maintains routine technical distribution with standard volume profiles. No major institutional liquidity walls or order book imbalances detected. Calculated Healthometer: 60/100. Conviction: Neutral."
+  },
+  {
+    "instruction": "Analyze technical price structures and institutional order flow anomalies on the NSE.",
+    "input": "Ticker: ADANIPORTS | Sector: Infrastructure | Last Price: 1150 | Volume Expansion: 1.4x | Delivery %: 32% | Order Flow: Continued delivery selling. DIIs reducing stake.",
+    "output": "ADANIPORTS exhibits distribution by institutional holders. Low delivery percentage (32%) combined with declining price action indicates weak hands. Calculated Healthometer: 35/100. Conviction: Low."
+  },
+  {
+    "instruction": "Analyze technical price structures and institutional order flow anomalies on the NSE.",
+    "input": "Ticker: HDFCBANK | Sector: Banking | Last Price: 1670 | Volume Expansion: 1.0x | Delivery %: 58% | Order Flow: Normal trading pattern. No unusual block activity.",
+    "output": "HDFCBANK maintains routine technical distribution with standard volume profiles. No major institutional liquidity walls or order book imbalances detected. Calculated Healthometer: 60/100. Conviction: Neutral."
+  },
+  {
+    "instruction": "Analyze technical price structures and institutional order flow anomalies on the NSE.",
+    "input": "Ticker: INFY | Sector: IT | Last Price: 1390 | Volume Expansion: 0.9x | Delivery %: 45% | Order Flow: US-based fund reduced stake by 1.2% via open market.",
+    "output": "INFY exhibits distribution by institutional holders. Low delivery percentage (45%) combined with declining price action indicates weak hands. Calculated Healthometer: 35/100. Conviction: Low."
+  },
+  {
+    "instruction": "Analyze technical price structures and institutional order flow anomalies on the NSE.",
+    "input": "Ticker: ZOMATO | Sector: Internet | Last Price: 268 | Volume Expansion: 1.8x | Delivery %: 76% | Order Flow: Mutual funds increased allocation. Delivery percentage elevated.",
+    "output": "ZOMATO shows strong institutional accumulation with elevated delivery (76%) and volume expansion of 1.8x. Momentum likely to sustain. Calculated Healthometer: 75/100. Conviction: Moderate-High."
+  },
+  {
+    "instruction": "Analyze technical price structures and institutional order flow anomalies on the NSE.",
+    "input": "Ticker: DMART | Sector: Retail | Last Price: 4800 | Volume Expansion: 1.0x | Delivery %: 38% | Order Flow: Insider selling by promoter entity via bulk deal window.",
+    "output": "DMART shows insider selling with declining delivery quality. Promoter or early investor profit booking suggests limited near-term upside. Calculated Healthometer: 40/100. Conviction: Cautious."
+  },
+  {
+    "instruction": "Analyze technical price structures and institutional order flow anomalies on the NSE.",
+    "input": "Ticker: TRENT | Sector: Retail | Last Price: 5100 | Volume Expansion: 1.6x | Delivery %: 35% | Order Flow: Profit booking by early-stage investors. Delivery ratio declining.",
+    "output": "TRENT shows insider selling with declining delivery quality. Promoter or early investor profit booking suggests limited near-term upside. Calculated Healthometer: 40/100. Conviction: Cautious."
+  },
+  {
+    "instruction": "Analyze technical price structures and institutional order flow anomalies on the NSE.",
+    "input": "Ticker: LT | Sector: Infrastructure | Last Price: 3640 | Volume Expansion: 1.4x | Delivery %: 71% | Order Flow: Block deal of 4.2M shares between two large institutional funds.",
+    "output": "LT maintains routine technical distribution with standard volume profiles. No major institutional liquidity walls or order book imbalances detected. Calculated Healthometer: 60/100. Conviction: Neutral."
+  },
+  {
+    "instruction": "Analyze technical price structures and institutional order flow anomalies on the NSE.",
+    "input": "Ticker: COALINDIA | Sector: Mining | Last Price: 480 | Volume Expansion: 1.1x | Delivery %: 62% | Order Flow: Steady accumulation by dividend yield funds.",
+    "output": "COALINDIA maintains routine technical distribution with standard volume profiles. No major institutional liquidity walls or order book imbalances detected. Calculated Healthometer: 60/100. Conviction: Neutral."
+  },
+  {
+    "instruction": "Analyze technical price structures and institutional order flow anomalies on the NSE.",
+    "input": "Ticker: WIPRO | Sector: IT | Last Price: 520 | Volume Expansion: 1.2x | Delivery %: 33% | Order Flow: Contributed delivery selling post weak Q4. FIIs net sellers.",
+    "output": "WIPRO exhibits distribution by institutional holders. Low delivery percentage (33%) combined with declining price action indicates weak hands. Calculated Healthometer: 35/100. Conviction: Low."
+  },
+  {
+    "instruction": "Analyze technical price structures and institutional order flow anomalies on the NSE.",
+    "input": "Ticker: ICICIBANK | Sector: Banking | Last Price: 1100 | Volume Expansion: 1.2x | Delivery %: 74% | Order Flow: FII buying streak for 8 consecutive sessions. Delivery at 74%.",
+    "output": "ICICIBANK shows strong institutional accumulation with elevated delivery (74%) and volume expansion of 1.2x. Momentum likely to sustain. Calculated Healthometer: 75/100. Conviction: Moderate-High."
+  },
+  {
+    "instruction": "Analyze technical price structures and institutional order flow anomalies on the NSE.",
+    "input": "Ticker: HINDALCO | Sector: Metals | Last Price: 620 | Volume Expansion: 1.3x | Delivery %: 41% | Order Flow: LME price decline triggered FII sell-off. Delivery moderate.",
+    "output": "HINDALCO maintains routine technical distribution with standard volume profiles. No major institutional liquidity walls or order book imbalances detected. Calculated Healthometer: 60/100. Conviction: Neutral."
+  },
+  {
+    "instruction": "Analyze technical price structures and institutional order flow anomalies on the NSE.",
+    "input": "Ticker: MARUTI | Sector: Auto | Last Price: 11800 | Volume Expansion: 1.2x | Delivery %: 69% | Order Flow: Institutional accumulation ahead of CNG model launch. Delivery elevated.",
+    "output": "MARUTI maintains routine technical distribution with standard volume profiles. No major institutional liquidity walls or order book imbalances detected. Calculated Healthometer: 60/100. Conviction: Neutral."
+  },
+  {
+    "instruction": "Analyze technical price structures and institutional order flow anomalies on the NSE.",
+    "input": "Ticker: BAJFINANCE | Sector: Financial | Last Price: 7350 | Volume Expansion: 1.2x | Delivery %: 72% | Order Flow: MFs increased AUM allocation. Consistent delivery above 70%.",
+    "output": "BAJFINANCE maintains routine technical distribution with standard volume profiles. No major institutional liquidity walls or order book imbalances detected. Calculated Healthometer: 60/100. Conviction: Neutral."
+  },
+  {
+    "instruction": "Analyze technical price structures and institutional order flow anomalies on the NSE.",
+    "input": "Ticker: POWERGRID | Sector: Power | Last Price: 345 | Volume Expansion: 1.2x | Delivery %: 65% | Order Flow: Steady buying by infrastructure-themed funds. Delivery stable.",
+    "output": "POWERGRID maintains routine technical distribution with standard volume profiles. No major institutional liquidity walls or order book imbalances detected. Calculated Healthometer: 60/100. Conviction: Neutral."
+  },
+  {
+    "instruction": "Analyze technical price structures and institutional order flow anomalies on the NSE.",
+    "input": "Ticker: TATASTEEL | Sector: Metals | Last Price: 160 | Volume Expansion: 1.2x | Delivery %: 36% | Order Flow: Global steel price concerns triggering delivery-based selling.",
+    "output": "TATASTEEL maintains routine technical distribution with standard volume profiles. No major institutional liquidity walls or order book imbalances detected. Calculated Healthometer: 60/100. Conviction: Neutral."
+  },
+  {
+    "instruction": "Assess the structural impact of a SEBI regulatory circular on market mechanics.",
+    "input": "Sector: Midcap Derivatives | SEBI Action: SEBI increases minimum contract value to 15 Lakhs and restricts weekly expiries to 1 per exchange. | Impacted Assets: Volatility Index, Nifty Midcap Select, BSE Midcap",
+    "output": "The unexpected SEBI regulatory intervention instantly shifts sector dynamics for Midcap Derivatives. Imposing strict margin ceilings or altered indexing parameters compresses short-term speculative volume across Volatility Index, Nifty Midcap Select, BSE Midcap, forcing institutional capital reallocation. Calculated Healthometer for affected names: 30/100. Elevated caution advised."
+  },
+  {
+    "instruction": "Assess the structural impact of a SEBI regulatory circular on market mechanics.",
+    "input": "Sector: F&O Segment | SEBI Action: SEBI bans new F&O entries in 10 illiquid stocks citing excessive speculation. | Impacted Assets: Repco Home Finance, South Indian Bank, 8 others",
+    "output": "The unexpected SEBI regulatory intervention instantly shifts sector dynamics for F&O Segment. Imposing strict margin ceilings or altered indexing parameters compresses short-term speculative volume across Repco Home Finance, South Indian Bank, 8 others, forcing institutional capital reallocation. Calculated Healthometer for affected names: 30/100. Elevated caution advised."
+  },
+  {
+    "instruction": "Assess the structural impact of a SEBI regulatory circular on market mechanics.",
+    "input": "Sector: ASM Framework | SEBI Action: SEBI expands Graded Surveillance Measure to include 150 additional stocks with price band of 5%. | Impacted Assets: Small-cap universe, 150 newly added names",
+    "output": "The unexpected SEBI regulatory intervention instantly shifts sector dynamics for ASM Framework. Imposing strict margin ceilings or altered indexing parameters compresses short-term speculative volume across Small-cap universe, 150 newly added names, forcing institutional capital reallocation. Calculated Healthometer for affected names: 30/100. Elevated caution advised."
+  },
+  {
+    "instruction": "Assess the structural impact of a SEBI regulatory circular on market mechanics.",
+    "input": "Sector: ESG Disclosure | SEBI Action: SEBI mandates BRSR core assurance for top 250 listed entities from FY25. | Impacted Assets: Nifty 50, Nifty Next 50 constituents",
+    "output": "This SEBI circular introduces procedural compliance requirements for ESG Disclosure. While the intent is structural improvement, near-term compliance costs may create headwinds. Calculated Healthometer for affected names: 55/100. Neutral near-term."
+  },
+  {
+    "instruction": "Assess the structural impact of a SEBI regulatory circular on market mechanics.",
+    "input": "Sector: IPO Framework | SEBI Action: SEBI relaxes anchor investor lock-in period from 90 to 30 days for mainboard IPOs. | Impacted Assets: Primary market pipeline, HNI investors",
+    "output": "SEBI's deregulatory step expands the addressable opportunity for Primary market pipeline, HNI investors in IPO Framework. Lower compliance burdens and relaxed operating norms are likely to attract increased retail and institutional participation. Calculated Healthometer for affected names: 75/100. Constructive outlook."
+  },
+  {
+    "instruction": "Assess the structural impact of a SEBI regulatory circular on market mechanics.",
+    "input": "Sector: Mutual Fund | SEBI Action: SEBI introduces New Fund Offer (NFO) guideline limiting sectoral fund launches to 2 per AMC per year. | Impacted Assets: Mutual fund industry, Sectoral fund managers",
+    "output": "This SEBI circular introduces procedural changes to Mutual Fund market mechanics. Market participants will require 2-3 trading sessions to fully price in the new operating parameters. Calculated Healthometer: 55/100. Neutral near-term."
+  },
+  {
+    "instruction": "Assess the structural impact of a SEBI regulatory circular on market mechanics.",
+    "input": "Sector: Corporate Bonds | SEBI Action: SEBI permits FPIs to trade corporate bonds on Request for Quote platform with same-day settlement. | Impacted Assets: Corporate bond market, FPI community",
+    "output": "SEBI's deregulatory step expands the addressable opportunity for Corporate bond market, FPI community in Corporate Bonds. Lower compliance burdens and relaxed operating norms are likely to attract increased retail and institutional participation. Calculated Healthometer for affected names: 75/100. Constructive outlook."
+  },
+  {
+    "instruction": "Assess the structural impact of a SEBI regulatory circular on market mechanics.",
+    "input": "Sector: Stock Lending | SEBI Action: SEBI relaxes SLBM norms allowing retail participation in securities lending. | Impacted Assets: Retail broking, Market making firms",
+    "output": "SEBI's deregulatory step expands the addressable opportunity for Retail broking, Market making firms in Stock Lending. Lower compliance burdens and relaxed operating norms are likely to attract increased retail and institutional participation. Calculated Healthometer for affected names: 75/100. Constructive outlook."
+  },
+  {
+    "instruction": "Assess the structural impact of a SEBI regulatory circular on market mechanics.",
+    "input": "Sector: REITs/InvITs | SEBI Action: SEBI mandates minimum public unitholding of 25% for all REITs and InvITs within 3 years. | Impacted Assets: REITs, InvITs, HNI investors",
+    "output": "This SEBI circular introduces procedural compliance requirements for REITs/InvITs. While the intent is structural improvement, near-term compliance costs may create headwinds. Calculated Healthometer for affected names: 55/100. Neutral near-term."
+  },
+  {
+    "instruction": "Assess the structural impact of a SEBI regulatory circular on market mechanics.",
+    "input": "Sector: M&A Disclosure | SEBI Action: SEBI tightens disclosure norms for related party transactions requiring shareholder approval above 5% threshold. | Impacted Assets: Corporate India, Minority shareholders",
+    "output": "This SEBI circular introduces procedural changes to M&A Disclosure market mechanics. Market participants will require 2-3 trading sessions to fully price in the new operating parameters. Calculated Healthometer: 55/100. Neutral near-term."
+  },
+  {
+    "instruction": "Assess the structural impact of a SEBI regulatory circular on market mechanics.",
+    "input": "Sector: Digital Payments | SEBI Action: SEBI permits UPI-based block mechanism for secondary market trading with auto-payment settlement. | Impacted Assets: Retail investors, Stock brokers, Clearing corporations",
+    "output": "SEBI's deregulatory step expands the addressable opportunity for Retail investors, Stock brokers, Clearing corporations in Digital Payments. Lower compliance burdens and relaxed operating norms are likely to attract increased retail and institutional participation. Calculated Healthometer for affected names: 75/100. Constructive outlook."
+  },
+  {
+    "instruction": "Assess the structural impact of a SEBI regulatory circular on market mechanics.",
+    "input": "Sector: Rights Issue | SEBI Action: SEBI reduces rights issue timeline from 317 days to 23 days via automated fast-track mechanism. | Impacted Assets: Listed companies, Existing shareholders",
+    "output": "This SEBI circular introduces procedural changes to Rights Issue market mechanics. Market participants will require 2-3 trading sessions to fully price in the new operating parameters. Calculated Healthometer: 55/100. Neutral near-term."
+  },
+  {
+    "instruction": "Analyze sector rotation dynamics and capital flow trends in Indian markets.",
+    "input": "Sector: Banking | FII Flow: Buying | DII Flow: Buying | Macro Trigger: RBI rate cut expectations + strong credit growth of 15% YoY",
+    "output": "Broad-based institutional accumulation detected in Banking. Both FII and DII participation signals strong conviction. Sector likely to outperform over the next quarter. Calculated Healthometer: 80/100. Conviction: High."
+  },
+  {
+    "instruction": "Analyze sector rotation dynamics and capital flow trends in Indian markets.",
+    "input": "Sector: IT | FII Flow: Selling | DII Flow: Buying | Macro Trigger: Global uncertainty + US dollar depreciation concern",
+    "output": "Divergent capital flows in IT: FIIs reducing exposure while domestic institutions absorb supply. This pattern historically leads to sector consolidation before a recovery. Calculated Healthometer: 55/100. Conviction: Cautious."
+  },
+  {
+    "instruction": "Analyze sector rotation dynamics and capital flow trends in Indian markets.",
+    "input": "Sector: Pharma | FII Flow: Buying | DII Flow: Neutral | Macro Trigger: USFDA approvals picking up + China API price stabilization",
+    "output": "Selective FII buying detected in Pharma while DIIs remain on the sidelines. Foreign institutional interest may signal early-stage recovery. Calculated Healthometer: 70/100. Conviction: Moderate."
+  },
+  {
+    "instruction": "Analyze sector rotation dynamics and capital flow trends in Indian markets.",
+    "input": "Sector: FMCG | FII Flow: Neutral | DII Flow: Buying | Macro Trigger: Rural recovery signs + input cost moderation",
+    "output": "Mixed institutional activity in FMCG. Capital flows are evenly balanced, suggesting stock-specific rather than sector-wide conviction. Calculated Healthometer: 65/100."
+  },
+  {
+    "instruction": "Analyze sector rotation dynamics and capital flow trends in Indian markets.",
+    "input": "Sector: Auto | FII Flow: Buying | DII Flow: Buying | Macro Trigger: EV policy push + CNG conversion wave + rural demand uptick",
+    "output": "Broad-based institutional accumulation detected in Auto. Both FII and DII participation signals strong conviction. Sector likely to outperform over the next quarter. Calculated Healthometer: 80/100. Conviction: High."
+  },
+  {
+    "instruction": "Analyze sector rotation dynamics and capital flow trends in Indian markets.",
+    "input": "Sector: Metals | FII Flow: Selling | DII Flow: Selling | Macro Trigger: Global recession fears + LME price correction",
+    "output": "Broad-based institutional distribution detected in Metals. Both FII and DII reducing exposure suggests sector headwinds. Avoid until reversal signals emerge. Calculated Healthometer: 30/100. Conviction: Low."
+  },
+  {
+    "instruction": "Analyze sector rotation dynamics and capital flow trends in Indian markets.",
+    "input": "Sector: Real Estate | FII Flow: Neutral | DII Flow: Buying | Macro Trigger: Affordable housing push + stable interest rates",
+    "output": "Mixed institutional activity in Real Estate. Capital flows are evenly balanced, suggesting stock-specific rather than sector-wide conviction. Calculated Healthometer: 65/100."
+  },
+  {
+    "instruction": "Analyze sector rotation dynamics and capital flow trends in Indian markets.",
+    "input": "Sector: PSU | FII Flow: Buying | DII Flow: Buying | Macro Trigger: Government capex push + dividend yield focus",
+    "output": "Broad-based institutional accumulation detected in PSU. Both FII and DII participation signals strong conviction. Sector likely to outperform over the next quarter. Calculated Healthometer: 80/100. Conviction: High."
+  },
+  {
+    "instruction": "Analyze sector rotation dynamics and capital flow trends in Indian markets.",
+    "input": "Sector: Telecom | FII Flow: Buying | DII Flow: Neutral | Macro Trigger: Tariff hike cycle + ARPU improvement + 5G monetization",
+    "output": "Selective FII buying detected in Telecom while DIIs remain on the sidelines. Foreign institutional interest may signal early-stage recovery. Calculated Healthometer: 70/100. Conviction: Moderate."
+  },
+  {
+    "instruction": "Analyze sector rotation dynamics and capital flow trends in Indian markets.",
+    "input": "Sector: Healthcare | FII Flow: Neutral | DII Flow: Buying | Macro Trigger: Insurance coverage expansion + hospital occupancy recovery",
+    "output": "Mixed institutional activity in Healthcare. Capital flows are evenly balanced, suggesting stock-specific rather than sector-wide conviction. Calculated Healthometer: 65/100."
+  },
+  {
+    "instruction": "Analyze sector rotation dynamics and capital flow trends in Indian markets.",
+    "input": "Sector: Chemicals | FII Flow: Selling | DII Flow: Neutral | Macro Trigger: China+1 supply chain shift + European energy cost advantage",
+    "output": "Mixed institutional activity in Chemicals. Capital flows are evenly balanced, suggesting stock-specific rather than sector-wide conviction. Calculated Healthometer: 65/100."
+  },
+  {
+    "instruction": "Analyze sector rotation dynamics and capital flow trends in Indian markets.",
+    "input": "Sector: Renewable Energy | FII Flow: Buying | DII Flow: Buying | Macro Trigger: Green H2 policy push + PLI scheme for solar manufacturing",
+    "output": "Broad-based institutional accumulation detected in Renewable Energy. Both FII and DII participation signals strong conviction. Sector likely to outperform over the next quarter. Calculated Healthometer: 80/100. Conviction: High."
+  },
+  {
+    "instruction": "Analyze quarterly earnings performance and management commentary for an Indian equity.",
+    "input": "Ticker: TCS | Sector: IT | Result: Beat | Revenue Growth: 8.2% | Margin Change: 120bps | Guidance: Positive | Management Commentary: Demand environment improving. BFSI vertical returning to growth.",
+    "output": "TCS reported inline results with steady operational performance. Calculated Healthometer: 65/100. No material revision expected."
+  },
+  {
+    "instruction": "Analyze quarterly earnings performance and management commentary for an Indian equity.",
+    "input": "Ticker: TATAMOTORS | Sector: Auto | Result: Beat | Revenue Growth: 18.5% | Margin Change: 250bps | Guidance: Raised | Management Commentary: JLR margins at 9-year high. EV volumes accelerating.",
+    "output": "TATAMOTORS delivered a strong earnings beat with accelerating revenue (+18.5%) and significant margin expansion (+250bps). Management commentary confident and guidance raised. Calculated Healthometer: 88/100. Upgrade expected."
+  },
+  {
+    "instruction": "Analyze quarterly earnings performance and management commentary for an Indian equity.",
+    "input": "Ticker: WIPRO | Sector: IT | Result: Miss | Revenue Growth: 2.1% | Margin Change: -80bps | Guidance: Cut | Management Commentary: Client discretionary spending remains weak. Consulting revenue down.",
+    "output": "WIPRO reported a significant earnings miss with sluggish revenue (+2.1%) and margin compression (-80bps). Guidance cut compounds concerns. Calculated Healthometer: 30/100. De-rating risk."
+  },
+  {
+    "instruction": "Analyze quarterly earnings performance and management commentary for an Indian equity.",
+    "input": "Ticker: HDFCBANK | Sector: Banking | Result: Inline | Revenue Growth: 16.2% | Margin Change: 10bps | Guidance: Maintained | Management Commentary: NIM steady at 3.6%. Asset quality stable.",
+    "output": "HDFCBANK reported inline results with steady operational performance. Calculated Healthometer: 65/100. No material revision expected."
+  },
+  {
+    "instruction": "Analyze quarterly earnings performance and management commentary for an Indian equity.",
+    "input": "Ticker: DMART | Sector: Retail | Result: Miss | Revenue Growth: 8.0% | Margin Change: -40bps | Guidance: Maintained | Management Commentary: Same-store sales growth decelerated to 8% from 16% YoY.",
+    "output": "DMART missed expectations with moderate revenue growth (8.0%) and margin headwinds (-40bps). Execution concerns remain. Calculated Healthometer: 50/100. Risk of downgrade."
+  },
+  {
+    "instruction": "Analyze quarterly earnings performance and management commentary for an Indian equity.",
+    "input": "Ticker: RELIANCE | Sector: Diversified | Result: Inline | Revenue Growth: 12.5% | Margin Change: 30bps | Guidance: Positive | Management Commentary: Telecom ARPU improving. Retail EBITDA margins expanding.",
+    "output": "RELIANCE reported inline results with steady operational performance. Calculated Healthometer: 65/100. No material revision expected."
+  },
+  {
+    "instruction": "Analyze quarterly earnings performance and management commentary for an Indian equity.",
+    "input": "Ticker: ICICIBANK | Sector: Banking | Result: Beat | Revenue Growth: 19.5% | Margin Change: 45bps | Guidance: Raised | Management Commentary: Retail loan growth at 22%. Fee income diversification strong.",
+    "output": "ICICIBANK reported a solid earnings beat with revenue growth of 19.5% and margin improvement. Management guidance positive. Calculated Healthometer: 78/100. Outlook positive."
+  },
+  {
+    "instruction": "Analyze quarterly earnings performance and management commentary for an Indian equity.",
+    "input": "Ticker: BAJFINANCE | Sector: Financial | Result: Beat | Revenue Growth: 24.5% | Margin Change: 15bps | Guidance: Positive | Management Commentary: AUM crossing 4L Cr mark. Rural disbursements outperforming.",
+    "output": "BAJFINANCE reported a solid earnings beat with revenue growth of 24.5% and margin improvement. Management guidance positive. Calculated Healthometer: 78/100. Outlook positive."
+  },
+  {
+    "instruction": "Analyze quarterly earnings performance and management commentary for an Indian equity.",
+    "input": "Ticker: MARUTI | Sector: Auto | Result: Inline | Revenue Growth: 9.5% | Margin Change: 20bps | Guidance: Positive | Management Commentary: CNG variant mix improving. EV transition on track.",
+    "output": "MARUTI reported inline results with steady operational performance. Calculated Healthometer: 65/100. No material revision expected."
+  },
+  {
+    "instruction": "Analyze quarterly earnings performance and management commentary for an Indian equity.",
+    "input": "Ticker: INFY | Sector: IT | Result: Miss | Revenue Growth: 3.8% | Margin Change: -30bps | Guidance: Maintained | Management Commentary: Client cautious on discretionary spends. Deal pipeline healthy.",
+    "output": "INFY missed expectations with moderate revenue growth (3.8%) and margin headwinds (-30bps). Execution concerns remain. Calculated Healthometer: 50/100. Risk of downgrade."
+  },
+  {
+    "instruction": "Analyze quarterly earnings performance and management commentary for an Indian equity.",
+    "input": "Ticker: TITAN | Sector: Consumer | Result: Beat | Revenue Growth: 18.5% | Margin Change: 150bps | Guidance: Raised | Management Commentary: Wedding season demand robust. Studded jewellery mix improving.",
+    "output": "TITAN delivered a strong earnings beat with accelerating revenue (+18.5%) and significant margin expansion (+150bps). Management commentary confident and guidance raised. Calculated Healthometer: 88/100. Upgrade expected."
+  },
+  {
+    "instruction": "Analyze quarterly earnings performance and management commentary for an Indian equity.",
+    "input": "Ticker: SBIN | Sector: Banking | Result: Beat | Revenue Growth: 14.2% | Margin Change: 35bps | Guidance: Positive | Management Commentary: Net interest margin stable. Slippage ratio improved to 0.8%.",
+    "output": "SBIN reported a solid earnings beat with revenue growth of 14.2% and margin improvement. Management guidance positive. Calculated Healthometer: 78/100. Outlook positive."
+  },
+  {
+    "instruction": "Analyze quarterly earnings performance and management commentary for an Indian equity.",
+    "input": "Ticker: HINDUNILVR | Sector: FMCG | Result: Miss | Revenue Growth: 4.2% | Margin Change: -60bps | Guidance: Maintained | Management Commentary: Rural volumes recovering slowly. Input cost pressure easing.",
+    "output": "HINDUNILVR missed expectations with moderate revenue growth (4.2%) and margin headwinds (-60bps). Execution concerns remain. Calculated Healthometer: 50/100. Risk of downgrade."
+  },
+  {
+    "instruction": "Evaluate the impact of a corporate action on shareholder value.",
+    "input": "Ticker: TCS | Sector: IT | Action: Buyback | Details: INR 18,000 Cr buyback at 10% premium to market price.",
+    "output": "TCS's buyback signals management confidence in intrinsic value. The share repurchase at a premium reduces outstanding equity and signals undervaluation. Calculated Healthometer: 78/100. Positive signal."
+  },
+  {
+    "instruction": "Evaluate the impact of a corporate action on shareholder value.",
+    "input": "Ticker: RELIANCE | Sector: Diversified | Action: Dividend | Details: Interim dividend of INR 14 per share. Record date set.",
+    "output": "RELIANCE's dividend declaration reflects strong cash generation and shareholder-friendly capital allocation policy. Consistent payout history reinforces income profile. Calculated Healthometer: 75/100. Positive signal."
+  },
+  {
+    "instruction": "Evaluate the impact of a corporate action on shareholder value.",
+    "input": "Ticker: VEDL | Sector: Metals | Action: Buyback | Details: INR 3,500 Cr buyback to reduce promoter pledge via open market.",
+    "output": "VEDL's buyback signals management confidence in intrinsic value. The share repurchase at a premium reduces outstanding equity and signals undervaluation. Calculated Healthometer: 78/100. Positive signal."
+  },
+  {
+    "instruction": "Evaluate the impact of a corporate action on shareholder value.",
+    "input": "Ticker: SBIN | Sector: Banking | Action: Rights Issue | Details: INR 20,000 Cr rights issue to bolster capital adequacy ratios.",
+    "output": "SBIN's rights issue creates near-term dilution for existing shareholders. While the capital raise strengthens the balance sheet, execution risk exists. Calculated Healthometer: 45/100. Monitor execution."
+  },
+  {
+    "instruction": "Evaluate the impact of a corporate action on shareholder value.",
+    "input": "Ticker: LT | Sector: Infrastructure | Action: Stock Split | Details: 1:2 stock split to improve liquidity for retail participation.",
+    "output": "LT's stock split improves retail accessibility and liquidity. No fundamental value change, but often signals management confidence in sustained growth. Calculated Healthometer: 60/100. Neutral."
+  },
+  {
+    "instruction": "Evaluate the impact of a corporate action on shareholder value.",
+    "input": "Ticker: HINDUNILVR | Sector: FMCG | Action: Dividend | Details: Final dividend of INR 22 per share. Consistent payout for 25 years.",
+    "output": "HINDUNILVR's dividend declaration reflects strong cash generation and shareholder-friendly capital allocation policy. Consistent payout history reinforces income profile. Calculated Healthometer: 75/100. Positive signal."
+  },
+  {
+    "instruction": "Evaluate the impact of a corporate action on shareholder value.",
+    "input": "Ticker: TRENT | Sector: Retail | Action: Bonus Issue | Details: 1:1 bonus issue from free reserves. Record date Q3.",
+    "output": "TRENT's bonus issue rewards existing shareholders from accumulated reserves. Reflects strong retained earnings but does not create economic value. Calculated Healthometer: 60/100. Neutral."
+  },
+  {
+    "instruction": "Evaluate the impact of a corporate action on shareholder value.",
+    "input": "Ticker: ADANIPORTS | Sector: Infrastructure | Action: Rights Issue | Details: INR 5,000 Cr rights issue partially subscribed by promoter group.",
+    "output": "ADANIPORTS's rights issue creates near-term dilution for existing shareholders. While the capital raise strengthens the balance sheet, execution risk exists. Calculated Healthometer: 45/100. Monitor execution."
+  },
+  {
+    "instruction": "Evaluate the impact of a corporate action on shareholder value.",
+    "input": "Ticker: WIPRO | Sector: IT | Action: Buyback | Details: INR 12,000 Cr buyback via tender offer at 15% premium.",
+    "output": "WIPRO's buyback signals management confidence in intrinsic value. The share repurchase at a premium reduces outstanding equity and signals undervaluation. Calculated Healthometer: 78/100. Positive signal."
+  },
+  {
+    "instruction": "Evaluate the impact of a corporate action on shareholder value.",
+    "input": "Ticker: ITC | Sector: FMCG | Action: Dividend | Details: Special dividend of INR 12 per share on strong cash flows.",
+    "output": "ITC's dividend declaration reflects strong cash generation and shareholder-friendly capital allocation policy. Consistent payout history reinforces income profile. Calculated Healthometer: 75/100. Positive signal."
+  },
+  {
+    "instruction": "Evaluate the impact of a corporate action on shareholder value.",
+    "input": "Ticker: M&M | Sector: Auto | Action: Stock Split | Details: 1:2 stock split announced alongside EV vertical spin-off plans.",
+    "output": "M&M's stock split improves retail accessibility and liquidity. No fundamental value change, but often signals management confidence in sustained growth. Calculated Healthometer: 60/100. Neutral."
+  },
+  {
+    "instruction": "Evaluate the impact of a corporate action on shareholder value.",
+    "input": "Ticker: TATAPOWER | Sector: Power | Action: Rights Issue | Details: INR 3,000 Cr rights issue for renewable energy capex funding.",
+    "output": "TATAPOWER's rights issue creates near-term dilution for existing shareholders. While the capital raise strengthens the balance sheet, execution risk exists. Calculated Healthometer: 45/100. Monitor execution."
+  }
+]

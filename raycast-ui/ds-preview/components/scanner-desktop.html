@@ -1,0 +1,48 @@
+<!-- @dsCard group="PREDICTION-ENGINE / Scanner" -->
+<style>
+  :root {
+    --canvas:#000; --ink:#FFF; --body:#B4B4B4; --mute:#8C8C8C; --hairline:#1F1F1F;
+    --accent:#FF6B4A; --green:#34C759; --red:#FF3B30;
+    --bg-sheet: rgba(18,18,20,0.55);
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--canvas); font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Inter",sans-serif; color:var(--ink); }
+  .page { width: 1120px; padding: 32px; display: grid; gap: 20px; }
+  h1 { font-size: 32px; font-weight: 600; letter-spacing: -0.02em; margin: 0; }
+  .presets { display: flex; gap: 8px; flex-wrap: wrap; }
+  .preset { padding: 8px 14px; border-radius: 6px; font-size: 13px; color: var(--mute); border: 1px solid var(--hairline); }
+  .preset.active { background: var(--ink); color: #000; border-color: var(--ink); font-weight: 600; }
+  .search { height: 44px; width: 320px; border: 1px solid var(--hairline); background: var(--bg-sheet); border-radius: 4px; padding: 0 14px; color: var(--ink); font-size: 14px; }
+  table { width: 100%; border-collapse: collapse; }
+  th { text-align: left; font-size: 11px; color: var(--mute); text-transform: uppercase; letter-spacing: 0.04em; padding: 10px 12px; border-bottom: 1px solid var(--hairline); font-weight: 500; }
+  td { padding: 12px; font-size: 13px; border-bottom: 1px solid var(--hairline); }
+  .sym { font-weight: 600; }
+  .name { color: var(--body); }
+  .factor { text-align: center; }
+  .score { display: inline-block; width: 28px; height: 20px; border-radius: 4px; font-size: 11px; line-height: 20px; }
+  .score.hi { background: rgba(52,199,89,0.16); color: var(--green); }
+  .score.mid { background: rgba(255,149,0,0.16); color: #FF9500; }
+  .score.lo { background: rgba(255,59,48,0.16); color: var(--red); }
+</style>
+<div class="page">
+  <h1>Scanner</h1>
+  <div class="presets">
+    <div class="preset active">Quality Compounders</div>
+    <div class="preset">High Growth</div>
+    <div class="preset">Value Opportunities</div>
+    <div class="preset">Dividend Champions</div>
+    <div class="preset">Turnaround Stories</div>
+  </div>
+  <input class="search" placeholder="Filter results…" />
+  <table>
+    <thead>
+      <tr><th>Symbol</th><th>Company</th><th class="factor">Quality</th><th class="factor">Growth</th><th class="factor">Mom</th><th class="factor">Val</th><th class="factor">Risk</th><th class="factor">Stability</th><th class="factor">Div</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="sym">BDO</td><td class="name">BDO Unibank</td><td class="factor"><span class="score hi">92</span></td><td class="factor"><span class="score mid">61</span></td><td class="factor"><span class="score hi">78</span></td><td class="factor"><span class="score mid">54</span></td><td class="factor"><span class="score hi">81</span></td><td class="factor"><span class="score hi">88</span></td><td class="factor"><span class="score mid">65</span></td></tr>
+      <tr><td class="sym">AC</td><td class="name">Ayala Corp</td><td class="factor"><span class="score hi">85</span></td><td class="factor"><span class="score hi">72</span></td><td class="factor"><span class="score mid">58</span></td><td class="factor"><span class="score lo">38</span></td><td class="factor"><span class="score mid">62</span></td><td class="factor"><span class="score hi">79</span></td><td class="factor"><span class="score mid">55</span></td></tr>
+      <tr><td class="sym">SM</td><td class="name">SM Investments</td><td class="factor"><span class="score hi">89</span></td><td class="factor"><span class="score hi">75</span></td><td class="factor"><span class="score hi">83</span></td><td class="factor"><span class="score mid">47</span></td><td class="factor"><span class="score hi">80</span></td><td class="factor"><span class="score hi">86</span></td><td class="factor"><span class="score mid">60</span></td></tr>
+      <tr><td class="sym">JFC</td><td class="name">Jollibee Foods</td><td class="factor"><span class="score mid">67</span></td><td class="factor"><span class="score hi">81</span></td><td class="factor"><span class="score lo">42</span></td><td class="factor"><span class="score lo">35</span></td><td class="factor"><span class="score mid">58</span></td><td class="factor"><span class="score mid">64</span></td><td class="factor"><span class="score lo">30</span></td></tr>
+    </tbody>
+  </table>
+</div>

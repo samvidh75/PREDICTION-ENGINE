@@ -1,0 +1,19 @@
+<!-- @dsCard group="PREDICTION-ENGINE / PortfolioDetail" -->
+<style>
+  :root { --canvas:#000; --ink:#FFF; --body:#B4B4B4; --mute:#8C8C8C; --hairline:#1F1F1F; --accent:#FF6B4A; --bg-sheet: rgba(18,18,20,0.55); }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--canvas); font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Inter",sans-serif; color:var(--ink); display:flex; align-items:center; justify-content:center; min-height:420px; }
+  .card { width: 440px; background: var(--bg-sheet); border: 1px solid var(--hairline); border-radius: 12px; padding: 32px; text-align: center; display: grid; gap: 14px; }
+  .icon { font-size: 40px; }
+  h1 { font-size: 20px; font-weight: 600; margin: 0; }
+  p { color: var(--body); font-size: 13.5px; line-height: 1.6; margin: 0; }
+  .cta { display: inline-block; padding: 10px 22px; background: var(--ink); color: #000; border-radius: 8px; font-size: 13.5px; font-weight: 600; }
+  .brand { font-size: 11px; color: var(--mute); margin-top: 4px; }
+</style>
+<div class="card">
+  <div class="icon">🔌</div>
+  <h1>Not connected</h1>
+  <p>Not connected to Zerodha. Please authenticate first to view live portfolio detail and metrics.</p>
+  <div class="cta">Connect Zerodha</div>
+  <div class="brand">Broker integration · read-only</div>
+</div>

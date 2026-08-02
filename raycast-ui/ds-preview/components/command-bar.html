@@ -1,0 +1,30 @@
+<!-- @dsCard group="Components" -->
+<style>
+  :root {
+    --bg-base: #0b0b0c;
+    --bg-card-alt: #1c1c1e;
+    --border-hairline: #2c2c2e;
+    --text-muted: #71717a;
+    --text-secondary: #a1a1aa;
+  }
+  body { margin: 0; background: var(--bg-base); font-family: -apple-system, Inter, sans-serif; }
+  .stage { padding: 32px; }
+  .command-bar {
+    display: flex; align-items: center; gap: 12px;
+    width: 480px; padding: 12px 16px;
+    background: var(--bg-base);
+    border-bottom: 1px solid var(--border-hairline);
+  }
+  .search { flex: 1; font-size: 14px; color: var(--text-muted); }
+  .kbd {
+    display: inline-flex; padding: 2px 6px; font-size: 11px; font-weight: 500;
+    border-radius: 8px; background: var(--bg-card-alt); border: 1px solid var(--border-hairline);
+    color: var(--text-secondary);
+  }
+</style>
+<div class="stage">
+  <div class="command-bar">
+    <span class="search">Search for apps and commands…</span>
+    <kbd class="kbd">⌘K</kbd>
+  </div>
+</div>

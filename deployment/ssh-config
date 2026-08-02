@@ -1,0 +1,36 @@
+# StockEX Philippines — VPS SSH Config
+# Install: cp deployment/ssh-config ~/.ssh/config_stockex
+# Usage: ssh stockex
+#
+# If the VPS IP changes, just update HostName below.
+
+Host stockex
+  HostName 103.211.56.127
+  User root
+  Port 22
+  StrictHostKeyChecking no
+  UserKnownHostsFile /dev/null
+  ServerAliveInterval 30
+  ServerAliveCountMax 3
+  LogLevel ERROR
+
+Host stockex-ubuntu
+  HostName 103.211.56.127
+  User ubuntu
+  Port 22
+  StrictHostKeyChecking no
+  UserKnownHostsFile /dev/null
+  ServerAliveInterval 30
+  ServerAliveCountMax 3
+  LogLevel ERROR
+
+# Tunnel for local dev (forward VPS ports to localhost)
+Host stockex-tunnel
+  HostName 103.211.56.127
+  User root
+  Port 22
+  StrictHostKeyChecking no
+  UserKnownHostsFile /dev/null
+  LocalForward 4001 127.0.0.1:4001
+  LocalForward 8000 127.0.0.1:8000
+  LocalForward 3001 127.0.0.1:3001

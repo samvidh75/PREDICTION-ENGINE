@@ -1,0 +1,35 @@
+=== UI Screenshot Capture Report ===
+Source: http://localhost:5174
+Output: /Users/samvidhmehta/Desktop/PREDICTION-ENGINE/reports/screenshots/local-aura-glass
+Captured: 2026-06-19T14:12:28.670Z
+
+  [OK] landing_mobile-375.png (375x812)
+  [OK] landing_mobile-430.png (430x932)
+  [OK] landing_tablet-768.png (768x1024)
+  [OK] landing_desktop-1440.png (1440x900)
+  [OK] about_mobile-375.png (375x812)
+  [OK] about_mobile-430.png (430x932)
+  [OK] about_tablet-768.png (768x1024)
+  [OK] about_desktop-1440.png (1440x900)
+  [OK] rankings_mobile-375.png (375x812)
+  [OK] rankings_mobile-430.png (430x932)
+  [OK] rankings_tablet-768.png (768x1024)
+  [OK] rankings_desktop-1440.png (1440x900)
+  [OK] predictions_mobile-375.png (375x812)
+  [OK] predictions_mobile-430.png (430x932)
+  [OK] predictions_tablet-768.png (768x1024)
+  [OK] predictions_desktop-1440.png (1440x900)
+  [OK] trust-centre_mobile-375.png (375x812)
+  [OK] trust-centre_mobile-430.png (430x932)
+  [OK] trust-centre_tablet-768.png (768x1024)
+  [OK] trust-centre_desktop-1440.png (1440x900)
+  [OK] login_mobile-375.png (375x812)
+  [OK] login_mobile-430.png (430x932)
+  [OK] login_tablet-768.png (768x1024)
+  [OK] login_desktop-1440.png (1440x900)
+  [OK] signup_mobile-375.png (375x812)
+  [OK] signup_mobile-430.png (430x932)
+  [OK] signup_tablet-768.png (768x1024)
+  [OK] signup_desktop-1440.png (1440x900)
+
+Total: 7 routes × 4 viewports = 28 screenshots

@@ -1,0 +1,19 @@
+[Unit]
+Description=StockStory LoRA Fine-Tuned Model Server
+After=network.target
+Before=stockstory-backend.service
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/home/ubuntu/PREDICTION-ENGINE
+ExecStart=/home/ubuntu/PREDICTION-ENGINE/.lora_venv/bin/gunicorn -w 1 -k uvicorn.workers.UvicornWorker scripts.backend_lora_server:app --bind 127.0.0.1:3001
+Restart=always
+RestartSec=10
+Environment="PORT=3001"
+Environment="PYTHONUNBUFFERED=1"
+Environment="OLLAMA_HOST=http://127.0.0.1:11434"
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target

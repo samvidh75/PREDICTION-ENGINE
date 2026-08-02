@@ -1,0 +1,38 @@
+<!-- @dsCard group="PREDICTION-ENGINE / Backtest" -->
+<style>
+  :root { --canvas:#000; --ink:#FFF; --body:#B4B4B4; --mute:#8C8C8C; --hairline:#1F1F1F; --accent:#FF6B4A; --green:#34C759; --red:#FF3B30; --bg-sheet: rgba(18,18,20,0.55); }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--canvas); font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Inter",sans-serif; color:var(--ink); }
+  .page { width: 1040px; padding: 32px; display: grid; gap: 20px; }
+  h1 { font-size: 28px; font-weight: 700; margin: 0; }
+  .strategies { display: flex; gap: 8px; }
+  .strat { padding: 8px 14px; border: 1px solid var(--hairline); border-radius: 8px; font-size: 12.5px; color: var(--mute); }
+  .strat.active { background: var(--ink); color: #000; font-weight: 600; }
+  .params { display: flex; gap: 16px; align-items: center; }
+  .param { display: grid; gap: 4px; }
+  .param label { font-size: 11px; color: var(--mute); }
+  .param .val { font-size: 13px; font-weight: 600; }
+  .run-btn { padding: 10px 20px; background: var(--accent); color: #000; border-radius: 8px; font-size: 13px; font-weight: 600; border: none; width: fit-content; }
+  .results { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  .stat-card { background: var(--bg-sheet); border: 1px solid var(--hairline); border-radius: 10px; padding: 16px; }
+  .stat-label { font-size: 11px; color: var(--mute); }
+  .stat-value { font-size: 20px; font-weight: 600; margin-top: 4px; }
+  .up { color: var(--green); } .down { color: var(--red); }
+</style>
+<div class="page">
+  <h1>Backtest</h1>
+  <div class="strategies">
+    <div class="strat active">MA Crossover</div><div class="strat">RSI</div><div class="strat">MACD</div><div class="strat">Bollinger</div><div class="strat">Buy & Hold</div>
+  </div>
+  <div class="params">
+    <div class="param"><label>Fast Period</label><div class="val">20</div></div>
+    <div class="param"><label>Slow Period</label><div class="val">50</div></div>
+    <div class="run-btn">▶ Run Backtest</div>
+  </div>
+  <div class="results">
+    <div class="stat-card"><div class="stat-label">Total Return</div><div class="stat-value up">+34.2%</div></div>
+    <div class="stat-card"><div class="stat-label">Sharpe Ratio</div><div class="stat-value">1.42</div></div>
+    <div class="stat-card"><div class="stat-label">Max Drawdown</div><div class="stat-value down">-12.8%</div></div>
+    <div class="stat-card"><div class="stat-label">Win Rate</div><div class="stat-value">58%</div></div>
+  </div>
+</div>

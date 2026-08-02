@@ -1,0 +1,30 @@
+groups:
+  - name: stockstory_alerts
+    rules:
+      - alert: OllamaDown
+        expr: up{job="ollama"} == 0
+        for: 5m
+        annotations:
+          summary: "Ollama service is down"
+          description: "Ollama has been unreachable for 5 minutes"
+
+      - alert: QdrantDown
+        expr: up{job="qdrant"} == 0
+        for: 5m
+        annotations:
+          summary: "Qdrant service is down"
+          description: "Qdrant has been unreachable for 5 minutes"
+
+      - alert: HighLLMLatency
+        expr: histogram_quantile(0.99, llm_latency_seconds) > 5
+        for: 5m
+        annotations:
+          summary: "LLM latency is high"
+          description: "P99 latency is > 5 seconds"
+
+      - alert: HighErrorRate
+        expr: rate(llm_calls_total{status="error"}[5m]) > 0.05
+        for: 5m
+        annotations:
+          summary: "High LLM error rate"
+          description: "Error rate > 5%"

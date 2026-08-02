@@ -1,0 +1,14 @@
+config:
+  target: "https://stockstory-api.onrender.com"
+  phases:
+    - duration: 60
+      arrivalRate: 10
+
+scenarios:
+  - name: "LLM Requests"
+    flow:
+      - post:
+          url: "/api/free/chat"
+          json:
+            symbol: "TCS"
+            message: "What is PE?"

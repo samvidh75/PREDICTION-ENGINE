@@ -1,0 +1,28 @@
+<!-- @dsCard group="PREDICTION-ENGINE / AdvancedScanner" -->
+<style>
+  :root { --canvas:#000; --ink:#FFF; --body:#B4B4B4; --mute:#8C8C8C; --hairline:#1F1F1F; --accent:#FF6B4A; --green:#34C759; --red:#FF3B30; --bg-sheet: rgba(18,18,20,0.55); }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--canvas); font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Inter",sans-serif; color:var(--ink); }
+  .page { width: 390px; padding: 16px; display: grid; gap: 14px; }
+  h1 { font-size: 20px; font-weight: 700; margin: 0; }
+  .sub { color: var(--mute); font-size: 11px; margin: 0; }
+  .progress-card { background: var(--bg-sheet); border: 1px solid var(--hairline); border-radius: 10px; padding: 12px 14px; display: flex; align-items: center; gap: 10px; }
+  .progress-bar { flex: 1; height: 5px; background: var(--hairline); border-radius: 3px; overflow: hidden; }
+  .progress-fill { width: 68%; height: 100%; background: var(--accent); }
+  .progress-label { font-size: 10.5px; color: var(--mute); white-space: nowrap; }
+  .row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-top: 1px solid var(--hairline); font-size: 12.5px; }
+  .row:first-of-type { border-top: none; }
+  .sym { font-weight: 600; }
+  .signal { display: inline-flex; padding: 2px 8px; border-radius: 6px; font-size: 10.5px; }
+  .signal.bull { background: rgba(52,199,89,0.14); color: var(--green); }
+  .signal.bear { background: rgba(255,59,48,0.14); color: var(--red); }
+</style>
+<div class="page">
+  <div><h1>Advanced Scanner</h1><p class="sub">Client-side technical analysis.</p></div>
+  <div class="progress-card"><span class="progress-label">1,240 / 1,820</span><div class="progress-bar"><div class="progress-fill"></div></div></div>
+  <div>
+    <div class="row"><span class="sym">BDO</span><span class="signal bull">↗ Bullish</span></div>
+    <div class="row"><span class="sym">JFC</span><span class="signal bear">↘ Bearish</span></div>
+    <div class="row"><span class="sym">SM</span><span class="signal bull">↗ Bullish</span></div>
+  </div>
+</div>

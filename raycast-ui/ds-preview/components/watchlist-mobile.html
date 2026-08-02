@@ -1,0 +1,28 @@
+<!-- @dsCard group="PREDICTION-ENGINE / Watchlist" -->
+<style>
+  :root {
+    --canvas:#000; --ink:#FFF; --body:#B4B4B4; --mute:#8C8C8C; --hairline:#1F1F1F;
+    --green:#34C759; --blue:#57C1FF; --yellow:#FF9500; --red:#FF3B30;
+    --bg-sheet: rgba(18,18,20,0.55);
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--canvas); font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Inter",sans-serif; color:var(--ink); }
+  .page { width: 390px; padding: 16px; display: grid; gap: 14px; }
+  h1 { font-size: 22px; font-weight: 600; letter-spacing: -0.02em; margin: 0; }
+  .card { background: var(--bg-sheet); border: 1px solid var(--hairline); border-radius: 8px; }
+  .row { padding: 12px 14px; border-top: 1px solid var(--hairline); }
+  .row:first-of-type { border-top: none; }
+  .top { display: flex; justify-content: space-between; }
+  .sym { font-weight: 600; font-size: 13px; }
+  .name { color: var(--body); font-size: 11.5px; }
+  .status { font-size: 11.5px; display: flex; align-items: center; gap: 6px; margin-top: 6px; }
+  .dot { width: 6px; height: 6px; border-radius: 50%; }
+</style>
+<div class="page">
+  <h1>Watchlist</h1>
+  <div class="card">
+    <div class="row"><div class="top"><span class="sym">BDO</span><span class="name">BDO Unibank</span></div><div class="status"><span class="dot" style="background:var(--green)"></span>Strengthening</div></div>
+    <div class="row"><div class="top"><span class="sym">JFC</span><span class="name">Jollibee Foods</span></div><div class="status"><span class="dot" style="background:var(--yellow)"></span>Needs review</div></div>
+    <div class="row"><div class="top"><span class="sym">AC</span><span class="name">Ayala Corp</span></div><div class="status"><span class="dot" style="background:var(--blue)"></span>Stable</div></div>
+  </div>
+</div>

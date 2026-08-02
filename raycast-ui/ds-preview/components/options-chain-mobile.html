@@ -1,0 +1,29 @@
+<!-- @dsCard group="PREDICTION-ENGINE / OptionsChain" -->
+<style>
+  :root { --canvas:#000; --ink:#FFF; --body:#B4B4B4; --mute:#8C8C8C; --hairline:#1F1F1F; --green:#34C759; --red:#FF3B30; --yellow:#FF9500; --bg-sheet: rgba(18,18,20,0.55); }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--canvas); font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Inter",sans-serif; color:var(--ink); }
+  .page { width: 390px; padding: 16px; display: grid; gap: 12px; }
+  h1 { font-size: 20px; font-weight: 700; margin: 0; }
+  .toolbar { display: flex; gap: 8px; }
+  .sym-select, .expiry { padding: 6px 10px; border: 1px solid var(--hairline); border-radius: 6px; font-size: 11.5px; }
+  table { width: 100%; border-collapse: collapse; font-size: 11px; }
+  th, td { padding: 6px; text-align: center; border-bottom: 1px solid var(--hairline); }
+  th { color: var(--mute); font-size: 9.5px; text-transform: uppercase; }
+  .strike { font-weight: 700; background: var(--bg-sheet); }
+  .ce-itm, .pe-itm { background: rgba(52,199,89,0.12); color: var(--green); }
+  .atm { background: rgba(255,149,0,0.14); color: var(--yellow); }
+  .otm { color: var(--red); }
+</style>
+<div class="page">
+  <h1>Options Chain</h1>
+  <div class="toolbar"><div class="sym-select">HBL</div><div class="expiry">26 Sep 2026</div></div>
+  <table>
+    <thead><tr><th>Call LTP</th><th>Strike</th><th>Put LTP</th></tr></thead>
+    <tbody>
+      <tr><td class="ce-itm">18.20</td><td class="strike">120</td><td class="otm">2.10</td></tr>
+      <tr><td class="atm">9.40</td><td class="strike">125</td><td class="atm">6.30</td></tr>
+      <tr><td class="otm">3.80</td><td class="strike">130</td><td class="pe-itm">12.90</td></tr>
+    </tbody>
+  </table>
+</div>

@@ -1,0 +1,58 @@
+<!-- @dsCard group="PREDICTION-ENGINE / Dashboard" -->
+<style>
+  :root {
+    --canvas:#000; --ink:#FFF; --body:#B4B4B4; --mute:#8C8C8C; --hairline:#1F1F1F;
+    --accent:#FF6B4A; --green:#34C759; --red:#FF3B30;
+    --bg-sheet: rgba(18,18,20,0.55); --bg-card: rgba(26,26,28,0.62);
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--canvas); font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Inter",sans-serif; color:var(--ink); }
+  .page { width: 1120px; padding: 32px; display: grid; gap: 24px; }
+  .row { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; }
+  .card { background: var(--bg-sheet); border: 1px solid var(--hairline); border-radius: 8px; padding: 20px; }
+  .card h3 { margin: 0 0 16px; font-size: 13px; font-weight: 600; color: var(--mute); text-transform: uppercase; letter-spacing: 0.04em; }
+  .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  .stat { display: grid; gap: 4px; }
+  .stat-label { font-size: 12px; color: var(--mute); }
+  .stat-value { font-size: 22px; font-weight: 600; }
+  .stat-value.up { color: var(--green); }
+  .stat-value.down { color: var(--red); }
+  .list-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-top: 1px solid var(--hairline); font-size: 13px; }
+  .list-row:first-of-type { border-top: none; }
+  .sym { font-weight: 600; }
+  .chg.up { color: var(--green); } .chg.down { color: var(--red); }
+</style>
+<div class="page">
+  <div class="row">
+    <div class="card">
+      <h3>Portfolio Overview</h3>
+      <div class="stat-grid">
+        <div class="stat"><div class="stat-label">Total Value</div><div class="stat-value">₱1,284,600</div></div>
+        <div class="stat"><div class="stat-label">Today</div><div class="stat-value up">+2.14%</div></div>
+        <div class="stat"><div class="stat-label">Total Return</div><div class="stat-value up">+18.4%</div></div>
+        <div class="stat"><div class="stat-label">Positions</div><div class="stat-value">12</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Provider Health</h3>
+      <div class="list-row"><span>PSE Live Feed</span><span class="chg up">● Online</span></div>
+      <div class="list-row"><span>Fundamentals API</span><span class="chg up">● Online</span></div>
+      <div class="list-row"><span>News Ingest</span><span class="chg up">● Online</span></div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="card">
+      <h3>Watchlist</h3>
+      <div class="list-row"><span class="sym">BDO</span><span>BDO Unibank</span><span class="chg up">+1.8%</span></div>
+      <div class="list-row"><span class="sym">JFC</span><span>Jollibee Foods</span><span class="chg down">-0.6%</span></div>
+      <div class="list-row"><span class="sym">AC</span><span>Ayala Corp</span><span class="chg up">+0.9%</span></div>
+      <div class="list-row"><span class="sym">SM</span><span>SM Investments</span><span class="chg up">+2.3%</span></div>
+    </div>
+    <div class="card">
+      <h3>Trending</h3>
+      <div class="list-row"><span class="sym">TEL</span><span class="chg up">+4.1%</span></div>
+      <div class="list-row"><span class="sym">GLO</span><span class="chg down">-1.2%</span></div>
+      <div class="list-row"><span class="sym">ICT</span><span class="chg up">+3.5%</span></div>
+    </div>
+  </div>
+</div>

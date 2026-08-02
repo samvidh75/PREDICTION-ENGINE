@@ -1,0 +1,25 @@
+<!-- @dsCard group="PREDICTION-ENGINE / Alert" -->
+<style>
+  :root { --canvas:#000; --ink:#FFF; --body:#B4B4B4; --mute:#8C8C8C; --hairline:#1F1F1F; --accent:#FF6B4A; --green:#34C759; --bg-sheet: rgba(18,18,20,0.55); }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--canvas); font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Inter",sans-serif; color:var(--ink); }
+  .page { width: 390px; padding: 16px; display: grid; gap: 14px; }
+  .head { display: flex; justify-content: space-between; align-items: center; }
+  h1 { font-size: 20px; font-weight: 700; margin: 0; }
+  .add-btn { padding: 8px 14px; background: var(--accent); color: #000; border-radius: 8px; font-size: 12px; font-weight: 600; }
+  .card { background: var(--bg-sheet); border: 1px solid var(--hairline); border-radius: 10px; }
+  .row { padding: 12px 14px; border-top: 1px solid var(--hairline); display: flex; justify-content: space-between; align-items: center; }
+  .row:first-of-type { border-top: none; }
+  .sym { font-weight: 600; font-size: 13px; }
+  .cond { color: var(--body); font-size: 11.5px; }
+  .toggle { width: 32px; height: 18px; border-radius: 9px; background: var(--green); position: relative; }
+  .toggle::after { content: ''; position: absolute; right: 2px; top: 2px; width: 14px; height: 14px; border-radius: 50%; background: #000; }
+</style>
+<div class="page">
+  <div class="head"><h1>Alerts</h1><div class="add-btn">+ New</div></div>
+  <div class="card">
+    <div class="row"><div><div class="sym">BDO</div><div class="cond">Price Above ₱145.00</div></div><div class="toggle"></div></div>
+    <div class="row"><div><div class="sym">HBL</div><div class="cond">RSI Oversold</div></div><div class="toggle"></div></div>
+    <div class="row"><div><div class="sym">ENGRO</div><div class="cond">Volume Spike</div></div><div class="toggle"></div></div>
+  </div>
+</div>

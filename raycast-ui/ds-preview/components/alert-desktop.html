@@ -1,0 +1,27 @@
+<!-- @dsCard group="PREDICTION-ENGINE / Alert" -->
+<style>
+  :root { --canvas:#000; --ink:#FFF; --body:#B4B4B4; --mute:#8C8C8C; --hairline:#1F1F1F; --accent:#FF6B4A; --green:#34C759; --bg-sheet: rgba(18,18,20,0.55); }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--canvas); font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Inter",sans-serif; color:var(--ink); }
+  .page { width: 900px; padding: 32px; display: grid; gap: 20px; }
+  .head { display: flex; justify-content: space-between; align-items: center; }
+  h1 { font-size: 28px; font-weight: 700; margin: 0; }
+  .add-btn { padding: 10px 18px; background: var(--accent); color: #000; border-radius: 8px; font-size: 13px; font-weight: 600; border: none; }
+  .card { background: var(--bg-sheet); border: 1px solid var(--hairline); border-radius: 10px; }
+  .row { display: grid; grid-template-columns: 80px 1fr 140px 100px 90px; align-items: center; padding: 14px 20px; border-top: 1px solid var(--hairline); font-size: 13px; }
+  .row:first-of-type { border-top: none; }
+  .sym { font-weight: 600; }
+  .cond { color: var(--body); }
+  .repeat { color: var(--mute); font-size: 11.5px; }
+  .toggle { justify-self: end; width: 36px; height: 20px; border-radius: 10px; background: var(--green); position: relative; }
+  .toggle::after { content: ''; position: absolute; right: 2px; top: 2px; width: 16px; height: 16px; border-radius: 50%; background: #000; }
+</style>
+<div class="page">
+  <div class="head"><h1>Alerts</h1><div class="add-btn">+ New Alert</div></div>
+  <div class="card">
+    <div class="row"><span class="sym">BDO</span><span class="cond">Price Above ₱145.00</span><span class="repeat">Daily</span><span>Never</span><div class="toggle"></div></div>
+    <div class="row"><span class="sym">HBL</span><span class="cond">RSI Oversold (&lt; 30)</span><span class="repeat">Always</span><span>2d ago</span><div class="toggle"></div></div>
+    <div class="row"><span class="sym">ENGRO</span><span class="cond">Volume Spike</span><span class="repeat">Once</span><span>Never</span><div class="toggle"></div></div>
+    <div class="row"><span class="sym">MCB</span><span class="cond">MACD Crossover</span><span class="repeat">Daily</span><span>5d ago</span><div class="toggle"></div></div>
+  </div>
+</div>

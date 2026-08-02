@@ -1,0 +1,12 @@
+:root {
+  --bg-base: #0b0b0c;
+  --bg-card: #121214;
+  --bg-card-alt: #1c1c1e;
+  --bg-elevated: #2c2c2e;
+  --border-hairline: #2c2c2e;
+  --text-primary: #f4f4f5;
+  --text-secondary: #a1a1aa;
+  --text-muted: #71717a;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+}

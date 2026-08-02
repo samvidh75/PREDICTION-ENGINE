@@ -1,0 +1,30 @@
+<!-- @dsCard group="PREDICTION-ENGINE / AnalystWorkspace" -->
+<style>
+  :root { --canvas:#000; --ink:#FFF; --body:#B4B4B4; --mute:#8C8C8C; --hairline:#1F1F1F; --accent:#FF6B4A; --bg-sheet: rgba(18,18,20,0.55); }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--canvas); font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Inter",sans-serif; color:var(--ink); }
+  .page { width: 1040px; padding: 32px; display: grid; gap: 20px; }
+  h1 { font-size: 28px; font-weight: 700; margin: 0; }
+  .query-row { display: flex; gap: 10px; }
+  .query-input { flex: 1; height: 44px; border: 1px solid var(--hairline); background: rgba(255,255,255,0.03); border-radius: 8px; padding: 0 16px; color: var(--ink); font-size: 14px; }
+  .run-btn { height: 44px; padding: 0 20px; background: var(--ink); color: #000; border-radius: 8px; font-size: 13px; font-weight: 600; border: none; }
+  .card { background: var(--bg-sheet); border: 1px solid var(--hairline); border-radius: 10px; padding: 20px; }
+  .card h3 { margin: 0 0 10px; font-size: 12px; color: var(--mute); text-transform: uppercase; letter-spacing: 0.04em; }
+  .badge { display: inline-flex; padding: 3px 10px; border-radius: 10px; font-size: 11px; border: 1px solid var(--hairline); color: var(--body); margin-right: 6px; }
+  .output { font-size: 13px; color: var(--body); line-height: 1.6; }
+</style>
+<div class="page">
+  <h1>Analyst Workspace</h1>
+  <div class="query-row">
+    <input class="query-input" placeholder="Ask a research question about a stock or sector…" />
+    <div class="run-btn">Run analysis</div>
+  </div>
+  <div class="card">
+    <h3>Query context</h3>
+    <span class="badge">BDO</span><span class="badge">Banking sector</span><span class="badge">Q2 2026</span>
+  </div>
+  <div class="card">
+    <h3>Analyst output</h3>
+    <p class="output">BDO's loan growth accelerated in Q2, with net interest margins holding steady against a rising rate environment. Provisioning for credit losses remains conservative relative to sector peers, suggesting management is pricing in continued macro uncertainty rather than signaling deteriorating asset quality.</p>
+  </div>
+</div>

@@ -1,0 +1,29 @@
+{
+  "enabled": true,
+  "channels": {
+    "local": {
+      "enabled": true,
+      "description": "Console logging"
+    },
+    "email": {
+      "enabled": false,
+      "smtpHost": null
+    },
+    "slack": {
+      "enabled": false,
+      "webhookConfigured": false
+    },
+    "discord": {
+      "enabled": false,
+      "webhookConfigured": false
+    }
+  },
+  "triggers": [
+    "scheduler_failure",
+    "stale_data",
+    "db_unavailable",
+    "prediction_failure",
+    "validation_failure"
+  ],
+  "lastHealthCheck": "2026-06-07T12:33:34.158Z"
+}

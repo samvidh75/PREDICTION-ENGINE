@@ -1,0 +1,28 @@
+<!-- @dsCard group="Components" -->
+<style>
+  :root {
+    --bg-base: #0b0b0c;
+    --bg-card-alt: #1c1c1e;
+    --border-hairline: #2c2c2e;
+    --text-secondary: #a1a1aa;
+  }
+  body { margin: 0; background: var(--bg-base); font-family: -apple-system, Inter, sans-serif; }
+  .stage { display: flex; gap: 24px; align-items: center; padding: 32px; }
+  .kbd {
+    display: inline-flex;
+    padding: 2px 6px;
+    font-size: 11px;
+    font-weight: 500;
+    border-radius: 8px;
+    background: var(--bg-card-alt);
+    border: 1px solid var(--border-hairline);
+    color: var(--text-secondary);
+  }
+</style>
+<div class="stage">
+  <kbd class="kbd">⌘K</kbd>
+  <kbd class="kbd">⌘D</kbd>
+  <kbd class="kbd">⌘N</kbd>
+  <kbd class="kbd">↵</kbd>
+  <kbd class="kbd">⌥←</kbd>
+</div>

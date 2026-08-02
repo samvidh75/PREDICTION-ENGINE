@@ -1,0 +1,115 @@
+/* ============================================================================
+   CARDS — Masthead editorial
+   Paper cards with hairline rules; no drop shadows on flat surfaces,
+   reserved shadow only for lifted sheets.
+   ============================================================================ */
+
+.card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur)) saturate(160%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(160%);
+  border: 1px solid var(--glass-border);
+  box-shadow: inset 0 1px 0 var(--glass-border-top);
+  border-radius: var(--radius-md);
+  padding: 20px 24px;
+  transition: background-color var(--t-fast),
+              border-color var(--t-fast),
+              transform 200ms var(--ease-soft);
+  position: relative;
+}
+
+.card-elevated {
+  background-color: var(--bg-sheet);
+  box-shadow: var(--sh-raised);
+}
+
+.card-default { background-color: var(--bg-card); }
+
+.card-flat { border: none; background-color: transparent; }
+
+.card-paper {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+}
+
+/* Interactive — small lift on hover, fox-orange rule */
+.card-interactive {
+  cursor: pointer;
+}
+.card-interactive::before {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: -1px;
+  height: 2px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 360ms var(--ease-paper);
+}
+.card-interactive:hover {
+  border-color: var(--border-strong);
+}
+.card-interactive:hover::before {
+  transform: scaleX(1);
+}
+
+.card-header {
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.card-header:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+.card-body { margin: 16px 0; }
+.card-body:first-child { margin-top: 0; }
+.card-body:last-child { margin-bottom: 0; }
+.card-footer {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.card-title { font-size: 15px; font-weight: 600; line-height: 1.4; color: var(--text-primary); margin: 0; }
+.card-description { font-size: 13px; font-weight: 400; line-height: 1.5; color: var(--text-secondary); margin: 4px 0 0 0; }
+
+.card-with-icon { display: flex; gap: 16px; align-items: flex-start; }
+.card-with-icon .icon {
+  flex: 0 0 auto;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-primary);
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+
+.card-list { list-style: none; padding: 0; margin: 0; }
+.card-list li {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.card-list li:last-child { border-bottom: none; padding-bottom: 0; }
+
+.card.has-error { border-color: var(--red); background-color: var(--red-light); }
+.card.has-success { border-color: var(--green); background-color: var(--green-light); }
+.card.has-warning { border-color: var(--amber); background-color: var(--amber-light); }
+
+@media (max-width: 767px) {
+  .card { padding: 16px; border-radius: var(--radius-md); }
+  .card-grid { grid-template-columns: 1fr; gap: 12px; }
+  .card-footer { flex-direction: column; justify-content: stretch; }
+  .card-footer button { width: 100%; }
+}

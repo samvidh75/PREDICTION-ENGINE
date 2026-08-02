@@ -1,0 +1,24 @@
+version: "3.8"
+
+services:
+  market-data:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.market-data
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend/data:/app/data
+    environment:
+      - DATABASE_PATH=/app/data/market_data.db
+    command: python api_server.py
+
+  market-scheduler:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.market-data
+    volumes:
+      - ./backend/data:/app/data
+    command: python scheduler.py
+    depends_on:
+      - market-data

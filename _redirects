@@ -1,0 +1,5 @@
+# StockStory India — Cloudflare Pages Redirects
+# SPA fallback: all non-file, non-api routes serve index.html
+
+/api/*  /api/*  200
+/*  /index.html  200

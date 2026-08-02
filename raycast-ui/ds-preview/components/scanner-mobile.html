@@ -1,0 +1,34 @@
+<!-- @dsCard group="PREDICTION-ENGINE / Scanner" -->
+<style>
+  :root {
+    --canvas:#000; --ink:#FFF; --body:#B4B4B4; --mute:#8C8C8C; --hairline:#1F1F1F;
+    --green:#34C759; --red:#FF3B30; --bg-sheet: rgba(18,18,20,0.55);
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--canvas); font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Inter",sans-serif; color:var(--ink); }
+  .page { width: 390px; padding: 16px; display: grid; gap: 14px; }
+  h1 { font-size: 22px; font-weight: 600; letter-spacing: -0.02em; margin: 0; }
+  .presets { display: flex; gap: 6px; overflow-x: auto; }
+  .preset { padding: 6px 12px; border-radius: 6px; font-size: 12px; color: var(--mute); border: 1px solid var(--hairline); flex-shrink: 0; white-space: nowrap; }
+  .preset.active { background: var(--ink); color: #000; border-color: var(--ink); font-weight: 600; }
+  .search { height: 40px; border: 1px solid var(--hairline); background: var(--bg-sheet); border-radius: 4px; padding: 0 12px; color: var(--ink); font-size: 13px; }
+  .row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-top: 1px solid var(--hairline); }
+  .row:first-of-type { border-top: none; }
+  .sym { font-weight: 600; font-size: 13px; }
+  .name { color: var(--body); font-size: 11.5px; }
+  .score { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; background: rgba(52,199,89,0.16); color: var(--green); }
+</style>
+<div class="page">
+  <h1>Scanner</h1>
+  <div class="presets">
+    <div class="preset active">Quality Compounders</div>
+    <div class="preset">High Growth</div>
+    <div class="preset">Value Opportunities</div>
+  </div>
+  <input class="search" placeholder="Filter results…" />
+  <div>
+    <div class="row"><div><div class="sym">BDO</div><div class="name">BDO Unibank</div></div><span class="score">92</span></div>
+    <div class="row"><div><div class="sym">AC</div><div class="name">Ayala Corp</div></div><span class="score">85</span></div>
+    <div class="row"><div><div class="sym">SM</div><div class="name">SM Investments</div></div><span class="score">89</span></div>
+  </div>
+</div>

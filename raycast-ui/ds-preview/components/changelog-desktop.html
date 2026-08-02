@@ -1,0 +1,42 @@
+<!-- @dsCard group="PREDICTION-ENGINE / Changelog" -->
+<style>
+  :root { --canvas:#000; --ink:#FFF; --body:#B4B4B4; --mute:#8C8C8C; --hairline:#1F1F1F; --accent:#FF6B4A; --bg-sheet: rgba(18,18,20,0.55); }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--canvas); font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Inter",sans-serif; color:var(--ink); }
+  .page { width: 680px; padding: 32px; display: grid; gap: 24px; }
+  h1 { font-size: 28px; font-weight: 700; margin: 0; }
+  .sub { color: var(--body); font-size: 14px; margin: 0 0 8px; }
+  .entry { border-left: 2px solid var(--hairline); padding-left: 20px; display: grid; gap: 8px; position: relative; }
+  .entry::before { content: ''; position: absolute; left: -5px; top: 4px; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+  .meta { font-size: 11.5px; color: var(--mute); font-family: 'SF Mono', monospace; }
+  .title { font-size: 16px; font-weight: 600; }
+  ul { margin: 0; padding-left: 18px; display: grid; gap: 4px; }
+  li { font-size: 13px; color: var(--body); }
+</style>
+<div class="page">
+  <div>
+    <h1>Changelog</h1>
+    <p class="sub">See what's new in StockEX.</p>
+  </div>
+  <div class="entry">
+    <div class="meta">2026-04-10 · v0.2.0</div>
+    <div class="title">Scanner v2 & Watchlist Improvements</div>
+    <ul>
+      <li>Added industry filters to the stock scanner</li>
+      <li>Improved watchlist sync performance</li>
+      <li>Fixed PSE data refresh timing issue</li>
+      <li>Added PE ratio and market cap columns to scanner results</li>
+    </ul>
+  </div>
+  <div class="entry">
+    <div class="meta">2026-03-28 · v0.1.0</div>
+    <div class="title">Private Beta Launch</div>
+    <ul>
+      <li>Initial private beta release</li>
+      <li>PSE stock scanner with multi-factor screening</li>
+      <li>Watchlist with timely price updates</li>
+      <li>Stock detail pages with fundamental data</li>
+      <li>Research profiles for tracking thesis</li>
+    </ul>
+  </div>
+</div>

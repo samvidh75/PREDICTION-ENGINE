@@ -1,0 +1,41 @@
+# wrangler.toml - Cloudflare Pages Configuration
+# Frontend deployment for StockStory India
+
+name = "prediction-engine"
+type = "javascript"
+account_id = ""  # Set via environment variable or Cloudflare dashboard
+pages_build_output_dir = "dist"
+
+# Build configuration
+[build]
+command = "npm run build:frontend"
+cwd = "./"
+watch_paths = ["src/**/*.tsx", "src/**/*.ts"]
+
+# Environment variables for Cloudflare
+[env.production]
+name = "prediction-engine"
+routes = [
+  { pattern = "stockstory-india.com", zone_name = "stockstory-india.com" },
+  { pattern = "www.stockstory-india.com", zone_name = "stockstory-india.com" }
+]
+
+[[env.production.vars]]
+name = "VITE_API_DOMAIN"
+value = "stockstory-india.com"
+
+[[env.production.vars]]
+name = "VITE_APP_ORIGIN"
+value = "https://stockstory-india.com"
+
+[[env.production.vars]]
+name = "VITE_APP_DOMAIN"
+value = "stockstory-india.com"
+
+# Cache configuration
+[triggers.crons]
+cron = "0 0 * * *"  # Daily at midnight UTC
+
+# Compatibility
+compatibility_date = "2024-09-03"
+compatibility_flags = ["nodejs_compat"]

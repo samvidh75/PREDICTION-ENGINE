@@ -1,0 +1,194 @@
+import { describe, expect, it } from 'vitest';
+import { evaluatePSEEquity } from './pseMarketBrain';
+import {
+  MARKET_BRAIN_FACTOR_KEYS,
+  MARKET_BRAIN_FORBIDDEN_RECOMMENDATION_TERMS,
+} from './marketBrainGuardrails';
+import { toMarketBrainResearchView } from './researchContract';
+
+const basePacket = {
+  symbol: 'SAMPLE',
+  companyName: 'Sample Limited',
+  sector: 'General',
+  asOf: '2026-06-27',
+  fundamentals: {
+    peRatio: 21,
+    pbRatio: 3,
+    evEbitda: 15,
+    roe: 18,
+    roa: 12,
+    roic: 17,
+    revenueGrowth: 14,
+    profitGrowth: 13,
+    operatingMargin: 25,
+    debtToEquity: 0.4,
+    currentRatio: 1.4,
+    fcfYield: 4,
+    marketCap: 12000000000000,
+  },
+  technicals: {
+    momentum: 10,
+    relativeStrength: 8,
+    volatility: 20,
+    rsi: 57,
+    trendStrength: 10,
+  },
+};
+
+const completeEvidence = {
+  instrument_master: 'ready' as const,
+  prices: 'ready' as const,
+  fundamentals: 'ready' as const,
+  financial_statements: 'ready' as const,
+  technicals: 'ready' as const,
+  sector_context: 'ready' as const,
+};
+
+describe('toMarketBrainResearchView', () => {
+  it('creates a product-safe research view from output', () => {
+    const result = evaluatePSEEquity({
+      ...basePacket,
+      evidence: completeEvidence,
+    });
+
+    const view = toMarketBrainResearchView(result);
+
+    expect(view.symbol).toBe('SAMPLE');
+    expect(view.headline).toContain('conviction');
+    expect(view.factorViews).toHaveLength(7);
+    expect(view.factorViews.map((factor) => factor.key)).toEqual(MARKET_BRAIN_FACTOR_KEYS);
+    expect(view.methodNote).toContain('Research-only');
+    expect(view.evidenceReview.needsReview).toBe(false);
+    expect(view.evidenceReview.summary).toBe('Required research evidence is available for this view.');
+  });
+
+  it('uses the shared narrative fallback for empty research risk bullets', () => {
+    const result = evaluatePSEEquity({
+      ...basePacket,
+      evidence: completeEvidence,
+    });
+
+    const view = toMarketBrainResearchView({
+      ...result,
+      risksToReview: [],
+    });
+
+    expect(view.risksToReview).toEqual(['No dominant signal yet.']);
+  });
+
+  it('uses factor driver, risk, then neutral fallback summaries', () => {
+    const result = evaluatePSEEquity({
+      ...basePacket,
+      evidence: completeEvidence,
+    });
+
+    const view = toMarketBrainResearchView({
+      ...result,
+      quality: { score: 72, drivers: ['Quality driver copy.'], risks: ['Quality risk copy.'] },
+      growth: { score: 38, drivers: [], risks: ['Growth risk copy.'] },
+      valuation: { score: 50, drivers: [], risks: [] },
+    });
+
+    expect(view.factorViews.find((factor) => factor.key === 'quality')?.summary).toBe('Quality driver copy.');
+    expect(view.factorViews.find((factor) => factor.key === 'growth')?.summary).toBe('Growth risk copy.');
+    expect(view.factorViews.find((factor) => factor.key === 'valuation')?.summary).toBe('Valuation needs peer and history context.');
+  });
+
+  it('rejects direct recommendation language before returning public factor copy', () => {
+    const result = evaluatePSEEquity({
+      ...basePacket,
+      evidence: completeEvidence,
+    });
+    const unsafeCopy = MARKET_BRAIN_FORBIDDEN_RECOMMENDATION_TERMS[0];
+
+    expect(() => toMarketBrainResearchView({
+      ...result,
+      quality: { score: 72, drivers: [unsafeCopy], risks: [] },
+    })).toThrow('Market brain copy contains recommendation language that requires compliance review.');
+  });
+
+  it('rejects direct recommendation language before returning public company names', () => {
+    const result = evaluatePSEEquity({
+      ...basePacket,
+      companyName: MARKET_BRAIN_FORBIDDEN_RECOMMENDATION_TERMS[0],
+      evidence: completeEvidence,
+    });
+
+    expect(() => toMarketBrainResearchView(result)).toThrow('Market brain copy contains recommendation language that requires compliance review.');
+  });
+
+  it('surfaces partial evidence as review metadata without marking it missing', () => {
+    const result = evaluatePSEEquity({
+      ...basePacket,
+      evidence: {
+        ...completeEvidence,
+        fundamentals: 'partial',
+      },
+    });
+
+    const view = toMarketBrainResearchView(result);
+
+    expect(view.evidenceReview.needsReview).toBe(true);
+    expect(view.evidenceReview.partial).toEqual(['fundamentals']);
+    expect(view.evidenceReview.missing).toEqual([]);
+    expect(view.evidenceReview.summary).toContain('Needs review: Fundamentals.');
+  });
+
+  it('returns evidence review arrays without mutating the engine result arrays', () => {
+    const result = evaluatePSEEquity({
+      ...basePacket,
+      evidence: {
+        ...completeEvidence,
+        fundamentals: 'partial',
+        sector_context: 'missing',
+      },
+    });
+
+    const view = toMarketBrainResearchView(result);
+
+    view.evidenceReview.partial.push('prices');
+    view.evidenceReview.missing.push('technicals');
+
+    expect(result.partialEvidence).toEqual(['fundamentals']);
+    expect(result.missingEvidence).toEqual(['sector_context']);
+  });
+
+  it('returns narrative arrays without mutating the engine result arrays', () => {
+    const result = evaluatePSEEquity({
+      ...basePacket,
+      evidence: completeEvidence,
+    });
+    const originalThesis = [...result.thesis];
+    const originalRisks = [...result.risksToReview];
+    const originalWatch = [...result.whatToWatch];
+
+    const view = toMarketBrainResearchView(result);
+
+    view.thesis.push('UI-only thesis mutation.');
+    view.risksToReview.push('UI-only risk mutation.');
+    view.whatToWatch.push('UI-only watch mutation.');
+
+    expect(result.thesis).toEqual(originalThesis);
+    expect(result.risksToReview).toEqual(originalRisks);
+    expect(result.whatToWatch).toEqual(originalWatch);
+  });
+
+  it('renders public evidence labels without raw domain keys', () => {
+    const result = evaluatePSEEquity({
+      ...basePacket,
+      evidence: {
+        ...completeEvidence,
+        fundamentals: 'partial',
+        financial_statements: 'missing',
+        sector_context: 'missing',
+      },
+    });
+
+    const view = toMarketBrainResearchView(result);
+
+    expect(view.evidenceReview.summary).toContain('Needs review: Fundamentals.');
+    expect(view.evidenceReview.summary).toContain('Unavailable evidence: Financial Statements, Sector Context.');
+    expect(view.evidenceReview.summary).not.toContain('financial_statements');
+    expect(view.evidenceReview.summary).not.toContain('sector_context');
+  });
+});

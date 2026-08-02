@@ -1,0 +1,35 @@
+<!-- @dsCard group="PREDICTION-ENGINE / AdvancedScanner" -->
+<style>
+  :root { --canvas:#000; --ink:#FFF; --body:#B4B4B4; --mute:#8C8C8C; --hairline:#1F1F1F; --accent:#FF6B4A; --green:#34C759; --red:#FF3B30; --bg-sheet: rgba(18,18,20,0.55); }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--canvas); font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Inter",sans-serif; color:var(--ink); }
+  .page { width: 1040px; padding: 32px; display: grid; gap: 20px; }
+  h1 { font-size: 28px; font-weight: 700; margin: 0; }
+  .sub { color: var(--mute); font-size: 12.5px; margin: 0; }
+  .progress-card { background: var(--bg-sheet); border: 1px solid var(--hairline); border-radius: 10px; padding: 16px 20px; display: flex; align-items: center; gap: 16px; }
+  .progress-bar { flex: 1; height: 6px; background: var(--hairline); border-radius: 3px; overflow: hidden; }
+  .progress-fill { width: 68%; height: 100%; background: var(--accent); }
+  .progress-label { font-size: 12px; color: var(--mute); font-family: 'SF Mono', monospace; white-space: nowrap; }
+  table { width: 100%; border-collapse: collapse; }
+  th { text-align: left; font-size: 11px; color: var(--mute); text-transform: uppercase; padding: 10px; border-bottom: 1px solid var(--hairline); }
+  td { padding: 10px; font-size: 13px; border-bottom: 1px solid var(--hairline); }
+  .sym { font-weight: 600; }
+  .signal { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 6px; font-size: 11px; }
+  .signal.bull { background: rgba(52,199,89,0.14); color: var(--green); }
+  .signal.bear { background: rgba(255,59,48,0.14); color: var(--red); }
+</style>
+<div class="page">
+  <div><h1>Advanced Scanner</h1><p class="sub">Client-side technical analysis — Bollinger Bands, MACD, volume divergence.</p></div>
+  <div class="progress-card">
+    <span class="progress-label">Scanning 1,240 / 1,820</span>
+    <div class="progress-bar"><div class="progress-fill"></div></div>
+  </div>
+  <table>
+    <thead><tr><th>Symbol</th><th>Company</th><th>Signal</th><th>MACD</th><th>Bollinger</th><th>Vol. Divergence</th></tr></thead>
+    <tbody>
+      <tr><td class="sym">BDO</td><td>BDO Unibank</td><td><span class="signal bull">↗ Bullish cross</span></td><td>+0.42</td><td>Upper band</td><td>Confirmed</td></tr>
+      <tr><td class="sym">JFC</td><td>Jollibee Foods</td><td><span class="signal bear">↘ Bearish cross</span></td><td>-0.18</td><td>Lower band</td><td>Diverging</td></tr>
+      <tr><td class="sym">SM</td><td>SM Investments</td><td><span class="signal bull">↗ Bullish cross</span></td><td>+0.31</td><td>Mid-band</td><td>Confirmed</td></tr>
+    </tbody>
+  </table>
+</div>

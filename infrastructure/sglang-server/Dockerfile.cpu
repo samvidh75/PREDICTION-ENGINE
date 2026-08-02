@@ -1,0 +1,22 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+RUN apt-get update && \
+    apt-get install -y git build-essential cmake g++ && \
+    rm -rf /var/lib/apt/lists/* && \
+    pip install --upgrade pip setuptools wheel
+
+RUN pip install sglang[all]
+
+RUN mkdir -p /models && chmod 777 /models
+
+EXPOSE 30000
+
+CMD ["python3", "-m", "sglang.launch_server", \
+     "--model-path", "meta-llama/Meta-Llama-3.1-8B-Instruct", \
+     "--device", "cpu", \
+     "--port", "30000", \
+     "--host", "0.0.0.0", \
+     "--max-running-requests", "4", \
+     "--max-total-tokens", "8192"]

@@ -1,0 +1,22 @@
+<!-- @dsCard group="PREDICTION-ENGINE / CompanyResearchReport" -->
+<style>
+  :root { --canvas:#000; --ink:#FFF; --body:#B4B4B4; --mute:#8C8C8C; --hairline:#1F1F1F; --accent:#FF6B4A; --red:#FF3B30; --bg-sheet: rgba(18,18,20,0.55); }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--canvas); font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Inter",sans-serif; color:var(--ink); }
+  .page { width: 740px; padding: 32px; display: grid; gap: 20px; }
+  h1 { font-size: 28px; font-weight: 700; margin: 0; }
+  .sub { color: var(--mute); font-size: 13px; margin: 0; }
+  .section { background: var(--bg-sheet); border: 1px solid var(--hairline); border-radius: 10px; padding: 20px; display: grid; gap: 8px; }
+  .section h3 { margin: 0; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+  .tag { font-size: 10px; padding: 2px 8px; border-radius: 8px; background: rgba(255,107,74,0.14); color: var(--accent); text-transform: uppercase; letter-spacing: 0.04em; }
+  .tag.risk { background: rgba(255,59,48,0.14); color: var(--red); }
+  .section p { margin: 0; font-size: 13px; color: var(--body); line-height: 1.6; }
+</style>
+<div class="page">
+  <div><h1>BDO — Research Report</h1><p class="sub">Generated from available filings and market data</p></div>
+  <div class="section"><h3>Business Overview</h3><p>Company overview and business model description based on available data.</p></div>
+  <div class="section"><h3>Financial Health <span class="tag">Score</span></h3><p>Revenue trends, margin analysis, and key financial metrics for the company.</p></div>
+  <div class="section"><h3>Competitive Position</h3><p>Market position, moat analysis, and competitive advantages relative to peers.</p></div>
+  <div class="section"><h3>Risk Assessment <span class="tag risk">Risk</span></h3><p>Key business and market risks that could impact the company's performance.</p></div>
+  <div class="section"><h3>Investment Thesis</h3><p>Bull and bear case scenarios for the company based on available data.</p></div>
+</div>

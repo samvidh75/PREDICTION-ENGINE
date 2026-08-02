@@ -1,0 +1,619 @@
+import { useState, useRef, useEffect, useCallback } from "react";
+import { Send, Sparkles, User, TrendingUp, BarChart3, Zap, X, Plus, Cpu } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+import { motion } from "framer-motion";
+import { colors, typography, space, radius } from "../design/tokens";
+import type { FC, KeyboardEvent, FormEvent } from "react";
+import { localLLMService } from "../services/ai/LocalLLMService";
+import { isWebGpuEnabledInConfig, detectWebGpuSupport } from "../services/ai/webgpuConfig";
+
+// ── Minimal inline markdown: only handles **bold** segments, everything else is plain text.
+// Chat messages are plain strings with no markdown renderer wired up; without this,
+// literal "**" markers show up in the UI (e.g. "**Stock breakdowns**").
+function renderInlineBold(text: string) {
+  const segments = text.split(/(\*\*[^*]+\*\*)/g);
+  return segments.map((segment, i) => {
+    if (segment.startsWith("**") && segment.endsWith("**") && segment.length > 4) {
+      return <strong key={i}>{segment.slice(2, -2)}</strong>;
+    }
+    return <span key={i}>{segment}</span>;
+  });
+}
+
+// ── Shared motion presets (mirrors ScannerPage/StockPage animation vocabulary) ──
+const fadeUp = {
+  hidden: { opacity: 0, y: 16 },
+  visible: { opacity: 1, y: 0 },
+};
+const pageTransition = { duration: 0.32, ease: [0.22, 1, 0.36, 1] as const };
+
+// ── Types ──────────────────────────────────────────────────────────────────────
+interface Message {
+  id: string;
+  role: "user" | "assistant";
+  content: string;
+  timestamp: number;
+  citations?: string[];
+  thinkingSteps?: string[];
+}
+
+type Conversation = {
+  id: string;
+  title: string;
+  messages: Message[];
+  createdAt: number;
+};
+
+const SUGGESTED_QUESTIONS = [
+  "Analyze BDO Unibank — bull vs bear case",
+  "Which PSEi-30 stocks have the strongest quality scores?",
+  "Compare Ayala Land vs SM Prime on valuation metrics",
+  "What's driving the Financials sector's momentum today?",
+  "Screen for growth stocks with low debt",
+  "Explain the PSE sector taxonomy",
+];
+
+// ── Quick-start suggestions ────────────────────────────────────────────────────
+const QuickAction: FC<{ icon: LucideIcon; label: string; onClick: () => void; color?: string }> =
+  ({ icon: Icon, label, onClick, color = colors.accentBlue }) => (
+    <motion.button
+      whileHover={{ scale: 1.03 }}
+      whileTap={{ scale: 0.96 }}
+      onClick={onClick}
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: space[2],
+        padding: `${space[2]} ${space[4]}`,
+        borderRadius: radius.lg,
+        border: `1px solid ${colors.hairline}`,
+        background: colors.surface,
+        backdropFilter: "blur(20px) saturate(160%)",
+        WebkitBackdropFilter: "blur(20px) saturate(160%)",
+        color: colors.textPrimary,
+        fontFamily: typography.fontFamily,
+        fontSize: typography.bodySm.size,
+        cursor: "pointer",
+        transition: "background 0.15s ease",
+      }}
+      onMouseEnter={(e) => (e.currentTarget.style.background = colors.surfaceElevated)}
+      onMouseLeave={(e) => (e.currentTarget.style.background = colors.surface)}
+    >
+      <span style={{ color, display: "flex" }}><Icon size={16} /></span>
+      {label}
+    </motion.button>
+  );
+
+// ── Thinking Steps (visible while AI "thinks") ────────────────────────────────
+const ThinkingIndicator: FC<{ steps: string[] }> = ({ steps }) => {
+  const [visible, setVisible] = useState(0);
+  useEffect(() => {
+    if (visible < steps.length) {
+      const t = setTimeout(() => setVisible((v) => v + 1), 400);
+      return () => clearTimeout(t);
+    }
+  }, [visible, steps.length]);
+
+  if (visible >= steps.length) return null;
+
+  return (
+    <div style={{ padding: `${space[2]} 0`, opacity: 0.7 }}>
+      {steps.slice(0, visible).map((s, i) => (
+        <div key={i} style={{ fontSize: typography.captionSm.size, color: colors.textTertiary, padding: "2px 0" }}>
+          <Cpu size={10} style={{ marginRight: 4 }} />
+          {s}
+        </div>
+      ))}
+    </div>
+  );
+};
+
+// ── Message Bubble ─────────────────────────────────────────────────────────────
+const MessageBubble: FC<{ msg: Message; isLast: boolean }> = ({ msg, isLast }) => {
+  const isUser = msg.role === "user";
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={pageTransition}
+      style={{
+        display: "flex",
+        gap: space[3],
+        padding: `${space[3]} 0`,
+        alignItems: "flex-start",
+        flexDirection: isUser ? "row-reverse" : "row",
+      }}
+    >
+      {/* Avatar */}
+      <div
+        style={{
+          width: 32,
+          height: 32,
+          borderRadius: radius.full,
+          background: isUser ? colors.surfaceElevated : colors.accentRed,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexShrink: 0,
+        }}
+      >
+        {isUser ? (
+          <User size={16} style={{ color: colors.textSecondary }} />
+        ) : (
+          <Sparkles size={16} style={{ color: "#ffffff" }} />
+        )}
+      </div>
+
+      {/* Content */}
+      <div style={{ maxWidth: "75%", minWidth: 0 }}>
+        {!isUser && msg.thinkingSteps && isLast && <ThinkingIndicator steps={msg.thinkingSteps} />}
+        <div
+          style={{
+            padding: `${space[3]} ${space[4]}`,
+            borderRadius: radius.lg,
+            background: isUser ? colors.surface : colors.surfaceElevated,
+            border: isUser ? `1px solid ${colors.hairline}` : "none",
+            color: colors.textPrimary,
+            fontSize: typography.bodyMd.size,
+            lineHeight: typography.bodyMd.line,
+            whiteSpace: "pre-wrap",
+            wordBreak: "break-word",
+          }}
+        >
+          {renderInlineBold(msg.content)}
+        </div>
+        {msg.citations && msg.citations.length > 0 && (
+          <div style={{ marginTop: space[1], fontSize: typography.captionSm.size, color: colors.textTertiary }}>
+            Sources: {msg.citations.join(" · ")}
+          </div>
+        )}
+      </div>
+    </motion.div>
+  );
+};
+
+// ── Sidebar ────────────────────────────────────────────────────────────────────
+const Sidebar: FC<{
+  conversations: Conversation[];
+  activeId: string;
+  onSelect: (id: string) => void;
+  onNew: () => void;
+  compact: boolean;
+}> = ({ conversations, activeId, onSelect, onNew, compact }) => {
+  if (compact) return null;
+  return (
+    <aside
+      className="raycast-slideUp"
+      style={{
+        width: 260,
+        flexShrink: 0,
+        background: colors.canvas,
+        backdropFilter: "blur(20px) saturate(160%)",
+        WebkitBackdropFilter: "blur(20px) saturate(160%)",
+        borderRight: `1px solid ${colors.hairline}`,
+        display: "flex",
+        flexDirection: "column",
+        padding: space[4],
+        gap: space[3],
+        overflowY: "auto",
+      }}
+    >
+      <motion.button
+        whileHover={{ scale: 1.03 }}
+        whileTap={{ scale: 0.96 }}
+        onClick={onNew}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: space[2],
+          padding: `${space[2]} ${space[4]}`,
+          borderRadius: radius.lg,
+          border: "none",
+          background: colors.accentRed,
+          color: "#ffffff",
+          fontFamily: typography.fontFamily,
+          fontSize: typography.buttonMd.size,
+          fontWeight: 500,
+          cursor: "pointer",
+        }}
+      >
+        <Plus size={16} /> New Chat
+      </motion.button>
+      <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+        {conversations.map((c) => (
+          <motion.button
+            key={c.id}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.97 }}
+            onClick={() => onSelect(c.id)}
+            style={{
+              textAlign: "left",
+              padding: `${space[2]} ${space[3]}`,
+              borderRadius: radius.sm,
+              border: "none",
+              background: c.id === activeId ? colors.surfaceElevated : "transparent",
+              color: colors.textSecondary,
+              fontFamily: typography.fontFamily,
+              fontSize: typography.bodySm.size,
+              cursor: "pointer",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {c.title}
+          </motion.button>
+        ))}
+      </div>
+    </aside>
+  );
+};
+
+// ── Main AI Chat Page ─────────────────────────────────────────────────────────
+export default function AIChatPage() {
+  const [conversations, setConversations] = useState<Conversation[]>(() => [
+    {
+      id: "default",
+      title: "New research",
+      messages: [
+        {
+          id: "welcome",
+          role: "assistant",
+          content:
+            "Hi, I'm the StockEx research assistant.\n\nI can help you with:\n• **Stock breakdowns** — the case for and against a company\n• **Screening** — find stocks that match what you're looking for\n• **Comparisons** — put two or more stocks side by side\n• **Market context** — what's moving a sector right now\n• **Portfolio check-ins** — how your holdings are trending, and the risks to watch\n\nAsk me anything about PSE-listed stocks.",
+          timestamp: Date.now(),
+        },
+      ],
+      createdAt: Date.now(),
+    },
+  ]);
+  const [activeId, setActiveId] = useState("default");
+  const [input, setInput] = useState("");
+  const [loading, setLoading] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  // WebGPU local inference: onboarding stores a `webgpuEnabled` preference
+  // but nothing ever consumed it — the chatbot always went straight to the
+  // server API. This re-verifies actual browser support and, when the user
+  // opts in via the toggle below, runs generation locally through
+  // LocalLLMService (Transformers.js on the WebGPU backend) instead.
+  const [webgpuSupported, setWebgpuSupported] = useState(false);
+  const [localModeEnabled, setLocalModeEnabled] = useState(false);
+  useEffect(() => {
+    if (!isWebGpuEnabledInConfig()) return;
+    detectWebGpuSupport().then(setWebgpuSupported);
+  }, []);
+
+  const active = conversations.find((c) => c.id === activeId) ?? conversations[0];
+
+  // Auto-scroll
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [active.messages, active.messages.length]);
+
+  const addMessage = useCallback(
+    (msg: Message) => {
+      setConversations((prev) =>
+        prev.map((c) => {
+          if (c.id !== activeId) return c;
+          const updated = { ...c, messages: [...c.messages, msg] };
+          // Auto-title
+          if (c.title === "New research" && msg.role === "user") {
+            updated.title = msg.content.slice(0, 40) + (msg.content.length > 40 ? "…" : "");
+          }
+          return updated;
+        }),
+      );
+    },
+    [activeId],
+  );
+
+  // Generate AI response — either via the server API (Groq), or, when the
+  // user has opted into local mode and WebGPU is supported, entirely
+  // on-device via LocalLLMService (no network round-trip).
+  const generateResponse = useCallback(
+    async (userMessage: string) => {
+      setLoading(true);
+      const thinkingSteps = [
+        "Searching market data…",
+        "Analyzing 8-factor scores…",
+        "Compiling research context…",
+      ];
+
+      if (localModeEnabled && webgpuSupported) {
+        try {
+          const result = await localLLMService.generateStockAnalysis("", {}, userMessage, { maxNewTokens: 200 });
+          setLoading(false);
+          return {
+            id: `ai-${Date.now()}`,
+            role: "assistant" as const,
+            content: result.text || "Local model returned an empty response — try disabling local mode.",
+            timestamp: Date.now(),
+            thinkingSteps,
+            citations: ["On-device WebGPU inference (experimental)"],
+          };
+        } catch (error) {
+          console.error("[AIChatPage] Local WebGPU generation failed, falling back to server:", error);
+          // fall through to the server API below
+        }
+      }
+
+      const apiBase = import.meta.env.VITE_API_BASE_URL || (window.location.hostname.includes("stockstory-ph.com") ? "/api" : "/api");
+      const apiUrl = `${apiBase}/chat`;
+
+      try {
+        const res = await fetch(apiUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            message: userMessage,
+            symbol: "",
+            context: "General PSE stock market research and analysis.",
+          }),
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        const content = data?.response ?? "I'm unable to process your request right now. Please try again.";
+
+        const aiMsg: Message = {
+          id: `ai-${Date.now()}`,
+          role: "assistant",
+          content,
+          timestamp: Date.now(),
+          thinkingSteps,
+          citations: data?.citations?.length ? data.citations : ["Philippine Stock Exchange", "SEC Filings"],
+        };
+
+        setLoading(false);
+        return aiMsg;
+      } catch {
+        const aiMsg: Message = {
+          id: `ai-${Date.now()}`,
+          role: "assistant",
+          content: "I'm unable to process your request right now. Please try again.",
+          timestamp: Date.now(),
+        };
+        setLoading(false);
+        return aiMsg;
+      }
+    },
+    [localModeEnabled, webgpuSupported],
+  );
+
+  const handleSend = useCallback(async () => {
+    const trimmed = input.trim();
+    if (!trimmed || loading) return;
+
+    const userMsg: Message = { id: `user-${Date.now()}`, role: "user", content: trimmed, timestamp: Date.now() };
+    addMessage(userMsg);
+    setInput("");
+
+    const aiMsg = await generateResponse(trimmed);
+    addMessage(aiMsg);
+  }, [input, loading, addMessage, generateResponse]);
+
+  const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
+    }
+  };
+
+  const newConversation = () => {
+    const newConv: Conversation = {
+      id: `conv-${Date.now()}`,
+      title: "New research",
+      messages: [],
+      createdAt: Date.now(),
+    };
+    setConversations((prev) => [newConv, ...prev]);
+    setActiveId(newConv.id);
+  };
+
+  return (
+    <motion.div
+      initial="hidden"
+      animate="visible"
+      variants={{ visible: { transition: { staggerChildren: 0.06 } } }}
+      style={{ display: "flex", height: "calc(100vh - 56px)", background: colors.canvas }}
+    >
+      <Sidebar
+        conversations={conversations}
+        activeId={activeId}
+        onSelect={setActiveId}
+        onNew={newConversation}
+        compact={false}
+      />
+
+      {/* Main Chat Area */}
+      <motion.main variants={fadeUp} transition={pageTransition} style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
+        {/* Messages */}
+        <div
+          style={{
+            flex: 1,
+            overflowY: "auto",
+            padding: `${space[6]} ${space[8]}`,
+            maxWidth: 800,
+            width: "100%",
+            margin: "0 auto",
+          }}
+        >
+          {active.messages.length === 1 && active.messages[0].role === "assistant" ? (
+            /* Welcome + suggestions */
+            <div>
+              <MessageBubble msg={active.messages[0]} isLast={false} />
+              <div
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  gap: space[2],
+                  marginTop: space[6],
+                  justifyContent: "center",
+                }}
+              >
+                {SUGGESTED_QUESTIONS.map((q) => (
+                  <QuickAction
+                    key={q}
+                    icon={Sparkles}
+                    label={q}
+                    onClick={() => {
+                      setInput(q);
+                      inputRef.current?.focus();
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
+          ) : (
+            active.messages.map((msg, i) => (
+              <MessageBubble key={msg.id} msg={msg} isLast={i === active.messages.length - 1} />
+            ))
+          )}
+          {loading && (
+            <div style={{ padding: space[3], display: "flex", gap: space[2], alignItems: "center" }}>
+              <div style={{ width: 32, height: 32, borderRadius: radius.full, background: colors.accentRed, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <Sparkles size={16} style={{ color: "#ffffff" }} />
+              </div>
+              <div style={{ display: "flex", gap: 4 }}>
+                {[0, 1, 2].map((i) => (
+                  <div
+                    key={i}
+                    className="ai-chat-dot"
+                    style={{
+                      width: 6,
+                      height: 6,
+                      borderRadius: radius.full,
+                      background: colors.textTertiary,
+                      animationDelay: `${i * 0.15}s`,
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+          <div ref={messagesEndRef} />
+        </div>
+
+        {/* Input Bar */}
+        <motion.div
+          variants={fadeUp}
+          transition={pageTransition}
+          style={{
+            padding: `${space[4]} ${space[8]}`,
+            borderTop: `1px solid ${colors.hairline}`,
+            background: colors.canvas,
+            backdropFilter: "blur(20px) saturate(160%)",
+            WebkitBackdropFilter: "blur(20px) saturate(160%)",
+          }}
+        >
+          <div
+            style={{
+              maxWidth: 800,
+              margin: "0 auto",
+              display: "flex",
+              gap: space[2],
+              alignItems: "flex-end",
+              background: colors.surface,
+              backdropFilter: "blur(20px) saturate(160%)",
+              WebkitBackdropFilter: "blur(20px) saturate(160%)",
+              borderRadius: radius.lg,
+              border: `1px solid ${colors.hairline}`,
+              padding: `${space[2]} ${space[2]} ${space[2]} ${space[4]}`,
+            }}
+          >
+            <textarea
+              ref={inputRef}
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="Ask about any stock, sector, or market trend…"
+              rows={1}
+              style={{
+                flex: 1,
+                background: "transparent",
+                border: "none",
+                outline: "none",
+                color: colors.textPrimary,
+                fontFamily: typography.fontFamily,
+                fontSize: typography.bodyMd.size,
+                resize: "none",
+                padding: `${space[1]} 0`,
+                lineHeight: typography.bodyMd.line,
+              }}
+            />
+            <motion.button
+              whileHover={input.trim() && !loading ? { scale: 1.04 } : {}}
+              whileTap={input.trim() && !loading ? { scale: 0.94 } : {}}
+              onClick={handleSend}
+              disabled={!input.trim() || loading}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: 36,
+                height: 36,
+                borderRadius: radius.md,
+                border: "none",
+                background: input.trim() && !loading ? colors.accentRed : colors.surfaceElevated,
+                color: input.trim() && !loading ? "#ffffff" : colors.textTertiary,
+                cursor: input.trim() && !loading ? "pointer" : "default",
+                flexShrink: 0,
+                transition: "background 0.15s ease",
+              }}
+            >
+              <Send size={16} />
+            </motion.button>
+          </div>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: space[3],
+              marginTop: space[2],
+            }}
+          >
+            <div style={{ fontSize: typography.captionSm.size, color: colors.textTertiary }}>
+              StockEX AI may make mistakes. Verify critical data before investing.
+            </div>
+            {webgpuSupported && (
+              <motion.button
+                whileHover={{ scale: 1.04 }}
+                whileTap={{ scale: 0.94 }}
+                onClick={() => setLocalModeEnabled((v) => !v)}
+                title="Run responses on-device via WebGPU instead of the server — faster privacy, weaker model quality (experimental)."
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 4,
+                  padding: "2px 8px",
+                  borderRadius: radius.md,
+                  border: `1px solid ${localModeEnabled ? colors.accentRed : colors.hairline}`,
+                  background: localModeEnabled ? `${colors.accentRed}15` : "transparent",
+                  color: localModeEnabled ? colors.accentRed : colors.textTertiary,
+                  fontSize: typography.captionSm.size,
+                  cursor: "pointer",
+                }}
+              >
+                <Cpu size={11} />
+                {localModeEnabled ? "WebGPU local mode: ON" : "Run locally (WebGPU)"}
+              </motion.button>
+            )}
+          </div>
+        </motion.div>
+      </motion.main>
+
+      {/* Add animation keyframes */}
+      <style>{`
+        @keyframes ai-chat-bounce {
+          0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+          30% { transform: translateY(-6px); opacity: 1; }
+        }
+        .ai-chat-dot {
+          animation: ai-chat-bounce 1.2s infinite ease-in-out;
+        }
+      `}</style>
+    </motion.div>
+  );
+}

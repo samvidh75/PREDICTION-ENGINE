@@ -1,0 +1,10 @@
+[Unit]
+Description=StockEX Health Check Timer (every 5 minutes)
+Requires=stockex-health.service
+
+[Timer]
+OnCalendar=*:0/5
+Persistent=true
+
+[Install]
+WantedBy=timers.target

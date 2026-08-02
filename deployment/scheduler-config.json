@@ -1,0 +1,19 @@
+{
+  "name": "SSI DailyPipelineScheduler",
+  "schedule": "05:00 IST daily",
+  "phases": [
+    "data_refresh",
+    "factor_refresh",
+    "prediction_generation",
+    "outcome_validation",
+    "trust_metrics",
+    "daily_feed"
+  ],
+  "retries": 3,
+  "retryDelayMs": 60000,
+  "lockFile": "C:\\Users\\Samvidh\\OneDrive\\Desktop\\STOCKSTORY\\PREDICTION-ENGINE\\data\\.pipeline_lock",
+  "database": "C:\\Users\\Samvidh\\OneDrive\\Desktop\\STOCKSTORY\\PREDICTION-ENGINE\\data\\stockstory.db",
+  "environment": "SQLite (local)",
+  "nodeVersion": "v24.16.0",
+  "cwd": "C:\\Users\\Samvidh\\OneDrive\\Desktop\\STOCKSTORY\\PREDICTION-ENGINE"
+}

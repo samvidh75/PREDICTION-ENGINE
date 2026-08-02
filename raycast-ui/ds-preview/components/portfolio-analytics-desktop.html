@@ -1,0 +1,34 @@
+<!-- @dsCard group="PREDICTION-ENGINE / PortfolioAnalytics" -->
+<style>
+  :root { --canvas:#000; --ink:#FFF; --body:#B4B4B4; --mute:#8C8C8C; --hairline:#1F1F1F; --green:#34C759; --red:#FF3B30; --bg-sheet: rgba(18,18,20,0.55); }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--canvas); font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Inter",sans-serif; color:var(--ink); }
+  .page { width: 1040px; padding: 32px; display: grid; gap: 20px; }
+  h1 { font-size: 28px; font-weight: 700; margin: 0; }
+  .summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .stat-card { background: var(--bg-sheet); border: 1px solid var(--hairline); border-radius: 10px; padding: 18px; }
+  .stat-label { font-size: 11px; color: var(--mute); }
+  .stat-value { font-size: 22px; font-weight: 600; margin-top: 4px; }
+  table { width: 100%; border-collapse: collapse; }
+  th { text-align: left; font-size: 11px; color: var(--mute); text-transform: uppercase; padding: 10px; border-bottom: 1px solid var(--hairline); }
+  td { padding: 10px; font-size: 13px; border-bottom: 1px solid var(--hairline); }
+  .sym { font-weight: 600; }
+  .up { color: var(--green); } .down { color: var(--red); }
+</style>
+<div class="page">
+  <h1>Portfolio Analytics</h1>
+  <div class="summary">
+    <div class="stat-card"><div class="stat-label">XIRR</div><div class="stat-value up">+22.4%</div></div>
+    <div class="stat-card"><div class="stat-label">Total Invested</div><div class="stat-value">Rs. 87,450.00</div></div>
+    <div class="stat-card"><div class="stat-label">Current Value</div><div class="stat-value">Rs. 104,220.00</div></div>
+  </div>
+  <table>
+    <thead><tr><th>Symbol</th><th>Qty</th><th>Buy Date</th><th>Buy Price</th><th>Current</th><th>Gain</th></tr></thead>
+    <tbody>
+      <tr><td class="sym">RELIANCE</td><td>10</td><td>2024-03-15</td><td>Rs. 2,450.00</td><td>Rs. 2,980.00</td><td class="up">+21.6%</td></tr>
+      <tr><td class="sym">TCS</td><td>5</td><td>2024-06-01</td><td>Rs. 3,850.00</td><td>Rs. 4,120.00</td><td class="up">+7.0%</td></tr>
+      <tr><td class="sym">HDFCBANK</td><td>15</td><td>2024-09-10</td><td>Rs. 1,620.00</td><td>Rs. 1,780.00</td><td class="up">+9.9%</td></tr>
+      <tr><td class="sym">INFY</td><td>20</td><td>2025-01-05</td><td>Rs. 1,480.00</td><td>Rs. 1,650.00</td><td class="up">+11.5%</td></tr>
+    </tbody>
+  </table>
+</div>

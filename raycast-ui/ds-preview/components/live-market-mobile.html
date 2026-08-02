@@ -1,0 +1,23 @@
+<!-- @dsCard group="PREDICTION-ENGINE / LiveMarket" -->
+<style>
+  :root { --canvas:#000; --ink:#FFF; --body:#B4B4B4; --mute:#8C8C8C; --hairline:#1F1F1F; --green:#34C759; --red:#FF3B30; --bg-sheet: rgba(18,18,20,0.55); }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--canvas); font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Inter",sans-serif; color:var(--ink); }
+  .page { width: 390px; padding: 16px; display: grid; gap: 12px; }
+  .head { display: flex; justify-content: space-between; align-items: center; }
+  h1 { font-size: 20px; font-weight: 700; margin: 0; }
+  .status { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--green); }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+  .row { display: flex; justify-content: space-between; padding: 10px 0; border-top: 1px solid var(--hairline); font-size: 12.5px; }
+  .row:first-of-type { border-top: none; }
+  .sym { font-weight: 600; }
+  .up { color: var(--green); } .down { color: var(--red); }
+</style>
+<div class="page">
+  <div class="head"><h1>Live Market</h1><div class="status"><span class="dot"></span>Live</div></div>
+  <div>
+    <div class="row"><span class="sym">HBL</span><span>Rs. 128.40</span><span class="up">+1.8%</span></div>
+    <div class="row"><span class="sym">ENGRO</span><span>Rs. 312.60</span><span class="down">-0.6%</span></div>
+    <div class="row"><span class="sym">UBL</span><span>Rs. 178.20</span><span class="up">+0.9%</span></div>
+  </div>
+</div>

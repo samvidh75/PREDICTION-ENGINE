@@ -1,0 +1,92 @@
+# Responsive UI Audit
+
+Base URL: http://127.0.0.1:4173
+
+- landing 320x568: FAIL (navigation missing; premium surface selectors missing; SSI app shell primitives missing)
+- landing 375x812: FAIL (navigation missing; premium surface selectors missing; SSI app shell primitives missing)
+- landing 390x844: FAIL (navigation missing; premium surface selectors missing; SSI app shell primitives missing)
+- landing 768x1024: FAIL (navigation missing; premium surface selectors missing; SSI app shell primitives missing)
+- landing 1024x768: FAIL (navigation missing; premium surface selectors missing; SSI app shell primitives missing)
+- landing 1366x768: FAIL (navigation missing; premium surface selectors missing; SSI app shell primitives missing)
+- landing 1440x900: FAIL (navigation missing; premium surface selectors missing; SSI app shell primitives missing)
+- landing 1920x1080: FAIL (navigation missing; premium surface selectors missing; SSI app shell primitives missing)
+- rankings 320x568: FAIL (navigation missing; no actionable control detected; SSI app shell primitives missing; scanner mobile/table structure missing)
+- rankings 375x812: FAIL (navigation missing; no actionable control detected; SSI app shell primitives missing; scanner mobile/table structure missing)
+- rankings 390x844: FAIL (navigation missing; no actionable control detected; SSI app shell primitives missing; scanner mobile/table structure missing)
+- rankings 768x1024: FAIL (navigation missing; no actionable control detected; SSI app shell primitives missing; scanner mobile/table structure missing)
+- rankings 1024x768: FAIL (navigation missing; no actionable control detected; SSI app shell primitives missing; scanner mobile/table structure missing)
+- rankings 1366x768: FAIL (navigation missing; no actionable control detected; SSI app shell primitives missing; scanner mobile/table structure missing)
+- rankings 1440x900: FAIL (navigation missing; no actionable control detected; SSI app shell primitives missing; scanner mobile/table structure missing)
+- rankings 1920x1080: FAIL (navigation missing; no actionable control detected; SSI app shell primitives missing; scanner mobile/table structure missing)
+- signals 320x568: FAIL (navigation missing; premium surface selectors missing; SSI app shell primitives missing)
+- signals 375x812: FAIL (navigation missing; premium surface selectors missing; SSI app shell primitives missing)
+- signals 390x844: FAIL (navigation missing; premium surface selectors missing; SSI app shell primitives missing)
+- signals 768x1024: FAIL (navigation missing; premium surface selectors missing; SSI app shell primitives missing)
+- signals 1024x768: FAIL (navigation missing; premium surface selectors missing; SSI app shell primitives missing)
+- signals 1366x768: FAIL (navigation missing; premium surface selectors missing; SSI app shell primitives missing)
+- signals 1440x900: FAIL (navigation missing; premium surface selectors missing; SSI app shell primitives missing)
+- signals 1920x1080: FAIL (navigation missing; premium surface selectors missing; SSI app shell primitives missing)
+- about 320x568: FAIL (navigation missing; SSI app shell primitives missing)
+- about 375x812: FAIL (navigation missing; SSI app shell primitives missing)
+- about 390x844: FAIL (navigation missing; SSI app shell primitives missing)
+- about 768x1024: FAIL (navigation missing; SSI app shell primitives missing)
+- about 1024x768: FAIL (navigation missing; SSI app shell primitives missing)
+- about 1366x768: FAIL (navigation missing; SSI app shell primitives missing)
+- about 1440x900: FAIL (navigation missing; SSI app shell primitives missing)
+- about 1920x1080: FAIL (navigation missing; SSI app shell primitives missing)
+- trust 320x568: FAIL (navigation missing; SSI app shell primitives missing)
+- trust 375x812: FAIL (navigation missing; SSI app shell primitives missing)
+- trust 390x844: FAIL (navigation missing; SSI app shell primitives missing)
+- trust 768x1024: FAIL (navigation missing; SSI app shell primitives missing)
+- trust 1024x768: FAIL (navigation missing; SSI app shell primitives missing)
+- trust 1366x768: FAIL (navigation missing; SSI app shell primitives missing)
+- trust 1440x900: FAIL (navigation missing; SSI app shell primitives missing)
+- trust 1920x1080: FAIL (navigation missing; SSI app shell primitives missing)
+- signin 320x568: FAIL (premium surface selectors missing; SSI app shell primitives missing)
+- signin 375x812: FAIL (premium surface selectors missing; SSI app shell primitives missing)
+- signin 390x844: FAIL (premium surface selectors missing; SSI app shell primitives missing)
+- signin 768x1024: FAIL (premium surface selectors missing; SSI app shell primitives missing)
+- signin 1024x768: FAIL (premium surface selectors missing; SSI app shell primitives missing)
+- signin 1366x768: FAIL (premium surface selectors missing; SSI app shell primitives missing)
+- signin 1440x900: FAIL (premium surface selectors missing; SSI app shell primitives missing)
+- signin 1920x1080: FAIL (premium surface selectors missing; SSI app shell primitives missing)
+- search-auth 320x568: PASS
+- search-auth 375x812: PASS
+- search-auth 390x844: PASS
+- search-auth 768x1024: PASS
+- search-auth 1024x768: PASS
+- search-auth 1366x768: PASS
+- search-auth 1440x900: PASS
+- search-auth 1920x1080: PASS
+- dashboard-auth 320x568: PASS
+- dashboard-auth 375x812: PASS
+- dashboard-auth 390x844: PASS
+- dashboard-auth 768x1024: PASS
+- dashboard-auth 1024x768: PASS
+- dashboard-auth 1366x768: PASS
+- dashboard-auth 1440x900: PASS
+- dashboard-auth 1920x1080: PASS
+- watchlist-auth 320x568: PASS
+- watchlist-auth 375x812: PASS
+- watchlist-auth 390x844: PASS
+- watchlist-auth 768x1024: PASS
+- watchlist-auth 1024x768: PASS
+- watchlist-auth 1366x768: PASS
+- watchlist-auth 1440x900: PASS
+- watchlist-auth 1920x1080: PASS
+- portfolio-auth 320x568: PASS
+- portfolio-auth 375x812: PASS
+- portfolio-auth 390x844: PASS
+- portfolio-auth 768x1024: PASS
+- portfolio-auth 1024x768: PASS
+- portfolio-auth 1366x768: PASS
+- portfolio-auth 1440x900: PASS
+- portfolio-auth 1920x1080: PASS
+- company-reliance-auth 320x568: PASS
+- company-reliance-auth 375x812: PASS
+- company-reliance-auth 390x844: PASS
+- company-reliance-auth 768x1024: PASS
+- company-reliance-auth 1024x768: PASS
+- company-reliance-auth 1366x768: PASS
+- company-reliance-auth 1440x900: PASS
+- company-reliance-auth 1920x1080: PASS

@@ -1,0 +1,4 @@
+/* Preflight (base reset) is intentionally omitted — the app has an existing
+   inline-style-driven design system; only utility classes are opted into. */
+@tailwind components;
+@tailwind utilities;

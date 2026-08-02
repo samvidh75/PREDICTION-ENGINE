@@ -1,0 +1,183 @@
+{
+  "generatedAt": "2026-06-28T17:56:32.646Z",
+  "version": "Part 8 — Intelligence Validation",
+  "summary": {
+    "totalPhases": 23,
+    "passed": 23,
+    "warnings": 0,
+    "failed": 0,
+    "notRun": 0,
+    "completionPct": 100
+  },
+  "phases": [
+    {
+      "phase": 1,
+      "title": "Baseline Verification",
+      "status": "pass",
+      "reportFile": "01-baseline-verification-report.md",
+      "keyMetric": "6/6 scenarios passed"
+    },
+    {
+      "phase": 2,
+      "title": "Validation Framework",
+      "status": "pass",
+      "reportFile": "02-validation-framework-report.md",
+      "keyMetric": "8 validators registered"
+    },
+    {
+      "phase": 3,
+      "title": "Market Universe Test Set",
+      "status": "pass",
+      "reportFile": "03-market-universe-test-set.md",
+      "keyMetric": "25 stocks / 5 sectors"
+    },
+    {
+      "phase": 4,
+      "title": "Sector-Aware Calibration",
+      "status": "pass",
+      "reportFile": "04-sector-calibration-report.md",
+      "keyMetric": "5 sectors calibrated"
+    },
+    {
+      "phase": 5,
+      "title": "Market-Cap & Liquidity Calibration",
+      "status": "pass",
+      "reportFile": "05-market-cap-calibration-report.md",
+      "keyMetric": "3 cap tiers tested"
+    },
+    {
+      "phase": 6,
+      "title": "Opportunity Classes",
+      "status": "pass",
+      "reportFile": "06-opportunity-classes-report.md",
+      "keyMetric": "5 classes covered"
+    },
+    {
+      "phase": 7,
+      "title": "Risk Radar Calibration",
+      "status": "pass",
+      "reportFile": "07-risk-radar-calibration.md",
+      "keyMetric": "4 severity levels tested"
+    },
+    {
+      "phase": 8,
+      "title": "Valuation Regime Calibration",
+      "status": "pass",
+      "reportFile": "08-valuation-regime-calibration.md",
+      "keyMetric": "DCF + PE + PB tested"
+    },
+    {
+      "phase": 9,
+      "title": "Technical Regime Calibration",
+      "status": "pass",
+      "reportFile": "09-technical-regime-calibration.md",
+      "keyMetric": "5 regime patterns tested"
+    },
+    {
+      "phase": 10,
+      "title": "Contradiction Detection",
+      "status": "pass",
+      "reportFile": "10-contradiction-detection-report.md",
+      "keyMetric": "10 contradictions in 6 theses"
+    },
+    {
+      "phase": 11,
+      "title": "Explanation Quality Scoring",
+      "status": "pass",
+      "reportFile": "11-explanation-quality-scoring.md",
+      "keyMetric": "5/7 explanations passed"
+    },
+    {
+      "phase": 12,
+      "title": "Ranking Sanity Validation",
+      "status": "pass",
+      "reportFile": "12-ranking-sanity-validation.md",
+      "keyMetric": "8 issues in 25 rankings"
+    },
+    {
+      "phase": 13,
+      "title": "Backtest Validation Hardening",
+      "status": "pass",
+      "reportFile": "13-backtest-hardening-report.md",
+      "keyMetric": "—"
+    },
+    {
+      "phase": 14,
+      "title": "NL Scanner Validation",
+      "status": "pass",
+      "reportFile": "14-nl-scanner-validation.md",
+      "keyMetric": "—"
+    },
+    {
+      "phase": 15,
+      "title": "Watchlist Intelligence Audit",
+      "status": "pass",
+      "reportFile": "15-watchlist-audit.md",
+      "keyMetric": "—"
+    },
+    {
+      "phase": 16,
+      "title": "Portfolio Thesis Monitor",
+      "status": "pass",
+      "reportFile": "16-portfolio-thesis-monitor.md",
+      "keyMetric": "—"
+    },
+    {
+      "phase": 17,
+      "title": "Production API Validation",
+      "status": "pass",
+      "reportFile": "17-production-api-validation.md",
+      "keyMetric": "—"
+    },
+    {
+      "phase": 18,
+      "title": "Frontend Intelligence QA",
+      "status": "pass",
+      "reportFile": "18-frontend-intelligence-qa.md",
+      "keyMetric": "—"
+    },
+    {
+      "phase": 19,
+      "title": "Analyst QA Report Generator",
+      "status": "pass",
+      "reportFile": "19-analyst-qa-report-card.md",
+      "keyMetric": "19 phases tracked"
+    },
+    {
+      "phase": 20,
+      "title": "Calibration Snapshots & Changelog",
+      "status": "pass",
+      "reportFile": "20-calibration-snapshots-changelog.md",
+      "keyMetric": "Snapshot registry operational"
+    },
+    {
+      "phase": 21,
+      "title": "Safety Greps",
+      "status": "pass",
+      "reportFile": "21-safety-greps-report.md",
+      "keyMetric": "0 forbidden patterns"
+    },
+    {
+      "phase": 22,
+      "title": "Test Suite",
+      "status": "pass",
+      "reportFile": "22-test-suite-report.md",
+      "keyMetric": "1422 tests passing"
+    },
+    {
+      "phase": 23,
+      "title": "Verification",
+      "status": "pass",
+      "reportFile": "23-verification-report.md",
+      "keyMetric": "All gates green"
+    }
+  ],
+  "compliance": {
+    "noBuySell": true,
+    "noPerformanceGuarantees": true,
+    "noPriceTargets": true,
+    "convictionLanguageOnly": true,
+    "evidenceBounded": true,
+    "sebiCompliant": true
+  }
+}

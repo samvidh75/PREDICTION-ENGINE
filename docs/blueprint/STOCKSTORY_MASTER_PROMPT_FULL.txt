@@ -1,0 +1,1846 @@
+# 🚀 STOCKSTORY INDIA — ULTIMATE MASTER PROMPT
+## Complete Feature Rebuild + Raycast Design Integration + AI Enhancement
+
+**Version:** 2.0 Production
+**Status:** Ready for Implementation
+**Effort:** 4-6 weeks for senior team
+**Outcome:** Billion-dollar market-ready fintech platform
+
+---
+
+## EXECUTIVE SUMMARY
+
+You're rebuilding StockStory as a **Raycast-native, AI-first equity research platform** that combines:
+
+1. **Production-grade UI** (Raycast design system — already 83% aligned)
+2. **Advanced AI engine** (Multi-factor research, thesis building, risk analysis)
+3. **Market-leading animations** (Live interactions like Raycast.com)
+4. **Revenue optimization** (Native ads, premium features, broker handoff)
+5. **User delight** (Polish, speed, keyboard-first experience)
+
+This prompt gives you the **complete blueprint** for rebuilding every feature with both design and technical specifications.
+
+---
+
+## PART 1: CORE PLATFORM ARCHITECTURE
+
+### 1.1 Data & AI Layer (Backend)
+
+**Purpose:** Centralized intelligence engine powering all features
+
+```typescript
+// API Structure
+POST /api/ai/analyze-stock
+  → Input: { symbol, timeframe, userContext }
+  → Output: { 
+      thesis: string,
+      bullCase: string,
+      bearCase: string,
+      riskFactors: RiskFactor[],
+      conviction: 'High' | 'Watch' | 'Needs Review' | 'Risk Rising' | 'Avoid',
+      confidence: 0-100,
+      changedFactors: string[],
+      whatToWatchNext: string[]
+    }
+
+POST /api/ai/compare-stocks
+  → Input: { symbols: string[], metrics: string[], userContext }
+  → Output: { 
+      recommendations: { symbol: string, reason: string, ranking: 1-5 }[],
+      comparisonMetrics: ComparisonTable,
+      capitalizationDecision: string
+    }
+
+POST /api/ai/scanner-run
+  → Input: { preset: 'Quality Compounders' | 'High Growth' | 'Value' | 'Dividend' | 'Custom', limit: 10-100 }
+  → Output: { 
+      results: [
+        {
+          symbol: string,
+          name: string,
+          price: number,
+          change: number,
+          conviction: string,
+          score: 0-100,
+          keyMetrics: { pe?: number, growth?: number, roic?: number },
+          whyIncluded: string
+        }
+      ],
+      metadata: { runTime: number, providers: string[], universe: number }
+    }
+
+POST /api/ai/thesis-monitor
+  → Input: { symbol, originalThesis: string, timeframe: 'daily' | 'weekly' }
+  → Output: {
+      thesisStatus: 'Intact' | 'Improving' | 'Deteriorating' | 'Broken',
+      changes: Change[],
+      recommendations: string
+    }
+
+GET /api/market-data/chart/:symbol
+  → Input: { timeframe: '1d' | '1w' | '1m' | '3m' | '1y' }
+  → Output: { 
+      priceHistory: [{ date, open, high, low, close, volume }],
+      technical: { rsi, macd, sma20, sma50, sma200 },
+      nextSupport: number,
+      nextResistance: number
+    }
+
+GET /api/financial-data/:symbol
+  → Input: { years: 1-5 }
+  → Output: {
+      fundamentals: { pe, pb, roe, roic, debtEquity, evEbitda },
+      growth: { revenue: number[], profit: number[], eps: number[] },
+      margins: { operating: number[], net: number[] },
+      dividends: { yield, payout, trend }
+    }
+
+GET /api/news/:symbol
+  → Input: { limit: 10-30, sentiment: 'all' | 'positive' | 'negative' }
+  → Output: [
+      {
+        title: string,
+        source: string,
+        date: timestamp,
+        summary: string,
+        sentiment: 'positive' | 'neutral' | 'negative',
+        relevance: 0-100,
+        impact: 'high' | 'medium' | 'low'
+      }
+    ]
+```
+
+**Implementation Rules:**
+- ✅ All endpoints return consistent JSON shape
+- ✅ No provider names in response (Upstox, Screener, etc. hidden)
+- ✅ Real data only (no placeholder/fake scores)
+- ✅ <500ms latency (cached when appropriate)
+- ✅ Fallback chain: Upstox → IndianAPI → Screener → Yahoo → NSEPython
+- ✅ Circuit breaker: Skip offline provider after 5 min outage
+
+---
+
+### 1.2 AI Scanner Engine (Revolutionary)
+
+**Current State:** Raw, limited presets
+**Target State:** Market-leading research discovery tool
+
+#### Scanner Architecture
+
+```typescript
+// Scanner.ts — Advanced multi-factor research engine
+
+interface ScannerPreset {
+  name: string;
+  description: string;
+  filters: {
+    marketCap: { min: number, max: number },
+    pe: { min?: number, max?: number },
+    pb: { min?: number, max?: number },
+    roe: { min: number },
+    debtEquity: { max: number },
+    revenueGrowth: { min: number },
+    profitGrowth: { min: number },
+    rsi: { min: number, max: number },
+    sector?: string[],
+    trend: 'uptrend' | 'downtrend' | 'neutral',
+  };
+  weights: {
+    quality: 0-100,
+    growth: 0-100,
+    valuation: 0-100,
+    momentum: 0-100,
+    stability: 0-100,
+  };
+  sortBy: 'score' | 'conviction' | 'upside' | 'dividend';
+}
+
+export const SCANNER_PRESETS: Record<string, ScannerPreset> = {
+  'Quality Compounders': {
+    name: 'Quality Compounders',
+    description: 'Durable businesses with high returns on capital',
+    filters: {
+      marketCap: { min: 100, max: 100000 }, // crores
+      pe: { min: 10, max: 50 },
+      pb: { min: 1, max: 10 },
+      roe: { min: 15 }, // %
+      debtEquity: { max: 0.5 },
+      revenueGrowth: { min: 10 },
+      profitGrowth: { min: 12 },
+      rsi: { min: 30, max: 70 },
+    },
+    weights: {
+      quality: 40,
+      valuation: 30,
+      growth: 20,
+      momentum: 10,
+      stability: 0,
+    },
+    sortBy: 'score',
+  },
+
+  'High Growth': {
+    name: 'High Growth',
+    description: 'Fast-growing companies in expanding markets',
+    filters: {
+      marketCap: { min: 50, max: 50000 },
+      revenueGrowth: { min: 25 },
+      profitGrowth: { min: 30 },
+      roe: { min: 12 },
+      debtEquity: { max: 1 },
+    },
+    weights: {
+      growth: 50,
+      momentum: 20,
+      quality: 20,
+      valuation: 10,
+      stability: 0,
+    },
+    sortBy: 'score',
+  },
+
+  'Value Opportunities': {
+    name: 'Value Opportunities',
+    description: 'Trading below intrinsic value with good fundamentals',
+    filters: {
+      pe: { min: 5, max: 20 },
+      pb: { min: 0.5, max: 3 },
+      roe: { min: 12 },
+      debtEquity: { max: 0.7 },
+      revenueGrowth: { min: 5 },
+    },
+    weights: {
+      valuation: 40,
+      quality: 35,
+      growth: 15,
+      momentum: 10,
+      stability: 0,
+    },
+    sortBy: 'score',
+  },
+
+  'Dividend Champions': {
+    name: 'Dividend Champions',
+    description: 'Consistent dividend payers with yield',
+    filters: {
+      marketCap: { min: 100, max: 100000 },
+      debtEquity: { max: 0.6 },
+      roe: { min: 10 },
+    },
+    weights: {
+      stability: 35,
+      quality: 35,
+      valuation: 20,
+      growth: 10,
+      momentum: 0,
+    },
+    sortBy: 'dividend',
+  },
+
+  'Turnaround Stories': {
+    name: 'Turnaround Stories',
+    description: 'Recently improving metrics with momentum',
+    filters: {
+      pe: { min: 5, max: 25 },
+      revenueGrowth: { min: 10 },
+      profitGrowth: { min: 15 },
+      rsi: { min: 40, max: 80 },
+    },
+    weights: {
+      momentum: 40,
+      growth: 30,
+      quality: 20,
+      valuation: 10,
+      stability: 0,
+    },
+    sortBy: 'score',
+  },
+
+  'Custom': {
+    // User-created filters stored in DB
+  },
+};
+
+// Scoring Algorithm
+export function calculateScore(stock: Stock, preset: ScannerPreset): number {
+  const factors = {
+    qualityScore: calculateQuality(stock), // ROE, ROIC, margin quality
+    valuationScore: calculateValuation(stock), // PE, PB, EV/EBITDA, DCF
+    growthScore: calculateGrowth(stock), // Revenue & profit growth
+    momentumScore: calculateMomentum(stock), // RSI, MACD, trend
+    stabilityScore: calculateStability(stock), // Debt, beta, VIX
+  };
+
+  const weightedScore = 
+    (factors.qualityScore * preset.weights.quality) +
+    (factors.valuationScore * preset.weights.valuation) +
+    (factors.growthScore * preset.weights.growth) +
+    (factors.momentumScore * preset.weights.momentum) +
+    (factors.stabilityScore * preset.weights.stability);
+
+  return Math.round(weightedScore);
+}
+
+// Generate AI explanation
+export async function generateScannerExplanation(stock: Stock, score: number): Promise<string> {
+  const prompt = `
+    Stock: ${stock.symbol} (${stock.name})
+    Score: ${score}/100
+    
+    Key metrics:
+    - ROE: ${stock.roe}%
+    - Revenue Growth: ${stock.revenueGrowth}%
+    - PE: ${stock.pe}x
+    - Debt/Equity: ${stock.debtEquity}
+    
+    Generate a 2-3 sentence explanation of why this stock scored ${score}/100.
+    Focus on: quality, growth, valuation, or momentum—whichever is most relevant.
+    Be specific and avoid generic language.
+  `;
+  
+  return await ai.generate(prompt);
+}
+```
+
+#### Scanner Results Display (Raycast Design)
+
+**Feature:** Real-time 10-100 results with reason explanations
+
+```typescript
+// ScannerResultsPage.tsx
+
+export function ScannerResultsPage({ preset, limit }: Props) {
+  const [results, setResults] = useState<ScannerResult[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedIndex, setSelectedIndex] = useState(0);
+
+  useEffect(() => {
+    fetchScannerResults(preset, limit).then(setResults).finally(() => setLoading(false));
+  }, [preset, limit]);
+
+  if (loading) return <LoadingState />;
+
+  return (
+    <div style={styles.container}>
+      {/* HEADER */}
+      <div style={styles.header}>
+        <h1 style={styles.title}>{preset}</h1>
+        <p style={styles.subtitle}>
+          {results.length} stocks match your criteria
+        </p>
+      </div>
+
+      {/* FILTER PILLS */}
+      <div style={styles.filterPills}>
+        <Pill active sort="score">Score</Pill>
+        <Pill sort="conviction">Conviction</Pill>
+        <Pill sort="upside">Upside Potential</Pill>
+        <Pill sort="dividend">Dividend Yield</Pill>
+      </div>
+
+      {/* RESULTS TABLE/GRID */}
+      <div style={styles.resultsList}>
+        {results.map((result, idx) => (
+          <ResultRow
+            key={result.symbol}
+            result={result}
+            selected={idx === selectedIndex}
+            onHover={() => setSelectedIndex(idx)}
+            onClick={() => navigateToStock(result.symbol)}
+          />
+        ))}
+      </div>
+
+      {/* KEYBOARD HINTS */}
+      <div style={styles.keyboardHints}>
+        <span>↑↓ Navigate</span> • <span>Enter</span> Research • <span>c</span> Compare
+      </div>
+    </div>
+  );
+}
+
+// ResultRow Component
+function ResultRow({ result, selected, onHover, onClick }: Props) {
+  return (
+    <div
+      style={{
+        ...styles.row,
+        ...(selected ? styles.rowSelected : {}),
+      }}
+      onMouseEnter={onHover}
+      onClick={onClick}
+    >
+      {/* RANK + SYMBOL */}
+      <div style={styles.symbol}>
+        <span style={styles.rank}>{result.rank}</span>
+        <div>
+          <div style={styles.symbolText}>{result.symbol}</div>
+          <div style={styles.nameText}>{result.name}</div>
+        </div>
+      </div>
+
+      {/* PRICE */}
+      <div style={styles.price}>
+        <div style={styles.priceValue}>₹{result.price}</div>
+        <div style={{
+          ...styles.change,
+          color: result.change > 0 ? colors.success : colors.danger,
+        }}>
+          {result.change > 0 ? '+' : ''}{result.change}%
+        </div>
+      </div>
+
+      {/* HEALTHOMETER BADGE */}
+      <HealthometerMini score={result.healthScore} />
+
+      {/* MAIN SCORE */}
+      <div style={styles.score}>
+        <div style={styles.scoreCircle}>{result.score}</div>
+      </div>
+
+      {/* CONVICTION BADGE */}
+      <ConvictionBadge state={result.conviction} />
+
+      {/* KEY METRIC (Varies by preset) */}
+      <div style={styles.keyMetric}>
+        {result.keyMetric.label}: {result.keyMetric.value}
+      </div>
+
+      {/* EXPANSION ARROW */}
+      <div style={styles.expandArrow}>→</div>
+    </div>
+  );
+}
+
+// Expanded Detail Panel (Slides in from right on hover/select)
+function ResultDetailPanel({ result }: Props) {
+  return (
+    <div style={styles.detailPanel}>
+      {/* WHY INCLUDED */}
+      <Section title="Why This Ranked #1">
+        <p>{result.explanation}</p>
+        <ul>
+          <li>✅ Strong ROE: {result.roe}%</li>
+          <li>✅ Revenue growth: {result.revenueGrowth}%</li>
+          <li>⚠️ High PE: {result.pe}x (monitor valuation)</li>
+        </ul>
+      </Section>
+
+      {/* QUICK METRICS */}
+      <Section title="Key Metrics">
+        <MetricsGrid metrics={result.metrics} />
+      </Section>
+
+      {/* WHAT TO WATCH */}
+      <Section title="What to Watch Next">
+        <ul>
+          <li>Q{currentQuarter} earnings release (in X days)</li>
+          <li>Dividend announcement expected</li>
+          <li>Market cap milestone approaching</li>
+        </ul>
+      </Section>
+
+      {/* ACTIONS */}
+      <div style={styles.actions}>
+        <Button variant="cta">Research →</Button>
+        <Button variant="secondary">Add to Compare</Button>
+        <Button variant="ghost">Track This</Button>
+      </div>
+    </div>
+  );
+}
+```
+
+**Key Features:**
+- ✅ 5 expert presets + custom filter builder
+- ✅ AI explains why each stock scored that high
+- ✅ Real-time scoring (no cached outdated data)
+- ✅ Keyboard navigation (↑↓ move, Enter research, c compare)
+- ✅ Expandable details panel (right-side slide)
+- ✅ Export to CSV, share scan link
+- ✅ Save custom presets for re-running
+
+---
+
+## PART 2: FEATURE PAGES COMPLETE REDESIGN
+
+### 2.1 HOME / DASHBOARD (Magnificent Entry Point)
+
+**Goal:** Command center that feels like the best research experience in India
+
+#### Layout Architecture
+
+```
+HERO SECTION
+├─ Red stripe (Raycast signature)
+├─ Large headline: "Understand the stock before you invest"
+├─ Search hero input (cmd+K hint visible)
+└─ Animated background: Subtle keyboard visualization
+
+QUICK ACTIONS (Grid 2x3)
+├─ 🔍 Scanner (link to presets)
+├─ 📊 Research Last Stock (resumption)
+├─ ⭐ Trending Stocks (real-time momentum)
+├─ 👥 Compare (launch comparison)
+├─ 📈 Portfolio Watch (tracked stocks summary)
+└─ 🤖 AI Assistant (quick questions)
+
+RECENT RESEARCH (Carousel)
+├─ Last 5 stocks researched (with conviction badges)
+├─ Quick comparison links
+└─ "Resume research" button
+
+AI INSIGHTS (Live, Updated Hourly)
+├─ Market Sentiment: "59% bullish (up 3%)"
+├─ Top Trending: "HDFCBANK, LT, INFY"
+├─ Market Alert: "Nifty Support at 23,400"
+└─ Updated: "15 mins ago"
+
+SCANNER LEADERBOARD (Real-time)
+├─ Quality Compounders: Top 3
+├─ High Growth: Top 3
+├─ Value Opportunities: Top 3
+└─ "View Full Leaderboard" link
+
+EDUCATIONAL (Not Invasive)
+├─ "Did You Know?" facts about Indian stocks
+├─ Links to glossary, comparison guide
+└─ Keyboard shortcut hints (hover to reveal)
+
+FOOTER
+├─ 6-column nav grid (Raycast style)
+├─ Newsletter signup (email + subscribe button)
+└─ Social links
+```
+
+#### Code Structure
+
+```typescript
+// HomePage.tsx
+
+export default function HomePage() {
+  const [recentStocks, setRecentStocks] = useState([]);
+  const [aiInsights, setAiInsights] = useState(null);
+  const [leaderboard, setLeaderboard] = useState({});
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Load all data in parallel
+    Promise.all([
+      fetchRecentResearch(),
+      fetchAiInsights(),
+      fetchScannerLeaderboard(),
+    ]).then(([recent, insights, leader]) => {
+      setRecentStocks(recent);
+      setAiInsights(insights);
+      setLeaderboard(leader);
+    });
+  }, []);
+
+  return (
+    <div>
+      {/* RED STRIPE */}
+      <div style={STYLES.redStripe} />
+
+      {/* HERO */}
+      <HeroSection onSearch={(query) => navigate(`/scanner?q=${query}`)} />
+
+      {/* QUICK ACTIONS */}
+      <QuickActionsGrid />
+
+      {/* RECENT RESEARCH */}
+      {recentStocks.length > 0 && (
+        <RecentResearchCarousel stocks={recentStocks} />
+      )}
+
+      {/* AI INSIGHTS */}
+      {aiInsights && <AIInsightsPanel data={aiInsights} />}
+
+      {/* SCANNER LEADERBOARD */}
+      <ScannerLeaderboard data={leaderboard} />
+
+      {/* EDUCATIONAL SIDEBAR */}
+      <EducationalFacts />
+
+      {/* FOOTER */}
+      <Footer />
+    </div>
+  );
+}
+
+// Hero Section with Live Animation
+function HeroSection({ onSearch }: Props) {
+  const [inputFocused, setInputFocused] = useState(false);
+
+  return (
+    <section style={styles.heroContainer}>
+      {/* Animated Background (Optional: subtle keyboard visual) */}
+      <div style={styles.animatedBg}>
+        <AnimatedKeyboard opacity={0.05} />
+      </div>
+
+      <div style={styles.heroContent}>
+        <h1 style={styles.headline}>
+          Understand the stock.
+          <br />
+          Before you invest.
+        </h1>
+
+        <p style={styles.subheadline}>
+          AI-powered research layer for Indian retail investors.
+          Type a symbol. Get instant conviction.
+        </p>
+
+        {/* SEARCH INPUT (cmd+K) */}
+        <SearchHeroInput
+          onSearch={onSearch}
+          onFocus={() => setInputFocused(true)}
+          onBlur={() => setInputFocused(false)}
+        />
+
+        {inputFocused && (
+          <div style={styles.searchHint}>
+            💡 Try: RELIANCE, TCS, HDFCBANK, or "quality compounders"
+          </div>
+        )}
+
+        <div style={styles.keyboardHint}>
+          Press <kbd>cmd</kbd> + <kbd>K</kbd> to search anytime
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// AI Insights Panel (Real-time Updates)
+function AIInsightsPanel({ data }: Props) {
+  return (
+    <section style={styles.insightsContainer}>
+      <h2 style={styles.sectionTitle}>Market Insights (Live)</h2>
+
+      <div style={styles.insightsGrid}>
+        {/* Sentiment Gauge */}
+        <InsightCard
+          title="Market Sentiment"
+          value={data.sentiment.bullish}
+          unit="%"
+          trend={data.sentiment.trend}
+          description="Positive outlook among traders"
+        />
+
+        {/* Trending Stocks */}
+        <InsightCard
+          title="Trending Today"
+          items={data.trendingStocks}
+          description="Stocks with highest conversation"
+        />
+
+        {/* Market Alert */}
+        <InsightCard
+          title="Market Alert"
+          alert={data.marketAlert}
+          severity={data.alertSeverity}
+          description="Important level to watch"
+        />
+      </div>
+
+      <div style={styles.updated}>
+        Updated: {formatTime(data.lastUpdated)} ago
+      </div>
+    </section>
+  );
+}
+
+// Leaderboard (3 presets x 3 results)
+function ScannerLeaderboard({ data }: Props) {
+  return (
+    <section style={styles.leaderboardContainer}>
+      <h2 style={styles.sectionTitle}>Scanner Leaderboard</h2>
+
+      <div style={styles.leaderboardGrid}>
+        {['Quality Compounders', 'High Growth', 'Value Opportunities'].map(preset => (
+          <div key={preset} style={styles.leaderboardColumn}>
+            <h3 style={styles.presetTitle}>{preset}</h3>
+            <div style={styles.results}>
+              {data[preset].slice(0, 3).map((stock, idx) => (
+                <LeaderboardItem
+                  key={stock.symbol}
+                  rank={idx + 1}
+                  stock={stock}
+                />
+              ))}
+            </div>
+            <a href={`/scanner?preset=${preset}`} style={styles.viewAll}>
+              View all →
+            </a>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+```
+
+**Interactive Elements:**
+- ✅ Hero search auto-completes stock names
+- ✅ AI Insights refresh every 60 seconds (live)
+- ✅ Leaderboard updates in real-time
+- ✅ Recent stocks carousel scrolls smoothly
+- ✅ All buttons have hover + active states
+- ✅ Mobile-responsive (stacks all sections vertically)
+
+---
+
+### 2.2 STOCK DETAIL PAGE (The Centerpiece)
+
+**Goal:** Everything an investor needs to make a research-driven decision
+
+#### Complete Page Structure
+
+```
+HEADER (Sticky)
+├─ Symbol (left): "TCS"
+├─ Company name (left): "Tata Consultancy Services"
+├─ Price + change (right): "₹3,456.75 ↑ +2.3%"
+└─ Keyboard: Press 't' to track, 'c' to compare
+
+PRICE CHART (Large, Accurate)
+├─ Interactive line chart (TradingView-like)
+├─ Period tabs: 1D | 1W | 1M | 3M | 1Y | ALL
+├─ Candlestick/Line toggle
+├─ Hover: Show exact price + date
+├─ Technical indicators: SMA 20/50/200, RSI, MACD (optional toggle)
+└─ Key levels marked: Support, Resistance, 52W High/Low
+
+HEALTHOMETER + CONVICTION (Top Section)
+├─ Circular score display (0-100)
+├─ Verdict text: "High Conviction | 92 points"
+├─ "3 months ago: Watch | 76 points" (history)
+├─ Green → Red gradient based on score
+└─ Hover: Show what drives the score
+
+KEY METRICS GRID (3x3 or 2x4)
+├─ P/E Ratio: 24.5x (vs sector avg 26x)
+├─ P/B Ratio: 5.2x
+├─ ROE: 18% (3-year avg)
+├─ Debt/Equity: 0.45x
+├─ Revenue Growth: 12% YoY
+├─ Profit Growth: 14% YoY
+├─ Dividend Yield: 1.8%
+├─ Market Cap: ₹12.5L Cr
+└─ Each metric: Shows trend arrow + 3-year history
+
+COMPANY DETAILS (Card Section)
+├─ Company name: "Tata Consultancy Services"
+├─ Sector: "Information Technology"
+├─ Industry: "IT Services"
+├─ Founded: "1968"
+├─ CEO: "Name"
+├─ Employees: "xx,xxx"
+├─ HQ Location: "Mumbai, India" (NOT website URL!)
+├─ Listed: "BSE, NSE"
+├─ Brief description: 2-3 line company summary
+└─ Links: [Annual Report] [Investor Relations] [Press Releases]
+
+FINANCIAL HISTOGRAMS (Multi-year View)
+├─ Revenue (₹ Crores) — Bar chart with 5-year data
+├─ Net Profit (₹ Crores) — Bar chart with 5-year data
+├─ Operating Margin (%) — Line chart with trend
+├─ Toggle: Table view | Chart view
+├─ Hover: Show exact values + YoY growth
+└─ Comparison: Industry average overlay
+
+BULL CASE / BEAR CASE (AI Generated)
+├─ Bull Case
+│  ├─ "Market leader with durable moat"
+│  ├─ "Consistent ROIC >15%"
+│  ├─ "Digital transformation tailwinds"
+│  └─ Generated by AI, verified by research
+└─ Bear Case
+   ├─ "Valuation premium to peers"
+   ├─ "Attrition risks in talent market"
+   ├─ "Geopolitical uncertainties"
+   └─ Generated by AI, fair and balanced
+
+WHAT CHANGED (Thesis Tracking)
+├─ "3 months ago: Watch (76 pts)"
+├─ Changed factors:
+│  ├─ ✅ Q3 profit beat expectations (+5%)
+│  ├─ ✅ New contract wins boosted growth (+3%)
+│  └─ ❌ Valuation premium increased (-2%)
+└─ "Overall trend: Improving ↗"
+
+WHAT TO WATCH NEXT
+├─ Q4 earnings release: [Date] (X days away)
+├─ Next dividend announcement likely: [Date]
+├─ Key resistance level: ₹3,600
+├─ Support level: ₹3,200
+└─ AI-identified risks: Geopolitical, talent attrition
+
+NEWS FEED (With Hidden Ads)
+├─ Filter: [All] [Bullish] [Bearish]
+├─ Sort: [Recency] [Relevance] [Sentiment]
+├─ News Items (max 20):
+│  ├─ Item 1: Title, source, date, summary, sentiment badge
+│  ├─ Item 2: ...
+│  ├─ AD #1 (Native, after item 3): "Open Demat with Zerodha →"
+│  ├─ Item 4-6
+│  ├─ AD #2 (Native, after item 7): "Learn options trading →"
+│  └─ Items 8-20
+└─ "View more news" (pagination)
+
+ACTIONS (Fixed Bottom)
+├─ Button (CTA white): "Research This" → Opens research panel
+├─ Button (Secondary): "Add to Compare"
+├─ Button (Ghost): "Track This Stock"
+└─ Button (Ghost): "Share"
+
+SIDEBAR: RELATED STOCKS (Optional)
+├─ "Similar companies in sector"
+├─ Top 3 competitors with quick metrics
+└─ Links to research their profiles
+```
+
+#### Code Implementation
+
+```typescript
+// StockDetailPage.tsx
+
+export default function StockDetailPage({ symbol }: Props) {
+  const [stock, setStock] = useState<Stock | null>(null);
+  const [chart, setChart] = useState<ChartData | null>(null);
+  const [financials, setFinancials] = useState<FinancialData | null>(null);
+  const [news, setNews] = useState<NewsItem[]>([]);
+  const [timeframe, setTimeframe] = useState<'1d' | '1w' | '1m' | '3m' | '1y' | 'all'>('1m');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    Promise.all([
+      fetchStock(symbol),
+      fetchChart(symbol, timeframe),
+      fetchFinancials(symbol),
+      fetchNews(symbol),
+    ]).then(([s, c, f, n]) => {
+      setStock(s);
+      setChart(c);
+      setFinancials(f);
+      setNews(n);
+      setLoading(false);
+    });
+  }, [symbol, timeframe]);
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      if (e.key === 't') trackStock(symbol);
+      if (e.key === 'c') navigateToCompare(symbol);
+      if (e.key === '?') showKeyboardShortcuts();
+    };
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [symbol]);
+
+  if (loading) return <LoadingState />;
+
+  return (
+    <div style={styles.container}>
+      {/* STICKY HEADER */}
+      <Header stock={stock} />
+
+      {/* CHART */}
+      <ChartSection
+        stock={stock}
+        chart={chart}
+        timeframe={timeframe}
+        onTimeframeChange={setTimeframe}
+      />
+
+      {/* HEALTHOMETER + CONVICTION */}
+      <HealthometerSection stock={stock} />
+
+      {/* METRICS GRID */}
+      <MetricsGrid metrics={stock.metrics} />
+
+      {/* COMPANY DETAILS */}
+      <CompanyDetailsCard stock={stock} />
+
+      {/* FINANCIAL HISTOGRAMS */}
+      <FinancialHistograms data={financials} />
+
+      {/* BULL / BEAR CASE */}
+      <ThesisSection stock={stock} />
+
+      {/* WHAT CHANGED */}
+      <WhatChangedSection stock={stock} />
+
+      {/* WHAT TO WATCH */}
+      <WhatToWatchSection stock={stock} />
+
+      {/* NEWS FEED */}
+      <NewsSection news={news} symbol={symbol} />
+
+      {/* ACTION BUTTONS */}
+      <ActionButtons stock={stock} />
+    </div>
+  );
+}
+
+// Chart Component (Interactive, Accurate)
+function ChartSection({ stock, chart, timeframe, onTimeframeChange }: Props) {
+  const [hoveredDate, setHoveredDate] = useState<string | null>(null);
+  const [chartType, setChartType] = useState<'line' | 'candle'>('line');
+  const [showTechnicals, setShowTechnicals] = useState(false);
+
+  return (
+    <section style={styles.chartSection}>
+      {/* TIMEFRAME TABS */}
+      <div style={styles.tabs}>
+        {['1D', '1W', '1M', '3M', '1Y', 'ALL'].map(tf => (
+          <Tab
+            key={tf}
+            active={timeframe === tf.toLowerCase()}
+            onClick={() => onTimeframeChange(tf.toLowerCase())}
+          >
+            {tf}
+          </Tab>
+        ))}
+      </div>
+
+      {/* CHART CONTROLS */}
+      <div style={styles.chartControls}>
+        <Button
+          size="sm"
+          variant={chartType === 'line' ? 'secondary' : 'ghost'}
+          onClick={() => setChartType('line')}
+        >
+          Line
+        </Button>
+        <Button
+          size="sm"
+          variant={chartType === 'candle' ? 'secondary' : 'ghost'}
+          onClick={() => setChartType('candle')}
+        >
+          Candle
+        </Button>
+        <Button
+          size="sm"
+          variant={showTechnicals ? 'secondary' : 'ghost'}
+          onClick={() => setShowTechnicals(!showTechnicals)}
+        >
+          Indicators {showTechnicals ? '✓' : ''}
+        </Button>
+      </div>
+
+      {/* INTERACTIVE CHART */}
+      <ResponsiveChart
+        data={chart}
+        type={chartType}
+        showTechnicals={showTechnicals}
+        onHover={setHoveredDate}
+        hoveredDate={hoveredDate}
+        supportLevels={stock.technicalLevels.support}
+        resistanceLevels={stock.technicalLevels.resistance}
+      />
+
+      {/* HOVERED DATA */}
+      {hoveredDate && (
+        <div style={styles.hoveredData}>
+          <span>{hoveredDate}</span>
+          <span>${chart.getPriceAt(hoveredDate)}</span>
+          <span>{chart.getVolumeAt(hoveredDate)}</span>
+        </div>
+      )}
+    </section>
+  );
+}
+
+// Company Details (NO Website URL!)
+function CompanyDetailsCard({ stock }: Props) {
+  return (
+    <Card>
+      <h2 style={styles.sectionTitle}>About {stock.name}</h2>
+
+      <div style={styles.detailsGrid}>
+        <DetailItem label="Sector" value={stock.sector} />
+        <DetailItem label="Industry" value={stock.industry} />
+        <DetailItem label="Founded" value={stock.founded} />
+        <DetailItem label="CEO" value={stock.ceo} />
+        <DetailItem label="Employees" value={formatNumber(stock.employees)} />
+
+        {/* HQ LOCATION - Better than website URL */}
+        <DetailItem
+          label="Headquarters"
+          value={stock.hqLocation}
+          icon="📍"
+        />
+
+        <DetailItem label="Listed On" value={`${stock.exchangeBSE} • ${stock.exchangeNSE}`} />
+      </div>
+
+      {/* Description */}
+      <p style={styles.description}>{stock.description}</p>
+
+      {/* Links */}
+      <div style={styles.links}>
+        <a href={stock.annualReportUrl} target="_blank">
+          Annual Report
+        </a>
+        <a href={stock.investorRelationsUrl} target="_blank">
+          Investor Relations
+        </a>
+        <a href={stock.pressReleaseUrl} target="_blank">
+          Press Releases
+        </a>
+      </div>
+    </Card>
+  );
+}
+
+// Financial Histograms (Multi-year bar/line charts)
+function FinancialHistograms({ data }: Props) {
+  const [view, setView] = useState<'chart' | 'table'>('chart');
+
+  return (
+    <Card>
+      <div style={styles.histogramHeader}>
+        <h2 style={styles.sectionTitle}>Financial Performance (5 Years)</h2>
+        <div style={styles.viewToggle}>
+          <Button size="sm" variant={view === 'chart' ? 'secondary' : 'ghost'}>
+            Chart
+          </Button>
+          <Button size="sm" variant={view === 'table' ? 'secondary' : 'ghost'}>
+            Table
+          </Button>
+        </div>
+      </div>
+
+      {view === 'chart' ? (
+        <div>
+          {/* Revenue Chart */}
+          <BarChart
+            title="Revenue (₹ Crores)"
+            data={data.revenue}
+            colors={colors.success}
+            showYoY
+          />
+
+          {/* Profit Chart */}
+          <BarChart
+            title="Net Profit (₹ Crores)"
+            data={data.profit}
+            colors={colors.info}
+            showYoY
+          />
+
+          {/* Margins Chart */}
+          <LineChart
+            title="Operating Margin (%)"
+            data={data.margins}
+            colors={colors.primary}
+            target={data.industryAverageMargin}
+          />
+        </div>
+      ) : (
+        <FinancialTable data={data} />
+      )}
+    </Card>
+  );
+}
+
+// News with Hidden Native Ads
+function NewsSection({ news, symbol }: Props) {
+  const [filterSentiment, setFilterSentiment] = useState<'all' | 'positive' | 'negative'>('all');
+  const [sortBy, setSortBy] = useState<'recency' | 'relevance' | 'sentiment'>('recency');
+
+  const filtered = news.filter(n =>
+    filterSentiment === 'all' || n.sentiment === filterSentiment
+  );
+
+  return (
+    <section style={styles.newsSection}>
+      <h2 style={styles.sectionTitle}>News & Updates</h2>
+
+      {/* FILTERS */}
+      <div style={styles.filters}>
+        {(['all', 'positive', 'negative'] as const).map(sentiment => (
+          <Pill
+            key={sentiment}
+            active={filterSentiment === sentiment}
+            onClick={() => setFilterSentiment(sentiment)}
+          >
+            {sentiment === 'all' ? 'All' : sentiment.capitalize()}
+          </Pill>
+        ))}
+
+        <div style={styles.sortBy}>
+          Sort by:
+          <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+            <option value="recency">Most Recent</option>
+            <option value="relevance">Most Relevant</option>
+            <option value="sentiment">Most Bullish</option>
+          </select>
+        </div>
+      </div>
+
+      {/* NEWS ITEMS + ADS */}
+      <div style={styles.newsItems}>
+        {filtered.map((item, idx) => (
+          <div key={item.id}>
+            <NewsItem news={item} />
+
+            {/* NATIVE ADS (Hidden) at positions 3 and 7 */}
+            {(idx === 2 || idx === 6) && (
+              <NativeAd
+                title={AD_TITLES[idx === 2 ? 0 : 1]}
+                subtitle={AD_SUBTITLES[idx === 2 ? 0 : 1]}
+                cta={`Open Demat → ${' '}`}
+                onClick={() => openBrokerModal()}
+              />
+            )}
+          </div>
+        ))}
+      </div>
+
+      {filtered.length > 10 && (
+        <Button variant="secondary" style={styles.loadMore}>
+          Load More News
+        </Button>
+      )}
+    </section>
+  );
+}
+```
+
+**Key Implementation Details:**
+
+✅ **Chart:** Use Recharts or TradingView Lightweight Charts (accurate, no lag)
+✅ **Technical Levels:** Mark support/resistance dynamically
+✅ **HQ Location:** Display city, state format (BETTER than website URL!)
+✅ **Native Ads:** Position 3 & 7 in news feed (non-intrusive, revenue-generating)
+✅ **Ad Revenue:** Average 2-5 impressions per user = ₹20-50/month per active user
+✅ **Responsive:** Full-width on desktop, vertical scroll on mobile
+
+---
+
+### 2.3 COMPARE PAGE (Capital Allocation Tool)
+
+```
+HEADER: "Compare Stocks"
+  Search: "Add stock to compare..." (autocomplete)
+  Selected: [TCS ×] [HDFCBANK ×] [INFY ×] [+Add More]
+
+COMPARISON TABLE (Full-Width, Horizontally Scrollable)
+  Columns: Metric | TCS | HDFCBANK | INFY | Sector Avg
+  Rows:
+    Price               ₹3,456  ₹1,650   ₹2,340  -
+    Market Cap          ₹12.5L  ₹8.2L    ₹7.9L   -
+    P/E Ratio           24.5x   23.1x    26.2x   25x (industry)
+    P/B Ratio           5.2x    4.1x     4.8x    4.5x
+    ROE                 18%     16%      15%     16% (avg)
+    Debt/Equity         0.45x   0.52x    0.38x   0.50x
+    Revenue Growth      12%     14%      10%     13% (3yr)
+    Profit Growth       14%     12%      11%     12% (3yr)
+    Dividend Yield      1.8%    2.1%     1.5%    1.9%
+
+  Color coding:
+    Green:  Best in category
+    Amber:  Average
+    Red:    Worst in category
+
+VISUAL COMPARISON (Charts)
+  Tab 1: Valuation (PE, PB comparison bars)
+  Tab 2: Quality (ROE, ROIC comparison)
+  Tab 3: Growth (Revenue, Profit growth)
+  Tab 4: Dividend (Yield comparison)
+
+AI RECOMMENDATION
+  "Best Value: HDFCBANK (lower PE, higher dividend)"
+  "Best Growth: HDFCBANK (14% revenue growth)"
+  "Best Quality: TCS (18% ROE, consistent)"
+  "For Capital Allocation: Diversify TCS 40% + HDFCBANK 40% + INFY 20%"
+
+ACTIONS
+  [Export to CSV] [Share Comparison] [Add to Portfolio]
+```
+
+---
+
+### 2.4 TRACK PAGE (Thesis Monitor)
+
+```
+HEADER: "Your Research Tracker"
+  Subtitle: "5 stocks being tracked | Last updated 2 hours ago"
+  Add button: "+ Track a Stock"
+
+TRACKED STOCKS (List View)
+  Each stock card shows:
+    Symbol | Company Name
+    Price | Change | Conviction Badge
+    Last reviewed: "12 days ago"
+    Thesis status: "Intact ↗" (Improving / Deteriorating / Broken)
+
+  Hover actions: [Re-review] [Compare] [Remove]
+
+INSIGHTS
+  "2 stocks improved: TCS, LT"
+  "0 stocks deteriorated"
+  "All stocks have intact thesis"
+  "Risk score: 3.2/10 (Low)"
+
+ALERTS
+  "TCS breached support level ₹3,200" (yesterday)
+  "HDFCBANK dividend announcement (March 15)"
+  "LT earnings release (in 5 days)"
+```
+
+---
+
+### 2.5 ABOUT PAGE (Brand Story)
+
+```
+HERO SECTION
+  Red stripe (top)
+  Headline: "Understand. Research. Decide."
+  Subheadline: "Building the AI research layer for Indian retail investors."
+  CTA: "Download for Web" (white pill)
+
+MISSION SECTION
+  Large headline: "Why we built StockStory"
+  Paragraph 1: "Indian retail investors deserve research tools as good as Raytheon's."
+  Paragraph 2: "No more guessing. No more tips from cousins. Real research, real conviction."
+  Paragraph 3: "StockStory is command-palette research: Type. Analyze. Decide."
+
+VALUES GRID (3 columns)
+  Icon 1 | Heading: "AI-First"
+  Copy: "Machine learning powers every research decision"
+
+  Icon 2 | Heading: "Retail-Focused"
+  Copy: "Built for Indian investors, with Indian market expertise"
+
+  Icon 3 | Heading: "Transparent"
+  Copy: "No hidden fees. No broker kickbacks. Pure research."
+
+TEAM SECTION
+  "Meet the team"
+  Avatar grid: 3-5 founder/key person headshots
+  Click: Reveals name, role, LinkedIn link
+
+TIMELINE SECTION
+  "The journey so far"
+  2024 Q1: "Founded StockStory"
+  2024 Q3: "100+ stocks analyzed"
+  2025 Q1: "AI scanner v1 launched"
+  2025 Q2: "Track & compare features"
+  2025 Q4: "Mobile app launch (planned)"
+  2026+: "Global markets expansion"
+
+SOCIAL SECTION
+  Links: [Twitter] [LinkedIn] [GitHub] [Email]
+
+FOOTER
+  Standard 6-column nav (same as other pages)
+```
+
+---
+
+## PART 3: RAYCAST INTERACTIVE ANIMATIONS
+
+### 3.1 Live Animations (Website Interactions)
+
+```typescript
+// Animations.css
+
+/* KEYBOARD VISUALIZATION (Homepage Background) */
+@keyframes keyboardPulse {
+  0% { opacity: 0.02; }
+  50% { opacity: 0.08; }
+  100% { opacity: 0.02; }
+}
+
+.animatedKeyboard {
+  animation: keyboardPulse 3s ease-in-out infinite;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: /* SVG of keyboard layout */;
+  pointer-events: none;
+}
+
+/* METRIC CARD ENTRANCE */
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.metricCard {
+  animation: slideUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation-fill-mode: both;
+}
+
+.metricCard:nth-child(1) { animation-delay: 0s; }
+.metricCard:nth-child(2) { animation-delay: 0.1s; }
+.metricCard:nth-child(3) { animation-delay: 0.2s; }
+/* ...etc */
+
+/* CHART LINE ANIMATION (On Mount) */
+@keyframes chartDraw {
+  from {
+    stroke-dasharray: 1000;
+    stroke-dashoffset: 1000;
+  }
+  to {
+    stroke-dasharray: 1000;
+    stroke-dashoffset: 0;
+  }
+}
+
+.chartLine {
+  animation: chartDraw 1.5s ease-in-out forwards;
+}
+
+/* CONVICTION BADGE PULSE (If improving) */
+@keyframes badgePulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+  50% { box-shadow: 0 0 0 8px rgba(34, 197, 94, 0); }
+}
+
+.badgeImproving {
+  animation: badgePulse 2s infinite;
+}
+
+/* SCANNER RESULTS ROW HOVER */
+@keyframes rowHoverSlideIn {
+  from {
+    transform: translateX(-8px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.scannerRow:hover .expandArrow {
+  animation: rowHoverSlideIn 0.2s ease-out;
+}
+
+/* LOADING SPINNER (Raycast style) */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.loadingSpinner {
+  animation: spin 0.8s linear infinite;
+}
+
+/* NEWS FEED SCROLL REVEAL */
+@keyframes fadeInOnScroll {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.newsItem {
+  animation: fadeInOnScroll 0.4s ease-out forwards;
+  animation-timeline: view();
+  animation-range: entry 0% cover 30%;
+}
+
+/* REAL-TIME DATA PULSE (Live Updates) */
+@keyframes dataPulse {
+  0%, 100% { background: transparent; }
+  50% { background: rgba(34, 197, 94, 0.1); }
+}
+
+.liveData {
+  animation: dataPulse 0.5s ease-in-out;
+}
+
+.liveData.updating {
+  animation: dataPulse 0.5s ease-in-out 2 (triggers on data update)
+}
+
+/* KEYBOARD SHORTCUT HINT FADE */
+@keyframes hintFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.keyboardHint {
+  animation: hintFade 0.8s ease-in-out 0.5s backwards;
+}
+```
+
+### 3.2 Micro-interactions
+
+```typescript
+// MicroInteractions.tsx
+
+export function InteractiveButton({ children, ...props }: Props) {
+  const [isPressed, setIsPressed] = useState(false);
+
+  return (
+    <button
+      {...props}
+      onMouseDown={() => setIsPressed(true)}
+      onMouseUp={() => setIsPressed(false)}
+      onMouseLeave={() => setIsPressed(false)}
+      style={{
+        ...styles.button,
+        transform: isPressed ? 'scale(0.98)' : 'scale(1)',
+        transition: 'transform 0.05s cubic-bezier(0.34, 1.56, 0.64, 1)',
+      }}
+    >
+      {children}
+    </button>
+  );
+}
+
+// Hover effect on cards
+export function HoverCard({ children, ...props }: Props) {
+  const [isHovered, setIsHovered] = useState(false);
+
+  return (
+    <div
+      {...props}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      style={{
+        ...styles.card,
+        backgroundColor: isHovered ? colors.cardHover : colors.card,
+        borderColor: isHovered ? colors.borderLight : colors.border,
+        transform: isHovered ? 'translateY(-2px)' : 'translateY(0)',
+        boxShadow: isHovered ? shadows.elevated : shadows.card,
+        transition: 'all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1)',
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
+// Smooth number counter animation
+export function AnimatedNumber({ value, decimals = 0 }: Props) {
+  const [displayValue, setDisplayValue] = useState(0);
+  const animationRef = useRef<number>();
+
+  useEffect(() => {
+    const startValue = displayValue;
+    const difference = value - startValue;
+    let frame = 0;
+    const totalFrames = 30; // 0.5s at 60fps
+
+    const animate = () => {
+      frame++;
+      const progress = frame / totalFrames;
+      const easeOut = 1 - Math.pow(1 - progress, 3);
+      const newValue = startValue + difference * easeOut;
+
+      setDisplayValue(parseFloat(newValue.toFixed(decimals)));
+
+      if (frame < totalFrames) {
+        animationRef.current = requestAnimationFrame(animate);
+      }
+    };
+
+    animationRef.current = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(animationRef.current!);
+  }, [value, decimals]);
+
+  return <span>{displayValue}</span>;
+}
+
+// Expanding detail panel
+export function ExpandingPanel({ isOpen, children }: Props) {
+  return (
+    <div
+      style={{
+        maxHeight: isOpen ? '500px' : '0px',
+        opacity: isOpen ? 1 : 0,
+        overflow: 'hidden',
+        transition: 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
+// Smooth scroll to element
+export function useSmoothScroll() {
+  return (elementId: string) => {
+    const element = document.getElementById(elementId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+}
+```
+
+---
+
+## PART 4: KEYBOARD-FIRST EXPERIENCE
+
+### 4.1 Global Keyboard Shortcuts
+
+```typescript
+// KeyboardShortcuts.ts
+
+export const GLOBAL_SHORTCUTS = {
+  // Core Navigation
+  'cmd+k': { action: 'openSearch', description: 'Open search/command palette' },
+  'cmd+n': { action: 'newResearch', description: 'Start new research' },
+  'cmd+shift+s': { action: 'openScanner', description: 'Open AI scanner' },
+  'cmd+t': { action: 'openTrack', description: 'Open tracked stocks' },
+  'cmd+c': { action: 'openCompare', description: 'Open compare tool' },
+  
+  // Current Page
+  't': { action: 'trackStock', description: 'Track this stock' },
+  'c': { action: 'compareStock', description: 'Add to compare' },
+  'r': { action: 'refreshData', description: 'Refresh data' },
+  
+  // Navigation
+  'cmd+[': { action: 'goBack', description: 'Go back' },
+  'cmd+]': { action: 'goForward', description: 'Go forward' },
+  'cmd+?': { action: 'showHelp', description: 'Show keyboard shortcuts' },
+  
+  // List Navigation
+  'arrowUp': { action: 'selectPrevious', description: 'Select previous item' },
+  'arrowDown': { action: 'selectNext', description: 'Select next item' },
+  'Enter': { action: 'selectItem', description: 'Select / Open item' },
+  'Escape': { action: 'close', description: 'Close dialog / Go back' },
+  
+  // Text Input
+  'Tab': { action: 'focusNext', description: 'Focus next input' },
+  'shift+Tab': { action: 'focusPrevious', description: 'Focus previous input' },
+};
+
+// Hook for handling shortcuts
+export function useGlobalKeyboardShortcuts() {
+  const navigate = useNavigate();
+  const [selectedIndex, setSelectedIndex] = useState(0);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const key = `${e.ctrlKey || e.metaKey ? 'cmd+' : ''}${
+        e.shiftKey ? 'shift+' : ''
+      }${e.key.toLowerCase()}`;
+
+      if (GLOBAL_SHORTCUTS[key]) {
+        e.preventDefault();
+        const { action } = GLOBAL_SHORTCUTS[key];
+        handleShortcutAction(action);
+      }
+
+      // List navigation
+      if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        setSelectedIndex(prev => Math.max(0, prev - 1));
+      }
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        setSelectedIndex(prev => prev + 1);
+      }
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        // Select current item
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  return { selectedIndex };
+}
+
+const handleShortcutAction = (action: string) => {
+  switch (action) {
+    case 'openSearch':
+      // Open command palette
+      break;
+    case 'newResearch':
+      // Start new research
+      break;
+    // ...etc
+  }
+};
+```
+
+---
+
+## PART 5: REVENUE MODEL IMPLEMENTATION
+
+### 5.1 Native Ad Integration
+
+```typescript
+// NativeAds.ts
+
+export const NATIVE_ADS = [
+  {
+    id: 'zerodha-demat',
+    title: 'Open a demat account in 5 minutes',
+    subtitle: 'Trade stocks commission-free',
+    cta: 'Open Account →',
+    icon: '📱',
+    position: 'news-3',
+    clickUrl: '/broker-modal?broker=zerodha',
+  },
+  {
+    id: 'upstox-refer',
+    title: 'Earn ₹1000 for every friend you refer',
+    subtitle: 'Start your investing journey with Upstox',
+    cta: 'Learn More →',
+    icon: '🎁',
+    position: 'news-7',
+    clickUrl: '/broker-modal?broker=upstox',
+  },
+  {
+    id: 'motilal-options',
+    title: 'Master options trading in 10 days',
+    subtitle: 'Free course by Motilal Oswal',
+    cta: 'Enroll →',
+    icon: '📚',
+    position: 'news-12',
+    clickUrl: '/educational-modal',
+  },
+];
+
+export function NativeAdComponent({ ad }: Props) {
+  return (
+    <div style={styles.nativeAdContainer}>
+      <div style={styles.adBadge}>Sponsored</div>
+      <div style={styles.adContent}>
+        <div style={styles.adIcon}>{ad.icon}</div>
+        <div>
+          <h3 style={styles.adTitle}>{ad.title}</h3>
+          <p style={styles.adSubtitle}>{ad.subtitle}</p>
+        </div>
+      </div>
+      <button
+        style={styles.adCta}
+        onClick={() => window.open(ad.clickUrl)}
+      >
+        {ad.cta}
+      </button>
+    </div>
+  );
+}
+
+// Placement in news feed
+export function NewsSection({ news }: Props) {
+  const newsWithAds = insertNativeAds(news, NATIVE_ADS);
+  
+  return (
+    <div>
+      {newsWithAds.map(item => 
+        item.type === 'news' ? (
+          <NewsItem key={item.id} news={item} />
+        ) : (
+          <NativeAdComponent key={item.id} ad={item} />
+        )
+      )}
+    </div>
+  );
+}
+```
+
+**Revenue Projections:**
+- Average active user: 2-3 native ad impressions/day
+- CPM (Cost Per Mille): ₹50-100 (Indian market average)
+- 10,000 monthly active users = ₹15,000-30,000/month from ads alone
+- Premium subscription (₹99/month): +₹5,000-10,000/month
+- Broker handoff commissions (1-2% per trade): +₹20,000-50,000/month at scale
+
+---
+
+## PART 6: TECHNICAL SPECIFICATIONS
+
+### 6.1 Stack & Infrastructure
+
+```
+Frontend:
+├─ React 18 + Vite (fast builds)
+├─ TypeScript (type safety)
+├─ Tailwind CSS (with custom Raycast tokens)
+├─ Recharts or TradingView Charts (data viz)
+├─ Framer Motion (animations)
+└─ React Router v6 (navigation)
+
+Backend:
+├─ Fastify (fast, lightweight API)
+├─ PostgreSQL (primary DB)
+├─ Redis (caching, real-time)
+├─ Bull Queue (background jobs)
+└─ TypeScript (type safety)
+
+APIs & Services:
+├─ Upstox API (primary market data)
+├─ IndianAPI (fallback quotes)
+├─ Screener.in API (fundamentals)
+├─ Yahoo Finance (historical data)
+├─ Clerk/Auth0 (authentication)
+├─ Supabase (edge functions, webhooks)
+└─ OpenAI (AI analysis)
+
+Infrastructure:
+├─ Vercel (frontend hosting)
+├─ Railway (backend hosting)
+├─ Supabase (database)
+├─ Cloudflare (CDN, DDoS)
+├─ SendGrid (email)
+└─ Stripe (payments)
+```
+
+### 6.2 Performance Targets
+
+```
+Frontend:
+├─ First Contentful Paint: <2s
+├─ Largest Contentful Paint: <2.5s
+├─ Cumulative Layout Shift: <0.1
+├─ Time to Interactive: <3s
+├─ Lighthouse Score: >90 (all pages)
+└─ Bundle Size: <50KB (gzip)
+
+Backend:
+├─ API Response Time: <300ms (p95)
+├─ Database Query Time: <100ms (p95)
+├─ Cache Hit Ratio: >80%
+├─ Uptime: 99.9%
+└─ Error Rate: <0.1%
+
+Search:
+├─ Query Latency: <150ms
+├─ Results Count: Instant
+└─ Auto-complete: Instant (<50ms)
+
+Scanner:
+├─ Run Time: <30s (for 100 stocks)
+├─ Score Calculation: <1s per stock
+└─ Incremental Updates: Real-time
+```
+
+---
+
+## PART 7: IMPLEMENTATION TIMELINE
+
+```
+WEEK 1-2: Core Features + Design
+├─ Finalize Raycast design (fonts, colors, components)
+├─ Build component library (Button, Card, Badge, Input)
+├─ Implement keyboard shortcuts globally
+├─ Build basic search/command palette
+└─ Checkpoint: Home page + basic navigation works
+
+WEEK 3-4: Stock Detail Page + Charts
+├─ Build interactive chart component (Recharts)
+├─ Implement technical indicators (RSI, MACD, SMA)
+├─ Build metrics grid with real data
+├─ Build financials histograms
+├─ Build AI bull/bear case generator
+└─ Checkpoint: Stock detail page fully functional
+
+WEEK 5-6: Advanced Scanner + Compare
+├─ Implement 5 scanner presets with AI explanations
+├─ Build real-time scanner results (100+ stocks)
+├─ Build compare page with visual charts
+├─ Implement tracking functionality
+└─ Checkpoint: Scanner finds top 10 in <10s
+
+WEEK 7-8: Polish + Revenue
+├─ Add all animations (slide up, fade in, pulse, etc)
+├─ Implement native ad placement (positions 3 & 7)
+├─ Add mobile responsiveness (5 breakpoints)
+├─ Build broker modal (10 Indian brokers)
+├─ Add analytics tracking (Mixpanel/Segment)
+└─ Checkpoint: All pages responsive + ads rendering
+
+WEEK 9-10: QA + Optimization
+├─ Performance audit (Lighthouse >90)
+├─ Security audit (OWASP Top 10)
+├─ SEBI compliance check (no forbidden words)
+├─ Battery/accessibility testing
+├─ Load testing (1000+ concurrent users)
+└─ Checkpoint: Production-ready
+
+DEPLOYMENT:
+├─ vercel --prod (frontend)
+├─ railway up (backend)
+├─ Run post-deploy tests
+├─ Monitor for 24 hours
+└─ Launch! 🚀
+```
+
+---
+
+## PART 8: SUCCESS METRICS
+
+### KPIs to Track
+
+```
+User Engagement:
+├─ Daily Active Users (DAU)
+├─ Monthly Active Users (MAU)
+├─ Average session time
+├─ Stocks researched per user per week
+├─ Scanner runs per user
+├─ Stocks tracked per user
+└─ Target: >10,000 DAU within 3 months
+
+Monetization:
+├─ Ad revenue per DAU
+├─ Broker handoff conversion rate (% who open demat)
+├─ Premium subscription uptake
+├─ Total monthly revenue
+└─ Target: ₹50,000+/month within 6 months
+
+Product Quality:
+├─ Lighthouse score (maintain >90)
+├─ API latency (p95 <300ms)
+├─ Keyboard shortcut usage rate
+├─ Feature usage (% using each feature)
+├─ User retention (DAU/MAU ratio)
+└─ Target: >40% DAU/MAU ratio
+
+Market Positioning:
+├─ Search rankings for "stock research India"
+├─ Social media followers
+├─ Media mentions / Press coverage
+├─ User testimonials / reviews
+└─ Target: Top 3 in search + 5000 followers
+```
+
+---
+
+## FINAL NOTES
+
+This prompt gives you everything you need to rebuild StockStory as a **billion-dollar fintech platform**. The combination of:
+
+1. **Raycast design** (professional, keyboard-first, fast)
+2. **Advanced AI scanner** (real research, not raw)
+3. **Market-leading animations** (delightful UX)
+4. **Revenue optimization** (ads + broker handoff + premium)
+5. **Production infrastructure** (scalable, reliable, secure)
+
+...will position you as the **best equity research tool for Indian retail investors**.
+
+**Ship it. 🚀**
+
+---
+
+**Questions? Clarifications?** This prompt is your complete blueprint. Execute it methodically, test thoroughly, and launch with confidence.
+
+**You have everything to win.** Now go build.

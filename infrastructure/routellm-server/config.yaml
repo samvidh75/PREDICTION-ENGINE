@@ -1,0 +1,9 @@
+mf:
+  checkpoint_path: "routellm/mf_gpt4_augmented"
+  arena_embedding_model: "sentence-transformers/all-mpnet-base-v2"
+
+causal_llm:
+  checkpoint_path: "routellm/causal_llm_gpt4_augmented"
+
+bert:
+  checkpoint_path: "routellm/bert_gpt4_augmented"

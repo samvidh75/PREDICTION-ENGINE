@@ -1,0 +1,26 @@
+<!-- @dsCard group="PREDICTION-ENGINE / Track" -->
+<style>
+  :root { --canvas:#000; --ink:#FFF; --body:#B4B4B4; --mute:#8C8C8C; --hairline:#1F1F1F; --accent:#FF6B4A; --bg-sheet: rgba(18,18,20,0.55); --bg-card: rgba(26,26,28,0.62); }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--canvas); font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Inter",sans-serif; color:var(--ink); }
+  .page { width: 1040px; padding: 32px; display: grid; gap: 20px; }
+  .tabbar { display: inline-flex; gap: 4px; padding: 4px; background: var(--bg-sheet); border-radius: 10px; }
+  .tab { padding: 8px 16px; border-radius: 8px; font-size: 13px; color: var(--mute); display: flex; align-items: center; gap: 6px; }
+  .tab.active { background: var(--bg-card); color: var(--ink); }
+  .card { background: var(--bg-sheet); border: 1px solid var(--hairline); border-radius: 10px; padding: 20px; }
+  .row { display: flex; justify-content: space-between; padding: 12px 0; border-top: 1px solid var(--hairline); font-size: 13px; }
+  .row:first-of-type { border-top: none; }
+  .date { color: var(--mute); font-size: 11.5px; font-family: 'SF Mono', monospace; }
+</style>
+<div class="page">
+  <div class="tabbar">
+    <div class="tab active">▤ Overview</div>
+    <div class="tab">◔ Catalysts</div>
+    <div class="tab">◈ Alerts</div>
+  </div>
+  <div class="card">
+    <div class="row"><span>BDO Q2 earnings call</span><span class="date">Aug 14, 2026</span></div>
+    <div class="row"><span>Ayala Corp dividend ex-date</span><span class="date">Aug 20, 2026</span></div>
+    <div class="row"><span>Jollibee same-store sales report</span><span class="date">Sep 02, 2026</span></div>
+  </div>
+</div>
