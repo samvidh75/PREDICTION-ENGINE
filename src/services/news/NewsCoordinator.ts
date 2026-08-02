@@ -107,13 +107,13 @@ export class NewsCoordinator {
       AC: "Holding",
       BDO: "Banking",
       BPI: "Banking",
+      SECB: "Banking",
       JFC: "Consumer",
       TEL: "Telecom",
+      GLO: "Telecom",
       MER: "Utility",
-      LT: "Infrastructure",
-      BAJFINANCE: "Banking",
-      ITC: "FMCG",
-      HINDUNILVR: "FMCG",
+      ALI: "Property",
+      SMPH: "Property",
     };
     return map[symbol.toUpperCase()] ?? "Market";
   }

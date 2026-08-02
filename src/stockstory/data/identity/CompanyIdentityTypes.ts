@@ -5,7 +5,7 @@
  * built from real source data only. All optional fields nullable.
  */
 
-import type { PakistanExchange, ListingStatus } from "../universe/PSEUniverseTypes.ts";
+import type { PSEExchange, ListingStatus } from "../universe/PSEUniverseTypes.ts";
 
 // ---------------------------------------------------------------------------
 // Core identity type
@@ -37,7 +37,7 @@ export interface CompanyIdentity {
   websiteUrl?: string | null;
 
   /** Primary exchange. */
-  exchange: PakistanExchange;
+  exchange: PSEExchange;
 
   /** Current listing status. */
   listingStatus: ListingStatus;

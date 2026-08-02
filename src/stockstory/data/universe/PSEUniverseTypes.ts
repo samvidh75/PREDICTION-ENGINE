@@ -7,7 +7,7 @@
  */
 
 /** Recognised PSE exchanges. */
-export type PakistanExchange = "PSE" | "SME";
+export type PSEExchange = "PSE" | "SME";
 
 /** Listing status of a company. */
 export type ListingStatus =
@@ -29,7 +29,7 @@ export interface PSEEntry {
   /** Primary PSE symbol (canonical). */
   symbol: string;
   /** Exchange (or "PSE" as default). */
-  exchange: PakistanExchange;
+  exchange: PSEExchange;
   /** Company legal name. */
   companyName: string;
   /** ISIN if known. */
@@ -60,7 +60,7 @@ export interface PSEEntry {
 export interface CompanyAlias {
   /** The canonical symbol this alias resolves to. */
   canonicalSymbol: string;
-  /** The alias value (e.g. "MARUTI" → canonical "MARTI"). */
+  /** The alias value (e.g. "AC-OLD" → canonical "AC"). */
   alias: string;
   /** The namespace of this alias ("PSE_OLD", "PSE_CODE", "ISIN", etc.). */
   namespace: string;

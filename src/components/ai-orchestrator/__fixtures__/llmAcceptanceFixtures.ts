@@ -409,17 +409,17 @@ export const watchlistFixture: LlmAcceptanceFixture = {
 export const alertsFixture: LlmAcceptanceFixture = {
   surface: "alerts",
   name: "Alerts / What changed",
-  symbol: "BAJFINANCE",
+  symbol: "SECB",
   context: makeContext({
     surface: "alerts",
-    symbol: "BAJFINANCE",
-    companyName: "Bajaj Finance",
-    currentPrice: 7200.0,
+    symbol: "SECB",
+    companyName: "Security Bank Corporation",
+    currentPrice: 72.0,
     title: "Thesis change: Valuation concern",
     narrative: [
       "Score dropped from 68 to 62 — crossing the alert threshold.",
-      "AUM growth remains strong at 25% YoY.",
-      "Asset quality stable with GNPA at 0.85%.",
+      "Loan book growth remains strong at 25% YoY.",
+      "Asset quality stable with NPL ratio at 0.85%.",
     ],
     alertContext: [
       "Type: valuation_change",
@@ -428,10 +428,10 @@ export const alertsFixture: LlmAcceptanceFixture = {
     ],
     risksToReview: [
       "Valuation premium compressing with rising rates",
-      "Competition from fintech players intensifying",
+      "Competition from digital banks intensifying",
     ],
     whatToWatch: [
-      "Q1 AUM growth and NIM trends",
+      "Q1 loan growth and net interest margin trends",
     ],
   }),
   safeQuestions: [
