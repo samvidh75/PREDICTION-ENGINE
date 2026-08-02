@@ -1,12 +1,12 @@
 """
 SLM-Powered Walk-Forward Backtesting Engine
 ============================================
-Fetches 5+ years of NSE historical data, generates Healthometer scores
+Fetches 5+ years of PSE historical data, generates Healthometer scores
 via the local Ollama SLM, creates decile portfolios, and computes
 institutional-grade performance matrices with walk-forward validation.
 
 Usage:
-    python backtest_slm_strategy.py --fetch          # Download 5Y NSE data
+    python backtest_slm_strategy.py --fetch          # Download 5Y PSE data
     python backtest_slm_strategy.py --run            # Run full backtest
     python backtest_slm_strategy.py --run --no-ollama  # Rule-based scoring (fast)
     python backtest_slm_strategy.py --report         # Show last run summary
@@ -41,20 +41,15 @@ DATA_DIR.mkdir(parents=True, exist_ok=True)
 CACHE_DIR.mkdir(parents=True, exist_ok=True)
 REPORT_DIR.mkdir(parents=True, exist_ok=True)
 
-NSE_SUFFIX = ".NS"
-RISK_FREE_RATE = 0.065
+PSE_SUFFIX = ".PS"
+RISK_FREE_RATE = 0.065  # verify against current PH T-bond yield before relying on Sharpe output
 TRADING_DAYS = 252
 
-NIFTY50_TICKERS = [
-    "RELIANCE", "TCS", "HDFCBANK", "ICICIBANK", "INFY", "ITC", "SBIN",
-    "BHARTIARTL", "LT", "KOTAKBANK", "BAJFINANCE", "HINDUNILVR", "WIPRO",
-    "TITAN", "MARUTI", "SUNPHARMA", "ONGC", "ADANIPORTS", "NTPC", "ULTRACEMCO",
-    "HCLTECH", "POWERGRID", "ASIANPAINT", "M&M", "TRENT", "JSWSTEEL",
-    "AXISBANK", "BAJAJFINSV", "TATAMOTORS", "HINDALCO", "TATASTEEL", "ADANIENT",
-    "COALINDIA", "SHRIRAMFIN", "INDUSINDBK", "NESTLEIND", "BPCL", "BEL",
-    "GRASIM", "TATACONSUM", "EICHERMOT", "HEROMOTOCO", "HDFCLIFE", "BRITANNIA",
-    "DIVISLAB", "CIPLA", "APOLLOHOSP", "SBILIFE", "DRREDDY", "BAJAJ-AUTO",
-    "HINDZINC", "WIPRO", "PIDILITIND",
+PSEI30_TICKERS = [
+    "AC", "ALI", "AEV", "AGI", "BDO", "BLOOM", "BPI", "CNVRG", "DMC",
+    "EMI", "GLO", "GTCAP", "ICT", "JFC", "JGS", "LTG", "MBT", "MEG",
+    "MER", "MONDE", "PGOLD", "RLC", "RRHI", "SCC", "SM", "SMC",
+    "SMPH", "TEL", "URC", "WLCON",
 ]
 
 OLLAMA_URL = "http://localhost:11434/api/generate"
@@ -67,7 +62,7 @@ HEALTHOMETER_CACHE: dict[str, dict[str, float]] = {}
 # DATA LAYER
 # ═══════════════════════════════════════════════════════════════════════
 
-class NseHistoricalDataFetcher:
+class PseHistoricalDataFetcher:
     def __init__(self, years: int = 5):
         self.years = years
         self.end_date = datetime.now()
@@ -90,7 +85,7 @@ class NseHistoricalDataFetcher:
             return None
 
         try:
-            s = yf.Ticker(ticker + NSE_SUFFIX)
+            s = yf.Ticker(ticker + PSE_SUFFIX)
             df = s.history(start=self.start_date.strftime("%Y-%m-%d"),
                            end=self.end_date.strftime("%Y-%m-%d"),
                            auto_adjust=True)
@@ -111,7 +106,7 @@ class NseHistoricalDataFetcher:
 
     def fetch_universe(self, tickers: Optional[list[str]] = None) -> dict[str, pd.DataFrame]:
         if tickers is None:
-            tickers = NIFTY50_TICKERS
+            tickers = PSEI30_TICKERS
         print(f"Fetching {len(tickers)} tickers ({self.years} years of data)...")
         results: dict[str, pd.DataFrame] = {}
         with ThreadPoolExecutor(max_workers=10) as pool:
@@ -283,7 +278,7 @@ class SlmScorer:
                           features: pd.Series) -> dict:
         context = self.build_context(ticker, date, features)
         prompt = (
-            f"Task: Compute structural Healthometer score for an Indian equity. "
+            f"Task: Compute structural Healthometer score for a PSE-listed equity. "
             f"Context: {context}"
         )
         try:
@@ -522,7 +517,7 @@ class WalkForwardValidator:
 
 class SlmBacktestOrchestrator:
     def __init__(self, use_ollama: bool = True):
-        self.fetcher = NseHistoricalDataFetcher()
+        self.fetcher = PseHistoricalDataFetcher()
         self.scorer = SlmScorer(use_ollama=use_ollama)
         self.strategy = HealthometerStrategy()
         self.walk_forward = WalkForwardValidator()
@@ -817,7 +812,7 @@ if __name__ == "__main__":
         description="SLM-Powered Walk-Forward Backtesting Engine"
     )
     parser.add_argument("--fetch", action="store_true",
-                        help="Download 5Y NSE data for NIFTY50 universe")
+                        help="Download 5Y PSE data for PSEi-30 universe")
     parser.add_argument("--tickers", nargs="+",
                         help="Specific tickers to fetch (space-separated)")
     parser.add_argument("--run", action="store_true",

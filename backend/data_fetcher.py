@@ -1,13 +1,18 @@
 #!/usr/bin/env python3
 """
-Real-time market data fetcher
-- Live prices: yfinance, NSEPython
-- Option chains: NSEPython, manual scraping
-- Fundamentals: XBRL from BSE, Screener.in
+Real-time market data fetcher for the Philippine Stock Exchange (PSE)
+- Live prices: yfinance (.PS suffix)
 - Technical indicators: pandas_ta
 - Caching: SQLite + JSON
 
 Rate limiting: 2-5s between requests (never in while True)
+
+Previously built entirely for the Indian market: fetch_indianapi() called
+a real India-only API (data.indianapi.in), fetch_nsepython() depended on
+the NSE-only `nsepython` package, and both fetchers used Yahoo Finance's
+".NS" (NSE) suffix. Both fallback fetchers are now disabled (no PSE
+equivalent exists) rather than left silently pulling Indian data under a
+PSE label; yfinance now uses the correct ".PS" suffix.
 """
 
 import time
@@ -21,20 +26,12 @@ import numpy as np
 from pathlib import Path
 
 import yfinance as yf
-import requests
-from bs4 import BeautifulSoup
 
 try:
     import pandas_ta as ta
     HAS_PANDAS_TA = True
 except ImportError:
     HAS_PANDAS_TA = False
-
-try:
-    from nsepython import nse_eq, nse_quote, nse_get_index_quote
-    HAS_NSEPYTHON = True
-except ImportError:
-    HAS_NSEPYTHON = False
 
 try:
     from scipy.stats import norm
@@ -243,7 +240,7 @@ class LivePriceFetcher:
 
     def fetch_yfinance(self, symbol: str) -> Optional[Dict]:
         try:
-            ticker = f"{symbol}.NS" if not symbol.endswith(".NS") else symbol
+            ticker = f"{symbol}.PS" if not symbol.endswith(".PS") else symbol
             data = yf.Ticker(ticker)
             info = data.info
             return {
@@ -260,55 +257,13 @@ class LivePriceFetcher:
             logger.warning(f"yfinance failed for {symbol}: {e}")
             return None
 
-    def fetch_indianapi(self, symbol: str) -> Optional[Dict]:
-        try:
-            time.sleep(2)
-            url = f"https://data.indianapi.in/nse/quote/{symbol.upper()}"
-            res = requests.get(url, timeout=5)
-            if res.status_code == 200:
-                data = res.json()
-                return {
-                    'price': data.get('price'),
-                    'bid': data.get('bid'),
-                    'ask': data.get('ask'),
-                    'volume': data.get('volume'),
-                    'open': data.get('open'),
-                    'high': data.get('high'),
-                    'low': data.get('low'),
-                    'prev_close': data.get('prevClose'),
-                }
-        except Exception as e:
-            logger.warning(f"IndianAPI failed for {symbol}: {e}")
-        return None
-
-    def fetch_nsepython(self, symbol: str) -> Optional[Dict]:
-        if not HAS_NSEPYTHON:
-            return None
-        try:
-            time.sleep(3)
-            quote = nse_quote(symbol.upper())
-            if quote:
-                return {
-                    'price': float(quote.get('lastPrice', 0)),
-                    'bid': float(quote.get('bid', 0)),
-                    'ask': float(quote.get('ask', 0)),
-                    'volume': int(quote.get('totalTradedVolume', 0)),
-                    'open': float(quote.get('open', 0)),
-                    'high': float(quote.get('dayHigh', 0)),
-                    'low': float(quote.get('dayLow', 0)),
-                    'prev_close': float(quote.get('previousClose', 0)),
-                }
-        except Exception as e:
-            logger.warning(f"NSEPython failed for {symbol}: {e}")
-        return None
-
     def fetch_live_price(self, symbol: str) -> Dict:
         logger.info(f"Fetching {symbol}...")
-        price_data = (
-            self.fetch_yfinance(symbol)
-            or self.fetch_indianapi(symbol)
-            or self.fetch_nsepython(symbol)
-        )
+        # yfinance is the only fetcher wired in — the previous fallback
+        # chain (fetch_indianapi, fetch_nsepython) called real Indian
+        # data sources with no PSE equivalent; removed rather than left
+        # as dead-but-wrong-country fallbacks.
+        price_data = self.fetch_yfinance(symbol)
         if price_data:
             self.cache.insert_quote(symbol, price_data)
             return price_data
@@ -327,7 +282,7 @@ class HistoricalDataFetcher:
 
     def fetch_from_yfinance(self, symbol: str, period: str = "1y") -> pd.DataFrame:
         try:
-            ticker = f"{symbol}.NS" if not symbol.endswith(".NS") else symbol
+            ticker = f"{symbol}.PS" if not symbol.endswith(".PS") else symbol
             df = yf.download(ticker, period=period, progress=False)
             return df
         except Exception as e:
@@ -590,10 +545,10 @@ class MarketDataOrchestrator:
 
 if __name__ == "__main__":
     SYMBOLS = [
-        "TCS", "INFY", "RELIANCE", "HDFCBANK", "ICICIBANK",
-        "BAJAJFINSV", "MARUTI", "LT", "AXISBANK", "SBIN",
-        "BHARTIARTL", "KOTAKBANK", "HCLTECH", "ITC", "WIPRO",
-        "ASIANPAINT", "DMART", "TITAN", "NESTLEIND", "HINDUNILVR",
+        "BDO", "JFC", "SM", "AC", "ALI",
+        "SMPH", "BPI", "TEL", "GLO", "MER",
+        "MBT", "URC", "AEV", "JGS", "SECB",
+        "GTCAP", "CNPF", "EMI", "WLCON", "MONDE",
     ]
     orchestrator = MarketDataOrchestrator()
     orchestrator.fetch_all_symbols(SYMBOLS)
