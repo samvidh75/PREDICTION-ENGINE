@@ -112,7 +112,7 @@ function detectIntent(text: string): { intent: AssistantIntent } {
   }
   // Company storytelling signals
   if (
-    /(why did|how does|how did|make money|business model|management|leadership|revenue|margin|margin expansion|strategy|company story|tata|infosys|reliance|drdo|sun pharma|hindustan|hero)/i.test(
+    /(why did|how does|how did|make money|business model|management|leadership|revenue|margin|margin expansion|strategy|company story)/i.test(
       t,
     )
   ) {

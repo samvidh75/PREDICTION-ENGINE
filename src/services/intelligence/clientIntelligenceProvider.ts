@@ -69,8 +69,8 @@ export const staticIntelligenceData = {
       symbol: "BDO",
       tradeDate: "2026-05-30",
       insight: {
-        title: "RELIANCE holding in stable equilibrium",
-        summary: "Analytical indicators for RELIANCE reflect steady market conditions with balanced factor weights.",
+        title: "BDO holding in stable equilibrium",
+        summary: "Analytical indicators for BDO reflect steady market conditions with balanced factor weights.",
         confidence: 63,
         positiveDrivers: [
           "Lower risk profile (stable returns, low volatility & low beta) (Score: 66/100)",
@@ -88,27 +88,27 @@ export const staticIntelligenceData = {
         riskOutlook: "Low Risk" as const,
         valuationOutlook: "Undervalued" as const,
         momentumOutlook: "Bearish" as const,
-        overallSummary: "RELIANCE presents a medium business quality rating with an undervalued/expensive outlook of undervalued. Momentum signals are currently bearish alongside a low risk risk profile."
+        overallSummary: "BDO presents a medium business quality rating with an undervalued/expensive outlook of undervalued. Momentum signals are currently bearish alongside a low risk risk profile."
       },
       sectorOutlook: {
-        sector: "Energy",
+        sector: "Banking",
         sectorStrength: 65,
         sectorMomentum: "Accelerating" as const,
         sectorRisk: "Low" as const,
         sectorRotationSignal: "ACCUMULATE" as const
       },
       narrative: {
-        narrative50: "RELIANCE represents a structural factor profile scoring 54/100, pointing toward sideways consolidation. Profitability indicators remain strong, while valuation indices are ranked at 60/100. Positive drivers include lower risk profile (stable returns, low volat. Risk profiles are fully moderate.",
-        narrative100: "RELIANCE is currently demonstrating a factor score of 54/100, placing the stock in a state of sideways consolidation. A review of the technical features reveals an RSI of 38, coupled with a moving average distance of -4%. Fundamentally, Quality scores 61/100 and Value scores 60/100. The top driving factor is lower risk profile (stable returns, low volatility & low beta) (score: 66/100). Conversely, the primary headwind relates to strong upward price momentum (rsi/macd confirmations) (score: 38/100). Overall risk is managed, supporting steady portfolios.",
-        narrative250: "In-depth quantitative analysis of RELIANCE yields a comprehensive factor-intelligence rating of 54 out of 100, which signifies a regime characterized by sideways consolidation. This rating is compiled across six core risk-premia styles. The underlying technical feature pipeline records an RSI index at 38, an Average True Range (ATR) of 26.42, and a volatility profile of 20%. These variables combine to outline the underlying momentum and trend parameters.\n\nFrom a factor perspective, the Quality Score of 61/100 confirms robust company margins and return profiles, while the Value Score of 60/100 represents whether the asset trades at a premium or discount. Our Explanation Engine confirms that the key catalyst propelling the rating is lower risk profile (stable returns, low volatility & low beta) (score: 66/100), which offset headwinds like strong upward price momentum (rsi/macd confirmations) (score: 38/100). Furthermore, sector checks highlight a Sector Strength Score of 50/100, which reflects capital flows into the stock's broader industry group. Risk exposures (scored at 66/100) show moderate characteristics, suggesting low vulnerability to sudden market-wide corrections. Lensory classifies the current company health profile as balanced, with the assessment focused on quality, stability, and risk context rather than investment advice."
+        narrative50: "BDO represents a structural factor profile scoring 54/100, pointing toward sideways consolidation. Profitability indicators remain strong, while valuation indices are ranked at 60/100. Positive drivers include lower risk profile (stable returns, low volat. Risk profiles are fully moderate.",
+        narrative100: "BDO is currently demonstrating a factor score of 54/100, placing the stock in a state of sideways consolidation. A review of the technical features reveals an RSI of 38, coupled with a moving average distance of -4%. Fundamentally, Quality scores 61/100 and Value scores 60/100. The top driving factor is lower risk profile (stable returns, low volatility & low beta) (score: 66/100). Conversely, the primary headwind relates to strong upward price momentum (rsi/macd confirmations) (score: 38/100). Overall risk is managed, supporting steady portfolios.",
+        narrative250: "In-depth quantitative analysis of BDO yields a comprehensive factor-intelligence rating of 54 out of 100, which signifies a regime characterized by sideways consolidation. This rating is compiled across six core risk-premia styles. The underlying technical feature pipeline records an RSI index at 38, an Average True Range (ATR) of 26.42, and a volatility profile of 20%. These variables combine to outline the underlying momentum and trend parameters.\n\nFrom a factor perspective, the Quality Score of 61/100 confirms robust company margins and return profiles, while the Value Score of 60/100 represents whether the asset trades at a premium or discount. Our Explanation Engine confirms that the key catalyst propelling the rating is lower risk profile (stable returns, low volatility & low beta) (score: 66/100), which offset headwinds like strong upward price momentum (rsi/macd confirmations) (score: 38/100). Furthermore, sector checks highlight a Sector Strength Score of 50/100, which reflects capital flows into the stock's broader industry group. Risk exposures (scored at 66/100) show moderate characteristics, suggesting low vulnerability to sudden market-wide corrections. Lensory classifies the current company health profile as balanced, with the assessment focused on quality, stability, and risk context rather than investment advice."
       }
     },
     {
       symbol: "TEL",
       tradeDate: "2026-05-30",
       insight: {
-        title: "TCS holding in stable equilibrium",
-        summary: "Analytical indicators for TCS reflect steady market conditions with balanced factor weights.",
+        title: "TEL holding in stable equilibrium",
+        summary: "Analytical indicators for TEL reflect steady market conditions with balanced factor weights.",
         confidence: 64,
         positiveDrivers: [
           "Lower risk profile (stable returns, low volatility & low beta) (Score: 65/100)",
@@ -126,19 +126,19 @@ export const staticIntelligenceData = {
         riskOutlook: "Low Risk" as const,
         valuationOutlook: "Undervalued" as const,
         momentumOutlook: "Neutral" as const,
-        overallSummary: "TCS presents a medium business quality rating with an undervalued/expensive outlook of undervalued. Momentum signals are currently neutral alongside a low risk risk profile."
+        overallSummary: "TEL presents a medium business quality rating with an undervalued/expensive outlook of undervalued. Momentum signals are currently neutral alongside a low risk risk profile."
       },
       sectorOutlook: {
-        sector: "IT",
+        sector: "Telecom",
         sectorStrength: 50,
         sectorMomentum: "Steady" as const,
         sectorRisk: "Moderate" as const,
         sectorRotationSignal: "HOLD" as const
       },
       narrative: {
-        narrative50: "TCS represents a structural factor profile scoring 56/100, pointing toward growth and momentum expansion. Profitability indicators remain strong, while valuation indices are ranked at 60/100. Positive drivers include lower risk profile (stable returns, low volat. Risk profiles are fully moderate.",
-        narrative100: "TCS is currently demonstrating a factor score of 56/100, placing the stock in a state of growth and momentum expansion. A review of the technical features reveals an RSI of 41, coupled with a moving average distance of -5%. Fundamentally, Quality scores 61/100 and Value scores 60/100. The top driving factor is lower risk profile (stable returns, low volatility & low beta) (score: 65/100). Conversely, the primary headwind relates to earnings expansion and positive moving average trends (score: 44/100). Overall risk is managed, supporting steady portfolios.",
-        narrative250: "In-depth quantitative analysis of TCS yields a comprehensive factor-intelligence rating of 56 out of 100, which signifies a regime characterized by growth and momentum expansion. This rating is compiled across six core risk-premia styles. The underlying technical feature pipeline records an RSI index at 41, an Average True Range (ATR) of 52.88, and a volatility profile of 19%. These variables combine to outline the underlying momentum and trend parameters.\n\nFrom a factor perspective, the Quality Score of 61/100 confirms robust company margins and return profiles, while the Value Score of 60/100 represents whether the asset trades at a premium or discount. Our Explanation Engine confirms that the key catalyst propelling the rating is lower risk profile (stable returns, low volatility & low beta) (score: 65/100), which offset headwinds like earnings expansion and positive moving average trends (score: 44/100). Furthermore, sector checks highlight a Sector Strength Score of 50/100, which reflects capital flows into the stock's broader industry group. Risk exposures (scored at 65/100) show moderate characteristics, suggesting low vulnerability to sudden market-wide corrections. Lensory classifies the current company health profile as balanced, with the assessment focused on quality, stability, and risk context rather than investment advice."
+        narrative50: "TEL represents a structural factor profile scoring 56/100, pointing toward growth and momentum expansion. Profitability indicators remain strong, while valuation indices are ranked at 60/100. Positive drivers include lower risk profile (stable returns, low volat. Risk profiles are fully moderate.",
+        narrative100: "TEL is currently demonstrating a factor score of 56/100, placing the stock in a state of growth and momentum expansion. A review of the technical features reveals an RSI of 41, coupled with a moving average distance of -5%. Fundamentally, Quality scores 61/100 and Value scores 60/100. The top driving factor is lower risk profile (stable returns, low volatility & low beta) (score: 65/100). Conversely, the primary headwind relates to earnings expansion and positive moving average trends (score: 44/100). Overall risk is managed, supporting steady portfolios.",
+        narrative250: "In-depth quantitative analysis of TEL yields a comprehensive factor-intelligence rating of 56 out of 100, which signifies a regime characterized by growth and momentum expansion. This rating is compiled across six core risk-premia styles. The underlying technical feature pipeline records an RSI index at 41, an Average True Range (ATR) of 52.88, and a volatility profile of 19%. These variables combine to outline the underlying momentum and trend parameters.\n\nFrom a factor perspective, the Quality Score of 61/100 confirms robust company margins and return profiles, while the Value Score of 60/100 represents whether the asset trades at a premium or discount. Our Explanation Engine confirms that the key catalyst propelling the rating is lower risk profile (stable returns, low volatility & low beta) (score: 65/100), which offset headwinds like earnings expansion and positive moving average trends (score: 44/100). Furthermore, sector checks highlight a Sector Strength Score of 50/100, which reflects capital flows into the stock's broader industry group. Risk exposures (scored at 65/100) show moderate characteristics, suggesting low vulnerability to sudden market-wide corrections. Lensory classifies the current company health profile as balanced, with the assessment focused on quality, stability, and risk context rather than investment advice."
       }
     },
     {
@@ -167,7 +167,7 @@ export const staticIntelligenceData = {
         overallSummary: "JFC presents a medium business quality rating with an undervalued/expensive outlook of fair value. Momentum signals are currently bullish alongside a moderate risk profile."
       },
       sectorOutlook: {
-        sector: "IT",
+        sector: "Consumer",
         sectorStrength: 50,
         sectorMomentum: "Steady" as const,
         sectorRisk: "Moderate" as const,
@@ -243,7 +243,7 @@ export const staticIntelligenceData = {
         overallSummary: "ALI presents a medium business quality rating with an undervalued/expensive outlook of fair value. Momentum signals are currently bearish alongside a moderate risk profile."
       },
       sectorOutlook: {
-        sector: "Defence",
+        sector: "Property",
         sectorStrength: 75,
         sectorMomentum: "Accelerating" as const,
         sectorRisk: "Low" as const,

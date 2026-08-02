@@ -7,7 +7,7 @@
 // deterministic engine; all providers are optional enrichments.
 
 export interface NarrativeModelInput {
-  /** Stock symbol (normalised, e.g. "TCS") */
+  /** Stock symbol (normalised, e.g. "BDO") */
   symbol: string;
   /** The deterministic narrative to enrich */
   narrative: string;
