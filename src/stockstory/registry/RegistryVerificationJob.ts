@@ -183,7 +183,7 @@ export class RegistryVerificationJob {
         symbol: row.symbol,
         issue: 'Inconsistent exchange mapping',
         severity: 'low',
-        details: `Exchange ${row.exchange}: symbol="${row.symbol}", nse="${row.pse_symbol}", bse="${row.pse_symbol2}".`,
+        details: `Exchange ${row.exchange}: symbol="${row.symbol}", primary="${row.pse_symbol}", secondary="${row.pse_symbol2}".`,
       });
     }
   }

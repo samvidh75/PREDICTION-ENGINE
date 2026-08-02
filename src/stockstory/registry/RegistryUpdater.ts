@@ -4,16 +4,22 @@
  * TRACK-20 Phase 1 — Task 3
  *
  * Responsibilities:
- * - Detect delistings (symbols removed from PSE/PSE)
- * - Detect symbol changes (ticker rename, e.g. MCDOWELL_N → MCDOWELL-N)
+ * - Detect delistings (symbols removed from the PSE)
+ * - Detect symbol changes (ticker renames)
  * - Detect mergers (symbol absorbed into another)
  * - Detect name changes (company name updates)
  * - Detect new listings (IPOs, new additions to exchange)
  *
- * Data sources:
- * - PSE Bhavcopy (daily): SECURITIES AVAILABLE FOR TRADING CSV
- * - PSE Equity Master: ISIN dump
- * - NSDL/CDSL ISIN Portal: Public ISIN lookup
+ * IMPORTANT: the two exchange-fetch methods below (`fetchPrimaryMaster`,
+ * `fetchSecondaryMaster`) previously called real Pakistan Stock Exchange
+ * URLs (archives.pse.com.pk / www.pse.com.pk — .pk domains) under a "PSE"
+ * name meant for the Philippine Stock Exchange, and the whole file was
+ * structured around merging two separate exchange feeds the way India's
+ * NSE+BSE dual-exchange system requires — the PSE is a single exchange,
+ * so that split doesn't apply here. Both fetches are now no-ops pending a
+ * real PSE data source (PHISIX for live quotes, PSE EDGE or the official
+ * company list for a security master) — dead code is safer than code
+ * that silently pulls the wrong country's securities list.
  *
  * Runs: Daily, as part of nightly population pipeline
  */
@@ -50,9 +56,9 @@ export interface RegistryUpdateResult {
 }
 
 /**
- * PSE symbol master response shape (from PSE pse-daily CSV or API).
+ * Primary PSE symbol master response shape (daily security list CSV).
  */
-interface PseSymbolEntry {
+interface PrimaryMasterEntry {
   SYMBOL: string;
   ISIN: string;
   SERIES: string; // EQ, BE, etc.
@@ -61,9 +67,9 @@ interface PseSymbolEntry {
 }
 
 /**
- * PSE equity master response shape.
+ * Secondary/supplementary PSE equity master response shape.
  */
-interface PseSymbolEntry2 {
+interface SecondaryMasterEntry {
   scrip_code: string;
   scrip_id: string;
   isin: string;
@@ -93,11 +99,11 @@ export class RegistryUpdater {
     this.auditLog = [];
     this.log('RegistryUpdater: starting daily update');
 
-    const nseSymbols = await this.fetchPseMaster();
-    const bseSymbols = await this.fetchPseMaster2();
+    const primarySymbols = await this.fetchPrimaryMaster();
+    const secondarySymbols = await this.fetchSecondaryMaster();
 
-    if (nseSymbols.length === 0 && bseSymbols.length === 0) {
-      this.log('WARNING: Both PSE and PSE fetches returned empty. Skipping update.');
+    if (primarySymbols.length === 0 && secondarySymbols.length === 0) {
+      this.log('WARNING: Both PSE master fetches returned empty. Skipping update.');
       return {
         changes: [],
         updated_count: 0,
@@ -107,7 +113,7 @@ export class RegistryUpdater {
       };
     }
 
-    const exchangeSymbols = this.mergeExchangeData(nseSymbols, bseSymbols);
+    const exchangeSymbols = this.mergeExchangeData(primarySymbols, secondarySymbols);
 
     // 1. Detect new listings
     const newListings = this.detectNewListings(exchangeSymbols);
@@ -142,41 +148,23 @@ export class RegistryUpdater {
   }
 
   /**
-   * Fetch PSE symbol master from public pse-daily endpoint.
-   * Falls back gracefully if network or parsing fails.
+   * Fetch the primary PSE symbol master.
+   *
+   * Disabled: this previously called archives.pse.com.pk — a real Pakistan
+   * Stock Exchange URL — under a name meant for the Philippine Stock
+   * Exchange. No verified real PSE security-master CSV endpoint has been
+   * wired in yet; returns empty rather than pulling the wrong country's
+   * securities list.
    */
-  private async fetchPseMaster(): Promise<PseSymbolEntry[]> {
-    this.log('Fetching PSE master...');
-    try {
-      // Primary: PSE securities CSV (public, no auth)
-      // URL: https://archives.pse.com.pk/content/equities/EQUITY_L.csv
-      // Columns: SYMBOL, NAME OF COMPANY, SERIES, DATE OF LISTING, PAID UP VALUE,
-      //           MARKET LOT, ISIN NUMBER, FACE VALUE
-      const response = await fetch('https://archives.pse.com.pk/content/equities/EQUITY_L.csv', {
-        headers: {
-          'User-Agent': 'Mozilla/5.0',
-          'Accept': 'text/csv',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`PSE master fetch returned ${response.status}`);
-      }
-
-      const csv = await response.text();
-      const entries = this.parsePseCsv(csv);
-      this.log(`PSE master: ${entries.length} symbols fetched`);
-      return entries;
-    } catch (err: any) {
-      this.log(`PSE master fetch failed: ${err.message}. Trying PSE as fallback.`);
-      return [];
-    }
+  private async fetchPrimaryMaster(): Promise<PrimaryMasterEntry[]> {
+    this.log('Primary PSE master fetch not implemented — no verified PSE source wired in.');
+    return [];
   }
 
   /**
-   * Parse PSE EQUITY_L.csv into PseSymbolEntry[].
+   * Parse a PSE security-master CSV into PrimaryMasterEntry[].
    */
-  private parsePseCsv(csv: string): PseSymbolEntry[] {
+  private parsePseCsv(csv: string): PrimaryMasterEntry[] {
     const lines = csv.split('\n');
     if (lines.length < 2) return [];
 
@@ -195,7 +183,7 @@ export class RegistryUpdater {
       return [];
     }
 
-    const entries: PseSymbolEntry[] = [];
+    const entries: PrimaryMasterEntry[] = [];
     for (let i = 1; i < lines.length; i++) {
       const line = lines[i].trim();
       if (!line) continue;
@@ -221,44 +209,25 @@ export class RegistryUpdater {
   }
 
   /**
-   * Fetch PSE equity master as fallback.
+   * Fetch a supplementary PSE equity master, if a second source is ever
+   * wired in. Same "don't call the wrong country's real API" reasoning
+   * as fetchPrimaryMaster — currently a no-op.
    */
-  private async fetchPseMaster2(): Promise<PseSymbolEntry2[]> {
-    this.log('Fetching PSE master...');
-    try {
-      // PSE publically lists equity data at:
-      // https://www.pse.com.pk/download/PSE_EQ.zip (contains CSV)
-      // For now, attempt simplified CSV URL
-      const response = await fetch('https://www.pse.com.pk/download/BhavCopy/Equity/EQ_ISINCODE_latest.zip', {
-        headers: {
-          'User-Agent': 'Mozilla/5.0',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`PSE master fetch returned ${response.status}`);
-      }
-
-      // PSE provides .zip. In production, decompress first.
-      // For this implementation, return empty — PSE is supplementary.
-      this.log('PSE master: zip download — decompression not implemented in this version. Using PSE only.');
-      return [];
-    } catch (err: any) {
-      this.log(`PSE master fetch failed: ${err.message}`);
-      return [];
-    }
+  private async fetchSecondaryMaster(): Promise<SecondaryMasterEntry[]> {
+    this.log('Secondary PSE master fetch not implemented — no verified PSE source wired in.');
+    return [];
   }
 
   /**
-   * Merge PSE + PSE data into a unified exchange symbol map.
+   * Merge primary + secondary master data into a unified exchange symbol map.
    */
   private mergeExchangeData(
-    nse: PseSymbolEntry[],
-    bse: PseSymbolEntry2[],
+    primary: PrimaryMasterEntry[],
+    secondary: SecondaryMasterEntry[],
   ): Map<string, { isin: string; pse_symbol: string | null; pse_symbol2: string | null }> {
     const merged = new Map<string, { isin: string; pse_symbol: string | null; pse_symbol2: string | null }>();
 
-    for (const entry of nse) {
+    for (const entry of primary) {
       merged.set(entry.SYMBOL, {
         isin: entry.ISIN,
         pse_symbol: entry.SYMBOL,
@@ -266,7 +235,7 @@ export class RegistryUpdater {
       });
     }
 
-    for (const entry of bse) {
+    for (const entry of secondary) {
       const existing = merged.get(entry.scrip_id);
       if (existing) {
         existing.pse_symbol2 = String(entry.scrip_code);
@@ -311,7 +280,7 @@ export class RegistryUpdater {
           industry: null,
           market_cap_category: 'Unknown',
           listing_status: 'Active',
-          data_sources: ['PSE Bhavcopy', 'PSE Equity Master'],
+          data_sources: ['PSE Security Master'],
           last_verified: new Date().toISOString().split('T')[0],
         });
       }
@@ -329,11 +298,11 @@ export class RegistryUpdater {
     for (const [symbol, entry] of this.currentRegistry) {
       if (entry.listing_status === 'Delisted' || entry.listing_status === 'Merged') continue;
 
-      const onNse = entry.pse_symbol ? exchangeSymbols.has(entry.pse_symbol) : false;
-      const onBse = entry.pse_symbol2 ? exchangeSymbols.has(entry.pse_symbol2) : false;
+      const onPrimary = entry.pse_symbol ? exchangeSymbols.has(entry.pse_symbol) : false;
+      const onSecondary = entry.pse_symbol2 ? exchangeSymbols.has(entry.pse_symbol2) : false;
 
-      if (!onNse && !onBse) {
-        this.log(`Delisting detected: ${symbol} (PSE: ${entry.pse_symbol}, PSE: ${entry.pse_symbol2})`);
+      if (!onPrimary && !onSecondary) {
+        this.log(`Delisting detected: ${symbol} (primary: ${entry.pse_symbol}, secondary: ${entry.pse_symbol2})`);
         this.changeLog.push({
           type: 'delisting',
           old_value: symbol,
@@ -414,7 +383,7 @@ export class RegistryUpdater {
 
   /**
    * Detect company name changes using metadata provider enrichment.
-   * This requires supplementary metadata fetch (Yahoo/PSXAPI).
+   * This requires supplementary metadata fetch (Yahoo Finance or a PSE data source).
    * For now, placeholder with extensibility point.
    */
   private detectNameChanges(
