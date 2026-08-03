@@ -5,7 +5,7 @@ Equity Lens Corporate Actions Vectorizer — Phase 13
 Automated Financial Statement Vectorizer that:
   1. --init-db    : Creates corporate_actions, insider_trades, bulk_block_deals,
                     shareholding_snapshots tables in stockstory.db
-  2. --ingest-pdf : Parses NSE/BSE corporate announcement PDFs via pdfplumber
+  2. --ingest-pdf : Parses PSE EDGE corporate announcement PDFs via pdfplumber
                     and stores structured data in SQLite
   3. --embed      : Upserts all corporate actions data into ChromaDB vector store
                     for semantic similarity search
@@ -66,7 +66,7 @@ CREATE TABLE IF NOT EXISTS corporate_actions (
     record_date TEXT,
     value REAL,
     ratio_text TEXT,
-    source TEXT NOT NULL DEFAULT 'nse',
+    source TEXT NOT NULL DEFAULT 'pse',
     source_url TEXT,
     source_file TEXT,
     retrieved_at TEXT NOT NULL DEFAULT (datetime('now')),
@@ -92,7 +92,7 @@ CREATE TABLE IF NOT EXISTS insider_trades (
     disclosure_date TEXT,
     pre_holding_pct REAL,
     post_holding_pct REAL,
-    source TEXT NOT NULL DEFAULT 'nse',
+    source TEXT NOT NULL DEFAULT 'pse',
     source_url TEXT,
     source_file TEXT,
     retrieved_at TEXT NOT NULL DEFAULT (datetime('now'))
@@ -112,7 +112,7 @@ CREATE TABLE IF NOT EXISTS bulk_block_deals (
     price REAL NOT NULL,
     transaction_value REAL,
     deal_date TEXT NOT NULL,
-    source TEXT NOT NULL DEFAULT 'nse',
+    source TEXT NOT NULL DEFAULT 'pse',
     source_url TEXT,
     source_file TEXT,
     retrieved_at TEXT NOT NULL DEFAULT (datetime('now'))
@@ -131,7 +131,7 @@ CREATE TABLE IF NOT EXISTS shareholding_snapshots (
     public_holding_pct REAL,
     pledged_promoter_pct REAL,
     total_shareholder_count INTEGER,
-    source TEXT NOT NULL DEFAULT 'nse',
+    source TEXT NOT NULL DEFAULT 'pse',
     source_url TEXT,
     source_file TEXT,
     retrieved_at TEXT NOT NULL DEFAULT (datetime('now')),
@@ -180,7 +180,7 @@ class CorporateActionsVectorizer:
     # ── 2. ingest-pdf ─────────────────────────────────────
 
     def ingest_pdf(self, pdf_path: str | None = None) -> None:
-        """Parse NSE/BSE corporate announcement PDFs into SQLite tables."""
+        """Parse PSE EDGE corporate announcement PDFs into SQLite tables."""
         if pdfplumber is None:
             print("❌ pdfplumber not installed. Run: pip install pdfplumber")
             return
@@ -225,7 +225,7 @@ class CorporateActionsVectorizer:
         """Extract structured records from a PDF announcement.
 
         Returns a list of dicts with keys matching one of the corporate actions tables.
-        The classification relies on header text patterns found in NSE/BSE filings.
+        The classification relies on header text patterns found in PSE EDGE filings.
         """
         records: list[dict[str, Any]] = []
         full_text = ""
@@ -268,7 +268,7 @@ class CorporateActionsVectorizer:
                         "action_type": action,
                         "announcement_date": self._extract_date(text),
                         "ratio_text": line.strip(),
-                        "source": "nse",
+                        "source": "pse",
                     })
         return records
 
@@ -287,7 +287,7 @@ class CorporateActionsVectorizer:
                     "transaction_type": "buy" if any(kw in line_lower for kw in ("acquired", "purchased")) else "sell",
                     "quantity": self._extract_quantity(line),
                     "transaction_date": self._extract_date(text),
-                    "source": "nse",
+                    "source": "pse",
                 })
         return records
 
@@ -308,7 +308,7 @@ class CorporateActionsVectorizer:
                     "quantity": self._extract_quantity(line),
                     "price": self._extract_price(line),
                     "deal_date": self._extract_date(text),
-                    "source": "nse",
+                    "source": "pse",
                 })
         return records
 
@@ -327,7 +327,7 @@ class CorporateActionsVectorizer:
                         "symbol": self._extract_symbol(line, text),
                         "period_end": self._extract_date(text) or "",
                         "promoter_holding_pct": pct,
-                        "source": "nse",
+                        "source": "pse",
                     })
                 except (ValueError, IndexError):
                     pass
@@ -344,7 +344,7 @@ class CorporateActionsVectorizer:
         for pattern in patterns:
             matches = re.findall(pattern, line)
             for m in matches:
-                if m not in ("THE", "FOR", "AND", "NSE", "BSE", "LTD", "PVT", "INC"):
+                if m not in ("THE", "FOR", "AND", "PSE", "LTD", "INC", "CORP"):
                     return m
         return "UNKNOWN"
 
@@ -497,7 +497,7 @@ class CorporateActionsVectorizer:
                 doc_text = json.dumps(row_dict, indent=2, default=str)
                 metadata = {
                     "symbol": row_dict.get("symbol") or "UNKNOWN",
-                    "source": row_dict.get("source") or "nse",
+                    "source": row_dict.get("source") or "pse",
                     "retrieved_at": row_dict.get("retrieved_at") or "",
                 }
 
@@ -693,7 +693,7 @@ def main() -> None:
     )
     parser.add_argument("--init-db", action="store_true", help="Create corporate actions DB tables")
     parser.add_argument("--ingest-pdf", nargs="?", const=None, default=None,
-                        help="Parse NSE/BSE PDF(s) into SQLite. Provide path or scan data/pdf_inbox/")
+                        help="Parse PSE EDGE PDF(s) into SQLite. Provide path or scan data/pdf_inbox/")
     parser.add_argument("--embed", action="store_true", help="Upsert data into ChromaDB vector store")
     parser.add_argument("--dataset", action="store_true",
                         help="Generate Ollama Modelfile training blocks from stored data")

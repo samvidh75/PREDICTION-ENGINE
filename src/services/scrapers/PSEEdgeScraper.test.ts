@@ -75,28 +75,46 @@ describe('parseFinancialStatementText', () => {
 });
 
 describe('parseDisclosureListHtml', () => {
-  it('parses a well-formed PSE Edge-style disclosure table', () => {
+  // Table structure and the onclick="openPopup('edge_no')" link pattern are
+  // confirmed against a live edge.pse.com.ph response (see PSEEdgeScraper.ts
+  // module doc) — this is the real markup shape, not a guess.
+  it('parses a well-formed PSE Edge disclosure table', () => {
     const html = `
-      <table class="list_table">
+      <table class="list">
+        <thead>
+          <tr><th>Template Name</th><th>Announce Date and Time</th><th>PSE Form Number</th><th>Report/Circular Number</th></tr>
+        </thead>
         <tbody>
           <tr>
-            <td>1</td>
-            <td>SEC Form 17-Q Quarterly Report</td>
-            <td><a href="/openDiscViewer.do?id=12345">View</a></td>
-            <td>2026-05-15</td>
+            <td><a href="#viewer" onclick="openPopup('95d184d9c472822a64d70b69f0a3140b');return false;">BDO Unibank, Inc. 17-Q Quarterly Report</a></td>
+            <td class="alignC">05/15/2026 04:30 PM</td>
+            <td class="alignC">17-Q</td>
+            <td class="alignC">C12345-2026</td>
           </tr>
         </tbody>
       </table>
     `;
-    const rows = parseDisclosureListHtml(html, 'BDO Unibank, Inc.', '17-Q');
+    const rows = parseDisclosureListHtml(html);
     expect(rows).toHaveLength(1);
-    expect(rows[0].companyName).toBe('BDO Unibank, Inc.');
+    expect(rows[0].title).toBe('BDO Unibank, Inc. 17-Q Quarterly Report');
     expect(rows[0].formType).toBe('17-Q');
-    expect(rows[0].filingDate).toBe('2026-05-15');
+    expect(rows[0].filingDate).toBe('05/15/2026 04:30 PM');
+    expect(rows[0].edgeNo).toBe('95d184d9c472822a64d70b69f0a3140b');
   });
 
   it('returns an empty array when no disclosure rows match (no fabricated results)', () => {
-    const rows = parseDisclosureListHtml('<html><body>No results found</body></html>', 'Unknown Corp', '17-Q');
+    const rows = parseDisclosureListHtml('<html><body>No results found</body></html>');
     expect(rows).toEqual([]);
+  });
+
+  it('skips rows with no data (the literal "no data." placeholder row)', () => {
+    const html = `
+      <table class="list">
+        <tbody>
+          <tr><td>no data.</td><td></td><td></td><td></td></tr>
+        </tbody>
+      </table>
+    `;
+    expect(parseDisclosureListHtml(html)).toEqual([]);
   });
 });

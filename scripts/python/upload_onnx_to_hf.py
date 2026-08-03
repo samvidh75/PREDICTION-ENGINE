@@ -29,7 +29,7 @@ pipeline_tag: text-generation
 base_model: Qwen/Qwen2.5-0.5B-Instruct
 tags:
   - stockstory
-  - indian-stock-market
+  - pse-stock-market
   - finance
   - encyclopedia
   - onnx
@@ -37,7 +37,7 @@ tags:
 
 # StockEX Encyclopedia SLM (ONNX)
 
-Fine-tuned from **Qwen2.5-0.5B-Instruct** on 2,000 Indian stock encyclopedia entries.
+Fine-tuned from **Qwen2.5-0.5B-Instruct** on 2,000 PSE-listed stock encyclopedia entries.
 
 This ONNX model is optimized for browser inference via `@huggingface/transformers` (transformers.js).
 
@@ -77,7 +77,7 @@ pipeline_tag: text-generation
 base_model: Qwen/Qwen2.5-0.5B-Instruct
 tags:
   - stockstory
-  - indian-stock-market
+  - pse-stock-market
   - finance
   - encyclopedia
   - lora
@@ -85,7 +85,7 @@ tags:
 
 # StockEX Encyclopedia LoRA Adapter
 
-PEFT LoRA adapter for Qwen2.5-0.5B-Instruct, trained on 2,000 Indian stock encyclopedia entries.
+PEFT LoRA adapter for Qwen2.5-0.5B-Instruct, trained on 2,000 PSE-listed stock encyclopedia entries.
 
 ## Usage
 

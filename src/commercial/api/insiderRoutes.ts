@@ -1,7 +1,7 @@
 /**
  * commercial/api/insiderRoutes — Corporate Insider Disclosure API.
  *
- * Public endpoints that expose SEC regulatory filing data from the
+ * Public endpoints that expose PSE/SEC regulatory filing data from the
  * corporate_insider_disclosures table.  All data is public regulatory
  * information — no authentication is required for reads.
  *
@@ -20,7 +20,7 @@ interface InsiderFiling {
   disclosure_type: string;
   insider_name: string;
   shares_quantity: number;
-  transaction_value_inr: number;
+  transaction_value_php: number;
   filing_date: string;
   raw_announcement_text: string;
 }
@@ -43,7 +43,7 @@ export async function registerInsiderRoutes(fastify: FastifyInstance): Promise<v
       try {
         const result = await dbAdapter.query(
           `SELECT disclosure_type, insider_name, shares_quantity,
-                  transaction_value_inr, filing_date, raw_announcement_text
+                  transaction_value_php, filing_date, raw_announcement_text
            FROM corporate_insider_disclosures
            WHERE ticker LIKE $1
            ORDER BY filing_date DESC

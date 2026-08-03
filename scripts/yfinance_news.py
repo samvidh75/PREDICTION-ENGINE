@@ -1,7 +1,7 @@
 import yfinance as yf, sys, json
-symbol = sys.argv[1] if len(sys.argv) > 1 else 'RELIANCE'
+symbol = sys.argv[1] if len(sys.argv) > 1 else 'BDO'
 try:
-    t = yf.Ticker(f"{symbol}.NS")
+    t = yf.Ticker(f"{symbol}.PS")
     news = t.news
     if not news:
         news = []

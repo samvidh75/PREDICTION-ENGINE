@@ -53,10 +53,10 @@ def test_readyz(base: str) -> bool:
 
 
 def test_market_stream(base: str) -> bool:
-    """Test 2: Cache pipeline — /api/v1/market-stream/TCS must return data."""
+    """Test 2: Cache pipeline — /api/v1/market-stream/BDO must return data."""
     try:
         start = time.time()
-        res = requests.get(f"{base}/api/v1/market-stream/TCS", timeout=8)
+        res = requests.get(f"{base}/api/v1/market-stream/BDO", timeout=8)
         latency_ms = round((time.time() - start) * 1000, 2)
 
         if res.status_code != 200:
@@ -64,16 +64,16 @@ def test_market_stream(base: str) -> bool:
             return False
 
         body = res.json()
-        has_ticker = body.get("ticker") == "TCS"
+        has_ticker = body.get("ticker") == "BDO"
         has_price = body.get("price", 0) > 0
 
         if has_ticker and has_price:
-            print(f"  ✅ market-stream/TCS: ₹{body.get('price')} ({latency_ms}ms)")
+            print(f"  ✅ market-stream/BDO: ₱{body.get('price')} ({latency_ms}ms)")
             return True
         print(f"  ⚠️  market-stream returned but data may be incomplete ({latency_ms}ms)")
         return True
     except requests.ConnectionError:
-        print(f"  ❌ Cannot connect to {base}/api/v1/market-stream/TCS")
+        print(f"  ❌ Cannot connect to {base}/api/v1/market-stream/BDO")
         return False
     except Exception as e:
         print(f"  ❌ market-stream error: {e}")

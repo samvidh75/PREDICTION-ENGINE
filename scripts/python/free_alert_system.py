@@ -82,7 +82,7 @@ class FreeEquityLensNotificationEngine:
             f"Signal: {signal_desc}\n"
             f"CMP: \u20b9{price}\n"
             f"Time: {datetime.now().strftime('%d-%b %H:%M')}\n"
-            f"View: https://stockstory.in/{ticker}"
+            f"View: https://stockstory-ph.com/{ticker}"
         )
 
         if DRY_RUN:
@@ -206,8 +206,8 @@ class FreeEquityLensNotificationEngine:
                     f"Here is your weekly stock analysis report:\n\n"
                     f"{report_content}\n\n"
                     f"--\n"
-                    f"StockStory India\n"
-                    f"https://stockstory.in"
+                    f"StockStory PH\n"
+                    f"https://stockstory-ph.com"
                 )
                 msg.attach(MIMEText(body_text, "plain"))
                 try:
@@ -280,9 +280,9 @@ if __name__ == "__main__":
 
     if args.test_telegram:
         engine.send_free_whatsapp_alternative_alert(
-            ticker="TCS",
+            ticker="BDO",
             signal_desc="Institutional Accumulation — Multi-Year Breakout",
-            price=4120.50,
+            price=125.50,
         )
 
     if args.test_email:

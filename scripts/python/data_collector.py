@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 10-Year Historical Data Collector
-Fetches comprehensive market data for Indian stocks
+Fetches comprehensive market data for PSE-listed stocks
 """
 
 import json
@@ -21,12 +21,13 @@ class HistoricalDataCollector:
         self.start_date = (datetime.now() - timedelta(days=years*365)).strftime('%Y-%m-%d')
         self.end_date = datetime.now().strftime('%Y-%m-%d')
 
-        # Major Indian stocks (BSE/NSE)
+        # Major PSE-listed stocks
         self.major_stocks = [
-            'TCS.NS', 'INFY.NS', 'WIPRO.NS', 'HCL.NS', 'LT.NS',  # IT
-            'HDFC.NS', 'ICICIBANK.NS', 'AXISBANK.NS', 'KOTAK.NS',  # Banking
-            'RELIANCE.NS', 'JSWSTEEL.NS', 'TATASTEEL.NS',  # Metals
-            'MARUTI.NS', 'BHARTIARTL.NS', 'ITC.NS',  # Auto/Consumer
+            'BDO.PS', 'BPI.PS', 'MBT.PS', 'SECB.PS',  # Banking
+            'AC.PS', 'JGS.PS', 'SM.PS',  # Conglomerates
+            'ALI.PS', 'SMPH.PS', 'MEG.PS',  # Property
+            'JFC.PS', 'URC.PS', 'PGOLD.PS',  # Consumer
+            'TEL.PS', 'GLO.PS',  # Telecom
         ]
 
     def fetch_ohlcv_data(self, ticker: str) -> pd.DataFrame:

@@ -1,7 +1,9 @@
 -- Migration 048: Corporate Actions & Insider Trading Disclosures
--- Stores SEBI regulatory filings, insider acquisitions, pledge revisions,
+-- Stores SEC/PSE regulatory filings, insider acquisitions, pledge revisions,
 -- and bulk/block deal data for the InsiderTrackingPanel.
 -- RLS is enforced via `app.current_user_id` set by queryWithTenantContext.
+-- NOTE: transaction_value_inr was renamed to transaction_value_php in
+-- migration 054 — see that file for why.
 
 CREATE TABLE IF NOT EXISTS corporate_insider_disclosures (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -9,7 +11,7 @@ CREATE TABLE IF NOT EXISTS corporate_insider_disclosures (
     disclosure_type VARCHAR(50) NOT NULL,  -- 'INSIDER_ACQUISITION', 'PLEDGE_RELEASE', 'BULK_DEAL', 'BLOCK_DEAL'
     insider_name VARCHAR(150) NOT NULL,
     shares_quantity BIGINT NOT NULL,
-    transaction_value_inr NUMERIC(15, 2) NOT NULL,
+    transaction_value_inr NUMERIC(15, 2) NOT NULL,  -- renamed by migration 054
     filing_date DATE NOT NULL,
     raw_announcement_text TEXT,
     last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
