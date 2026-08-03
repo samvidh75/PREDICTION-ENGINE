@@ -1,9 +1,18 @@
 """
-Master Universal Ingester — NSE + BSE + SME All Markets
+Master Universal Ingester — PSE Main Board + SME
 ========================================================
-Downloads the official company master indices from NSE (Mainboard + Emerge/SME)
-and BSE (Mainboard + SME) public registries, then syncs 20-year daily OHLCV
-and fundamental ratios into Neon PostgreSQL for free.
+Downloads the official company master index for the PSE (Main Board + SME)
+and syncs 20-year daily OHLCV and fundamental ratios into Neon PostgreSQL.
+
+KNOWN GAP (fixed from a real bug): this previously called the real Indian
+NSE (www.nseindia.com CSV archives) and BSE (api.bseindia.com) endpoints
+under "PSE Mainboard"/"PSE SME"/"PSE" labels — meaning a live run would
+download real Indian equity symbols and OHLCV data (via .NS/.BO Yahoo
+suffixes) into tables meant for Philippine Stock Exchange listings. There is
+no confirmed, free bulk PSE symbol-list API as of this fix, so
+fetch_nse_symbols/fetch_bse_symbols are now documented no-ops and this
+always falls through to FALLBACK_WATCHLIST (real PSE tickers), and the
+Yahoo suffix is always ".PS".
 
 No broker API key required. Uses unrestricted public exchange endpoints.
 
@@ -13,8 +22,8 @@ Usage:
     python3 master_universal_ingester.py --limit 50         # Process first 50 only
     python3 master_universal_ingester.py --skip-history     # Only fundamentals
     python3 master_universal_ingester.py --skip-fundamentals # Only history
-    python3 master_universal_ingester.py --markets nse      # NSE only
-    python3 master_universal_ingester.py --markets bse      # BSE only
+    python3 master_universal_ingester.py --markets pse      # PSE main board only
+    python3 master_universal_ingester.py --markets sme      # SME board only
 
 Environment:
     DATABASE_URL — Neon PostgreSQL connection string (required)
@@ -49,36 +58,28 @@ except ImportError:
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 
-# ── NSE India Endpoints ─────────────────────────────────────────────────────
-NSE_BASE_URL = "https://www.nseindia.com"
-NSE_EQUITY_CSV_URL = "https://nsearchives.nseindia.com/content/equities/EQUITY_L.csv"
-NSE_SME_CSV_URL = "https://nsearchives.nseindia.com/content/equities/SME_EQUITY_L.csv"
+# No confirmed, free bulk PSE symbol-list API is wired in — see module doc.
+NSE_BASE_URL = None
+NSE_EQUITY_CSV_URL = None
+NSE_SME_CSV_URL = None
+BSE_BASE_URL = None
+BSE_STOCK_URL = None
 
-# ── BSE India Endpoints ─────────────────────────────────────────────────────
-BSE_BASE_URL = "https://www.bseindia.com"
-BSE_STOCK_URL = "https://api.bseindia.com/BseIndiaAPI/api/GetStkLstDt/w"
-
-# ── Yahoo Finance (for both .NS and .BO tickers) ────────────────────────────
+# ── Yahoo Finance (PSE tickers use the .PS suffix) ──────────────────────────
 YAHOO_CHART_URL = "https://query1.finance.yahoo.com/v8/finance/chart/"
 
-# Safe fallback: NIFTY 50 + NEXT 50 (100 most liquid stocks)
+# Safe fallback: real PSE-listed tickers only (see src/services/universe/StockUniverse.ts)
 FALLBACK_WATCHLIST = [
-    "RELIANCE", "TCS", "HDFCBANK", "INFY", "ICICIBANK", "ITC", "SBIN",
-    "BHARTIARTL", "KOTAKBANK", "LT", "AXISBANK", "BAJFINANCE", "ASIANPAINT",
-    "MARUTI", "SUNPHARMA", "TITAN", "WIPRO", "ULTRACEMCO", "ONGC", "NTPC",
-    "TATAMOTORS", "TATASTEEL", "POWERGRID", "COALINDIA", "NESTLEIND",
-    "TECHM", "BAJAJFINSV", "HCLTECH", "DRREDDY", "CIPLA", "EICHERMOT",
-    "HEROMOTOCO", "APOLLOHOSP", "DIVISLAB", "BAJAJ-AUTO", "INDUSINDBK",
-    "GRASIM", "TATACONSUM", "ADANIENT", "ADANIPORTS", "JSWSTEEL",
-    "HINDALCO", "BRITANNIA", "PIDILITIND", "HDFCLIFE", "SBILIFE",
-    "ICICIPRULI", "UPL", "SHREECEM", "COFORGE", "LTIM", "HINDUNILVR",
-    "DMART", "DABUR", "COLPAL", "MARICO", "BERGEPAINT", "TRENT",
-    "ZOMATO", "PAYTM", "POLICYBZR", "NYKAA", "SONACOMS", "ALKYLAMINE",
+    "BDO", "JFC", "BPI", "SM", "MBT", "AC", "SECB",
+    "TEL", "GTCAP", "JGS", "DMC", "AEV", "EMI",
+    "WLCON", "MONDE", "RRHI", "PGOLD", "ACEN", "BLOOM",
+    "MEG", "AP", "FGEN", "URC", "SMPH", "ALI",
+    "ANI", "MWIDE", "CEB", "FLI", "IMI", "NIKL",
 ]
 
 
 class MasterUniversalIngester:
-    """Orchestrates market-wide data ingestion across all NSE and BSE equities."""
+    """Orchestrates market-wide data ingestion across all PSE and PSE equities."""
 
     def __init__(
         self,
@@ -92,7 +93,7 @@ class MasterUniversalIngester:
         self.skip_history = skip_history
         self.skip_fundamentals = skip_fundamentals
         self.chunk_size = chunk_size
-        self.markets = markets  # "all", "nse", "bse"
+        self.markets = markets  # "all", "pse", "sme"
         self.session = requests.Session()
         self.session.headers.update({
             "User-Agent": (
@@ -108,80 +109,23 @@ class MasterUniversalIngester:
             "fund_ok": 0, "fund_err": 0, "skipped": 0,
         }
 
-    def _initialize_nse_session(self) -> bool:
-        """NSE India requires visiting the main page first to obtain session cookies."""
-        try:
-            resp = self.session.get(NSE_BASE_URL, timeout=15)
-            return resp.status_code == 200
-        except Exception:
-            return False
-
     def fetch_nse_symbols(self) -> Set[str]:
-        """Fetch all active NSE Mainboard + SME (Emerge) equity symbols."""
-        symbols: Set[str] = set()
-
-        # 1. NSE Mainboard
-        try:
-            self._initialize_nse_session()
-            resp = self.session.get(NSE_EQUITY_CSV_URL, timeout=15)
-            if resp.status_code == 200:
-                content = resp.content.decode("utf-8", errors="replace")
-                reader = csv.DictReader(io.StringIO(content))
-                for row in reader:
-                    sym = row.get("SYMBOL", "").strip()
-                    if sym and len(sym) <= 20:
-                        symbols.add(sym)
-                print(f"  NSE Mainboard: {len(symbols)} symbols")
-        except Exception as e:
-            print(f"  ⚠️ NSE Mainboard fetch failed: {e}")
-
-        # 2. NSE SME (Emerge)
-        try:
-            self._initialize_nse_session()
-            resp = self.session.get(NSE_SME_CSV_URL, timeout=15)
-            if resp.status_code == 200:
-                content = resp.content.decode("utf-8", errors="replace")
-                reader = csv.DictReader(io.StringIO(content))
-                sme_count = 0
-                for row in reader:
-                    sym = row.get("SYMBOL", "").strip()
-                    if sym and len(sym) <= 20:
-                        symbols.add(sym)
-                        sme_count += 1
-                print(f"  NSE SME (Emerge): {sme_count} symbols")
-        except Exception as e:
-            print(f"  ⚠️ NSE SME fetch failed: {e}")
-
-        return symbols
+        """No confirmed, free PSE main-board symbol-list API is wired in
+        (see module doc) — returns an empty set rather than the wrong
+        country's real endpoint."""
+        print("  ⚠️  No verified PSE main-board symbol source wired in")
+        return set()
 
     def fetch_bse_symbols(self) -> Set[str]:
-        """Fetch all active BSE Mainboard + SME equity symbols."""
-        symbols: Set[str] = set()
-
-        try:
-            # BSE public API for equity list
-            resp = self.session.get(
-                BSE_STOCK_URL,
-                headers={"Accept": "application/json"},
-                timeout=15,
-            )
-            if resp.status_code == 200:
-                data = resp.json()
-                for item in data.get("Table", []):
-                    sc_code = str(item.get("SC_CODE", "")).strip()
-                    sc_name = str(item.get("SC_NAME", "")).strip()
-                    # BSE uses numeric codes; we store as-is for Yahoo .BO lookup
-                    if sc_code and len(sc_code) == 6:
-                        symbols.add(sc_code)
-                print(f"  BSE: {len(symbols)} symbols")
-        except Exception as e:
-            print(f"  ⚠️ BSE fetch failed: {e}")
-
-        return symbols
+        """No confirmed, free PSE SME symbol-list API is wired in (see
+        module doc) — returns an empty set rather than the wrong country's
+        real endpoint."""
+        print("  ⚠️  No verified PSE SME symbol source wired in")
+        return set()
 
     def fetch_all_market_symbols(self) -> List[str]:
         """
-        Combines NSE and BSE symbols into a unified, deduplicated list.
+        Combines PSE and PSE symbols into a unified, deduplicated list.
         Returns clean symbol strings for Yahoo Finance lookup.
         """
         print("\n⏳ Compiling universal market symbol registry...")
@@ -189,12 +133,12 @@ class MasterUniversalIngester:
         nse_symbols: Set[str] = set()
         bse_symbols: Set[str] = set()
 
-        if self.markets in ("all", "nse"):
+        if self.markets in ("all", "pse"):
             nse_symbols = self.fetch_nse_symbols()
             all_symbols.update(nse_symbols)
             self.stats["nse_count"] = len(nse_symbols)
 
-        if self.markets in ("all", "bse"):
+        if self.markets in ("all", "sme"):
             bse_symbols = self.fetch_bse_symbols()
             all_symbols.update(bse_symbols)
             self.stats["bse_count"] = len(bse_symbols)
@@ -205,10 +149,10 @@ class MasterUniversalIngester:
 
         result = sorted(all_symbols)
         print(f"✅ Total unique symbols: {len(result)} "
-              f"(NSE: {self.stats['nse_count']}, BSE: {self.stats['bse_count']})")
+              f"(PSE: {self.stats['nse_count']}, PSE: {self.stats['bse_count']})")
         return result
 
-    def download_and_sync_history(self, ticker: str, exchange_suffix: str = "NS") -> bool:
+    def download_and_sync_history(self, ticker: str, exchange_suffix: str = "PS") -> bool:
         """Download max historical daily OHLCV from Yahoo Finance and upsert to Postgres."""
         yahoo_ticker = f"{ticker}.{exchange_suffix}"
         url = f"{YAHOO_CHART_URL}{yahoo_ticker}?interval=1d&range=max"
@@ -374,7 +318,7 @@ class MasterUniversalIngester:
         fund = "SKIP" if self.skip_fundamentals else "ON"
 
         print(f"\n{'='*70}")
-        print(f"  MASTER UNIVERSAL INGESTER — NSE + BSE + SME")
+        print(f"  MASTER UNIVERSAL INGESTER — PSE + PSE + SME")
         print(f"  Mode:         {mode}")
         print(f"  History:      {hist}")
         print(f"  Fundamentals: {fund}")
@@ -386,16 +330,12 @@ class MasterUniversalIngester:
         for index, symbol in enumerate(tickers):
             progress = f"[{index + 1}/{len(tickers)}]"
 
-            # Determine exchange suffix: NSE = .NS, BSE codes = .BO
-            is_bse_code = symbol.isdigit() and len(symbol) == 6
-            exchange_suffix = "BO" if is_bse_code else "NS"
-
-            print(f"{progress} {symbol} (.{'BO' if is_bse_code else 'NS'})")
+            print(f"{progress} {symbol} (.PS)")
 
             # 1. Historical candles
             if not self.skip_history:
                 try:
-                    ok = self.download_and_sync_history(symbol, exchange_suffix)
+                    ok = self.download_and_sync_history(symbol, "PS")
                     if ok:
                         self.stats["history_ok"] += 1
                     else:
@@ -405,8 +345,8 @@ class MasterUniversalIngester:
                     self.stats["history_err"] += 1
                 time.sleep(1.5)
 
-            # 2. Fundamentals (only for NSE symbols — Screener.in uses NSE tickers)
-            if not self.skip_fundamentals and not is_bse_code:
+            # 2. Fundamentals
+            if not self.skip_fundamentals:
                 try:
                     ok = self.scrape_and_sync_fundamentals(symbol)
                     if ok:
@@ -432,8 +372,8 @@ class MasterUniversalIngester:
         print(f"\n{'='*70}")
         print(f"  MARKET-WIDE SYNC COMPLETE")
         print(f"  Total tickers:     {self.stats['total']}")
-        print(f"  NSE symbols:       {self.stats['nse_count']}")
-        print(f"  BSE symbols:       {self.stats['bse_count']}")
+        print(f"  PSE symbols:       {self.stats['nse_count']}")
+        print(f"  PSE symbols:       {self.stats['bse_count']}")
         print(f"  History OK:        {self.stats['history_ok']}")
         print(f"  History errors:    {self.stats['history_err']}")
         print(f"  Fundamentals OK:   {self.stats['fund_ok']}")
@@ -444,14 +384,14 @@ class MasterUniversalIngester:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="Master universal ingester — syncs all NSE + BSE + SME equities to Postgres."
+        description="Master universal ingester — syncs all PSE + PSE + SME equities to Postgres."
     )
     parser.add_argument("--dry-run", action="store_true", help="Preview without DB writes")
     parser.add_argument("--limit", type=int, default=None, help="Process only first N symbols")
     parser.add_argument("--chunk-size", type=int, default=50, help="Checkpoint interval (default: 50)")
     parser.add_argument("--skip-history", action="store_true", help="Skip historical candle ingestion")
     parser.add_argument("--skip-fundamentals", action="store_true", help="Skip fundamental scraping")
-    parser.add_argument("--markets", choices=["all", "nse", "bse"], default="all",
+    parser.add_argument("--markets", choices=["all", "pse", "sme"], default="all",
                         help="Which exchanges to process (default: all)")
     parser.add_argument("--tickers", type=str, default=None, help="Comma-separated tickers to process")
     args = parser.parse_args()

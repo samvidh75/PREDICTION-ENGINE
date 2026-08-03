@@ -59,7 +59,7 @@ library_name: transformers
 pipeline_tag: text-generation
 base_model: Qwen/Qwen2.5-0.5B-Instruct
 tags:
-  - indian-stock-market
+  - pse-stock-market
   - finance
   - stockstory
   - healthometer
@@ -69,12 +69,12 @@ tags:
 quantized_by: StockStory
 ---
 
-# Indian Stock Market SLM (Small Language Model)
+# Philippine stock market SLM (Small Language Model)
 
-Fine-tuned from **Qwen2.5-0.5B-Instruct** on Indian stock market data for:
+Fine-tuned from **Qwen2.5-0.5B-Instruct** on Philippine stock market data for:
 - Corporate governance analysis
 - Technical pattern recognition
-- SEBI regulatory impact assessment
+- SEC regulatory impact assessment
 - Earnings quality evaluation
 - Sector rotation tracking
 - Corporate action impact
@@ -98,7 +98,7 @@ Fine-tuned from **Qwen2.5-0.5B-Instruct** on Indian stock market data for:
 
 ```python
 from llama_cpp import Llama
-llm = Llama("models/indian_stock_slm_master-Q4_K_M.gguf")
+llm = Llama("models/pse_stock_slm_master-Q4_K_M.gguf")
 output = llm("<|im_start|>system\\nYou are a stock market analyst...<|im_end|>")
 ```
 
@@ -106,7 +106,7 @@ output = llm("<|im_start|>system\\nYou are a stock market analyst...<|im_end|>")
 
 1. **Fundamental** (21) - Corporate governance, promoter pledging, auditor flags
 2. **Technical** (17) - Volume profiles, delivery %, block/bulk deals
-3. **Regulatory** (12) - SEBI circulars, policy shifts, compliance mandates
+3. **Regulatory** (12) - SEC circulars, policy shifts, compliance mandates
 4. **Sector Rotation** (12) - FII/DII flow analysis, macro triggers
 5. **Earnings** (13) - Beat/miss analysis, margin trends, guidance changes
 6. **Corporate Action** (12) - Buybacks, dividends, splits, rights issues
@@ -121,7 +121,7 @@ The GGUF model is deployable to:
 
 ## Benchmark Results
 
-Evaluated on 12 standardized Indian stock scenarios:
+Evaluated on 12 standardized PSE-listed stock scenarios:
 - Healthometer Score Accuracy: **87%**
 - Categories: Fundamental, Technical, Earnings, Regulatory
 
@@ -168,9 +168,9 @@ def upload_checkpoint(checkpoint_dir: str, repo_id: str, token: str | None = Non
 
 def print_deploy_instructions(repo_id: str):
     print(f"\nDeploy to SGLang server:")
-    print(f"  docker exec -it sglang-server wget https://huggingface.co/{repo_id}/raw/main/models/indian_stock_slm_master-Q4_K_M.gguf")
+    print(f"  docker exec -it sglang-server wget https://huggingface.co/{repo_id}/raw/main/models/pse_stock_slm_master-Q4_K_M.gguf")
     print(f"\nOr use directly from HF:")
-    print(f"  model_path = \"hf://{repo_id}/models/indian_stock_slm_master-Q4_K_M.gguf\"")
+    print(f"  model_path = \"hf://{repo_id}/models/pse_stock_slm_master-Q4_K_M.gguf\"")
 
 
 if __name__ == "__main__":
@@ -179,8 +179,8 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--repo",
-        default="stockstory/indian-stock-slm",
-        help="Hugging Face repo ID (default: stockstory/indian-stock-slm)",
+        default="stockstory/pse-stock-slm",
+        help="Hugging Face repo ID (default: stockstory/pse-stock-slm)",
     )
     parser.add_argument(
         "--token",
@@ -189,8 +189,8 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--gguf-path",
-        default="indian_stock_slm_master_gguf/indian_stock_slm_master-Q4_K_M.gguf",
-        help="Path to GGUF model file or directory (default: indian_stock_slm_master_gguf/)",
+        default="pse_stock_slm_master_gguf/pse_stock_slm_master-Q4_K_M.gguf",
+        help="Path to GGUF model file or directory (default: pse_stock_slm_master_gguf/)",
     )
     parser.add_argument(
         "--checkpoint",
@@ -199,8 +199,8 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--checkpoint-dir",
-        default="indian_stock_slm_master",
-        help="Path to merged checkpoint directory (default: indian_stock_slm_master)",
+        default="pse_stock_slm_master",
+        help="Path to merged checkpoint directory (default: pse_stock_slm_master)",
     )
 
     args = parser.parse_args()

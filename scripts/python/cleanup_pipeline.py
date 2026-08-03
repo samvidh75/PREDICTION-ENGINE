@@ -51,7 +51,7 @@ def run_weekly_pipeline_cleanup(base_dir: str, dry_run: bool = False):
                 print(f"  Failed to clear outputs: {e}")
 
     # 2. Prune GGUF build artifacts (Ollama already copied layers internally)
-    gguf_dir = os.path.join(base_dir, "indian_stock_slm_master_gguf")
+    gguf_dir = os.path.join(base_dir, "pse_stock_slm_master_gguf")
     if os.path.exists(gguf_dir):
         for filepath in glob.glob(os.path.join(gguf_dir, "*.gguf")):
             fsize = os.path.getsize(filepath)
@@ -88,7 +88,7 @@ def run_weekly_pipeline_cleanup(base_dir: str, dry_run: bool = False):
     # 4. Prune old merged checkpoint directories (keep only latest 2)
     checkpoint_dirs = sorted([
         d for d in Path(base_dir).iterdir()
-        if d.is_dir() and d.name.startswith("indian_stock_slm_master") and not d.name.endswith("_gguf")
+        if d.is_dir() and d.name.startswith("pse_stock_slm_master") and not d.name.endswith("_gguf")
     ], key=lambda d: d.stat().st_mtime, reverse=True)
 
     for old_dir in checkpoint_dirs[2:]:

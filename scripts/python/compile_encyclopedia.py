@@ -45,27 +45,27 @@ def fetch_from_neon() -> list[dict]:
 def generate_synthetic_records(count: int = 2000) -> list[dict]:
     random.seed(42)
     tickers = [
-        "RELIANCE", "TCS", "HDFCBANK", "INFY", "ICICIBANK",
-        "HINDUNILVR", "ITC", "SBIN", "BHARTIARTL", "KOTAKBANK",
-        "BAJFINANCE", "LT", "WIPRO", "AXISBANK", "TITAN",
-        "ASIANPAINT", "MARUTI", "SUNPHARMA", "NTPC", "ONGC",
-        "POWERGRID", "ULTRACEMCO", "BAJAJFINSV", "ADANIPORTS", "NESTLEIND",
-        "JSWSTEEL", "TECHM", "HCLTECH", "GRASIM", "INDUSINDBK",
-        "TATAMOTORS", "BRITANNIA", "DRREDDY", "CIPLA", "DIVISLAB",
+        "BDO", "JFC", "BPI", "SM", "MBT",
+        "URC", "ITC", "SECB", "TEL", "GTCAP",
+        "AEV", "LT", "WIPRO", "DMC", "TITAN",
+        "EMI", "MARUTI", "MONDE", "NTPC", "ACEN",
+        "POWERGRID", "ULTRACEMCO", "BAJAJFINSV", "SMPH", "NESTLEIND",
+        "JSWSTEEL", "TECHM", "RLC", "GRASIM", "INDUSINDBK",
+        "MEG", "BRITANNIA", "DRREDDY", "CIPLA", "DIVISLAB",
         "SBILIFE", "EICHERMOT", "BPCL", "HDFCLIFE",
-        "TATASTEEL", "HEROMOTOCO", "ADANIENT", "M&M", "TRENT",
+        "AP", "HEROMOTOCO", "ALI", "M&M", "TRENT",
         "HINDALCO", "BEL", "SIEMENS", "DLF", "HAVELLS",
         "PIDILITIND", "TATACONSUM", "GODREJCP", "MARICO", "DABUR",
         "SRTRANSFIN", "COLPAL", "TVSMOTOR", "MUTHOOTFIN",
-        "BANKBARODA", "LICI", "PNB", "CANBK",
+        "BANKBARODA", "LICI", "PNB", "MJC",
         "NHPC", "IRFC", "RVNL", "HAL", "BHEL",
     ]
-    exchange_pool = ["NSE", "NSE", "NSE", "BSE"]
+    exchange_pool = ["PSE", "PSE", "PSE", "PSE"]
     records = []
     for _ in range(count):
         t = random.choice(tickers)
         exchange = random.choice(exchange_pool)
-        suffix = ".BO" if exchange == "BSE" else ""
+        suffix = ".PS" if exchange == "PSE" else ""
         records.append({
             "ticker": t + suffix,
             "market_cap_cr": round(random.uniform(500, 800000), 2),
@@ -94,15 +94,15 @@ def main():
 
     with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
         for row in records:
-            ticker_clean = row["ticker"].replace(".NS", "").replace(".BO", "")
-            board_label = "BSE" if ".BO" in row["ticker"] else "NSE Mainboard/SME"
+            ticker_clean = row["ticker"].replace(".PS", "").replace(".PS", "")
+            board_label = "PSE" if ".PS" in row["ticker"] else "PSE Mainboard/SME"
             auditor = row["auditor_remarks"] or "No adverse remarks"
 
             turn = {
                 "messages": [
                     {
                         "role": "system",
-                        "content": "You are the official StockEX Encyclopedia. Provide deterministic, mathematically accurate reference data for Indian equities.",
+                        "content": "You are the official StockEX Encyclopedia. Provide deterministic, mathematically accurate reference data for PSE-listed equities.",
                     },
                     {
                         "role": "user",

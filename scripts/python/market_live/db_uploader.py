@@ -49,6 +49,7 @@ def upsert_ohlcv(engine, symbol: str) -> int:
 def upsert_fundamentals(engine, symbol: str) -> int:
     """
     Upload Screener.in fundamentals to 'stock_fundamentals' table.
+    KNOWN GAP: screener.in is India-only, no PSE equivalent confirmed.
     Returns number of rows inserted.
     """
     df = screener_export(symbol)

@@ -3,7 +3,7 @@
 resolve_placeholders.py -- Fill StockEX encyclopedia placeholders with real data.
 
 Usage:
-    python3 resolve_placeholders.py --ticker TCS
+    python3 resolve_placeholders.py --ticker JFC
     python3 resolve_placeholders.py --template "StockEX... {ticker} ... {market_cap}" --data '{...}'
 
 Pipeline: model generates template with {placeholders} -> this script fills real values
@@ -20,8 +20,8 @@ AUDIT_MAP = {
 }
 
 EXCHANGE_MAP = {
-    "{exchange_nse}": "NSE Mainboard/SME",
-    "{exchange_bse}": "BSE",
+    "{exchange_nse}": "PSE Mainboard/SME",
+    "{exchange_bse}": "PSE",
 }
 
 def resolve_placeholders(template: str, data: dict) -> str:
@@ -84,6 +84,6 @@ if __name__ == "__main__":
     elif args.ticker:
         data = fetch_data_for_ticker(args.ticker)
     else:
-        data = fetch_data_for_ticker("TCS")
+        data = fetch_data_for_ticker("JFC")
 
     print(resolve_placeholders(tpl, data))

@@ -634,7 +634,7 @@ class CorporateActionsVectorizer:
                 f'SYSTEM "You are an elite Equity Lens intelligence chip. '
                 f'Analyze bulk and block deals to deliver a 2-sentence structural liquidity risk and momentum evaluation."\n'
                 f'USER "Asset: {symbol} | Institutional Blocks: {client} {txn_type} {qty} @ {price}"\n'
-                f'ASSISTANT "{deal_type.title()} deal of {qty} shares at ₹{price} by {client} for {symbol}. '
+                f'ASSISTANT "{deal_type.title()} deal of {qty} shares at ₱{price} by {client} for {symbol}. '
                 f'{"Institutional Accumulation Support Floor" if txn_type == "buy" else "Material Liquidity Exit Flag"} applied."\n'
                 f"### OLLAMA NODE END ###\n"
             )
@@ -662,7 +662,7 @@ class CorporateActionsVectorizer:
         summary_prompt = (
             "You are an Equity Lens data quality auditor. "
             f"You have received {len(all_blocks)} structured corporate action training blocks "
-            "for the Indian stock market. Summarize the breadth of coverage, mention any "
+            "for the Philippine stock market. Summarize the breadth of coverage, mention any "
             "data quality flags, and suggest what additional data would improve the dataset. "
             "Keep response to 3-4 sentences."
         )

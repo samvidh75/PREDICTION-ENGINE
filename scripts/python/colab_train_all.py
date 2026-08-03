@@ -34,17 +34,17 @@ print("Step 1: Generating synthetic training datasets")
 print("=" * 60)
 
 TICKERS = [
-    "RELIANCE", "TCS", "HDFCBANK", "INFY", "ICICIBANK", "SBIN", "BHARTIARTL",
-    "ITC", "WIPRO", "HCLTECH", "LT", "AXISBANK", "BAJFINANCE", "MARUTI",
-    "SUNPHARMA", "TITAN", "ASIANPAINT", "NTPC", "KOTAKBANK", "ONGC",
+    "BDO", "JFC", "BPI", "SM", "MBT", "SECB", "TEL",
+    "ITC", "WIPRO", "RLC", "LT", "DMC", "AEV", "MARUTI",
+    "MONDE", "TITAN", "EMI", "NTPC", "GTCAP", "ACEN",
 ]
 SECTORS = {
-    "RELIANCE": "Energy", "TCS": "IT", "HDFCBANK": "Banking", "INFY": "IT",
-    "ICICIBANK": "Banking", "SBIN": "Banking", "BHARTIARTL": "Telecom",
-    "ITC": "FMCG", "WIPRO": "IT", "HCLTECH": "IT", "LT": "Infrastructure",
-    "AXISBANK": "Banking", "BAJFINANCE": "NBFC", "MARUTI": "Automobile",
-    "SUNPHARMA": "Pharma", "TITAN": "Retail", "ASIANPAINT": "Chemicals",
-    "NTPC": "Energy", "KOTAKBANK": "Banking", "ONGC": "Energy",
+    "BDO": "Energy", "JFC": "IT", "BPI": "Banking", "SM": "IT",
+    "MBT": "Banking", "SECB": "Banking", "TEL": "Telecom",
+    "ITC": "FMCG", "WIPRO": "IT", "RLC": "IT", "LT": "Infrastructure",
+    "DMC": "Banking", "AEV": "NBFC", "MARUTI": "Automobile",
+    "MONDE": "Pharma", "TITAN": "Retail", "EMI": "Chemicals",
+    "NTPC": "Energy", "GTCAP": "Banking", "ACEN": "Energy",
 }
 
 def rand_float(lo, hi):
@@ -65,7 +65,7 @@ def gen_encyclopedia_entry(ticker):
     )[0]
     target_vs_cmp = random.choice(["above", "below", "in line with"])
 
-    exchange = random.choice(["BSE", "NSE"])
+    exchange = random.choice(["PSE", "PSE"])
     auditor = random.choice([
         "Deloitte Haskins & Sells LLP",
         "S R Batliboi & Associates LLP",
@@ -90,7 +90,7 @@ def gen_encyclopedia_entry(ticker):
 
     | Metric | Value | Assessment |
     |---|---|---|
-    | Market Cap | ₹{mcap_cr:,} Cr | — |
+    | Market Cap | ₱{mcap_cr:,} Cr | — |
     | P/E | {pe:.1f}x | — |
     | P/B | {pb:.1f}x | — |
     | D/E | {de:.1f}x | {de_class} |
@@ -119,7 +119,7 @@ def gen_tool_call(ticker):
         f"Show P/E, P/B, and ROCE for {ticker}",
     ]
     query = random.choice(q_templates)
-    tool_name = random.choice(["calculate_indian_market_metrics", "calculate_batch_market_metrics"])
+    tool_name = random.choice(["calculate_pse_market_metrics", "calculate_batch_market_metrics"])
     params = json.dumps({"ticker": ticker, "metrics": "ALL"})
     system = "You are a financial analyst. Use the available tools to compute exact numbers — never hallucinate."
     user = query

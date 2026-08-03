@@ -199,7 +199,7 @@ def enrich_option_chain(
     underlying_price: float,
     risk_free_rate: float = 0.065,
 ) -> list[dict]:
-    """Enrich NSE option chain data with calculated Greeks."""
+    """Enrich PSE option chain data with calculated Greeks."""
     for entry in chain:
         expiry = entry.get("expiryDate", "")
         T = days_to_expiry(expiry)

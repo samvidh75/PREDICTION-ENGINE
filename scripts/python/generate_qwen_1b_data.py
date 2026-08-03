@@ -2,6 +2,11 @@
 """
 Generate Qwen 1B training data (60,000 analysis examples)
 from templates in QWEN_TRAINING_DATASETS_DETAILED.md
+
+KNOWN GAP: a couple of sector/macro templates still say "Indian economy" /
+"Indian Markets" left over from this file's original India-market version.
+Confirmed dead (no deployment/cron/CI reference) — review before using its
+output to train the live model.
 """
 
 import json
@@ -10,39 +15,39 @@ import os
 
 random.seed(42)
 
-TICKERS = ["RELIANCE", "TCS", "HDFCBANK", "INFY", "ICICIBANK", "HINDUNILVR",
-           "ITC", "SBIN", "BHARTIARTL", "KOTAKBANK", "LT", "AXISBANK",
-           "BAJFINANCE", "MARUTI", "TITAN", "SUNPHARMA", "WIPRO",
-           "ADANIENT", "NTPC", "M&M", "NESTLEIND", "ULTRACEMCO", "HCLTECH",
-           "TATAMOTORS", "TATASTEEL", "ASIANPAINT", "DIVISLAB", "DRREDDY",
-           "BRITANNIA", "EICHERMOT", "BPCL", "IOC", "ONGC", "GRASIM",
+TICKERS = ["BDO", "JFC", "BPI", "SM", "MBT", "URC",
+           "ITC", "SECB", "TEL", "GTCAP", "LT", "DMC",
+           "AEV", "MARUTI", "TITAN", "MONDE", "WIPRO",
+           "ALI", "NTPC", "M&M", "NESTLEIND", "ULTRACEMCO", "RLC",
+           "MEG", "AP", "EMI", "DIVISLAB", "DRREDDY",
+           "BRITANNIA", "EICHERMOT", "BPCL", "IOC", "ACEN", "GRASIM",
            "HINDALCO", "CIPLA", "HEROMOTOCO", "BAJAJFINSV", "TECHM",
-           "INDUSINDBK", "JSWSTEEL", "ADANIPORTS", "POWERGRID", "COALINDIA"]
+           "INDUSINDBK", "JSWSTEEL", "SMPH", "POWERGRID", "COALINDIA"]
 
 SECTORS = {
-    "RELIANCE": "Energy & Telecom", "TCS": "IT Services", "HDFCBANK": "Banking",
-    "INFY": "IT Services", "ICICIBANK": "Banking", "HINDUNILVR": "FMCG",
-    "ITC": "FMCG", "SBIN": "Banking", "BHARTIARTL": "Telecom",
-    "KOTAKBANK": "Banking", "LT": "Engineering", "AXISBANK": "Banking",
-    "BAJFINANCE": "NBFC", "MARUTI": "Automobile", "TITAN": "Retail",
-    "SUNPHARMA": "Pharma", "WIPRO": "IT Services", "ADANIENT": "Conglomerate",
+    "BDO": "Energy & Telecom", "JFC": "IT Services", "BPI": "Banking",
+    "SM": "IT Services", "MBT": "Banking", "URC": "FMCG",
+    "ITC": "FMCG", "SECB": "Banking", "TEL": "Telecom",
+    "GTCAP": "Banking", "LT": "Engineering", "DMC": "Banking",
+    "AEV": "NBFC", "MARUTI": "Automobile", "TITAN": "Retail",
+    "MONDE": "Pharma", "WIPRO": "IT Services", "ALI": "Conglomerate",
     "NTPC": "Power", "M&M": "Automobile", "NESTLEIND": "FMCG",
-    "ULTRACEMCO": "Cement", "HCLTECH": "IT Services", "TATAMOTORS": "Automobile",
-    "TATASTEEL": "Metals", "ASIANPAINT": "Consumer Goods", "DIVISLAB": "Pharma",
+    "ULTRACEMCO": "Cement", "RLC": "IT Services", "MEG": "Automobile",
+    "AP": "Metals", "EMI": "Consumer Goods", "DIVISLAB": "Pharma",
     "DRREDDY": "Pharma", "BRITANNIA": "FMCG", "EICHERMOT": "Automobile",
-    "BPCL": "Oil & Gas", "IOC": "Oil & Gas", "ONGC": "Oil & Gas",
+    "BPCL": "Oil & Gas", "IOC": "Oil & Gas", "ACEN": "Oil & Gas",
     "GRASIM": "Cement", "HINDALCO": "Metals", "CIPLA": "Pharma",
     "HEROMOTOCO": "Automobile", "BAJAJFINSV": "Financial Services",
     "TECHM": "IT Services", "INDUSINDBK": "Banking", "JSWSTEEL": "Metals",
-    "ADANIPORTS": "Infrastructure", "POWERGRID": "Power", "COALINDIA": "Mining"
+    "SMPH": "Infrastructure", "POWERGRID": "Power", "COALINDIA": "Mining"
 }
 
 SYSTEM_PROMPT = (
     "You are StockEX, a helpful, friendly, and knowledgeable AI assistant "
-    "specialised in Indian stock market research. You speak naturally and "
+    "specialised in Philippine stock market research. You speak naturally and "
     "conversationally. You provide accurate financial information but NEVER "
-    "give personalised investment advice. You always include SEBI disclaimers "
-    "when discussing investments. You are not a SEBI-registered advisor."
+    "give personalised investment advice. You always include SEC disclaimers "
+    "when discussing investments. You are not a SEC-registered advisor."
 )
 
 records = []
@@ -79,8 +84,8 @@ for _ in range(10000):
         f"✓ Check debt levels and interest coverage\n"
         f"✓ Review promoter holding and corporate governance\n\n"
         f"Rather than picking one, consider how each fits your portfolio's sector allocation. "
-        f"For personalised advice, consult a SEBI-registered advisor.\n\n"
-        f"[SEBI DISCLAIMER: This is educational analysis, not investment advice.]"
+        f"For personalised advice, consult a SEC-registered advisor.\n\n"
+        f"[SEC DISCLAIMER: This is educational analysis, not investment advice.]"
     )
 
     records.append({
@@ -115,17 +120,17 @@ for _ in range(8000):
 
     answer = (
         f"**{ticker} Technical Analysis:**\n\n"
-        f"Current Price: ₹{price}\n\n"
+        f"Current Price: ₱{price}\n\n"
         f"**Setup: {setup.title()}**\n"
         f"{analysis}\n\n"
         f"**Key Levels:**\n"
-        f"- Support: ₹{support}\n"
-        f"- Resistance: ₹{resistance}\n\n"
+        f"- Support: ₱{support}\n"
+        f"- Resistance: ₱{resistance}\n\n"
         f"**Strategy:**\n"
         f"{action}\n\n"
         f"Remember that technical analysis is just one tool. Combine with fundamental analysis "
         f"for better decision-making.\n\n"
-        f"[SEBI DISCLAIMER: This is educational technical analysis, not trading advice.]"
+        f"[SEC DISCLAIMER: This is educational technical analysis, not trading advice.]"
     )
 
     records.append({
@@ -144,7 +149,7 @@ for _ in range(7000):
     roe = round(random.uniform(10, 30), 1)
     de = round(random.uniform(0.1, 2.5), 2)
     price = random.randint(100, 5000)
-    market_cap = random.choice(["₹1,00,000 Cr", "₹5,00,000 Cr", "₹10,00,000 Cr", "₹50,000 Cr"])
+    market_cap = random.choice(["₱1,00,000 Cr", "₱5,00,000 Cr", "₱10,00,000 Cr", "₱50,000 Cr"])
 
     question = random.choice([
         f"Should I invest in {ticker}? Give detailed fundamental analysis.",
@@ -157,7 +162,7 @@ for _ in range(7000):
         f"**Company Overview:**\n"
         f"- Sector: {sector}\n"
         f"- Market Cap: {market_cap}\n"
-        f"- Current Price: ₹{price}\n\n"
+        f"- Current Price: ₱{price}\n\n"
         f"**Key Financial Metrics:**\n"
         f"- P/E Ratio: {pe} {'(below sector average)' if pe < 20 else '(near sector average)' if pe < 30 else '(above sector average)'}\n"
         f"- ROE: {roe}% {'(strong)' if roe > 20 else '(moderate)' if roe > 15 else '(needs improvement)'}\n"
@@ -171,8 +176,8 @@ for _ in range(7000):
         f"**Verdict:** {ticker} has {'strong' if roe > 18 else 'decent'} fundamentals. "
         f"The P/E of {pe} suggests it is {'fairly valued' if 18 < pe < 30 else 'undervalued' if pe < 18 else 'premium valued'}. "
         f"Consider your risk tolerance and investment horizon before investing.\n\n"
-        f"[SEBI DISCLAIMER: This is educational fundamental analysis, not investment advice. "
-        f"Consult a SEBI-registered advisor.]"
+        f"[SEC DISCLAIMER: This is educational fundamental analysis, not investment advice. "
+        f"Consult a SEC-registered advisor.]"
     )
 
     records.append({
@@ -199,7 +204,7 @@ for _ in range(6000):
 
     answer = (
         f"**{ticker} Valuation Analysis:**\n\n"
-        f"Current Price: ₹{price} | P/E: {pe} | EPS: ₹{eps}\n\n"
+        f"Current Price: ₱{price} | P/E: {pe} | EPS: ₱{eps}\n\n"
         f"**Relative Valuation:**\n"
         f"- The {sector} sector average P/E is around {'20-25' if sector in ['IT Services', 'Pharma'] else '15-20' if sector in ['Banking', 'Power'] else '18-22'}\n"
         f"- {ticker}'s P/E of {pe} is {'above' if pe > 22 else 'below' if pe < 18 else 'in line with'} the sector average\n\n"
@@ -209,7 +214,7 @@ for _ in range(6000):
         f"**Valuation Verdict:**\n"
         f"At P/E {pe}, {ticker} appears {'fairly valued' if 18 < pe < 30 else 'undervalued' if pe < 18 else 'premium priced'}. "
         f"Consider the company's growth rate, competitive position, and industry outlook.\n\n"
-        f"[SEBI DISCLAIMER: Valuation analysis is for educational purposes only.]"
+        f"[SEC DISCLAIMER: Valuation analysis is for educational purposes only.]"
     )
 
     records.append({
@@ -238,7 +243,7 @@ for _ in range(5000):
         f"**{sector} Sector Analysis:**\n\n"
         f"**Key Players:** {', '.join(sector_stocks[:5])}\n\n"
         f"**Sector Overview:**\n"
-        f"The {sector} sector is a {'defensive' if sector in ['FMCG', 'Pharma'] else 'cyclical' if sector in ['Automobile', 'Metals', 'Cement'] else 'growth'} sector in the Indian economy. "
+        f"The {sector} sector is a {'defensive' if sector in ['FMCG', 'Pharma'] else 'cyclical' if sector in ['Automobile', 'Metals', 'Cement'] else 'growth'} sector in the Philippine economy. "
         f"It contributes significantly to the broader market indices.\n\n"
         f"**Key Drivers:**\n"
         f"✓ Domestic demand and consumption\n"
@@ -250,7 +255,7 @@ for _ in range(5000):
         f"✗ Macroeconomic headwinds\n\n"
         f"**Outlook:** The sector has {'positive' if random.random() > 0.5 else 'cautious'} long-term prospects. "
         f"Investors should focus on companies with strong fundamentals and competitive advantage.\n\n"
-        f"[SEBI DISCLAIMER: This is educational sector analysis.]"
+        f"[SEC DISCLAIMER: This is educational sector analysis.]"
     )
 
     records.append({
@@ -273,7 +278,7 @@ macro_topics = [
 for _ in range(4000):
     topic, context = random.choice(macro_topics)
     question = random.choice([
-        f"How does {topic} affect Indian stocks?",
+        f"How does {topic} affect PSE-listed stocks?",
         f"Impact of {topic} on different sectors.",
         f"Explain the relationship between {topic} and stock market performance.",
     ])
@@ -289,7 +294,7 @@ for _ in range(4000):
         f"**Investment Strategy:**\n"
         f"Diversify across sectors to manage macro risks. Monitor RBI policy, global cues, "
         f"and economic data releases.\n\n"
-        f"[SEBI DISCLAIMER: Educational macro analysis only.]"
+        f"[SEC DISCLAIMER: Educational macro analysis only.]"
     )
 
     records.append({
@@ -328,7 +333,7 @@ for _ in range(3000):
         f"✓ Monitor quarterly results and management commentary\n\n"
         f"**Overall Risk Rating:** Moderate. {ticker} is an established company but all "
         f"investments carry risk. Position size according to your risk tolerance.\n\n"
-        f"[SEBI DISCLAIMER: Educational risk analysis. Consult a SEBI-registered advisor.]"
+        f"[SEC DISCLAIMER: Educational risk analysis. Consult a SEC-registered advisor.]"
     )
 
     records.append({
@@ -345,7 +350,7 @@ portfolio_questions = [
     ("How should I build a diversified portfolio?", "Diversification across sectors, market caps, and asset classes reduces risk. Allocate based on age: 100-age in equities."),
     ("What is the ideal asset allocation for beginners?", "Beginners should start with 60% large-cap, 20% mid-cap, 20% small-cap mutual funds or ETFs."),
     ("How much should I invest in stocks vs mutual funds?", "Direct stocks require research. Mutual funds offer diversification. A 50-50 split is reasonable for most investors."),
-    ("What is a good portfolio size to start investing?", "Start with any amount. Even ₹500/month via SIP builds the habit. Consistency matters more than initial amount."),
+    ("What is a good portfolio size to start investing?", "Start with any amount. Even ₱500/month via SIP builds the habit. Consistency matters more than initial amount."),
     ("How often should I rebalance my portfolio?", "Review quarterly, rebalance annually. Sell overperformers, buy underperformers to maintain target allocation."),
 ]
 
@@ -355,7 +360,7 @@ for _ in range(5000):
         "messages": [
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": q},
-            {"role": "assistant", "content": a + "\n\n[SEBI DISCLAIMER: Educational portfolio guidance. Consult a SEBI-registered advisor.]"}
+            {"role": "assistant", "content": a + "\n\n[SEC DISCLAIMER: Educational portfolio guidance. Consult a SEC-registered advisor.]"}
         ]
     })
 
@@ -385,15 +390,15 @@ for _ in range(5000):
                 "✓ Focus on long-term goals, not short-term noise\n"
                 "✓ Avoid checking portfolio daily\n"
                 "✓ Remember that market corrections are normal\n\n"
-                "[SEBI DISCLAIMER: Educational content on investment psychology.]"
+                "[SEC DISCLAIMER: Educational content on investment psychology.]"
             )}
         ]
     })
 
 # Tax/Legal Tips (4,000)
 tax_topics = [
-    ("capital gains tax", "Short-term gains (held < 1 year) taxed at 15%. Long-term gains (> 1 year) over ₹1 lakh taxed at 10%."),
-    ("dividend taxation", "Dividends are taxed in the hands of investors per their income tax slab. TDS at 10% if dividend exceeds ₹5,000."),
+    ("capital gains tax", "Short-term gains (held < 1 year) taxed at 15%. Long-term gains (> 1 year) over ₱1 lakh taxed at 10%."),
+    ("dividend taxation", "Dividends are taxed in the hands of investors per their income tax slab. TDS at 10% if dividend exceeds ₱5,000."),
     ("STT", "Securities Transaction Tax is 0.1% on delivery-based equity purchases and 0.025% on sales."),
     ("indexation benefit", "Debt funds held for 3+ years get indexation benefit, reducing effective tax rate significantly."),
     ("tax-loss harvesting", "Sell underperforming stocks to book losses, offset against capital gains. Buy back after 30 days."),
@@ -410,7 +415,7 @@ for _ in range(4000):
                 f"**Understanding {topic}:**\n\n{detail}\n\n"
                 f"Consult a tax professional for your specific situation. "
                 f"Tax laws can change based on budget announcements.\n\n"
-                f"[SEBI DISCLAIMER: Educational tax information. Consult a tax advisor.]"
+                f"[SEC DISCLAIMER: Educational tax information. Consult a tax advisor.]"
             )}
         ]
     })

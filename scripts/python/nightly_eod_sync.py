@@ -1,10 +1,17 @@
 #!/usr/bin/env python3
 """
 Nightly EOD Data Sync
-- Runs daily after market close (4:30 PM IST)
-- Fetches fundamentals from Upstox, Screener, Groww
+- Runs daily after market close (4:30 PM PHT)
+- Fetches fundamentals from Screener.in
 - Writes to PostgreSQL
 - Updates stock_scores table with fresh calculations
+
+KNOWN GAP: this previously also referenced Upstox and Groww (Indian
+brokers) as fundamentals sources — the config entries for those were
+already removed as dead in config/validator.ts. screener.in itself is an
+India-only fundamentals aggregator with no confirmed Philippine equivalent.
+Confirmed dead (no deployment/cron/CI reference) — review before wiring
+this into any real cron job.
 """
 
 import asyncio
@@ -21,38 +28,6 @@ logger = logging.getLogger(__name__)
 
 DB_URL = os.getenv('DATABASE_URL')
 engine = create_engine(DB_URL)
-
-
-async def fetch_upstox_fundamentals(symbol: str) -> dict:
-    api_key = os.getenv('UPSTOX_API_KEY')
-
-    async with httpx.AsyncClient() as client:
-        try:
-            response = await client.get(
-                f"https://api.upstox.com/v2/stock/{symbol}/fundamentals",
-                headers={"Authorization": f"Bearer {api_key}"}
-            )
-            data = response.json()
-
-            return {
-                'symbol': symbol,
-                'pe': data.get('pe'),
-                'pb': data.get('pb'),
-                'roe': data.get('roe'),
-                'roic': data.get('roic'),
-                'debt_to_equity': data.get('debt_to_equity'),
-                'ev_ebitda': data.get('ev_ebitda'),
-                'dividend_yield': data.get('dividend_yield'),
-                'fcf_yield': data.get('fcf_yield'),
-                'current_ratio': data.get('current_ratio'),
-                'interest_coverage': data.get('interest_coverage'),
-                'operating_margin': data.get('operating_margin'),
-                'fetched_from': 'upstox',
-                'fetched_at': datetime.now()
-            }
-        except Exception as e:
-            logger.error(f"Upstox fetch failed for {symbol}: {e}")
-            return None
 
 
 async def fetch_screener_fundamentals(symbol: str) -> dict:
@@ -170,7 +145,7 @@ async def run_nightly_sync():
         batch = symbols[i:i + batch_size]
 
         tasks = [
-            fetch_upstox_fundamentals(sym) for sym in batch
+            fetch_screener_fundamentals(sym) for sym in batch
         ]
         results = await asyncio.gather(*tasks)
 
@@ -179,13 +154,8 @@ async def run_nightly_sync():
                 upsert_fundamentals(symbol, fundamentals)
                 success_count += 1
             else:
-                screener_data = await fetch_screener_fundamentals(symbol)
-                if screener_data:
-                    upsert_fundamentals(symbol, screener_data)
-                    success_count += 1
-                else:
-                    error_count += 1
-                    logger.warning(f"No data for {symbol}")
+                error_count += 1
+                logger.warning(f"No data for {symbol}")
 
         logger.info(f"Processed batch {i // batch_size + 1}/{(len(symbols) - 1) // batch_size + 1}")
 

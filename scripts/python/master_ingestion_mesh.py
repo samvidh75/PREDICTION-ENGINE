@@ -4,9 +4,15 @@ Master Ingestion Mesh — Unified Multi-Source Data Pipeline
 Combines Screener.in fundamentals + Yahoo Finance OHLCV into a single
 batched upsert cycle. Runs via cron with 1.2s politeness delays.
 
+KNOWN GAP: screener.in is an India-only fundamentals aggregator with no
+Philippine equivalent confirmed. Confirmed dead (no deployment/cron/CI
+reference) — review before wiring this into any real cron job; the
+fundamentals half needs a PSE-verified source (see PSEEdgeScraper.ts) before
+it can be trusted.
+
 Usage:
     python3 master_ingestion_mesh.py                              # Default F&O stocks
-    python3 master_ingestion_mesh.py --tickers RELIANCE,TCS,SBIN  # Specific tickers
+    python3 master_ingestion_mesh.py --tickers BDO,JFC,SECB  # Specific tickers
     python3 master_ingestion_mesh.py --limit 100                  # First 100 F&O stocks
     python3 master_ingestion_mesh.py --dry-run                    # Preview without writing
 
@@ -36,11 +42,11 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 
 # Core F&O stocks + major indices
 DEFAULT_TICKERS = [
-    "RELIANCE", "TCS", "SBIN", "HDFCBANK", "INFY", "ICICIBANK", "BHARTIARTL",
-    "ITC", "LT", "KOTAKBANK", "AXISBANK", "BAJFINANCE", "MARUTI", "HCLTECH",
-    "SUNPHARMA", "TITAN", "ASIANPAINT", "WIPRO", "NTPC", "POWERGRID",
-    "ULTRACEMCO", "HINDUNILVR", "BAJAJFINSV", "TATASTEEL", "JSWSTEEL",
-    "TATAMOTORS", "M&M", "TECHM", "INDUSINDBK", "NESTLEIND",
+    "BDO", "JFC", "SECB", "BPI", "SM", "MBT", "TEL",
+    "ITC", "LT", "GTCAP", "DMC", "AEV", "MARUTI", "RLC",
+    "MONDE", "TITAN", "EMI", "WIPRO", "NTPC", "POWERGRID",
+    "ULTRACEMCO", "URC", "BAJAJFINSV", "AP", "JSWSTEEL",
+    "MEG", "M&M", "TECHM", "INDUSINDBK", "NESTLEIND",
 ]
 
 

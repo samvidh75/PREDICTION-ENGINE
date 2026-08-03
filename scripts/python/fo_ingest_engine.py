@@ -1,16 +1,24 @@
 """
 Multi-Asset Options Chain Ingestion Engine
 ============================================
-Ingests free public F&O data from NSE's open option chain API for indices
-(NIFTY, BANKNIFTY) and equity F&O stocks. Falls back to Yahoo Finance spot
-prices when NSE blocks. Computes PCR, Max Pain, and OI trends server-side.
+Ingests option chain data for PSE-listed equities, falling back to a
+synthetic chain built from a real Yahoo Finance spot price when no live
+option-chain source is available. Computes PCR, Max Pain, and OI trends
+server-side.
 
-Zero data costs — uses unrestricted public exchange endpoints.
+KNOWN GAP (fixed from a real bug): this previously called the real Indian
+NSE option-chain API (www.nseindia.com/api/option-chain-*) for NIFTY,
+BANKNIFTY, and equity F&O tickers, mislabeled as "PSE". The PSE does not
+have an equivalent liquid index-options market to NIFTY/BANKNIFTY, and
+there is no confirmed free PSE option-chain API, so fetch_nse_option_chain
+is now a documented no-op — this always falls through to the Yahoo-spot
+synthetic chain rather than hitting the wrong country's real endpoint.
+NIFTY/BANKNIFTY have been removed from FNO_STOCKS since they have no PSE
+equivalent.
 
 Usage:
     python3 fo_ingest_engine.py                               # Scan default F&O stocks
-    python3 fo_ingest_engine.py --ticker SBIN                 # Single ticker
-    python3 fo_ingest_engine.py --ticker NIFTY,BANKNIFTY      # Indices
+    python3 fo_ingest_engine.py --ticker SECB                 # Single ticker
     python3 fo_ingest_engine.py --all                          # All F&O stocks
 
 Environment:
@@ -40,14 +48,12 @@ except ImportError:
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 
-# Known F&O stocks on NSE
+# Known F&O stocks on PSE
 FNO_STOCKS = [
-    "SBIN", "RELIANCE", "TCS", "HDFCBANK", "INFY", "ICICIBANK", "BHARTIARTL",
-    "ITC", "LT", "KOTAKBANK", "AXISBANK", "BAJFINANCE", "MARUTI", "HCLTECH",
-    "SUNPHARMA", "TITAN", "ASIANPAINT", "WIPRO", "NTPC", "POWERGRID",
-    "ULTRACEMCO", "HINDUNILVR", "BAJAJFINSV", "TATASTEEL", "JSWSTEEL",
-    "TATAMOTORS", "M&M", "TECHM", "INDUSINDBK", "NESTLEIND",
-    "NIFTY", "BANKNIFTY",
+    "SECB", "BDO", "JFC", "BPI", "SM", "MBT", "TEL",
+    "AC", "JGS", "GTCAP", "DMC", "AEV", "WLCON", "RLC",
+    "MONDE", "RRHI", "EMI", "PGOLD", "BLOOM", "ACEN",
+    "URC", "AP", "MEG", "FGEN", "SMPH", "ALI",
 ]
 
 # ── Helpers ──────────────────────────────────────────────────────────
@@ -126,31 +132,17 @@ class FoIngestEngine:
     # ── Data Sources ──────────────────────────────────────────────
 
     def fetch_nse_option_chain(self, ticker: str) -> dict | None:
-        """Fetch live option chain from NSE's free public API with retry logic."""
-        try:
-            logger.info(f"Fetching NSE option chain for {ticker}")
-            # Seed NSE session cookie
-            self.session.get("https://www.nseindia.com", timeout=8)
-
-            if ticker in ("NIFTY", "BANKNIFTY"):
-                url = f"https://www.nseindia.com/api/option-chain-indices?symbol={ticker}"
-            else:
-                url = f"https://www.nseindia.com/api/option-chain-equities?symbol={ticker}"
-
-            resp = self.session.get(url, timeout=10)
-            if resp.status_code == 200:
-                logger.info(f"NSE fetch succeeded for {ticker}")
-                return resp.json()
-            logger.warning(f"NSE returned {resp.status_code} for {ticker}")
-            return None
-        except Exception as e:
-            logger.error(f"NSE fetch failed for {ticker}: {e}")
-            return None
+        """No confirmed, free PSE option-chain API is wired in (see module
+        doc) — always returns None so fetch_option_chain falls through to
+        the Yahoo-spot synthetic chain rather than hitting a real, wrong-
+        country endpoint."""
+        logger.info(f"No verified PSE option-chain source wired in for {ticker} — using synthetic fallback")
+        return None
 
     def fetch_yahoo_spot(self, ticker: str) -> float | None:
         """Fallback: fetch spot price from Yahoo Finance."""
         try:
-            yahoo_ticker = f"{ticker}.NS" if ticker not in ("NIFTY", "BANKNIFTY") else f"^{ticker}"
+            yahoo_ticker = f"{ticker}.PS"
             url = f"https://query1.finance.yahoo.com/v8/finance/chart/{yahoo_ticker}?interval=1d&range=1d"
             resp = requests.get(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=8)
             if resp.status_code != 200:
@@ -162,7 +154,7 @@ class FoIngestEngine:
             return None
 
     def fetch_option_chain(self, ticker: str) -> dict | None:
-        """Try NSE first, then fall back to synthetic chain from Yahoo spot."""
+        """Try PSE first, then fall back to synthetic chain from Yahoo spot."""
         data = self.fetch_nse_option_chain(ticker)
         if data and data.get("records", {}).get("data"):
             return data
@@ -173,7 +165,7 @@ class FoIngestEngine:
             print(f"  ⚠️  No price source available for {ticker}")
             return None
 
-        print(f"  📡 Using Yahoo spot ₹{spot:.2f} to generate option chain")
+        print(f"  📡 Using Yahoo spot ₱{spot:.2f} to generate option chain")
         return self._build_synthetic_chain(ticker, spot)
 
     # ── Synthetic Chain Builder ───────────────────────────────────
@@ -407,7 +399,7 @@ class FoIngestEngine:
             return
 
         print(f"     Strikes: {len(records) // 2} CE + {len(records) // 2} PE")
-        print(f"     PCR: {indicators['pcr_ratio']} | Max Pain: ₹{indicators['max_pain_strike']}")
+        print(f"     PCR: {indicators['pcr_ratio']} | Max Pain: ₱{indicators['max_pain_strike']}")
         print(f"     Trend: {indicators['oi_trend_status']}")
 
         self._write_options_to_db(records)
@@ -455,7 +447,7 @@ if __name__ == "__main__":
     elif args.ticker:
         targets = [t.strip().upper() for t in args.ticker.split(",")]
     else:
-        targets = ["NIFTY", "BANKNIFTY", "SBIN", "RELIANCE"]
+        targets = ["SECB", "BDO"]
 
     engine = FoIngestEngine(dry_run=args.dry_run, delay=args.delay)
     engine.run(targets)

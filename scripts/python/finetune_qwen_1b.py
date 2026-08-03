@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Fine-tune Qwen2.5-1B-Instruct on 57K Indian stock market analysis examples.
+Fine-tune Qwen2.5-1B-Instruct on 57K Philippine stock market analysis examples.
 Uses LoRA for memory-efficient training on MPS (Apple Silicon).
 
 Usage:

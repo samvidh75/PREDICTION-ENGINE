@@ -8,7 +8,7 @@ WhatsApp based on each user's stored notification preference.
 Usage:
     python notification_gateway.py                          # Mock test broadcast
     python notification_gateway.py --dry-run                # Preview without sending
-    python notification_gateway.py --trigger SBIN 842.5     # Quick alert for a ticker
+    python notification_gateway.py --trigger SECB 842.5     # Quick alert for a ticker
 
 Environment:
     TWILIO_ACCOUNT_SID         — From Twilio console
@@ -80,7 +80,7 @@ SIGNAL_TEMPLATES = {
     "rsi_oversold": "RSI(14) below 25 — Extreme oversold territory",
     "rsi_overbought": "RSI(14) above 75 — Overbought with expanding volume",
     "delivery_spike": "Delivery volume spike > 70% — Institutional hands changing",
-    "block_deal": "Block deal executed on NSE — Large institutional cross",
+    "block_deal": "Block deal executed on PSE — Large institutional cross",
     "insider_selling": "Insider Selling — Promoter pledge increase or stake reduction",
 }
 
@@ -102,7 +102,7 @@ class EquityLensNotificationGateway:
         current_price: float,
         signal_type: str = "volume_breakout",
     ):
-        print(f"Alert routing for {ticker}: {trigger_condition} @ ₹{current_price}")
+        print(f"Alert routing for {ticker}: {trigger_condition} @ ₱{current_price}")
 
         conn = sqlite3.connect(DB_PATH)
         conn.row_factory = sqlite3.Row
@@ -306,4 +306,4 @@ if __name__ == "__main__":
         print("  --register UID PHONE CHANNEL Save user preferences")
         print()
         print("Example:")
-        print("  python notification_gateway.py --dry-run --trigger SBIN 842.5 --signal volume_breakout")
+        print("  python notification_gateway.py --dry-run --trigger SECB 842.5 --signal volume_breakout")

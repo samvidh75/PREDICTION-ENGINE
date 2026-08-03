@@ -49,7 +49,7 @@ if __name__ == "__main__":
     parser.add_argument("--skip-eval", action="store_true", help="Skip evaluation step")
     parser.add_argument("--upload", action="store_true", help="Upload model to Hugging Face")
     parser.add_argument("--cloudflare-deploy", action="store_true", help="Deploy Cloudflare Worker")
-    parser.add_argument("--hf-repo", default="stockstory/indian-stock-slm", help="HF repo ID")
+    parser.add_argument("--hf-repo", default="stockstory/pse-stock-slm", help="HF repo ID")
     parser.add_argument("--dataset-only", action="store_true", help="Only build the dataset")
     args = parser.parse_args()
 
@@ -77,7 +77,7 @@ if __name__ == "__main__":
     print("=" * cols)
 
     # ── Step 1: Generate Dataset ──────────────────────────────
-    dataset_path = script_dir / "master_indian_market_train.json"
+    dataset_path = script_dir / "master_pse_market_train.json"
     log("Building master dataset...")
     step("dataset_builder.py", f"{sys.executable} dataset_builder.py")
 
@@ -111,8 +111,8 @@ if __name__ == "__main__":
     print("  This will:")
     print(f"    1. Load Qwen2.5-0.5B-Instruct with 4-bit LoRA")
     print(f"    2. Train on {count} examples for 180 steps")
-    print(f"    3. Save merged 16-bit model to indian_stock_slm_master/")
-    print(f"    4. Export GGUF to indian_stock_slm_master_gguf/")
+    print(f"    3. Save merged 16-bit model to pse_stock_slm_master/")
+    print(f"    4. Export GGUF to pse_stock_slm_master_gguf/")
     print()
     print("  Requirements: CUDA GPU with 6GB+ VRAM")
     print("  Install: pip install unsloth torch trl transformers datasets")
@@ -138,7 +138,7 @@ if __name__ == "__main__":
 
     # ── Step 3: Evaluate ──────────────────────────────────────
     gguf_path = (
-        script_dir / "indian_stock_slm_master_gguf" / "indian_stock_slm_master-Q4_K_M.gguf"
+        script_dir / "pse_stock_slm_master_gguf" / "pse_stock_slm_master-Q4_K_M.gguf"
     )
 
     if not args.skip_eval:

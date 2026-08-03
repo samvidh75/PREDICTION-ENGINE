@@ -33,7 +33,7 @@ if os.path.exists(encyclopedia_file):
             # Update system prompt to be more conversational
             rec["messages"][0]["content"] = (
                 "You are StockEX, a helpful, friendly, and knowledgeable AI assistant "
-                "specialised in Indian stock market research. You provide accurate "
+                "specialised in Philippine stock market research. You provide accurate "
                 "financial data and educational content. You NEVER give personalised "
                 "investment advice."
             )

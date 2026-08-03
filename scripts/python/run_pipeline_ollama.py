@@ -13,7 +13,7 @@ Usage:
 
 Requirements:
     - Ollama installed (https://ollama.com)
-    - GGUF model from fine_tune.py (indian_stock_slm_master_gguf/)
+    - GGUF model from fine_tune.py (pse_stock_slm_master_gguf/)
 """
 
 import argparse
@@ -28,9 +28,9 @@ from pathlib import Path
 class OllamaPipelineOrchestrator:
     def __init__(
         self,
-        dataset_path="master_indian_market_train.json",
+        dataset_path="master_pse_market_train.json",
         model_name="stockstory-slm",
-        gguf_dir="indian_stock_slm_master_gguf",
+        gguf_dir="pse_stock_slm_master_gguf",
     ):
         self.dataset_path = Path(dataset_path)
         self.model_name = model_name
@@ -41,7 +41,7 @@ class OllamaPipelineOrchestrator:
             self.gguf_source = str(gguf_files[0].resolve())
         else:
             self.gguf_source = str(
-                Path(gguf_dir) / "indian_stock_slm_master-Q4_K_M.gguf"
+                Path(gguf_dir) / "pse_stock_slm_master-Q4_K_M.gguf"
             )
 
     def build_ollama_modelfile(self):
@@ -63,7 +63,7 @@ class OllamaPipelineOrchestrator:
             'PARAMETER stop "<|im_end|>"',
             'PARAMETER stop "<|im_start|>"',
             "",
-            'SYSTEM """You are a dedicated Indian stock market AI chip running locally. '
+            'SYSTEM """You are a dedicated Philippine stock market AI chip running locally. '
             'Analyze technical indicators, Healthometer scales, and corporate news to deliver '
             'concise structural risk summaries. Never invent data. '
             'Always include a Healthometer score and risk level in your assessment."""',
@@ -121,28 +121,28 @@ class OllamaPipelineOrchestrator:
             (
                 "Fundamental Check",
                 "Task: Evaluate corporate governance | "
-                "Context: Ticker: SBIN | P/E: 9.6 | Debt/Equity: 0.6 | "
+                "Context: Ticker: SECB | P/E: 9.6 | Debt/Equity: 0.6 | "
                 "Promoter Pledging: 0% | ROCE: 12.2% | "
                 "Auditor: Clean opinion with stable asset quality."
             ),
             (
                 "Technical Anomaly",
                 "Task: Analyze technical price structures | "
-                "Context: Ticker: RELIANCE | Last Price: 2490 | "
+                "Context: Ticker: BDO | Last Price: 2490 | "
                 "Volume Expansion: 2.6x | Delivery: 72% | "
-                "Order Flow: Block deal detected via NSE window."
+                "Order Flow: Block deal detected via PSE window."
             ),
             (
                 "Regulatory Impact",
-                "Task: Assess SEBI regulatory impact | "
+                "Task: Assess SEC regulatory impact | "
                 "Context: Sector: Midcap Derivatives | "
-                "SEBI Action: Minimum contract value raised to 15 Lakhs, "
+                "SEC Action: Minimum contract value raised to 15 Lakhs, "
                 "weekly expiries restricted to 1 per exchange."
             ),
             (
                 "Earnings Analysis",
                 "Task: Analyze quarterly earnings | "
-                "Context: Ticker: TATAMOTORS | Result: Beat | "
+                "Context: Ticker: MEG | Result: Beat | "
                 "Revenue Growth: 18.5% | Margin Change: +250bps | "
                 "Guidance: Raised | Commentary: JLR margins at 9-year high."
             ),
@@ -229,11 +229,11 @@ if __name__ == "__main__":
         help="Ollama model name (default: stockstory-slm)"
     )
     parser.add_argument(
-        "--dataset", default="master_indian_market_train.json",
+        "--dataset", default="master_pse_market_train.json",
         help="Path to training dataset JSON"
     )
     parser.add_argument(
-        "--gguf-dir", default="indian_stock_slm_master_gguf",
+        "--gguf-dir", default="pse_stock_slm_master_gguf",
         help="Directory containing GGUF model files"
     )
 

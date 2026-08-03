@@ -1,7 +1,7 @@
 """
 Telegram Breakout Newsletter Daemon
 ====================================
-Scans 7,500+ NSE/BSE/SME equities for institutional entry patterns and
+Scans 7,500+ PSE/PSE/SME equities for institutional entry patterns and
 extreme mean-reversion zones, then broadcasts a professional technical
 newsletter digest to your Telegram channel via the free Bot API.
 
@@ -132,19 +132,19 @@ class TelegramNewsletter:
 
     def build_newsletter(self, stocks: list) -> str:
         """Construct a professional Markdown newsletter from scanned stocks."""
-        current_date = datetime.now().strftime("%d %B %Y | %H:%M IST")
+        current_date = datetime.now().strftime("%d %B %Y | %H:%M PHT")
 
         header = (
             f"⚡ *EQUITY LENS BREAKTHROUGH INTELLIGENCE DISPATCH* ⚡\n"
             f"📅 *Timestamp:* `{current_date}`\n"
-            f"🚨 *Target Scope:* Universal Indian Equities (NSE + BSE + SME)\n"
+            f"🚨 *Target Scope:* Universal PSE-listed Equities (Main Board + SME)\n"
             f"━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
         )
 
         body_parts = []
         for idx, stock in enumerate(stocks):
-            ticker = stock["ticker"].replace(".NS", "").replace(".BO", "")
-            board = "BSE/SME" if ".BO" in stock["ticker"] else "NSE"
+            ticker = stock["ticker"].replace(".PS", "").replace(".PS", "")
+            board = "PSE/SME" if ".PS" in stock["ticker"] else "PSE"
             mcap = int(stock["market_cap_cr"]) if stock["market_cap_cr"] else 0
             pe = stock["pe_ratio"] or 0
             pledge = stock["promoter_pledged_pct"] or 0
@@ -168,7 +168,7 @@ class TelegramNewsletter:
 
             body_parts.append(
                 f"🔥 *{idx + 1}. {ticker} ({board})*\n"
-                f"   💰 CMP: `₹{price:,.2f}` • M-Cap: `₹{mcap:,} Cr`\n"
+                f"   💰 CMP: `₱{price:,.2f}` • M-Cap: `₱{mcap:,} Cr`\n"
                 f"   📊 P/E: `{pe:.1f}` • D/E: `{de:.2f}` • Pledge: `{pledge:.1f}%`\n"
                 f"   🧬 Governance: `{remarks}`\n"
                 f"   🎯 Signals: {signal_text}\n"

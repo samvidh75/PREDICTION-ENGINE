@@ -44,7 +44,7 @@ class StockExSentimentFeedMesh:
         )
 
         payload = {
-            "ticker": f"{clean_ticker}.NS",
+            "ticker": f"{clean_ticker}.PS",
             "text": mock_announcement,
             "source": "Exchange Public Board Disclosure",
             "epoch": int(time.time()),
@@ -70,7 +70,7 @@ class StockExSentimentFeedMesh:
 
     def run(self, tickers: list[str] | None = None) -> None:
         """Ingest headlines for a list of tickers with politeness delay."""
-        targets = tickers or ["RELIANCE", "TCS", "SBIN"]
+        targets = tickers or ["BDO", "JFC", "SECB"]
         for t in targets:
             self.ingest_live_headline_stream(t)
             time.sleep(1.2)  # Essential politeness buffer delay

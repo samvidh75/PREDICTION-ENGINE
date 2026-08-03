@@ -2,7 +2,7 @@
 
 echo "════════════════════════════════════════════"
 echo "  CRITICAL PATHS VALIDATION"
-echo "  StockStory India — Pre-Deployment Check"
+echo "  StockStory PH — Pre-Deployment Check"
 echo "════════════════════════════════════════════"
 echo ""
 
@@ -26,8 +26,8 @@ check_file "2a" "scripts/python/nightly_eod_sync.py" "Script exists"
 # ── Path 3 ──
 echo ""
 echo "── Path 3: Universe ──"
-check_file "3a" "scripts/python/sync_nse_universe.py" "Script exists"
-check_grep "3b" "CHENNPETRO" "scripts/python/sync_nse_universe.py" "CHENNPETRO validation"
+check_file "3a" "scripts/python/sync_pse_universe.py" "Script exists"
+check_grep "3b" "validate_known_symbol" "scripts/python/sync_pse_universe.py" "PSE symbol validation"
 
 # ── Path 4 ──
 echo ""

@@ -177,8 +177,8 @@ class NewsletterDispatcher:
             pledge = float(s["promoter_pledged_pct"] or 0)
 
             lines.append(
-                f"  {i}. *{ticker}* — ₹{close:,.2f}\n"
-                f"     MCap: ₹{mcap:,.0f}Cr | P/E: {pe:.1f} | D/E: {debt:.2f}\n"
+                f"  {i}. *{ticker}* — ₱{close:,.2f}\n"
+                f"     MCap: ₱{mcap:,.0f}Cr | P/E: {pe:.1f} | D/E: {debt:.2f}\n"
                 f"     Vol: {volume:,} | Pledge: {pledge:.1f}%\n"
             )
         return "\n".join(lines)
@@ -197,8 +197,8 @@ class NewsletterDispatcher:
 
             cards.append(f"""
             <div class="stock-card">
-              <h3>{ticker} <span class="badge">₹{close:,.2f}</span></h3>
-              <div class="metric"><span class="metric-label">Market Cap</span><span class="white">₹{mcap:,.0f}Cr</span></div>
+              <h3>{ticker} <span class="badge">₱{close:,.2f}</span></h3>
+              <div class="metric"><span class="metric-label">Market Cap</span><span class="white">₱{mcap:,.0f}Cr</span></div>
               <div class="metric"><span class="metric-label">P/E Ratio</span><span class="white">{pe:.1f}</span></div>
               <div class="metric"><span class="metric-label">Debt/Equity</span><span class="white">{debt:.2f}</span></div>
               <div class="metric"><span class="metric-label">Volume</span><span class="white">{volume:,}</span></div>
@@ -210,7 +210,7 @@ class NewsletterDispatcher:
 
     def build_newsletter(self, stocks: list) -> dict:
         """Build both markdown and HTML versions of the newsletter."""
-        current_date = datetime.now().strftime("%d %B %Y | %H:%M IST")
+        current_date = datetime.now().strftime("%d %B %Y | %H:%M PHT")
         mode_label = self.mode.upper()
 
         body_md = self.build_markdown_body(stocks)

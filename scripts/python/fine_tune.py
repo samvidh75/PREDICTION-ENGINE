@@ -1,5 +1,5 @@
 """
-Unsloth Fine-Tuning Script for Indian Stock Market SLM
+Unsloth Fine-Tuning Script for Philippine stock market SLM
 =======================================================
 Trains Qwen2.5-0.5B-Instruct on custom Healthometer + trend summaries.
 Run on Google Colab (free T4) or Kaggle.
@@ -39,7 +39,7 @@ model = FastLanguageModel.get_peft_model(
 )
 
 prompt_format = """<|im_start|>system
-You are a dedicated Indian stock market analyst. Use the context to provide a concise Healthometer assessment with score and risk level.
+You are a dedicated Philippine stock market analyst. Use the context to provide a concise Healthometer assessment with score and risk level.
 <|im_start|>user
 Task: {}
 Context: {}
@@ -57,7 +57,7 @@ def formatting_prompts_func(examples):
     return {"text": texts}
 
 
-dataset = load_dataset("json", data_files="master_indian_market_train.json", split="train")
+dataset = load_dataset("json", data_files="master_pse_market_train.json", split="train")
 dataset = dataset.map(formatting_prompts_func, batched=True)
 
 steps = 180
@@ -86,8 +86,8 @@ trainer = SFTTrainer(
 
 trainer_stats = trainer.train()
 
-model.save_pretrained_merged("indian_stock_slm_master", tokenizer, save_method="merged_16bit")
-print("Merged model saved to 'indian_stock_slm_master'")
+model.save_pretrained_merged("pse_stock_slm_master", tokenizer, save_method="merged_16bit")
+print("Merged model saved to 'pse_stock_slm_master'")
 
-model.save_pretrained_gguf("indian_stock_slm_master_gguf", tokenizer, quantization_method="q4_k_m")
+model.save_pretrained_gguf("pse_stock_slm_master_gguf", tokenizer, quantization_method="q4_k_m")
 print("GGUF model saved for web deployment")

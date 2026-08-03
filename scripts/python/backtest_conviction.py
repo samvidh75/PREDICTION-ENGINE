@@ -2,10 +2,10 @@
 """Backtest conviction model performance against historical returns.
 
 Validates that the conviction score separating high/low performers is
-statistically significant. Uses walk-forward methodology with NSE data.
+statistically significant. Uses walk-forward methodology with PSE data.
 
 Usage:
-    python backtest_conviction.py --fetch          # Download 5Y NSE price data
+    python backtest_conviction.py --fetch          # Download 5Y PSE price data
     python backtest_conviction.py --run            # Run full backtest
     python backtest_conviction.py --report         # Print latest report
 
@@ -33,22 +33,22 @@ RESULTS_FILE = DATA_DIR / "conviction_results.pkl"
 
 DATA_DIR.mkdir(parents=True, exist_ok=True)
 
-NSE_SUFFIX = ".NS"
+NSE_SUFFIX = ".PS"
 RISK_FREE_RATE = 0.065
 TRADING_DAYS = 252
 
 NIFTY500_TICKERS = [
-    "RELIANCE", "TCS", "HDFCBANK", "ICICIBANK", "INFY", "ITC", "SBIN",
-    "BHARTIARTL", "LT", "KOTAKBANK", "BAJFINANCE", "HINDUNILVR", "WIPRO",
-    "TITAN", "MARUTI", "SUNPHARMA", "ONGC", "ADANIPORTS", "NTPC", "ULTRACEMCO",
-    "HCLTECH", "POWERGRID", "ASIANPAINT", "M&M", "TRENT", "JSWSTEEL",
-    "AXISBANK", "BAJAJFINSV", "TATAMOTORS", "HINDALCO", "TATASTEEL", "ADANIENT",
+    "BDO", "JFC", "BPI", "MBT", "SM", "ITC", "SECB",
+    "TEL", "LT", "GTCAP", "AEV", "URC", "WIPRO",
+    "TITAN", "MARUTI", "MONDE", "ACEN", "SMPH", "NTPC", "ULTRACEMCO",
+    "RLC", "POWERGRID", "EMI", "M&M", "TRENT", "JSWSTEEL",
+    "DMC", "BAJAJFINSV", "MEG", "HINDALCO", "AP", "ALI",
     "COALINDIA", "SHRIRAMFIN", "INDUSINDBK", "NESTLEIND", "BPCL", "BEL",
     "GRASIM", "TATACONSUM", "EICHERMOT", "HEROMOTOCO", "HDFCLIFE", "BRITANNIA",
     "DIVISLAB", "CIPLA", "APOLLOHOSP", "SBILIFE", "DRREDDY", "BAJAJ-AUTO",
     "PIDILITIND", "HINDZINC", "VEDL", "IOC", "GAIL", "HINDALCO",
     "YESBANK", "IDEA", "SAIL", "BHEL", "PNB", "BANKBARODA",
-    "UNIONBANK", "CANBK", "INDIANB", "IDFCFIRSTB", "FEDERALBNK",
+    "CHP", "MJC", "HCOR", "ATN", "DMP",
     "MOTHERSUMI", "ASHOKLEY", "EICHERMOT", "MARICO", "DABUR",
     "COLPAL", "GODREJCP", "BRITANNIA", "HAVELLS", "VOLTAS",
     "SIEMENS", "ABB", "BATAINDIA", "JUBLFOOD", "RESTAURANT",
@@ -269,7 +269,7 @@ def run_backtest(data, months_horizon=3):
 
 def main():
     parser = argparse.ArgumentParser(description="Backtest conviction model")
-    parser.add_argument("--fetch", action="store_true", help="Download 5Y NSE data")
+    parser.add_argument("--fetch", action="store_true", help="Download 5Y PSE data")
     parser.add_argument("--run", action="store_true", help="Run backtest")
     parser.add_argument("--report", action="store_true", help="Print last report")
     args = parser.parse_args()

@@ -3,15 +3,21 @@
 Prepare high-quality, factual training corpus for Gemma-2B fine-tuning.
 Focus: Financial analysis, stock thesis explanation, risk assessment.
 No hallucination. Every claim is grounded in structured data.
+
+KNOWN GAP: a few thesis templates still describe PSE-listed companies (e.g.
+MARUTI-style entries) using "Indian passenger vehicles" / "Indian consumer"
+market-share framing left over from this file's original India-market
+version. Confirmed dead (no deployment/cron/CI reference) — review before
+using its output to train the live model.
 """
 
 import json
 
 training_examples = [
     {
-        "instruction": "Analyze the business quality of RELIANCE based on these metrics.",
+        "instruction": "Analyze the business quality of BDO based on these metrics.",
         "input": json.dumps({
-            "symbol": "RELIANCE",
+            "symbol": "BDO",
             "roe": 18.5,
             "roic": 16.2,
             "op_margin": 22.3,
@@ -23,13 +29,13 @@ training_examples = [
                 {"year": 2021, "revenue_growth": 22.1, "profit_growth": 31.2}
             ]
         }),
-        "output": "RELIANCE shows strong business quality with ROE of 18.5% and ROIC of 16.2%, both above sector median. Operating margin at 22.3% demonstrates efficient cost structure. Debt-to-equity ratio of 0.45 is conservative. However, profit growth has decelerated from 31.2% (2021) to 8.1% (2023), suggesting slower earnings momentum. FCF yield of 4.2% provides downside support but growth visibility remains uncertain.",
+        "output": "BDO shows strong business quality with ROE of 18.5% and ROIC of 16.2%, both above sector median. Operating margin at 22.3% demonstrates efficient cost structure. Debt-to-equity ratio of 0.45 is conservative. However, profit growth has decelerated from 31.2% (2021) to 8.1% (2023), suggesting slower earnings momentum. FCF yield of 4.2% provides downside support but growth visibility remains uncertain.",
         "source": "fundamental_analysis"
     },
     {
-        "instruction": "What is the risk profile for TCS given these metrics?",
+        "instruction": "What is the risk profile for JFC given these metrics?",
         "input": json.dumps({
-            "symbol": "TCS",
+            "symbol": "JFC",
             "pe_ratio": 28.5,
             "volatility_30d": 22.4,
             "debt_to_equity": 0.12,
@@ -38,15 +44,15 @@ training_examples = [
             "vix_equivalent": 26,
             "earnings_misses_count": 1
         }),
-        "output": "TCS carries MODERATE risk. Valuation at 28.5x P/E is elevated; any earnings miss triggers sharp repricing. 30-day volatility of 22.4% is above IT sector median, indicating headline sensitivity. Strong balance sheet (D/E 0.12, current ratio 1.8) provides downside cushion. Maximum 52-week drawdown of 18.3% shows normal correction range. One recent earnings miss signals need for execution monitoring. Watch for: FY25 guidance revision, client concentration shifts.",
+        "output": "JFC carries MODERATE risk. Valuation at 28.5x P/E is elevated; any earnings miss triggers sharp repricing. 30-day volatility of 22.4% is above IT sector median, indicating headline sensitivity. Strong balance sheet (D/E 0.12, current ratio 1.8) provides downside cushion. Maximum 52-week drawdown of 18.3% shows normal correction range. One recent earnings miss signals need for execution monitoring. Watch for: FY25 guidance revision, client concentration shifts.",
         "source": "risk_assessment"
     },
     {
-        "instruction": "Compare INFY and TCS on valuation.",
+        "instruction": "Compare SM and JFC on valuation.",
         "input": json.dumps({
             "stocks": [
                 {
-                    "symbol": "INFY",
+                    "symbol": "SM",
                     "pe": 25.2,
                     "pb": 4.8,
                     "ev_ebitda": 18.5,
@@ -55,7 +61,7 @@ training_examples = [
                     "roe": 15.2
                 },
                 {
-                    "symbol": "TCS",
+                    "symbol": "JFC",
                     "pe": 28.5,
                     "pb": 5.2,
                     "ev_ebitda": 20.1,
@@ -65,13 +71,13 @@ training_examples = [
                 }
             ]
         }),
-        "output": "INFY trades at 25.2x P/E vs TCS at 28.5x—INFY is 11% cheaper. On EV/EBITDA, INFY's 18.5x vs TCS's 20.1x shows similar discount. FCF yield slightly favors INFY (5.1% vs 4.8%), but dividend yield favors TCS (2.1% vs 1.8%). Both are fairly priced for their ROE (~15-17%). Valuation edge goes to INFY if growth outlooks are similar; otherwise quality premium justifies TCS's premium.",
+        "output": "SM trades at 25.2x P/E vs JFC at 28.5x—SM is 11% cheaper. On EV/EBITDA, SM's 18.5x vs JFC's 20.1x shows similar discount. FCF yield slightly favors SM (5.1% vs 4.8%), but dividend yield favors JFC (2.1% vs 1.8%). Both are fairly priced for their ROE (~15-17%). Valuation edge goes to SM if growth outlooks are similar; otherwise quality premium justifies JFC's premium.",
         "source": "comparative_analysis"
     },
     {
-        "instruction": "Assess the growth trajectory for HDFCBANK based on these numbers.",
+        "instruction": "Assess the growth trajectory for BPI based on these numbers.",
         "input": json.dumps({
-            "symbol": "HDFCBANK",
+            "symbol": "BPI",
             "revenue_cagr_3y": 18.2,
             "profit_cagr_3y": 22.5,
             "revenue_growth_yoy": 15.8,
@@ -80,7 +86,7 @@ training_examples = [
             "roe": 16.8,
             "npa_ratio": 1.2
         }),
-        "output": "HDFCBANK shows healthy growth trajectory with 3-year revenue CAGR of 18.2% and profit CAGR of 22.5%, indicating consistent earnings expansion. YoY growth of 15.8% (revenue) and 20.1% (profit) suggests sustained momentum. EPS growth of 19.5% is in line with profit growth, demonstrating no significant dilution. ROE of 16.8% indicates efficient capital use. NPA ratio of 1.2% is well below sector average. Monitor for: NPA trend direction, loan growth sustainability, net interest margin trajectory.",
+        "output": "BPI shows healthy growth trajectory with 3-year revenue CAGR of 18.2% and profit CAGR of 22.5%, indicating consistent earnings expansion. YoY growth of 15.8% (revenue) and 20.1% (profit) suggests sustained momentum. EPS growth of 19.5% is in line with profit growth, demonstrating no significant dilution. ROE of 16.8% indicates efficient capital use. NPA ratio of 1.2% is well below sector average. Monitor for: NPA trend direction, loan growth sustainability, net interest margin trajectory.",
         "source": "growth_analysis"
     },
     {
@@ -100,9 +106,9 @@ training_examples = [
         "source": "red_flag_analysis"
     },
     {
-        "instruction": "Explain the investment thesis for ASIANPAINT.",
+        "instruction": "Explain the investment thesis for EMI.",
         "input": json.dumps({
-            "symbol": "ASIANPAINT",
+            "symbol": "EMI",
             "roe": 22.4,
             "roic": 20.1,
             "op_margin": 18.5,
@@ -112,7 +118,7 @@ training_examples = [
             "pe": 58.2,
             "market_cap": 280000
         }),
-        "output": "ASIANPAINT's investment thesis centers on dominant market position in Indian paints (55%+ market share) translating into consistently high ROE of 22.4% and ROIC of 20.1%. Operating margin of 18.5% reflects pricing power and distribution efficiency. Near-zero debt (D/E 0.08) provides balance sheet resilience. Revenue CAGR of 14.5% with profit CAGR of 16.8% shows margin expansion. However, at 58.2x P/E, the market prices in perfection—any demand slowdown or raw material shock could trigger multiple compression. Watch for: rural demand trend, raw material cost inflation, competitive intensity from new entrants (Grasim, JSW).",
+        "output": "EMI's investment thesis centers on dominant market position in Philippine paints (55%+ market share) translating into consistently high ROE of 22.4% and ROIC of 20.1%. Operating margin of 18.5% reflects pricing power and distribution efficiency. Near-zero debt (D/E 0.08) provides balance sheet resilience. Revenue CAGR of 14.5% with profit CAGR of 16.8% shows margin expansion. However, at 58.2x P/E, the market prices in perfection—any demand slowdown or raw material shock could trigger multiple compression. Watch for: rural demand trend, raw material cost inflation, competitive intensity from new entrants (Grasim, JSW).",
         "source": "thesis_explanation"
     },
     {
@@ -128,13 +134,13 @@ training_examples = [
             "pe": 72.5,
             "market_cap": 295000
         }),
-        "output": "TITAN's bull case: (1) Structural growth in organized jewelry (only ~35% organized vs 65% unorganized) provides decades of market share gain runway. Revenue CAGR of 19.2% reflects this tailwind. (2) Profit CAGR of 24.5% outpacing revenue shows operating leverage—as scale grows, fixed costs are spread thinner. (3) ROIC of 22.3% indicates exceptional capital efficiency; every rupee invested generates strong returns. (4) Brand moat in watches and jewelry is among the strongest in Indian consumer. Risk: premium valuation at 72.5x P/E leaves no room for error. Watch for: same-store sales growth, gold price volatility impact, wedding season trends.",
+        "output": "TITAN's bull case: (1) Structural growth in organized jewelry (only ~35% organized vs 65% unorganized) provides decades of market share gain runway. Revenue CAGR of 19.2% reflects this tailwind. (2) Profit CAGR of 24.5% outpacing revenue shows operating leverage—as scale grows, fixed costs are spread thinner. (3) ROIC of 22.3% indicates exceptional capital efficiency; every rupee invested generates strong returns. (4) Brand moat in watches and jewelry is among the strongest in Philippine consumer. Risk: premium valuation at 72.5x P/E leaves no room for error. Watch for: same-store sales growth, gold price volatility impact, wedding season trends.",
         "source": "bull_case"
     },
     {
-        "instruction": "What is the bear case for ZOMATO?",
+        "instruction": "What is the bear case for FGEN?",
         "input": json.dumps({
-            "symbol": "ZOMATO",
+            "symbol": "FGEN",
             "pe": -45.2,
             "debt_to_equity": 0.35,
             "revenue_cagr_3y": 62.5,
@@ -144,7 +150,7 @@ training_examples = [
             "volatility_30d": 38.5,
             "market_cap": 165000
         }),
-        "output": "ZOMATO's bear case: (1) Despite 62.5% revenue CAGR, the company remains unprofitable with negative operating margin of -3.2%—growth is being bought, not earned. (2) Profit CAGR of -12.8% over 3 years means losses are compounding. Negative FCF yield of -2.5% indicates ongoing cash burn. (3) At negative P/E and market cap of ₹1.65 lakh crore, investors are pricing in future profitability that has not materialized. (4) Quick commerce expansion (Blinkit) adds execution risk and capital requirements. Watch for: path to profitability timeline, unit economics improvement, competitive pressure from Swiggy/Zepto.",
+        "output": "FGEN's bear case: (1) Despite 62.5% revenue CAGR, the company remains unprofitable with negative operating margin of -3.2%—growth is being bought, not earned. (2) Profit CAGR of -12.8% over 3 years means losses are compounding. Negative FCF yield of -2.5% indicates ongoing cash burn. (3) At negative P/E and market cap of ₱1.65 lakh crore, investors are pricing in future profitability that has not materialized. (4) Quick commerce expansion (Blinkit) adds execution risk and capital requirements. Watch for: path to profitability timeline, unit economics improvement, competitive pressure from Swiggy/Zepto.",
         "source": "bear_case"
     },
     {
@@ -162,7 +168,7 @@ training_examples = [
             "fii_flow_it": -1200,
             "fii_flow_pharma": 850
         }),
-        "output": "Sector rotation from IT to Pharma is supported by relative valuation and growth dynamics. Pharma trades at 22.1x P/E vs IT's 26.5x (17% cheaper) while growing nearly 2x faster (14.8% vs 8.2%). Pharma's 3-month momentum of +8.2% vs IT's -3.5% confirms capital rotation is underway. FII flows show ₹850Cr into Pharma vs ₹1,200Cr out of IT, validating institutional preference shift. Key drivers: USFDA approval pipeline for Pharma, INR depreciation benefiting exports, US rate cut cycle improving pharma demand. Monitor: US FDA plant inspection outcomes, IT client budgets for FY26, currency movement.",
+        "output": "Sector rotation from IT to Pharma is supported by relative valuation and growth dynamics. Pharma trades at 22.1x P/E vs IT's 26.5x (17% cheaper) while growing nearly 2x faster (14.8% vs 8.2%). Pharma's 3-month momentum of +8.2% vs IT's -3.5% confirms capital rotation is underway. FII flows show ₱850Cr into Pharma vs ₱1,200Cr out of IT, validating institutional preference shift. Key drivers: USFDA approval pipeline for Pharma, INR depreciation benefiting exports, US rate cut cycle improving pharma demand. Monitor: US FDA plant inspection outcomes, IT client budgets for FY26, currency movement.",
         "source": "sector_rotation"
     },
     {
@@ -217,9 +223,9 @@ training_examples = [
         "source": "risk_return_comparison"
     },
     {
-        "instruction": "What technical and fundamental factors support the thesis for BAJFINANCE?",
+        "instruction": "What technical and fundamental factors support the thesis for AEV?",
         "input": json.dumps({
-            "symbol": "BAJFINANCE",
+            "symbol": "AEV",
             "pe": 32.5,
             "roe": 18.2,
             "roic": 14.5,
@@ -233,7 +239,7 @@ training_examples = [
             "sma_200": 6550,
             "price": 7100
         }),
-        "output": "BAJFINANCE combines strong fundamentals with constructive technical setup. Fundamentals: ROE of 18.2% and ROIC of 14.5% demonstrate high-quality lending franchise. Revenue CAGR of 21.5% and profit CAGR of 19.8% show sustained growth momentum. NPA ratio of 1.5% is among the best in NBFCs. However, D/E of 3.8x is high (typical for NBFCs but still elevated). Technically: price at ₹7,100 is above both SMA-50 (₹6,850) and SMA-200 (₹6,550), confirming uptrend. RSI of 58.5 is neutral with room for upside. MACD positive crossover supports bullish momentum. Key risk: any credit cycle deterioration amplifies due to leverage. Watch for: AUM growth rate, credit cost trend, funding cost movement.",
+        "output": "AEV combines strong fundamentals with constructive technical setup. Fundamentals: ROE of 18.2% and ROIC of 14.5% demonstrate high-quality lending franchise. Revenue CAGR of 21.5% and profit CAGR of 19.8% show sustained growth momentum. NPA ratio of 1.5% is among the best in NBFCs. However, D/E of 3.8x is high (typical for NBFCs but still elevated). Technically: price at ₱7,100 is above both SMA-50 (₱6,850) and SMA-200 (₱6,550), confirming uptrend. RSI of 58.5 is neutral with room for upside. MACD positive crossover supports bullish momentum. Key risk: any credit cycle deterioration amplifies due to leverage. Watch for: AUM growth rate, credit cost trend, funding cost movement.",
         "source": "technical_fundamental_blend"
     },
     {
@@ -252,9 +258,9 @@ training_examples = [
         "source": "options_analysis"
     },
     {
-        "instruction": "Analyze HINDUNILVR's quality and what to watch.",
+        "instruction": "Analyze URC's quality and what to watch.",
         "input": json.dumps({
-            "symbol": "HINDUNILVR",
+            "symbol": "URC",
             "roe": 22.8,
             "roic": 19.5,
             "op_margin": 23.5,
@@ -266,7 +272,7 @@ training_examples = [
             "volume_growth": 4.2,
             "rural_exposure_pct": 40
         }),
-        "output": "HINDUNILVR is a high-quality franchise with ROE of 22.8% and ROIC of 19.5%, underpinned by powerful distribution network and brand portfolio. Operating margin of 23.5% is best-in-class among Indian FMCG. Near-zero debt (D/E 0.02) and FCF yield of 2.8% provide financial flexibility. The concern: revenue CAGR of 8.5% over 3 years is moderate, with volume growth of just 4.2%—meaning 4.3% comes from price increases. In a disinflationary environment, volume growth must accelerate to justify a 55.2x P/E. Rural recovery is key given 40% rural exposure. Watch for: rural growth trajectory, raw material (palm oil/crude) cost trend, competitive intensity from regional brands, volume vs price growth mix.",
+        "output": "URC is a high-quality franchise with ROE of 22.8% and ROIC of 19.5%, underpinned by powerful distribution network and brand portfolio. Operating margin of 23.5% is best-in-class among Philippine FMCG. Near-zero debt (D/E 0.02) and FCF yield of 2.8% provide financial flexibility. The concern: revenue CAGR of 8.5% over 3 years is moderate, with volume growth of just 4.2%—meaning 4.3% comes from price increases. In a disinflationary environment, volume growth must accelerate to justify a 55.2x P/E. Rural recovery is key given 40% rural exposure. Watch for: rural growth trajectory, raw material (palm oil/crude) cost trend, competitive intensity from regional brands, volume vs price growth mix.",
         "source": "quality_with_concerns"
     }
 ]

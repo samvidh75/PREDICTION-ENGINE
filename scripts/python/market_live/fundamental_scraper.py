@@ -1,9 +1,19 @@
 """
-Screener.in CSV exports + BSE XBRL filing downloader.
+Screener.in CSV exports + PSE filing downloader.
 
 Reads public Excel/CSV exports with pandas and structures data for DB upload.
 
 Rate-limited with 3-5s pauses between requests.
+
+KNOWN GAP: screener.in is an India-only fundamentals aggregator with no
+Philippine equivalent — the screener_export/screener_ratios_summary/
+screener_peers functions below scrape it directly and were never re-pointed
+at a PSE data source. Confirmed dead (no deployment/cron/CI reference), so
+nothing in production consumes this today, but calling these functions
+manually would still pull real Indian company data. pse_corp_filings()
+below (previously bse_corp_filings, hitting the real Indian BSE API under a
+"PSE" label) has been fixed to a documented no-op — see PSEEdgeScraper.ts
+for the verified, working PSE disclosure scraper instead.
 """
 import time
 import random
@@ -106,59 +116,21 @@ def screener_export(symbol: str) -> Optional[pd.DataFrame]:
     return None
 
 
-# ── BSE Corporate filings (XBRL) ────────────────────────────────
+# ── PSE Corporate filings ────────────────────────────────────────
 
-def bse_corp_filings(symbol: str, num_filings: int = 10) -> list[dict]:
+def pse_corp_filings(symbol: str, num_filings: int = 10) -> list[dict]:
     """
-    Fetch latest BSE corporate filings for a company.
-    
-    Uses BSE's public API: https://api.bseindia.com
-    Returns list of filings with links to XBRL/PDF files.
+    Fetch latest PSE corporate filings for a company.
+
+    KNOWN GAP (fixed from a real bug): this function previously called the
+    real Indian BSE API (api.bseindia.com) under a "PSE" label — meaning a
+    live call would fetch real Indian corporate announcements mislabeled as
+    Philippine ones. Corporate filings for PSE-listed companies are
+    published via PSE EDGE (edge.pse.com.ph) — see PSEEdgeScraper.ts for the
+    verified scraper. This function returns no results rather than the
+    wrong country's real endpoint.
     """
-    cache_key = f"bse_filings_{symbol.upper()}"
-    p = CACHE_DIR / f"{cache_key}.json"
-    if p.exists():
-        age = time.time() - p.stat().st_mtime
-        if age < 3600:
-            import json
-            return json.loads(p.read_text())
-
-    _pause()
-    s = _session()
-    s.headers.update({
-        "Referer": "https://www.bseindia.com/",
-        "Origin": "https://www.bseindia.com",
-    })
-
-    # BSE API endpoint for corporate announcements
-    url = (
-        f"https://api.bseindia.com/BseIndiaAPI/api/AnnSubSysGetData/"
-        f"?strCat=-1&strPrevDate=&strPostDate=&strSearch=P&strToDate="
-        f"&strFromDate=&strQuater=&strSegment=All&strSCrip={symbol.upper()}"
-    )
-    try:
-        r = s.get(url, timeout=30)
-        r.raise_for_status()
-        data = r.json()
-    except Exception:
-        return []
-
-    filings = []
-    table = data.get("Table", [])
-    for row in table[:num_filings]:
-        filings.append({
-            "symbol": symbol.upper(),
-            "filingName": row.get("NEWS_DESC", ""),
-            "filingDate": row.get("NEWS_DT", ""),
-            "category": row.get("CATEGORYNAME", ""),
-            "attachment": row.get("ATTACHMENTNAME", ""),
-            "source": "BSE",
-            "fetchedAt": datetime.now().isoformat(),
-        })
-
-    import json
-    p.write_text(json.dumps(filings, default=str))
-    return filings
+    return []
 
 
 # ── Parse quarterly P&L, balance sheet, ratios ──────────────────
@@ -217,11 +189,11 @@ def screener_ratios_summary(symbol: str) -> dict:
     return summary
 
 
-# ── BSE XBRL financial statements download ──────────────────────
+# ── PSE XBRL financial statements download ──────────────────────
 
 def download_xbrl(url: str, save_dir: Optional[Path] = None) -> Optional[Path]:
     """
-    Download an XBRL (XML) filing from BSE.
+    Download an XBRL (XML) filing from PSE.
     Returns path to saved file.
     """
     if save_dir is None:
@@ -294,12 +266,12 @@ def _json_safe(value):
 
 
 def run_cli() -> int:
-    parser = argparse.ArgumentParser(description="Screener.in + BSE filings helper")
-    parser.add_argument("--symbol", default="RELIANCE", help="Indian symbol to fetch")
-    parser.add_argument("--mode", choices=["screener", "bse", "both"], default="both", help="What to fetch")
+    parser = argparse.ArgumentParser(description="Screener.in + PSE filings helper")
+    parser.add_argument("--symbol", default="BDO", help="PSE symbol to fetch")
+    parser.add_argument("--mode", choices=["screener", "secondary", "both"], default="both", help="What to fetch")
     parser.add_argument("--output-dir", default=str(CACHE_DIR / "official"), help="Directory for JSON snapshots")
-    parser.add_argument("--num-filings", type=int, default=10, help="Number of BSE filings to keep")
-    parser.add_argument("--xbrl-url", default="", help="Optional BSE XBRL/PDF URL to download")
+    parser.add_argument("--num-filings", type=int, default=10, help="Number of PSE filings to keep")
+    parser.add_argument("--xbrl-url", default="", help="Optional PSE XBRL/PDF URL to download")
     args = parser.parse_args()
 
     symbol = args.symbol.upper().strip()
@@ -317,9 +289,9 @@ def run_cli() -> int:
             payload["balanceSheetRows"] = _json_safe(parse_screener_balance_sheet(screener_df))
             payload["ratioRows"] = _json_safe(parse_screener_ratios(screener_df))
 
-    if args.mode in ("bse", "both"):
-        filings = bse_corp_filings(symbol, num_filings=args.num_filings)
-        payload["bseFilings"] = filings
+    if args.mode in ("secondary", "both"):
+        filings = pse_corp_filings(symbol, num_filings=args.num_filings)
+        payload["pseFilings"] = filings
 
     if args.xbrl_url:
         downloaded = download_xbrl(args.xbrl_url, output_dir / "xbrl")

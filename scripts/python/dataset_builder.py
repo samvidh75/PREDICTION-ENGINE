@@ -1,12 +1,12 @@
 """
-MasterDatasetBuilder — Indian Stock Market Training Dataset Engine
+MasterDatasetBuilder — Philippine stock market Training Dataset Engine
 ==================================================================
 Extracts raw financial context, maps to structured training nodes,
 and exports to fine-tuning format compatible with Unsloth.
 
 Usage:
     python dataset_builder.py
-    Produces master_indian_market_train.json
+    Produces master_pse_market_train.json
 """
 
 import json
@@ -16,7 +16,7 @@ from datetime import datetime
 
 
 class MasterDatasetBuilder:
-    def __init__(self, output_path="master_indian_market_train.json"):
+    def __init__(self, output_path="master_pse_market_train.json"):
         self.output_path = output_path
         self.training_pool = []
 
@@ -37,7 +37,7 @@ class MasterDatasetBuilder:
         return False
 
     def compile_fundamental_node(self, ticker, balance_sheet_dict, auditor_notes, sector=""):
-        instruction = "Evaluate corporate governance and fundamental sustainability for an Indian equity."
+        instruction = "Evaluate corporate governance and fundamental sustainability for a PSE-listed equity."
         pe = balance_sheet_dict.get("pe", 0)
         debt_to_equity = balance_sheet_dict.get("debt_to_equity", 0)
         promoter_pledge = balance_sheet_dict.get("promoter_pledged_pct", 0)
@@ -98,7 +98,7 @@ class MasterDatasetBuilder:
         self._append_to_pool(instruction, input_context, output_response)
 
     def compile_technical_anomaly_node(self, ticker, ohlc_history, order_flow_notes, sector=""):
-        instruction = "Analyze technical price structures and institutional order flow anomalies on the NSE."
+        instruction = "Analyze technical price structures and institutional order flow anomalies on the PSE."
 
         df = [{"close": c, "volume": v} for c, v in ohlc_history]
         current_price = df[-1]["close"]
@@ -161,34 +161,34 @@ class MasterDatasetBuilder:
 
         self._append_to_pool(instruction, input_context, output_response)
 
-    def compile_regulatory_node(self, sector, sebi_circular_text, impacted_tickers):
-        instruction = "Assess the structural impact of a SEBI regulatory circular on market mechanics."
-        input_context = f"Sector: {sector} | SEBI Action: {sebi_circular_text} | Impacted Assets: {impacted_tickers}"
+    def compile_regulatory_node(self, sector, sec_circular_text, impacted_tickers):
+        instruction = "Assess the structural impact of a SEC regulatory circular on market mechanics."
+        input_context = f"Sector: {sector} | SEC Action: {sec_circular_text} | Impacted Assets: {impacted_tickers}"
 
-        lower_text = sebi_circular_text.lower()
+        lower_text = sec_circular_text.lower()
         if "ban" in lower_text or "restrict" in lower_text or "surveillance" in lower_text:
             output_response = (
-                f"The unexpected SEBI regulatory intervention instantly shifts sector dynamics for {sector}. "
+                f"The unexpected SEC regulatory intervention instantly shifts sector dynamics for {sector}. "
                 f"Imposing strict margin ceilings or altered indexing parameters compresses short-term "
                 f"speculative volume across {impacted_tickers}, forcing institutional capital reallocation. "
                 f"Calculated Healthometer for affected names: 30/100. Elevated caution advised."
             )
         elif "liberalise" in lower_text or "relax" in lower_text or "permit" in lower_text:
             output_response = (
-                f"SEBI's deregulatory step expands the addressable opportunity for {impacted_tickers} in {sector}. "
+                f"SEC's deregulatory step expands the addressable opportunity for {impacted_tickers} in {sector}. "
                 f"Lower compliance burdens and relaxed operating norms are likely to attract increased "
                 f"retail and institutional participation. "
                 f"Calculated Healthometer for affected names: 75/100. Constructive outlook."
             )
         elif "mandate" in lower_text or "require" in lower_text:
             output_response = (
-                f"This SEBI circular introduces procedural compliance requirements for {sector}. "
+                f"This SEC circular introduces procedural compliance requirements for {sector}. "
                 f"While the intent is structural improvement, near-term compliance costs may create headwinds. "
                 f"Calculated Healthometer for affected names: 55/100. Neutral near-term."
             )
         else:
             output_response = (
-                f"This SEBI circular introduces procedural changes to {sector} market mechanics. "
+                f"This SEC circular introduces procedural changes to {sector} market mechanics. "
                 f"Market participants will require 2-3 trading sessions to fully price in the new "
                 f"operating parameters. Calculated Healthometer: 55/100. Neutral near-term."
             )
@@ -196,7 +196,7 @@ class MasterDatasetBuilder:
         self._append_to_pool(instruction, input_context, output_response)
 
     def compile_sector_rotation_node(self, sector, macro_data, fii_dii_flow):
-        instruction = "Analyze sector rotation dynamics and capital flow trends in Indian markets."
+        instruction = "Analyze sector rotation dynamics and capital flow trends in the Philippine market."
         fii = fii_dii_flow.get("fii", "Neutral")
         dii = fii_dii_flow.get("dii", "Neutral")
 
@@ -240,7 +240,7 @@ class MasterDatasetBuilder:
         self._append_to_pool(instruction, input_context, output_response)
 
     def compile_earnings_node(self, ticker, earnings_data, sector=""):
-        instruction = "Analyze quarterly earnings performance and management commentary for an Indian equity."
+        instruction = "Analyze quarterly earnings performance and management commentary for a PSE-listed equity."
         beat_miss = earnings_data.get("result", "Inline")
         revenue_growth = earnings_data.get("revenue_growth", 0)
         margin_change = earnings_data.get("margin_change", 0)
@@ -346,72 +346,72 @@ class MasterDatasetBuilder:
 
 def generate_master_dataset():
     """Generate a comprehensive master training dataset."""
-    builder = MasterDatasetBuilder(output_path="master_indian_market_train.json")
+    builder = MasterDatasetBuilder(output_path="master_pse_market_train.json")
 
     # ── Fundamental Nodes (21) ──────────────────────────
     fundamental_cases = [
-        ("RELIANCE", {"pe": 32.4, "debt_to_equity": 0.8, "promoter_pledged_pct": 0, "roce": 16.2, "revenue_growth": 12}, "Standard audit opinion. All entities consolidated.", "Energy/Telco/Retail"),
-        ("TATAMOTORS", {"pe": 28.5, "debt_to_equity": 1.2, "promoter_pledged_pct": 0, "roce": 14.8, "revenue_growth": 18}, "Audit opinion unqualified. JLR subsidiary audited separately.", "Auto"),
-        ("ADANIENT", {"pe": 45.2, "debt_to_equity": 1.8, "promoter_pledged_pct": 52.4, "roce": 8.5, "revenue_growth": 22}, "Auditor noted multi-layered shell entities handling capital distribution streams.", "Diversified"),
-        ("HDFCBANK", {"pe": 18.2, "debt_to_equity": 0.4, "promoter_pledged_pct": 0, "roce": 14.5, "revenue_growth": 16}, "Clean audit report. Provisioning coverage maintained at 74%.", "Banking"),
-        ("INFY", {"pe": 22.1, "debt_to_equity": 0.1, "promoter_pledged_pct": 0, "roce": 32.4, "revenue_growth": 5}, "Auditor notes no material discrepancies. Revenue recognition policy consistent.", "IT"),
-        ("TCS", {"pe": 26.3, "debt_to_equity": 0.05, "promoter_pledged_pct": 0, "roce": 48.2, "revenue_growth": 8}, "Clean audit with robust internal financial controls.", "IT"),
-        ("SBIN", {"pe": 9.6, "debt_to_equity": 0.6, "promoter_pledged_pct": 0, "roce": 12.2, "revenue_growth": 14}, "Audit flagged agri-loan slippages due to uneven monsoon. CET-1 at 13.6%.", "Banking"),
+        ("BDO", {"pe": 32.4, "debt_to_equity": 0.8, "promoter_pledged_pct": 0, "roce": 16.2, "revenue_growth": 12}, "Standard audit opinion. All entities consolidated.", "Energy/Telco/Retail"),
+        ("MEG", {"pe": 28.5, "debt_to_equity": 1.2, "promoter_pledged_pct": 0, "roce": 14.8, "revenue_growth": 18}, "Audit opinion unqualified. JLR subsidiary audited separately.", "Auto"),
+        ("ALI", {"pe": 45.2, "debt_to_equity": 1.8, "promoter_pledged_pct": 52.4, "roce": 8.5, "revenue_growth": 22}, "Auditor noted multi-layered shell entities handling capital distribution streams.", "Diversified"),
+        ("BPI", {"pe": 18.2, "debt_to_equity": 0.4, "promoter_pledged_pct": 0, "roce": 14.5, "revenue_growth": 16}, "Clean audit report. Provisioning coverage maintained at 74%.", "Banking"),
+        ("SM", {"pe": 22.1, "debt_to_equity": 0.1, "promoter_pledged_pct": 0, "roce": 32.4, "revenue_growth": 5}, "Auditor notes no material discrepancies. Revenue recognition policy consistent.", "IT"),
+        ("JFC", {"pe": 26.3, "debt_to_equity": 0.05, "promoter_pledged_pct": 0, "roce": 48.2, "revenue_growth": 8}, "Clean audit with robust internal financial controls.", "IT"),
+        ("SECB", {"pe": 9.6, "debt_to_equity": 0.6, "promoter_pledged_pct": 0, "roce": 12.2, "revenue_growth": 14}, "Audit flagged agri-loan slippages due to uneven monsoon. CET-1 at 13.6%.", "Banking"),
         ("VEDL", {"pe": 12.8, "debt_to_equity": 1.5, "promoter_pledged_pct": 38.2, "roce": 18.5, "revenue_growth": 8}, "Auditor draws attention to related party transactions with promoter group entities.", "Metals"),
-        ("PAYTM", {"pe": 0, "debt_to_equity": 0.2, "promoter_pledged_pct": 0, "roce": -5.2, "revenue_growth": -15}, "Auditor highlights going concern uncertainty due to regulatory restrictions on payments bank.", "Fintech"),
-        ("DMART", {"pe": 72.3, "debt_to_equity": 0.0, "promoter_pledged_pct": 0, "roce": 22.8, "revenue_growth": 12}, "Clean audit. Cash-rich balance sheet with zero debt.", "Retail"),
+        ("MWIDE", {"pe": 0, "debt_to_equity": 0.2, "promoter_pledged_pct": 0, "roce": -5.2, "revenue_growth": -15}, "Auditor highlights going concern uncertainty due to regulatory restrictions on payments bank.", "Fintech"),
+        ("ANI", {"pe": 72.3, "debt_to_equity": 0.0, "promoter_pledged_pct": 0, "roce": 22.8, "revenue_growth": 12}, "Clean audit. Cash-rich balance sheet with zero debt.", "Retail"),
         ("LT", {"pe": 32.5, "debt_to_equity": 0.3, "promoter_pledged_pct": 0, "roce": 18.2, "revenue_growth": 20}, "Auditor notes order book execution risk on international projects.", "Infrastructure"),
         ("JUBLFOOD", {"pe": 55.2, "debt_to_equity": 0.6, "promoter_pledged_pct": 0, "roce": 12.5, "revenue_growth": 6}, "Audit notes increasing store payback period and franchisee profitability concerns.", "QSR"),
-        ("ZOMATO", {"pe": 0, "debt_to_equity": 0.0, "promoter_pledged_pct": 0, "roce": -2.1, "revenue_growth": 62}, "First-time PAT positive. Auditor notes competition risks in quick-commerce.", "Internet"),
+        ("FGEN", {"pe": 0, "debt_to_equity": 0.0, "promoter_pledged_pct": 0, "roce": -2.1, "revenue_growth": 62}, "First-time PAT positive. Auditor notes competition risks in quick-commerce.", "Internet"),
         ("HINDALCO", {"pe": 14.5, "debt_to_equity": 1.2, "promoter_pledged_pct": 0, "roce": 11.5, "revenue_growth": -3}, "Audit notes impact of LME price volatility on inventory valuation.", "Metals"),
-        ("ICICIBANK", {"pe": 17.8, "debt_to_equity": 0.3, "promoter_pledged_pct": 0, "roce": 15.8, "revenue_growth": 18}, "Best-in-class asset quality report. Provision coverage at 80%.", "Banking"),
+        ("MBT", {"pe": 17.8, "debt_to_equity": 0.3, "promoter_pledged_pct": 0, "roce": 15.8, "revenue_growth": 18}, "Best-in-class asset quality report. Provision coverage at 80%.", "Banking"),
         ("MARUTI", {"pe": 28.5, "debt_to_equity": 0.1, "promoter_pledged_pct": 0, "roce": 19.8, "revenue_growth": 11}, "Clean audit. Strong operating cash flows with capex for EV transition.", "Auto"),
         ("ITC", {"pe": 25.2, "debt_to_equity": 0.0, "promoter_pledged_pct": 0, "roce": 28.5, "revenue_growth": 7}, "Clean audit with consistent dividend payout for 15 consecutive years.", "FMCG/Cigarettes"),
-        ("TATASTEEL", {"pe": 22.1, "debt_to_equity": 1.8, "promoter_pledged_pct": 0, "roce": 9.5, "revenue_growth": -5}, "Audit flagged impact of EU carbon border tax on export profitability.", "Metals"),
-        ("ASIANPAINT", {"pe": 48.2, "debt_to_equity": 0.05, "promoter_pledged_pct": 0, "roce": 35.2, "revenue_growth": 9}, "Clean audit with strong internal financial controls and stable margins.", "Consumer"),
+        ("AP", {"pe": 22.1, "debt_to_equity": 1.8, "promoter_pledged_pct": 0, "roce": 9.5, "revenue_growth": -5}, "Audit flagged impact of EU carbon border tax on export profitability.", "Metals"),
+        ("EMI", {"pe": 48.2, "debt_to_equity": 0.05, "promoter_pledged_pct": 0, "roce": 35.2, "revenue_growth": 9}, "Clean audit with strong internal financial controls and stable margins.", "Consumer"),
         ("TITAN", {"pe": 62.3, "debt_to_equity": 0.08, "promoter_pledged_pct": 0, "roce": 28.8, "revenue_growth": 18}, "Clean audit. Management commentary confident about jewellery demand outlook.", "Consumer/Retail"),
-        ("SUNPHARMA", {"pe": 22.5, "debt_to_equity": 0.4, "promoter_pledged_pct": 0, "roce": 16.8, "revenue_growth": 14}, "Clean audit. USFDA compliance status normal. R&D pipeline progressing.", "Pharma"),
+        ("MONDE", {"pe": 22.5, "debt_to_equity": 0.4, "promoter_pledged_pct": 0, "roce": 16.8, "revenue_growth": 14}, "Clean audit. USFDA compliance status normal. R&D pipeline progressing.", "Pharma"),
     ]
     for ticker, bsheet, notes, sector in fundamental_cases:
         builder.compile_fundamental_node(ticker, bsheet, notes, sector)
 
     # ── Technical Anomaly Nodes (17) ─────────────────────
     technical_cases = [
-        ("RELIANCE", [(2400, 100000), (2420, 120000), (2450, 95000), (2480, 110000), (2490, 450000)], {"delivery_pct": 72, "notes": "Institutional block deal detected via NSE co-location server window tracking."}, "Energy"),
-        ("TATAMOTORS", [(850, 200000), (870, 180000), (890, 220000), (910, 350000), (920, 520000)], {"delivery_pct": 68, "notes": "FII bought 2.3M shares via bulk deal. Delivery volume at 68%."}, "Auto"),
-        ("ADANIPORTS", [(1250, 300000), (1230, 280000), (1200, 350000), (1180, 420000), (1150, 510000)], {"delivery_pct": 32, "notes": "Continued delivery selling. DIIs reducing stake."}, "Infrastructure"),
-        ("HDFCBANK", [(1620, 150000), (1640, 140000), (1650, 160000), (1660, 155000), (1670, 148000)], {"delivery_pct": 58, "notes": "Normal trading pattern. No unusual block activity."}, "Banking"),
-        ("INFY", [(1450, 250000), (1430, 350000), (1410, 420000), (1400, 380000), (1390, 310000)], {"delivery_pct": 45, "notes": "US-based fund reduced stake by 1.2% via open market."}, "IT"),
-        ("ZOMATO", [(220, 800000), (235, 1200000), (248, 950000), (250, 1500000), (268, 2500000)], {"delivery_pct": 76, "notes": "Mutual funds increased allocation. Delivery percentage elevated."}, "Internet"),
-        ("DMART", [(5100, 300000), (5050, 450000), (4980, 600000), (4920, 550000), (4800, 480000)], {"delivery_pct": 38, "notes": "Insider selling by promoter entity via bulk deal window."}, "Retail"),
+        ("BDO", [(2400, 100000), (2420, 120000), (2450, 95000), (2480, 110000), (2490, 450000)], {"delivery_pct": 72, "notes": "Institutional block deal detected via PSE co-location server window tracking."}, "Energy"),
+        ("MEG", [(850, 200000), (870, 180000), (890, 220000), (910, 350000), (920, 520000)], {"delivery_pct": 68, "notes": "FII bought 2.3M shares via bulk deal. Delivery volume at 68%."}, "Auto"),
+        ("SMPH", [(1250, 300000), (1230, 280000), (1200, 350000), (1180, 420000), (1150, 510000)], {"delivery_pct": 32, "notes": "Continued delivery selling. DIIs reducing stake."}, "Infrastructure"),
+        ("BPI", [(1620, 150000), (1640, 140000), (1650, 160000), (1660, 155000), (1670, 148000)], {"delivery_pct": 58, "notes": "Normal trading pattern. No unusual block activity."}, "Banking"),
+        ("SM", [(1450, 250000), (1430, 350000), (1410, 420000), (1400, 380000), (1390, 310000)], {"delivery_pct": 45, "notes": "US-based fund reduced stake by 1.2% via open market."}, "IT"),
+        ("FGEN", [(220, 800000), (235, 1200000), (248, 950000), (250, 1500000), (268, 2500000)], {"delivery_pct": 76, "notes": "Mutual funds increased allocation. Delivery percentage elevated."}, "Internet"),
+        ("ANI", [(5100, 300000), (5050, 450000), (4980, 600000), (4920, 550000), (4800, 480000)], {"delivery_pct": 38, "notes": "Insider selling by promoter entity via bulk deal window."}, "Retail"),
         ("TRENT", [(5500, 120000), (5400, 180000), (5300, 250000), (5200, 350000), (5100, 420000)], {"delivery_pct": 35, "notes": "Profit booking by early-stage investors. Delivery ratio declining."}, "Retail"),
         ("LT", [(3400, 180000), (3500, 220000), (3550, 280000), (3600, 350000), (3640, 420000)], {"delivery_pct": 71, "notes": "Block deal of 4.2M shares between two large institutional funds."}, "Infrastructure"),
         ("COALINDIA", [(460, 900000), (465, 850000), (470, 920000), (475, 880000), (480, 950000)], {"delivery_pct": 62, "notes": "Steady accumulation by dividend yield funds."}, "Mining"),
         ("WIPRO", [(560, 310000), (550, 380000), (540, 420000), (530, 480000), (520, 520000)], {"delivery_pct": 33, "notes": "Contributed delivery selling post weak Q4. FIIs net sellers."}, "IT"),
-        ("ICICIBANK", [(1050, 250000), (1060, 280000), (1070, 320000), (1080, 350000), (1100, 400000)], {"delivery_pct": 74, "notes": "FII buying streak for 8 consecutive sessions. Delivery at 74%."}, "Banking"),
+        ("MBT", [(1050, 250000), (1060, 280000), (1070, 320000), (1080, 350000), (1100, 400000)], {"delivery_pct": 74, "notes": "FII buying streak for 8 consecutive sessions. Delivery at 74%."}, "Banking"),
         ("HINDALCO", [(645, 350000), (635, 420000), (640, 380000), (630, 510000), (620, 580000)], {"delivery_pct": 41, "notes": "LME price decline triggered FII sell-off. Delivery moderate."}, "Metals"),
         ("MARUTI", [(11500, 280000), (11600, 320000), (11700, 300000), (11750, 350000), (11800, 380000)], {"delivery_pct": 69, "notes": "Institutional accumulation ahead of CNG model launch. Delivery elevated."}, "Auto"),
-        ("BAJFINANCE", [(7100, 180000), (7200, 220000), (7250, 250000), (7300, 280000), (7350, 310000)], {"delivery_pct": 72, "notes": "MFs increased AUM allocation. Consistent delivery above 70%."}, "Financial"),
+        ("AEV", [(7100, 180000), (7200, 220000), (7250, 250000), (7300, 280000), (7350, 310000)], {"delivery_pct": 72, "notes": "MFs increased AUM allocation. Consistent delivery above 70%."}, "Financial"),
         ("POWERGRID", [(325, 2000000), (330, 2400000), (335, 2200000), (340, 2800000), (345, 3100000)], {"delivery_pct": 65, "notes": "Steady buying by infrastructure-themed funds. Delivery stable."}, "Power"),
-        ("TATASTEEL", [(170, 2500000), (168, 2800000), (165, 3200000), (163, 3500000), (160, 3800000)], {"delivery_pct": 36, "notes": "Global steel price concerns triggering delivery-based selling."}, "Metals"),
+        ("AP", [(170, 2500000), (168, 2800000), (165, 3200000), (163, 3500000), (160, 3800000)], {"delivery_pct": 36, "notes": "Global steel price concerns triggering delivery-based selling."}, "Metals"),
     ]
     for ticker, ohlc, flow, sector in technical_cases:
         builder.compile_technical_anomaly_node(ticker, ohlc, flow, sector)
 
     # ── Regulatory Nodes (12) ────────────────────────────
     regulatory_cases = [
-        ("Midcap Derivatives", "SEBI increases minimum contract value to 15 Lakhs and restricts weekly expiries to 1 per exchange.", "Volatility Index, Nifty Midcap Select, BSE Midcap"),
-        ("F&O Segment", "SEBI bans new F&O entries in 10 illiquid stocks citing excessive speculation.", "Repco Home Finance, South Indian Bank, 8 others"),
-        ("ASM Framework", "SEBI expands Graded Surveillance Measure to include 150 additional stocks with price band of 5%.", "Small-cap universe, 150 newly added names"),
-        ("ESG Disclosure", "SEBI mandates BRSR core assurance for top 250 listed entities from FY25.", "Nifty 50, Nifty Next 50 constituents"),
-        ("IPO Framework", "SEBI relaxes anchor investor lock-in period from 90 to 30 days for mainboard IPOs.", "Primary market pipeline, HNI investors"),
-        ("Mutual Fund", "SEBI introduces New Fund Offer (NFO) guideline limiting sectoral fund launches to 2 per AMC per year.", "Mutual fund industry, Sectoral fund managers"),
-        ("Corporate Bonds", "SEBI permits FPIs to trade corporate bonds on Request for Quote platform with same-day settlement.", "Corporate bond market, FPI community"),
-        ("Stock Lending", "SEBI relaxes SLBM norms allowing retail participation in securities lending.", "Retail broking, Market making firms"),
-        ("REITs/InvITs", "SEBI mandates minimum public unitholding of 25% for all REITs and InvITs within 3 years.", "REITs, InvITs, HNI investors"),
-        ("M&A Disclosure", "SEBI tightens disclosure norms for related party transactions requiring shareholder approval above 5% threshold.", "Corporate India, Minority shareholders"),
-        ("Digital Payments", "SEBI permits UPI-based block mechanism for secondary market trading with auto-payment settlement.", "Retail investors, Stock brokers, Clearing corporations"),
-        ("Rights Issue", "SEBI reduces rights issue timeline from 317 days to 23 days via automated fast-track mechanism.", "Listed companies, Existing shareholders"),
+        ("Midcap Derivatives", "SEC increases minimum contract value to 15 Lakhs and restricts weekly expiries to 1 per exchange.", "Volatility Index, Nifty Midcap Select, PSE Midcap"),
+        ("F&O Segment", "SEC bans new F&O entries in 10 illiquid stocks citing excessive speculation.", "PHL small-cap financials, 8 others"),
+        ("ASM Framework", "SEC expands Graded Surveillance Measure to include 150 additional stocks with price band of 5%.", "Small-cap universe, 150 newly added names"),
+        ("ESG Disclosure", "SEC mandates BRSR core assurance for top 250 listed entities from FY25.", "Nifty 50, Nifty Next 50 constituents"),
+        ("IPO Framework", "SEC relaxes anchor investor lock-in period from 90 to 30 days for mainboard IPOs.", "Primary market pipeline, HNI investors"),
+        ("Mutual Fund", "SEC introduces New Fund Offer (NFO) guideline limiting sectoral fund launches to 2 per AMC per year.", "Mutual fund industry, Sectoral fund managers"),
+        ("Corporate Bonds", "SEC permits FPIs to trade corporate bonds on Request for Quote platform with same-day settlement.", "Corporate bond market, FPI community"),
+        ("Stock Lending", "SEC relaxes SLBM norms allowing retail participation in securities lending.", "Retail broking, Market making firms"),
+        ("REITs/InvITs", "SEC mandates minimum public unitholding of 25% for all REITs and InvITs within 3 years.", "REITs, InvITs, HNI investors"),
+        ("M&A Disclosure", "SEC tightens disclosure norms for related party transactions requiring shareholder approval above 5% threshold.", "Corporate India, Minority shareholders"),
+        ("Digital Payments", "SEC permits UPI-based block mechanism for secondary market trading with auto-payment settlement.", "Retail investors, Stock brokers, Clearing corporations"),
+        ("Rights Issue", "SEC reduces rights issue timeline from 317 days to 23 days via automated fast-track mechanism.", "Listed companies, Existing shareholders"),
     ]
     for sector, circular, tickers in regulatory_cases:
         builder.compile_regulatory_node(sector, circular, tickers)
@@ -436,33 +436,33 @@ def generate_master_dataset():
 
     # ── Earnings Nodes (13) ──────────────────────────────
     earnings_cases = [
-        ("TCS", {"result": "Beat", "revenue_growth": 8.2, "margin_change": 120, "guidance": "Positive", "commentary": "Demand environment improving. BFSI vertical returning to growth."}, "IT"),
-        ("TATAMOTORS", {"result": "Beat", "revenue_growth": 18.5, "margin_change": 250, "guidance": "Raised", "commentary": "JLR margins at 9-year high. EV volumes accelerating."}, "Auto"),
+        ("JFC", {"result": "Beat", "revenue_growth": 8.2, "margin_change": 120, "guidance": "Positive", "commentary": "Demand environment improving. BFSI vertical returning to growth."}, "IT"),
+        ("MEG", {"result": "Beat", "revenue_growth": 18.5, "margin_change": 250, "guidance": "Raised", "commentary": "JLR margins at 9-year high. EV volumes accelerating."}, "Auto"),
         ("WIPRO", {"result": "Miss", "revenue_growth": 2.1, "margin_change": -80, "guidance": "Cut", "commentary": "Client discretionary spending remains weak. Consulting revenue down."}, "IT"),
-        ("HDFCBANK", {"result": "Inline", "revenue_growth": 16.2, "margin_change": 10, "guidance": "Maintained", "commentary": "NIM steady at 3.6%. Asset quality stable."}, "Banking"),
-        ("DMART", {"result": "Miss", "revenue_growth": 8.0, "margin_change": -40, "guidance": "Maintained", "commentary": "Same-store sales growth decelerated to 8% from 16% YoY."}, "Retail"),
-        ("RELIANCE", {"result": "Inline", "revenue_growth": 12.5, "margin_change": 30, "guidance": "Positive", "commentary": "Telecom ARPU improving. Retail EBITDA margins expanding."}, "Diversified"),
-        ("ICICIBANK", {"result": "Beat", "revenue_growth": 19.5, "margin_change": 45, "guidance": "Raised", "commentary": "Retail loan growth at 22%. Fee income diversification strong."}, "Banking"),
-        ("BAJFINANCE", {"result": "Beat", "revenue_growth": 24.5, "margin_change": 15, "guidance": "Positive", "commentary": "AUM crossing 4L Cr mark. Rural disbursements outperforming."}, "Financial"),
+        ("BPI", {"result": "Inline", "revenue_growth": 16.2, "margin_change": 10, "guidance": "Maintained", "commentary": "NIM steady at 3.6%. Asset quality stable."}, "Banking"),
+        ("ANI", {"result": "Miss", "revenue_growth": 8.0, "margin_change": -40, "guidance": "Maintained", "commentary": "Same-store sales growth decelerated to 8% from 16% YoY."}, "Retail"),
+        ("BDO", {"result": "Inline", "revenue_growth": 12.5, "margin_change": 30, "guidance": "Positive", "commentary": "Telecom ARPU improving. Retail EBITDA margins expanding."}, "Diversified"),
+        ("MBT", {"result": "Beat", "revenue_growth": 19.5, "margin_change": 45, "guidance": "Raised", "commentary": "Retail loan growth at 22%. Fee income diversification strong."}, "Banking"),
+        ("AEV", {"result": "Beat", "revenue_growth": 24.5, "margin_change": 15, "guidance": "Positive", "commentary": "AUM crossing 4L Cr mark. Rural disbursements outperforming."}, "Financial"),
         ("MARUTI", {"result": "Inline", "revenue_growth": 9.5, "margin_change": 20, "guidance": "Positive", "commentary": "CNG variant mix improving. EV transition on track."}, "Auto"),
-        ("INFY", {"result": "Miss", "revenue_growth": 3.8, "margin_change": -30, "guidance": "Maintained", "commentary": "Client cautious on discretionary spends. Deal pipeline healthy."}, "IT"),
+        ("SM", {"result": "Miss", "revenue_growth": 3.8, "margin_change": -30, "guidance": "Maintained", "commentary": "Client cautious on discretionary spends. Deal pipeline healthy."}, "IT"),
         ("TITAN", {"result": "Beat", "revenue_growth": 18.5, "margin_change": 150, "guidance": "Raised", "commentary": "Wedding season demand robust. Studded jewellery mix improving."}, "Consumer"),
-        ("SBIN", {"result": "Beat", "revenue_growth": 14.2, "margin_change": 35, "guidance": "Positive", "commentary": "Net interest margin stable. Slippage ratio improved to 0.8%."}, "Banking"),
-        ("HINDUNILVR", {"result": "Miss", "revenue_growth": 4.2, "margin_change": -60, "guidance": "Maintained", "commentary": "Rural volumes recovering slowly. Input cost pressure easing."}, "FMCG"),
+        ("SECB", {"result": "Beat", "revenue_growth": 14.2, "margin_change": 35, "guidance": "Positive", "commentary": "Net interest margin stable. Slippage ratio improved to 0.8%."}, "Banking"),
+        ("URC", {"result": "Miss", "revenue_growth": 4.2, "margin_change": -60, "guidance": "Maintained", "commentary": "Rural volumes recovering slowly. Input cost pressure easing."}, "FMCG"),
     ]
     for ticker, edata, sector in earnings_cases:
         builder.compile_earnings_node(ticker, edata, sector)
 
     # ── Corporate Action Nodes (12) ──────────────────────
     action_cases = [
-        ("TCS", "Buyback", "INR 18,000 Cr buyback at 10% premium to market price.", "IT"),
-        ("RELIANCE", "Dividend", "Interim dividend of INR 14 per share. Record date set.", "Diversified"),
+        ("JFC", "Buyback", "INR 18,000 Cr buyback at 10% premium to market price.", "IT"),
+        ("BDO", "Dividend", "Interim dividend of INR 14 per share. Record date set.", "Diversified"),
         ("VEDL", "Buyback", "INR 3,500 Cr buyback to reduce promoter pledge via open market.", "Metals"),
-        ("SBIN", "Rights Issue", "INR 20,000 Cr rights issue to bolster capital adequacy ratios.", "Banking"),
+        ("SECB", "Rights Issue", "INR 20,000 Cr rights issue to bolster capital adequacy ratios.", "Banking"),
         ("LT", "Stock Split", "1:2 stock split to improve liquidity for retail participation.", "Infrastructure"),
-        ("HINDUNILVR", "Dividend", "Final dividend of INR 22 per share. Consistent payout for 25 years.", "FMCG"),
+        ("URC", "Dividend", "Final dividend of INR 22 per share. Consistent payout for 25 years.", "FMCG"),
         ("TRENT", "Bonus Issue", "1:1 bonus issue from free reserves. Record date Q3.", "Retail"),
-        ("ADANIPORTS", "Rights Issue", "INR 5,000 Cr rights issue partially subscribed by promoter group.", "Infrastructure"),
+        ("SMPH", "Rights Issue", "INR 5,000 Cr rights issue partially subscribed by promoter group.", "Infrastructure"),
         ("WIPRO", "Buyback", "INR 12,000 Cr buyback via tender offer at 15% premium.", "IT"),
         ("ITC", "Dividend", "Special dividend of INR 12 per share on strong cash flows.", "FMCG"),
         ("M&M", "Stock Split", "1:2 stock split announced alongside EV vertical spin-off plans.", "Auto"),

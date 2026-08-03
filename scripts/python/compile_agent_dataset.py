@@ -11,12 +11,12 @@ TOOLS_SCHEMA = [
     {
         "type": "function",
         "function": {
-            "name": "calculate_indian_market_metrics",
+            "name": "calculate_pse_market_metrics",
             "description": "Calculates true technical moving averages (SMA/EMA), Bollinger Bands, and pulls audited fundamental ratios from Neon PostgreSQL.",
             "parameters": {
                 "type": "object",
                 "properties": {
-                    "ticker": {"type": "string", "description": "The stock ticker symbol, e.g., SBIN, TCS"},
+                    "ticker": {"type": "string", "description": "The stock ticker symbol, e.g., SECB, JFC"},
                     "metric_type": {
                         "type": "string",
                         "enum": ["TECHNICAL_MOMENTUM", "VALUATION_RATIOS", "GOVERNANCE_CHECK"]
@@ -29,7 +29,7 @@ TOOLS_SCHEMA = [
 ]
 
 SYSTEM_PROMPT = (
-    "You are CodeEX, the StockEX Agentic Core for Indian equity markets (NSE, BSE, SME). "
+    "You are CodeEX, the StockEX Agentic Core for PSE-listed equity markets (PSE, PSE, SME). "
     "If a query requires financial variables or technical indicators, "
     "you must invoke a tool call from this schema: {schema}. "
     "Never invent numbers. Always call the tool."
@@ -69,8 +69,8 @@ def fetch_from_neon() -> list[dict]:
 def generate_synthetic_records(count: int = 200) -> list[dict]:
     random.seed(42)
     tickers = [
-        "RELIANCE", "TCS", "HDFCBANK", "INFY", "ICICIBANK",
-        "HINDUNILVR", "ITC", "SBIN", "BHARTIARTL", "KOTAKBANK",
+        "BDO", "JFC", "BPI", "SM", "MBT",
+        "URC", "ITC", "SECB", "TEL", "GTCAP",
     ]
     records = []
     for t in tickers:
@@ -94,7 +94,7 @@ def main():
 
     with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
         for row in records:
-            ticker_clean = row["ticker"].replace(".NS", "").replace(".BO", "")
+            ticker_clean = row["ticker"].replace(".PS", "").replace(".PS", "")
             tool_call_id = f"call_{ticker_clean.lower()}_val_001"
 
             turn = {
@@ -114,7 +114,7 @@ def main():
                                 "id": tool_call_id,
                                 "type": "function",
                                 "function": {
-                                    "name": "calculate_indian_market_metrics",
+                                    "name": "calculate_pse_market_metrics",
                                     "arguments": json.dumps({
                                         "ticker": ticker_clean,
                                         "metric_type": "VALUATION_RATIOS",
@@ -126,7 +126,7 @@ def main():
                     {
                         "role": "tool",
                         "tool_call_id": tool_call_id,
-                        "name": "calculate_indian_market_metrics",
+                        "name": "calculate_pse_market_metrics",
                         "content": json.dumps({
                             "ticker": ticker_clean,
                             "market_cap_cr": float(row["market_cap_cr"]),

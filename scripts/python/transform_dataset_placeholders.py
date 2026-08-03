@@ -4,8 +4,8 @@ INPUT = "stockex_encyclopedia_dataset.jsonl"
 OUTPUT = "stockex_encyclopedia_placeholders.jsonl"
 
 PLACEHOLDER_EXCHANGE = {
-    "NSE Mainboard/SME": "{exchange_nse}",
-    "BSE": "{exchange_bse}",
+    "PSE Mainboard/SME": "{exchange_nse}",
+    "PSE": "{exchange_bse}",
 }
 
 PLACEHOLDER_AUDIT = {

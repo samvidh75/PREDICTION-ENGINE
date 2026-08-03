@@ -14,7 +14,7 @@ import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from peft import PeftModel
 
-TEST_STOCKS = ['TCS', 'RELIANCE', 'HDFCBANK', 'SBIN', 'INFY', 'HINDUNILVR']
+TEST_STOCKS = ['JFC', 'BDO', 'BPI', 'SECB', 'SM', 'URC']
 
 def main():
     print("=" * 70)
@@ -40,7 +40,7 @@ def main():
         prompt = (
             '<|im_start|>system\n'
             'You are the official StockEX Encyclopedia. Provide deterministic, '
-            'mathematically accurate reference data for Indian equities.<|im_end|>\n'
+            'mathematically accurate reference data for PSE-listed equities.<|im_end|>\n'
             '<|im_start|>user\n'
             f'Provide encyclopedic reference overview and structural risk audit metrics for: {ticker}.<|im_end|>\n'
             '<|im_start|>assistant\n'

@@ -1,10 +1,19 @@
 """
-Market-Wide Data Scaler — All 2,000+ NSE Equities
+Market-Wide Data Scaler — All 2,000+ PSE Equities
 ===================================================
-Downloads the official NSE corporate symbol index, filters active equities,
+Downloads the official PSE corporate symbol index, filters active equities,
 and feeds them into BulkHistoryIngester and FundamentalScraper pipelines.
 
-Handles NSE India's session/cookie requirements with automatic fallback.
+KNOWN GAP (fixed from a real bug): this previously called the real Indian
+NSE website (www.nseindia.com, NIFTY TOTAL MARKET index) under a "PSE"
+label — meaning a live run would have downloaded Indian equity symbols and
+fed them into the PSE ingestion pipeline. There is no confirmed, working,
+free bulk PSE symbol-list API as of this fix, so rather than swap in a
+guessed endpoint, the three NSE-hitting methods below now return None
+immediately and this always falls through to FALLBACK_WATCHLIST (real PSE
+tickers only). Confirmed dead — no deployment/cron/CI references this
+script — but left honest rather than silently wrong in case it's ever run
+manually.
 
 Usage:
     python3 scale_market_ingestion.py                    # Full market sync
@@ -39,29 +48,26 @@ from fundamental_scraper import FundamentalScraper
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 
-# NSE India public endpoints for equity list
-NSE_BASE_URL = "https://www.nseindia.com"
-NSE_EQUITY_LIST_URL = "https://www.nseindia.com/api/equity-stockIndices?index=NIFTY%20TOTAL%20MARKET"
-NSE_SYMBOLS_CSV_URL = "https://nsearchives.nseindia.com/content/equities/EQUITY_L.csv"
+# No confirmed, working, free bulk PSE symbol-list API is wired in — see the
+# module doc for why these are now no-ops rather than real NSE endpoints.
+NSE_BASE_URL = None
+NSE_EQUITY_LIST_URL = None
+NSE_SYMBOLS_CSV_URL = None
 
-# Safe fallback: NIFTY 50 + NIFTY NEXT 50 (100 most liquid stocks)
+# Safe fallback: real PSE-listed tickers only (see src/services/universe/StockUniverse.ts)
 FALLBACK_WATCHLIST = [
-    "RELIANCE", "TCS", "HDFCBANK", "INFY", "ICICIBANK", "ITC", "SBIN",
-    "BHARTIARTL", "KOTAKBANK", "LT", "AXISBANK", "BAJFINANCE", "ASIANPAINT",
-    "MARUTI", "SUNPHARMA", "TITAN", "WIPRO", "ULTRACEMCO", "ONGC", "NTPC",
-    "TATAMOTORS", "TATASTEEL", "POWERGRID", "COALINDIA", "NESTLEIND",
-    "TECHM", "BAJAJFINSV", "HCLTECH", "DRREDDY", "CIPLA", "EICHERMOT",
-    "HEROMOTOCO", "APOLLOHOSP", "DIVISLAB", "BAJAJ-AUTO", "INDUSINDBK",
-    "GRASIM", "TATACONSUM", "ADANIENT", "ADANIPORTS", "JSWSTEEL",
-    "HINDALCO", "BRITANNIA", "PIDILITIND", "HDFCLIFE", "SBILIFE",
-    "ICICIPRULI", "UPL", "SHREECEM", "COFORGE", "LTIM", "HINDUNILVR",
-    "BRITANNIA", "DMART", "DABUR", "COLPAL", "MARICO", "BERGEPAINT",
-    "CADILAHC", "TRENT", "ZOMATO", "PAYTM", "POLICYBZR", "NYKAA",
+    "BDO", "JFC", "BPI", "SM", "MBT", "AC", "SECB",
+    "TEL", "GTCAP", "JGS", "DMC", "AEV", "EMI",
+    "WLCON", "MONDE", "RRHI", "PGOLD", "ACEN", "BLOOM",
+    "MEG", "AP", "FGEN", "URC", "SMPH", "ALI",
+    "ANI", "MWIDE", "CEB", "FLI", "IMI", "NIKL",
+    "PXP", "SCC", "SSI", "TFHI", "VLL", "CHP",
+    "MJC", "HCOR", "ATN", "DMP", "CLC", "WEB", "NCM",
 ]
 
 
 class MarketWideScaler:
-    """Orchestrates market-wide data ingestion across all NSE listed equities."""
+    """Orchestrates market-wide data ingestion across all PSE listed equities."""
 
     def __init__(
         self,
@@ -88,106 +94,22 @@ class MarketWideScaler:
         self.stats = {"total": 0, "history_ok": 0, "history_err": 0,
                       "fund_ok": 0, "fund_err": 0, "skipped": 0}
 
-    def _initialize_nse_session(self) -> bool:
-        """
-        NSE India requires visiting the main page first to obtain session cookies.
-        This method performs that handshake.
-        """
-        try:
-            print("  Initializing NSE session (obtaining cookies)...")
-            resp = self.session.get(NSE_BASE_URL, timeout=15)
-            if resp.status_code == 200:
-                print("  NSE session initialized successfully.")
-                return True
-            print(f"  NSE session init returned HTTP {resp.status_code}")
-            return False
-        except Exception as e:
-            print(f"  NSE session init failed: {e}")
-            return False
-
     def fetch_active_nse_ticker_list(self) -> List[str]:
         """
-        Downloads and filters the official master equity list from NSE India.
-        Tries multiple endpoints with automatic fallback.
+        No confirmed, working, free bulk PSE symbol-list API is wired in (see
+        module doc) — always falls through to FALLBACK_WATCHLIST rather than
+        hitting a real (and wrong-country) endpoint.
         """
-        print("\n⏳ Synchronizing master equity index from NSE India...")
-
-        # Strategy 1: Try the NSE API endpoint (requires session cookies)
-        symbols = self._try_nse_api_endpoint()
-        if symbols:
-            return symbols
-
-        # Strategy 2: Try the CSV archive endpoint
-        symbols = self._try_nse_csv_endpoint()
-        if symbols:
-            return symbols
-
-        # Strategy 3: Try the equity indices endpoint
-        symbols = self._try_nse_indices_endpoint()
-        if symbols:
-            return symbols
-
-        # Fallback: Use hardcoded NIFTY 50 + NEXT 50
-        print("⚠️  All NSE endpoints failed. Using safe fallback list (100 liquid stocks).")
+        print("\n⚠️  No verified PSE symbol-list source wired in. Using fallback list.")
         return FALLBACK_WATCHLIST
 
     def _try_nse_api_endpoint(self) -> Optional[List[str]]:
-        """Try fetching from NSE's equity list API."""
-        try:
-            self._initialize_nse_session()
-            # The NSE equity list CSV endpoint
-            url = "https://www.nseindia.com/api/equity-stockIndices?index=NIFTY%20TOTAL%20MARKET"
-            resp = self.session.get(url, timeout=15)
-            if resp.status_code == 200:
-                data = resp.json()
-                symbols = [item.get("symbol", "") for item in data.get("data", [])]
-                symbols = [s.strip() for s in symbols if s.strip()]
-                if symbols:
-                    print(f"✅ Extracted {len(symbols)} active symbols from NSE API.")
-                    return symbols
-        except Exception as e:
-            print(f"  NSE API endpoint failed: {e}")
         return None
 
     def _try_nse_csv_endpoint(self) -> Optional[List[str]]:
-        """Try fetching from NSE's CSV archive."""
-        try:
-            resp = self.session.get(NSE_SYMBOLS_CSV_URL, timeout=15)
-            if resp.status_code == 200:
-                content = resp.content.decode("utf-8", errors="replace")
-                reader = csv.DictReader(io.StringIO(content))
-                symbols = []
-                for row in reader:
-                    sym = row.get("SYMBOL", "").strip()
-                    if sym:
-                        symbols.append(sym)
-                if symbols:
-                    print(f"✅ Extracted {len(symbols)} symbols from NSE CSV archive.")
-                    return symbols
-        except Exception as e:
-            print(f"  NSE CSV endpoint failed: {e}")
         return None
 
     def _try_nse_indices_endpoint(self) -> Optional[List[str]]:
-        """Try fetching from NSE's NIFTY TOTAL MARKET index."""
-        try:
-            self._initialize_nse_session()
-            resp = self.session.get(
-                "https://www.nseindia.com/api/equity-stockIndices?index=NIFTY%20TOTAL%20MARKET",
-                timeout=15,
-            )
-            if resp.status_code == 200:
-                data = resp.json()
-                symbols = [
-                    item.get("symbol", "")
-                    for item in data.get("data", [])
-                    if item.get("symbol")
-                ]
-                if symbols:
-                    print(f"✅ Extracted {len(symbols)} symbols from NSE indices endpoint.")
-                    return symbols
-        except Exception as e:
-            print(f"  NSE indices endpoint failed: {e}")
         return None
 
     def _is_valid_symbol(self, symbol: str) -> bool:
@@ -288,7 +210,7 @@ class MarketWideScaler:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="Market-wide data scaler — syncs all NSE equities to Neon PostgreSQL."
+        description="Market-wide data scaler — syncs all PSE equities to Neon PostgreSQL."
     )
     parser.add_argument(
         "--dry-run", action="store_true",
@@ -312,7 +234,7 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--tickers", type=str, default=None,
-        help="Comma-separated list of tickers to process (overrides NSE fetch)"
+        help="Comma-separated list of tickers to process (overrides PSE fetch)"
     )
     args = parser.parse_args()
 

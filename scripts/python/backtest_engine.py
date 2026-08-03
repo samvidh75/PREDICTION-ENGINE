@@ -8,7 +8,7 @@ and computes institutional-grade performance metrics.
 Usage:
     from backtest_engine import VectorizedBacktestEngine
     engine = VectorizedBacktestEngine()
-    metrics = engine.run_volume_breakout_strategy("RELIANCE")
+    metrics = engine.run_volume_breakout_strategy("BDO")
 """
 
 import os
@@ -122,7 +122,7 @@ class VectorizedBacktestEngine:
 if __name__ == "__main__":
     engine = VectorizedBacktestEngine()
     print("🔍 Available tickers:", engine.available_tickers())
-    sample = engine.run_volume_breakout_strategy("RELIANCE")
+    sample = engine.run_volume_breakout_strategy("BDO")
     print("\n📊 Vectorized Strategy Analytics:")
     for k, v in sample.items():
         print(f"  {k}: {v}")

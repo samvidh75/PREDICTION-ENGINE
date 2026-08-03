@@ -77,7 +77,7 @@ WEEKLY_HTML_TEMPLATE = """<!DOCTYPE html>
     <div class="footer">
       <p>Equity Lens &mdash; AI-Powered Stock Research &amp; Analysis</p>
       <p><a href="https://stockstory.in">stockstory.in</a> &middot; <a href="https://stockstory.in/settings">Manage preferences</a></p>
-      <p>Past performance does not guarantee future results. Data from NSE/BSE, Screener.in.</p>
+      <p>Past performance does not guarantee future results. Data from PSE, Screener.in.</p>
     </div>
   </div>
 </body>

@@ -1,7 +1,7 @@
 """
 StockStory Model Evaluation — 12-Stock Benchmark
 =================================================
-Tests a fine-tuned model against a standardized set of 12 Indian stocks
+Tests a fine-tuned model against a standardized set of 12 PSE-listed stocks
 across fundamental, technical, earnings, and regulatory categories.
 
 Usage:
@@ -17,44 +17,44 @@ from pathlib import Path
 BENCHMARK_STOCKS = [
     # (ticker, instruction, input, expected_healthometer_range, category)
     # Fundamental
-    ("RELIANCE", "Evaluate corporate governance and fundamental sustainability for an Indian equity.",
-     "Ticker: RELIANCE | Sector: Energy/Telco/Retail | P/E: 32.4 | Debt/Equity: 0.8 | Promoter Pledging: 0% | ROCE: 16.2% | Revenue Growth: 12% | Auditor Commentary: Standard audit opinion. All entities consolidated.",
+    ("BDO", "Evaluate corporate governance and fundamental sustainability for a PSE-listed equity.",
+     "Ticker: BDO | Sector: Energy/Telco/Retail | P/E: 32.4 | Debt/Equity: 0.8 | Promoter Pledging: 0% | ROCE: 16.2% | Revenue Growth: 12% | Auditor Commentary: Standard audit opinion. All entities consolidated.",
      (60, 75), "fundamental"),
-    ("ADANIENT", "Evaluate corporate governance and fundamental sustainability for an Indian equity.",
-     "Ticker: ADANIENT | Sector: Diversified | P/E: 45.2 | Debt/Equity: 1.8 | Promoter Pledging: 52.4% | ROCE: 8.5% | Revenue Growth: 22% | Auditor Commentary: Auditor noted multi-layered shell entities handling capital distribution streams.",
+    ("ALI", "Evaluate corporate governance and fundamental sustainability for a PSE-listed equity.",
+     "Ticker: ALI | Sector: Diversified | P/E: 45.2 | Debt/Equity: 1.8 | Promoter Pledging: 52.4% | ROCE: 8.5% | Revenue Growth: 22% | Auditor Commentary: Auditor noted multi-layered shell entities handling capital distribution streams.",
      (20, 40), "fundamental"),
-    ("INFY", "Evaluate corporate governance and fundamental sustainability for an Indian equity.",
-     "Ticker: INFY | Sector: IT | P/E: 22.1 | Debt/Equity: 0.1 | Promoter Pledging: 0% | ROCE: 32.4% | Revenue Growth: 5% | Auditor Commentary: Auditor notes no material discrepancies. Revenue recognition policy consistent.",
+    ("SM", "Evaluate corporate governance and fundamental sustainability for a PSE-listed equity.",
+     "Ticker: SM | Sector: IT | P/E: 22.1 | Debt/Equity: 0.1 | Promoter Pledging: 0% | ROCE: 32.4% | Revenue Growth: 5% | Auditor Commentary: Auditor notes no material discrepancies. Revenue recognition policy consistent.",
      (75, 90), "fundamental"),
-    ("TCS", "Evaluate corporate governance and fundamental sustainability for an Indian equity.",
-     "Ticker: TCS | Sector: IT | P/E: 26.3 | Debt/Equity: 0.05 | Promoter Pledging: 0% | ROCE: 48.2% | Revenue Growth: 8% | Auditor Commentary: Clean audit with robust internal financial controls.",
+    ("JFC", "Evaluate corporate governance and fundamental sustainability for a PSE-listed equity.",
+     "Ticker: JFC | Sector: IT | P/E: 26.3 | Debt/Equity: 0.05 | Promoter Pledging: 0% | ROCE: 48.2% | Revenue Growth: 8% | Auditor Commentary: Clean audit with robust internal financial controls.",
      (80, 90), "fundamental"),
-    ("PAYTM", "Evaluate corporate governance and fundamental sustainability for an Indian equity.",
-     "Ticker: PAYTM | Sector: Fintech | P/E: 0 | Debt/Equity: 0.2 | Promoter Pledging: 0% | ROCE: -5.2% | Revenue Growth: -15% | Auditor Commentary: Auditor highlights going concern uncertainty due to regulatory restrictions on payments bank.",
+    ("MWIDE", "Evaluate corporate governance and fundamental sustainability for a PSE-listed equity.",
+     "Ticker: MWIDE | Sector: Fintech | P/E: 0 | Debt/Equity: 0.2 | Promoter Pledging: 0% | ROCE: -5.2% | Revenue Growth: -15% | Auditor Commentary: Auditor highlights going concern uncertainty due to regulatory restrictions on payments bank.",
      (20, 40), "fundamental"),
     # Technical
-    ("RELIANCE", "Analyze technical price structures and institutional order flow anomalies on the NSE.",
-     "Ticker: RELIANCE | Sector: Energy | Last Price: 2490 | Volume Expansion: 2.6x | Delivery %: 72% | Order Flow: Institutional block deal detected via NSE co-location server window tracking.",
+    ("BDO", "Analyze technical price structures and institutional order flow anomalies on the PSE.",
+     "Ticker: BDO | Sector: Energy | Last Price: 2490 | Volume Expansion: 2.6x | Delivery %: 72% | Order Flow: Institutional block deal detected via PSE co-location server window tracking.",
      (70, 90), "technical"),
-    ("ADANIPORTS", "Analyze technical price structures and institutional order flow anomalies on the NSE.",
-     "Ticker: ADANIPORTS | Sector: Infrastructure | Last Price: 1150 | Volume Expansion: 1.4x | Delivery %: 32% | Order Flow: Continued delivery selling. DIIs reducing stake.",
+    ("SMPH", "Analyze technical price structures and institutional order flow anomalies on the PSE.",
+     "Ticker: SMPH | Sector: Infrastructure | Last Price: 1150 | Volume Expansion: 1.4x | Delivery %: 32% | Order Flow: Continued delivery selling. DIIs reducing stake.",
      (30, 50), "technical"),
-    ("DMART", "Analyze technical price structures and institutional order flow anomalies on the NSE.",
-     "Ticker: DMART | Sector: Retail | Last Price: 4800 | Volume Expansion: 1.0x | Delivery %: 38% | Order Flow: Insider selling by promoter entity via bulk deal window.",
+    ("ANI", "Analyze technical price structures and institutional order flow anomalies on the PSE.",
+     "Ticker: ANI | Sector: Retail | Last Price: 4800 | Volume Expansion: 1.0x | Delivery %: 38% | Order Flow: Insider selling by promoter entity via bulk deal window.",
      (30, 50), "technical"),
-    ("ZOMATO", "Analyze technical price structures and institutional order flow anomalies on the NSE.",
-     "Ticker: ZOMATO | Sector: Internet | Last Price: 268 | Volume Expansion: 1.8x | Delivery %: 76% | Order Flow: Mutual funds increased allocation. Delivery percentage elevated.",
+    ("FGEN", "Analyze technical price structures and institutional order flow anomalies on the PSE.",
+     "Ticker: FGEN | Sector: Internet | Last Price: 268 | Volume Expansion: 1.8x | Delivery %: 76% | Order Flow: Mutual funds increased allocation. Delivery percentage elevated.",
      (65, 85), "technical"),
     # Earnings
-    ("TATAMOTORS", "Analyze quarterly earnings performance and management commentary for an Indian equity.",
-     "Ticker: TATAMOTORS | Sector: Auto | Result: Beat | Revenue Growth: 18.5% | Margin Change: 250bps | Guidance: Raised | Management Commentary: JLR margins at 9-year high. EV volumes accelerating.",
+    ("MEG", "Analyze quarterly earnings performance and management commentary for a PSE-listed equity.",
+     "Ticker: MEG | Sector: Auto | Result: Beat | Revenue Growth: 18.5% | Margin Change: 250bps | Guidance: Raised | Management Commentary: JLR margins at 9-year high. EV volumes accelerating.",
      (80, 95), "earnings"),
-    ("WIPRO", "Analyze quarterly earnings performance and management commentary for an Indian equity.",
+    ("WIPRO", "Analyze quarterly earnings performance and management commentary for a PSE-listed equity.",
      "Ticker: WIPRO | Sector: IT | Result: Miss | Revenue Growth: 2.1% | Margin Change: -80bps | Guidance: Cut | Management Commentary: Client discretionary spending remains weak. Consulting revenue down.",
      (25, 45), "earnings"),
     # Regulatory
-    ("Midcap Derivatives", "Assess the structural impact of a SEBI regulatory circular on market mechanics.",
-     "Sector: Midcap Derivatives | SEBI Action: SEBI increases minimum contract value to 15 Lakhs and restricts weekly expiries to 1 per exchange. | Impacted Assets: Volatility Index, Nifty Midcap Select, BSE Midcap",
+    ("Midcap Derivatives", "Assess the structural impact of a SEC regulatory circular on market mechanics.",
+     "Sector: Midcap Derivatives | SEC Action: SEC increases minimum contract value to 15 Lakhs and restricts weekly expiries to 1 per exchange. | Impacted Assets: Volatility Index, Nifty Midcap Select, PSE Midcap",
      (20, 45), "regulatory"),
 ]
 
@@ -103,7 +103,7 @@ def evaluate_model_local(model_path, quantized=False):
 
     for i, (ticker, instruction, input_text, expected_range, category) in enumerate(BENCHMARK_STOCKS, 1):
         prompt = f"""<|im_start|>system
-You are a dedicated Indian stock market chip running on this phone. Use the context to summarize or answer the query directly in under 2 short sentences.
+You are a dedicated Philippine stock market chip running on this phone. Use the context to summarize or answer the query directly in under 2 short sentences.
 <|im_start|>user
 Task: {instruction}
 Context: {input_text}
@@ -239,7 +239,7 @@ def evaluate_model_cloudflare(worker_url):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Evaluate StockStory model against 12-stock benchmark")
-    parser.add_argument("--model-path", default="indian_stock_slm_master_gguf/indian_stock_slm_master-Q4_K_M.gguf",
+    parser.add_argument("--model-path", default="pse_stock_slm_master_gguf/pse_stock_slm_master-Q4_K_M.gguf",
                         help="Path to GGUF model file")
     parser.add_argument("--quantized", action="store_true", help="Model is quantized")
     parser.add_argument("--worker-url", help="Cloudflare Worker URL for remote evaluation")

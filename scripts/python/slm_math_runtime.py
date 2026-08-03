@@ -6,8 +6,8 @@ Fallback: Yahoo Finance historical candles (adjusted, for SMA/RSI).
 Strict fail-fast if both sources return empty.
 
 Usage:
-    python3 slm_math_runtime.py --ticker SBIN
-    python3 slm_math_runtime.py --batch RELIANCE,TCS,500325
+    python3 slm_math_runtime.py --ticker SECB
+    python3 slm_math_runtime.py --batch BDO,JFC,500325
 """
 
 import argparse
@@ -47,14 +47,14 @@ YAHOO_MIRRORS = [
 
 
 def _to_yahoo_ticker(symbol: str) -> str:
-    s = symbol.upper().replace(".NS", "").replace(".BO", "").strip()
-    return f"{s}.BO" if s.isdigit() else f"{s}.NS"
+    s = symbol.upper().replace(".PS", "").replace(".PS", "").strip()
+    return f"{s}.PS" if s.isdigit() else f"{s}.PS"
 
 
 def _to_google_exchange(symbol: str) -> tuple:
     """Returns (clean_symbol, exchange_code) for Google Finance URL."""
-    s = symbol.upper().replace(".NS", "").replace(".BO", "").strip()
-    exchange = "BOM" if s.isdigit() else "NSE"
+    s = symbol.upper().replace(".PS", "").replace(".PS", "").strip()
+    exchange = "BOM" if s.isdigit() else "PSE"
     return s, exchange
 
 
@@ -66,7 +66,7 @@ def fetch_google_finance_live_price(symbol: str) -> float | None:
       2. og:price:amount meta tag
       3. Title tag price extraction
       4. Known CSS class selectors (N6SYTe, fxKb6c, YMlKec, YMlbe)
-      5. First page element containing ₹
+      5. First page element containing ₱
     """
     if BeautifulSoup is None:
         return None
@@ -98,11 +98,11 @@ def fetch_google_finance_live_price(symbol: str) -> float | None:
             except (ValueError, TypeError):
                 pass
 
-        # Strategy 3: Title tag parsing (format: "TCS Stock Price, Live ...")
+        # Strategy 3: Title tag parsing (format: "JFC Stock Price, Live ...")
         if soup.title:
             parts = soup.title.text.replace(",", "").split(" ")
             for p in parts:
-                p_clean = p.replace("₹", "").strip()
+                p_clean = p.replace("₱", "").strip()
                 try:
                     v = float(p_clean)
                     if 1 < v < 1000000:
@@ -114,17 +114,17 @@ def fetch_google_finance_live_price(symbol: str) -> float | None:
         for cls in ("N6SYTe", "fxKb6c", "YMlKec", "YMlbe"):
             el = soup.find("div", class_=cls)
             if el:
-                raw = el.text.replace("₹", "").replace(",", "").replace(" ", "").strip()
+                raw = el.text.replace("₱", "").replace(",", "").replace(" ", "").strip()
                 try:
                     return float(raw)
                 except ValueError:
                     continue
 
-        # Strategy 5: First element with ₹ text that looks like a valid price
+        # Strategy 5: First element with ₱ text that looks like a valid price
         for el in soup.find_all(["div", "span"]):
             txt = el.get_text(strip=True)
-            if txt.startswith("₹"):
-                raw = txt.replace("₹", "").replace(",", "").strip()
+            if txt.startswith("₱"):
+                raw = txt.replace("₱", "").replace(",", "").strip()
                 try:
                     v = float(raw)
                     if 1 < v < 1000000:
@@ -178,7 +178,7 @@ def fetch_yahoo_historical_candles(symbol: str) -> pd.DataFrame:
 
 
 def run_precision_intelligence_kernel(ticker: str):
-    symbol = ticker.upper().replace(".NS", "").replace(".BO", "").strip()
+    symbol = ticker.upper().replace(".PS", "").replace(".PS", "").strip()
     df = pd.DataFrame()
     data_source = "UNKNOWN"
 
@@ -212,7 +212,7 @@ def run_precision_intelligence_kernel(ticker: str):
                 data_source = "YAHOO_HISTORICAL"
 
     # Step 4: Fallback to Screener.in SME mesh for SME stocks (<50 data points or -SM suffix)
-    # Yahoo often lacks historical data for NSE SME Emerge tickers (SRIVASAVI-SM.NS pattern)
+    # Yahoo often lacks historical data for PSE SME Emerge tickers (SRIVASAVI-SM.NS pattern)
     if (df.empty or len(df) < 15) and run_sme_mesh is not None:
         try:
             sme_result = run_sme_mesh(symbol, include_historical=True)

@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """
 sme_ticker_mesh.py — StockEX SME Ticker Data Mesh.
-Alternative data source for NSE SME Emerge stocks (Yahoo -SM suffix limitation).
+Alternative data source for PSE SME board stocks (Yahoo -SM suffix limitation).
 Scrapes Screener.in for live prices, fundamental ratios, and historical closes.
 
 Usage:
-    python3 sme_ticker_mesh.py --ticker SRIVASAVI
-    python3 sme_ticker_mesh.py --ticker SRIVASAVI --historical
-    python3 sme_ticker_mesh.py --batch SRIVASAVI,ACE,AARON
+    python3 sme_ticker_mesh.py --ticker CHP
+    python3 sme_ticker_mesh.py --ticker CHP --historical
+    python3 sme_ticker_mesh.py --batch CHP,MJC,HCOR
 """
 
 import argparse
@@ -34,12 +34,12 @@ HEADERS = {
 
 def clean_ticker(symbol: str) -> str:
     """Strip suffixes to get the base Screener.in ticker."""
-    return symbol.upper().replace(".NS", "").replace(".BO", "").replace("-SM", "").strip()
+    return symbol.upper().replace(".PS", "").replace(".PS", "").replace("-SM", "").strip()
 
 
 def _extract_float(text: str) -> float | None:
-    """Parse a float from text containing ₹, commas, whitespace."""
-    cleaned = text.replace("₹", "").replace(",", "").replace("\xa0", "").strip()
+    """Parse a float from text containing ₱, commas, whitespace."""
+    cleaned = text.replace("₱", "").replace(",", "").replace("\xa0", "").strip()
     try:
         return float(cleaned)
     except (ValueError, TypeError):
@@ -100,19 +100,19 @@ def fetch_screener_fundamentals(ticker: str) -> dict | None:
         _rf = _extract_float  # shorthand
 
         if "current_price" not in ratios:
-            m = __import__("re").search(r'Current Price\s*</span>\s*<span[^>]*class="number"[^>]*>₹?\s*([\d,.]+)', html, __import__("re").I)
+            m = __import__("re").search(r'Current Price\s*</span>\s*<span[^>]*class="number"[^>]*>₱?\s*([\d,.]+)', html, __import__("re").I)
             if m:
                 v = _rf(m.group(1))
                 if v: ratios["current_price"] = v
 
         if "market_cap" not in ratios:
-            m = __import__("re").search(r'Market Cap\s*</span>\s*<span[^>]*class="number"[^>]*>₹?\s*([\d,.]+)', html, __import__("re").I)
+            m = __import__("re").search(r'Market Cap\s*</span>\s*<span[^>]*class="number"[^>]*>₱?\s*([\d,.]+)', html, __import__("re").I)
             if m:
                 v = _rf(m.group(1))
                 if v: ratios["market_cap"] = v
 
         if "high_52w" not in ratios or "low_52w" not in ratios:
-            m = __import__("re").search(r'High / Low\s*</span>\s*<span[^>]*class="number"[^>]*>₹?\s*([\d,.]+)\s*\/\s*([\d,.]+)', html)
+            m = __import__("re").search(r'High / Low\s*</span>\s*<span[^>]*class="number"[^>]*>₱?\s*([\d,.]+)\s*\/\s*([\d,.]+)', html)
             if m:
                 h = _rf(m.group(1))
                 l = _rf(m.group(2))

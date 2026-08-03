@@ -8,7 +8,7 @@ No broker API key required. Uses unrestricted public charting endpoints.
 
 Usage:
     python3 bulk_history_ingester.py                          # Default watchlist
-    python3 bulk_history_ingester.py --tickers RELIANCE,TCS   # Specific tickers
+    python3 bulk_history_ingester.py --tickers BDO,JFC   # Specific tickers
     python3 bulk_history_ingester.py --watchlist-file stocks.txt  # From file
     python3 bulk_history_ingester.py --dry-run                 # Preview only
 
@@ -35,12 +35,12 @@ except ImportError:
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 
-# Default NSE blue-chip watchlist
+# Default PSE blue-chip watchlist
 DEFAULT_WATCHLIST = [
-    "RELIANCE", "TCS", "SBIN", "INFY", "TATAMOTORS", "HDFCBANK",
-    "ICICIBANK", "HINDUNILVR", "ITC", "KOTAKBANK", "BHARTIARTL",
-    "ASIANPAINT", "MARUTI", "SUNPHARMA", "TITAN", "BAJFINANCE",
-    "WIPRO", "HCLTECH", "ADANIENT", "ONGC", "NTPC", "TATASTEEL",
+    "BDO", "JFC", "SECB", "SM", "MEG", "BPI",
+    "MBT", "URC", "ITC", "GTCAP", "TEL",
+    "EMI", "MARUTI", "MONDE", "TITAN", "AEV",
+    "WIPRO", "RLC", "ALI", "ACEN", "NTPC", "AP",
     "JSWSTEEL", "POWERGRID", "COALINDIA", "TECHM", "DRREDDY",
     "CIPLA", "DIVISLAB", "EICHERMOT", "BAJAJFINSV", "HEROMOTOCO",
     "BAJAJ-AUTO", "INDUSINDBK", "GRASIM", "TATACONSUM", "APOLLOHOSP",
@@ -205,7 +205,7 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--tickers", type=str, default=None,
-        help="Comma-separated list of tickers (e.g. RELIANCE,TCS,INFY)"
+        help="Comma-separated list of tickers (e.g. BDO,JFC,SM)"
     )
     parser.add_argument(
         "--watchlist-file", type=str, default=None,
