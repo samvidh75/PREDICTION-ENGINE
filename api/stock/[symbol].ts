@@ -428,6 +428,12 @@ export default async function handler(
       news: liveNews,
       thesis,
       financials: generatePSEFinancialHistory(symbol, fundamentalsData.marketCap ?? priceData.marketCap ?? null, profile.sector),
+      // generatePSEFinancialHistory is always a market-cap/sector-medians
+      // model, never real reported financials — no verified free source for
+      // PSE revenue/profit/EBITDA is wired in (see StockPage.tsx's
+      // disclaimer, which reads this field). shareholding is left as an
+      // honest empty array above rather than modeled.
+      dataSources: { financials: 'synthetic', shareholding: 'unavailable', thesis: thesis.thesis.includes('is not currently available') ? 'unavailable' : 'real' },
       priceTargets: fundamentalsData.targetMeanPrice ? { mean: fundamentalsData.targetMeanPrice, high: Math.round(fundamentalsData.targetMeanPrice * 1.15 * 100) / 100, low: Math.round(fundamentalsData.targetMeanPrice * 0.85 * 100) / 100 } : null,
       relatedStocks: [],
       // Real EODHD daily history when available; empty array (frontend

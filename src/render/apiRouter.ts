@@ -44,8 +44,6 @@ import type { UsageMetric } from "../commercial/UsageLimits.js";
 import { DeterministicResearchProvider } from "../services/ai/DeterministicResearchProvider.js";
 import { dbAdapter } from "../db/DatabaseAdapter.js";
 import { AsymmetricDataGateway } from "../db/AsymmetricDataGateway.js";
-import { execFile } from "node:child_process";
-import { promisify } from "node:util";
 import {
   registerCommercialRoutes,
   registerIntelligenceContextRoutes,
@@ -54,8 +52,6 @@ import {
   registerPersonalResearchRoutes,
   registerPublicEngagementRoutes,
 } from "../backend/web/routes/index.js";
-
-const execFileAsync = promisify(execFile);
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -302,47 +298,48 @@ function findRow(rows: string[][], matcher: (label: string) => boolean): string[
   return null;
 }
 
-async function fetchScreenerPage(symbol: string, consolidated = true): Promise<string | null> {
-  const suffix = consolidated ? "/consolidated/" : "/";
-  try {
-    const response = await fetch(`https://www.pse.com.ph/company/${encodeURIComponent(symbol)}${suffix}`, {
-      headers: { "User-Agent": "Mozilla/5.0 Lensory/2.0" },
-      signal: AbortSignal.timeout(8_000),
-    });
-    if (!response.ok) return null;
-    return await response.text();
-  } catch {
-    return null;
-  }
+/**
+ * KNOWN GAP (fixed from a real bug): this used to fetch
+ * https://www.pse.com.ph/company/{symbol}/consolidated/ — a URL pattern
+ * carried over from this codebase's original Screener.in (India) version
+ * and never actually verified against the real pse.com.ph site structure.
+ * Live-tested: it returns a 404 "Page not found" for every symbol. The
+ * table-extraction logic downstream (extractScreenerTableByHeading,
+ * findRow for "Promoters"/"FIIs"/"DIIs" — Indian shareholding categories
+ * with no PSE equivalent) was also never adapted for a real PSE page
+ * shape. Rather than keep paying an 8s timeout on every stock page load
+ * for a call that can never succeed, this now returns null immediately.
+ * A real PSE financials/shareholding source (e.g. parsing 17-Q/17-A
+ * filings via PSEEdgeScraper.ts) would need to replace this outright, not
+ * patch this URL.
+ */
+async function fetchScreenerPage(_symbol: string, _consolidated = true): Promise<string | null> {
+  return null;
 }
 
-async function loadYFinanceFinancialSeries(symbol: string): Promise<{
+/**
+ * KNOWN GAP (fixed from a real bug): this called scripts/yfinance_financials.py,
+ * which fetches Yahoo Finance under a `{symbol}.PS` suffix. Verified live
+ * (both raw Yahoo API calls and the yfinance library, across BDO/JFC/SM/TEL/
+ * AC/ALI): Yahoo Finance has no real coverage of PSE-listed equities under
+ * any suffix (.PS, .PSE, or bare) — `.PS` returns a dead placeholder shell
+ * (exchangeName "YHD", no price, no timestamps), `.PSE` returns a clean
+ * "symbol may be delisted" 404. This is not a suffix-naming bug; there is
+ * no free data behind it. Rather than pay a 30s subprocess-spawn timeout on
+ * every stock page load for a call that can never succeed, this now
+ * returns null immediately. See EodhdCandleProvider.ts / eodhdClient.ts —
+ * EODHD's free tier also blocks /fundamentals/ ("Only EOD data allowed for
+ * free users"), so there is currently no verified free source for real
+ * revenue/profit/ebitda series; deriveFinancials()'s synthetic estimate is
+ * the honest fallback, and the frontend must label it as such (see
+ * dataSources.financials below and StockPage.tsx's disclaimer).
+ */
+async function loadYFinanceFinancialSeries(_symbol: string): Promise<{
   annual: { revenue: Array<{ period: string; value: number }>; profit: Array<{ period: string; value: number }>; ebitda: Array<{ period: string; value: number }> };
   quarterly: { revenue: Array<{ period: string; value: number }>; profit: Array<{ period: string; value: number }>; ebitda: Array<{ period: string; value: number }> };
   dataSource: string;
 } | null> {
-  try {
-    const { stdout } = await execFileAsync("python3", ["scripts/yfinance_financials.py", symbol], {
-      cwd: process.cwd(),
-      timeout: 30_000,
-      maxBuffer: 1024 * 1024,
-    });
-    const parsed = JSON.parse(stdout) as Record<string, any>;
-    const annual = parsed.financials?.annual ?? {};
-    const toPHPUnit = (items: Array<{ period: string; value: number }> = []) =>
-      items.map((item) => ({ period: item.period, value: Math.round((Number(item.value) / 10_000_000) * 100) / 100 }));
-    return {
-      annual: {
-        revenue: toPHPUnit(annual.revenue),
-        profit: toPHPUnit(annual.profit),
-        ebitda: toPHPUnit(annual.ebitda),
-      },
-      quarterly: { revenue: [], profit: [], ebitda: [] },
-      dataSource: "yfinance",
-    };
-  } catch {
-    return null;
-  }
+  return null;
 }
 
 async function loadRealFinancialSeries(symbol: string) {
@@ -858,7 +855,13 @@ export default async function registerApiRoutes(server: FastifyInstance) {
       },
       thesis: thesisData,
       dataSources: {
-        financials: realFinancialsData?.dataSource ?? (fundData?.pe_ratio ? 'real' : 'synthetic'),
+        // Was `realFinancialsData?.dataSource ?? (fundData?.pe_ratio ? 'real' : 'synthetic')`
+        // -- that conflated "do we have a real P/E ratio" with "is this
+        // revenue/profit/ebitda time series real," mislabeling synthetic
+        // chart data as 'real' whenever a P/E happened to be available from
+        // elsewhere. realFinancialsData is the only thing that actually
+        // reflects whether financialsData came from a verified source.
+        financials: realFinancialsData?.dataSource ?? 'synthetic',
         shareholding: 'synthetic',
         thesis: fundData?.pe_ratio ? 'real' : 'yahoo',
       },

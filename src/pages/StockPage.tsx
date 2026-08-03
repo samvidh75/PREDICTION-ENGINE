@@ -73,6 +73,11 @@ type StockResearchDetail = {
   news: Array<{ headline: string; source: string; time: string; link?: string; publishedAt?: string }>;
   thesis: { thesis: string; bullCase: string; bearCase: string; whatToWatch: string; stance: "High conviction" | "Watch" | "Needs review" | "Risk rising" | "Avoid for now" };
   priceHistory: Record<string, Array<{ label?: string; price?: number; time?: string; open?: number; high?: number; low?: number; close?: number; volume?: number }>>;
+  /** Whether financials/shareholding/thesis came from a real verified
+   * source or an estimate — see apiRouter.ts's dataSources comment.
+   * 'synthetic' means the figures are modeled from market cap and sector
+   * medians, not real reported financials. */
+  dataSources: { financials: string; shareholding: string; thesis: string };
 };
 
 const TIMEFRAMES = ["1W", "1M", "3M", "1Y", "5Y"] as const;
@@ -559,6 +564,7 @@ function normalizeStockData(raw: Record<string, any>): StockResearchDetail {
     news: raw.news ?? [],
     thesis: raw.thesis ?? { thesis: "", bullCase: "", bearCase: "", whatToWatch: "", stance: "Watch" },
     priceHistory: raw.priceHistory ?? buildPriceHistoryFromFlatSeries(raw.priceChart ?? []),
+    dataSources: raw.dataSources ?? { financials: "synthetic", shareholding: "synthetic", thesis: "synthetic" },
   };
 }
 
@@ -1006,9 +1012,18 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
           </div>
         </ChartErrorBoundary>
         <p style={{ color: colors.textSecondary, fontSize: "12px", marginTop: "12px" }}>All values in ₱M</p>
+        {stock.dataSources.financials !== "real" && stock.dataSources.financials !== "pseApi" && (
+          <p style={{ color: colors.textSecondary, fontSize: "11.5px", marginTop: "6px", lineHeight: 1.5 }}>
+            Estimated from market cap and sector medians — not real reported financials. No verified free
+            source for PSE revenue/profit/EBITDA is wired in yet.
+          </p>
+        )}
       </Card>
 
-      {/* ── Shareholdings (only render with real data — avoid showing fabricated 0.0% rows) ── */}
+      {/* Shareholdings breakdown is currently always modeled (hash-seeded from
+          symbol + sector), never real filing data — see dataSources.shareholding
+          and the disclaimer below. Still gated on effectiveShareholding existing
+          in case that changes. */}
       {effectiveShareholding && (
       <Card className="stock-shareholdings-card raycast-slideUp" style={{ animationDelay: "0.3s", animationFillMode: "both" }}>
         <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", flexWrap: "wrap", marginBottom: "16px" }}>
@@ -1042,6 +1057,12 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
             );
           })}
         </div>
+        {stock.dataSources.shareholding !== "real" && stock.dataSources.shareholding !== "pseApi" && (
+          <p style={{ color: colors.textSecondary, fontSize: "11.5px", marginTop: "14px", lineHeight: 1.5 }}>
+            Modeled from company size and sector, not a real ownership disclosure — no verified free source
+            for PSE shareholding structure is wired in yet.
+          </p>
+        )}
       </Card>
       )}
 
