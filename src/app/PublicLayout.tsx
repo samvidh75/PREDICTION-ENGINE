@@ -315,11 +315,24 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
             header[role="masthead"], header { padding-left: 16px !important; padding-right: 16px !important; }
           }
           .stockex-page-enter {
+            /*
+             * Opacity-only: a transform here (even the identity
+             * translateY(0) the animation used to end on, held forever by
+             * animation-fill-mode: both) makes this element the containing
+             * block for every position:fixed descendant -- which breaks
+             * any fixed-position modal/banner/floating button rendered
+             * inside a page (GuidedOnboarding, PrivacyConsentBanner,
+             * BrokerHandoffModal, FloatingAiAssistant, LiveAlertSentinel,
+             * etc. all use position:fixed and were silently mispositioned
+             * while nested under this wrapper). Keep the fade, drop the
+             * slide, and position:fixed children escape to the viewport
+             * again as intended.
+             */
             animation: stockex-page-fade-in 220ms cubic-bezier(0.16, 1, 0.3, 1) both;
           }
           @keyframes stockex-page-fade-in {
-            from { opacity: 0; transform: translateY(8px); }
-            to   { opacity: 1; transform: translateY(0); }
+            from { opacity: 0; }
+            to   { opacity: 1; }
           }
           @media (prefers-reduced-motion: reduce) {
             .stockex-page-enter { animation: none; }
