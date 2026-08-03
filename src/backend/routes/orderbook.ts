@@ -4,7 +4,7 @@ import { OrderBookAggregator } from '@/services/microstructure/OrderBookAggregat
 import { rateLimit } from '@/backend/middlewares/rateLimit';
 
 const router = express.Router();
-const aggregator = new OrderBookAggregator([{ name: 'upstox' }]);
+const aggregator = new OrderBookAggregator([{ name: 'pse' }]);
 
 // GET /api/orderbook/:ticker - Get current order book snapshot
 router.get('/orderbook/:ticker', rateLimit(1000), async (req: Request, res: Response) => {

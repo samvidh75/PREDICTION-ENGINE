@@ -594,18 +594,17 @@ export interface TrendlyneStatusResponse {
 // ── Data Source Tags ─────────────────────────────────────────────────
 
 export type DataSourceTag =
-  | 'psxapi_price'
+  | 'pse_price'
   | 'yahoo_price'
-  | 'psxapi_financials'
+  | 'pse_financials'
   | 'screener'
-  | 'upstox'
   | 'computed'
   | 'unavailable';
 
 // ── Priority rules (documented) ──────────────────────────────────────
-// PRICE fields:           Provider A (indianapi) > Provider B (yahoo)
-// VALUATION ratios:       Provider C (psxapi_financials) > Provider D (screener) > null
-// QUALITY/GROWTH/STABLE:  Provider D (screener) > Provider E (upstox) > null
+// PRICE fields:           Provider A (pse_price) > Provider B (yahoo)
+// VALUATION ratios:       Provider C (pse_financials) > Provider D (screener) > null
+// QUALITY/GROWTH/STABLE:  Provider D (screener) > null
 // TECHNICALS:             always computed from Yahoo historical, never from providers
 
 // ── Historical Point (for price.getHistory) ──────────────────────────
@@ -824,7 +823,7 @@ export const api = {
   // ── Namespaced method groups (clean API surface) ──────────────────────────
 
   price: {
-    /** Live quote. Uses Provider A (IndianAPI) with Provider B (Yahoo) fallback on backend. */
+    /** Live quote. Uses Provider A (PSE) with Provider B (Yahoo) fallback on backend. */
     getQuote: (symbol: string) =>
       apiFetch<StockQuote>(`/api/market-data/quote/${encodeURIComponent(symbol)}`),
 
@@ -840,7 +839,7 @@ export const api = {
   fundamentals: {
     /**
      * Merged fundamentals for a symbol.
-     * Valuation (PE/PB/EPS): Provider C (IndianAPI financials) wins.
+     * Valuation (PE/PB/EPS): Provider C (PSE financials) wins.
      * Quality/Growth/Stability (ROE/D-E/margins): Provider D (Screener) wins.
      */
     get: (symbol: string) =>

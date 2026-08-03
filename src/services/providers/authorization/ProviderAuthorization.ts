@@ -18,6 +18,11 @@ function loadProviderConfig(prefix: string): ProviderAuthorizationConfig {
   return { enabled, authorizationRecordId, authorizationScope, requestsPerMinute, requestsPerDay, concurrencyLimit, userAgent };
 }
 
+// KNOWN GAP: 'moneycontrol' is a real India-only financial news site with
+// no PSE relevance. This gate defaults to disabled (INGESTION_ENABLED must
+// be explicitly set true) so it is not actively harmful, but it should be
+// replaced with a real, authorized PSE-relevant source before ever being
+// enabled.
 export function loadAuthorizedProviderConfig(): AuthorizedProviderConfig {
   return {
     screener: loadProviderConfig('SCREENER'),

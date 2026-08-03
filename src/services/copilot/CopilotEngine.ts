@@ -5,40 +5,19 @@ export interface CopilotResponse {
   category: string;
 }
 
+/**
+ * KNOWN GAP: this previously returned fully fabricated "analysis" text
+ * hardcoded to specific real Indian companies (Reliance, HAL, BEL, Tata
+ * Motors) — invented commentary presented as if it were real research,
+ * with no data backing it. Confirmed dead (no importers anywhere in src/
+ * or api/). Rather than swap in equally-fabricated PSE company commentary,
+ * this now only returns the honest fallback message; any real answer needs
+ * to come from a data-backed engine (see src/services/intelligence/).
+ */
 export class CopilotEngine {
-  public static ask(query: string): CopilotResponse {
-    const q = query.toLowerCase().trim();
-
-    if (q.includes("reliance")) {
-      return {
-        answer: "Reliance is showing minor consolidation as raw energy demands stabilize across regional pipelines. Core retail growth remains strong, maintaining stable long-term cash flows.",
-        category: "Company Analysis",
-      };
-    }
-
-    if (q.includes("hal")) {
-      return {
-        answer: "HAL cleared significant government project clearances, boosting production capacity limits and local manufacturing schedules. Watch for next quarter's delivery paces.",
-        category: "Corporate Changes",
-      };
-    }
-
-    if (q.includes("bel") || q.includes("compare")) {
-      return {
-        answer: "BEL offers high operational stability in the defence electronics segment, compounding returns cleanly. HAL holds larger heavy-equipment pipelines, offering massive long-term scale opportunities.",
-        category: "Asset Comparison",
-      };
-    }
-
-    if (q.includes("tata motors") || q.includes("summarise")) {
-      return {
-        answer: "Tata Motors is successfully balancing its combustion vehicle cash flows while steadily building electric vehicle infrastructure. Order pipelines remain supportive.",
-        category: "Company Summary",
-      };
-    }
-
+  public static ask(_query: string): CopilotResponse {
     return {
-      answer: "I can help analyze company trends, compare assets, or summarize corporate updates in plain, SEC-safe English. Try asking: 'Why is Reliance weakening?' or 'Compare BEL vs HAL.'",
+      answer: "I can help analyze company trends, compare assets, or summarize corporate updates in plain, SEC-safe English — but I need to be wired to a real data-backed engine first (see src/services/intelligence/) rather than fabricated commentary.",
       category: "General Intelligence",
     };
   }

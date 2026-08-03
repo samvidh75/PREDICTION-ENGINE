@@ -8,7 +8,7 @@ export interface HistoricalProvider {
 export class MockHistoricalProvider implements HistoricalProvider {
   public async getHistory(symbol: string): Promise<HistoricalPoint[]> {
     const points: HistoricalPoint[] = [];
-    const basePrice = symbol.toUpperCase() === 'RELIANCE' ? 2800 : 150;
+    const basePrice = symbol.toUpperCase() === 'BDO' ? 145 : 150;
     
     // Generate 30 days of mock timeline points
     for (let i = 30; i >= 0; i--) {

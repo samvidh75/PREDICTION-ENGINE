@@ -57,7 +57,7 @@ export interface CompanyIdentity {
 // ---------------------------------------------------------------------------
 
 export interface CompanyAlias {
-  /** The alias value (e.g. "RELIANCE.PSX", "500325", "INE002A01018"). */
+  /** The alias value (e.g. "BDO.PSE", "BDO", or a PSE-issued ISIN). */
   value: string;
 
   /** Kind of alias. */

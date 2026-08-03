@@ -1,7 +1,7 @@
 export interface EncyclopediaData {
   ticker: string;
-  exchange: 'nse' | 'bse';
-  marketCapCr: number;
+  exchange: 'pse';
+  marketCapM: number;
   peRatio: number;
   debtToEquity: number;
   pledgePct: number;
@@ -17,8 +17,7 @@ const AUDIT_MAP: Record<string, string> = {
 };
 
 const EXCHANGE_MAP: Record<string, string> = {
-  '{exchange_nse}': 'PSE Mainboard/SME',
-  '{exchange_bse}': 'PSE',
+  '{exchange_pse}': 'PSE',
 };
 
 export function resolveEncyclopediaPlaceholders(
@@ -27,7 +26,7 @@ export function resolveEncyclopediaPlaceholders(
 ): string {
   let result = template
     .replace('{ticker}', data.ticker)
-    .replace('{market_cap}', `Rs${data.marketCapCr.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`)
+    .replace('{market_cap}', `₱${data.marketCapM.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}M`)
     .replace('{pe_ratio}', String(data.peRatio))
     .replace('{de_ratio}', String(data.debtToEquity))
     .replace('{pledge_pct}', String(data.pledgePct));
@@ -63,8 +62,8 @@ export function generateDemoData(ticker: string): EncyclopediaData {
 
   return {
     ticker,
-    exchange: seededRandom(0, 2) ? 'nse' : 'bse',
-    marketCapCr: seededRandom(500, 800000),
+    exchange: 'pse',
+    marketCapM: seededRandom(500, 800000),
     peRatio: seededRandom(8, 65),
     debtToEquity: seededRandom(5, 350) / 100,
     pledgePct: seededRandom(0, 1800) / 100,

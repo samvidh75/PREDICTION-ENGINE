@@ -9,9 +9,9 @@ export class MockMetadataProvider implements MetadataProvider {
   public async getMetadata(symbol: string): Promise<CompanyMetadata> {
     const sym = symbol.toUpperCase();
     const mockDetails: Record<string, CompanyMetadata> = {
-      RELIANCE: { symbol: 'RELIANCE', companyName: 'Reliance Industries Limited', sector: 'Energy & Oil', industry: 'Conglomerate', marketCap: 1845000 },
-      HAL: { symbol: 'HAL', companyName: 'Hindustan Aeronautics Limited', sector: 'Defence & Aerospace', industry: 'Aerospace Systems', marketCap: 245000 },
-      BEL: { symbol: 'BEL', companyName: 'Bharat Electronics Limited', sector: 'Defence & Electronics', industry: 'Systems Contractor', marketCap: 165000 },
+      BDO: { symbol: 'BDO', companyName: 'BDO Unibank Inc', sector: 'Financial', industry: 'Banking', marketCap: 1845000 },
+      AC: { symbol: 'AC', companyName: 'Ayala Corporation', sector: 'Holding Firms', industry: 'Diversified Conglomerate', marketCap: 245000 },
+      TEL: { symbol: 'TEL', companyName: 'PLDT Inc', sector: 'Services', industry: 'Telecommunications', marketCap: 165000 },
     };
 
     return mockDetails[sym] || {

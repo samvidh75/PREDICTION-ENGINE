@@ -5,7 +5,7 @@
 
 /** A single holding (delivery position) from broker */
 export interface PortfolioHolding {
-  symbol: string;            // PSE symbol (e.g., "RELIANCE")
+  symbol: string;            // PSE symbol (e.g., "BDO")
   isin?: string;             // ISIN identifier
   exchange: 'PSE';   // Exchange
   quantity: number;          // Number of shares

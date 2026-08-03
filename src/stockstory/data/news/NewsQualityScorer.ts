@@ -9,13 +9,8 @@ import type { NewsSourceQuality, NewsQualityScore } from './NewsQualityTypes';
 
 /** Internal mapping of source IDs to quality tiers. Never exposed publicly. */
 const SOURCE_QUALITY_MAP: Record<string, { quality: NewsSourceQuality; score: number }> = {
-  'nse-official': { quality: 'official_exchange', score: 1.0 },
-  'bse-official': { quality: 'official_exchange', score: 1.0 },
-  'bse-corp-announcements': { quality: 'official_exchange', score: 1.0 },
-  'nse-corp-announcements': { quality: 'official_exchange', score: 1.0 },
-  'sec-edgar': { quality: 'regulated', score: 0.95 },
-  'stockedge': { quality: 'reputable', score: 0.7 },
-  'trendlyne': { quality: 'reputable', score: 0.7 },
+  'pse-official': { quality: 'official_exchange', score: 1.0 },
+  'pse-corp-announcements': { quality: 'official_exchange', score: 1.0 },
   'yahoo-finance': { quality: 'reputable', score: 0.65 },
 };
 

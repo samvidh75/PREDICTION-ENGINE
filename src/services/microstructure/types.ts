@@ -46,7 +46,7 @@ export interface Anomaly {
 }
 
 export interface ProviderConfig {
-  name: 'upstox' | 'shoonya' | 'finvasia' | 'finvasia-nse' | 'manual';
+  name: 'pse' | 'manual';
   apiKey?: string;
   accessToken?: string;
   baseUrl?: string;

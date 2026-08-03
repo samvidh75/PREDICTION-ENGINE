@@ -42,10 +42,16 @@ export interface SentimentConfig {
   sources: string[];
 }
 
+// KNOWN GAP (fixed from a real bug): this previously defaulted to real
+// India-only news sites (moneycontrol, economictimes, livemint,
+// business-standard). `sources` is descriptive config only — it's never
+// used to filter or fetch articles in this class (addArticle() accepts
+// any source string) — but the default list should not name unverified
+// or wrong-country sources.
 const DEFAULT_CONFIG: SentimentConfig = {
   lookbackDays: 7,
   minArticles: 1,
-  sources: ['moneycontrol', 'economictimes', 'livemint', 'business-standard', 'reuters'],
+  sources: ['reuters'],
 };
 
 export class NewsSentimentAggregator {

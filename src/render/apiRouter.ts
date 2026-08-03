@@ -1000,7 +1000,7 @@ export default async function registerApiRoutes(server: FastifyInstance) {
     };
   });
 
-  // GET /api/search?q=reliance&limit=10
+  // GET /api/search?q=bdo&limit=10
   server.get("/api/search", async (req, reply) => {
     const qRaw = (req.query as any)?.q;
     const query = String(qRaw ?? "").trim();

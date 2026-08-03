@@ -6,7 +6,7 @@ describe('OrderBookAggregator', () => {
   let aggregator: OrderBookAggregator;
 
   beforeEach(() => {
-    aggregator = new OrderBookAggregator([{ name: 'upstox' }]);
+    aggregator = new OrderBookAggregator([{ name: 'pse' }]);
   });
 
   afterEach(async () => {

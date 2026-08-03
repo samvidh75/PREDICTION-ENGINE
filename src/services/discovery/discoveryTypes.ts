@@ -52,7 +52,7 @@ export type DiscoveryResult = {
    * Optional intelligence card fields (used by the universal discovery overlay).
    * Kept optional so discovery entities can remain lightweight.
    */
-  ticker?: string; // e.g. RELIANCE
+  ticker?: string; // e.g. BDO
   companyName?: string; // e.g. Reliance Industries Limited
   sector?: string; // e.g. Energy & Retail / Banking / IT Services
   miniChartSeed?: string; // stable seed key for mini spark previews

@@ -1,6 +1,17 @@
 // src/services/providers/unified/ProviderRegistry.ts
 // Unified provider registry with fallback chains and health monitoring
 // Wraps existing ProviderCoordinator and adds unified IMarketDataProvider interface
+//
+// KNOWN GAP: this whole src/services/providers/unified/ directory is not
+// covered by tsconfig.json's `include` list, so it is excluded from every
+// build and never type-checked — which is why the import below (of a
+// TrendlyneProvider.ts file that does not exist anywhere in the repo) has
+// never surfaced as an error. Trendlyne is also a real Indian stock
+// analytics site with no PSE relevance; TRENDLYNE_ENABLED/TRENDLYNE_WIDGET_MODE
+// were already removed as dead from config/validator.ts. This file needs a
+// real PSE-provider rewrite (or deletion) before it could ever be wired
+// into the build — left as-is rather than fixing dead code with an
+// unresolvable import.
 
 import { QuoteData, FundamentalData, ProviderHealth, IMarketDataProvider } from './types';
 import { ProviderCoordinator } from '../ProviderCoordinator';
