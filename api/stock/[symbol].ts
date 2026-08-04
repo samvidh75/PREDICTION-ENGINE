@@ -433,7 +433,16 @@ export default async function handler(
       // PSE revenue/profit/EBITDA is wired in (see StockPage.tsx's
       // disclaimer, which reads this field). shareholding is left as an
       // honest empty array above rather than modeled.
-      dataSources: { financials: 'synthetic', shareholding: 'unavailable', thesis: thesis.thesis.includes('is not currently available') ? 'unavailable' : 'real' },
+      dataSources: {
+        // 'partial-real': eps/roe/debtToEquity came from a real PSE Edge
+        // filing (see pseFundamentalsProvider.ts's isReal), but the
+        // multi-year revenue/profit/EBITDA series shown in the chart is
+        // still always the synthetic model — PSE Edge only gives the
+        // latest single quarter, not a history.
+        financials: fundamentalsData.isReal ? 'partial-real' : 'synthetic',
+        shareholding: 'unavailable',
+        thesis: thesis.thesis.includes('is not currently available') ? 'unavailable' : 'real',
+      },
       priceTargets: fundamentalsData.targetMeanPrice ? { mean: fundamentalsData.targetMeanPrice, high: Math.round(fundamentalsData.targetMeanPrice * 1.15 * 100) / 100, low: Math.round(fundamentalsData.targetMeanPrice * 0.85 * 100) / 100 } : null,
       relatedStocks: [],
       // Real EODHD daily history when available; empty array (frontend

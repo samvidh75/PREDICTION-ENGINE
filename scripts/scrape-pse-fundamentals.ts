@@ -3,18 +3,21 @@
  * (edge.pse.com.ph, the PSE's own public disclosure system) and writes them
  * to data/pse-fundamentals.json for the app to read at request time.
  *
- * NOT run automatically and NOT verified in the sandbox this was written
- * in — that sandbox has no outbound network access to edge.pse.com.ph (see
- * src/services/scrapers/PSEEdgeScraper.ts's module doc for the verification
- * that only phisix-api3.appspot.com was reachable there). Run this from an
- * environment with normal internet access:
+ * Confirmed working live (2026-08-04) — see
+ * src/services/scrapers/PSEEdgeScraper.ts's module doc for exactly how the
+ * company-specific search filter was reverse-engineered (a numeric
+ * `cmpy_id`, not free-text keyword). Run:
  *
  *   npx tsx scripts/scrape-pse-fundamentals.ts
  *
- * On first run, watch the per-company summary at the end — a `parsed: 0/7`
- * fields count means PSE Edge's PDF layout didn't match the regexes in
- * PSEEdgeScraper.ts's parseFinancialStatementText and the selectors/regexes
- * need adjusting against the real filing text.
+ * Symbols without a known `cmpy_id` (see KNOWN_CMPY_IDS in
+ * PSEEdgeScraper.ts — currently the PSEi-30 plus a few extras) return
+ * `no_disclosure_found`, not a crash; that's the honest "not resolvable
+ * yet" state, not a scraping failure. A `parsed: 0/7` fields count for a
+ * symbol that DID resolve means PSE Edge's filing text didn't match the
+ * label regexes in parseFinancialStatementText for that specific filer's
+ * formatting — those need adjusting against the real filing text, not
+ * guessed at.
  */
 import { writeFileSync } from 'fs';
 import { resolve } from 'path';

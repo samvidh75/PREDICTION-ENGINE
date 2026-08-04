@@ -900,6 +900,11 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
       {/* ── Key Metrics Grid — grouped by theme instead of one flat wall of numbers ── */}
       <Card className="stock-metrics-card raycast-slideUp" style={{ animationDelay: "0.15s", animationFillMode: "both" }}>
         <CardLabel>Key metrics</CardLabel>
+        <p style={{ color: colors.textSecondary, fontSize: "11.5px", margin: "2px 0 12px 0", lineHeight: 1.5 }}>
+          {stock.dataSources.financials === "partial-real"
+            ? "EPS, ROE, and Debt/Equity are from a real PSE Edge filing. Everything else on this card (PE, PB, dividend yield, growth rates) is still a sector-based estimate."
+            : "Estimated from sector medians — no verified free source for this company's real fundamentals is wired in yet."}
+        </p>
 
         <div style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.04em", textTransform: "uppercase", color: colors.textSecondary, marginTop: "4px", marginBottom: "10px" }}>
           Size &amp; valuation

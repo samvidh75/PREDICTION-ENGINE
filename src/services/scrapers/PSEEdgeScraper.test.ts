@@ -56,6 +56,23 @@ describe('parseFinancialStatementText', () => {
     expect(result.asOfPeriod).toBeNull();
   });
 
+  it('extracts values past a decorative "/(Loss)" in the label (real PSE 17-Q formatting)', () => {
+    // Real filers (verified: Ayala Land's 17-Q) label rows like this —
+    // the old regex excluded "(" from the label-to-number gap entirely,
+    // so it died at the first such label before ever reaching a number,
+    // silently leaving every one of these fields null for every filer.
+    const text = `
+      Net Income/(Loss) After Tax 6,695,026 8,393,040
+      Earnings/(Loss) Per Share(Basic) 0.38 0.48
+      Stockholders' Equity 388,555,060 385,054,413
+    `;
+    const result = parseFinancialStatementText(text, 'ALI', 'https://edge.pse.com.ph/fake.pdf');
+
+    expect(result.netIncome).toBe(6695026);
+    expect(result.eps).toBe(0.38);
+    expect(result.totalEquity).toBe(388555060);
+  });
+
   it('handles parenthesized negative values as negative numbers', () => {
     const text = `
       Net Income for the period (45,000)

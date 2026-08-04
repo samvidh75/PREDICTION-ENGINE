@@ -1,9 +1,66 @@
 /**
  * PSE Fundamentals Provider
- * Fetches real fundamental data for PSE-listed stocks from Yahoo Finance
- * (which serves PSE data via the .PSE suffix). Falls back to sector-based
- * estimates when Yahoo has no data.
+ *
+ * KNOWN GAP (fixed from a real bug): the doc comment here used to claim
+ * Yahoo Finance "serves PSE data via the .PSE suffix" — verified false.
+ * `.PSE`, `.PS`, and bare symbols were all live-tested against real Yahoo
+ * endpoints (both the raw chart API and the yfinance library) across
+ * BDO/JFC/SM/TEL/AC/ALI: `.PSE` returns a clean 404 ("symbol may be
+ * delisted"); `.PS` returns a dead placeholder shell (exchangeName
+ * "YHD", no price, no timestamps). fetchFromYahooPSE below will
+ * therefore always return null for a real PSE ticker — it's kept as a
+ * harmless no-op fallback path rather than removed outright, in case
+ * Yahoo ever adds real PH coverage, but nothing should rely on it working.
+ *
+ * Every other field this module returns (pe, pb, eps, roe, debtToEquity,
+ * growth rates, beta, target price, etc.) is a **deterministic per-symbol
+ * hash-based estimate**, not real data, dressed up with sector-typical
+ * reference ranges — see fetchPSEFundamentals below. As of this fix, real
+ * eps/roe/debtToEquity are available for PSEi-30 symbols via PSE Edge
+ * (see scripts/scrape-pse-fundamentals.ts and
+ * src/services/scrapers/PSEEdgeScraper.ts) and are used here when
+ * present; `isReal` on the returned object reflects this. For any other
+ * symbol, all of these fields remain synthetic — callers must not present
+ * them as real without checking `isReal`.
  */
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+
+interface RealPseFundamentalsRecord {
+  eps: number | null;
+  roe: number | null;
+  debtToEquity: number | null;
+  revenue: number | null;
+  netIncome: number | null;
+  totalAssets: number | null;
+  totalLiabilities: number | null;
+  totalEquity: number | null;
+  asOfPeriod: string | null;
+}
+
+let realFundamentalsCache: Record<string, RealPseFundamentalsRecord | { error: string }> | null = null;
+
+type RealFundamentalsMap = Record<string, RealPseFundamentalsRecord | { error: string }>;
+
+function loadRealFundamentalsMap(): RealFundamentalsMap {
+  if (realFundamentalsCache !== null) return realFundamentalsCache;
+  let loaded: RealFundamentalsMap = {};
+  try {
+    const raw = readFileSync(resolve(process.cwd(), 'data/pse-fundamentals.json'), 'utf-8');
+    loaded = JSON.parse(raw).results ?? {};
+  } catch {
+    // File not generated yet (scripts/scrape-pse-fundamentals.ts hasn't
+    // been run) — treat as "no real data available", not an error.
+  }
+  realFundamentalsCache = loaded;
+  return loaded;
+}
+
+function loadRealPseFundamentals(symbol: string): RealPseFundamentalsRecord | null {
+  const record = loadRealFundamentalsMap()[symbol.toUpperCase()];
+  if (!record || 'error' in record) return null;
+  return record;
+}
 
 const SECTOR_REFERENCE: Record<string, {
   avgPe: number; avgPb: number; avgDividendYield: number;
@@ -40,6 +97,14 @@ export type PSEFundamentals = {
   low52w: number | null; price: number | null; volume: number | null;
   targetMeanPrice: number | null; industryPe: number | null;
   rsi?: number | null;
+  /** True when eps/roe/debtToEquity came from a real PSE Edge filing
+   * (see loadRealPseFundamentals above) rather than the sector-hash
+   * estimate. Every other field on this object is still an estimate even
+   * when this is true — PSE Edge only gives us the latest single quarter,
+   * not P/B, dividend yield, beta, etc. */
+  isReal: boolean;
+  /** Real filing period (e.g. "Mar 31, 2026") when isReal is true. */
+  realAsOfPeriod: string | null;
 };
 
 function getSectorRef(sector: string) {
@@ -85,6 +150,7 @@ async function fetchFromYahooPSE(symbol: string): Promise<Partial<PSEFundamental
 
 export async function fetchPSEFundamentals(symbol: string, sector: string = 'General', fallbackPrice: number | null = null): Promise<PSEFundamentals> {
   const yahooData = await fetchFromYahooPSE(symbol);
+  const realData = loadRealPseFundamentals(symbol);
   const sectorRef = getSectorRef(sector);
   // Deterministic per-symbol variation based on symbol hash
   // This gives each stock unique but stable fundamentals (not random on every call)
@@ -102,13 +168,24 @@ export async function fetchPSEFundamentals(symbol: string, sector: string = 'Gen
   const adjustedPe = sectorRef.avgPe * mcapMultiplier * (1 + variation);
   const estimatedEps = price && adjustedPe > 0 ? Math.round((price / adjustedPe) * 100) / 100 : null;
   const estimatedPe = price && estimatedEps && estimatedEps > 0 ? Math.round((price / estimatedEps) * 10) / 10 : null;
+
+  // Real eps/roe/debtToEquity from an actual PSE Edge filing take priority
+  // over the hash estimate when available. PE is recomputed from the real
+  // EPS (still an estimate in the sense that "price" may be a snapshot,
+  // but the EPS input itself is now real, not guessed).
+  const eps = realData?.eps ?? estimatedEps;
+  const pe = price && eps && eps > 0 ? Math.round((price / eps) * 10) / 10 : estimatedPe;
+  const roe = realData?.roe ?? Math.round(sectorRef.avgRoe * mcapMultiplier * (1 + variation) * 10) / 10;
+  const debtToEquity = realData?.debtToEquity ?? Math.round((sectorRef.avgDebtToEquity * (1 - variation * 0.5)) * 10) / 10;
+  const isReal = realData !== null && (realData.eps !== null || realData.roe !== null || realData.debtToEquity !== null);
+
   return {
-    pe: estimatedPe, pb: Math.round((sectorRef.avgPb * mcapMultiplier * (1 + variation)) * 10) / 10,
-    eps: estimatedEps, dividendYield: Math.round((sectorRef.avgDividendYield * (1 + variation)) * 10) / 10,
-    roe: Math.round(sectorRef.avgRoe * mcapMultiplier * (1 + variation) * 10) / 10,
+    pe, pb: Math.round((sectorRef.avgPb * mcapMultiplier * (1 + variation)) * 10) / 10,
+    eps, dividendYield: Math.round((sectorRef.avgDividendYield * (1 + variation)) * 10) / 10,
+    roe,
     roa: Math.round((sectorRef.avgRoe * 0.6 * (1 + variation)) * 10) / 10,
     roce: Math.round((sectorRef.avgRoe * 0.8 * (1 + variation)) * 10) / 10,
-    debtToEquity: Math.round((sectorRef.avgDebtToEquity * (1 - variation * 0.5)) * 10) / 10,
+    debtToEquity,
     currentRatio: Math.round((1.5 + (symHash % 20) / 10) * 10) / 10,
     interestCoverage: Math.round((3 + (symHash % 70) / 10) * 10) / 10,
     revenueGrowth: Math.round(sectorRef.avgRevenueGrowth * mcapMultiplier * (1 + variation) * 10) / 10,
@@ -118,6 +195,8 @@ export async function fetchPSEFundamentals(symbol: string, sector: string = 'Gen
     volume: yahooData?.volume ?? null,
     targetMeanPrice: price ? Math.round((price * (1 + ((symHash % 20) - 5) / 100)) * 100) / 100 : null,
     industryPe: Math.round(sectorRef.avgPe * 10) / 10,
+    isReal,
+    realAsOfPeriod: isReal ? (realData?.asOfPeriod ?? null) : null,
   };
 }
 
