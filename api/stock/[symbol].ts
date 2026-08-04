@@ -2,6 +2,7 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { PSE_STOCKS, PSE_SECTORS } from '../_lib/data/universe.js';
 import { fetchEodhdHistory, computeFiftyTwoWeekRange, toChartSeries } from '../_lib/services/eodhdClient.js';
 import { fetchPSEFundamentals, calculatePSEHealthScore, generatePSEFinancialHistory } from '../_lib/services/pseFundamentalsProvider.js';
+import { loadRealPseOwnership } from '../../src/services/scrapers/PSEOwnershipData.js';
 
 // Inline health scoring. Checks ~17 distinct metric fields across 6 factor
 // groups below (valuation, quality, growth, momentum, risk, health) — most
@@ -340,6 +341,7 @@ export default async function handler(
     // Pass the phisix price as fallback for P/E calculation when Yahoo has no PSE data
     const profile = buildProfile(symbol);
     const fundamentalsData = await fetchPSEFundamentals(symbol, profile.sector, priceData.price);
+    const realOwnership = loadRealPseOwnership(symbol);
     const fiftyTwoWeek = fundamentalsData.high52w ? { high: fundamentalsData.high52w, low: fundamentalsData.low52w } : (eodhdBars ? computeFiftyTwoWeekRange(eodhdBars) : null);
     const priceChart = eodhdBars ? toChartSeries(eodhdBars) : [];
 
@@ -424,15 +426,26 @@ export default async function handler(
         overall: healthScores.overall,
       },
       companyProfile: profile,
-      shareholding: [],
+      // Real when available (see pseOwnershipProvider.ts) — a PSE Public
+      // Ownership Report only reports insider % vs public %, so that's
+      // exactly what's mapped here, not a fabricated foreign/domestic
+      // institutional split. Empty array (StockPage.tsx hides the card)
+      // when no real record exists — never modeled.
+      shareholding: realOwnership && realOwnership.publicOwnershipPercent !== null
+        ? [{
+            period: realOwnership.reportDate ?? 'Latest',
+            insiderPercent: realOwnership.insiderOwnershipPercent ?? Number((100 - realOwnership.publicOwnershipPercent).toFixed(2)),
+            publicPercent: realOwnership.publicOwnershipPercent,
+            outstandingShares: realOwnership.outstandingShares,
+          }]
+        : [],
       news: liveNews,
       thesis,
       financials: generatePSEFinancialHistory(symbol, fundamentalsData.marketCap ?? priceData.marketCap ?? null, profile.sector),
       // generatePSEFinancialHistory is always a market-cap/sector-medians
       // model, never real reported financials — no verified free source for
       // PSE revenue/profit/EBITDA is wired in (see StockPage.tsx's
-      // disclaimer, which reads this field). shareholding is left as an
-      // honest empty array above rather than modeled.
+      // disclaimer, which reads this field).
       dataSources: {
         // 'partial-real': eps/roe/debtToEquity came from a real PSE Edge
         // filing (see pseFundamentalsProvider.ts's isReal), but the
@@ -440,7 +453,7 @@ export default async function handler(
         // still always the synthetic model — PSE Edge only gives the
         // latest single quarter, not a history.
         financials: fundamentalsData.isReal ? 'partial-real' : 'synthetic',
-        shareholding: 'unavailable',
+        shareholding: realOwnership ? 'real' : 'unavailable',
         thesis: thesis.thesis.includes('is not currently available') ? 'unavailable' : 'real',
       },
       priceTargets: fundamentalsData.targetMeanPrice ? { mean: fundamentalsData.targetMeanPrice, high: Math.round(fundamentalsData.targetMeanPrice * 1.15 * 100) / 100, low: Math.round(fundamentalsData.targetMeanPrice * 0.85 * 100) / 100 } : null,

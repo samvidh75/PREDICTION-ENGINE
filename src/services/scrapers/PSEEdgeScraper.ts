@@ -128,6 +128,7 @@ export const KNOWN_CMPY_IDS: Record<string, number> = {
 const TEMPLATE_NAMES = {
   quarterly: 'Quarterly Report',
   annual: 'Annual Report',
+  publicOwnership: 'Public Ownership Report',
 } as const;
 export type PseFilingType = keyof typeof TEMPLATE_NAMES;
 
@@ -154,6 +155,30 @@ export interface ParsedFundamentals {
   /** Derived — only set when the inputs needed to compute it are present. */
   roe: number | null;
   debtToEquity: number | null;
+  sourceUrl: string;
+  scrapedAt: string;
+}
+
+/**
+ * From a real "Public Ownership Report" (POR-1) filing — every PSE issuer
+ * files one quarterly. Confirmed live for ALI and BDO: the report gives
+ * outstanding shares, shares held by directors/officers/substantial
+ * shareholders (summed, not split out further), and a single
+ * `publicOwnershipPercent` figure. It does NOT report a foreign/domestic
+ * institutional split — that's not a real PSE disclosure category, unlike
+ * the FII/DII breakdown this codebase used to show (a leftover from an
+ * India-market version — see StockPage.tsx's shareholding card, which was
+ * redesigned around this real shape rather than kept forcing fabricated
+ * FII/DII numbers into categories PSE filings don't actually report).
+ */
+export interface ParsedOwnership {
+  symbol: string;
+  reportDate: string | null;
+  outstandingShares: number | null;
+  sharesOwnedByPublic: number | null;
+  publicOwnershipPercent: number | null;
+  /** Derived: 100 - publicOwnershipPercent, when that's present. */
+  insiderOwnershipPercent: number | null;
   sourceUrl: string;
   scrapedAt: string;
 }
@@ -360,6 +385,57 @@ export function parseFinancialStatementText(text: string, symbol: string, source
     sourceUrl,
     scrapedAt: new Date().toISOString(),
   };
+}
+
+/**
+ * Extract public/insider ownership from a real Public Ownership Report
+ * (POR-1) filing's text. Confirmed live for ALI ("Total Number of Shares
+ * Owned by the Public 6,409,136,845 Public Ownership Percentage 44.84")
+ * and BDO (same label format, different real numbers) — a stable, real
+ * label PSE issuers use consistently, unlike the ad-hoc line items in
+ * 17-Q financial statements which vary more by filer.
+ */
+export function parsePublicOwnershipText(text: string, symbol: string, sourceUrl: string): ParsedOwnership {
+  const normalized = text.replace(/\s+/g, ' ');
+
+  const extractNumber = (label: RegExp): number | null => {
+    const match = normalized.match(label);
+    if (!match || !match[1]) return null;
+    const cleaned = match[1].replace(/[,\s]/g, '');
+    const num = Number(cleaned);
+    return Number.isFinite(num) ? num : null;
+  };
+
+  const outstandingShares = extractNumber(/Number\s+of\s+Outstanding\s*Common\s+Shares\s*[^\d]{0,20}?([\d,.]+)/i);
+  const sharesOwnedByPublic = extractNumber(/Total\s+Number\s+of\s+Shares\s+Owned\s*(?:by\s+the\s+Public)?\s*[^\d]{0,20}?([\d,.]+)/i);
+  const publicOwnershipPercent = extractNumber(/Public\s+Ownership\s+Percentage\s*[^\d]{0,20}?([\d,.]+)/i);
+  const reportDateMatch = normalized.match(/Report\s+Date\s+([A-Za-z]+\s+\d{1,2},?\s+\d{4})/i);
+
+  return {
+    symbol,
+    reportDate: reportDateMatch?.[1] ?? null,
+    outstandingShares,
+    sharesOwnedByPublic,
+    publicOwnershipPercent,
+    insiderOwnershipPercent: publicOwnershipPercent !== null ? Number((100 - publicOwnershipPercent).toFixed(2)) : null,
+    sourceUrl,
+    scrapedAt: new Date().toISOString(),
+  };
+}
+
+/**
+ * End-to-end: find a company's most recent Public Ownership Report on PSE
+ * Edge, download it, and parse real ownership split out of it. Returns
+ * `null` (rather than a fabricated placeholder) if the symbol's cmpy_id
+ * isn't in KNOWN_CMPY_IDS yet, or if no filing is found.
+ */
+export async function scrapeCompanyOwnership(symbol: string, companyName: string): Promise<ParsedOwnership | null> {
+  const listings = await fetchDisclosureList(symbol, companyName, 'publicOwnership');
+  const latest = listings[0];
+  if (!latest) return null;
+
+  const text = await fetchAndExtractDisclosureText(latest.edgeNo);
+  return parsePublicOwnershipText(text, symbol, `${EDGE_BASE}/openDiscViewer.do?edge_no=${latest.edgeNo}`);
 }
 
 /**

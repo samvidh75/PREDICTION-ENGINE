@@ -1,5 +1,32 @@
 import { describe, expect, it } from 'vitest';
-import { parseDisclosureListHtml, parseFinancialStatementText } from './PSEEdgeScraper';
+import { parseDisclosureListHtml, parseFinancialStatementText, parsePublicOwnershipText } from './PSEEdgeScraper';
+
+describe('parsePublicOwnershipText', () => {
+  it('extracts real values from realistic POR-1 text (verified against a live Ayala Land filing)', () => {
+    const text = `
+      Report Date Jun 30, 2026
+      Computation of Public Ownership
+      Number of Issued Common Shares 16,712,819,848
+      Less: Number of Treasury Common Shares, if any 2,421,057,779
+      Number of Outstanding Common Shares 14,291,762,069
+      Total Number of Shares Owned by the Public 6,409,136,845
+      Public Ownership Percentage 44.84
+    `;
+    const result = parsePublicOwnershipText(text, 'ALI', 'https://edge.pse.com.ph/fake.pdf');
+
+    expect(result.reportDate).toBe('Jun 30, 2026');
+    expect(result.outstandingShares).toBe(14291762069);
+    expect(result.sharesOwnedByPublic).toBe(6409136845);
+    expect(result.publicOwnershipPercent).toBe(44.84);
+    expect(result.insiderOwnershipPercent).toBe(55.16);
+  });
+
+  it('leaves fields null when they cannot be found (no fabrication)', () => {
+    const result = parsePublicOwnershipText('unrelated filing text', 'AC', 'https://edge.pse.com.ph/fake.pdf');
+    expect(result.publicOwnershipPercent).toBeNull();
+    expect(result.insiderOwnershipPercent).toBeNull();
+  });
+});
 
 describe('parseFinancialStatementText', () => {
   it('extracts real line items from realistic 17-Q statement text', () => {

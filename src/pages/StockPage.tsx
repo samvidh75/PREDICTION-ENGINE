@@ -69,7 +69,13 @@ type StockResearchDetail = {
     annual: { revenue: Array<{ period: string; value: number }>; profit: Array<{ period: string; value: number }>; ebitda: Array<{ period: string; value: number }> };
     quarterly: { revenue: Array<{ period: string; value: number }>; profit: Array<{ period: string; value: number }>; ebitda: Array<{ period: string; value: number }> };
   };
-  shareholding: Array<{ period: string; promoter: number; fii: number; dii: number; retail: number; deltas: { promoter: number; fii: number; dii: number; retail: number } }>;
+  /** Real when available — see PSEEdgeScraper.ts's ParsedOwnership. A PSE
+   * Public Ownership Report only reports insider (directors/officers/
+   * substantial shareholders, summed) vs public %, not a foreign/domestic
+   * institutional split — that FII/DII breakdown was a leftover from an
+   * India-market version of this codebase and isn't a real PSE disclosure
+   * category, so it's gone rather than kept fabricated. */
+  shareholding: Array<{ period: string; insiderPercent: number; publicPercent: number; outstandingShares: number | null }>;
   news: Array<{ headline: string; source: string; time: string; link?: string; publishedAt?: string }>;
   thesis: { thesis: string; bullCase: string; bearCase: string; whatToWatch: string; stance: "High conviction" | "Watch" | "Needs review" | "Risk rising" | "Avoid for now" };
   priceHistory: Record<string, Array<{ label?: string; price?: number; time?: string; open?: number; high?: number; low?: number; close?: number; volume?: number }>>;
@@ -571,8 +577,8 @@ function normalizeStockData(raw: Record<string, any>): StockResearchDetail {
 function StockView({ stock, financialChartData, shareholding, shareholdingSeries, period: initialPeriod }: {
   stock: StockResearchDetail;
   financialChartData: { period: string; value: number }[];
-  shareholding?: { period: string; promoter: number; fii: number; dii: number; retail: number; deltas: { promoter: number; fii: number; dii: number; retail: number } };
-  shareholdingSeries: { period: string; promoter: number; fii: number; dii: number; retail: number; deltas: { promoter: number; fii: number; dii: number; retail: number } }[];
+  shareholding?: { period: string; insiderPercent: number; publicPercent: number; outstandingShares: number | null };
+  shareholdingSeries: { period: string; insiderPercent: number; publicPercent: number; outstandingShares: number | null }[];
   period: string;
 }) {
   const navigate = useNavigate();
@@ -1025,47 +1031,43 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
         )}
       </Card>
 
-      {/* Shareholdings breakdown is currently always modeled (hash-seeded from
-          symbol + sector), never real filing data — see dataSources.shareholding
-          and the disclaimer below. Still gated on effectiveShareholding existing
-          in case that changes. */}
+      {/* PSE's own Public Ownership Report (POR-1) only reports two real
+          numbers: insider % (directors, officers, substantial shareholders,
+          summed) and public %. There is no real foreign/domestic
+          institutional split to show — that FII/DII breakdown was a
+          leftover from an India-market version of this codebase. */}
       {effectiveShareholding && (
       <Card className="stock-shareholdings-card raycast-slideUp" style={{ animationDelay: "0.3s", animationFillMode: "both" }}>
         <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", flexWrap: "wrap", marginBottom: "16px" }}>
           <CardLabel>Shareholdings</CardLabel>
-          <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
-            {shareholdingSeriesArr.map((value) => (
-              <Button key={value.period} variant={value.period === period ? "secondary" : "tertiary"} onClick={() => setPeriod(value.period)}>{value.period}</Button>
-            ))}
-          </div>
+          <span style={{ fontSize: "12px", color: colors.textSecondary }}>
+            {effectiveShareholding.period ? `As of ${effectiveShareholding.period}` : null}
+          </span>
         </div>
         <div style={{ display: "grid", gap: "16px" }}>
           {[
-            { label: "Strategic / Insiders", value: effectiveShareholding?.promoter ?? 0, delta: effectiveShareholding?.deltas.promoter ?? 0 },
-            { label: "Foreign Holders", value: effectiveShareholding?.fii ?? 0, delta: effectiveShareholding?.deltas.fii ?? 0 },
-            { label: "Domestic Institutions", value: effectiveShareholding?.dii ?? 0, delta: effectiveShareholding?.deltas.dii ?? 0 },
-            { label: "Public Float", value: effectiveShareholding?.retail ?? 0, delta: effectiveShareholding?.deltas.retail ?? 0 },
-          ].map((item) => {
-            const positive = item.delta >= 0;
-            return (
-              <div key={item.label} style={{ display: "grid", gap: "8px" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", gap: "12px" }}>
-                  <span style={{ fontSize: "13px", color: colors.textPrimary }}>{item.label}</span>
-                  <span style={{ display: "inline-flex", alignItems: "center", gap: "4px", color: positive ? colors.success : colors.danger, fontSize: "13px" }}>
-                    {positive ? <ArrowUp size={14} /> : <ArrowDown size={14} />}{formatDecimal(item.value, 1)}%
-                  </span>
-                </div>
-                <div style={{ height: "8px", background: colors.border, borderRadius: radius.lg, overflow: "hidden" }}>
-                  <div style={{ width: `${item.value}%`, height: "100%", background: colors.primary, borderRadius: radius.lg }} />
-                </div>
+            { label: "Insiders (Directors, Officers, Substantial Shareholders)", value: effectiveShareholding?.insiderPercent ?? 0 },
+            { label: "Public Float", value: effectiveShareholding?.publicPercent ?? 0 },
+          ].map((item) => (
+            <div key={item.label} style={{ display: "grid", gap: "8px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", gap: "12px" }}>
+                <span style={{ fontSize: "13px", color: colors.textPrimary }}>{item.label}</span>
+                <span style={{ fontSize: "13px", color: colors.textPrimary }}>{formatDecimal(item.value, 2)}%</span>
               </div>
-            );
-          })}
+              <div style={{ height: "8px", background: colors.border, borderRadius: radius.lg, overflow: "hidden" }}>
+                <div style={{ width: `${item.value}%`, height: "100%", background: colors.primary, borderRadius: radius.lg }} />
+              </div>
+            </div>
+          ))}
         </div>
+        {effectiveShareholding.outstandingShares != null && (
+          <p style={{ color: colors.textSecondary, fontSize: "11.5px", marginTop: "14px" }}>
+            {formatNumber(effectiveShareholding.outstandingShares)} common shares outstanding.
+          </p>
+        )}
         {stock.dataSources.shareholding !== "real" && stock.dataSources.shareholding !== "pseApi" && (
-          <p style={{ color: colors.textSecondary, fontSize: "11.5px", marginTop: "14px", lineHeight: 1.5 }}>
-            Modeled from company size and sector, not a real ownership disclosure — no verified free source
-            for PSE shareholding structure is wired in yet.
+          <p style={{ color: colors.textSecondary, fontSize: "11.5px", marginTop: "6px", lineHeight: 1.5 }}>
+            No real Public Ownership Report is available for this symbol yet.
           </p>
         )}
       </Card>

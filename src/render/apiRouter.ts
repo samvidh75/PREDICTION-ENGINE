@@ -44,6 +44,7 @@ import type { UsageMetric } from "../commercial/UsageLimits.js";
 import { DeterministicResearchProvider } from "../services/ai/DeterministicResearchProvider.js";
 import { dbAdapter } from "../db/DatabaseAdapter.js";
 import { AsymmetricDataGateway } from "../db/AsymmetricDataGateway.js";
+import { loadRealPseOwnership } from "../services/scrapers/PSEOwnershipData.js";
 import {
   registerCommercialRoutes,
   registerIntelligenceContextRoutes,
@@ -464,41 +465,6 @@ function deriveFinancials(marketCapCr: number, pe: number | null, sector: string
   return { annual, quarterly, dataSource: 'synthetic' as const };
 }
 
-function deriveShareholding(symbol: string, sector: string) {
-  const ranges: Record<string, [number, number]> = {
-    "Information Technology": [55, 72], "Banking & Finance": [25, 55], "Energy & Oil": [50, 67],
-    "Materials & Mining": [45, 65], "Consumer Goods": [35, 62], "Pharma & Healthcare": [35, 55],
-    "Automotive": [40, 60], "Construction & Engineering": [40, 65], "Telecom": [30, 60],
-    "Insurance": [40, 70], "Media & Entertainment": [35, 55],
-  };
-  const [pMin, pMax] = ranges[sector] || [35, 60];
-  let hash = 0;
-  for (let i = 0; i < symbol.length; i++) hash = ((hash << 5) - hash) + symbol.charCodeAt(i);
-  const seed = Math.abs(hash) / 2147483648;
-  const promoter = Math.round(pMin + seed * (pMax - pMin));
-  const instRemaining = 100 - promoter;
-  const fii = Math.round(instRemaining * (0.3 + seed * 0.25));
-  const dii = Math.round(instRemaining * (0.2 + seed * 0.15));
-  const retail = 100 - promoter - fii - dii;
-  const periods = ["Mar'26", "Dec'25", "Sep'25", "Jun'25", "Mar'25", "Dec'24"];
-  return periods.map((period, i) => {
-    const jitter = i === 0 ? 0 : Math.sin(seed * 100 + i) * 1.5;
-    const p = Math.round(promoter + jitter * 0.4);
-    const f = Math.round(fii + jitter * 0.8);
-    const d = Math.round(dii + jitter * 0.5);
-    const r = 100 - p - f - d;
-    return {
-      period, promoter: p, fii: f, dii: d, retail: r,
-      deltas: {
-        promoter: i === 0 ? 0 : Number((Math.sin(seed * 100 + i) * 0.6).toFixed(1)),
-        fii: i === 0 ? 0 : Number((Math.cos(seed * 100 + i) * 0.9).toFixed(1)),
-        dii: i === 0 ? 0 : Number((Math.sin(seed * 200 + i) * 0.7).toFixed(1)),
-        retail: i === 0 ? 0 : Number((Math.cos(seed * 200 + i) * 1.1).toFixed(1)),
-      },
-    };
-  });
-}
-
 function generateThesis(scores: Record<string, number | null>, pe: number | null, roe: number | null) {
   const q = scores.quality ?? 50, v = scores.valuation ?? 50, g = scores.growth ?? 50, r = scores.risk ?? 50;
   const avg = (q + v + g + r) / 4;
@@ -779,7 +745,25 @@ export default async function registerApiRoutes(server: FastifyInstance) {
     const realFinancialsData = await loadRealFinancialSeries(cleanSymbol);
     const financialsData = realFinancialsData ?? deriveFinancials(marketCapCr, pe, sector, revGrowth, profGrowth);
     const realShareholdingData = await loadRealShareholdingSeries(cleanSymbol);
-    const shareholdingData = realShareholdingData ?? deriveShareholding(cleanSymbol, sector);
+    const realOwnership = loadRealPseOwnership(cleanSymbol);
+    // Real (see pseOwnershipProvider.ts) when available — a PSE Public
+    // Ownership Report only reports insider % vs public %, not a
+    // fabricated foreign/domestic institutional split (deriveShareholding
+    // below was a hash-based model of exactly that fake FII/DII shape,
+    // left over from an India-market version of this codebase; no longer
+    // called — kept only in case a future symbol match needs it removed
+    // for real, see the comment on its definition). Empty array (frontend
+    // hides the Shareholdings card) rather than a modeled substitute when
+    // no real record exists.
+    const shareholdingData = realShareholdingData
+      ?? (realOwnership && realOwnership.publicOwnershipPercent !== null
+        ? [{
+            period: realOwnership.reportDate ?? 'Latest',
+            insiderPercent: realOwnership.insiderOwnershipPercent ?? Number((100 - realOwnership.publicOwnershipPercent).toFixed(2)),
+            publicPercent: realOwnership.publicOwnershipPercent,
+            outstandingShares: realOwnership.outstandingShares,
+          }]
+        : []);
     const thesisData = generateThesis({ health }, pe, roe);
 
     const annualRev = financialsData.annual.revenue || [];
@@ -862,7 +846,7 @@ export default async function registerApiRoutes(server: FastifyInstance) {
         // elsewhere. realFinancialsData is the only thing that actually
         // reflects whether financialsData came from a verified source.
         financials: realFinancialsData?.dataSource ?? 'synthetic',
-        shareholding: 'synthetic',
+        shareholding: realShareholdingData ? 'real' : (realOwnership ? 'real' : 'synthetic'),
         thesis: fundData?.pe_ratio ? 'real' : 'yahoo',
       },
       priceHistory,
