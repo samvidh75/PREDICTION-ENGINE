@@ -41,21 +41,25 @@
  *      with `keyword=180` returned `[Total 7]`, `tmplNm=Annual Report`
  *      returned `[Total 2]`, both real.
  *
- * REMAINING GAP: this only works for a symbol whose `cmpy_id` is known.
- * KNOWN_CMPY_IDS below covers all 30 PSEi-30 constituents (resolved via
- * PSE Edge's own `/autoComplete/searchCompanyNameSymbol.ax?term={symbol}`
- * JSON endpoint) plus a handful of others observed incidentally — not the
- * full ~294-ticker universe. For any symbol not in the map,
- * `scrapeCompanyFundamentals` returns `null` (honest "can't resolve this
- * symbol yet") rather than guessing an ID or falling back to an
- * unreliable keyword-substring match. Next step for whoever continues
- * this: call the same autocomplete endpoint for the remaining ~264
- * tickers (see src/services/universe/StockUniverse.ts for the full list)
- * to complete the map. Separately, PSE Edge's company directory
- * (https://edge.pse.com.ph/companyDirectory/form.do, 282 companies) also
- * carries each company's real PSE sector/subsector, which would close the
- * gap where ScannerPage.tsx can only classify the PSEi-30 (see
- * api/_lib/data/universe.ts's PSE_SECTORS comment).
+ * COVERAGE: KNOWN_CMPY_IDS below was built by calling PSE Edge's own
+ * `/autoComplete/searchCompanyNameSymbol.ax?term={symbol}` endpoint for
+ * every symbol in PSE_STOCKS (api/_lib/data/universe.ts, ~294 tickers —
+ * see scripts/resolve-cmpy-ids.py), matched against the exact `symbol`
+ * field in the response since some terms return multiple candidates
+ * (e.g. `?term=AC` also returns ACEN, ACR, ACE). 280/294 resolved. The 14
+ * that didn't (ATNB, BCB, CAB, COAL, DMPA1, DMPA2, DMPI, DTEL, FJPB,
+ * FYNB, LCB, MAB, MAHB, OPMB) returned no exact match — mostly preferred-
+ * share/bond-style tickers PSE Edge's autocomplete doesn't index the same
+ * way as common shares. Left unresolved rather than guessed; for any of
+ * these, `scrapeCompanyFundamentals` returns `null` (honest "can't
+ * resolve this symbol yet").
+ *
+ * PSE Edge's company directory (https://edge.pse.com.ph/companyDirectory/
+ * form.do, 282 companies) separately carries each company's real PSE
+ * sector/subsector, which would close the gap where ScannerPage.tsx can
+ * only classify the PSEi-30 (see api/_lib/data/universe.ts's PSE_SECTORS
+ * comment) — not pulled in here since it needs different scraping logic
+ * (a paginated HTML table, not this JSON endpoint).
  *
  * No fundamentals are fabricated: if a filing can't be found or a line
  * item can't be parsed from the real PDF/HTML text, the corresponding
@@ -63,33 +67,58 @@
  */
 
 /**
- * Real (symbol, cmpy_id) pairs — see module doc for how the mechanism was
- * confirmed. The PSEi-30 entries were resolved via PSE Edge's own
- * `/autoComplete/searchCompanyNameSymbol.ax?term={symbol}` endpoint (a
- * clean JSON API — e.g. `?term=BDO` returns
- * `[{"cmpyId":"260","cmpyNm":"BDO Unibank, Inc.","symbol":"BDO",...}]`),
- * matched against the exact symbol field since some tickers return
- * multiple candidates (e.g. `?term=AC` also returns ACEN, ACR, ACE).
- * The remaining entries are real IDs observed incidentally while
- * investigating (recent disclosures, first page of the company
- * directory) — not a systematic crawl, and not fabricated.
- *
- * Covers all 30 PSEi-30 constituents (see PSEI_30 in
- * api/_lib/data/universe.ts) plus a handful of others. Still not the full
- * ~294-ticker universe — see the module doc's "REMAINING GAP" for the
- * next step (paging the company directory, or just calling the
- * autocomplete endpoint per-symbol the same way this list was built).
+ * Real (symbol, cmpy_id) pairs for ~95% of the PSE_STOCKS universe — see
+ * the module doc's COVERAGE section for exactly how this was built and
+ * which 14 symbols are missing and why.
  */
 export const KNOWN_CMPY_IDS: Record<string, number> = {
-  // PSEi-30
-  AC: 57, ACEN: 233, AEV: 16, ALI: 180, AREIT: 679, BDO: 260, BPI: 234,
-  CBC: 184, CNPF: 652, CNVRG: 680, DMC: 188, EMI: 632, GLO: 69, GTCAP: 633,
-  ICT: 83, JFC: 86, JGS: 210, LTG: 12, MBT: 128, MER: 118, MONDE: 682,
-  PGOLD: 629, PLUS: 96, RCR: 684, SCC: 157, SM: 599, SMC: 154, SMPH: 112,
-  TEL: 6, URC: 124,
-  // Others observed incidentally, not part of the PSEi-30
-  AAA: 55, ABS: 114, BNCOM: 692, CA: 213, WIN: 90, BEL: 21, LOTO: 605,
-  MREIT: 685, BH: 62, PRIM: 30, MYNLD: 707, FEU: 25, IPO: 85, EEI: 71,
+  AAA: 55, AB: 19, ABA: 174, ABG: 176, ABS: 114, ABSP: 15,
+  AC: 57, ACE: 48, ACEN: 233, ACR: 121, AEV: 16, AGI: 212,
+  ALCO: 172, ALHI: 612, ALI: 180, ALLDY: 686, ALLHC: 26, ALTER: 701,
+  ANI: 619, ANS: 14, AP: 609, APC: 177, APL: 638, APO: 52,
+  APVI: 678, APX: 178, AR: 33, ARA: 38, AREIT: 679, ASLAG: 694,
+  AT: 34, ATN: 56, AUB: 641, AXLM: 673, BALAI: 697, BC: 108,
+  BCOR: 9, BDO: 260, BEL: 21, BH: 62, BHI: 63, BLOOM: 49,
+  BMM: 181, BNCOM: 692, BPI: 234, BRN: 13, BSC: 60, C: 669,
+  CA: 213, CAT: 183, CBC: 184, CDC: 39, CEB: 624, CEI: 186,
+  CEU: 223, CHP: 662, CIC: 648, CLI: 668, CNPF: 652, CNVRG: 680,
+  COL: 601, COSCO: 50, CPG: 189, CPM: 621, CREC: 703, CREIT: 691,
+  CROWN: 657, CSB: 228, CTS: 693, CYBR: 67, DD: 651, DDMPR: 681,
+  DELM: 642, DFNN: 187, DHI: 31, DITO: 36, DIZ: 68, DMC: 188,
+  DMW: 671, DNL: 639, DWC: 647, ECP: 70, ECVC: 46, EEI: 71,
+  EG: 623, EGRN: 191, ELI: 190, EMI: 632, ENEX: 653, EURO: 219,
+  EW: 634, FAF: 81, FB: 151, FCG: 689, FDC: 75, FERRO: 643,
+  FEU: 25, FFI: 196, FGEN: 600, FILRT: 683, FJP: 225, FLI: 226,
+  FMETF: 649, FNI: 224, FOOD: 602, FPH: 197, FPI: 220, FRUIT: 676,
+  FYN: 80, GEO: 198, GERI: 193, GLO: 69, GMA7: 610, GMAP: 611,
+  GPH: 221, GREEN: 132, GSMI: 94, GTCAP: 633, HI: 82, HOME: 674,
+  HTI: 690, I: 613, ICT: 83, IDC: 660, IMI: 622, IMP: 201,
+  INFRA: 84, ION: 203, IPM: 4, IPO: 85, IS: 204, JAS: 134,
+  JFC: 86, JGS: 210, JOH: 261, KEEPR: 2, KEP: 88, KPPI: 672,
+  LBC: 236, LC: 98, LFM: 227, LMG: 205, LODE: 37, LOTO: 605,
+  LPC: 698, LPZ: 61, LSC: 115, LTG: 12, MA: 119, MAC: 106,
+  MACAY: 145, MAH: 3, MARC: 175, MAXS: 135, MB: 1, MBC: 117,
+  MBT: 128, MED: 126, MEDIC: 687, MEG: 127, MER: 118, MFC: 120,
+  MFIN: 263, MG: 105, MGH: 192, MHC: 206, MJC: 102, MJIC: 24,
+  MM: 677, MONDE: 682, MRC: 131, MREIT: 685, MRSGI: 659, MVC: 100,
+  MWC: 270, MWIDE: 627, MYNLD: 707, NI: 103, NIKL: 625, NOW: 264,
+  NRCP: 606, NXGEN: 179, OGP: 704, OM: 207, OPM: 43, ORE: 616,
+  OV: 45, PA: 109, PAL: 20, PAX: 194, PBB: 640, PBC: 208,
+  PCOR: 136, PERC: 578, PGOLD: 629, PHA: 148, PHC: 97, PHES: 138,
+  PHN: 107, PHR: 631, PIZZA: 664, PLUS: 96, PMPC: 104, PNB: 139,
+  PNC: 7, PNX: 608, PORT: 129, PPC: 150, PRC: 141, PREIT: 699,
+  PRIM: 30, PRMX: 214, PSB: 142, PSE: 478, PTC: 144, PTT: 76,
+  PX: 137, PXP: 628, RCB: 232, RCI: 54, RCR: 684, REDC: 702,
+  REG: 153, RFM: 77, RLC: 195, RLT: 40, ROCK: 635, ROX: 64,
+  RRHI: 646, SBS: 658, SCC: 157, SECB: 32, SEVN: 143, SFI: 165,
+  SGI: 160, SGP: 166, SHLPH: 663, SHNG: 218, SLF: 78, SLI: 41,
+  SM: 599, SMC: 154, SMPH: 112, SOC: 161, SPC: 237, SPM: 156,
+  SPNEC: 688, SRDC: 479, SSI: 654, STI: 222, STN: 164, STR: 147,
+  SUN: 73, T: 163, TBGI: 269, TECH: 630, TEL: 6, TFC: 8,
+  TFHI: 650, TOP: 706, TUGS: 644, UBP: 167, UNH: 22, UPM: 168,
+  UPSON: 700, URC: 124, V: 65, VITA: 28, VLC: 661, VLL: 607,
+  VMC: 123, VREIT: 695, VVT: 79, WEB: 122, WIN: 90, WLCON: 665,
+  WPI: 173, X: 656, XG: 705, ZHI: 89,
 };
 
 /** Real PSE Edge template-name strings, as required by `tmplNm` — see
