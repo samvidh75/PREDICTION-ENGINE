@@ -129,6 +129,7 @@ const TEMPLATE_NAMES = {
   quarterly: 'Quarterly Report',
   annual: 'Annual Report',
   publicOwnership: 'Public Ownership Report',
+  insiderChange: 'Statement of Changes in Beneficial Ownership of Securities',
 } as const;
 export type PseFilingType = keyof typeof TEMPLATE_NAMES;
 
@@ -436,6 +437,74 @@ export async function scrapeCompanyOwnership(symbol: string, companyName: string
 
   const text = await fetchAndExtractDisclosureText(latest.edgeNo);
   return parsePublicOwnershipText(text, symbol, `${EDGE_BASE}/openDiscViewer.do?edge_no=${latest.edgeNo}`);
+}
+
+/**
+ * From a real "Statement of Changes in Beneficial Ownership of Securities"
+ * (form 17-7) filing. Confirmed live against an Ayala Land filing: the
+ * disclosure reports the reporting person's name, their relationship to
+ * the issuer (e.g. "10% Owner", "Director"), and a plain-text description
+ * of the transaction (e.g. "Acquisition of common shares"). It does NOT
+ * reliably include a share quantity or transaction value/price in the
+ * rendered disclosure content — that data simply isn't present in this
+ * filing type's PSE Edge rendering (verified: the raw HTML has no
+ * quantity/amount fields at all for this filing). Earlier code in this
+ * codebase (scripts/python/insider_vectorizer.py's MOCK_FILINGS,
+ * src/commercial/api/insiderRoutes.ts's shares_quantity/
+ * transaction_value_php columns) presented fabricated numbers for these
+ * fields — this real version leaves them out rather than guess.
+ */
+export interface ParsedInsiderFiling {
+  symbol: string;
+  reportingPerson: string | null;
+  relationship: string | null;
+  description: string | null;
+  filingDate: string;
+  edgeNo: string;
+  sourceUrl: string;
+  scrapedAt: string;
+}
+
+export function parseInsiderFilingText(text: string, symbol: string, filingDate: string, edgeNo: string, sourceUrl: string): ParsedInsiderFiling {
+  const normalized = text.replace(/\s+/g, ' ');
+
+  const extractField = (label: RegExp): string | null => {
+    const match = normalized.match(label);
+    return match?.[1]?.trim() || null;
+  };
+
+  return {
+    symbol,
+    reportingPerson: extractField(/Name\s+of\s+Reporting\s+Person\s+([^]+?)\s+Relationship/i),
+    relationship: extractField(/Relationship\s+of\s+Reporting\s+Person\s+to\s+Issuer\s+([^]+?)\s+(?:Description|Filed)/i),
+    description: extractField(/Description\s+of\s+the\s+Disclosure\s+([^]+?)\s+Filed\s+on\s+behalf/i),
+    filingDate,
+    edgeNo,
+    sourceUrl,
+    scrapedAt: new Date().toISOString(),
+  };
+}
+
+/**
+ * End-to-end: find a company's most recent insider beneficial-ownership-
+ * change filings (form 17-7) and parse the real (name, relationship,
+ * description) out of each. Returns `[]` (not fabricated placeholders) if
+ * the symbol's cmpy_id isn't known or no such filings exist.
+ */
+export async function scrapeCompanyInsiderFilings(symbol: string, companyName: string, limit = 10): Promise<ParsedInsiderFiling[]> {
+  const listings = await fetchDisclosureList(symbol, companyName, 'insiderChange');
+  const toFetch = listings.slice(0, limit);
+
+  const results: ParsedInsiderFiling[] = [];
+  for (const listing of toFetch) {
+    try {
+      const text = await fetchAndExtractDisclosureText(listing.edgeNo);
+      results.push(parseInsiderFilingText(text, symbol, listing.filingDate, listing.edgeNo, `${EDGE_BASE}/openDiscViewer.do?edge_no=${listing.edgeNo}`));
+    } catch {
+      // One filing failing to fetch/parse shouldn't drop the rest.
+    }
+  }
+  return results;
 }
 
 /**

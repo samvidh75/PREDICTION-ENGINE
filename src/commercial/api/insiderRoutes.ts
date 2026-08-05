@@ -1,68 +1,45 @@
 /**
  * commercial/api/insiderRoutes — Corporate Insider Disclosure API.
  *
- * Public endpoints that expose PSE/SEC regulatory filing data from the
- * corporate_insider_disclosures table.  All data is public regulatory
- * information — no authentication is required for reads.
+ * Serves real form 17-7 "Statement of Changes in Beneficial Ownership of
+ * Securities" filings scraped from PSE Edge — see
+ * src/services/scrapers/PSEInsiderFilingsData.ts. Previously this queried
+ * a corporate_insider_disclosures Postgres table seeded entirely by
+ * scripts/python/insider_vectorizer.py's MOCK_FILINGS (three hardcoded
+ * fake entries) — that fabrication has been removed in favor of this real
+ * feed. A symbol with no scraped filings returns an empty array, not a
+ * fabricated placeholder.
  *
  * Routes:
- *   GET  /api/v1/corporate/insiders/:ticker  — Recent insider filings
+ *   GET  /api/v1/corporate/insiders/:ticker  — Recent real insider filings
  */
 
 import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
-import { dbAdapter } from "../../db/DatabaseAdapter";
-
-// ── Type Contracts ──────────────────────────────────────────────────
-
-interface InsiderFiling {
-  id: string;
-  ticker: string;
-  disclosure_type: string;
-  insider_name: string;
-  shares_quantity: number;
-  transaction_value_php: number;
-  filing_date: string;
-  raw_announcement_text: string;
-}
+import { loadPseInsiderFilings } from "../../services/scrapers/PSEInsiderFilingsData.js";
 
 interface Params {
   ticker: string;
 }
 
-// ── Route Registration ──────────────────────────────────────────────
-
 export async function registerInsiderRoutes(fastify: FastifyInstance): Promise<void> {
-
   // ── GET /api/v1/corporate/insiders/:ticker ──────────────────────
-  // Returns the 5 most recent insider filings for the given ticker.
   fastify.get<{ Params: Params }>(
     "/api/v1/corporate/insiders/:ticker",
     async (req: FastifyRequest<{ Params: Params }>, reply: FastifyReply) => {
       const symbol = req.params.ticker.toUpperCase().trim();
 
       try {
-        const result = await dbAdapter.query(
-          `SELECT disclosure_type, insider_name, shares_quantity,
-                  transaction_value_php, filing_date, raw_announcement_text
-           FROM corporate_insider_disclosures
-           WHERE ticker LIKE $1
-           ORDER BY filing_date DESC
-           LIMIT 5`,
-          [`${symbol}%`],
-        );
-
-        const rows = result.rows as InsiderFiling[];
-
+        const filings = loadPseInsiderFilings(symbol);
         return reply.status(200).send({
           success: true,
           ticker: symbol,
-          filings: Array.isArray(rows) ? rows : [],
+          filings,
         });
       } catch (err: any) {
-        req.log.error({ err }, "Failed to query insider disclosures");
+        req.log.error({ err }, "Failed to load insider filings");
         return reply.status(500).send({
           success: false,
-          error: "Failed to query insider trading database partitions.",
+          error: "Failed to load insider filings.",
         });
       }
     },

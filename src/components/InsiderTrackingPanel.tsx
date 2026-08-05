@@ -1,10 +1,16 @@
 /**
- * InsiderTrackingPanel — SEC Insider Disclosure Radar Widget.
+ * InsiderTrackingPanel — Insider Disclosure Radar Widget.
  *
- * Fetches corporate insider filings from the backend API and renders them
- * in the Raycast design system (dark theme, hairline borders).
- *
- * Spec ref: Phase 52 — Corporate Actions Vectorizer & Insider Tracking
+ * Fetches real form 17-7 (Statement of Changes in Beneficial Ownership of
+ * Securities) filings scraped from PSE Edge — see
+ * src/services/scrapers/PSEInsiderFilingsData.ts. There is no share
+ * quantity or transaction value/price here: that data isn't reliably
+ * present in this filing type's PSE Edge rendering (verified against real
+ * filings), so it's left out entirely rather than shown as a guess — this
+ * previously rendered fabricated numbers (a stale `transaction_value_inr`
+ * field, which had been silently undefined since a 2026 migration renamed
+ * the real column to `transaction_value_php` — moot now, both the mock
+ * data and that field are gone).
  */
 
 import { useEffect, useState } from "react";
@@ -13,12 +19,11 @@ import { colors, typography } from "../design/tokens";
 // ── Type Contracts ──────────────────────────────────────────────────
 
 interface InsiderFiling {
-  disclosure_type: string;
-  insider_name: string;
-  shares_quantity: number;
-  transaction_value_inr: number;
-  filing_date: string;
-  raw_announcement_text: string;
+  reportingPerson: string | null;
+  relationship: string | null;
+  description: string | null;
+  filingDate: string;
+  sourceUrl: string;
 }
 
 interface InsiderApiResponse {
@@ -172,30 +177,24 @@ export default function InsiderTrackingPanel({ ticker }: { ticker: string }) {
           <div key={idx} style={s.card}>
             <div style={s.cardHeader}>
               <span style={s.typeLabel}>
-                {f.disclosure_type.replace(/_/g, " ")}
+                {f.relationship ?? "Beneficial Ownership Change"}
               </span>
               <span style={s.dateLabel}>
-                Filing Date: {f.filing_date.split("T")[0]}
+                {f.filingDate}
               </span>
             </div>
 
-            <p style={s.insiderName}>{f.insider_name}</p>
+            <p style={s.insiderName}>{f.reportingPerson ?? "Unnamed reporting person"}</p>
 
-            <p style={s.details}>
-              Volume:{" "}
-              <strong style={s.valueGreen}>
-                {f.shares_quantity.toLocaleString("en-PH")} shares
-              </strong>
-              {" "}&bull;{" "}
-              Value:{" "}
-              <strong>
-                ₱{Number(f.transaction_value_inr).toLocaleString("en-PH")}
-              </strong>
-            </p>
+            {f.description && (
+              <p style={s.quote}>
+                &ldquo;{f.description}&rdquo;
+              </p>
+            )}
 
-            <p style={s.quote}>
-              &ldquo;{f.raw_announcement_text}&rdquo;
-            </p>
+            <a href={f.sourceUrl} target="_blank" rel="noopener noreferrer" style={{ fontSize: "10px", color: colors.textSecondary, textDecoration: "none" }}>
+              View real filing on PSE Edge →
+            </a>
           </div>
         ))}
       </div>

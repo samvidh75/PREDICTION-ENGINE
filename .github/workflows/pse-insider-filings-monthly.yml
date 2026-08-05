@@ -1,0 +1,52 @@
+name: PSE Insider Filings (Monthly)
+
+# Regenerates data/pse-insider-filings.json — real form 17-7 "Statement of
+# Changes in Beneficial Ownership of Securities" filings per PSE company
+# scraped from PSE Edge (up to 5 recent filings per company).
+#
+# Monthly cadence: insider transactions are infrequent for most issuers,
+# and this makes several requests per company (listing + per-filing
+# fetch), so it runs on the same lower-frequency schedule as the
+# financial-history job rather than the weekly fundamentals/ownership
+# refresh.
+
+on:
+  schedule:
+    # 1st of every month at 04:30 UTC (offset from the financial-history job)
+    - cron: '30 4 1 * *'
+  workflow_dispatch:
+
+jobs:
+  scrape-insider-filings:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Scrape PSE insider filings
+        run: npx tsx scripts/scrape-pse-insider-filings.ts
+        timeout-minutes: 150
+
+      - name: Commit refreshed insider filings
+        run: |
+          git config user.name "PSE Data Refresh Bot"
+          git config user.email "pipeline@pse-refresh.bot"
+          git add data/pse-insider-filings.json
+          git diff --staged --quiet || (git commit -m "chore(data): refresh PSE insider filings $(date +%Y-%m)" && git push)
+        continue-on-error: true
+
+      - name: Pipeline complete
+        run: echo "PSE insider filings refresh completed at $(date)"
