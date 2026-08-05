@@ -156,14 +156,24 @@ export function AppShell({ children }: { children: ReactNode }) {
         ))}
       </nav>
 
-      {/* CONTENT */}
+      {/* CONTENT
+          Opacity-only fade: a y-offset animation here leaves framer-motion
+          holding a `transform: translateY(...)` on this wrapper even at
+          rest (needed so it can interpolate for the next mount/exit) --
+          any `position: fixed` element rendered inside {children} (e.g.
+          WatchlistPage's "Add Stock Modal") would then be positioned
+          relative to THIS wrapper instead of the viewport, since a
+          non-none transform makes an element the containing block for
+          fixed-position descendants. Same root cause and fix as the
+          .stockex-page-enter bug fixed in PublicLayout.tsx -- see that
+          file's comment for the full CSS explanation. */}
       <main className="content">
         <AnimatePresence mode="wait">
           <motion.div
             key={location.pathname}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
           >
             {children}

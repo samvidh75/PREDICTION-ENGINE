@@ -1,27 +1,47 @@
-import { describe, it, expect, afterEach, vi } from 'vitest';
-import { readFileSync, writeFileSync, mkdirSync, rmSync } from 'node:fs';
+import { describe, it, expect, beforeAll, afterEach, afterAll, vi } from 'vitest';
+import { existsSync, readFileSync, writeFileSync, mkdirSync, rmSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 // We test the file directly rather than the cached loader, so the module's
 // internal cache never short-circuits between tests. The loader reads from
-// resolve(process.cwd(), 'data/pse-financial-history.json').
+// resolve(process.cwd(), 'data/pse-financial-history.json') — the SAME path
+// this test writes fixtures to, since the loader has no injectable path
+// override. This used to just rmSync the file after every test, which
+// permanently destroyed the real, committed, scraped production data file
+// on every `vitest run` (discovered after it vanished three times in one
+// session with no other explanation). Back up the real content once before
+// any test runs and restore it after the whole suite, rather than deleting.
 const DATA_FILE = resolve(process.cwd(), 'data/pse-financial-history.json');
 const DATA_DIR = resolve(process.cwd(), 'data');
+
+let originalContent: string | null = null;
 
 function writeFake(data: unknown) {
   mkdirSync(DATA_DIR, { recursive: true });
   writeFileSync(DATA_FILE, JSON.stringify(data), 'utf-8');
 }
 
-function removeFake() {
-  rmSync(DATA_FILE, { force: true });
+function restoreOriginal() {
+  if (originalContent !== null) {
+    writeFileSync(DATA_FILE, originalContent, 'utf-8');
+  } else {
+    rmSync(DATA_FILE, { force: true });
+  }
 }
 
 describe('PSEFinancialHistoryData loader', () => {
+  beforeAll(() => {
+    originalContent = existsSync(DATA_FILE) ? readFileSync(DATA_FILE, 'utf-8') : null;
+  });
+
   afterEach(() => {
-    removeFake();
+    restoreOriginal();
     // Clear the module cache so each import picks up the on-disk file.
     vi.resetModules();
+  });
+
+  afterAll(() => {
+    restoreOriginal();
   });
 
   it('returns a real series when the symbol has >=2 quarters', async () => {
@@ -70,6 +90,9 @@ describe('PSEFinancialHistoryData loader', () => {
   });
 
   it('returns null (falls back to synthetic) when the file does not exist', async () => {
+    // Explicitly absent for this one test only — afterEach restores the
+    // real file afterward, it doesn't just leave it deleted.
+    rmSync(DATA_FILE, { force: true });
     const { loadPseFinancialHistory } = await import('./PSEFinancialHistoryData.js');
     expect(loadPseFinancialHistory('ABA')).toBeNull();
   });
