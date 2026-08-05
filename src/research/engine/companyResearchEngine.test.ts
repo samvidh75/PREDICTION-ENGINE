@@ -59,4 +59,21 @@ describe("buildCompanyResearch", () => {
     expect(r.investContext.symbol).toBe("BDO");
     expect(r.investContext.whatToWatch.length).toBeGreaterThan(0);
   });
+
+  it("surfaces short/medium-term momentum in the factor explanation", () => {
+    // 130 candles rising ~2%/bar -> every momentum window is strongly positive.
+    const base = new Date("2026-01-01T00:00:00Z").getTime();
+    const candles = Array.from({ length: 130 }, (_, i) => ({
+      date: new Date(base + i * 86400000).toISOString().slice(0, 10),
+      close: 100 * Math.pow(1.02, i),
+      high: null,
+      low: null,
+      open: null,
+      volume: null,
+    }));
+    const r = buildCompanyResearch({ ...baseInput, candles });
+    expect(r.factorScores.momentumExplanation).toContain("short-term");
+    expect(r.factorScores.momentumExplanation).toContain("medium-term");
+    expect(r.factorScores.momentumExplanation).toContain("price trend");
+  });
 });

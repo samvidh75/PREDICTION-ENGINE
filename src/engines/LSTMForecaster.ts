@@ -1,3 +1,5 @@
+import { predictionTargetFramework } from "../services/PredictionTargetFramework";
+
 export interface LSTMFeatureSet {
   returns: number[];
   volume: number[];
@@ -28,6 +30,10 @@ export interface LSTMOutput {
     forecastHorizon: number;
     featureCount: number;
     residualVariance: number;
+    /** Annualized volatility (fraction) estimated from the input feature series. */
+    annualizedVolatility: number;
+    /** Probability of a >5% intra-30-day drawdown, via seeded Monte Carlo — see PredictionTargetFramework. */
+    drawdownProbability30D: number;
   };
 }
 
@@ -57,6 +63,7 @@ export class LSTMForecaster {
     const confidence = this.estimateConfidence(normalized);
     const forecastedReturn = prediction.return;
     const forecastedPrice = prediction.price;
+    const annualizedVolatility = this.estimateAnnualVolatility(features);
 
     const signalDirection = forecastedReturn > 0.02 ? 'bullish'
       : forecastedReturn < -0.02 ? 'bearish' : 'neutral';
@@ -75,6 +82,8 @@ export class LSTMForecaster {
         forecastHorizon: this.config.forecastHorizon,
         featureCount: Object.keys(normalized).length,
         residualVariance: this.computeResidualVariance(normalized),
+        annualizedVolatility,
+        drawdownProbability30D: predictionTargetFramework.estimateDrawdownProbability(annualizedVolatility),
       },
     };
   }
@@ -174,6 +183,19 @@ export class LSTMForecaster {
     return variance;
   }
 
+  /**
+   * Estimate annualized volatility from the input volatility feature series
+   * (values are treated as annualized fractions, e.g. 0.2 = 20%, matching the
+   * feature snapshots). Falls back to a neutral 0.30 when unavailable.
+   */
+  private estimateAnnualVolatility(features: LSTMFeatureSet): number {
+    const vols = (features.volatility ?? []).filter(
+      (v): v is number => typeof v === 'number' && Number.isFinite(v) && v > 0,
+    );
+    if (vols.length === 0) return 0.3;
+    return vols.reduce((a, b) => a + b, 0) / vols.length;
+  }
+
   private fallbackOutput(symbol: string, reason: string): LSTMOutput {
     return {
       symbol,
@@ -187,6 +209,8 @@ export class LSTMForecaster {
         forecastHorizon: this.config.forecastHorizon,
         featureCount: 0,
         residualVariance: 0,
+        annualizedVolatility: 0,
+        drawdownProbability30D: 0,
       },
     };
   }

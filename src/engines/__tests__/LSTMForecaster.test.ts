@@ -65,4 +65,13 @@ describe('LSTMForecaster', () => {
     const result = forecaster.forecast('RELIANCE', bullishFeatures);
     expect(result.forecastedReturn).toBeDefined();
   });
+
+  it('exposes a wired, bounded 30-day drawdown probability in metadata', () => {
+    const forecaster = new LSTMForecaster();
+    const result = forecaster.forecast('RELIANCE', makeFeatures());
+    expect(Number.isFinite(result.metadata.annualizedVolatility)).toBe(true);
+    expect(result.metadata.annualizedVolatility).toBeGreaterThan(0);
+    expect(result.metadata.drawdownProbability30D).toBeGreaterThanOrEqual(0);
+    expect(result.metadata.drawdownProbability30D).toBeLessThanOrEqual(1);
+  });
 });

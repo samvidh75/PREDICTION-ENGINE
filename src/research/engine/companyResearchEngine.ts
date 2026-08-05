@@ -116,7 +116,9 @@ export function buildCompanyResearch(input: CompanyResearchInput): CompanyResear
     valuationExplanation: valuationScore !== null ? `Valuation score of ${Math.round(valuationScore)}` : null,
     growthExplanation: growthScore !== null ? `Growth score of ${Math.round(growthScore)}` : null,
     riskExplanation: riskScore !== null ? `Risk score of ${Math.round(riskScore)}` : null,
-    momentumExplanation: momentumScore !== null ? `Momentum score of ${Math.round(momentumScore)}` : null,
+    momentumExplanation: momentumScore !== null
+      ? `Momentum score of ${Math.round(momentumScore)} (short-term ${mf.shortTermScore !== null ? Math.round(mf.shortTermScore) : "n/a"}, medium-term ${mf.mediumTermScore !== null ? Math.round(mf.mediumTermScore) : "n/a"}, price trend ${mf.priceTrendScore !== null ? Math.round(mf.priceTrendScore) : "n/a"})`
+      : null,
     stabilityExplanation: stabilityScore !== null ? `Stability score of ${Math.round(stabilityScore)}` : null,
     roaScore, dividendYieldScore, marketCapScore,
     financialIntelligenceScore,
