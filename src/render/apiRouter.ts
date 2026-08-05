@@ -45,8 +45,9 @@ import { DeterministicResearchProvider } from "../services/ai/DeterministicResea
 import { dbAdapter } from "../db/DatabaseAdapter.js";
 import { AsymmetricDataGateway } from "../db/AsymmetricDataGateway.js";
 import { loadRealPseOwnership } from "../services/scrapers/PSEOwnershipData.js";
-import { getSectorBySymbol, getSubsectorBySymbol } from "../services/scrapers/PSESectorsData.js";
+import { getSectorBySymbol, getSubsectorBySymbol, loadPseSector } from "../services/scrapers/PSESectorsData.js";
 import { loadPseDisclosures } from "../services/scrapers/PSEDisclosuresData.js";
+import { loadPseInsiderFilings } from "../services/scrapers/PSEInsiderFilingsData.js";
 import { loadPseFinancialHistory } from "../services/scrapers/PSEFinancialHistoryData.js";
 import {
   registerCommercialRoutes,
@@ -363,8 +364,12 @@ async function loadRealFinancialSeries(symbol: string) {
         const period = point.asOfPeriod ?? point.period;
         if (point.revenue != null) s.revenue.push({ period, value: point.revenue });
         if (point.netIncome != null) s.profit.push({ period, value: point.netIncome });
-        // EBITDA isn't parsed out of PSE filings — leave the array empty
-        // (the chart simply renders no EBITDA series) rather than modelling it.
+        // The `ebitda` key is real Operating Income, NOT EBITDA — PSE
+        // filings don't report a labeled "EBITDA" line. Genuinely absent
+        // for some filers (e.g. banks structure their income statement
+        // differently), left empty for that point rather than modelled.
+        // The frontend chart tab is labeled "Operating Income" to match.
+        if (point.operatingIncome != null) s.ebitda.push({ period, value: point.operatingIncome });
       }
       return s;
     };
@@ -1150,6 +1155,66 @@ export default async function registerApiRoutes(server: FastifyInstance) {
       ? corporateActionsService.getBulkDealsBySymbol(symbol)
       : corporateActionsService.getRecentBulkDeals(days);
     return { ok: true, count: data.length, data };
+  });
+
+  // ── Real PSE Edge scraped data (honest, never fabricated) ───────────────
+  // The read functions below surface genuinely scraped PSE Edge records from
+  // data/pse-*.json. A symbol with no scraped records returns an empty/null
+  // payload — there is no templated placeholder fallback.
+
+  // GET /api/pse/disclosures/:symbol — real PSE filings (press releases,
+  // material information, insider forms, results announcements).
+  server.get("/api/pse/disclosures/:symbol", async (request, reply) => {
+    const symbol = String((request.params as any)?.symbol ?? "").toUpperCase().trim();
+    if (!symbol) return reply.status(400).send({ error: "symbol required" });
+    try {
+      const disclosures = loadPseDisclosures(symbol);
+      reply.header("Cache-Control", "public, s-maxage=1800, max-age=600");
+      return { ok: true, symbol, count: disclosures.length, disclosures };
+    } catch (err: any) {
+      return reply.status(502).send({ error: err?.message || String(err), symbol });
+    }
+  });
+
+  // GET /api/pse/insider-filings/:symbol — real 17-7 ownership-change filings.
+  server.get("/api/pse/insider-filings/:symbol", async (request, reply) => {
+    const symbol = String((request.params as any)?.symbol ?? "").toUpperCase().trim();
+    if (!symbol) return reply.status(400).send({ error: "symbol required" });
+    try {
+      const filings = loadPseInsiderFilings(symbol);
+      reply.header("Cache-Control", "public, s-maxage=1800, max-age=600");
+      return { ok: true, symbol, count: filings.length, filings };
+    } catch (err: any) {
+      return reply.status(502).send({ error: err?.message || String(err), symbol });
+    }
+  });
+
+  // GET /api/pse/ownership/:symbol — real Ownership Report (insider vs public).
+  server.get("/api/pse/ownership/:symbol", async (request, reply) => {
+    const symbol = String((request.params as any)?.symbol ?? "").toUpperCase().trim();
+    if (!symbol) return reply.status(400).send({ error: "symbol required" });
+    try {
+      const ownership = loadRealPseOwnership(symbol);
+      reply.header("Cache-Control", "public, s-maxage=3600, max-age=900");
+      return { ok: true, symbol, ownership };
+    } catch (err: any) {
+      return reply.status(502).send({ error: err?.message || String(err), symbol });
+    }
+  });
+
+  // GET /api/pse/sector/:symbol — real PSE Edge sector/subsector assignment.
+  server.get("/api/pse/sector/:symbol", async (request, reply) => {
+    const symbol = String((request.params as any)?.symbol ?? "").toUpperCase().trim();
+    if (!symbol) return reply.status(400).send({ error: "symbol required" });
+    try {
+      const record = loadPseSector(symbol);
+      const sector = getSectorBySymbol(symbol);
+      const subsector = getSubsectorBySymbol(symbol);
+      reply.header("Cache-Control", "public, s-maxage=3600, max-age=900");
+      return { ok: true, symbol, sector, subsector, record };
+    } catch (err: any) {
+      return reply.status(502).send({ error: err?.message || String(err), symbol });
+    }
   });
 
   // GET /api/valuation/dcf?symbol=AC&price=850
