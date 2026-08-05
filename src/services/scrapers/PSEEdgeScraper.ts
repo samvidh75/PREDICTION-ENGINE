@@ -340,6 +340,39 @@ export function parseFinancialStatementText(text: string, symbol: string, source
     return Number.isFinite(num) ? num : null;
   };
 
+  // Like extractNumber, but scans every match of the label (not just the
+  // first) and prefers a comma-formatted candidate over a bare one.
+  // Annual reports (17-A, unlike quarterly 17-Q) routinely open with a
+  // "Financial Highlights" ratios table before the real balance sheet —
+  // e.g. a real Ayala Land 17-A has "Total Stockholders' Equity 0.83"
+  // (a Debt/Equity-style ratio) appearing BEFORE "Stockholders' Equity
+  // 385,054,413" (the real balance-sheet figure) — first-match-wins
+  // silently grabbed the ratio. Real PSE filings always comma-format
+  // large monetary totals and never comma-format ratios, so preferring
+  // the comma-formatted match is a reliable, real signal, not a guess.
+  // Takes one or more label variants (tried in preference order, e.g. a
+  // "Total X" form and a bare "X" fallback) and merges candidates across
+  // ALL of them before picking — not just within the first variant that
+  // matches at all. This matters because which variant matches isn't a
+  // reliable proxy for which one is real: verified on a real Ayala Land
+  // 17-A, the ratio-table entry is literally "Total Stockholders' Equity
+  // 0.83" (WITH "Total"), while the real balance-sheet line is bare
+  // "Stockholders' Equity 385,054,413" (WITHOUT "Total") — so trying
+  // "Total X" first and falling back to bare "X" only on a total *miss*
+  // (via ??) would keep the first variant's wrong match forever, since it
+  // does match, just the wrong thing.
+  const extractLargeNumber = (...labels: RegExp[]): number | null => {
+    const candidates = labels.flatMap((label) => {
+      const global = new RegExp(label.source, label.flags.includes('g') ? label.flags : label.flags + 'g');
+      return [...normalized.matchAll(global)].map((m) => m[1]).filter((v): v is string => Boolean(v));
+    });
+    if (candidates.length === 0) return null;
+    const withComma = candidates.find((v) => v.includes(','));
+    const cleaned = (withComma ?? candidates[0]).replace(/[,\s]/g, '').replace(/^\((.*)\)$/, '-$1');
+    const num = Number(cleaned);
+    return Number.isFinite(num) ? num : null;
+  };
+
   // Every regex below uses exactly one capturing group (the number) — any
   // label alternation/optionality is non-capturing `(?:...)` so extractNumber
   // can always safely read match[1] regardless of which label variant hit.
@@ -356,20 +389,28 @@ export function parseFinancialStatementText(text: string, symbol: string, source
   // this fix). The capture group's own `\([\d,.]+\)` alternative still
   // handles a genuine parenthesized negative number correctly — the gap
   // being lazy means it stops at the first digit it finds either way.
-  const totalAssets = extractNumber(/Total\s+Assets\s*[^\d]{0,40}?([\d,.]+|\([\d,.]+\))/i);
-  const totalLiabilities = extractNumber(/Total\s+Liabilities\s*[^\d]{0,40}?([\d,.]+|\([\d,.]+\))/i);
+  const totalAssets = extractLargeNumber(/Total\s+Assets\s*[^\d]{0,40}?([\d,.]+|\([\d,.]+\))/i);
+  const totalLiabilities = extractLargeNumber(/Total\s+Liabilities\s*[^\d]{0,40}?([\d,.]+|\([\d,.]+\))/i);
   // "Total" is not always present — some filers (verified: Ayala Land's
   // 17-Q) label this row bare "Stockholders' Equity", not
   // "Total Stockholders' Equity".
-  const totalEquity = extractNumber(/Total\s+(?:Stockholders'?|Equity\s+attributable).{0,20}Equity\s*[^\d]{0,40}?([\d,.]+|\([\d,.]+\))/i)
-    ?? extractNumber(/Total\s+Equity\s*[^\d]{0,40}?([\d,.]+|\([\d,.]+\))/i)
-    ?? extractNumber(/Stockholders'?\s+Equity\s*[^\d]{0,40}?([\d,.]+|\([\d,.]+\))/i);
-  const netIncome = extractNumber(/Net\s+Income\S*(?:\s+for\s+the\s+period)?\s*[^\d]{0,40}?([\d,.]+|\([\d,.]+\))/i);
-  const revenue = extractNumber(/(?:Total\s+)?Revenues?\s*[^\d]{0,40}?([\d,.]+|\([\d,.]+\))/i);
+  const totalEquity = extractLargeNumber(
+    /Total\s+(?:Stockholders'?|Equity\s+attributable).{0,20}Equity\s*[^\d]{0,40}?([\d,.]+|\([\d,.]+\))/i,
+    /Total\s+Equity\s*[^\d]{0,40}?([\d,.]+|\([\d,.]+\))/i,
+    /Stockholders'?\s+Equity\s*[^\d]{0,40}?([\d,.]+|\([\d,.]+\))/i,
+  );
+  const netIncome = extractLargeNumber(/Net\s+Income\S*(?:\s+for\s+the\s+period)?\s*[^\d]{0,40}?([\d,.]+|\([\d,.]+\))/i);
+  const revenue = extractLargeNumber(/(?:Total\s+)?Revenues?\s*[^\d]{0,40}?([\d,.]+|\([\d,.]+\))/i);
+  // EPS is deliberately left on plain extractNumber (first match, no
+  // comma preference) — a real EPS value is a small decimal and never
+  // comma-formatted, so the comma-preference heuristic doesn't apply.
   const eps = extractNumber(/Earnings?\S*\s+Per\s+Share\S*\s*[^\d]{0,40}?([\d,.]+|\([\d,.]+\))/i);
   const sharesOutstanding = extractNumber(/(?:Shares?\s+Outstanding|Number\s+of\s+Shares)\s*[^\d(]{0,10}([\d,.]+)/i);
 
-  const periodMatch = normalized.match(/(?:For\s+the\s+(?:Quarter|Period|Year)\s+Ended\s+)([A-Za-z]+\s+\d{1,2},?\s+\d{4})/i);
+  // 17-A annual reports real-world label this "For the fiscal year ended"
+  // (verified: Ayala Land's 17-A), not "For the Year Ended" — the old
+  // pattern only matched the 17-Q wording.
+  const periodMatch = normalized.match(/(?:For\s+the\s+(?:fiscal\s+)?(?:Quarter|Period|Year)\s+Ended\s+)([A-Za-z]+\s+\d{1,2},?\s+\d{4})/i);
 
   return {
     symbol,
@@ -542,38 +583,20 @@ export interface FinancialHistoryPoint {
 export interface ParsedFinancialHistory {
   symbol: string;
   latest: ParsedFundamentals | null;
-  series: FinancialHistoryPoint[]; // oldest → newest
+  series: FinancialHistoryPoint[]; // oldest → newest, quarterly (17-Q)
+  annualSeries: FinancialHistoryPoint[]; // oldest → newest, annual (17-A)
 }
 
-/**
- * Fetch the last `periodsToFetch` quarterly filings for a company and parse
- * each into a point of a real multi-quarter series — the ground truth the
- * Financials chart can render instead of the synthetic market-cap model.
- *
- * NOTE on request volume: this makes `periodsToFetch` PSE Edge viewer
- * requests per company (the latest + N-1 history filings), so ~N× the
- * traffic of scrapeCompanyFundamentals. It is intentionally a separate,
- * less-frequent (monthly) pipeline — see scripts/scrape-pse-financial-history.ts
- * and .github/workflows/pse-financial-history-monthly.yml. The weekly
- * fundamentals job keeps using scrapeCompanyFundamentals (latest only).
- */
-export async function scrapeCompanyFinancialHistory(
-  symbol: string,
-  companyName: string,
-  periodsToFetch = 8,
-): Promise<ParsedFinancialHistory | null> {
-  const listings = await fetchDisclosureList(symbol, companyName, 'quarterly');
-  if (listings.length === 0) return null;
-
+async function fetchFilingSeries(symbol: string, companyName: string, filingType: PseFilingType, periodsToFetch: number): Promise<FinancialHistoryPoint[]> {
+  const listings = await fetchDisclosureList(symbol, companyName, filingType);
   const selected = listings.slice(0, periodsToFetch);
-  const series: FinancialHistoryPoint[] = [];
-  let latest: ParsedFundamentals | null = null;
+  const points: FinancialHistoryPoint[] = [];
 
   for (const listing of selected) {
     const sourceUrl = `${EDGE_BASE}/openDiscViewer.do?edge_no=${listing.edgeNo}`;
     const text = await fetchAndExtractDisclosureText(listing.edgeNo);
     const parsed = parseFinancialStatementText(text, symbol, sourceUrl);
-    series.push({
+    points.push({
       period: listing.filingDate,
       asOfPeriod: parsed.asOfPeriod,
       revenue: parsed.revenue,
@@ -584,14 +607,61 @@ export async function scrapeCompanyFinancialHistory(
       eps: parsed.eps,
       sourceUrl,
     });
-    if (!latest) latest = parsed;
   }
 
-  // Series comes back newest-first (PSE sorted DESC); store oldest → newest.
+  // PSE sorts DESC (newest first); store oldest → newest for charting.
+  return points.reverse();
+}
+
+/**
+ * Fetch the last `periodsToFetch` quarterly filings (and up to 3 annual
+ * filings — issuers file at most one 17-A per year, so 8 would be
+ * pointless) for a company and parse each into a real multi-period
+ * series — the ground truth the Financials chart can render instead of
+ * the synthetic market-cap model.
+ *
+ * NOTE on request volume: this makes up to `periodsToFetch + 3` PSE Edge
+ * viewer requests per company, so several times the traffic of
+ * scrapeCompanyFundamentals. It is intentionally a separate,
+ * less-frequent (monthly) pipeline — see scripts/scrape-pse-financial-history.ts
+ * and .github/workflows/pse-financial-history-monthly.yml. The weekly
+ * fundamentals job keeps using scrapeCompanyFundamentals (latest only).
+ */
+export async function scrapeCompanyFinancialHistory(
+  symbol: string,
+  companyName: string,
+  periodsToFetch = 8,
+): Promise<ParsedFinancialHistory | null> {
+  const series = await fetchFilingSeries(symbol, companyName, 'quarterly', periodsToFetch);
+  if (series.length === 0) return null;
+
+  const annualSeries = await fetchFilingSeries(symbol, companyName, 'annual', 3);
+
+  // "Latest" reflects the most recent quarterly filing (17-Q reports are
+  // more current than the once-a-year 17-A) — series is oldest-first, so
+  // the last element is newest.
+  const latestPoint = series[series.length - 1];
+  const latest: ParsedFundamentals = {
+    symbol: symbol.toUpperCase(),
+    asOfPeriod: latestPoint.asOfPeriod,
+    totalAssets: latestPoint.totalAssets,
+    totalLiabilities: latestPoint.totalLiabilities,
+    totalEquity: latestPoint.totalEquity,
+    netIncome: latestPoint.netIncome,
+    revenue: latestPoint.revenue,
+    eps: latestPoint.eps,
+    sharesOutstanding: null,
+    roe: latestPoint.netIncome !== null && latestPoint.totalEquity ? Number(((latestPoint.netIncome / latestPoint.totalEquity) * 100).toFixed(2)) : null,
+    debtToEquity: latestPoint.totalLiabilities !== null && latestPoint.totalEquity ? Number((latestPoint.totalLiabilities / latestPoint.totalEquity).toFixed(2)) : null,
+    sourceUrl: latestPoint.sourceUrl,
+    scrapedAt: new Date().toISOString(),
+  };
+
   return {
     symbol: symbol.toUpperCase(),
     latest,
-    series: series.slice(0, periodsToFetch).reverse(),
+    series,
+    annualSeries,
   };
 }
 

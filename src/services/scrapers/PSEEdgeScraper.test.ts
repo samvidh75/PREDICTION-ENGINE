@@ -116,6 +116,32 @@ describe('parseFinancialStatementText', () => {
     expect(result.sourceUrl).toBe('https://edge.pse.com.ph/real-filing.pdf');
     expect(() => new Date(result.scrapedAt).toISOString()).not.toThrow();
   });
+
+  it('picks the real balance-sheet equity over an earlier ratio-table entry (real 17-A formatting)', () => {
+    // Real Ayala Land 17-A: a "Financial Highlights" ratios table opens the
+    // document with "Total Stockholders' Equity 0.83" (a Debt/Equity-style
+    // ratio) BEFORE the real balance sheet's bare "Stockholders' Equity
+    // 385,054,413" appears later. First-match-wins previously grabbed the
+    // ratio; the fix merges candidates across both label variants and
+    // prefers the comma-formatted (real monetary) one.
+    const text = `
+      For the fiscal year ended Dec 31, 2025
+      Financial Ratios
+      Total Stockholders' Equity 0.83 0.79
+      Total Liabilities to Total Stockholders' Equity 2.59 2.56
+      Statement of Financial Position
+      Total Assets 997,363,986
+      Total Liabilities 612,309,573
+      Stockholders' Equity 385,054,413 358,495,815
+      Net Income for the period 45,554,129
+    `;
+    const result = parseFinancialStatementText(text, 'ALI', 'https://edge.pse.com.ph/fake-17a.pdf');
+
+    expect(result.asOfPeriod).toBe('Dec 31, 2025');
+    expect(result.totalEquity).toBe(385054413);
+    expect(result.totalAssets).toBe(997363986);
+    expect(result.roe).toBeCloseTo(11.83, 1);
+  });
 });
 
 describe('parseDisclosureListHtml', () => {

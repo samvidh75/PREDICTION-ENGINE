@@ -5,7 +5,7 @@ import { fetchPSEFundamentals, calculatePSEHealthScore, generatePSEFinancialHist
 import { loadRealPseOwnership } from '../../src/services/scrapers/PSEOwnershipData.js';
 import { getSubsectorBySymbol } from '../../src/services/scrapers/PSESectorsData.js';
 import { loadPseDisclosures } from '../../src/services/scrapers/PSEDisclosuresData.js';
-import { loadPseFinancialHistory } from '../../src/services/scrapers/PSEFinancialHistoryData.js';
+import { loadPseFinancialHistory, type PseFinancialHistoryPoint } from '../../src/services/scrapers/PSEFinancialHistoryData.js';
 
 // Inline health scoring. Checks ~17 distinct metric fields across 6 factor
 // groups below (valuation, quality, growth, momentum, risk, health) — most
@@ -393,25 +393,24 @@ export default async function handler(
     // returns nothing — never templated placeholder headlines.
     const realDisclosures = loadPseDisclosures(symbol);
 
-    // Real multi-quarter financial series from PSE Edge 17-Q filings
-    // (data/pse-financial-history.json, refreshed by the monthly
-    // scrape-pse-financial-history pipeline). When present, the Financials
-    // chart renders genuine reported revenue/profit instead of the
-    // synthetic market-cap/sector-median model — see financials/dataSources
-    // below.
+    // Real multi-period financial series from PSE Edge 17-Q (quarterly)
+    // and 17-A (annual) filings (data/pse-financial-history.json, refreshed
+    // by the monthly scrape-pse-financial-history pipeline). When present,
+    // the Financials chart renders genuine reported revenue/profit instead
+    // of the synthetic market-cap/sector-median model — see
+    // financials/dataSources below. Annual is typically much shorter than
+    // quarterly (issuers file at most one 17-A/year) and may be empty for
+    // snapshots generated before annual scraping was added.
     const realFinancialHistory = loadPseFinancialHistory(symbol);
+    const toRealSeries = (points: PseFinancialHistoryPoint[]) => ({
+      revenue: points.filter((p) => p.revenue != null).map((p) => ({ period: p.asOfPeriod ?? p.period, value: p.revenue as number })),
+      profit: points.filter((p) => p.netIncome != null).map((p) => ({ period: p.asOfPeriod ?? p.period, value: p.netIncome as number })),
+      ebitda: [] as { period: string; value: number }[], // not parsed from PSE filings — left empty, never modeled
+    });
     const realFinancials = realFinancialHistory
       ? {
-          annual: { revenue: [], profit: [], ebitda: [] },
-          quarterly: {
-            revenue: realFinancialHistory.series
-              .filter((p) => p.revenue != null)
-              .map((p) => ({ period: p.asOfPeriod ?? p.period, value: p.revenue as number })),
-            profit: realFinancialHistory.series
-              .filter((p) => p.netIncome != null)
-              .map((p) => ({ period: p.asOfPeriod ?? p.period, value: p.netIncome as number })),
-            ebitda: [], // not parsed from PSE 17-Q — left empty, never modeled
-          },
+          annual: toRealSeries(realFinancialHistory.annualSeries ?? []),
+          quarterly: toRealSeries(realFinancialHistory.series),
           dataSource: 'pseApi' as const,
         }
       : null;

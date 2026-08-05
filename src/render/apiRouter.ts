@@ -347,26 +347,30 @@ async function loadYFinanceFinancialSeries(_symbol: string): Promise<{
 }
 
 async function loadRealFinancialSeries(symbol: string) {
-  // 1. Real PSE Edge quarterly-filing history — data/pse-financial-history.json
-  // (generated monthly by scripts/scrape-pse-financial-history.ts). Each point
-  // is parsed from a real 17-Q filing via parseFinancialStatementText, so these
-  // are genuine reported revenue/net-income figures, not a model. We only have
-  // the quarterly series here (annual reports aren't fetched in the monthly job),
-  // so annual is left empty — the frontend then renders the real Quarterly tab
-  // and hides its "Estimated" disclaimer (dataSources.financials === 'pseApi').
+  // 1. Real PSE Edge filing history — data/pse-financial-history.json
+  // (generated monthly by scripts/scrape-pse-financial-history.ts). Each
+  // point is parsed from a real 17-Q (quarterly) or 17-A (annual) filing
+  // via parseFinancialStatementText, so these are genuine reported
+  // revenue/net-income figures, not a model. Annual is typically much
+  // shorter than quarterly (issuers file at most one 17-A/year); an empty
+  // annualSeries still means dataSource is 'pseApi' overall since the
+  // quarterly series alone is real.
   const history = loadPseFinancialHistory(symbol);
   if (history) {
-    const quarterly = { revenue: [] as Array<{ period: string; value: number }>, profit: [] as Array<{ period: string; value: number }>, ebitda: [] as Array<{ period: string; value: number }> };
-    for (const point of history.series) {
-      const period = point.asOfPeriod ?? point.period;
-      if (point.revenue != null) quarterly.revenue.push({ period, value: point.revenue });
-      if (point.netIncome != null) quarterly.profit.push({ period, value: point.netIncome });
-      // EBITDA isn't parsed out of PSE 17-Q statements — leave the array empty
-      // (the chart simply renders no EBITDA series) rather than modelling it.
-    }
+    const toSeries = (points: typeof history.series) => {
+      const s = { revenue: [] as Array<{ period: string; value: number }>, profit: [] as Array<{ period: string; value: number }>, ebitda: [] as Array<{ period: string; value: number }> };
+      for (const point of points) {
+        const period = point.asOfPeriod ?? point.period;
+        if (point.revenue != null) s.revenue.push({ period, value: point.revenue });
+        if (point.netIncome != null) s.profit.push({ period, value: point.netIncome });
+        // EBITDA isn't parsed out of PSE filings — leave the array empty
+        // (the chart simply renders no EBITDA series) rather than modelling it.
+      }
+      return s;
+    };
     return {
-      annual: { revenue: [] as Array<{ period: string; value: number }>, profit: [] as Array<{ period: string; value: number }>, ebitda: [] as Array<{ period: string; value: number }> },
-      quarterly,
+      annual: toSeries(history.annualSeries ?? []),
+      quarterly: toSeries(history.series),
       dataSource: 'pseApi' as const,
     };
   }
