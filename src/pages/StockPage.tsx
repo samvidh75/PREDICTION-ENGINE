@@ -83,7 +83,7 @@ type StockResearchDetail = {
    * source or an estimate — see apiRouter.ts's dataSources comment.
    * 'synthetic' means the figures are modeled from market cap and sector
    * medians, not real reported financials. */
-  dataSources: { financials: string; shareholding: string; thesis: string };
+  dataSources: { financials: string; shareholding: string; thesis: string; news: string };
 };
 
 const TIMEFRAMES = ["1W", "1M", "3M", "1Y", "5Y"] as const;
@@ -570,7 +570,7 @@ function normalizeStockData(raw: Record<string, any>): StockResearchDetail {
     news: raw.news ?? [],
     thesis: raw.thesis ?? { thesis: "", bullCase: "", bearCase: "", whatToWatch: "", stance: "Watch" },
     priceHistory: raw.priceHistory ?? buildPriceHistoryFromFlatSeries(raw.priceChart ?? []),
-    dataSources: raw.dataSources ?? { financials: "synthetic", shareholding: "synthetic", thesis: "synthetic" },
+    dataSources: raw.dataSources ?? { financials: "synthetic", shareholding: "synthetic", thesis: "synthetic", news: "unavailable" },
   };
 }
 
@@ -612,6 +612,12 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
   const filteredNews = newsFilter === "all" ? newsItems : (newsItems ?? []).filter((n: any) => n?.sentiment === newsFilter);
   const disclaimer = "StockEx research is for informational purposes only and is not investment advice.";
   const fundamentals = stock.fundamentals ?? {};
+  // Data-quality flags driving the Verified/Estimated badges (Task 3).
+  const financialsReal = stock.dataSources.financials === "real" || stock.dataSources.financials === "pseApi";
+  const financialsRealQuarterCount = stock.financials?.quarterly?.revenue?.length ?? 0;
+  const shareholdingReal = stock.dataSources.shareholding === "real" || stock.dataSources.shareholding === "pseApi";
+  const newsReal = stock.dataSources.news === "real";
+  const newsFromDisclosures = stock.dataSources.news === "disclosures";
   const companyProfile = stock.companyProfile ?? {
     founded: "—",
     ceo: "—",
@@ -907,7 +913,9 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
       <Card className="stock-metrics-card raycast-slideUp" style={{ animationDelay: "0.15s", animationFillMode: "both" }}>
         <CardLabel>Key metrics</CardLabel>
         <p style={{ color: colors.textSecondary, fontSize: "11.5px", margin: "2px 0 12px 0", lineHeight: 1.5 }}>
-          {stock.dataSources.financials === "partial-real"
+          {stock.dataSources.financials === "pseApi"
+            ? "All figures on this card and in the Financials chart are real reported PSE Edge filing data."
+            : stock.dataSources.financials === "partial-real"
             ? "EPS, ROE, and Debt/Equity are from a real PSE Edge filing. Everything else on this card (PE, PB, dividend yield, growth rates) is still a sector-based estimate."
             : "Estimated from sector medians — no verified free source for this company's real fundamentals is wired in yet."}
         </p>
@@ -989,6 +997,12 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
       <Card className="stock-financials-card raycast-slideUp" style={{ animationDelay: "0.25s", animationFillMode: "both" }}>
         <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", flexWrap: "wrap", marginBottom: "16px" }}>
           <CardLabel>Financials</CardLabel>
+          <span style={{ fontSize: "11px", fontWeight: 600, padding: "2px 8px", borderRadius: "999px", whiteSpace: "nowrap",
+            background: financialsReal ? "rgba(16,185,129,0.15)" : "rgba(245,152,45,0.15)",
+            color: financialsReal ? "#10b981" : "#f59728",
+            border: `1px solid ${financialsReal ? "rgba(16,185,129,0.4)" : "rgba(245,152,45,0.4)"}` }}>
+            {financialsReal ? `Verified — ${financialsRealQuarterCount} real PSE Edge quarters` : "Estimated"}
+          </span>
           <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", alignItems: "center" }}>
             <Button variant={financialMetric === "revenue" ? "primary" : "secondary"} onClick={() => setFinancialMetric("revenue")}>Revenue</Button>
             <Button variant={financialMetric === "profit" ? "primary" : "secondary"} onClick={() => setFinancialMetric("profit")}>Profit</Button>
@@ -1040,6 +1054,12 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
       <Card className="stock-shareholdings-card raycast-slideUp" style={{ animationDelay: "0.3s", animationFillMode: "both" }}>
         <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", flexWrap: "wrap", marginBottom: "16px" }}>
           <CardLabel>Shareholdings</CardLabel>
+          <span style={{ fontSize: "11px", fontWeight: 600, padding: "2px 8px", borderRadius: "999px",
+            background: shareholdingReal ? "rgba(16,185,129,0.15)" : "rgba(245,152,45,0.15)",
+            color: shareholdingReal ? "#10b981" : "#f59728",
+            border: `1px solid ${shareholdingReal ? "rgba(16,185,129,0.4)" : "rgba(245,152,45,0.4)"}` }}>
+            {shareholdingReal ? "Verified" : "Estimated"}
+          </span>
           <span style={{ fontSize: "12px", color: colors.textSecondary }}>
             {effectiveShareholding.period ? `As of ${effectiveShareholding.period}` : null}
           </span>
@@ -1078,7 +1098,15 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
       {/* ── News Feed with Native Ads ── */}
       <Card className="stock-news-card raycast-slideUp" style={{ animationDelay: "0.3s", animationFillMode: "both" }}>
         <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", flexWrap: "wrap", marginBottom: "16px" }}>
-          <CardLabel>Latest news</CardLabel>
+          <CardLabel>
+            {stock.dataSources.news === "disclosures" ? "Company Disclosures" : "Latest news"}
+            <span style={{ fontSize: "11px", fontWeight: 600, padding: "2px 8px", borderRadius: "999px", marginLeft: "8px",
+              background: (newsReal || newsFromDisclosures) ? "rgba(16,185,129,0.15)" : "rgba(245,152,45,0.15)",
+              color: (newsReal || newsFromDisclosures) ? "#10b981" : "#f59728",
+              border: `1px solid ${(newsReal || newsFromDisclosures) ? "rgba(16,185,129,0.4)" : "rgba(245,152,45,0.4)"}` }}>
+              {(newsReal || newsFromDisclosures) ? (newsReal ? "Verified" : "PSE filings") : "Estimated"}
+            </span>
+          </CardLabel>
           <div className="stock-news-filters" style={{ display: "flex", gap: "4px", padding: "2px", background: colors.fill, borderRadius: radius.full }}>
             {(["all", "positive", "negative"] as const).map((f) => (
               <motion.button
@@ -1094,6 +1122,13 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
           </div>
         </div>
         <div className="stock-news-list" style={{ display: "grid", gap: "12px" }}>
+          {stock.news && stock.news.length === 0 && (
+            <div style={{ padding: "28px 16px", textAlign: "center", color: colors.textSecondary, fontSize: "13px" }}>
+              {stock.dataSources.news === "unavailable"
+                ? "No recent news or PSE Edge disclosures are available to show for this symbol yet."
+                : "No recent news available for this symbol."}
+            </div>
+          )}
           {newsFeedWithAds.map((entry, entryIdx) => {
             if (entry.type === "ad") {
               return (
@@ -1176,6 +1211,13 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
             <p style={{ color: colors.textPrimary, fontSize: "14px", lineHeight: "1.5" }}>{stock.thesis.whatToWatch}</p>
           </div>
         </div>
+        {stock.dataSources.thesis !== "real" && stock.dataSources.thesis !== "pseApi" && (
+          <p style={{ color: colors.textTertiary, fontSize: "11px", marginTop: "6px", lineHeight: 1.5 }}>
+            {stock.dataSources.thesis === "unavailable"
+              ? "A detailed research thesis isn't available yet for this symbol — the section above reflects that limitation and is not a grounded analysis."
+              : "The thesis above is a general template based on the limited metrics shown, not a grounded per-stock analysis."}
+          </p>
+        )}
       </Card>
 
       {/* ── Thesis History ── */}

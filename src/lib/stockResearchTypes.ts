@@ -60,11 +60,14 @@ export interface StockResearchDetail extends StockResearchSummary {
   };
   shareholding: Array<{
     period: string;
-    promoter: number;
-    fii: number;
-    dii: number;
-    retail: number;
-    deltas: { promoter: number; fii: number; dii: number; retail: number };
+    // Real PSE Public Ownership Report shape — insider (directors/officers/
+    // substantial shareholders, summed) vs public %, plus outstanding shares.
+    // A PSE POR-1 filing does NOT report a foreign/domestic institutional
+    // split, so the old FII/DII shape this interface once carried has been
+    // removed rather than kept as a fabricated placeholder.
+    insiderPercent: number;
+    publicPercent: number;
+    outstandingShares: number | null;
   }>;
   news: Array<{ headline: string; source: string; time: string; link: string; publishedAt: string }>;
   thesis: {

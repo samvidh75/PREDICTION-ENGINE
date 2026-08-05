@@ -1,0 +1,2837 @@
+{
+  "generatedAt": "2026-08-04T11:10:19.452Z",
+  "source": "edge.pse.com.ph",
+  "totalCompanies": 282,
+  "sectorBreakdown": {
+    "Holding Firms": 31,
+    "Mining and Oil": 24,
+    "Services": 62,
+    "Industrial": 74,
+    "Property": 50,
+    "Financials": 31,
+    "Small, Medium & Emerging Board": 9,
+    "ETF": 1
+  },
+  "results": {
+    "AAA": {
+      "symbol": "AAA",
+      "companyName": "Asia Amalgamated Holdings Corporation",
+      "sector": "Holding Firms",
+      "subsector": "Holding Firms",
+      "cmpyId": 55,
+      "securityId": 347,
+      "listingDate": "Mar 22, 1973",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "AB": {
+      "symbol": "AB",
+      "companyName": "Atok-Big Wedge Co., Inc.",
+      "sector": "Mining and Oil",
+      "subsector": "Mining",
+      "cmpyId": 19,
+      "securityId": 181,
+      "listingDate": "Jan 08, 1948",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "ABA": {
+      "symbol": "ABA",
+      "companyName": "AbaCore Capital Holdings, Inc.",
+      "sector": "Holding Firms",
+      "subsector": "Holding Firms",
+      "cmpyId": 174,
+      "securityId": 173,
+      "listingDate": "Oct 28, 1987",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "ABG": {
+      "symbol": "ABG",
+      "companyName": "Asiabest Group International Inc.",
+      "sector": "Holding Firms",
+      "subsector": "Holding Firms",
+      "cmpyId": 176,
+      "securityId": 350,
+      "listingDate": "Jul 10, 1979",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "ABS": {
+      "symbol": "ABS",
+      "companyName": "ABS-CBN Corporation",
+      "sector": "Services",
+      "subsector": "Media",
+      "cmpyId": 114,
+      "securityId": 123,
+      "listingDate": "Jul 08, 1992",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "ABSP": {
+      "symbol": "ABSP",
+      "companyName": "ABS-CBN Holdings Corporation",
+      "sector": "Services",
+      "subsector": "Media",
+      "cmpyId": 15,
+      "securityId": 259,
+      "listingDate": "Oct 07, 1999",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "AC": {
+      "symbol": "AC",
+      "companyName": "Ayala Corporation",
+      "sector": "Holding Firms",
+      "subsector": "Holding Firms",
+      "cmpyId": 57,
+      "securityId": 180,
+      "listingDate": "Nov 08, 1976",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "ACE": {
+      "symbol": "ACE",
+      "companyName": "Acesite (Phils.) Hotel Corporation",
+      "sector": "Services",
+      "subsector": "Hotel & Leisure",
+      "cmpyId": 48,
+      "securityId": 370,
+      "listingDate": "Dec 05, 1986",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "ACEN": {
+      "symbol": "ACEN",
+      "companyName": "ACEN CORPORATION",
+      "sector": "Industrial",
+      "subsector": "Electricity, Energy, Power & Water",
+      "cmpyId": 233,
+      "securityId": 140,
+      "listingDate": "Jan 05, 1970",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "ACR": {
+      "symbol": "ACR",
+      "companyName": "Alsons Consolidated Resources, Inc.",
+      "sector": "Industrial",
+      "subsector": "Electricity, Energy, Power & Water",
+      "cmpyId": 121,
+      "securityId": 170,
+      "listingDate": "Apr 12, 1993",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "AEV": {
+      "symbol": "AEV",
+      "companyName": "Aboitiz Equity Ventures, Inc.",
+      "sector": "Holding Firms",
+      "subsector": "Holding Firms",
+      "cmpyId": 16,
+      "securityId": 183,
+      "listingDate": "Nov 16, 1994",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "AGI": {
+      "symbol": "AGI",
+      "companyName": "Alliance Global Group, Inc.",
+      "sector": "Holding Firms",
+      "subsector": "Holding Firms",
+      "cmpyId": 212,
+      "securityId": 179,
+      "listingDate": "Apr 19, 1999",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "ALCO": {
+      "symbol": "ALCO",
+      "companyName": "Arthaland Corporation",
+      "sector": "Property",
+      "subsector": "Property",
+      "cmpyId": 172,
+      "securityId": 316,
+      "listingDate": "Mar 19, 1996",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "ALHI": {
+      "symbol": "ALHI",
+      "companyName": "Anchor Land Holdings, Inc.",
+      "sector": "Property",
+      "subsector": "Property",
+      "cmpyId": 612,
+      "securityId": 536,
+      "listingDate": "Aug 08, 2007",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "ALI": {
+      "symbol": "ALI",
+      "companyName": "Ayala Land, Inc.",
+      "sector": "Property",
+      "subsector": "Property",
+      "cmpyId": 180,
+      "securityId": 293,
+      "listingDate": "Jul 05, 1991",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "ALLDY": {
+      "symbol": "ALLDY",
+      "companyName": "AllDay Marts, Inc.",
+      "sector": "Services",
+      "subsector": "Retail",
+      "cmpyId": 686,
+      "securityId": 674,
+      "listingDate": "Nov 03, 2021",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "ALLHC": {
+      "symbol": "ALLHC",
+      "companyName": "AyalaLand Logistics Holdings Corp.",
+      "sector": "Property",
+      "subsector": "Property",
+      "cmpyId": 26,
+      "securityId": 202,
+      "listingDate": "Feb 28, 1990",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "ALTER": {
+      "symbol": "ALTER",
+      "companyName": "Alternergy Holdings Corporation",
+      "sector": "Industrial",
+      "subsector": "Electricity, Energy, Power, & Water",
+      "cmpyId": 701,
+      "securityId": 696,
+      "listingDate": "Mar 24, 2023",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "ANI": {
+      "symbol": "ANI",
+      "companyName": "AgriNurture, Inc.",
+      "sector": "Industrial",
+      "subsector": "Food, Beverage & Tobacco",
+      "cmpyId": 619,
+      "securityId": 547,
+      "listingDate": "May 25, 2009",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "ANS": {
+      "symbol": "ANS",
+      "companyName": "A. Soriano Corporation",
+      "sector": "Holding Firms",
+      "subsector": "Holding Firms",
+      "cmpyId": 14,
+      "securityId": 169,
+      "listingDate": "Oct 25, 1973",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "AP": {
+      "symbol": "AP",
+      "companyName": "Aboitiz Power Corporation",
+      "sector": "Industrial",
+      "subsector": "Electricity, Energy, Power & Water",
+      "cmpyId": 609,
+      "securityId": 532,
+      "listingDate": "Jul 16, 2007",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "APC": {
+      "symbol": "APC",
+      "companyName": "APC Group, Inc.",
+      "sector": "Services",
+      "subsector": "Other Services",
+      "cmpyId": 177,
+      "securityId": 182,
+      "listingDate": "Mar 08, 1994",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "APL": {
+      "symbol": "APL",
+      "companyName": "Apollo Global Capital, Inc.",
+      "sector": "Services",
+      "subsector": "Information Technology",
+      "cmpyId": 638,
+      "securityId": 581,
+      "listingDate": "Oct 18, 2012",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "APO": {
+      "symbol": "APO",
+      "companyName": "Anglo Philippine Holdings Corporation",
+      "sector": "Holding Firms",
+      "subsector": "Holding Firms",
+      "cmpyId": 52,
+      "securityId": 171,
+      "listingDate": "Jul 31, 1959",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "APVI": {
+      "symbol": "APVI",
+      "companyName": "Altus Property Ventures, Inc.",
+      "sector": "Property",
+      "subsector": "Property",
+      "cmpyId": 678,
+      "securityId": 654,
+      "listingDate": "Jun 26, 2020",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "APX": {
+      "symbol": "APX",
+      "companyName": "Apex Mining Co., Inc.",
+      "sector": "Mining and Oil",
+      "subsector": "Mining",
+      "cmpyId": 178,
+      "securityId": 318,
+      "listingDate": "Mar 07, 1974",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "AR": {
+      "symbol": "AR",
+      "companyName": "Abra Mining and Industrial Corporation",
+      "sector": "Mining and Oil",
+      "subsector": "Mining",
+      "cmpyId": 33,
+      "securityId": 321,
+      "listingDate": "Dec 24, 1969",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "ARA": {
+      "symbol": "ARA",
+      "companyName": "Araneta Properties, Inc.",
+      "sector": "Property",
+      "subsector": "Property",
+      "cmpyId": 38,
+      "securityId": 294,
+      "listingDate": "Nov 14, 1989",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "AREIT": {
+      "symbol": "AREIT",
+      "companyName": "AREIT, Inc.",
+      "sector": "Property",
+      "subsector": "Property",
+      "cmpyId": 679,
+      "securityId": 655,
+      "listingDate": "Aug 13, 2020",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "ASLAG": {
+      "symbol": "ASLAG",
+      "companyName": "Raslag Corp.",
+      "sector": "Industrial",
+      "subsector": "Electricity, Energy, Power & Water",
+      "cmpyId": 694,
+      "securityId": 689,
+      "listingDate": "Jun 06, 2022",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "AT": {
+      "symbol": "AT",
+      "companyName": "Atlas Consolidated Mining and Development Corporation",
+      "sector": "Mining and Oil",
+      "subsector": "Mining",
+      "cmpyId": 34,
+      "securityId": 320,
+      "listingDate": "Nov 17, 1970",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "ATN": {
+      "symbol": "ATN",
+      "companyName": "ATN Holdings, Inc.",
+      "sector": "Industrial",
+      "subsector": "Construction, Infrastructure & Allied Services",
+      "cmpyId": 56,
+      "securityId": 176,
+      "listingDate": "Sep 24, 1970",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "AUB": {
+      "symbol": "AUB",
+      "companyName": "Asia United Bank Corporation",
+      "sector": "Financials",
+      "subsector": "Banks",
+      "cmpyId": 641,
+      "securityId": 584,
+      "listingDate": "May 17, 2013",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "AXLM": {
+      "symbol": "AXLM",
+      "companyName": "Axelum Resources Corp.",
+      "sector": "Industrial",
+      "subsector": "Food, Beverage & Tobacco",
+      "cmpyId": 673,
+      "securityId": 646,
+      "listingDate": "Oct 07, 2019",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "BALAI": {
+      "symbol": "BALAI",
+      "companyName": "Balai Ni Fruitas Inc.",
+      "sector": "Industrial",
+      "subsector": "Food, Beverage, & Tobacco",
+      "cmpyId": 697,
+      "securityId": 692,
+      "listingDate": "Jun 30, 2022",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "BC": {
+      "symbol": "BC",
+      "companyName": "Benguet Corporation",
+      "sector": "Mining and Oil",
+      "subsector": "Mining",
+      "cmpyId": 108,
+      "securityId": 353,
+      "listingDate": "Jan 04, 1950",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "BCOR": {
+      "symbol": "BCOR",
+      "companyName": "Berjaya Philippines Inc.",
+      "sector": "Services",
+      "subsector": "Retail",
+      "cmpyId": 9,
+      "securityId": 391,
+      "listingDate": "Nov 29, 1948",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "BDO": {
+      "symbol": "BDO",
+      "companyName": "BDO Unibank, Inc.",
+      "sector": "Financials",
+      "subsector": "Banks",
+      "cmpyId": 260,
+      "securityId": 468,
+      "listingDate": "May 21, 2002",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "BEL": {
+      "symbol": "BEL",
+      "companyName": "Belle Corporation",
+      "sector": "Services",
+      "subsector": "Casinos & Gaming",
+      "cmpyId": 21,
+      "securityId": 252,
+      "listingDate": "Feb 02, 1977",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "BH": {
+      "symbol": "BH",
+      "companyName": "BHI Holdings, Inc.",
+      "sector": "Holding Firms",
+      "subsector": "Holding Firms",
+      "cmpyId": 62,
+      "securityId": 358,
+      "listingDate": "Nov 02, 1966",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "BHI": {
+      "symbol": "BHI",
+      "companyName": "Boulevard Holdings, Inc.",
+      "sector": "Services",
+      "subsector": "Hotel & Leisure",
+      "cmpyId": 63,
+      "securityId": 187,
+      "listingDate": "Apr 28, 1997",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "BKR": {
+      "symbol": "BKR",
+      "companyName": "Bright Kindle Resources & Investments Inc.",
+      "sector": "Financials",
+      "subsector": "Other Financial Institutions",
+      "cmpyId": 66,
+      "securityId": 116,
+      "listingDate": "Mar 21, 1995",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "BLOOM": {
+      "symbol": "BLOOM",
+      "companyName": "Bloomberry Resorts Corporation",
+      "sector": "Services",
+      "subsector": "Casinos & Gaming",
+      "cmpyId": 49,
+      "securityId": 233,
+      "listingDate": "Oct 17, 2000",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "BMM": {
+      "symbol": "BMM",
+      "companyName": "Bogo-Medellin Milling Company, Inc.",
+      "sector": "Industrial",
+      "subsector": "Food, Beverage & Tobacco",
+      "cmpyId": 181,
+      "securityId": 359,
+      "listingDate": "Nov 16, 1950",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "BNCOM": {
+      "symbol": "BNCOM",
+      "companyName": "Bank of Commerce",
+      "sector": "Financials",
+      "subsector": "Banks",
+      "cmpyId": 692,
+      "securityId": 687,
+      "listingDate": "Mar 31, 2022",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "BPI": {
+      "symbol": "BPI",
+      "companyName": "Bank of the Philippine Islands",
+      "sector": "Financials",
+      "subsector": "Banks",
+      "cmpyId": 234,
+      "securityId": 101,
+      "listingDate": "Oct 12, 1971",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "BRN": {
+      "symbol": "BRN",
+      "companyName": "A Brown Company, Inc.",
+      "sector": "Property",
+      "subsector": "Property",
+      "cmpyId": 13,
+      "securityId": 234,
+      "listingDate": "Feb 08, 1994",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "BSC": {
+      "symbol": "BSC",
+      "companyName": "Basic Energy Corporation",
+      "sector": "Industrial",
+      "subsector": "Electricity, Energy, Power & Water",
+      "cmpyId": 60,
+      "securityId": 188,
+      "listingDate": "Oct 16, 1973",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "C": {
+      "symbol": "C",
+      "companyName": "Chelsea Logistics and Infrastructure Holdings Corp.",
+      "sector": "Services",
+      "subsector": "Transportation Services",
+      "cmpyId": 669,
+      "securityId": 636,
+      "listingDate": "Aug 08, 2017",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "CA": {
+      "symbol": "CA",
+      "companyName": "Concrete Aggregates Corporation",
+      "sector": "Industrial",
+      "subsector": "Construction, Infra. & Allied Services",
+      "cmpyId": 213,
+      "securityId": 361,
+      "listingDate": "Oct 20, 1972",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "CAT": {
+      "symbol": "CAT",
+      "companyName": "Central Azucarera de Tarlac, Inc.",
+      "sector": "Industrial",
+      "subsector": "Food, Beverage & Tobacco",
+      "cmpyId": 183,
+      "securityId": 366,
+      "listingDate": "Apr 12, 1977",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "CBC": {
+      "symbol": "CBC",
+      "companyName": "China Banking Corporation",
+      "sector": "Financials",
+      "subsector": "Banks",
+      "cmpyId": 184,
+      "securityId": 104,
+      "listingDate": "Sep 01, 1927",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "CDC": {
+      "symbol": "CDC",
+      "companyName": "Cityland Development Corporation",
+      "sector": "Property",
+      "subsector": "Property",
+      "cmpyId": 39,
+      "securityId": 297,
+      "listingDate": "Aug 02, 1983",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "CEB": {
+      "symbol": "CEB",
+      "companyName": "Cebu Air, Inc.",
+      "sector": "Services",
+      "subsector": "Transportation Services",
+      "cmpyId": 624,
+      "securityId": 560,
+      "listingDate": "Oct 26, 2010",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "CEI": {
+      "symbol": "CEI",
+      "companyName": "Crown Equities, Inc.",
+      "sector": "Property",
+      "subsector": "Property",
+      "cmpyId": 186,
+      "securityId": 191,
+      "listingDate": "Aug 16, 1994",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "CEU": {
+      "symbol": "CEU",
+      "companyName": "Centro Escolar University",
+      "sector": "Services",
+      "subsector": "Education",
+      "cmpyId": 223,
+      "securityId": 291,
+      "listingDate": "Nov 10, 1986",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "CHP": {
+      "symbol": "CHP",
+      "companyName": "Concreat Holdings Philippines, Inc.",
+      "sector": "Industrial",
+      "subsector": "Construction, Infra. & Allied Services",
+      "cmpyId": 662,
+      "securityId": 625,
+      "listingDate": "Jul 18, 2016",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "CIC": {
+      "symbol": "CIC",
+      "companyName": "Concepcion Industrial Corporation",
+      "sector": "Industrial",
+      "subsector": "Electrical Components & Equipment",
+      "cmpyId": 648,
+      "securityId": 591,
+      "listingDate": "Nov 27, 2013",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "CLI": {
+      "symbol": "CLI",
+      "companyName": "Cebu Landmasters, Inc.",
+      "sector": "Property",
+      "subsector": "Property",
+      "cmpyId": 668,
+      "securityId": 635,
+      "listingDate": "Jun 02, 2017",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "CNPF": {
+      "symbol": "CNPF",
+      "companyName": "Century Pacific Food, Inc.",
+      "sector": "Industrial",
+      "subsector": "Food, Beverage & Tobacco",
+      "cmpyId": 652,
+      "securityId": 597,
+      "listingDate": "May 06, 2014",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "CNVRG": {
+      "symbol": "CNVRG",
+      "companyName": "Converge Information and Communications Technology Solutions, Inc.",
+      "sector": "Services",
+      "subsector": "Information Technology",
+      "cmpyId": 680,
+      "securityId": 656,
+      "listingDate": "Oct 26, 2020",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "COL": {
+      "symbol": "COL",
+      "companyName": "COL Financial Group, Inc.",
+      "sector": "Financials",
+      "subsector": "Other Financial Institutions",
+      "cmpyId": 601,
+      "securityId": 522,
+      "listingDate": "Jul 12, 2006",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "COSCO": {
+      "symbol": "COSCO",
+      "companyName": "Cosco Capital, Inc.",
+      "sector": "Holding Firms",
+      "subsector": "Holding Firms",
+      "cmpyId": 50,
+      "securityId": 178,
+      "listingDate": "Sep 26, 1988",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "CPG": {
+      "symbol": "CPG",
+      "companyName": "Century Properties Group, Inc.",
+      "sector": "Property",
+      "subsector": "Property",
+      "cmpyId": 189,
+      "securityId": 219,
+      "listingDate": "Jun 16, 1976",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "CPM": {
+      "symbol": "CPM",
+      "companyName": "Century Peak Holdings Corporation",
+      "sector": "Mining and Oil",
+      "subsector": "Mining",
+      "cmpyId": 621,
+      "securityId": 549,
+      "listingDate": "Oct 06, 2009",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "CREC": {
+      "symbol": "CREC",
+      "companyName": "Citicore Renewable Energy Corporation",
+      "sector": "Industrial",
+      "subsector": "Electricity, Energy, Power and Water",
+      "cmpyId": 703,
+      "securityId": 710,
+      "listingDate": "Jun 07, 2024",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "CREIT": {
+      "symbol": "CREIT",
+      "companyName": "Citicore Energy REIT Corp.",
+      "sector": "Property",
+      "subsector": "Property",
+      "cmpyId": 691,
+      "securityId": 686,
+      "listingDate": "Feb 22, 2022",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "CROWN": {
+      "symbol": "CROWN",
+      "companyName": "Crown Asia Chemicals Corporation",
+      "sector": "Industrial",
+      "subsector": "Chemicals",
+      "cmpyId": 657,
+      "securityId": 611,
+      "listingDate": "Apr 27, 2015",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "CSB": {
+      "symbol": "CSB",
+      "companyName": "Citystate Savings Bank, Inc.",
+      "sector": "Financials",
+      "subsector": "Banks",
+      "cmpyId": 228,
+      "securityId": 457,
+      "listingDate": "Jan 03, 2002",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "CTS": {
+      "symbol": "CTS",
+      "companyName": "CTS Global Equity Group, Inc.",
+      "sector": "Small, Medium & Emerging Board",
+      "subsector": "Small, Medium & Emerging Board",
+      "cmpyId": 693,
+      "securityId": 688,
+      "listingDate": "Apr 13, 2022",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "CYBR": {
+      "symbol": "CYBR",
+      "companyName": "Cyber Bay Corporation",
+      "sector": "Property",
+      "subsector": "Property",
+      "cmpyId": 67,
+      "securityId": 295,
+      "listingDate": "Mar 19, 1991",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "DD": {
+      "symbol": "DD",
+      "companyName": "DoubleDragon Corporation",
+      "sector": "Property",
+      "subsector": "Property",
+      "cmpyId": 651,
+      "securityId": 596,
+      "listingDate": "Apr 07, 2014",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "DDMPR": {
+      "symbol": "DDMPR",
+      "companyName": "DDMP REIT, Inc.",
+      "sector": "Property",
+      "subsector": "Property",
+      "cmpyId": 681,
+      "securityId": 664,
+      "listingDate": "Mar 24, 2021",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "DELM": {
+      "symbol": "DELM",
+      "companyName": "Del Monte Pacific Limited",
+      "sector": "Industrial",
+      "subsector": "Food, Beverage & Tobacco",
+      "cmpyId": 642,
+      "securityId": 585,
+      "listingDate": "Jun 10, 2013",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "DFNN": {
+      "symbol": "DFNN",
+      "companyName": "DFNN, Inc.",
+      "sector": "Services",
+      "subsector": "Information Technology",
+      "cmpyId": 187,
+      "securityId": 125,
+      "listingDate": "Oct 30, 2000",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "DHI": {
+      "symbol": "DHI",
+      "companyName": "Dominion Holdings, Inc.",
+      "sector": "Financials",
+      "subsector": "Other Financial Institutions",
+      "cmpyId": 31,
+      "securityId": 121,
+      "listingDate": "Jan 06, 1997",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "DITO": {
+      "symbol": "DITO",
+      "companyName": "DITO CME Holdings Corp.",
+      "sector": "Services",
+      "subsector": "Telecommunications",
+      "cmpyId": 36,
+      "securityId": 324,
+      "listingDate": "Oct 01, 1975",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "DIZ": {
+      "symbol": "DIZ",
+      "companyName": "Dizon Copper-Silver Mines, Inc.",
+      "sector": "Mining and Oil",
+      "subsector": "Mining",
+      "cmpyId": 68,
+      "securityId": 323,
+      "listingDate": "Feb 10, 1988",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "DMC": {
+      "symbol": "DMC",
+      "companyName": "DMCI Holdings, Inc.",
+      "sector": "Holding Firms",
+      "subsector": "Holding Firms",
+      "cmpyId": 188,
+      "securityId": 192,
+      "listingDate": "Dec 18, 1995",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "DMW": {
+      "symbol": "DMW",
+      "companyName": "D.M. Wenceslao & Associates, Incorporated",
+      "sector": "Property",
+      "subsector": "Property",
+      "cmpyId": 671,
+      "securityId": 641,
+      "listingDate": "Jun 29, 2018",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "DNL": {
+      "symbol": "DNL",
+      "companyName": "D&L Industries, Inc.",
+      "sector": "Industrial",
+      "subsector": "Food, Beverage & Tobacco",
+      "cmpyId": 639,
+      "securityId": 582,
+      "listingDate": "Dec 12, 2012",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "DWC": {
+      "symbol": "DWC",
+      "companyName": "Discovery World Corporation",
+      "sector": "Services",
+      "subsector": "Hotel & Leisure",
+      "cmpyId": 647,
+      "securityId": 590,
+      "listingDate": "Nov 21, 2013",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "ECP": {
+      "symbol": "ECP",
+      "companyName": "EasyCall Communications Philippines, Inc.",
+      "sector": "Services",
+      "subsector": "Information Technology",
+      "cmpyId": 70,
+      "securityId": 126,
+      "listingDate": "May 05, 1992",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "ECVC": {
+      "symbol": "ECVC",
+      "companyName": "East Coast Vulcan Mining Corporation",
+      "sector": "Mining and Oil",
+      "subsector": "Mining",
+      "cmpyId": 46,
+      "securityId": 346,
+      "listingDate": "Aug 31, 1970",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "EEI": {
+      "symbol": "EEI",
+      "companyName": "EEI Corporation",
+      "sector": "Industrial",
+      "subsector": "Construction, Infra. & Allied Services",
+      "cmpyId": 71,
+      "securityId": 148,
+      "listingDate": "Jul 21, 1975",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "EG": {
+      "symbol": "EG",
+      "companyName": "IP E-Game Ventures, Inc.",
+      "sector": "Services",
+      "subsector": "Casinos & Gaming",
+      "cmpyId": 623,
+      "securityId": 552,
+      "listingDate": "Feb 17, 2010",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "EGRN": {
+      "symbol": "EGRN",
+      "companyName": "Everwoods Green Resources and Holdings, Inc.",
+      "sector": "Property",
+      "subsector": "Property",
+      "cmpyId": 191,
+      "securityId": 193,
+      "listingDate": "Sep 16, 1996",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "ELI": {
+      "symbol": "ELI",
+      "companyName": "Empire East Land Holdings, Inc.",
+      "sector": "Property",
+      "subsector": "Property",
+      "cmpyId": 190,
+      "securityId": 300,
+      "listingDate": "Jun 28, 1996",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "EMI": {
+      "symbol": "EMI",
+      "companyName": "Emperador Inc.",
+      "sector": "Industrial",
+      "subsector": "Food, Beverage & Tobacco",
+      "cmpyId": 632,
+      "securityId": 571,
+      "listingDate": "Dec 19, 2011",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "ENEX": {
+      "symbol": "ENEX",
+      "companyName": "ENEX Energy Corp.",
+      "sector": "Mining and Oil",
+      "subsector": "Oil",
+      "cmpyId": 653,
+      "securityId": 599,
+      "listingDate": "Aug 28, 2014",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "EURO": {
+      "symbol": "EURO",
+      "companyName": "Euro-Med Laboratories Phil., Inc.",
+      "sector": "Industrial",
+      "subsector": "Chemicals",
+      "cmpyId": 219,
+      "securityId": 236,
+      "listingDate": "Jul 02, 1998",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "EW": {
+      "symbol": "EW",
+      "companyName": "East West Banking Corporation",
+      "sector": "Financials",
+      "subsector": "Banks",
+      "cmpyId": 634,
+      "securityId": 573,
+      "listingDate": "May 07, 2012",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "FAF": {
+      "symbol": "FAF",
+      "companyName": "First Abacus Financial Holdings Corporation",
+      "sector": "Financials",
+      "subsector": "Other Financial Institutions",
+      "cmpyId": 81,
+      "securityId": 118,
+      "listingDate": "Nov 17, 1994",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "FB": {
+      "symbol": "FB",
+      "companyName": "San Miguel Food and Beverage, Inc.",
+      "sector": "Industrial",
+      "subsector": "Food, Beverage & Tobacco",
+      "cmpyId": 151,
+      "securityId": 161,
+      "listingDate": "Oct 28, 1971",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "FCG": {
+      "symbol": "FCG",
+      "companyName": "Figaro Culinary Group, Inc.",
+      "sector": "Industrial",
+      "subsector": "Food, Beverage & Tobacco",
+      "cmpyId": 689,
+      "securityId": 684,
+      "listingDate": "Jan 24, 2022",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "FDC": {
+      "symbol": "FDC",
+      "companyName": "Filinvest Development Corporation",
+      "sector": "Holding Firms",
+      "subsector": "Holding Firms",
+      "cmpyId": 75,
+      "securityId": 199,
+      "listingDate": "Dec 22, 1982",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "FERRO": {
+      "symbol": "FERRO",
+      "companyName": "Ferronoux Holdings, Inc.",
+      "sector": "Financials",
+      "subsector": "Other Financial Institutions",
+      "cmpyId": 643,
+      "securityId": 586,
+      "listingDate": "Aug 13, 2013",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "FEU": {
+      "symbol": "FEU",
+      "companyName": "Far Eastern University, Incorporated",
+      "sector": "Services",
+      "subsector": "Education",
+      "cmpyId": 25,
+      "securityId": 292,
+      "listingDate": "Jul 11, 1986",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "FFI": {
+      "symbol": "FFI",
+      "companyName": "Filipino Fund, Inc.",
+      "sector": "Financials",
+      "subsector": "Other Financial Institutions",
+      "cmpyId": 196,
+      "securityId": 117,
+      "listingDate": "Sep 27, 1995",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "FGEN": {
+      "symbol": "FGEN",
+      "companyName": "First Gen Corporation",
+      "sector": "Industrial",
+      "subsector": "Electricity, Energy, Power & Water",
+      "cmpyId": 600,
+      "securityId": 521,
+      "listingDate": "Feb 10, 2006",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "FILRT": {
+      "symbol": "FILRT",
+      "companyName": "Filinvest REIT Corp.",
+      "sector": "Property",
+      "subsector": "Property",
+      "cmpyId": 683,
+      "securityId": 668,
+      "listingDate": "Aug 12, 2021",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "FJP": {
+      "symbol": "FJP",
+      "companyName": "F & J Prince Holdings Corporation",
+      "sector": "Holding Firms",
+      "subsector": "Holding Firms",
+      "cmpyId": 225,
+      "securityId": 196,
+      "listingDate": "Dec 08, 1982",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "FLI": {
+      "symbol": "FLI",
+      "companyName": "Filinvest Land, Inc.",
+      "sector": "Property",
+      "subsector": "Property",
+      "cmpyId": 226,
+      "securityId": 302,
+      "listingDate": "Oct 25, 1993",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "FMETF": {
+      "symbol": "FMETF",
+      "companyName": "First Metro Philippine Equity Exchange Traded Fund, Inc.",
+      "sector": "ETF",
+      "subsector": "ETF-Equity",
+      "cmpyId": 649,
+      "securityId": 592,
+      "listingDate": "Dec 02, 2013",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "FNI": {
+      "symbol": "FNI",
+      "companyName": "Global Ferronickel Holdings, Inc.",
+      "sector": "Mining and Oil",
+      "subsector": "Mining",
+      "cmpyId": 224,
+      "securityId": 190,
+      "listingDate": "Dec 14, 1994",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "FOOD": {
+      "symbol": "FOOD",
+      "companyName": "Alliance Select Foods International, Inc.",
+      "sector": "Industrial",
+      "subsector": "Food, Beverage & Tobacco",
+      "cmpyId": 602,
+      "securityId": 524,
+      "listingDate": "Nov 08, 2006",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "FPH": {
+      "symbol": "FPH",
+      "companyName": "First Philippine Holdings Corporation",
+      "sector": "Industrial",
+      "subsector": "Electricity, Energy, Power & Water",
+      "cmpyId": 197,
+      "securityId": 197,
+      "listingDate": "May 23, 1963",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "FPI": {
+      "symbol": "FPI",
+      "companyName": "Forum Pacific, Inc.",
+      "sector": "Holding Firms",
+      "subsector": "Holding Firms",
+      "cmpyId": 220,
+      "securityId": 200,
+      "listingDate": "Dec 19, 1994",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "FRUIT": {
+      "symbol": "FRUIT",
+      "companyName": "Fruitas Holdings, Inc.",
+      "sector": "Industrial",
+      "subsector": "Food, Beverage & Tobacco",
+      "cmpyId": 676,
+      "securityId": 650,
+      "listingDate": "Nov 29, 2019",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "FYN": {
+      "symbol": "FYN",
+      "companyName": "Filsyn Corporation",
+      "sector": "Industrial",
+      "subsector": "Chemicals",
+      "cmpyId": 80,
+      "securityId": 372,
+      "listingDate": "Jun 03, 1975",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "GEO": {
+      "symbol": "GEO",
+      "companyName": "GEOGRACE Resources Philippines, Inc.",
+      "sector": "Mining and Oil",
+      "subsector": "Mining",
+      "cmpyId": 198,
+      "securityId": 201,
+      "listingDate": "Feb 07, 1972",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "GERI": {
+      "symbol": "GERI",
+      "companyName": "Global-Estate Resorts, Inc.",
+      "sector": "Property",
+      "subsector": "Property",
+      "cmpyId": 193,
+      "securityId": 307,
+      "listingDate": "Nov 23, 1995",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "GLO": {
+      "symbol": "GLO",
+      "companyName": "Globe Telecom, Inc.",
+      "sector": "Services",
+      "subsector": "Telecommunications",
+      "cmpyId": 69,
+      "securityId": 127,
+      "listingDate": "Aug 11, 1975",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "GMA7": {
+      "symbol": "GMA7",
+      "companyName": "GMA Network, Inc.",
+      "sector": "Services",
+      "subsector": "Media",
+      "cmpyId": 610,
+      "securityId": 533,
+      "listingDate": "Jul 30, 2007",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "GMAP": {
+      "symbol": "GMAP",
+      "companyName": "GMA Holdings, Inc.",
+      "sector": "Services",
+      "subsector": "Media",
+      "cmpyId": 611,
+      "securityId": 534,
+      "listingDate": "Jul 30, 2007",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "GPH": {
+      "symbol": "GPH",
+      "companyName": "Grand Plaza Hotel Corporation",
+      "sector": "Services",
+      "subsector": "Hotel & Leisure",
+      "cmpyId": 221,
+      "securityId": 255,
+      "listingDate": "Dec 10, 1992",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "GREEN": {
+      "symbol": "GREEN",
+      "companyName": "Greenergy Holdings Incorporated",
+      "sector": "Industrial",
+      "subsector": "Electrical Components & Equipment",
+      "cmpyId": 132,
+      "securityId": 243,
+      "listingDate": "Sep 26, 1996",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "GSMI": {
+      "symbol": "GSMI",
+      "companyName": "Ginebra San Miguel,  Inc.",
+      "sector": "Industrial",
+      "subsector": "Food, Beverage & Tobacco",
+      "cmpyId": 94,
+      "securityId": 160,
+      "listingDate": "Apr 18, 1995",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "GTCAP": {
+      "symbol": "GTCAP",
+      "companyName": "GT Capital Holdings, Inc.",
+      "sector": "Holding Firms",
+      "subsector": "Holding Firms",
+      "cmpyId": 633,
+      "securityId": 572,
+      "listingDate": "Apr 20, 2012",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "HI": {
+      "symbol": "HI",
+      "companyName": "House of Investments, Inc.",
+      "sector": "Holding Firms",
+      "subsector": "Holding Firms",
+      "cmpyId": 82,
+      "securityId": 203,
+      "listingDate": "Jul 02, 1962",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "HOME": {
+      "symbol": "HOME",
+      "companyName": "AllHome Corp.",
+      "sector": "Services",
+      "subsector": "Retail",
+      "cmpyId": 674,
+      "securityId": 647,
+      "listingDate": "Oct 10, 2019",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "HTI": {
+      "symbol": "HTI",
+      "companyName": "Haus Talk, Inc.",
+      "sector": "Small, Medium & Emerging Board",
+      "subsector": "Small, Medium & Emerging Board",
+      "cmpyId": 690,
+      "securityId": 685,
+      "listingDate": "Jan 17, 2022",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "I": {
+      "symbol": "I",
+      "companyName": "I-Remit, Inc.",
+      "sector": "Financials",
+      "subsector": "Other Financial Institutions",
+      "cmpyId": 613,
+      "securityId": 538,
+      "listingDate": "Oct 17, 2007",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "ICT": {
+      "symbol": "ICT",
+      "companyName": "International Container Terminal Services, Inc.",
+      "sector": "Services",
+      "subsector": "Transportation Services",
+      "cmpyId": 83,
+      "securityId": 142,
+      "listingDate": "Mar 23, 1992",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "IDC": {
+      "symbol": "IDC",
+      "companyName": "Italpinas Development Corporation",
+      "sector": "Small, Medium & Emerging Board",
+      "subsector": "Small, Medium & Emerging Board",
+      "cmpyId": 660,
+      "securityId": 617,
+      "listingDate": "Dec 07, 2015",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "IMI": {
+      "symbol": "IMI",
+      "companyName": "Integrated Micro-Electronics, Inc.",
+      "sector": "Industrial",
+      "subsector": "Electrical Components & Equipment",
+      "cmpyId": 622,
+      "securityId": 551,
+      "listingDate": "Jan 21, 2010",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "IMP": {
+      "symbol": "IMP",
+      "companyName": "Imperial Resources, Inc.",
+      "sector": "Services",
+      "subsector": "Information Technology",
+      "cmpyId": 201,
+      "securityId": 336,
+      "listingDate": "Aug 31, 1970",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "INFRA": {
+      "symbol": "INFRA",
+      "companyName": "Philippine Infradev Holdings, Inc.",
+      "sector": "Property",
+      "subsector": "Property",
+      "cmpyId": 84,
+      "securityId": 337,
+      "listingDate": "Feb 27, 1978",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "ION": {
+      "symbol": "ION",
+      "companyName": "Ionics, Inc.",
+      "sector": "Industrial",
+      "subsector": "Electrical Components & Equipment",
+      "cmpyId": 203,
+      "securityId": 204,
+      "listingDate": "Jul 18, 1995",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "IPM": {
+      "symbol": "IPM",
+      "companyName": "IPM Holdings, Inc.",
+      "sector": "Services",
+      "subsector": "Other Services",
+      "cmpyId": 4,
+      "securityId": 218,
+      "listingDate": "Jun 17, 1998",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "IPO": {
+      "symbol": "IPO",
+      "companyName": "iPeople, inc.",
+      "sector": "Services",
+      "subsector": "Education",
+      "cmpyId": 85,
+      "securityId": 205,
+      "listingDate": "Jan 24, 1990",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "IS": {
+      "symbol": "IS",
+      "companyName": "Island Information & Technology, Inc.",
+      "sector": "Services",
+      "subsector": "Information Technology",
+      "cmpyId": 204,
+      "securityId": 128,
+      "listingDate": "Dec 06, 1988",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "JAS": {
+      "symbol": "JAS",
+      "companyName": "Jackstones, Inc.",
+      "sector": "Property",
+      "subsector": "Property",
+      "cmpyId": 134,
+      "securityId": 392,
+      "listingDate": "Oct 27, 1967",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "JFC": {
+      "symbol": "JFC",
+      "companyName": "Jollibee Foods Corporation",
+      "sector": "Industrial",
+      "subsector": "Food, Beverage & Tobacco",
+      "cmpyId": 86,
+      "securityId": 158,
+      "listingDate": "Jul 14, 1993",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "JGS": {
+      "symbol": "JGS",
+      "companyName": "JG Summit Holdings, Inc.",
+      "sector": "Holding Firms",
+      "subsector": "Holding Firms",
+      "cmpyId": 210,
+      "securityId": 207,
+      "listingDate": "Aug 09, 1993",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "JOH": {
+      "symbol": "JOH",
+      "companyName": "Jolliville Holdings Corporation",
+      "sector": "Industrial",
+      "subsector": "Electricity, Energy, Power & Water",
+      "cmpyId": 261,
+      "securityId": 470,
+      "listingDate": "Jun 17, 2002",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "KEEPR": {
+      "symbol": "KEEPR",
+      "companyName": "The Keepers Holdings, Inc.",
+      "sector": "Industrial",
+      "subsector": "Food, Beverage & Tobacco",
+      "cmpyId": 2,
+      "securityId": 150,
+      "listingDate": "Sep 03, 1991",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "KEP": {
+      "symbol": "KEP",
+      "companyName": "Keppel Philippines Properties, Inc.",
+      "sector": "Property",
+      "subsector": "Property",
+      "cmpyId": 88,
+      "securityId": 306,
+      "listingDate": "Sep 11, 1989",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "KPPI": {
+      "symbol": "KPPI",
+      "companyName": "Kepwealth Property Phils., Inc.",
+      "sector": "Small, Medium & Emerging Board",
+      "subsector": "Small, Medium & Emerging Board",
+      "cmpyId": 672,
+      "securityId": 645,
+      "listingDate": "Aug 19, 2019",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "LBC": {
+      "symbol": "LBC",
+      "companyName": "LBC Express Holdings, Inc.",
+      "sector": "Services",
+      "subsector": "Transportation Services",
+      "cmpyId": 236,
+      "securityId": 469,
+      "listingDate": "Dec 21, 2001",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "LC": {
+      "symbol": "LC",
+      "companyName": "Lepanto Consolidated Mining Company",
+      "sector": "Mining and Oil",
+      "subsector": "Mining",
+      "cmpyId": 98,
+      "securityId": 326,
+      "listingDate": "Apr 30, 1947",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "LFM": {
+      "symbol": "LFM",
+      "companyName": "Liberty Flour Mills, Inc.",
+      "sector": "Industrial",
+      "subsector": "Food, Beverage & Tobacco",
+      "cmpyId": 227,
+      "securityId": 159,
+      "listingDate": "Apr 25, 1985",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "LMG": {
+      "symbol": "LMG",
+      "companyName": "LMG Corp.",
+      "sector": "Financials",
+      "subsector": "Other Financial Institutions",
+      "cmpyId": 205,
+      "securityId": 379,
+      "listingDate": "Jan 07, 1986",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "LODE": {
+      "symbol": "LODE",
+      "companyName": "Lodestar Investment Holdings Corporation",
+      "sector": "Holding Firms",
+      "subsector": "Holding Firms",
+      "cmpyId": 37,
+      "securityId": 377,
+      "listingDate": "May 26, 1989",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "LOTO": {
+      "symbol": "LOTO",
+      "companyName": "Pacific Online Systems Corporation",
+      "sector": "Services",
+      "subsector": "Casinos & Gaming",
+      "cmpyId": 605,
+      "securityId": 528,
+      "listingDate": "Apr 12, 2007",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "LPC": {
+      "symbol": "LPC",
+      "companyName": "LFM Properties Corporation",
+      "sector": "Small, Medium & Emerging Board",
+      "subsector": "Small, Medium & Emerging Board",
+      "cmpyId": 698,
+      "securityId": 693,
+      "listingDate": "Nov 09, 2022",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "LPZ": {
+      "symbol": "LPZ",
+      "companyName": "Lopez Holdings Corporation",
+      "sector": "Holding Firms",
+      "subsector": "Holding Firms",
+      "cmpyId": 61,
+      "securityId": 186,
+      "listingDate": "Nov 25, 1993",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "LSC": {
+      "symbol": "LSC",
+      "companyName": "Lorenzo Shipping Corporation",
+      "sector": "Services",
+      "subsector": "Transportation Services",
+      "cmpyId": 115,
+      "securityId": 144,
+      "listingDate": "Jul 22, 1996",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "LTG": {
+      "symbol": "LTG",
+      "companyName": "LT Group, Inc.",
+      "sector": "Holding Firms",
+      "subsector": "Holding Firms",
+      "cmpyId": 12,
+      "securityId": 225,
+      "listingDate": "Nov 07, 1947",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "MA": {
+      "symbol": "MA",
+      "companyName": "Manila Mining Corporation",
+      "sector": "Mining and Oil",
+      "subsector": "Mining",
+      "cmpyId": 119,
+      "securityId": 328,
+      "listingDate": "Dec 17, 1959",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "MAC": {
+      "symbol": "MAC",
+      "companyName": "MacroAsia Corporation",
+      "sector": "Services",
+      "subsector": "Transportation Services",
+      "cmpyId": 106,
+      "securityId": 212,
+      "listingDate": "May 21, 1970",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "MACAY": {
+      "symbol": "MACAY",
+      "companyName": "Macay Holdings, Inc.",
+      "sector": "Industrial",
+      "subsector": "Food, Beverage & Tobacco",
+      "cmpyId": 145,
+      "securityId": 221,
+      "listingDate": "Jan 28, 1987",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "MAH": {
+      "symbol": "MAH",
+      "companyName": "Metro Alliance Holdings & Equities Corp.",
+      "sector": "Services",
+      "subsector": "Transportation Services",
+      "cmpyId": 3,
+      "securityId": 241,
+      "listingDate": "Dec 08, 1947",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "MARC": {
+      "symbol": "MARC",
+      "companyName": "Marcventures Holdings, Inc.",
+      "sector": "Mining and Oil",
+      "subsector": "Mining",
+      "cmpyId": 175,
+      "securityId": 177,
+      "listingDate": "Jan 10, 1958",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "MAXS": {
+      "symbol": "MAXS",
+      "companyName": "Max's Group, Inc.",
+      "sector": "Industrial",
+      "subsector": "Food, Beverage & Tobacco",
+      "cmpyId": 135,
+      "securityId": 163,
+      "listingDate": "Dec 15, 2000",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "MB": {
+      "symbol": "MB",
+      "companyName": "Manila Bulletin Publishing Corporation",
+      "sector": "Services",
+      "subsector": "Media",
+      "cmpyId": 1,
+      "securityId": 130,
+      "listingDate": "Apr 18, 1990",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "MBC": {
+      "symbol": "MBC",
+      "companyName": "Manila Broadcasting Company",
+      "sector": "Services",
+      "subsector": "Media",
+      "cmpyId": 117,
+      "securityId": 382,
+      "listingDate": "Oct 08, 1949",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "MBT": {
+      "symbol": "MBT",
+      "companyName": "Metropolitan Bank & Trust Company",
+      "sector": "Financials",
+      "subsector": "Banks",
+      "cmpyId": 128,
+      "securityId": 108,
+      "listingDate": "Feb 26, 1981",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "MED": {
+      "symbol": "MED",
+      "companyName": "MEDCO Holdings, Inc.",
+      "sector": "Financials",
+      "subsector": "Other Financial Institutions",
+      "cmpyId": 126,
+      "securityId": 383,
+      "listingDate": "Nov 18, 1975",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "MEDIC": {
+      "symbol": "MEDIC",
+      "companyName": "Medilines Distributors Incorporated",
+      "sector": "Services",
+      "subsector": "Other Services",
+      "cmpyId": 687,
+      "securityId": 676,
+      "listingDate": "Dec 07, 2021",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "MEG": {
+      "symbol": "MEG",
+      "companyName": "Megaworld Corporation",
+      "sector": "Property",
+      "subsector": "Property",
+      "cmpyId": 127,
+      "securityId": 215,
+      "listingDate": "Jun 15, 1994",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "MER": {
+      "symbol": "MER",
+      "companyName": "Manila Electric Company",
+      "sector": "Industrial",
+      "subsector": "Electricity, Energy, Power & Water",
+      "cmpyId": 118,
+      "securityId": 137,
+      "listingDate": "Jan 08, 1992",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "MFC": {
+      "symbol": "MFC",
+      "companyName": "Manulife Financial Corporation",
+      "sector": "Financials",
+      "subsector": "Other Financial Institutions",
+      "cmpyId": 120,
+      "securityId": 120,
+      "listingDate": "Sep 27, 1999",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "MFIN": {
+      "symbol": "MFIN",
+      "companyName": "Makati Finance Corporation",
+      "sector": "Small, Medium & Emerging Board",
+      "subsector": "Small, Medium & Emerging Board",
+      "cmpyId": 263,
+      "securityId": 503,
+      "listingDate": "Jan 06, 2003",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "MG": {
+      "symbol": "MG",
+      "companyName": "Millennium Global Holdings, Inc.",
+      "sector": "Industrial",
+      "subsector": "Food, Beverage & Tobacco",
+      "cmpyId": 105,
+      "securityId": 214,
+      "listingDate": "Mar 01, 1976",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "MGH": {
+      "symbol": "MGH",
+      "companyName": "Metro Global Holdings Corporation",
+      "sector": "Holding Firms",
+      "subsector": "Holding Firms",
+      "cmpyId": 192,
+      "securityId": 198,
+      "listingDate": "May 04, 1964",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "MHC": {
+      "symbol": "MHC",
+      "companyName": "Mabuhay Holdings Corporation",
+      "sector": "Holding Firms",
+      "subsector": "Holding Firms",
+      "cmpyId": 206,
+      "securityId": 217,
+      "listingDate": "Oct 22, 1990",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "MJC": {
+      "symbol": "MJC",
+      "companyName": "Manila Jockey Club, Inc.",
+      "sector": "Services",
+      "subsector": "Casinos & Gaming",
+      "cmpyId": 102,
+      "securityId": 256,
+      "listingDate": "Oct 11, 1963",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "MJIC": {
+      "symbol": "MJIC",
+      "companyName": "MJC Investments Corporation",
+      "sector": "Services",
+      "subsector": "Casinos & Gaming",
+      "cmpyId": 24,
+      "securityId": 194,
+      "listingDate": "Nov 11, 1955",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "MM": {
+      "symbol": "MM",
+      "companyName": "MerryMart Consumer Corp.",
+      "sector": "Small, Medium & Emerging Board",
+      "subsector": "Small, Medium & Emerging Board",
+      "cmpyId": 677,
+      "securityId": 653,
+      "listingDate": "Jun 15, 2020",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "MONDE": {
+      "symbol": "MONDE",
+      "companyName": "Monde Nissin Corporation",
+      "sector": "Industrial",
+      "subsector": "Food, Beverage & Tobacco",
+      "cmpyId": 682,
+      "securityId": 665,
+      "listingDate": "Jun 01, 2021",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "MRC": {
+      "symbol": "MRC",
+      "companyName": "MRC Allied, Inc.",
+      "sector": "Property",
+      "subsector": "Property",
+      "cmpyId": 131,
+      "securityId": 309,
+      "listingDate": "May 18, 1995",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "MREIT": {
+      "symbol": "MREIT",
+      "companyName": "MREIT, Inc.",
+      "sector": "Property",
+      "subsector": "Property",
+      "cmpyId": 685,
+      "securityId": 671,
+      "listingDate": "Oct 01, 2021",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "MRSGI": {
+      "symbol": "MRSGI",
+      "companyName": "Metro Retail Stores Group, Inc.",
+      "sector": "Services",
+      "subsector": "Retail",
+      "cmpyId": 659,
+      "securityId": 616,
+      "listingDate": "Nov 24, 2015",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "MVC": {
+      "symbol": "MVC",
+      "companyName": "Mabuhay Vinyl Corporation",
+      "sector": "Industrial",
+      "subsector": "Chemicals",
+      "cmpyId": 100,
+      "securityId": 242,
+      "listingDate": "Feb 05, 1997",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "MWC": {
+      "symbol": "MWC",
+      "companyName": "Manila Water Company, Inc.",
+      "sector": "Industrial",
+      "subsector": "Electricity, Energy, Power & Water",
+      "cmpyId": 270,
+      "securityId": 518,
+      "listingDate": "Mar 18, 2005",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "MWIDE": {
+      "symbol": "MWIDE",
+      "companyName": "Megawide Construction Corporation",
+      "sector": "Industrial",
+      "subsector": "Construction, Infra. & Allied Services",
+      "cmpyId": 627,
+      "securityId": 564,
+      "listingDate": "Feb 18, 2011",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "MYNLD": {
+      "symbol": "MYNLD",
+      "companyName": "Maynilad Water Services, Inc.",
+      "sector": "Industrial",
+      "subsector": "Electricity, Energy, Power & Water",
+      "cmpyId": 707,
+      "securityId": 737,
+      "listingDate": "Nov 07, 2025",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "NI": {
+      "symbol": "NI",
+      "companyName": "NiHAO Mineral Resources International, Inc.",
+      "sector": "Mining and Oil",
+      "subsector": "Mining",
+      "cmpyId": 103,
+      "securityId": 213,
+      "listingDate": "Oct 03, 1990",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "NIKL": {
+      "symbol": "NIKL",
+      "companyName": "Nickel Asia Corporation",
+      "sector": "Mining and Oil",
+      "subsector": "Mining",
+      "cmpyId": 625,
+      "securityId": 561,
+      "listingDate": "Nov 22, 2010",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "NOW": {
+      "symbol": "NOW",
+      "companyName": "Now Corporation",
+      "sector": "Services",
+      "subsector": "Information Technology",
+      "cmpyId": 264,
+      "securityId": 510,
+      "listingDate": "Jul 23, 2003",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "NRCP": {
+      "symbol": "NRCP",
+      "companyName": "National Reinsurance Corporation of the Philippines",
+      "sector": "Financials",
+      "subsector": "Other Financial Institutions",
+      "cmpyId": 606,
+      "securityId": 529,
+      "listingDate": "Apr 27, 2007",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "NXGEN": {
+      "symbol": "NXGEN",
+      "companyName": "NextGenesis Corporation",
+      "sector": "Financials",
+      "subsector": "Banks",
+      "cmpyId": 179,
+      "securityId": 100,
+      "listingDate": "Oct 08, 1996",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "OGP": {
+      "symbol": "OGP",
+      "companyName": "OceanaGold (Philippines), Inc.",
+      "sector": "Mining and Oil",
+      "subsector": "Mining",
+      "cmpyId": 704,
+      "securityId": 716,
+      "listingDate": "May 13, 2024",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "OM": {
+      "symbol": "OM",
+      "companyName": "Omico Corporation",
+      "sector": "Property",
+      "subsector": "Property",
+      "cmpyId": 207,
+      "securityId": 330,
+      "listingDate": "May 02, 1969",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "OPM": {
+      "symbol": "OPM",
+      "companyName": "Oriental Petroleum and Minerals Corporation",
+      "sector": "Mining and Oil",
+      "subsector": "Oil",
+      "cmpyId": 43,
+      "securityId": 338,
+      "listingDate": "Oct 14, 1970",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "ORE": {
+      "symbol": "ORE",
+      "companyName": "Oriental Peninsula Resources Group, Inc.",
+      "sector": "Mining and Oil",
+      "subsector": "Mining",
+      "cmpyId": 616,
+      "securityId": 541,
+      "listingDate": "Dec 19, 2007",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "OV": {
+      "symbol": "OV",
+      "companyName": "The Philodrill Corporation",
+      "sector": "Mining and Oil",
+      "subsector": "Oil",
+      "cmpyId": 45,
+      "securityId": 341,
+      "listingDate": "Sep 25, 1969",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "PA": {
+      "symbol": "PA",
+      "companyName": "Pacifica Holdings, Inc.",
+      "sector": "Holding Firms",
+      "subsector": "Holding Firms",
+      "cmpyId": 109,
+      "securityId": 342,
+      "listingDate": "Nov 23, 1959",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "PAL": {
+      "symbol": "PAL",
+      "companyName": "PAL Holdings, Inc.",
+      "sector": "Services",
+      "subsector": "Transportation Services",
+      "cmpyId": 20,
+      "securityId": 189,
+      "listingDate": "Jan 04, 1954",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "PAX": {
+      "symbol": "PAX",
+      "companyName": "Paxys, Inc.",
+      "sector": "Services",
+      "subsector": "Other Services",
+      "cmpyId": 194,
+      "securityId": 195,
+      "listingDate": "Oct 05, 1972",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "PBB": {
+      "symbol": "PBB",
+      "companyName": "Philippine Business Bank",
+      "sector": "Financials",
+      "subsector": "Banks",
+      "cmpyId": 640,
+      "securityId": 583,
+      "listingDate": "Feb 19, 2013",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "PBC": {
+      "symbol": "PBC",
+      "companyName": "Philippine Bank of Communications",
+      "sector": "Financials",
+      "subsector": "Banks",
+      "cmpyId": 208,
+      "securityId": 110,
+      "listingDate": "May 12, 1988",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "PCOR": {
+      "symbol": "PCOR",
+      "companyName": "Petron Corporation",
+      "sector": "Industrial",
+      "subsector": "Electricity, Energy, Power & Water",
+      "cmpyId": 136,
+      "securityId": 139,
+      "listingDate": "Sep 07, 1994",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "PERC": {
+      "symbol": "PERC",
+      "companyName": "PetroEnergy Resources Corporation",
+      "sector": "Industrial",
+      "subsector": "Electricity, Energy, Power & Water",
+      "cmpyId": 578,
+      "securityId": 516,
+      "listingDate": "Aug 11, 2004",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "PGOLD": {
+      "symbol": "PGOLD",
+      "companyName": "Puregold Price Club, Inc.",
+      "sector": "Services",
+      "subsector": "Retail",
+      "cmpyId": 629,
+      "securityId": 567,
+      "listingDate": "Oct 05, 2011",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "PHA": {
+      "symbol": "PHA",
+      "companyName": "Premiere Horizon Alliance Corporation",
+      "sector": "Property",
+      "subsector": "Property",
+      "cmpyId": 148,
+      "securityId": 258,
+      "listingDate": "May 05, 1997",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "PHC": {
+      "symbol": "PHC",
+      "companyName": "Philcomsat Holdings Corporation",
+      "sector": "Services",
+      "subsector": "Other Services",
+      "cmpyId": 97,
+      "securityId": 220,
+      "listingDate": "Nov 28, 1958",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "PHES": {
+      "symbol": "PHES",
+      "companyName": "Philippine Estates Corporation",
+      "sector": "Property",
+      "subsector": "Property",
+      "cmpyId": 138,
+      "securityId": 310,
+      "listingDate": "Jan 21, 1985",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "PHN": {
+      "symbol": "PHN",
+      "companyName": "Phinma Corporation",
+      "sector": "Industrial",
+      "subsector": "Construction, Infra. & Allied Services",
+      "cmpyId": 107,
+      "securityId": 184,
+      "listingDate": "Aug 18, 1958",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "PHR": {
+      "symbol": "PHR",
+      "companyName": "PH Resorts Group Holdings, Inc.",
+      "sector": "Services",
+      "subsector": "Hotel & Leisure",
+      "cmpyId": 631,
+      "securityId": 570,
+      "listingDate": "Nov 24, 2011",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "PIZZA": {
+      "symbol": "PIZZA",
+      "companyName": "Shakey's Pizza Asia Ventures, Inc.",
+      "sector": "Industrial",
+      "subsector": "Food, Beverage & Tobacco",
+      "cmpyId": 664,
+      "securityId": 631,
+      "listingDate": "Dec 15, 2016",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "PLUS": {
+      "symbol": "PLUS",
+      "companyName": "DigiPlus Interactive Corp.",
+      "sector": "Services",
+      "subsector": "Casinos & Gaming",
+      "cmpyId": 96,
+      "securityId": 253,
+      "listingDate": "Apr 17, 1958",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "PMPC": {
+      "symbol": "PMPC",
+      "companyName": "Panasonic Manufacturing Philippines Corporation",
+      "sector": "Industrial",
+      "subsector": "Electrical Components & Equipment",
+      "cmpyId": 104,
+      "securityId": 239,
+      "listingDate": "Jan 21, 1983",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "PNB": {
+      "symbol": "PNB",
+      "companyName": "Philippine National Bank",
+      "sector": "Financials",
+      "subsector": "Banks",
+      "cmpyId": 139,
+      "securityId": 109,
+      "listingDate": "Jun 21, 1989",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "PNC": {
+      "symbol": "PNC",
+      "companyName": "Philippine National Construction Corporation",
+      "sector": "Industrial",
+      "subsector": "Construction, Infra. & Allied Services",
+      "cmpyId": 7,
+      "securityId": 151,
+      "listingDate": "Mar 13, 1974",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "PNX": {
+      "symbol": "PNX",
+      "companyName": "Phoenix Petroleum Philippines, Inc.",
+      "sector": "Industrial",
+      "subsector": "Electricity, Energy, Power & Water",
+      "cmpyId": 608,
+      "securityId": 531,
+      "listingDate": "Jul 11, 2007",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "PORT": {
+      "symbol": "PORT",
+      "companyName": "Globalport 900, Inc.",
+      "sector": "Services",
+      "subsector": "Transportation Services",
+      "cmpyId": 129,
+      "securityId": 384,
+      "listingDate": "Jun 09, 1948",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "PPC": {
+      "symbol": "PPC",
+      "companyName": "Pryce Corporation",
+      "sector": "Industrial",
+      "subsector": "Electricity, Energy, Power & Water",
+      "cmpyId": 150,
+      "securityId": 246,
+      "listingDate": "Oct 29, 1991",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "PRC": {
+      "symbol": "PRC",
+      "companyName": "Philippine Racing Club, Inc.",
+      "sector": "Property",
+      "subsector": "Property",
+      "cmpyId": 141,
+      "securityId": 257,
+      "listingDate": "Mar 02, 1952",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "PREIT": {
+      "symbol": "PREIT",
+      "companyName": "Premiere Island Power REIT Corporation",
+      "sector": "Property",
+      "subsector": "Property",
+      "cmpyId": 699,
+      "securityId": 694,
+      "listingDate": "Dec 15, 2022",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "PRIM": {
+      "symbol": "PRIM",
+      "companyName": "Prime Media Holdings, Inc.",
+      "sector": "Holding Firms",
+      "subsector": "Holding Firms",
+      "cmpyId": 30,
+      "securityId": 106,
+      "listingDate": "Jul 29, 1964",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "PRMX": {
+      "symbol": "PRMX",
+      "companyName": "Primex Corporation",
+      "sector": "Property",
+      "subsector": "Property",
+      "cmpyId": 214,
+      "securityId": 419,
+      "listingDate": "Aug 10, 2001",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "PSB": {
+      "symbol": "PSB",
+      "companyName": "Philippine Savings Bank",
+      "sector": "Financials",
+      "subsector": "Banks",
+      "cmpyId": 142,
+      "securityId": 112,
+      "listingDate": "Oct 10, 1994",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "PSE": {
+      "symbol": "PSE",
+      "companyName": "The Philippine Stock Exchange, Inc.",
+      "sector": "Financials",
+      "subsector": "Other Financial Institutions",
+      "cmpyId": 478,
+      "securityId": 512,
+      "listingDate": "Dec 15, 2003",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "PTC": {
+      "symbol": "PTC",
+      "companyName": "Philippine Trust Company",
+      "sector": "Financials",
+      "subsector": "Banks",
+      "cmpyId": 144,
+      "securityId": 393,
+      "listingDate": "Feb 17, 1988",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "PTT": {
+      "symbol": "PTT",
+      "companyName": "PT&T Corp.",
+      "sector": "Services",
+      "subsector": "Telecommunications",
+      "cmpyId": 76,
+      "securityId": 132,
+      "listingDate": "Jan 10, 1990",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "PX": {
+      "symbol": "PX",
+      "companyName": "Philex Mining Corporation",
+      "sector": "Mining and Oil",
+      "subsector": "Mining",
+      "cmpyId": 137,
+      "securityId": 331,
+      "listingDate": "Nov 23, 1956",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "PXP": {
+      "symbol": "PXP",
+      "companyName": "PXP Energy Corporation",
+      "sector": "Mining and Oil",
+      "subsector": "Oil",
+      "cmpyId": 628,
+      "securityId": 566,
+      "listingDate": "Sep 12, 2011",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "RCB": {
+      "symbol": "RCB",
+      "companyName": "Rizal Commercial Banking Corporation",
+      "sector": "Financials",
+      "subsector": "Banks",
+      "cmpyId": 232,
+      "securityId": 113,
+      "listingDate": "Nov 06, 1986",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "RCI": {
+      "symbol": "RCI",
+      "companyName": "Roxas and Company, Inc.",
+      "sector": "Industrial",
+      "subsector": "Food, Beverage & Tobacco",
+      "cmpyId": 54,
+      "securityId": 363,
+      "listingDate": "Nov 29, 1948",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "RCR": {
+      "symbol": "RCR",
+      "companyName": "RL Commercial REIT, Inc.",
+      "sector": "Property",
+      "subsector": "Property",
+      "cmpyId": 684,
+      "securityId": 670,
+      "listingDate": "Sep 14, 2021",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "REDC": {
+      "symbol": "REDC",
+      "companyName": "Repower Energy Development Corporation",
+      "sector": "Industrial",
+      "subsector": "Electricity, Energy, Power & Water",
+      "cmpyId": 702,
+      "securityId": 702,
+      "listingDate": "Jul 24, 2023",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "REG": {
+      "symbol": "REG",
+      "companyName": "Republic Glass Holdings Corporation",
+      "sector": "Holding Firms",
+      "subsector": "Holding Firms",
+      "cmpyId": 153,
+      "securityId": 153,
+      "listingDate": "Jul 17, 1959",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "RFM": {
+      "symbol": "RFM",
+      "companyName": "RFM Corporation",
+      "sector": "Industrial",
+      "subsector": "Food, Beverage & Tobacco",
+      "cmpyId": 77,
+      "securityId": 164,
+      "listingDate": "Feb 21, 1966",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "RLC": {
+      "symbol": "RLC",
+      "companyName": "Robinsons Land Corporation",
+      "sector": "Property",
+      "subsector": "Property",
+      "cmpyId": 195,
+      "securityId": 312,
+      "listingDate": "Oct 16, 1989",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "RLT": {
+      "symbol": "RLT",
+      "companyName": "Philippine Realty and Holdings Corporation",
+      "sector": "Property",
+      "subsector": "Property",
+      "cmpyId": 40,
+      "securityId": 313,
+      "listingDate": "Sep 07, 1987",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "ROCK": {
+      "symbol": "ROCK",
+      "companyName": "Rockwell Land Corporation",
+      "sector": "Property",
+      "subsector": "Property",
+      "cmpyId": 635,
+      "securityId": 574,
+      "listingDate": "May 11, 2012",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "ROX": {
+      "symbol": "ROX",
+      "companyName": "Roxas Holdings,  Inc.",
+      "sector": "Industrial",
+      "subsector": "Food, Beverage & Tobacco",
+      "cmpyId": 64,
+      "securityId": 250,
+      "listingDate": "Aug 08, 1996",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "RRHI": {
+      "symbol": "RRHI",
+      "companyName": "Robinsons Retail Holdings, Inc.",
+      "sector": "Services",
+      "subsector": "Retail",
+      "cmpyId": 646,
+      "securityId": 589,
+      "listingDate": "Nov 11, 2013",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "SBS": {
+      "symbol": "SBS",
+      "companyName": "SBS Philippines Corporation",
+      "sector": "Services",
+      "subsector": "Other Services",
+      "cmpyId": 658,
+      "securityId": 612,
+      "listingDate": "Aug 10, 2015",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "SCC": {
+      "symbol": "SCC",
+      "companyName": "Semirara Mining and Power Corporation",
+      "sector": "Industrial",
+      "subsector": "Electricity, Energy, Power and Water",
+      "cmpyId": 157,
+      "securityId": 396,
+      "listingDate": "Nov 28, 1983",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "SECB": {
+      "symbol": "SECB",
+      "companyName": "Security Bank Corporation",
+      "sector": "Financials",
+      "subsector": "Banks",
+      "cmpyId": 32,
+      "securityId": 114,
+      "listingDate": "Jun 08, 1995",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "SEVN": {
+      "symbol": "SEVN",
+      "companyName": "Philippine Seven Corporation",
+      "sector": "Services",
+      "subsector": "Retail",
+      "cmpyId": 143,
+      "securityId": 251,
+      "listingDate": "Feb 04, 1998",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "SFI": {
+      "symbol": "SFI",
+      "companyName": "Swift Foods, Inc.",
+      "sector": "Industrial",
+      "subsector": "Food, Beverage & Tobacco",
+      "cmpyId": 165,
+      "securityId": 402,
+      "listingDate": "Nov 15, 1994",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "SGI": {
+      "symbol": "SGI",
+      "companyName": "Solid Group, Inc.",
+      "sector": "Holding Firms",
+      "subsector": "Holding Firms",
+      "cmpyId": 160,
+      "securityId": 224,
+      "listingDate": "Apr 26, 1948",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "SGP": {
+      "symbol": "SGP",
+      "companyName": "Synergy Grid & Development Phils., Inc.",
+      "sector": "Industrial",
+      "subsector": "Electricity, Energy, Power & Water",
+      "cmpyId": 166,
+      "securityId": 385,
+      "listingDate": "May 10, 1972",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "SHLPH": {
+      "symbol": "SHLPH",
+      "companyName": "Shell Pilipinas Corporation",
+      "sector": "Industrial",
+      "subsector": "Electricity, Energy, Power & Water",
+      "cmpyId": 663,
+      "securityId": 629,
+      "listingDate": "Nov 03, 2016",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "SHNG": {
+      "symbol": "SHNG",
+      "companyName": "Shang Properties, Inc.",
+      "sector": "Property",
+      "subsector": "Property",
+      "cmpyId": 218,
+      "securityId": 301,
+      "listingDate": "Jun 13, 1991",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "SLF": {
+      "symbol": "SLF",
+      "companyName": "Sun Life Financial Inc.",
+      "sector": "Financials",
+      "subsector": "Other Financial Institutions",
+      "cmpyId": 78,
+      "securityId": 122,
+      "listingDate": "Mar 24, 2000",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "SLI": {
+      "symbol": "SLI",
+      "companyName": "Sta. Lucia Land, Inc.",
+      "sector": "Property",
+      "subsector": "Property",
+      "cmpyId": 41,
+      "securityId": 417,
+      "listingDate": "Sep 14, 1987",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "SM": {
+      "symbol": "SM",
+      "companyName": "SM Investments Corporation",
+      "sector": "Holding Firms",
+      "subsector": "Holding Firms",
+      "cmpyId": 599,
+      "securityId": 520,
+      "listingDate": "Mar 22, 2005",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "SMC": {
+      "symbol": "SMC",
+      "companyName": "San Miguel Corporation",
+      "sector": "Holding Firms",
+      "subsector": "Holding Firms",
+      "cmpyId": 154,
+      "securityId": 165,
+      "listingDate": "Nov 05, 1948",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "SMPH": {
+      "symbol": "SMPH",
+      "companyName": "SM Prime Holdings, Inc.",
+      "sector": "Property",
+      "subsector": "Property",
+      "cmpyId": 112,
+      "securityId": 314,
+      "listingDate": "Jul 05, 1994",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "SOC": {
+      "symbol": "SOC",
+      "companyName": "SOCResources, Inc.",
+      "sector": "Property",
+      "subsector": "Property",
+      "cmpyId": 161,
+      "securityId": 345,
+      "listingDate": "Jan 05, 1994",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "SPC": {
+      "symbol": "SPC",
+      "companyName": "SPC Power Corporation",
+      "sector": "Industrial",
+      "subsector": "Electricity, Energy, Power & Water",
+      "cmpyId": 237,
+      "securityId": 466,
+      "listingDate": "Apr 02, 2002",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "SPM": {
+      "symbol": "SPM",
+      "companyName": "Seafront Resources Corporation",
+      "sector": "Holding Firms",
+      "subsector": "Holding Firms",
+      "cmpyId": 156,
+      "securityId": 223,
+      "listingDate": "May 07, 1974",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "SPNEC": {
+      "symbol": "SPNEC",
+      "companyName": "SP New Energy Corporation",
+      "sector": "Industrial",
+      "subsector": "Electricity, Energy, Power & Water",
+      "cmpyId": 688,
+      "securityId": 678,
+      "listingDate": "Dec 17, 2021",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "SRDC": {
+      "symbol": "SRDC",
+      "companyName": "Supercity Realty Development Corporation",
+      "sector": "Industrial",
+      "subsector": "Construction, Infra. & Allied Services",
+      "cmpyId": 479,
+      "securityId": 513,
+      "listingDate": "Dec 19, 2003",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "SSI": {
+      "symbol": "SSI",
+      "companyName": "SSI Group, Inc.",
+      "sector": "Services",
+      "subsector": "Retail",
+      "cmpyId": 654,
+      "securityId": 604,
+      "listingDate": "Nov 07, 2014",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "STI": {
+      "symbol": "STI",
+      "companyName": "STI Education Systems Holdings, Inc.",
+      "sector": "Services",
+      "subsector": "Education",
+      "cmpyId": 222,
+      "securityId": 376,
+      "listingDate": "Oct 12, 1976",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "STN": {
+      "symbol": "STN",
+      "companyName": "Steniel Manufacturing Corporation",
+      "sector": "Industrial",
+      "subsector": "Other Industrials",
+      "cmpyId": 164,
+      "securityId": 249,
+      "listingDate": "Nov 22, 1993",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "STR": {
+      "symbol": "STR",
+      "companyName": "Vistamalls, Inc.",
+      "sector": "Property",
+      "subsector": "Property",
+      "cmpyId": 147,
+      "securityId": 333,
+      "listingDate": "Nov 17, 1970",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "SUN": {
+      "symbol": "SUN",
+      "companyName": "Suntrust Resort Holdings, Inc.",
+      "sector": "Property",
+      "subsector": "Property",
+      "cmpyId": 73,
+      "securityId": 254,
+      "listingDate": "Feb 11, 1959",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "T": {
+      "symbol": "T",
+      "companyName": "TKC Metals Corporation",
+      "sector": "Industrial",
+      "subsector": "Construction, Infra. & Allied Services",
+      "cmpyId": 163,
+      "securityId": 418,
+      "listingDate": "Jul 20, 2001",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "TBGI": {
+      "symbol": "TBGI",
+      "companyName": "Transpacific Broadband Group Int`l. Inc.",
+      "sector": "Services",
+      "subsector": "Information Technology",
+      "cmpyId": 269,
+      "securityId": 511,
+      "listingDate": "Dec 12, 2003",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "TECH": {
+      "symbol": "TECH",
+      "companyName": "Cirtek Holdings Philippines Corporation",
+      "sector": "Industrial",
+      "subsector": "Electrical Components & Equipment",
+      "cmpyId": 630,
+      "securityId": 569,
+      "listingDate": "Nov 18, 2011",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "TEL": {
+      "symbol": "TEL",
+      "companyName": "PLDT Inc.",
+      "sector": "Services",
+      "subsector": "Telecommunications",
+      "cmpyId": 6,
+      "securityId": 134,
+      "listingDate": "Sep 17, 1953",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "TFC": {
+      "symbol": "TFC",
+      "companyName": "PTFC Redevelopment Corporation",
+      "sector": "Property",
+      "subsector": "Property",
+      "cmpyId": 8,
+      "securityId": 413,
+      "listingDate": "Dec 19, 1955",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "TFHI": {
+      "symbol": "TFHI",
+      "companyName": "Top Frontier Investment Holdings, Inc.",
+      "sector": "Holding Firms",
+      "subsector": "Holding Firms",
+      "cmpyId": 650,
+      "securityId": 595,
+      "listingDate": "Jan 13, 2014",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "TOP": {
+      "symbol": "TOP",
+      "companyName": "Top Line Business Development Corp.",
+      "sector": "Industrial",
+      "subsector": "Electricity, Energy, Power and Water",
+      "cmpyId": 706,
+      "securityId": 724,
+      "listingDate": "Apr 08, 2025",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "TUBIG": {
+      "symbol": "TUBIG",
+      "companyName": "Tubig Pilipinas Holdings Inc.",
+      "sector": "Mining and Oil",
+      "subsector": "Mining",
+      "cmpyId": 637,
+      "securityId": 580,
+      "listingDate": "Oct 23, 2012",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "TUGS": {
+      "symbol": "TUGS",
+      "companyName": "Harbor Star Shipping Services, Inc.",
+      "sector": "Services",
+      "subsector": "Transportation Services",
+      "cmpyId": 644,
+      "securityId": 587,
+      "listingDate": "Oct 30, 2013",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "UBP": {
+      "symbol": "UBP",
+      "companyName": "Union Bank of the Philippines",
+      "sector": "Financials",
+      "subsector": "Banks",
+      "cmpyId": 167,
+      "securityId": 115,
+      "listingDate": "Jun 29, 1992",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "UNH": {
+      "symbol": "UNH",
+      "companyName": "Uniholdings Inc.",
+      "sector": "Property",
+      "subsector": "Property",
+      "cmpyId": 22,
+      "securityId": 367,
+      "listingDate": "Nov 21, 1985",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "UPM": {
+      "symbol": "UPM",
+      "companyName": "United Paragon Mining Corporation",
+      "sector": "Mining and Oil",
+      "subsector": "Mining",
+      "cmpyId": 168,
+      "securityId": 334,
+      "listingDate": "Aug 31, 1972",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "UPSON": {
+      "symbol": "UPSON",
+      "companyName": "Upson International Corp.",
+      "sector": "Services",
+      "subsector": "Retail",
+      "cmpyId": 700,
+      "securityId": 695,
+      "listingDate": "Apr 03, 2023",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "URC": {
+      "symbol": "URC",
+      "companyName": "Universal Robina Corporation",
+      "sector": "Industrial",
+      "subsector": "Food, Beverage & Tobacco",
+      "cmpyId": 124,
+      "securityId": 167,
+      "listingDate": "Mar 25, 1994",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "V": {
+      "symbol": "V",
+      "companyName": "Vantage Equities, Inc.",
+      "sector": "Financials",
+      "subsector": "Other Financial Institutions",
+      "cmpyId": 65,
+      "securityId": 135,
+      "listingDate": "Mar 30, 1993",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "VITA": {
+      "symbol": "VITA",
+      "companyName": "Vitarich Corporation",
+      "sector": "Industrial",
+      "subsector": "Food, Beverage & Tobacco",
+      "cmpyId": 28,
+      "securityId": 168,
+      "listingDate": "Feb 08, 1995",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "VLC": {
+      "symbol": "VLC",
+      "companyName": "Villar Land Holdings Corp.",
+      "sector": "Property",
+      "subsector": "Property",
+      "cmpyId": 661,
+      "securityId": 624,
+      "listingDate": "Jun 29, 2016",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "VLL": {
+      "symbol": "VLL",
+      "companyName": "Vista Land & Lifescapes, Inc.",
+      "sector": "Property",
+      "subsector": "Property",
+      "cmpyId": 607,
+      "securityId": 530,
+      "listingDate": "Jun 25, 2007",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "VMC": {
+      "symbol": "VMC",
+      "companyName": "Victorias Milling Company, Inc.",
+      "sector": "Industrial",
+      "subsector": "Food, Beverage & Tobacco",
+      "cmpyId": 123,
+      "securityId": 415,
+      "listingDate": "Nov 15, 1993",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "VREIT": {
+      "symbol": "VREIT",
+      "companyName": "VistaREIT, Inc.",
+      "sector": "Property",
+      "subsector": "Property",
+      "cmpyId": 695,
+      "securityId": 690,
+      "listingDate": "Jun 15, 2022",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "VVT": {
+      "symbol": "VVT",
+      "companyName": "Vivant Corporation",
+      "sector": "Industrial",
+      "subsector": "Electricity, Energy, Power & Water",
+      "cmpyId": 79,
+      "securityId": 133,
+      "listingDate": "Jun 23, 1994",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "WEB": {
+      "symbol": "WEB",
+      "companyName": "PhilWeb Corporation",
+      "sector": "Services",
+      "subsector": "Casinos & Gaming",
+      "cmpyId": 122,
+      "securityId": 136,
+      "listingDate": "Dec 08, 1969",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "WIN": {
+      "symbol": "WIN",
+      "companyName": "Wellex Industries, Incorporated",
+      "sector": "Property",
+      "subsector": "Property",
+      "cmpyId": 90,
+      "securityId": 229,
+      "listingDate": "Jan 09, 1958",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "WLCON": {
+      "symbol": "WLCON",
+      "companyName": "Wilcon Depot, Inc.",
+      "sector": "Services",
+      "subsector": "Retail",
+      "cmpyId": 665,
+      "securityId": 632,
+      "listingDate": "Mar 31, 2017",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "WPI": {
+      "symbol": "WPI",
+      "companyName": "Waterfront Philippines, Incorporated",
+      "sector": "Services",
+      "subsector": "Hotel & Leisure",
+      "cmpyId": 173,
+      "securityId": 228,
+      "listingDate": "Mar 17, 1995",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "X": {
+      "symbol": "X",
+      "companyName": "Xurpas Inc.",
+      "sector": "Small, Medium & Emerging Board",
+      "subsector": "Small, Medium & Emerging Board",
+      "cmpyId": 656,
+      "securityId": 607,
+      "listingDate": "Dec 02, 2014",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "XG": {
+      "symbol": "XG",
+      "companyName": "NexGen Energy Corp.",
+      "sector": "Small, Medium & Emerging Board",
+      "subsector": "Small, Medium & Emerging Board",
+      "cmpyId": 705,
+      "securityId": 717,
+      "listingDate": "Jul 16, 2024",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "ZHI": {
+      "symbol": "ZHI",
+      "companyName": "Zeus Holdings, Inc.",
+      "sector": "Holding Firms",
+      "subsector": "Holding Firms",
+      "cmpyId": 89,
+      "securityId": 232,
+      "listingDate": "Jul 15, 1991",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    }
+  }
+}

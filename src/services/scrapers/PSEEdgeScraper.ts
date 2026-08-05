@@ -452,3 +452,334 @@ export async function scrapeCompanyFundamentals(symbol: string, companyName: str
   const text = await fetchAndExtractDisclosureText(latest.edgeNo);
   return parseFinancialStatementText(text, symbol, `${EDGE_BASE}/openDiscViewer.do?edge_no=${latest.edgeNo}`);
 }
+
+// ── Multi-period financial history (real time series) ─────────────
+
+/** One point in a real multi-quarter financial series, parsed from a
+ * single PSE Edge quarterly filing. Null fields mean that specific filing
+ * didn't match the label regex — never a fabricated value. */
+export interface FinancialHistoryPoint {
+  period: string;             // the filing's announce date (e.g. "05/15/2026 04:30 PM")
+  asOfPeriod: string | null;  // e.g. "March 31, 2026"
+  revenue: number | null;
+  netIncome: number | null;
+  totalAssets: number | null;
+  totalEquity: number | null;
+  totalLiabilities: number | null;
+  eps: number | null;
+  sourceUrl: string;
+}
+
+export interface ParsedFinancialHistory {
+  symbol: string;
+  latest: ParsedFundamentals | null;
+  series: FinancialHistoryPoint[]; // oldest → newest
+}
+
+/**
+ * Fetch the last `periodsToFetch` quarterly filings for a company and parse
+ * each into a point of a real multi-quarter series — the ground truth the
+ * Financials chart can render instead of the synthetic market-cap model.
+ *
+ * NOTE on request volume: this makes `periodsToFetch` PSE Edge viewer
+ * requests per company (the latest + N-1 history filings), so ~N× the
+ * traffic of scrapeCompanyFundamentals. It is intentionally a separate,
+ * less-frequent (monthly) pipeline — see scripts/scrape-pse-financial-history.ts
+ * and .github/workflows/pse-financial-history-monthly.yml. The weekly
+ * fundamentals job keeps using scrapeCompanyFundamentals (latest only).
+ */
+export async function scrapeCompanyFinancialHistory(
+  symbol: string,
+  companyName: string,
+  periodsToFetch = 8,
+): Promise<ParsedFinancialHistory | null> {
+  const listings = await fetchDisclosureList(symbol, companyName, 'quarterly');
+  if (listings.length === 0) return null;
+
+  const selected = listings.slice(0, periodsToFetch);
+  const series: FinancialHistoryPoint[] = [];
+  let latest: ParsedFundamentals | null = null;
+
+  for (const listing of selected) {
+    const sourceUrl = `${EDGE_BASE}/openDiscViewer.do?edge_no=${listing.edgeNo}`;
+    const text = await fetchAndExtractDisclosureText(listing.edgeNo);
+    const parsed = parseFinancialStatementText(text, symbol, sourceUrl);
+    series.push({
+      period: listing.filingDate,
+      asOfPeriod: parsed.asOfPeriod,
+      revenue: parsed.revenue,
+      netIncome: parsed.netIncome,
+      totalAssets: parsed.totalAssets,
+      totalEquity: parsed.totalEquity,
+      totalLiabilities: parsed.totalLiabilities,
+      eps: parsed.eps,
+      sourceUrl,
+    });
+    if (!latest) latest = parsed;
+  }
+
+  // Series comes back newest-first (PSE sorted DESC); store oldest → newest.
+  return {
+    symbol: symbol.toUpperCase(),
+    latest,
+    series: series.slice(0, periodsToFetch).reverse(),
+  };
+}
+
+// ── Company Directory (sector/subsector) ──────────────────────────
+
+const COMPANY_DIR_SEARCH_ENDPOINT = `${EDGE_BASE}/companyDirectory/search.ax`;
+
+/** Real sector/subsector classification for a PSE-listed company, scraped
+ * from PSE Edge's company directory. The `cmpyId`/`securityId` are the
+ * numeric identifiers PSE Edge uses internally — `cmpyId` matches the
+ * values in KNOWN_CMPY_IDS above, confirming the two endpoints agree. */
+export interface PseCompanyDirectoryEntry {
+  symbol: string;
+  companyName: string;
+  sector: string;
+  subsector: string;
+  cmpyId: number | null;
+  securityId: number | null;
+  listingDate: string;
+  sourceUrl: string;
+}
+
+/**
+ * Retry an async operation with exponential backoff. Used to make transient
+ * network failures (timeouts, rate-limit responses) non-fatal during
+ * batch scraping — a single hiccup no longer gets silently recorded as
+ * "no data found" for a symbol that actually has real disclosures.
+ *
+ * - `retries` is the max number of *additional* attempts (so 3 retries =
+ *   4 total attempts).
+ * - Backoff starts at `baseDelayMs` (default 2000) and doubles each retry.
+ * - Only errors are retried; a `null` return is treated as a legitimate
+ *   "no result" outcome (e.g. no disclosure found), not a transient failure.
+ */
+export async function withRetry<T>(
+  fn: () => Promise<T>,
+  retries = 3,
+  baseDelayMs = 2000,
+): Promise<T> {
+  let lastError: unknown;
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      return await fn();
+    } catch (err) {
+      lastError = err;
+      if (attempt < retries) {
+        const delay = baseDelayMs * Math.pow(2, attempt);
+        const jitter = Math.random() * 200;
+        const msg = `Transient error (attempt ${attempt + 1}/${retries + 1}): ${err instanceof Error ? err.message : String(err)}. Retrying in ${Math.round(delay + jitter)}ms…`;
+        console.warn(`[retry] ${msg}`);
+        await new Promise((resolve) => setTimeout(resolve, delay + jitter));
+      }
+    }
+  }
+  throw lastError;
+}
+
+/**
+ * Fetch a single page of PSE Edge's company directory and parse the
+ * company/sector/subsector table. Confirmed live (2026-08-04): the table
+ * has class `list` with columns Company Name | Stock Symbol | Sector |
+ * Subsector | Listing Date, and each row has an onclick of
+ * `cmDetail('cmpyId','securityId')` giving the numeric company identifier.
+ * 6 pages total (282 companies, ~50 per page).
+ */
+export async function scrapeCompanyDirectoryPage(pageNo: number): Promise<PseCompanyDirectoryEntry[]> {
+  const response = await fetch(COMPANY_DIR_SEARCH_ENDPOINT, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'User-Agent': USER_AGENT,
+    },
+    body: new URLSearchParams({
+      pageNo: String(pageNo),
+      sector: 'ALL',
+      subsector: 'ALL',
+    }).toString(),
+    signal: AbortSignal.timeout(15_000),
+  });
+
+  if (!response.ok) {
+    throw new Error(`PSE Edge company directory fetch failed: HTTP ${response.status}`);
+  }
+
+  const html = await response.text();
+  return parseCompanyDirectoryHtml(html);
+}
+
+/**
+ * Parse a single page of the company directory HTML into typed records.
+ * Column order (confirmed live): Company Name | Stock Symbol | Sector |
+ * Subsector | Listing Date.
+ */
+export function parseCompanyDirectoryHtml(html: string): PseCompanyDirectoryEntry[] {
+  const $ = cheerio.load(html);
+  const rows: PseCompanyDirectoryEntry[] = [];
+
+  $('table.list tbody tr').each((_, el) => {
+    const cells = $(el).find('td');
+    if (cells.length < 5) return;
+
+    const companyName = $(cells[0]).text().trim();
+    const symbol = $(cells[1]).text().trim();
+    const sector = $(cells[2]).text().trim();
+    const subsector = $(cells[3]).text().trim();
+    const listingDate = $(cells[4]).text().trim();
+
+    if (!symbol || !sector) return;
+
+    const onclick = $(el).find('a').attr('onclick') ?? $(el).attr('onclick') ?? '';
+    const match = onclick.match(/cmDetail\('(\d+)','(\d+)'\)/);
+    const cmpyId = match ? parseInt(match[1], 10) : null;
+    const securityId = match ? parseInt(match[2], 10) : null;
+
+    rows.push({
+      symbol,
+      companyName,
+      sector,
+      subsector,
+      cmpyId,
+      securityId,
+      listingDate,
+      sourceUrl: COMPANY_DIR_SEARCH_ENDPOINT,
+    });
+  });
+
+  return rows;
+}
+
+/**
+ * End-to-end: page through all pages of PSE Edge's company directory and
+ * collect the full sector/subsector classification for every listed
+ * company (~282 companies across 6 pages). Returns an empty array rather
+ * than throwing on a per-page failure — individual page retries use
+ * exponential backoff so a transient hiccup doesn't lose an entire page.
+ */
+export async function scrapeCompanySectors(): Promise<PseCompanyDirectoryEntry[]> {
+  const all: PseCompanyDirectoryEntry[] = [];
+  const totalPages = 6;
+
+  for (let page = 1; page <= totalPages; page++) {
+    try {
+      const pageEntries = await withRetry(() => scrapeCompanyDirectoryPage(page));
+      all.push(...pageEntries);
+      console.log(`[sectors] page ${page}/${totalPages}: ${pageEntries.length} companies`);
+    } catch (err) {
+      console.error(`[sectors] page ${page} failed after retries:`, err instanceof Error ? err.message : err);
+    }
+    // Polite pause between pages
+    if (page < totalPages) await new Promise((resolve) => setTimeout(resolve, 500));
+  }
+
+  return all;
+}
+
+// ── Recent disclosures (real company news) ─────────────────────────
+
+export interface CompanyDisclosure {
+  symbol: string;
+  companyName: string;
+  formType: string;      // e.g. "4-30" (Material Info), "4-31" (Press Release), "13-1" (insider)
+  title: string;         // the disclosure category shown in PSE Edge's table (e.g. "Press Release")
+  filingDate: string;    // e.g. "Jul 28, 2026 03:57 PM"
+  edgeNo: string;
+  sourceUrl: string;
+}
+
+/**
+ * Fetch a company's most recent disclosures from PSE Edge WITHOUT a
+ * template filter — the full disclosure history (Material Information,
+ * Press Releases, insider-transaction forms, results announcements, etc.).
+ * Confirmed live for BDO (cmpy_id=260): returns real recent filings such
+ * as [4-30] Material Information/Transactions and [4-31] Press Release.
+ * These are genuine company announcements — a real "Company Disclosures"
+ * news feed, unlike templated placeholder headlines.
+ */
+export async function fetchCompanyDisclosures(
+  symbol: string,
+  companyName: string,
+  limit = 8,
+): Promise<CompanyDisclosure[]> {
+  const cmpyId = KNOWN_CMPY_IDS[symbol.toUpperCase()];
+  if (cmpyId === undefined) return [];
+
+  const response = await fetch(SEARCH_ENDPOINT, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'User-Agent': USER_AGENT,
+    },
+    body: new URLSearchParams({
+      keyword: String(cmpyId),
+      pageNo: '1',
+      sortType: 'date',
+      dateSortType: 'DESC',
+    }).toString(),
+    signal: AbortSignal.timeout(15_000),
+  });
+
+  if (!response.ok) {
+    throw new Error(`PSE Edge disclosure search failed: HTTP ${response.status}`);
+  }
+
+  const html = await response.text();
+  const rows = parseDisclosureListHtml(html);
+  return rows.slice(0, limit).map((row) => ({
+    symbol: symbol.toUpperCase(),
+    companyName,
+    formType: row.formType,
+    title: row.title,
+    filingDate: row.filingDate,
+    edgeNo: row.edgeNo,
+    sourceUrl: `${EDGE_BASE}/openDiscViewer.do?edge_no=${row.edgeNo}`,
+  }));
+}
+
+/**
+ * End-to-end: fetch the most recent disclosures for every company with a
+ * known `cmpy_id` (the ~280 in KNOWN_CMPY_IDS), with retry-with-backoff
+ * per company so a transient failure doesn't silently drop a symbol.
+ */
+export async function scrapeAllCompanyDisclosures(
+  limits = 8,
+  concurrency = 4,
+  delayMs = 1200,
+): Promise<Record<string, CompanyDisclosure[]>> {
+  const symbols = Object.keys(KNOWN_CMPY_IDS).sort();
+  const results: Record<string, CompanyDisclosure[]> = {};
+  let succeeded = 0;
+  let failed = 0;
+
+  for (let i = 0; i < symbols.length; i += concurrency) {
+    const batch = symbols.slice(i, i + concurrency);
+    const batchResults = await Promise.all(
+      batch.map(async (symbol) => {
+        try {
+          const recs = await withRetry(() => fetchCompanyDisclosures(symbol, symbol, limits), 2, 2000);
+          return { symbol, recs };
+        } catch (err) {
+          console.error(`[disclosures] ${symbol} failed after retries:`, err instanceof Error ? err.message : err);
+          return { symbol, recs: [] as CompanyDisclosure[] };
+        }
+      }),
+    );
+
+    for (const { symbol, recs } of batchResults) {
+      results[symbol] = recs;
+      if (recs.length > 0) succeeded++;
+      else {
+        failed++;
+        console.warn(`[disclosures] ${symbol}: no disclosures returned`);
+      }
+    }
+
+    if (i + concurrency < symbols.length) await new Promise((resolve) => setTimeout(resolve, delayMs));
+  }
+
+  console.log(`\n[disclosures] Done: ${succeeded} with disclosures, ${failed} empty out of ${symbols.length}.`);
+  return results;
+}

@@ -22,7 +22,18 @@
 import { writeFileSync } from 'fs';
 import { resolve } from 'path';
 import { getAllCompanies } from '../src/services/data/MasterCompanyRegistry.js';
-import { scrapeCompanyFundamentals, KNOWN_CMPY_IDS, type ParsedFundamentals } from '../src/services/scrapers/PSEEdgeScraper.js';
+import { scrapeCompanyFundamentals, withRetry, KNOWN_CMPY_IDS, type ParsedFundamentals } from '../src/services/scrapers/PSEEdgeScraper.js';
+
+/** Wrap a scrape call with exponential backoff retry so a transient network
+ * failure (timeout, rate-limit) doesn't get silently recorded as
+ * "no_disclosure_found" for a symbol that actually has real filings. */
+async function scrapeWithRetry(symbol: string, companyName: string): Promise<ParsedFundamentals | null> {
+  return withRetry(
+    () => scrapeCompanyFundamentals(symbol, companyName),
+    3,     // 3 retries (4 total attempts)
+    2000,  // 2s base backoff, doubling each retry
+  );
+}
 
 const OUTPUT_PATH = resolve(process.cwd(), 'data/pse-fundamentals.json');
 const CONCURRENCY = 3; // polite to PSE Edge — don't hammer it with dozens of parallel requests
@@ -50,7 +61,7 @@ async function main() {
       batch.map(async (symbol) => {
         const companyName = nameBySymbol.get(symbol) ?? symbol;
         try {
-          const fundamentals = await scrapeCompanyFundamentals(symbol, companyName);
+                    const fundamentals = await scrapeWithRetry(symbol, companyName);
           if (!fundamentals) {
             console.warn(`[${symbol}] no quarterly disclosure found for "${companyName}"`);
             return { symbol, data: { error: 'no_disclosure_found' } };

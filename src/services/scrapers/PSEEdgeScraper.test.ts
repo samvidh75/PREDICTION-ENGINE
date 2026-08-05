@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { parseDisclosureListHtml, parseFinancialStatementText, parsePublicOwnershipText } from './PSEEdgeScraper';
+import { parseDisclosureListHtml, parseFinancialStatementText, parsePublicOwnershipText, parseCompanyDirectoryHtml, withRetry } from './PSEEdgeScraper';
 
 describe('parsePublicOwnershipText', () => {
   it('extracts real values from realistic POR-1 text (verified against a live Ayala Land filing)', () => {
@@ -160,5 +160,99 @@ describe('parseDisclosureListHtml', () => {
       </table>
     `;
     expect(parseDisclosureListHtml(html)).toEqual([]);
+  });
+});
+
+describe('parseCompanyDirectoryHtml', () => {
+  // Table shape and the cmDetail('cmpyId','securityId') link pattern are
+  // confirmed against a live edge.pse.com.ph company directory response —
+  // this is the real markup shape, not a guess.
+  it('parses company rows with sector, subsector, and cmpy_id', () => {
+    const html = `
+      <table class="list">
+        <tbody>
+          <tr>
+            <td class="alignL"><a href="#" onclick="cmDetail('55','347');return false;">Asia Amalgamated Holdings Corporation</a></td>
+            <td class="alignC"><a href="#" onclick="cmDetail('55','347');return false;">AAA</a></td>
+            <td class="alignC">Holding Firms</td>
+            <td class="alignC">Holding Firms</td>
+            <td class="alignC">Mar 22, 1973</td>
+          </tr>
+          <tr>
+            <td class="alignL"><a href="#" onclick="cmDetail('260','100');return false;">BDO Unibank, Inc.</a></td>
+            <td class="alignC"><a href="#" onclick="cmDetail('260','100');return false;">BDO</a></td>
+            <td class="alignC">Financials</td>
+            <td class="alignC">Banks</td>
+            <td class="alignC">Jun 20, 2002</td>
+          </tr>
+        </tbody>
+      </table>
+    `;
+    const rows = parseCompanyDirectoryHtml(html);
+    expect(rows).toHaveLength(2);
+
+    expect(rows[0].symbol).toBe('AAA');
+    expect(rows[0].companyName).toBe('Asia Amalgamated Holdings Corporation');
+    expect(rows[0].sector).toBe('Holding Firms');
+    expect(rows[0].subsector).toBe('Holding Firms');
+    expect(rows[0].cmpyId).toBe(55);
+    expect(rows[0].securityId).toBe(347);
+
+    expect(rows[1].symbol).toBe('BDO');
+    expect(rows[1].sector).toBe('Financials');
+    expect(rows[1].subsector).toBe('Banks');
+    expect(rows[1].cmpyId).toBe(260);
+  });
+
+  it('returns empty array when no rows match (no fabrication)', () => {
+    const rows = parseCompanyDirectoryHtml('<html><body>No companies</body></html>');
+    expect(rows).toEqual([]);
+  });
+
+  it('leaves cmpy_id null when the onclick pattern is absent', () => {
+    const html = `
+      <table class="list">
+        <tbody>
+          <tr>
+            <td class="alignL">Some Company</td>
+            <td class="alignC">X</td>
+            <td class="alignC">Services</td>
+            <td class="alignC">Retail</td>
+            <td class="alignC">Jan 01, 2000</td>
+          </tr>
+        </tbody>
+      </table>
+    `;
+    const rows = parseCompanyDirectoryHtml(html);
+    expect(rows).toHaveLength(1);
+    expect(rows[0].symbol).toBe('X');
+    expect(rows[0].sector).toBe('Services');
+    expect(rows[0].cmpyId).toBeNull();
+  });
+});
+
+describe('withRetry', () => {
+  it('returns the result on first success without retrying', async () => {
+    let calls = 0;
+    const result = await withRetry(async () => { calls++; return 'ok'; });
+    expect(result).toBe('ok');
+    expect(calls).toBe(1);
+  });
+
+  it('retries transient errors and succeeds on a later attempt', async () => {
+    let calls = 0;
+    const result = await withRetry(async () => {
+      calls++;
+      if (calls < 3) throw new Error('transient timeout');
+      return 'recovered';
+    }, 3, 1); // short backoff for test speed
+    expect(result).toBe('recovered');
+    expect(calls).toBe(3);
+  });
+
+  it('throws after exhausting all retries', async () => {
+    let calls = 0;
+    await expect(withRetry(async () => { calls++; throw new Error('persistent'); }, 2, 1)).rejects.toThrow('persistent');
+    expect(calls).toBe(3); // initial + 2 retries
   });
 });

@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { PSE_STOCKS, PSE_SECTORS } from './_lib/data/universe.js';
+import { PSE_STOCKS, getPseSector } from './_lib/data/universe.js';
 import { cacheGet, cacheSet } from './_lib/serverlessCache.js';
 
 /**
@@ -22,19 +22,15 @@ interface UniverseQuote {
   change: number;
   changePercent: number;
   volume: number;
-  /** Only populated for the PSEi-30 (the only stocks with a verified sector
-   * classification in this codebase — see PSE_SECTORS in _lib/data/universe.ts).
-   * `null` for everything else rather than guessing. */
+  /** Populated from real PSE Edge company-directory sector data for all
+   * ~282 common shares (see data/pse-sectors.json and getPseSector), with
+   * a static PSEi-30 fallback. `null` only for symbols with no verified
+   * classification anywhere — never guessed. */
   sector: string | null;
 }
 
 const CACHE_KEY = 'market-universe:all';
 const CACHE_TTL_SECONDS = 240;
-
-const sectorBySymbol = new Map<string, string>();
-for (const [sector, symbols] of Object.entries(PSE_SECTORS)) {
-  for (const symbol of symbols) sectorBySymbol.set(symbol, sector);
-}
 
 async function fetchQuote(symbol: string, name: string): Promise<UniverseQuote | null> {
   try {
@@ -61,7 +57,7 @@ async function fetchQuote(symbol: string, name: string): Promise<UniverseQuote |
       change: Number((price - prevClose).toFixed(2)),
       changePercent: Number(changePercent.toFixed(2)),
       volume: Number(volume) || 0,
-      sector: sectorBySymbol.get(symbol) ?? null,
+      sector: getPseSector(symbol),
     };
   } catch {
     return null;

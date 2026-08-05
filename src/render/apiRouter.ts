@@ -45,6 +45,9 @@ import { DeterministicResearchProvider } from "../services/ai/DeterministicResea
 import { dbAdapter } from "../db/DatabaseAdapter.js";
 import { AsymmetricDataGateway } from "../db/AsymmetricDataGateway.js";
 import { loadRealPseOwnership } from "../services/scrapers/PSEOwnershipData.js";
+import { getSectorBySymbol, getSubsectorBySymbol } from "../services/scrapers/PSESectorsData.js";
+import { loadPseDisclosures } from "../services/scrapers/PSEDisclosuresData.js";
+import { loadPseFinancialHistory } from "../services/scrapers/PSEFinancialHistoryData.js";
 import {
   registerCommercialRoutes,
   registerIntelligenceContextRoutes,
@@ -344,6 +347,31 @@ async function loadYFinanceFinancialSeries(_symbol: string): Promise<{
 }
 
 async function loadRealFinancialSeries(symbol: string) {
+  // 1. Real PSE Edge quarterly-filing history — data/pse-financial-history.json
+  // (generated monthly by scripts/scrape-pse-financial-history.ts). Each point
+  // is parsed from a real 17-Q filing via parseFinancialStatementText, so these
+  // are genuine reported revenue/net-income figures, not a model. We only have
+  // the quarterly series here (annual reports aren't fetched in the monthly job),
+  // so annual is left empty — the frontend then renders the real Quarterly tab
+  // and hides its "Estimated" disclaimer (dataSources.financials === 'pseApi').
+  const history = loadPseFinancialHistory(symbol);
+  if (history) {
+    const quarterly = { revenue: [] as Array<{ period: string; value: number }>, profit: [] as Array<{ period: string; value: number }>, ebitda: [] as Array<{ period: string; value: number }> };
+    for (const point of history.series) {
+      const period = point.asOfPeriod ?? point.period;
+      if (point.revenue != null) quarterly.revenue.push({ period, value: point.revenue });
+      if (point.netIncome != null) quarterly.profit.push({ period, value: point.netIncome });
+      // EBITDA isn't parsed out of PSE 17-Q statements — leave the array empty
+      // (the chart simply renders no EBITDA series) rather than modelling it.
+    }
+    return {
+      annual: { revenue: [] as Array<{ period: string; value: number }>, profit: [] as Array<{ period: string; value: number }>, ebitda: [] as Array<{ period: string; value: number }> },
+      quarterly,
+      dataSource: 'pseApi' as const,
+    };
+  }
+
+  // 2. Existing (Screener.in / yfinance) path — both stubs return null for PSE.
   const html = await fetchScreenerPage(symbol, true);
   if (html) {
     const annualTable = extractScreenerTableByHeading(html, "Profit & Loss");
@@ -728,7 +756,15 @@ export default async function registerApiRoutes(server: FastifyInstance) {
     const change = quote.change || 0;
     const changePercent = quote.changePercent || 0;
     const marketCapCr = Math.round(((meta?.marketCap ?? (cachedFinancials?.marketCap ?? 0)) / 1e7) * 100) / 100;
+    // Real PSE Edge company-directory sector when available (full universe);
+    // falls back to the provider's sector string. The estimation tables below
+    // (SECTOR_PS / SECTOR_PE_MEDIAN / SECTOR_NET_MARGIN) are keyed by their
+    // own sector taxonomy, so estimation keeps using `sector` while the real
+    // PSE sector is surfaced to the frontend as `displaySector`.
+    const realSector = getSectorBySymbol(cleanSymbol);
+    const realSubsector = getSubsectorBySymbol(cleanSymbol);
     const sector: string = (fundData.sector as string) || "Diversified";
+    const displaySector: string = realSector ?? sector;
     const pe = n(fundData.pe_ratio) ?? null;
     const pb = n(fundData.pb_ratio) ?? null;
     const roe = n(fundData.roe ?? fundData.return_on_equity) ?? null;
@@ -746,6 +782,12 @@ export default async function registerApiRoutes(server: FastifyInstance) {
     const financialsData = realFinancialsData ?? deriveFinancials(marketCapCr, pe, sector, revGrowth, profGrowth);
     const realShareholdingData = await loadRealShareholdingSeries(cleanSymbol);
     const realOwnership = loadRealPseOwnership(cleanSymbol);
+    // Real PSE Edge disclosure records (Press Releases, Material
+    // Information, insider forms, results announcements) — genuine company
+    // filings with links to the real filing, used as the honest fallback
+    // when no live news feed is available (previously this fell back to
+    // fabricated placeholder headlines — that has been removed).
+    const realDisclosures = loadPseDisclosures(cleanSymbol);
     // Real (see pseOwnershipProvider.ts) when available — a PSE Public
     // Ownership Report only reports insider % vs public %, not a
     // fabricated foreign/domestic institutional split (deriveShareholding
@@ -783,8 +825,8 @@ export default async function registerApiRoutes(server: FastifyInstance) {
       symbol,
       companyName: gatewayMeta?.companyName || gatewayMeta?.name || symbol,
       exchange: "PSE" as "PSE" | "PSE",
-      sector,
-      industry: sector,
+      sector: displaySector,
+      industry: realSubsector ?? displaySector,
       price: { current: price, changeAbs: change, changePercent, marketCap: marketCapCr },
       fundamentals: { pe, industryPe, pb, dividendYield: divYld, eps },
       roe, debtToEquity: de, revenueGrowth: revGrowth, profitGrowth: profGrowth,
@@ -810,7 +852,7 @@ export default async function registerApiRoutes(server: FastifyInstance) {
         { label: "ROE %", company: roe ? roe.toFixed(1) : "—", sectorMedian: "15.0" },
         { label: "Rev Growth %", company: revGrowth ? revGrowth.toFixed(1) : "—", sectorMedian: "12.0" },
       ],
-      description: `${symbol} operates in the ${sector} sector.`,
+      description: `${symbol} operates in the ${displaySector} sector.`,
       companyProfile: {
         founded: known?.founded || "",
         ceo: "",
@@ -822,10 +864,22 @@ export default async function registerApiRoutes(server: FastifyInstance) {
       },
       financials: financialsData,
       shareholding: shareholdingData,
-      news: activeNews && activeNews.length > 0 ? activeNews : [
-        { headline: "Quarterly results show steady performance", source: "Lensory Research", time: new Date(Date.now() - 86400000).toISOString() },
-        { headline: "Sector outlook remains positive for coming quarters", source: "Financial Express", time: new Date(Date.now() - 172800000).toISOString() },
-      ],
+      // Real news from the market-data feed when available; otherwise real
+      // PSE Edge disclosure records; otherwise an honest empty array (the
+      // frontend renders a "no news/disclosures available" state). Never
+      // templated/fabricated placeholder headlines.
+      news: activeNews && activeNews.length > 0
+        ? activeNews
+        : realDisclosures.length > 0
+          ? realDisclosures.map((d, i) => ({
+              headline: `${d.title} (${d.formType})`,
+              source: "PSE Edge Disclosure",
+              time: d.filingDate,
+              link: d.sourceUrl,
+              publishedAt: d.filingDate,
+              disclosure: true,
+            }))
+          : [],
       dcf: {
         fairValuePerShare: dcf.fairValuePerShare,
         currentPrice: dcf.currentPrice,
@@ -847,7 +901,16 @@ export default async function registerApiRoutes(server: FastifyInstance) {
         // reflects whether financialsData came from a verified source.
         financials: realFinancialsData?.dataSource ?? 'synthetic',
         shareholding: realShareholdingData ? 'real' : (realOwnership ? 'real' : 'synthetic'),
-        thesis: fundData?.pe_ratio ? 'real' : 'yahoo',
+        // 'real' = live news feed, 'disclosures' = real PSE Edge filings,
+        // 'unavailable' = neither (honest empty feed, never fabricated).
+        news: activeNews && activeNews.length > 0 ? 'real' : (realDisclosures.length > 0 ? 'disclosures' : 'unavailable'),
+        // The Fastify stock handler builds its thesis from a fixed score set
+        // (health is hardcoded 50 here), so `generateThesis` always returns
+        // the same templated "Watch"/"quality needs improvement" text — it is
+        // NOT grounded in real per-stock data, so label it honestly as
+        // 'synthetic' rather than 'real'/'yahoo'. The Vercel variant
+        // (api/stock/[symbol].ts) uses a real grounded LLM instead.
+        thesis: 'synthetic',
       },
       priceHistory,
     };

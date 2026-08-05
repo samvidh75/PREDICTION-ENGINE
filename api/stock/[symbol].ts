@@ -1,8 +1,11 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { PSE_STOCKS, PSE_SECTORS } from '../_lib/data/universe.js';
+import { PSE_STOCKS, PSE_SECTORS, getPseSector } from '../_lib/data/universe.js';
 import { fetchEodhdHistory, computeFiftyTwoWeekRange, toChartSeries } from '../_lib/services/eodhdClient.js';
 import { fetchPSEFundamentals, calculatePSEHealthScore, generatePSEFinancialHistory } from '../_lib/services/pseFundamentalsProvider.js';
 import { loadRealPseOwnership } from '../../src/services/scrapers/PSEOwnershipData.js';
+import { getSubsectorBySymbol } from '../../src/services/scrapers/PSESectorsData.js';
+import { loadPseDisclosures } from '../../src/services/scrapers/PSEDisclosuresData.js';
+import { loadPseFinancialHistory } from '../../src/services/scrapers/PSEFinancialHistoryData.js';
 
 // Inline health scoring. Checks ~17 distinct metric fields across 6 factor
 // groups below (valuation, quality, growth, momentum, risk, health) — most
@@ -149,10 +152,13 @@ function isPSESymbol(symbol: string): boolean {
 
 function buildProfile(symbol: string): { name: string; sector: string; industry: string; description: string } {
   const override = PSE_PROFILE_OVERRIDES[symbol];
+  // Prefer the curated override (most descriptive), then real PSE Edge
+  // company-directory sector data (data/pse-sectors.json), then the static
+  // PSEi-30 map, then an honest placeholder — never a guessed sector.
   return {
     name: symbolToName.get(symbol) || symbol,
-    sector: override?.sector || symbolToUniverseSector.get(symbol) || 'PSE Listed',
-    industry: override?.industry || 'Unknown',
+    sector: override?.sector || getPseSector(symbol) || symbolToUniverseSector.get(symbol) || 'PSE Listed',
+    industry: override?.industry || getSubsectorBySymbol(symbol) || 'Unknown',
     description: override?.description || '',
   };
 }
@@ -382,6 +388,34 @@ export default async function handler(
       }),
     ]);
 
+    // Real PSE Edge disclosure records (Press Releases, Material
+    // Information, etc.) as the honest fallback when the live news feed
+    // returns nothing — never templated placeholder headlines.
+    const realDisclosures = loadPseDisclosures(symbol);
+
+    // Real multi-quarter financial series from PSE Edge 17-Q filings
+    // (data/pse-financial-history.json, refreshed by the monthly
+    // scrape-pse-financial-history pipeline). When present, the Financials
+    // chart renders genuine reported revenue/profit instead of the
+    // synthetic market-cap/sector-median model — see financials/dataSources
+    // below.
+    const realFinancialHistory = loadPseFinancialHistory(symbol);
+    const realFinancials = realFinancialHistory
+      ? {
+          annual: { revenue: [], profit: [], ebitda: [] },
+          quarterly: {
+            revenue: realFinancialHistory.series
+              .filter((p) => p.revenue != null)
+              .map((p) => ({ period: p.asOfPeriod ?? p.period, value: p.revenue as number })),
+            profit: realFinancialHistory.series
+              .filter((p) => p.netIncome != null)
+              .map((p) => ({ period: p.asOfPeriod ?? p.period, value: p.netIncome as number })),
+            ebitda: [], // not parsed from PSE 17-Q — left empty, never modeled
+          },
+          dataSource: 'pseApi' as const,
+        }
+      : null;
+
     const response = {
       symbol,
       name: companyName,
@@ -439,22 +473,34 @@ export default async function handler(
             outstandingShares: realOwnership.outstandingShares,
           }]
         : [],
-      news: liveNews,
+      news: liveNews && liveNews.length > 0
+        ? liveNews
+        : realDisclosures.length > 0
+          ? realDisclosures.map((d) => ({
+              headline: `${d.title} (${d.formType})`,
+              source: 'PSE Edge Disclosure',
+              time: d.filingDate,
+              link: d.sourceUrl,
+              publishedAt: d.filingDate,
+              disclosure: true,
+            }))
+          : [],
       thesis,
-      financials: generatePSEFinancialHistory(symbol, fundamentalsData.marketCap ?? priceData.marketCap ?? null, profile.sector),
-      // generatePSEFinancialHistory is always a market-cap/sector-medians
-      // model, never real reported financials — no verified free source for
-      // PSE revenue/profit/EBITDA is wired in (see StockPage.tsx's
-      // disclaimer, which reads this field).
+      financials: realFinancials ?? generatePSEFinancialHistory(symbol, fundamentalsData.marketCap ?? priceData.marketCap ?? null, profile.sector),
+      // generatePSEFinancialHistory is the synthetic market-cap/sector-median
+      // model; realFinancials (when present) is genuine reported quarterly
+      // figures from PSE Edge 17-Q filings — see realFinancials above.
       dataSources: {
-        // 'partial-real': eps/roe/debtToEquity came from a real PSE Edge
-        // filing (see pseFundamentalsProvider.ts's isReal), but the
-        // multi-year revenue/profit/EBITDA series shown in the chart is
-        // still always the synthetic model — PSE Edge only gives the
-        // latest single quarter, not a history.
-        financials: fundamentalsData.isReal ? 'partial-real' : 'synthetic',
+        // 'pseApi' = real reported revenue/profit from PSE Edge quarterly
+        // filings; 'partial-real' = the latest single quarter's EPS/ROE/D-E
+        // is real but the multi-quarter chart series is still the synthetic
+        // model; 'synthetic' = model throughout.
+        financials: realFinancials ? 'pseApi' : (fundamentalsData.isReal ? 'partial-real' : 'synthetic'),
         shareholding: realOwnership ? 'real' : 'unavailable',
         thesis: thesis.thesis.includes('is not currently available') ? 'unavailable' : 'real',
+        // 'real' = live news feed, 'disclosures' = real PSE Edge filings,
+        // 'unavailable' = neither (honest empty feed, never fabricated).
+        news: liveNews && liveNews.length > 0 ? 'real' : (realDisclosures.length > 0 ? 'disclosures' : 'unavailable'),
       },
       priceTargets: fundamentalsData.targetMeanPrice ? { mean: fundamentalsData.targetMeanPrice, high: Math.round(fundamentalsData.targetMeanPrice * 1.15 * 100) / 100, low: Math.round(fundamentalsData.targetMeanPrice * 0.85 * 100) / 100 } : null,
       relatedStocks: [],

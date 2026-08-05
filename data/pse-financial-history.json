@@ -1,0 +1,451 @@
+{
+  "generatedAt": "2026-08-05T09:18:33.197Z",
+  "source": "edge.pse.com.ph",
+  "periodsPerCompany": 8,
+  "results": {
+    "AAA": {
+      "error": "no_disclosure_found"
+    },
+    "AB": {
+      "symbol": "AB",
+      "latest": {
+        "symbol": "AB",
+        "asOfPeriod": "Mar 31, 2026",
+        "totalAssets": 967936987,
+        "totalLiabilities": 3244575,
+        "totalEquity": 964692412,
+        "netIncome": 508335,
+        "revenue": 0,
+        "eps": 0,
+        "sharesOutstanding": null,
+        "roe": 0.05,
+        "debtToEquity": 0,
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=0c43a248c514ff2664d70b69f0a3140b",
+        "scrapedAt": "2026-08-05T09:18:16.116Z"
+      },
+      "series": [
+        {
+          "period": "Aug 14, 2024 09:47 AM",
+          "asOfPeriod": "Jun 30, 2024",
+          "revenue": 0,
+          "netIncome": 1265769,
+          "totalAssets": 970560550,
+          "totalEquity": 969288832,
+          "totalLiabilities": 1271718,
+          "eps": 0,
+          "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=8e5b23890bede09dabca0fa0c5b4e4d0"
+        },
+        {
+          "period": "Nov 13, 2024 01:02 PM",
+          "asOfPeriod": "Sep 30, 2024",
+          "revenue": 0,
+          "netIncome": 1379211,
+          "totalAssets": 919120305,
+          "totalEquity": 918036733,
+          "totalLiabilities": 1083572,
+          "eps": 0,
+          "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=1df71eef05e38294abca0fa0c5b4e4d0"
+        },
+        {
+          "period": "May 14, 2025 02:43 PM",
+          "asOfPeriod": "Mar 31, 2025",
+          "revenue": 0,
+          "netIncome": 427746,
+          "totalAssets": 948926133,
+          "totalEquity": 945470571,
+          "totalLiabilities": 3455561,
+          "eps": 0,
+          "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=3814c59fb7b38429ec6e1601ccee8f59"
+        },
+        {
+          "period": "Aug 14, 2025 08:04 AM",
+          "asOfPeriod": "Jun 30, 2025",
+          "revenue": 0,
+          "netIncome": 1503425,
+          "totalAssets": 930150663,
+          "totalEquity": 926956237,
+          "totalLiabilities": 3194426,
+          "eps": 0,
+          "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=db108c3bca56b055ec6e1601ccee8f59"
+        },
+        {
+          "period": "Nov 14, 2025 11:47 AM",
+          "asOfPeriod": "Sep 30, 2025",
+          "revenue": 0,
+          "netIncome": 1930620,
+          "totalAssets": 964392553,
+          "totalEquity": 961096472,
+          "totalLiabilities": 3296081,
+          "eps": 0,
+          "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=85c8dd12ed331290ec6e1601ccee8f59"
+        },
+        {
+          "period": "May 15, 2026 08:22 AM",
+          "asOfPeriod": "Mar 31, 2026",
+          "revenue": 0,
+          "netIncome": 508335,
+          "totalAssets": 967936987,
+          "totalEquity": 964692412,
+          "totalLiabilities": 3244575,
+          "eps": 0,
+          "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=0c43a248c514ff2664d70b69f0a3140b"
+        }
+      ]
+    },
+    "ABA": {
+      "symbol": "ABA",
+      "latest": {
+        "symbol": "ABA",
+        "asOfPeriod": "Mar 31, 2026",
+        "totalAssets": 27913865369,
+        "totalLiabilities": 4302961677,
+        "totalEquity": 23610903692,
+        "netIncome": 34836857,
+        "revenue": 274566,
+        "eps": 0.37,
+        "sharesOutstanding": null,
+        "roe": 0.15,
+        "debtToEquity": 0.18,
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=b12e9585d5bf188064d70b69f0a3140b",
+        "scrapedAt": "2026-08-05T09:18:22.498Z"
+      },
+      "series": [
+        {
+          "period": "Aug 14, 2024 09:42 AM",
+          "asOfPeriod": "Jun 30, 2024",
+          "revenue": 121279153,
+          "netIncome": 85119978,
+          "totalAssets": 22796691367,
+          "totalEquity": 18950398170,
+          "totalLiabilities": 3846293196,
+          "eps": 0.02,
+          "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=0fd220949b3632f2abca0fa0c5b4e4d0"
+        },
+        {
+          "period": "Nov 12, 2024 04:17 PM",
+          "asOfPeriod": "Sep 30, 2024",
+          "revenue": 6473138,
+          "netIncome": 32333476,
+          "totalAssets": 22759630238,
+          "totalEquity": 18917220720,
+          "totalLiabilities": 3842409518,
+          "eps": 0,
+          "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=0f459096ff9aa85aabca0fa0c5b4e4d0"
+        },
+        {
+          "period": "May 20, 2025 01:04 PM",
+          "asOfPeriod": "Mar 31, 2025",
+          "revenue": 142457469,
+          "netIncome": 107277964,
+          "totalAssets": 26271829271,
+          "totalEquity": 21806318413,
+          "totalLiabilities": 4465510859,
+          "eps": 0.02,
+          "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=0601f48b3b4110e4ec6e1601ccee8f59"
+        },
+        {
+          "period": "Aug 20, 2025 03:43 PM",
+          "asOfPeriod": "Jun 30, 2025",
+          "revenue": 2868846,
+          "netIncome": 26611923,
+          "totalAssets": 26253960539,
+          "totalEquity": 21788861131,
+          "totalLiabilities": 4465099408,
+          "eps": 0.01,
+          "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=7f55e4c1a3e81c70ec6e1601ccee8f59"
+        },
+        {
+          "period": "Nov 12, 2025 09:21 AM",
+          "asOfPeriod": "Sep 30, 2025",
+          "revenue": 31523221,
+          "netIncome": 2002840,
+          "totalAssets": 26110290296,
+          "totalEquity": 21687004401,
+          "totalLiabilities": 4423285895,
+          "eps": 0,
+          "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=11918e700dbdbf34ec6e1601ccee8f59"
+        },
+        {
+          "period": "May 15, 2026 02:08 PM",
+          "asOfPeriod": "Mar 31, 2026",
+          "revenue": 274566,
+          "netIncome": 34836857,
+          "totalAssets": 27913865369,
+          "totalEquity": 23610903692,
+          "totalLiabilities": 4302961677,
+          "eps": 0.37,
+          "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=b12e9585d5bf188064d70b69f0a3140b"
+        }
+      ]
+    },
+    "ABG": {
+      "symbol": "ABG",
+      "latest": {
+        "symbol": "ABG",
+        "asOfPeriod": "Mar 31, 2026",
+        "totalAssets": 251192774,
+        "totalLiabilities": 3165105,
+        "totalEquity": 248027669,
+        "netIncome": 18691,
+        "revenue": 1745309,
+        "eps": 0,
+        "sharesOutstanding": null,
+        "roe": 0.01,
+        "debtToEquity": 0.01,
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=ba2594838d9104c964d70b69f0a3140b",
+        "scrapedAt": "2026-08-05T09:18:22.735Z"
+      },
+      "series": [
+        {
+          "period": "Aug 13, 2024 01:17 PM",
+          "asOfPeriod": "Jun 30, 2024",
+          "revenue": 2150610,
+          "netIncome": 206492,
+          "totalAssets": 252368337,
+          "totalEquity": 251524177,
+          "totalLiabilities": 844160,
+          "eps": 0,
+          "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=c19aebb7a8c16a68abca0fa0c5b4e4d0"
+        },
+        {
+          "period": "Nov 15, 2024 07:11 AM",
+          "asOfPeriod": "Sep 30, 2024",
+          "revenue": 2266834,
+          "netIncome": 393689,
+          "totalAssets": 252565475,
+          "totalEquity": 251130488,
+          "totalLiabilities": 1434987,
+          "eps": 0,
+          "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=dd8d1eaf52d2069cabca0fa0c5b4e4d0"
+        },
+        {
+          "period": "May 09, 2025 11:07 AM",
+          "asOfPeriod": "Mar 31, 2025",
+          "revenue": 1477066,
+          "netIncome": 172618,
+          "totalAssets": 251756685,
+          "totalEquity": 250369189,
+          "totalLiabilities": 1387496,
+          "eps": 0,
+          "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=5bf349aa1c94ec9cec6e1601ccee8f59"
+        },
+        {
+          "period": "Jul 21, 2025 11:00 AM",
+          "asOfPeriod": "Jun 30, 2025",
+          "revenue": 2200921,
+          "netIncome": 487345,
+          "totalAssets": 250634783,
+          "totalEquity": 249881844,
+          "totalLiabilities": 752939,
+          "eps": 0,
+          "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=2a9a5ae1b3ef4f83ec6e1601ccee8f59"
+        },
+        {
+          "period": "Jul 24, 2025 09:51 AM",
+          "asOfPeriod": "Jun 30, 2025",
+          "revenue": 2200921,
+          "netIncome": 487345,
+          "totalAssets": 250634783,
+          "totalEquity": 249881844,
+          "totalLiabilities": 752939,
+          "eps": 0,
+          "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=ee1411af836f28c2ec6e1601ccee8f59"
+        },
+        {
+          "period": "Nov 18, 2025 03:26 PM",
+          "asOfPeriod": "Sep 30, 2025",
+          "revenue": 1916849,
+          "netIncome": 1015253,
+          "totalAssets": 249652972,
+          "totalEquity": 248866590,
+          "totalLiabilities": 786382,
+          "eps": 0,
+          "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=b44c0201185404b2ec6e1601ccee8f59"
+        },
+        {
+          "period": "May 20, 2026 02:23 PM",
+          "asOfPeriod": "Mar 31, 2026",
+          "revenue": 1745309,
+          "netIncome": 18691,
+          "totalAssets": 251192774,
+          "totalEquity": 248027669,
+          "totalLiabilities": 3165105,
+          "eps": 0,
+          "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=ba2594838d9104c964d70b69f0a3140b"
+        }
+      ]
+    },
+    "ABS": {
+      "symbol": "ABS",
+      "latest": {
+        "symbol": "ABS",
+        "asOfPeriod": "Mar 31, 2026",
+        "totalAssets": 33956611,
+        "totalLiabilities": 34022724,
+        "totalEquity": 66113,
+        "netIncome": 813202,
+        "revenue": 3334391,
+        "eps": 0.77,
+        "sharesOutstanding": null,
+        "roe": 1230.02,
+        "debtToEquity": 514.61,
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=1cf71e7a473c40b364d70b69f0a3140b",
+        "scrapedAt": "2026-08-05T09:18:29.954Z"
+      },
+      "series": [
+        {
+          "period": "Aug 14, 2024 04:21 PM",
+          "asOfPeriod": "Jun 30, 2024",
+          "revenue": 3707518,
+          "netIncome": 1133986,
+          "totalAssets": 50922074,
+          "totalEquity": 7000799,
+          "totalLiabilities": 43921275,
+          "eps": 1.3,
+          "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=95f0d877d6440266abca0fa0c5b4e4d0"
+        },
+        {
+          "period": "Nov 15, 2024 11:12 AM",
+          "asOfPeriod": "Sep 30, 2024",
+          "revenue": 4331820,
+          "netIncome": 459647,
+          "totalAssets": 51249734,
+          "totalEquity": 6126448,
+          "totalLiabilities": 45123286,
+          "eps": 0.44,
+          "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=d845b465a0e0d534abca0fa0c5b4e4d0"
+        },
+        {
+          "period": "May 16, 2025 12:16 PM",
+          "asOfPeriod": "Mar 31, 2025",
+          "revenue": 4231443,
+          "netIncome": 499734,
+          "totalAssets": 44445207,
+          "totalEquity": 2020614,
+          "totalLiabilities": 42424593,
+          "eps": 0.48,
+          "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=b6b35b3c83796e68ec6e1601ccee8f59"
+        },
+        {
+          "period": "Aug 13, 2025 11:02 AM",
+          "asOfPeriod": "Jun 30, 2025",
+          "revenue": 4043169,
+          "netIncome": 352738,
+          "totalAssets": 43393762,
+          "totalEquity": 1691503,
+          "totalLiabilities": 41702259,
+          "eps": 0.3,
+          "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=867963bd28b440b4ec6e1601ccee8f59"
+        },
+        {
+          "period": "Nov 17, 2025 12:39 PM",
+          "asOfPeriod": "Sep 30, 2025",
+          "revenue": 3475309,
+          "netIncome": 1388963,
+          "totalAssets": 38535985,
+          "totalEquity": 1590699,
+          "totalLiabilities": 36945286,
+          "eps": 1.43,
+          "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=1e2ad3ecb575aadeec6e1601ccee8f59"
+        },
+        {
+          "period": "May 18, 2026 09:03 AM",
+          "asOfPeriod": "Mar 31, 2026",
+          "revenue": 3334391,
+          "netIncome": 813202,
+          "totalAssets": 33956611,
+          "totalEquity": 66113,
+          "totalLiabilities": 34022724,
+          "eps": 0.77,
+          "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=1cf71e7a473c40b364d70b69f0a3140b"
+        }
+      ]
+    },
+    "ABSP": {
+      "symbol": "ABSP",
+      "latest": {
+        "symbol": "ABSP",
+        "asOfPeriod": "Mar 31, 2026",
+        "totalAssets": 22864149,
+        "totalLiabilities": 22864149,
+        "totalEquity": 0,
+        "netIncome": 0,
+        "revenue": 986540,
+        "eps": 0,
+        "sharesOutstanding": null,
+        "roe": null,
+        "debtToEquity": null,
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=cd5d0696e8b6d9ef64d70b69f0a3140b",
+        "scrapedAt": "2026-08-05T09:18:29.967Z"
+      },
+      "series": [
+        {
+          "period": "Aug 14, 2024 01:23 PM",
+          "asOfPeriod": "Jun 30, 2024",
+          "revenue": 1168255,
+          "netIncome": 0,
+          "totalAssets": 13169951,
+          "totalEquity": 0,
+          "totalLiabilities": 13169951,
+          "eps": 0,
+          "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=0619c041479441e7abca0fa0c5b4e4d0"
+        },
+        {
+          "period": "Nov 13, 2024 01:20 PM",
+          "asOfPeriod": "Sep 30, 2024",
+          "revenue": 375399,
+          "netIncome": 0,
+          "totalAssets": 15609807,
+          "totalEquity": 0,
+          "totalLiabilities": 15609807,
+          "eps": 0,
+          "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=2a889782b4062763abca0fa0c5b4e4d0"
+        },
+        {
+          "period": "May 14, 2025 11:42 AM",
+          "asOfPeriod": "Mar 31, 2025",
+          "revenue": 820799,
+          "netIncome": 0,
+          "totalAssets": 11970135,
+          "totalEquity": 0,
+          "totalLiabilities": 11970135,
+          "eps": 0,
+          "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=3e5be56063b34516ec6e1601ccee8f59"
+        },
+        {
+          "period": "Aug 14, 2025 07:46 AM",
+          "asOfPeriod": "Jun 30, 2025",
+          "revenue": 913892,
+          "netIncome": 0,
+          "totalAssets": 12050314,
+          "totalEquity": 0,
+          "totalLiabilities": 12050314,
+          "eps": 0,
+          "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=dea04599f7c2c6e4ec6e1601ccee8f59"
+        },
+        {
+          "period": "Nov 14, 2025 04:38 PM",
+          "asOfPeriod": "Sep 30, 2025",
+          "revenue": 1255970,
+          "netIncome": 0,
+          "totalAssets": 11281614,
+          "totalEquity": 0,
+          "totalLiabilities": 11281614,
+          "eps": 0,
+          "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=15aaed29d2b6d611ec6e1601ccee8f59"
+        },
+        {
+          "period": "May 14, 2026 11:43 AM",
+          "asOfPeriod": "Mar 31, 2026",
+          "revenue": 986540,
+          "netIncome": 0,
+          "totalAssets": 22864149,
+          "totalEquity": 0,
+          "totalLiabilities": 22864149,
+          "eps": 0,
+          "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=cd5d0696e8b6d9ef64d70b69f0a3140b"
+        }
+      ]
+    }
+  }
+}

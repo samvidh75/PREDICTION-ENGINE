@@ -1,0 +1,74 @@
+name: PSE Data Refresh (Weekly)
+
+# Regenerates the real PSE Edge data snapshots that the app reads at
+# request time (data/pse-fundamentals.json, data/pse-ownership.json,
+# data/pse-sectors.json, data/pse-disclosures.json) so they don't go stale
+# as PSE-listed companies file new quarterly/annual results. PSE companies
+# file quarterly, so a weekly run is a comfortable cadence that stays well
+# under any rate-limit concern. Each scrape already applies
+# retry-with-backoff (see withRetry in
+# src/services/scrapers/PSEEdgeScraper.ts) so transient timeouts/rate-limits
+# don't silently drop a symbol's real data.
+
+on:
+  schedule:
+    # Every Sunday at 03:00 UTC
+    - cron: '0 3 * * 0'
+  workflow_dispatch:
+    inputs:
+      force:
+        description: 'Force a full re-scrape regardless of freshness'
+        type: boolean
+        default: false
+
+jobs:
+  scrape-pse-data:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      # === 1. Fundamentals (PSE Edge quarterly/annual filings) ===
+      - name: Scrape PSE fundamentals
+        run: npx tsx scripts/scrape-pse-fundamentals.ts
+        timeout-minutes: 60
+
+      # === 2. Ownership (PSE Public Ownership Report filings) ===
+      - name: Scrape PSE ownership
+        run: npx tsx scripts/scrape-pse-ownership.ts
+        timeout-minutes: 60
+
+      # === 3. Sectors (PSE Edge company directory) ===
+      - name: Scrape PSE sectors
+        run: npx tsx scripts/scrape-pse-sectors.ts
+        timeout-minutes: 30
+
+      # === 4. Recent disclosures (real company news/announcements) ===
+      - name: Scrape PSE disclosures
+        run: npx tsx scripts/scrape-pse-disclosures.ts
+        timeout-minutes: 60
+
+      # === Commit the refreshed snapshots ===
+      - name: Commit refreshed PSE data
+        run: |
+          git config user.name "PSE Data Refresh Bot"
+          git config user.email "pipeline@pse-refresh.bot"
+          git add data/pse-fundamentals.json data/pse-ownership.json data/pse-sectors.json data/pse-disclosures.json
+          git diff --staged --quiet || (git commit -m "chore(data): refresh PSE Edge snapshots $(date +%Y-%m-%d)" && git push)
+        continue-on-error: true
+
+      - name: Pipeline complete
+        run: echo "PSE data refresh completed at $(date)"

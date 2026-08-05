@@ -15,6 +15,11 @@ export interface PSEStock {
   name: string;
 }
 
+// Real PSE Edge company-directory sector lookup (data/pse-sectors.json).
+// Loaded lazily at request time (see PSESectorsData.ts) — safe to import at
+// module scope; the file's absence just yields `null`, never a crash.
+import { getSectorBySymbol } from "../../../src/services/scrapers/PSESectorsData.js";
+
 // PSEi — the PSE's flagship 30-company composite index (free-float market
 // cap weighted). Verified against the live feed and Wikipedia's PSE
 // Composite Index constituent table.
@@ -29,7 +34,11 @@ export const PSEI_30: string[] = [
 // Mining & Oil). Unlike the ticker list above this is not pulled from a
 // verified feed — treat as a reasonable default, not an authoritative
 // source, and correct against pse.com.ph's official sector pages if exact
-// classification matters.
+// classification matters. Note: the full-universe real sector data now
+// lives in data/pse-sectors.json (scraped from PSE Edge's company
+// directory — see src/services/scrapers/PSESectorsData.ts) and is
+// preferred over this static PSEi-30-only map wherever a symbol is
+// available there; getPseSector below wires the two together.
 export const PSE_SECTORS: Record<string, string[]> = {
   financials: ["BDO", "BPI", "CBC", "MBT"],
   industrial: ["ACEN", "AEV", "CNPF", "EMI", "MER", "MONDE", "SMC", "URC"],
@@ -38,6 +47,25 @@ export const PSE_SECTORS: Record<string, string[]> = {
   services: ["CNVRG", "GLO", "ICT", "JFC", "PGOLD", "PLUS", "TEL"],
   miningAndOil: ["SCC"],
 };
+
+// Real PSE sector lookup — prefers PSE Edge's company-directory
+// classification for the full ~282-company universe (data/pse-sectors.json),
+// falling back to the static PSEi-30 map above only for symbols not yet
+// covered by the scraped file. Returns `null` rather than a guessed sector.
+// Implemented here (rather than only in the consumer files) so both the
+// Vercel functions (api/stock/[symbol].ts, api/market-universe.ts) and
+// consumers reading the universe share one path.
+// Note: intentionally imported with a dynamic require-style guard so the
+// data file's absence never crashes universe imports.
+export function getPseSector(symbol: string): string | null {
+  const real = getSectorBySymbol(symbol);
+  if (real) return real;
+  // Static PSEi-30 fallback
+  for (const [sector, symbols] of Object.entries(PSE_SECTORS)) {
+    if (symbols.includes(symbol)) return sector;
+  }
+  return null;
+}
 
 // Full common-share universe — all PSE-listed common stocks available on
 // the live feed. Includes PSEi members plus the broader listed board.

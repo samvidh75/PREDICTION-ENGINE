@@ -1,0 +1,57 @@
+name: PSE Financial History (Monthly)
+
+# Regenerates data/pse-financial-history.json — a REAL multi-quarter
+# financial series per PSE company scraped from PSE Edge quarterly filings.
+#
+# This is intentionally a SEPARATE, MONTHLY job (not part of the weekly
+# refresh) because it makes ~8× the request volume of the weekly
+# fundamentals scrape (8 filings per company instead of 1). Running it
+# monthly is a comfortable cadence for quarterly-filing companies and stays
+# polite to PSE Edge. Retry-with-backoff is applied per company so a
+# transient timeout/rate-limit never silently drops a symbol.
+
+on:
+  schedule:
+    # 1st of every month at 03:30 UTC
+    - cron: '30 3 1 * *'
+  workflow_dispatch:
+    inputs:
+      force:
+        description: 'Force a full re-scrape regardless of freshness'
+        type: boolean
+        default: false
+
+jobs:
+  scrape-financial-history:
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Scrape PSE financial history
+        run: npx tsx scripts/scrape-pse-financial-history.ts
+        timeout-minutes: 180
+
+      - name: Commit refreshed financial history
+        run: |
+          git config user.name "PSE Data Refresh Bot"
+          git config user.email "pipeline@pse-refresh.bot"
+          git add data/pse-financial-history.json
+          git diff --staged --quiet || (git commit -m "chore(data): refresh PSE financial history $(date +%Y-%m)" && git push)
+        continue-on-error: true
+
+      - name: Pipeline complete
+        run: echo "PSE financial history refresh completed at $(date)"
