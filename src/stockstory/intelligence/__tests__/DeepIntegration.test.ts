@@ -90,7 +90,7 @@ describe('DeepLensoryOrchestrator — 20-Engine Pipeline', () => {
     const report = await deepOrch.analyze(testInput);
 
     // Base fields
-    expect(report.symbol).toBe('RELIANCE');
+    expect(report.symbol).toBe('SM');
     expect(report.compositeScore.score).toBeGreaterThanOrEqual(0);
     expect(report.compositeScore.score).toBeLessThanOrEqual(100);
     expect(report.classification).toBeDefined();
@@ -134,7 +134,7 @@ describe('Individual Engine Unit Tests', () => {
   it('CompanyProfileFactory builds a profile', () => {
     const profile = buildFromInput(testInput);
     expect(profile).not.toBeNull();
-    expect(profile.symbol).toBe('RELIANCE');
+    expect(profile.symbol).toBe('SM');
     expect(profile.aggregate.overall).toBeGreaterThanOrEqual(0);
     expect(profile.identity).toBeDefined();
   });
@@ -148,13 +148,13 @@ describe('Individual Engine Unit Tests', () => {
   it('PeerGraphBuilder builds a peer graph', () => {
     const focus = buildFromInput(testInput);
     const graph = peerGraphBuilder.build(focus, []);
-    expect(graph.focusCompany).toBe('RELIANCE');
+    expect(graph.focusCompany).toBe('SM');
     expect(graph.peers).toBeDefined();
   });
 
   it('FactorAttributionEngine decomposes factors', () => {
     const report = factorAttributionEngine.analyze(testInput);
-    expect(report.symbol).toBe('RELIANCE');
+    expect(report.symbol).toBe('SM');
     expect(report.factors).toBeDefined();
     expect(report.factors.length).toBeGreaterThan(0);
   });

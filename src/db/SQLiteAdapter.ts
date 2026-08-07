@@ -213,7 +213,7 @@ class SQLitePool {
         symbol TEXT NOT NULL, period_end TEXT NOT NULL,
         snapshot_date TEXT NOT NULL DEFAULT (date('now')),
         market_cap REAL, pe_ratio REAL, eps REAL, dividend_yield REAL, beta REAL, free_float REAL,
-        fcf_yield REAL, ev_ebitda REAL, roa REAL, roe REAL, roic REAL,
+        fcf_yield REAL, ev_ebitda REAL, roa REAL, roe REAL, roic REAL, roce REAL, net_margin REAL,
         debt_to_equity REAL, current_ratio REAL,
         revenue_growth REAL, profit_growth REAL, eps_growth REAL, fcf_growth REAL,
         gross_margin REAL, operating_margin REAL, pb_ratio REAL,

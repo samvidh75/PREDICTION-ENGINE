@@ -195,6 +195,7 @@ export class CompanyProfileBuilder {
     moatScore = Math.round(moatScore * 0.7 + clampScore(moatRatio * 100) * 0.3);
 
     return {
+      symbol: input.symbol,
       moatScore: clampScore(moatScore),
       moatWidth: moatScore >= 65 ? 'wide' : moatScore >= 40 ? 'narrow' : 'unclear',
       pricingPower: f.operatingMargin !== null && f.operatingMargin > 20 ? 'strong'

@@ -139,7 +139,7 @@ export class SectorProfileBuilder {
     let governmentSupport: PhilippinesSectorContext['governmentSupport'] = 'unclear';
     let formalisationBenefit: PhilippinesSectorContext['formalisationBenefit'] = 'unclear';
     let importSubstitution: PhilippinesSectorContext['importSubstitution'] = 'unclear';
-    let exportPotential: PhilippinesSectorContext['exportPotential'] = 'unclear';
+    const exportPotential: PhilippinesSectorContext['exportPotential'] = 'unclear';
 
     // Infrastructure beneficiaries
     if (name.includes('construction') || name.includes('cement') || name.includes('engineering')) {
@@ -184,3 +184,5 @@ export class SectorProfileBuilder {
     return 'unclear';
   }
 }
+
+export const sectorProfileBuilder = new SectorProfileBuilder();

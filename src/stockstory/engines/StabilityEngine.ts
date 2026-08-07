@@ -128,8 +128,15 @@ export class StabilityEngine {
     if (marketCap !== null && marketCap > 0) {
       const mcapCr = marketCap; // in millions (PHP)
       const logMcap = Math.log10(mcapCr);
-      // Continuous log10 scaling: ~10M (log10≈1) → 5, 1B (log10=9) → 81, ~1T (log10=12) → 100
-      marketCapSizeScore = clampScore((logMcap - 1) / 11 * 95 + 5);
+      // Continuous log10 scaling across the real PSE market-cap range.
+      // marketCap is PHP-millions: the achievable log10 band is roughly
+      // 10M PHP (log10≈1) → 5, 50B PHP (log10≈4.7) → ~73, ~1.5T PHP
+      // (log10≈6.2) → 100. The prior formula divided by 11 (a log10 range
+      // of 12), which no PHP-millions value can reach — capping every stock
+      // below ~48 and making the sub-score nearly inert.
+      const LO_M = 1; // log10(10M PHP)
+      const HI_M = Math.log10(1_500_000); // log10(~1.5T PHP), SM Investments scale
+      marketCapSizeScore = clampScore(5 + 95 * ((logMcap - LO_M) / (HI_M - LO_M)));
     } else if (marketCap !== null) {
       marketCapSizeScore = 10; // Negative or zero → score floor
     }

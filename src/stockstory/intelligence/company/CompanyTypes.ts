@@ -99,6 +99,7 @@ export interface GrowthTrajectory {
 }
 
 export interface MoatAssessment {
+  symbol?: string;             // set by MoatEngine.analyze for report tagging
   moatScore: number;             // 0-100
   moatWidth: 'wide' | 'narrow' | 'none' | 'unclear';
   pricingPower: 'strong' | 'moderate' | 'weak' | 'unclear';

@@ -41,7 +41,7 @@ export class FeatureEngine {
     if (!this.marketAvgPromise) {
       this.marketAvgPromise = (async () => {
         const marketAvgRes = await query<MarketAverageRow>(
-          `SELECT trade_date::text as date, AVG((close - open) / open) as avg_return
+          `SELECT CAST(trade_date AS TEXT) as date, AVG((close - open) / open) as avg_return
            FROM daily_prices
            GROUP BY trade_date`
         );
@@ -62,7 +62,7 @@ export class FeatureEngine {
   async calculateAndStoreFeatures(symbol: string): Promise<StockFeatureSnapshot[]> {
     // 1. Fetch historical prices from DB ordered by trade_date ascending
     const priceRes = await query<DailyPriceRow>(
-      `SELECT trade_date::text as date, open, high, low, close, volume
+      `SELECT CAST(trade_date AS TEXT) as date, open, high, low, close, volume
        FROM daily_prices
        WHERE symbol = $1
        ORDER BY trade_date ASC`,

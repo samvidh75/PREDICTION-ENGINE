@@ -64,7 +64,7 @@ export class FactorEngine {
     if (!prom) {
       prom = (async () => {
         const sectorMomentumRes = await query<SectorMomentumRow>(
-          `SELECT dp.trade_date::text as date, AVG((dp.close - dp.open)/dp.open) as avg_return
+          `SELECT CAST(dp.trade_date AS TEXT) as date, AVG((dp.close - dp.open)/dp.open) as avg_return
            FROM daily_prices dp
            JOIN symbols s ON dp.symbol = s.symbol
            WHERE s.sector = $1
@@ -90,7 +90,7 @@ export class FactorEngine {
     );
 
     const pricesRes = await query<DailyPriceRow>(
-      `SELECT trade_date::text as date, close, volume FROM daily_prices WHERE symbol = $1 ORDER BY trade_date ASC`,
+      `SELECT CAST(trade_date AS TEXT) as date, close, volume FROM daily_prices WHERE symbol = $1 ORDER BY trade_date ASC`,
       [symbol]
     );
 

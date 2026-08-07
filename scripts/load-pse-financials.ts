@@ -17,6 +17,8 @@
  *  - debt_to_equity: stored as a decimal ratio (1.32 = 132%), matching what
  *    mapFinancialSnapshot expects (it multiplies by 100).
  *  - operating_margin: operatingIncome to revenue, in percent.
+ *  - net_margin: netIncome to revenue, in percent (real — negative for
+ *    loss-making filers; never clamped or fabricated).
  *  - revenue_growth / profit_growth / eps_growth: period-over-period computed
  *    ONLY within the same cadence (quarterly `series` -> QoQ, `annualSeries`
  *    -> YoY). Mixing a quarterly figure with an annual one would produce a
@@ -96,6 +98,7 @@ export interface SnapshotRow {
   fcf_growth: null;
   gross_margin: null;
   operating_margin: number | null;
+  net_margin: number | null;
   pb_ratio: null;
 }
 
@@ -224,6 +227,7 @@ export function buildSymbolSnapshots(symbol: string, rec: PseRecord): SnapshotRo
     roa: pct(d.p.netIncome, d.p.totalAssets),
     roe: pct(d.p.netIncome, d.p.totalEquity),
     roic: null,
+    roce: null, // no EBIT / capital-employed breakdown in PSE EDGE → never fabricated
     debt_to_equity: ratioOf(d.p.totalLiabilities, d.p.totalEquity),
     current_ratio: null,
     revenue_growth: d.revGrowth,
@@ -232,6 +236,7 @@ export function buildSymbolSnapshots(symbol: string, rec: PseRecord): SnapshotRo
     fcf_growth: null,
     gross_margin: null,
     operating_margin: pct(d.p.operatingIncome, d.p.revenue),
+    net_margin: pct(d.p.netIncome, d.p.revenue),
     pb_ratio: null,
   }));
 }
@@ -240,7 +245,7 @@ export function buildSymbolSnapshots(symbol: string, rec: PseRecord): SnapshotRo
 const UPSERT_COLUMNS = [
   'symbol', 'period_end', 'snapshot_date', 'market_cap', 'pe_ratio', 'eps', 'dividend_yield', 'beta', 'free_float',
   'fcf_yield', 'ev_ebitda', 'roa', 'roe', 'roic', 'debt_to_equity', 'current_ratio',
-  'revenue_growth', 'profit_growth', 'eps_growth', 'fcf_growth', 'gross_margin', 'operating_margin', 'pb_ratio',
+  'revenue_growth', 'profit_growth', 'eps_growth', 'fcf_growth', 'gross_margin', 'operating_margin', 'net_margin', 'pb_ratio',
 ];
 
 async function upsertRows(rows: SnapshotRow[]): Promise<void> {
@@ -252,7 +257,7 @@ async function upsertRows(rows: SnapshotRow[]): Promise<void> {
       [
         r.symbol, r.period_end, r.snapshot_date, r.market_cap, r.pe_ratio, r.eps, r.dividend_yield, r.beta, r.free_float,
         r.fcf_yield, r.ev_ebitda, r.roa, r.roe, r.roic, r.debt_to_equity, r.current_ratio,
-        r.revenue_growth, r.profit_growth, r.eps_growth, r.fcf_growth, r.gross_margin, r.operating_margin, r.pb_ratio,
+        r.revenue_growth, r.profit_growth, r.eps_growth, r.fcf_growth, r.gross_margin, r.operating_margin, r.net_margin, r.pb_ratio,
       ],
     );
   }

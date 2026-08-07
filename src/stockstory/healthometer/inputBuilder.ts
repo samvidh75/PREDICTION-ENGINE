@@ -18,7 +18,6 @@ export async function buildHealthometerInput(symbol: string): Promise<Healthomet
               eps_growth, fcf_yield, market_cap, beta
        FROM financial_snapshots
        WHERE UPPER(REPLACE(symbol, ' ', '')) = $1
-         AND pe_ratio IS NOT NULL
        ORDER BY snapshot_date DESC LIMIT 1`,
       [sym]
     ),

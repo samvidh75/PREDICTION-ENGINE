@@ -370,7 +370,7 @@ describe('Lensory Orchestrator', () => {
   it('orchestrates all engines for healthy company', async () => {
     const result = await orchestrator.analyze(healthyLargeCapInput);
     expect(result).toBeDefined();
-    expect(result.symbol).toBe('TCS');
+    expect(result.symbol).toBe('BDO');
 
     // All engine outputs should be present
     expect(result.engines.financial).toBeDefined();

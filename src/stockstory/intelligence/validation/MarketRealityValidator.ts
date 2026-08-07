@@ -144,6 +144,24 @@ export class MarketRealityValidator extends BaseValidator {
         detectedAt: new Date().toISOString(),
       });
     }
+
+    // Check 2: Sector mismatch for known symbols
+    const inputSector = typeof payload.sector === 'string' ? String(payload.sector).trim() : null;
+    if (inputSector && this.sectorMap[symbol]) {
+      totalChecks++;
+      const expected = this.sectorMap[symbol];
+      if (expected.toLowerCase() !== inputSector.toLowerCase()) {
+        issues.push({
+          id: `mr-sector-mismatch-${symbol}`,
+          severity: 'warning',
+          module: this.id,
+          symbol,
+          reason: `Sector mismatch: input '${inputSector}' vs known '${expected}' for ${symbol}`,
+          recommendedFix: `Use the PSE sector '${expected}' for ${symbol}`,
+          detectedAt: new Date().toISOString(),
+        });
+      }
+    }
     return { issues, totalChecks };
   }
 }

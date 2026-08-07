@@ -2,10 +2,32 @@
  * Moat Engine
  *
  * Evaluates competitive moat and barriers to entry for a given stock.
+ * Returns a complete MoatAssessment tagged with the input symbol so report
+ * aggregation can attribute the assessment back to the issuer.
  */
 
 import { clampScore } from '../scoring';
-import type { MoatAssessment, PowerAssessment, IntelligenceInput } from '../types';
+import type { IntelligenceInput } from '../types';
+
+export interface PowerAssessment {
+  score: number;
+  level: 'high' | 'moderate' | 'low' | 'unclear';
+  description: string;
+}
+
+export interface MoatAssessment {
+  symbol: string;
+  moatScore: number;             // 0-100
+  moatWidth: 'wide' | 'narrow' | 'none' | 'unclear';
+  pricingPower: 'strong' | 'moderate' | 'weak' | 'unclear';
+  switchingCosts: 'high' | 'moderate' | 'low' | 'unclear';
+  networkEffects: boolean | null;
+  costAdvantage: boolean | null;
+  intangibleAssets: boolean | null;
+  factors: string[];
+  supplierPower: PowerAssessment;
+  buyerPower: PowerAssessment;
+}
 
 export class MoatEngine {
   analyze(input: IntelligenceInput): MoatAssessment {
@@ -14,8 +36,8 @@ export class MoatEngine {
     let score = 30;
     const factors: string[] = [];
 
-    // Scale advantage
-    if (f.revenue !== null && f.revenue > 10000) {
+    // Scale advantage — market cap in PHP millions, ~PHP 500B+ = PSE mega-cap
+    if (f.marketCap !== null && f.marketCap > 500000) {
       score += 20;
       factors.push('Significant scale advantage');
     }
@@ -42,10 +64,22 @@ export class MoatEngine {
       factors.push('Regulated sector with licensing barriers');
     }
 
+    const moatScore = clampScore(score);
+
     return {
-      score: clampScore(score),
-      level: score >= 65 ? 'high' : score >= 40 ? 'moderate' : 'unclear',
+      symbol: input.symbol,
+      moatScore,
+      moatWidth: moatScore >= 65 ? 'wide' : moatScore >= 40 ? 'narrow' : 'unclear',
+      pricingPower: f.operatingMargin !== null && f.operatingMargin > 20 ? 'strong'
+        : f.operatingMargin !== null && f.operatingMargin > 10 ? 'moderate'
+        : 'unclear',
+      switchingCosts: f.roic !== null && f.roic > 15 ? 'high' : 'unclear',
+      networkEffects: null,
+      costAdvantage: f.operatingMargin !== null && f.operatingMargin > 25,
+      intangibleAssets: f.roa !== null && f.roa > 15,
       factors,
+      supplierPower: this.assessSupplierPower(f, s),
+      buyerPower: this.assessBuyerPower(f),
     };
   }
 
@@ -103,3 +137,4 @@ export class MoatEngine {
 }
 
 export const moatEngine = new MoatEngine();
+

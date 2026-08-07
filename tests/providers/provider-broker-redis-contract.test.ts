@@ -60,7 +60,7 @@ describe('provider broker Redis contract', () => {
   });
 
   it('uses provider-broker namespaced keys only', async () => {
-    const store = new RedisProviderBrokerStore(process.env.REDIS_URL ?? 'redis://test', await redisClient());
+    const store = new RedisProviderBrokerStore(process.env.REDIS_URL || 'redis://test', await redisClient());
 
     expect(store.key('quota', 'IndianApi', 'minute')).toBe('provider-broker:quota:indianapi:minute');
     expect(store.key('cooldown', 'IndianApi')).toBe('provider-broker:cooldown:indianapi');
@@ -72,7 +72,7 @@ describe('provider broker Redis contract', () => {
 
   it('applies TTL to quota, cooldown, and negative-cache keys', async () => {
     const client = await redisClient();
-    const store = new RedisProviderBrokerStore(process.env.REDIS_URL ?? 'redis://test', client);
+    const store = new RedisProviderBrokerStore(process.env.REDIS_URL || 'redis://test', client);
 
     await store.incrementQuotaCounter('indianapi', 'minute', 60);
     await store.setCooldown('indianapi', 5_000);
@@ -84,7 +84,7 @@ describe('provider broker Redis contract', () => {
   });
 
   it('acquires and releases distributed locks by owner', async () => {
-    const store = new RedisProviderBrokerStore(process.env.REDIS_URL ?? 'redis://test', await redisClient());
+    const store = new RedisProviderBrokerStore(process.env.REDIS_URL || 'redis://test', await redisClient());
 
     await expect(store.acquireLock('quote:RELIANCE', 'owner-a', 5_000)).resolves.toBe(true);
     await expect(store.acquireLock('quote:RELIANCE', 'owner-b', 5_000)).resolves.toBe(false);
