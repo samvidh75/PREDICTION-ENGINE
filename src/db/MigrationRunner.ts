@@ -29,6 +29,15 @@ export interface MigrationStatus {
   checksumMismatch: boolean;
   ready: boolean;
   detail: string | null;
+  /**
+   * True when the target adapter is the SQLite dev/test fallback.
+   * The SQLite fallback self-bootstraps a core schema and does NOT run the
+   * PostgreSQL-only migration set, so pendingCount may remain > 0 even though
+   * the app is functional. See `sqliteMigrationsSkipped`.
+   */
+  sqliteActive?: boolean;
+  /** True when SQLite is active and PostgreSQL-only migrations were skipped. */
+  sqliteMigrationsSkipped?: boolean;
 }
 
 export class MigrationRunner {
@@ -38,6 +47,19 @@ export class MigrationRunner {
   constructor(db: MigrationExecutionAdapter, migrationsDir: string) {
     this.db = db;
     this.migrationsDir = migrationsDir;
+  }
+
+  /**
+   * True when the target adapter is the SQLite dev/test fallback.
+   *
+   * The SQLite fallback (src/db/SQLiteAdapter.ts) self-bootstraps a core subset
+   * of tables and cannot run the PostgreSQL-only DDL used across the migration
+   * set (SERIAL, NOW(), DO $$ blocks, NUMERIC(12,4), ON DELETE CASCADE, ...).
+   * Detecting this lets the runner skip those migrations honestly instead of
+   * throwing on every startup against an adapter that was never meant to run them.
+   */
+  private isSqlite(): boolean {
+    return (this.db as unknown as { kind?: string })?.kind === 'sqlite';
   }
 
   async ensureTable(): Promise<void> {
@@ -91,15 +113,28 @@ export class MigrationRunner {
       }
     }
 
+    const sqliteActive = this.isSqlite();
+    const sqliteMigrationsSkipped = sqliteActive && pending.length > 0;
+
+    let detail = checksumMismatch
+      ? 'Migration checksum mismatch — previously applied migration file has changed.'
+      : null;
+    if (!checksumMismatch && sqliteMigrationsSkipped) {
+      detail =
+        'SQLite active — PostgreSQL-only migrations are not applied; ' +
+        'SQLite runs a self-bootstrapped core schema. ' +
+        'Use PostgreSQL (e.g. via docker-compose) for the full schema.';
+    }
+
     return {
       latestAppliedId: applied.length > 0 ? applied[applied.length - 1].id : null,
       appliedCount: applied.length,
       pendingCount: pending.length,
       checksumMismatch,
       ready: !checksumMismatch,
-      detail: checksumMismatch
-        ? 'Migration checksum mismatch — previously applied migration file has changed.'
-        : null,
+      detail,
+      sqliteActive,
+      sqliteMigrationsSkipped,
     };
   }
 
@@ -141,6 +176,19 @@ export class MigrationRunner {
     const available = await this.listAvailable();
     const appliedIds = new Set((await this.listApplied()).map(a => a.id));
     const pending = available.filter(a => !appliedIds.has(a.id));
+
+    // PostgreSQL-only migration set on the SQLite fallback:
+    // SQLite self-bootstraps a core schema and cannot run SERIAL/DO $$/NOW()/
+    // ON DELETE CASCADE etc. Skip them loudly instead of throwing on every
+    // startup against an adapter that was never meant to run them.
+    if (this.isSqlite()) {
+      console.warn(
+        `[migrate] SQLite active: skipping ${pending.length} PostgreSQL-only ` +
+        `migration(s). SQLite uses a self-bootstrapped core schema. Run against ` +
+        `PostgreSQL (e.g. via docker-compose) for the full schema.`
+      );
+      return this.status();
+    }
 
     for (const migration of pending) {
       try {

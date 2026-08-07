@@ -206,6 +206,25 @@ describe('MigrationRunner', () => {
     expect(insertCall).toBeUndefined();
   });
 
+  // ---- PostgreSQL-only migrations are skipped on the SQLite fallback ----
+  it('skips PostgreSQL-only migrations on the SQLite fallback (does not throw)', async () => {
+    writeMigration(tempDir, '001_postgres_only.sql', 'CREATE TABLE t (id SERIAL PRIMARY KEY);');
+
+    const executeScript = vi.fn().mockResolvedValue(undefined);
+    const adapter = mockAdapter(executeScript) as MigrationExecutionAdapter & { kind?: string };
+    adapter.kind = 'sqlite';
+
+    const runner = new MigrationRunner(adapter, tempDir);
+    const result = await runner.runPending();
+
+    // SQLite must not attempt the un-runnable Postgres DDL and must not throw.
+    expect(executeScript).not.toHaveBeenCalled();
+    expect(result.sqliteActive).toBe(true);
+    expect(result.sqliteMigrationsSkipped).toBe(true);
+    expect(result.ready).toBe(true);
+    expect(result.detail).toMatch(/PostgreSQL-only migrations are not applied/i);
+  });
+
   // ---- thrown error includes migration filename ----
   it('thrown error includes migration filename', async () => {
     writeMigration(tempDir, '002_critical.sql', 'THIS IS BROKEN SQL;');

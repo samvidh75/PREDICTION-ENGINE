@@ -15,7 +15,15 @@ export const healthRoutes: FastifyPluginAsync = async (app: FastifyInstance) => 
   // GET /healthz — lightweight liveness probe
   // -------------------------------------------------------------------
   app.get('/healthz', async (_req, reply) => {
-    reply.status(200).send({ ok: true });
+    // Must `return` the send — an async handler that calls reply.send()
+    // without returning it leaves Fastify thinking the handler's resolved
+    // value (undefined) still needs sending too, causing a double-send.
+    // Harmless as a same-process HTTP request (Fastify just logs a
+    // warning), but fatal under server.inject() (startServer.ts's
+    // warm-up self-ping) — light-my-request's response object throws
+    // ERR_HTTP_HEADERS_SENT on the second write, crashing the whole
+    // process. /readyz below already does this correctly.
+    return reply.status(200).send({ ok: true });
   });
 
   // -------------------------------------------------------------------
@@ -52,11 +60,23 @@ export const healthRoutes: FastifyPluginAsync = async (app: FastifyInstance) => 
       const runner = new MigrationRunner(dbAdapter, migrationsDir);
       const migStatus = await runner.status();
 
+      // Surface the SQLite dev/test fallback clearly: its core schema is
+      // self-bootstrapped and the PostgreSQL-only migration set is not
+      // applied. Built as one literal (not payload.migrations = {...} then
+      // spread back into itself) — payload is Record<string, unknown>, so
+      // payload.migrations is typed unknown and can't be spread.
       payload.migrations = {
         applied: migStatus.appliedCount,
         pending: migStatus.pendingCount,
         checksumMismatch: migStatus.checksumMismatch,
         ready: migStatus.ready,
+        ...(dbKind === 'sqlite'
+          ? {
+              sqlite: true,
+              sqliteMigrationsSkipped: migStatus.sqliteMigrationsSkipped ?? migStatus.pendingCount > 0,
+              note: migStatus.detail ?? null,
+            }
+          : {}),
       };
 
       if (migStatus.checksumMismatch) {

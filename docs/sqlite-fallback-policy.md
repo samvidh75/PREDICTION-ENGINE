@@ -134,3 +134,45 @@ If full PostgreSQL → SQLite parity is required in the future:
 6. Document remaining gaps explicitly
 
 **Current recommendation**: defer full SQLite parity. PostgreSQL is the production persistence layer. SQLite is a development/test convenience.
+
+---
+
+## 9. SQLite vs. the PostgreSQL-only Migration Set
+
+The migration files in `src/db/migrations/` (currently 60) are written **for PostgreSQL** and use
+PostgreSQL-only syntax (`SERIAL`/`BIGSERIAL`, `NOW()`, `DO $$ ... $$` blocks, `NUMERIC(12,4)`,
+`ON DELETE CASCADE`, identity columns, RLS). The SQLite fallback **does not** run them.
+
+### Why this is safe
+
+- `src/db/SQLiteAdapter.ts` **self-bootstraps** the core tables it needs
+  (`master_security_registry`, `symbols`, `daily_prices`, `financial_snapshots`,
+  `prediction_registry`, `benchmark_observations`, `daily_prediction_snapshots`) directly —
+  it never depends on the Postgres migration files to exist.
+- The full 60-migration schema is only ever applied against **PostgreSQL** (production / Docker).
+
+### Behaviors implemented
+
+- `MigrationRunner` is now **adapter-aware**. When the target adapter is SQLite, it **skips**
+  the PostgreSQL-only migration set with a clear warning and **does not throw** on it. It reports
+  `sqliteActive` / `sqliteMigrationsSkipped` on `MigrationStatus`.
+- `/readyz` includes `migrations.sqlite`, `migrations.sqliteMigrationsSkipped`, and
+  `migrations.note` so SQLite fallback is surfaced rather than silent.
+- Server startup logs a loud warning whenever SQLite skips pending migrations.
+
+### Running the full schema locally
+
+For development against the complete 60-migration schema, start PostgreSQL via Docker and point
+the app at it:
+
+```bash
+# from repo root
+docker compose up -d postgres        # or `docker compose -f docker-compose.three-tier.yml up -d`
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/stockstory \
+DB_ADAPTER=postgres \
+npm run migrate
+```
+
+SQLite remains the zero-config fallback for quick local runs and the integration test suite
+(`DB_ADAPTER=sqlite`), but those intentionally run the self-bootstrapped core schema only.
+

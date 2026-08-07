@@ -29,6 +29,60 @@ Every loader (`PSEOwnershipData.ts`, `PSEFinancialHistoryData.ts`, `PSESectorsDa
 
 All three commit their regenerated JSON straight to `main` if the diff is non-empty (`continue-on-error: true` so a partial failure doesn't block).
 
+## `/api/pse/*` endpoints (Render server: `src/render/apiRouter.ts`)
+
+These routes expose the scraped PSE data directly to clients:
+
+| Endpoint | Source | Notes |
+|---|---|---|
+| `GET /api/pse/disclosures/:symbol` | `pse-disclosures.json` | Most recent ~8 disclosures for a company |
+| `GET /api/pse/insider-filings/:symbol` | `pse-insider-filings.json` | Form 17-7 beneficial-ownership changes |
+| `GET /api/pse/ownership/:symbol` | `pse-ownership.json` | Insider % vs Public Float % |
+| `GET /api/pse/sector/:symbol` | `pse-sectors.json` | Real sector/subsector, cmpy_id, listing date |
+| `GET /api/pse/stocks` | `pse-sectors.json` | Full company/sector directory |
+| `GET /api/pse/summary` | `pseDataPipeline.getMarketSummary()` | Constituent/market summary |
+| `GET /api/pse/gainers` / `GET /api/pse/losers` | `pseDataPipeline.getTopGainers(15)` / `getTopLosers(15)` | Derived from live prices |
+| `GET /api/pse/history/:symbol` | `pseDataPipeline.getHistoricalData(symbol)` | Historical OHLCV |
+
+All of them follow the same no-synthetic-fallback rule: a symbol with no record returns
+`null`/`[]`, never a fabricated substitute.
+
+## The `operatingIncome` field (and why it's not EBITDA)
+
+`PSEFinancialHistoryData` parses each real 17-Q (quarterly) / 17-A (annual) filing and can
+carry an `operatingIncome` value — the **Operating Income** line from the statement text.
+Because PSE filings do **not** report a distinct labeled "EBITDA" line, we deliberately do
+**not** model EBITDA. Exactly one of two things happens:
+
+- The "Operating Income" line is parseable → `operatingIncome` is set and the financial
+  chart shows it under the label **"Operating Income"**.
+- It is genuinely absent for a filer (e.g. banks structure their income statement
+  differently) → the point is left `null`/empty, never estimated.
+
+Internally this value is surfaced through the chart series keyed as `ebitda` only for
+backwards-compatibility with the existing chart component; the user-facing label is always
+"Operating Income", and the doc/gap note in `apiRouter.ts` marks it as real Operating
+Income, not EBITDA.
+
+## Momentum / backtest / prediction work
+
+- **Momentum scoring** — `src/research/features/momentumFeatures.ts` exposes
+  `computeMomentumFeatures(candles, relativeStrength)`, a self-contained (no `@/` alias)
+  scorer returning a breakdown: `priceTrendScore`, `relativeStrengthScore`,
+  `shortTermScore`, `mediumTermScore`, `overallMomentum`, `confidence`, and `missingInputs`
+  (zero lookahead — each window uses only closes at/before its endpoint). Real EODHD-based
+  bars feed it, so `overallMomentum` is real, not a neutral default.
+- **`momentumBreakdown` in the Prediction type** — added to the `Prediction` type and to
+  both API providers (`api/stock/[symbol].ts` and `src/render/apiRouter.ts`); the front end
+  renders it in `PredictionPage.tsx`.
+- **Real-data walk-forward backtest** — `src/backtest/realDataWalkForward.ts` +
+  `scripts/run-real-backtest.ts` run an anti-lookahead `WalkForwardValidator`
+  (`src/services/backtest/WalkForwardValidator.ts`) on actual `daily_prices` bars. This is
+  a genuine long-only momentum strategy (long when the train-window mean return > 0), with
+  honest reporting: any symbol with **fewer than 316 bars** (252 train + 63 test + 1) is
+  reported as `insufficient data` — never backfilled or fabricated.
+
+
 ## What's real vs. estimated on the Stock page today
 
 `api/stock/[symbol].ts` and `src/render/apiRouter.ts` (the two live server variants — **update both** for any data-layer change; they don't share code, and the backend build's `rootDir: "src"` means it can't import from `api/_lib/`) set `dataSources` on the response:

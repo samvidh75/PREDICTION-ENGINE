@@ -22,7 +22,7 @@ import { defaultDataAdapterRegistry } from "../services/data/dataAdapterRegistry
 import { startWebSocketDataProducer } from "../services/market/websocketDataProducer.js";
 import { MetricsCollector } from "../commercial/api/monitoring/MetricsCollector.js";
 import { registerLiveQuotesWs } from "../backend/routes/liveQuotesWs.js";
-import { registerFeatureRoutes } from "../backend/web/routes/index.js";
+import { registerFeatureRoutes, registerHealthRoutes } from "../backend/web/routes/index.js";
 import { registerAIRoutes } from "./aiRoutes.js";
 import { registerModelInferenceRoutes } from "../services/ai/ModelInferenceServer.js";
 
@@ -207,34 +207,20 @@ async function bootstrap() {
   });
 
   // ── Health & status endpoints (always respond, even without DB) ────
-  server.get("/healthz", async () => {
-    try {
-      await dbAdapter.query("SELECT 1");
-      return { ok: true, status: "ok", db: "connected" };
-    } catch {
-      return { ok: false, status: "degraded", db: "unavailable" };
-    }
-  });
-
-  server.get("/readyz", async (_req, rep) => {
-    try {
-      await dbAdapter.query("SELECT 1");
-      const diag = dbAdapter.diagnostics();
-      return {
-        ok: true,
-        status: "ok",
-        database: { kind: diag.kind, fallbackUsed: diag.fallbackUsed },
-      };
-    } catch (err) {
-      rep.status(503);
-      return {
-        ok: false,
-        status: "not_ready",
-        database: { kind: "unavailable" as const, fallbackUsed: false },
-        error: String(err),
-      };
-    }
-  });
+  // registerHealthRoutes (src/backend/web/routes/health.ts) is the real
+  // /healthz + /readyz implementation — it surfaces MigrationRunner status
+  // (applied/pending/checksum, and the SQLite-fallback-skips-Postgres-
+  // migrations note) and is what the integration tests
+  // (readiness.integration.test.ts, postgres-readiness.integration.test.ts,
+  // sqlite-migration.integration.test.ts) exercise directly. It used to
+  // ALSO be exported from routes/index.ts but never actually imported or
+  // registered here — this file had its own separate, simpler inline
+  // /healthz + /readyz (just a raw `SELECT 1`, no migration status at
+  // all), so every one of those integration tests' guarantees were true
+  // only in an isolated test harness and never reachable from the real
+  // running server. Registering the real plugin instead of the inline
+  // stand-ins closes that gap.
+  await server.register(registerHealthRoutes);
 
   // ── SMTP health check (Phase 43) ────────────────────────────────────
   server.get("/health/smtp", async (_req, reply) => {
@@ -576,9 +562,19 @@ async function bootstrap() {
     server.log.info(`Migrations: ${status.appliedCount} applied, ${status.pendingCount} pending`);
 
     if (status.pendingCount > 0) {
-      server.log.info("Running pending migrations...");
-      await runner.runPending(process.env.FORCE_MIGRATIONS === "true");
-      server.log.info("Migrations complete");
+      if (dbAdapter.kind === "sqlite") {
+        // SQLite self-bootstraps a core schema and cannot run the PostgreSQL-only
+        // migration set. Be loud about this instead of silently degrading.
+        server.log.warn(
+          `SQLite adapter active: ${status.pendingCount} PostgreSQL-only migration(s) ` +
+          `skipped. SQLite runs a self-bootstrapped core schema. For the full schema, ` +
+          `run against PostgreSQL (e.g. via docker-compose).`
+        );
+      } else {
+        server.log.info("Running pending migrations...");
+        await runner.runPending(process.env.FORCE_MIGRATIONS === "true");
+        server.log.info("Migrations complete");
+      }
     }
 
     if (status.checksumMismatch && process.env.FORCE_MIGRATIONS === "true") {
