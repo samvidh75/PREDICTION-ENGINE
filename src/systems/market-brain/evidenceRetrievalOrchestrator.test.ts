@@ -13,9 +13,9 @@ import {
 
 describe('buildEvidenceRetrievalAggregate', () => {
   it('builds a valid aggregate for a known symbol', async () => {
-    const { aggregate, pack } = await buildEvidenceRetrievalAggregate('RELIANCE');
-    expect(aggregate.symbol).toBe('RELIANCE');
-    expect(pack.symbol).toBe('RELIANCE');
+    const { aggregate, pack } = await buildEvidenceRetrievalAggregate('SMPH');
+    expect(aggregate.symbol).toBe('SMPH');
+    expect(pack.symbol).toBe('SMPH');
     expect(aggregate.totalItems).toBeGreaterThanOrEqual(0);
     expect(pack.totalCount).toBeGreaterThanOrEqual(0);
     expect(pack.retrievedAt).toBeGreaterThan(0);
@@ -52,7 +52,7 @@ describe('buildEvidenceRetrievalAggregate', () => {
 
 describe('buildEvidenceRetrievalContext', () => {
   it('returns non-empty string when data exists', async () => {
-    const context = await buildEvidenceRetrievalContext('RELIANCE');
+    const context = await buildEvidenceRetrievalContext('SMPH');
     expect(typeof context).toBe('string');
   });
 

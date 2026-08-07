@@ -18,8 +18,8 @@ import {
 
 describe('retrieveNewsEvidence', () => {
   it('returns items with correct structure when data is available', async () => {
-    const result = await retrieveNewsEvidence('RELIANCE');
-    expect(result.symbol).toBe('RELIANCE');
+    const result = await retrieveNewsEvidence('SMPH');
+    expect(result.symbol).toBe('SMPH');
     // Adapter may return items or None depending on environment
     if (result.source !== 'None') {
       expect(result.items.length).toBeGreaterThan(0);
@@ -39,8 +39,8 @@ describe('retrieveNewsEvidence', () => {
 
 describe('retrieveFilingEvidence', () => {
   it('returns items with reference data for a known symbol', async () => {
-    const result = await retrieveFilingEvidence('RELIANCE');
-    expect(result.symbol).toBe('RELIANCE');
+    const result = await retrieveFilingEvidence('SMPH');
+    expect(result.symbol).toBe('SMPH');
     if (result.source !== 'None') {
       expect(result.items.length).toBeGreaterThan(0);
       expect(result.items[0]).toHaveProperty('label');
@@ -66,8 +66,8 @@ describe('retrieveCorporateActionEvidence', () => {
 
 describe('retrieveResultEventEvidence', () => {
   it('attempts to retrieve result data', async () => {
-    const result = await retrieveResultEventEvidence('RELIANCE');
-    expect(result.symbol).toBe('RELIANCE');
+    const result = await retrieveResultEventEvidence('SMPH');
+    expect(result.symbol).toBe('SMPH');
     if (result.source !== 'None') {
       expect(result.items.length).toBeGreaterThan(0);
       expect(result.items[0]).toHaveProperty('period');
