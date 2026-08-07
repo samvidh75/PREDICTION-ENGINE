@@ -14,6 +14,15 @@ export interface WalkForwardConfig {
  * and evaluate it strictly out-of-sample on the following test window.
  * The strategy never sees test data — the anti-lookahead guarantee comes
  * from slicing returns *before* the strategy function is invoked.
+ *
+ * Per-window `testMetrics` evaluate each window's full test span on its own.
+ * The `aggregateOutOfSample` / `equityCurve`, however, are built from a
+ * CHAINED series that counts each trading day exactly once: a window's
+ * exposure only drives returns until the next refit, so only the first
+ * `stepDays` days of each test window (the days a position is actually held)
+ * enter the aggregate. Without this, test windows that overlap
+ * (`stepDays < testWindowDays`) compound the same days multiple times and
+ * inflate the aggregate return.
  */
 export class WalkForwardValidator {
   constructor(private readonly config: WalkForwardConfig) {
@@ -55,6 +64,11 @@ export class WalkForwardValidator {
 
       const testReturns = returns.slice(trainEnd, testEnd);
       const windowNetReturns: number[] = [];
+      // Days actually traded before the next refit. With overlapping test
+      // windows (`stepDays < testWindowDays`) only the first `stepDays` days
+      // are new — chaining them gives a contiguous, non-overlapping OOS
+      // series so the aggregate never double-counts the same trading day.
+      const chainedDays = Math.min(stepDays, testReturns.length);
       for (let i = 0; i < testReturns.length; i++) {
         let net = exposure * testReturns[i];
         if (i === 0) {
@@ -62,9 +76,11 @@ export class WalkForwardValidator {
           net -= turnover * (slippage + commission);
         }
         windowNetReturns.push(net);
-        oosReturns.push(net);
-        equity *= 1 + net;
-        equityCurve.push({ date: bars[trainEnd + i + 1].date, value: equity });
+        if (i < chainedDays) {
+          oosReturns.push(net);
+          equity *= 1 + net;
+          equityCurve.push({ date: bars[trainEnd + i + 1].date, value: equity });
+        }
       }
       previousExposure = exposure;
 

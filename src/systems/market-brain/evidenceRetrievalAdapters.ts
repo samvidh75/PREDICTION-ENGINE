@@ -225,15 +225,22 @@ export async function retrieveResultEventEvidence(
   try {
     const { query } = await import('../../db/index');
 
-    // Try financial_snapshots table which stores the latest fundamentals
-    const rows = await query(
+    // Read the latest financial snapshot for the symbol. Only emit a result
+    // event when real data exists — never fabricate a "Latest Period" event
+    // for symbols with no snapshot (the old code pushed one unconditionally
+    // and also checked `Array.isArray(rows)` against the adapter's
+    // `{ rows, rowCount }` result, so EPS was never actually read).
+    const res = await query(
       `SELECT pe_ratio, eps, dividend_yield, beta FROM financial_snapshots WHERE symbol = ? ORDER BY rowid DESC LIMIT 1`,
       [symbol]
     );
 
-    const epsValue = Array.isArray(rows) && rows.length > 0
-      ? (rows[0] as Record<string, unknown>).eps ?? null
-      : null;
+    const snapshot = Array.isArray(res.rows) && res.rows.length > 0 ? res.rows[0] : null;
+    if (!snapshot) {
+      return { symbol, items: [], source: 'None' };
+    }
+
+    const epsValue = (snapshot as Record<string, unknown>).eps ?? null;
 
     // Build a result item from what's available
     items.push({

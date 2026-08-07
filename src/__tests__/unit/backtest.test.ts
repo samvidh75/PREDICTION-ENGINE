@@ -76,6 +76,26 @@ describe('WalkForwardValidator', () => {
     expect(result.aggregateOutOfSample.totalReturnPct).toBeCloseTo(0, 6);
   });
 
+  it('does not double-count overlapping test windows in the aggregate', () => {
+    // stepDays (21) < testWindowDays (63) => test windows overlap. A fully
+    // invested strategy must only compound each trading day once: the
+    // aggregate chains the first 21 days of each of the 5 windows (105 days),
+    // not 5 * 63 = 315 overlapping days. Before the chaining fix this test
+    // computed ~36.9% (same days compounded ~3x); the correct value is the
+    // true growth over the 105 actually-traded days (~11.0%).
+    const closes = Array.from({ length: 400 }, (_, i) => 100 * Math.pow(1.001, i));
+    const result = new WalkForwardValidator({
+      trainWindowDays: 252,
+      testWindowDays: 63,
+      stepDays: 21,
+    }).validate(makeBars(closes), () => 1);
+
+    // 5 windows x 21 chained days, minus one-time 8bps entry cost (5+3 bps).
+    const expected = Math.pow(1.001, 105) * (1 - (5 + 3) / 10000) - 1;
+    expect(result.aggregateOutOfSample.totalReturnPct).toBeCloseTo(expected * 100, 1);
+    expect(result.equityCurve.length).toBe(105);
+  });
+
   it('clamps out-of-range and non-finite exposures', () => {
     const closes = Array.from({ length: 350 }, (_, i) => 100 + i * 0.05);
     const validator = new WalkForwardValidator({ trainWindowDays: 252, testWindowDays: 63, stepDays: 63 });

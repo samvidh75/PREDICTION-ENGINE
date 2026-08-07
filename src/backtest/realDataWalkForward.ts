@@ -4,6 +4,11 @@
 // them per symbol. This moves the backtest pipeline from simulated/1-year
 // EODHD-free-tier data onto whatever real multi-year history is in the DB,
 // and reports honest "insufficient data" outcomes instead of fabricating.
+//
+// Aggregate returns reported here are the validator's CHAINED out-of-sample
+// series (each trading day counted once, exposure held between refits), so
+// the totals are real, investable returns — not overlapping-window
+// compounding.
 
 import { query } from "../db/index";
 import { WalkForwardValidator, type WalkForwardConfig } from "../services/backtest/WalkForwardValidator";
