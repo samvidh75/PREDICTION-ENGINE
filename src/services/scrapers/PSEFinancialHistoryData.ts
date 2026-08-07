@@ -27,6 +27,12 @@ export interface PseFinancialHistoryPoint {
   totalEquity: number | null;
   totalLiabilities: number | null;
   eps: number | null;
+  /** NOT EBITDA — real PSE filings don't report a labeled "EBITDA" line.
+   * This is "Operating Income", real but genuinely absent for some
+   * filers (e.g. banks structure their income statement differently).
+   * Optional for backward compatibility with snapshots generated before
+   * this field was added. */
+  operatingIncome?: number | null;
   sourceUrl: string;
 }
 

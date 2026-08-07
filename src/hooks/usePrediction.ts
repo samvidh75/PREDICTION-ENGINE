@@ -88,6 +88,7 @@ export interface Prediction {
   sector?: string;
   industry?: string;
   calculated_at: string;
+  momentumBreakdown?: { shortTerm: number | null; mediumTerm: number | null; trend: number | null; overall: number | null };
 }
 
 interface LivePriceCache {

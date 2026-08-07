@@ -48,6 +48,7 @@ import { loadRealPseOwnership } from "../services/scrapers/PSEOwnershipData.js";
 import { getSectorBySymbol, getSubsectorBySymbol, loadPseSector } from "../services/scrapers/PSESectorsData.js";
 import { loadPseDisclosures } from "../services/scrapers/PSEDisclosuresData.js";
 import { loadPseInsiderFilings } from "../services/scrapers/PSEInsiderFilingsData.js";
+import { computeMomentumFeatures } from "../research/features/momentumFeatures.js";
 import { loadPseFinancialHistory } from "../services/scrapers/PSEFinancialHistoryData.js";
 import {
   registerCommercialRoutes,
@@ -784,6 +785,23 @@ export default async function registerApiRoutes(server: FastifyInstance) {
     const profGrowth = n(fundData.profit_growth_3y ?? fundData.profit_growth) ?? null;
     const activeNews = newsSafe && newsSafe.length > 0 ? newsSafe : null;
     const activePriceHistory = priceHistorySafe;
+    // Real momentum sub-scores from the same daily price history the chart
+    // uses. Stays null when no real history is available (the frontend shows
+    // an honest "momentum data unavailable" state — never fabricated).
+    let momentumBreakdown: { shortTerm: number | null; mediumTerm: number | null; trend: number | null; overall: number | null } | null = null;
+    if (Array.isArray(activePriceHistory) && activePriceHistory.length > 0) {
+      const candles = (activePriceHistory as Array<Record<string, any>>).map((p) => ({
+        date: String(p.date ?? p.trade_date ?? ""),
+        close: Number(p.close ?? p.adjusted_close ?? p.close_price),
+      }));
+      const mf = computeMomentumFeatures(candles as any, null);
+      momentumBreakdown = {
+        shortTerm: mf.shortTermScore,
+        mediumTerm: mf.mediumTermScore,
+        trend: mf.priceTrendScore,
+        overall: mf.overallMomentum,
+      };
+    }
     const health = 50;
     const industryPe = SECTOR_PE_MEDIAN[sector] || 20;
     const known = KNOWN[cleanSymbol];
@@ -846,6 +864,7 @@ export default async function registerApiRoutes(server: FastifyInstance) {
         risk: 50, health,
         riskAdjusted: 50,
       },
+      momentumBreakdown,
       confidenceMeter: health,
       timeline: Array.from({ length: 6 }, (_, i) => ({
         day: ["Mon", "Tue", "Wed", "Thu", "Fri", "Today"][i],

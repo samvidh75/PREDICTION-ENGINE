@@ -6,6 +6,7 @@ import { loadRealPseOwnership } from '../../src/services/scrapers/PSEOwnershipDa
 import { getSubsectorBySymbol } from '../../src/services/scrapers/PSESectorsData.js';
 import { loadPseDisclosures } from '../../src/services/scrapers/PSEDisclosuresData.js';
 import { loadPseFinancialHistory, type PseFinancialHistoryPoint } from '../../src/services/scrapers/PSEFinancialHistoryData.js';
+import { computeMomentumFeatures } from '../../src/research/features/momentumFeatures.js';
 
 // Inline health scoring. Checks ~17 distinct metric fields across 6 factor
 // groups below (valuation, quality, growth, momentum, risk, health) — most
@@ -405,7 +406,12 @@ export default async function handler(
     const toRealSeries = (points: PseFinancialHistoryPoint[]) => ({
       revenue: points.filter((p) => p.revenue != null).map((p) => ({ period: p.asOfPeriod ?? p.period, value: p.revenue as number })),
       profit: points.filter((p) => p.netIncome != null).map((p) => ({ period: p.asOfPeriod ?? p.period, value: p.netIncome as number })),
-      ebitda: [] as { period: string; value: number }[], // not parsed from PSE filings — left empty, never modeled
+      // The `ebitda` key is real Operating Income, NOT EBITDA — PSE
+      // filings don't report a labeled "EBITDA" line. Genuinely absent
+      // for some filers (e.g. banks structure their income statement
+      // differently), so this may be shorter than revenue/profit. The
+      // frontend chart tab is labeled "Operating Income" to match.
+      ebitda: points.filter((p) => p.operatingIncome != null).map((p) => ({ period: p.asOfPeriod ?? p.period, value: p.operatingIncome as number })),
     });
     const realFinancials = realFinancialHistory
       ? {
@@ -414,6 +420,29 @@ export default async function handler(
           dataSource: 'pseApi' as const,
         }
       : null;
+
+    // Real momentum sub-scores from the same EODHD daily bars the chart uses.
+    // `momentumBreakdown` stays null when no real history is available — the
+    // frontend renders an honest "momentum data unavailable" state, never a
+    // fabricated value.
+    let momentumBreakdown: { shortTerm: number | null; mediumTerm: number | null; trend: number | null; overall: number | null } | null = null;
+    if (eodhdBars && eodhdBars.length > 0) {
+      const candles = eodhdBars.map((b) => ({
+        date: b.date,
+        close: b.close,
+        high: null,
+        low: null,
+        open: null,
+        volume: b.volume ?? null,
+      }));
+      const mf = computeMomentumFeatures(candles, null);
+      momentumBreakdown = {
+        shortTerm: mf.shortTermScore,
+        mediumTerm: mf.mediumTermScore,
+        trend: mf.priceTrendScore,
+        overall: mf.overallMomentum,
+      };
+    }
 
     const response = {
       symbol,
@@ -458,6 +487,7 @@ export default async function handler(
         health: healthScores.health,
         overall: healthScores.overall,
       },
+      momentumBreakdown,
       companyProfile: profile,
       // Real when available (see pseOwnershipProvider.ts) — a PSE Public
       // Ownership Report only reports insider % vs public %, so that's

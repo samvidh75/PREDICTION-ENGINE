@@ -153,6 +153,13 @@ export interface ParsedFundamentals {
   revenue: number | null;
   eps: number | null;
   sharesOutstanding: number | null;
+  /** NOT EBITDA — real PSE filings don't report a labeled "EBITDA" line.
+   * "Operating Income" is a real, present line for many filers, but is
+   * genuinely absent for others (verified: BDO, a bank, reports
+   * "Operating Income - - - -" i.e. not applicable — banks structure
+   * their income statement differently than industrials/retailers). Left
+   * `null` rather than substituted with anything when absent. */
+  operatingIncome: number | null;
   /** Derived — only set when the inputs needed to compute it are present. */
   roe: number | null;
   debtToEquity: number | null;
@@ -389,23 +396,37 @@ export function parseFinancialStatementText(text: string, symbol: string, source
   // this fix). The capture group's own `\([\d,.]+\)` alternative still
   // handles a genuine parenthesized negative number correctly — the gap
   // being lazy means it stops at the first digit it finds either way.
-  const totalAssets = extractLargeNumber(/Total\s+Assets\s*[^\d]{0,40}?([\d,.]+|\([\d,.]+\))/i);
-  const totalLiabilities = extractLargeNumber(/Total\s+Liabilities\s*[^\d]{0,40}?([\d,.]+|\([\d,.]+\))/i);
+  // Gap excludes literal "-" too, not just digits: a not-applicable line
+  // (verified real: BDO's "Operating Income - - - -") is rendered as
+  // dashes, which aren't digits — the old [^\d] gap happily skipped over
+  // them and kept extending into the NEXT line's real number, silently
+  // attributing an unrelated figure to this label. Excluding "-" makes
+  // any dash placeholder a hard stop instead (applied defensively to
+  // every field here, even though only Operating Income was confirmed to
+  // hit it in practice).
+  const totalAssets = extractLargeNumber(/Total\s+Assets\s*[^\d-]{0,40}?([\d,.]+|\([\d,.]+\))/i);
+  const totalLiabilities = extractLargeNumber(/Total\s+Liabilities\s*[^\d-]{0,40}?([\d,.]+|\([\d,.]+\))/i);
   // "Total" is not always present — some filers (verified: Ayala Land's
   // 17-Q) label this row bare "Stockholders' Equity", not
   // "Total Stockholders' Equity".
   const totalEquity = extractLargeNumber(
-    /Total\s+(?:Stockholders'?|Equity\s+attributable).{0,20}Equity\s*[^\d]{0,40}?([\d,.]+|\([\d,.]+\))/i,
-    /Total\s+Equity\s*[^\d]{0,40}?([\d,.]+|\([\d,.]+\))/i,
-    /Stockholders'?\s+Equity\s*[^\d]{0,40}?([\d,.]+|\([\d,.]+\))/i,
+    /Total\s+(?:Stockholders'?|Equity\s+attributable).{0,20}Equity\s*[^\d-]{0,40}?([\d,.]+|\([\d,.]+\))/i,
+    /Total\s+Equity\s*[^\d-]{0,40}?([\d,.]+|\([\d,.]+\))/i,
+    /Stockholders'?\s+Equity\s*[^\d-]{0,40}?([\d,.]+|\([\d,.]+\))/i,
   );
-  const netIncome = extractLargeNumber(/Net\s+Income\S*(?:\s+for\s+the\s+period)?\s*[^\d]{0,40}?([\d,.]+|\([\d,.]+\))/i);
-  const revenue = extractLargeNumber(/(?:Total\s+)?Revenues?\s*[^\d]{0,40}?([\d,.]+|\([\d,.]+\))/i);
+  const netIncome = extractLargeNumber(/Net\s+Income\S*(?:\s+for\s+the\s+period)?\s*[^\d-]{0,40}?([\d,.]+|\([\d,.]+\))/i);
+  const revenue = extractLargeNumber(/(?:Total\s+)?Revenues?\s*[^\d-]{0,40}?([\d,.]+|\([\d,.]+\))/i);
   // EPS is deliberately left on plain extractNumber (first match, no
   // comma preference) — a real EPS value is a small decimal and never
   // comma-formatted, so the comma-preference heuristic doesn't apply.
-  const eps = extractNumber(/Earnings?\S*\s+Per\s+Share\S*\s*[^\d]{0,40}?([\d,.]+|\([\d,.]+\))/i);
-  const sharesOutstanding = extractNumber(/(?:Shares?\s+Outstanding|Number\s+of\s+Shares)\s*[^\d(]{0,10}([\d,.]+)/i);
+  const eps = extractNumber(/Earnings?\S*\s+Per\s+Share\S*\s*[^\d-]{0,40}?([\d,.]+|\([\d,.]+\))/i);
+  const sharesOutstanding = extractNumber(/(?:Shares?\s+Outstanding|Number\s+of\s+Shares)\s*[^\d(-]{0,10}([\d,.]+)/i);
+  // "Operating Income" — real, present for many filers (verified: Ayala
+  // Land, where it confirmed the dash-exclusion fix above matters: BDO's
+  // real filing renders it as "Operating Income - - - -", genuinely not
+  // applicable for a bank's income-statement structure) but absent for
+  // others. Not EBITDA — see ParsedFundamentals's operatingIncome doc.
+  const operatingIncome = extractLargeNumber(/Operating\s+Income\s*[^\d-]{0,40}?([\d,.]+|\([\d,.]+\))/i);
 
   // 17-A annual reports real-world label this "For the fiscal year ended"
   // (verified: Ayala Land's 17-A), not "For the Year Ended" — the old
@@ -422,6 +443,7 @@ export function parseFinancialStatementText(text: string, symbol: string, source
     revenue,
     eps,
     sharesOutstanding,
+    operatingIncome,
     roe: netIncome !== null && totalEquity ? Number(((netIncome / totalEquity) * 100).toFixed(2)) : null,
     debtToEquity: totalLiabilities !== null && totalEquity ? Number((totalLiabilities / totalEquity).toFixed(2)) : null,
     sourceUrl,
@@ -448,9 +470,13 @@ export function parsePublicOwnershipText(text: string, symbol: string, sourceUrl
     return Number.isFinite(num) ? num : null;
   };
 
-  const outstandingShares = extractNumber(/Number\s+of\s+Outstanding\s*Common\s+Shares\s*[^\d]{0,20}?([\d,.]+)/i);
-  const sharesOwnedByPublic = extractNumber(/Total\s+Number\s+of\s+Shares\s+Owned\s*(?:by\s+the\s+Public)?\s*[^\d]{0,20}?([\d,.]+)/i);
-  const publicOwnershipPercent = extractNumber(/Public\s+Ownership\s+Percentage\s*[^\d]{0,20}?([\d,.]+)/i);
+  // Gap excludes literal "-" too — see parseFinancialStatementText's
+  // dash-placeholder comment for the real-world case that motivated this
+  // (not confirmed to occur in POR-1 filings specifically, but these are
+  // mandatory disclosure fields so the same defensive fix costs nothing).
+  const outstandingShares = extractNumber(/Number\s+of\s+Outstanding\s*Common\s+Shares\s*[^\d-]{0,20}?([\d,.]+)/i);
+  const sharesOwnedByPublic = extractNumber(/Total\s+Number\s+of\s+Shares\s+Owned\s*(?:by\s+the\s+Public)?\s*[^\d-]{0,20}?([\d,.]+)/i);
+  const publicOwnershipPercent = extractNumber(/Public\s+Ownership\s+Percentage\s*[^\d-]{0,20}?([\d,.]+)/i);
   const reportDateMatch = normalized.match(/Report\s+Date\s+([A-Za-z]+\s+\d{1,2},?\s+\d{4})/i);
 
   return {
@@ -577,6 +603,8 @@ export interface FinancialHistoryPoint {
   totalEquity: number | null;
   totalLiabilities: number | null;
   eps: number | null;
+  /** NOT EBITDA — see ParsedFundamentals's operatingIncome doc. */
+  operatingIncome: number | null;
   sourceUrl: string;
 }
 
@@ -605,6 +633,7 @@ async function fetchFilingSeries(symbol: string, companyName: string, filingType
       totalEquity: parsed.totalEquity,
       totalLiabilities: parsed.totalLiabilities,
       eps: parsed.eps,
+      operatingIncome: parsed.operatingIncome,
       sourceUrl,
     });
   }
@@ -651,6 +680,7 @@ export async function scrapeCompanyFinancialHistory(
     revenue: latestPoint.revenue,
     eps: latestPoint.eps,
     sharesOutstanding: null,
+    operatingIncome: latestPoint.operatingIncome,
     roe: latestPoint.netIncome !== null && latestPoint.totalEquity ? Number(((latestPoint.netIncome / latestPoint.totalEquity) * 100).toFixed(2)) : null,
     debtToEquity: latestPoint.totalLiabilities !== null && latestPoint.totalEquity ? Number((latestPoint.totalLiabilities / latestPoint.totalEquity).toFixed(2)) : null,
     sourceUrl: latestPoint.sourceUrl,

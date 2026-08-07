@@ -120,6 +120,34 @@ function PredictionCard({ ticker, prediction, loading, failed, onRefresh }: { ti
           <FactorBar label="Revenue Growth" value={f.revenue_growth} max={50} />
           <FactorBar label="Profit Margin" value={f.profit_margin} max={30} />
         </div>
+      </div>
+
+      {/* Momentum Breakdown Sub-scores */}
+      {prediction.momentumBreakdown && (
+        <div style={{ marginTop: "16px", padding: "12px", background: "rgba(255,255,255,0.03)", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.06)" }}>
+          <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)", margin: "0 0 8px", fontWeight: 600 }}>Momentum Breakdown (from real EODHD data)</p>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: "8px", textAlign: "center" }}>
+            <div>
+              <div style={{ fontSize: "10px", color: "rgba(255,255,255,0.5)" }}>Short Term</div>
+              <div style={{ fontSize: "16px", fontWeight: 600, color: prediction.momentumBreakdown.shortTerm !== null ? (prediction.momentumBreakdown.shortTerm >= 50 ? "#00c853" : prediction.momentumBreakdown.shortTerm >= 35 ? "#ffd600" : "#dd2c00") : "rgba(255,255,255,0.3)" }}>{prediction.momentumBreakdown.shortTerm !== null ? prediction.momentumBreakdown.shortTerm : "—"}</div>
+            </div>
+            <div>
+              <div style={{ fontSize: "10px", color: "rgba(255,255,255,0.5)" }}>Medium Term</div>
+              <div style={{ fontSize: "16px", fontWeight: 600, color: prediction.momentumBreakdown.mediumTerm !== null ? (prediction.momentumBreakdown.mediumTerm >= 50 ? "#00c853" : prediction.momentumBreakdown.mediumTerm >= 35 ? "#ffd600" : "#dd2c00") : "rgba(255,255,255,0.3)" }}>{prediction.momentumBreakdown.mediumTerm !== null ? prediction.momentumBreakdown.mediumTerm : "—"}</div>
+            </div>
+            <div>
+              <div style={{ fontSize: "10px", color: "rgba(255,255,255,0.5)" }}>Trend</div>
+              <div style={{ fontSize: "16px", fontWeight: 600, color: prediction.momentumBreakdown.trend !== null ? (prediction.momentumBreakdown.trend >= 50 ? "#00c853" : prediction.momentumBreakdown.trend >= 35 ? "#ffd600" : "#dd2c00") : "rgba(255,255,255,0.3)" }}>{prediction.momentumBreakdown.trend !== null ? prediction.momentumBreakdown.trend : "—"}</div>
+            </div>
+            <div>
+              <div style={{ fontSize: "10px", color: "rgba(255,255,255,0.5)" }}>Overall</div>
+              <div style={{ fontSize: "16px", fontWeight: 600, color: prediction.momentumBreakdown.overall !== null ? (prediction.momentumBreakdown.overall >= 50 ? "#00c853" : prediction.momentumBreakdown.overall >= 35 ? "#ffd600" : "#dd2c00") : "rgba(255,255,255,0.3)" }}>{prediction.momentumBreakdown.overall !== null ? prediction.momentumBreakdown.overall : "—"}</div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
         <div>
           <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)", margin: "0 0 6px", fontWeight: 600 }}>Valuation</p>
           <FactorBar label="P/B" value={f.pb_ratio} max={10} />

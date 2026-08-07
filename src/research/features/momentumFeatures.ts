@@ -1,5 +1,4 @@
 import type { NormalizedCandle } from "../normalization/types";
-import { mean } from "@/utils/statisticalUtils";
 
 export interface MomentumFeatures {
   priceTrendScore: number | null;
@@ -83,7 +82,9 @@ export function computeMomentumFeatures(
   const confidence = Math.round((present / total) * 100);
 
   const scores = [priceTrendScore, shortTermScore, mediumTermScore, relativeStrengthScore].filter((s): s is number => s !== null);
-  const overallMomentum = scores.length > 0 ? mean(scores) : null;
+  const overallMomentum = scores.length > 0
+    ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length)
+    : null;
 
   return { priceTrendScore, relativeStrengthScore, shortTermScore, mediumTermScore, overallMomentum, confidence, missingInputs: missing };
 }

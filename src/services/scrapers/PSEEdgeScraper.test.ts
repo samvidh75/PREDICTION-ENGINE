@@ -55,6 +55,27 @@ describe('parseFinancialStatementText', () => {
     expect(result.asOfPeriod).toBe('March 31, 2026');
   });
 
+  it('extracts operatingIncome when present (verified: real Ayala Land 17-Q formatting)', () => {
+    const text = `
+      Operating Income 716,307 389,657 716,307 389,657
+      Non-Operating Expense 7,999,643 7,675,047
+    `;
+    const result = parseFinancialStatementText(text, 'ALI', 'https://edge.pse.com.ph/fake.pdf');
+    expect(result.operatingIncome).toBe(716307);
+  });
+
+  it('leaves operatingIncome null when the line is genuinely not applicable (verified: real BDO formatting)', () => {
+    // Banks structure their income statement differently — BDO's real
+    // 17-Q literally has "Operating Income - - - -" (dashes, no digits).
+    // Not a parsing failure to fix; there is no real value to extract.
+    const text = `
+      Operating Income - - - -
+      Non-Operating Expense 6,617 4,218
+    `;
+    const result = parseFinancialStatementText(text, 'BDO', 'https://edge.pse.com.ph/fake.pdf');
+    expect(result.operatingIncome).toBeNull();
+  });
+
   it('derives ROE and debt-to-equity only when their real inputs are present', () => {
     const text = `
       Total Liabilities 2,000,000

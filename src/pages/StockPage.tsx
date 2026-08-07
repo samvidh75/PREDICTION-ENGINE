@@ -1006,7 +1006,11 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
           <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", alignItems: "center" }}>
             <Button variant={financialMetric === "revenue" ? "primary" : "secondary"} onClick={() => setFinancialMetric("revenue")}>Revenue</Button>
             <Button variant={financialMetric === "profit" ? "primary" : "secondary"} onClick={() => setFinancialMetric("profit")}>Profit</Button>
-            <Button variant={financialMetric === "ebitda" ? "primary" : "secondary"} onClick={() => setFinancialMetric("ebitda")}>EBITDA</Button>
+            {/* Internal key stays "ebitda" to match the data shape, but this
+                is real Operating Income, not EBITDA — PSE filings don't
+                report a labeled "EBITDA" line (see apiRouter.ts's toSeries
+                comment). Labeled honestly here. */}
+            <Button variant={financialMetric === "ebitda" ? "primary" : "secondary"} onClick={() => setFinancialMetric("ebitda")}>Operating Income</Button>
             <Button variant={financialPeriod === "annual" ? "primary" : "secondary"} onClick={() => setFinancialPeriod("annual")}>Annual</Button>
             <Button variant={financialPeriod === "quarterly" ? "primary" : "secondary"} onClick={() => setFinancialPeriod("quarterly")}>Quarterly</Button>
             <motion.button
@@ -1040,7 +1044,7 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
         {stock.dataSources.financials !== "real" && stock.dataSources.financials !== "pseApi" && (
           <p style={{ color: colors.textSecondary, fontSize: "11.5px", marginTop: "6px", lineHeight: 1.5 }}>
             Estimated from market cap and sector medians — not real reported financials. No verified free
-            source for PSE revenue/profit/EBITDA is wired in yet.
+            source for PSE revenue/profit/operating income is wired in yet.
           </p>
         )}
       </Card>

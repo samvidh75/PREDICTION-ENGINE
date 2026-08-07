@@ -13,9 +13,18 @@
  * Run:
  *   npx tsx scripts/scrape-pse-financial-history.ts
  *
+ * RETRY_SYMBOLS=AAA,BMM,... npx tsx scripts/scrape-pse-financial-history.ts
+ *   Re-scrapes only the listed symbols and merges the result into the
+ *   existing output file rather than overwriting it wholesale — for when
+ *   a full run has a tail of transient "fetch failed" errors from PSE
+ *   Edge rate-limiting escalating over a long run (observed: the last
+ *   ~40 of 280 symbols failing this way in one run, including symbols
+ *   that succeeded in an earlier run — a real, live PSE Edge, not a
+ *   parsing bug) rather than re-scraping the whole universe again.
+ *
  * Writes: data/pse-financial-history.json
  */
-import { writeFileSync } from 'fs';
+import { writeFileSync, readFileSync, existsSync } from 'fs';
 import { resolve } from 'path';
 import { getAllCompanies } from '../src/services/data/MasterCompanyRegistry.js';
 import { scrapeCompanyFinancialHistory, withRetry, KNOWN_CMPY_IDS, type ParsedFinancialHistory } from '../src/services/scrapers/PSEEdgeScraper.js';
@@ -26,13 +35,15 @@ const CONCURRENCY = 2; // heavy: each company makes ~N viewer requests
 const DELAY_MS = 2000;  // polite to PSE Edge
 
 async function main() {
-    const symbols = Object.keys(KNOWN_CMPY_IDS).sort();
+  const allSymbols = Object.keys(KNOWN_CMPY_IDS).sort();
+  const retrySymbols = process.env.RETRY_SYMBOLS?.split(',').map((s) => s.trim()).filter(Boolean);
   // MAX_SYMBOLS (env) is a dev/validation override only — the monthly
   // production job runs the full universe; never committed.
-  const max = process.env.MAX_SYMBOLS ? Number(process.env.MAX_SYMBOLS) : symbols.length;
-  const toScrape = symbols.slice(0, max);
+  const max = process.env.MAX_SYMBOLS ? Number(process.env.MAX_SYMBOLS) : allSymbols.length;
+  const toScrape = retrySymbols ?? allSymbols.slice(0, max);
   const nameBySymbol = new Map(getAllCompanies().map((c) => [c.symbol, c.companyName]));
-  const results: Record<string, ParsedFinancialHistory | { error: string }> = {};
+  const results: Record<string, ParsedFinancialHistory | { error: string }> =
+    retrySymbols && existsSync(OUTPUT_PATH) ? JSON.parse(readFileSync(OUTPUT_PATH, 'utf-8')).results ?? {} : {};
   let succeeded = 0;
   let failed = 0;
 
