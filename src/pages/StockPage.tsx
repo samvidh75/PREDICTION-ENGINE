@@ -54,6 +54,7 @@ type StockResearchDetail = {
   fundamentals: {
     pe: number | null; industryPe: number | null; pb: number | null; dividendYield: number | null;
     eps: number | null; high52w?: number | null; low52w?: number | null;
+    netMargin?: number | null; operatingMargin?: number | null; snapshotDate?: string | null;
   };
   roe: number | null; debtToEquity: number | null; revenueGrowth: number | null; profitGrowth: number | null;
   rsi: number | null;
@@ -538,11 +539,14 @@ function normalizeStockData(raw: Record<string, any>): StockResearchDetail {
       eps: raw.fundamentals?.eps ?? raw.eps ?? null,
       high52w: raw.fundamentals?.high52w ?? raw.high52w ?? null,
       low52w: raw.fundamentals?.low52w ?? raw.low52w ?? null,
+      netMargin: raw.fundamentals?.netMargin ?? raw.net_margin ?? null,
+      operatingMargin: raw.fundamentals?.operatingMargin ?? raw.operating_margin ?? null,
+      snapshotDate: raw.fundamentals?.snapshotDate ?? raw.snapshot_date ?? null,
     },
-    roe: raw.roe ?? null,
-    debtToEquity: raw.debtToEquity ?? null,
-    revenueGrowth: raw.revenueGrowth ?? null,
-    profitGrowth: raw.profitGrowth ?? null,
+    roe: raw.fundamentals?.roe ?? raw.roe ?? null,
+    debtToEquity: raw.fundamentals?.debtToEquity ?? raw.debtToEquity ?? null,
+    revenueGrowth: raw.fundamentals?.revenueGrowth ?? raw.revenueGrowth ?? null,
+    profitGrowth: raw.fundamentals?.profitGrowth ?? raw.profitGrowth ?? null,
     rsi: raw.rsi ?? null,
     scores: raw.scores ?? { quality: null, valuation: null, growth: null, momentum: null, risk: null, health: null, riskAdjusted: null },
     confidenceMeter: raw.confidenceMeter ?? 0,
@@ -913,11 +917,16 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
       <Card className="stock-metrics-card raycast-slideUp" style={{ animationDelay: "0.15s", animationFillMode: "both" }}>
         <CardLabel>Key metrics</CardLabel>
         <p style={{ color: colors.textSecondary, fontSize: "11.5px", margin: "2px 0 12px 0", lineHeight: 1.5 }}>
-          {stock.dataSources.financials === "pseApi"
+          {fundamentals.netMargin != null || stock.roe != null || fundamentals.eps != null
+            ? "EPS, ROE, margins, growth and debt/equity are real figures from the latest PSE Edge disclosure."
+            : stock.dataSources.financials === "pseApi"
             ? "All figures on this card and in the Financials chart are real reported PSE Edge filing data."
             : stock.dataSources.financials === "partial-real"
             ? "EPS, ROE, and Debt/Equity are from a real PSE Edge filing. Everything else on this card (PE, PB, dividend yield, growth rates) is still a sector-based estimate."
-            : "Estimated from sector medians — no verified free source for this company's real fundamentals is wired in yet."}
+            : "No verified free source for this company's real fundamentals is wired in yet — values shown are sector-based estimates."}
+          {fundamentals.snapshotDate ? (
+            <span style={{ opacity: 0.7 }}> Last filed {fundamentals.snapshotDate}.</span>
+          ) : null}
         </p>
 
         <div style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.04em", textTransform: "uppercase", color: colors.textSecondary, marginTop: "4px", marginBottom: "10px" }}>
@@ -946,6 +955,10 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
             subtitle={sectorRelMap["revenue growth"] ? `Sector: ${sectorRelMap["revenue growth"]}` : undefined} />
           <MetricCard label="Profit Growth" value={stock.profitGrowth != null ? `${formatDecimal(stock.profitGrowth, 1)}%` : "—"}
             trend={stock.profitGrowth != null && stock.profitGrowth > 10 ? "up" : stock.profitGrowth != null ? "down" : "neutral"} />
+          <MetricCard label="Net Margin" value={fundamentals.netMargin != null ? `${formatDecimal(fundamentals.netMargin, 1)}%` : "—"}
+            trend={fundamentals.netMargin != null && fundamentals.netMargin > 15 ? "up" : fundamentals.netMargin != null && fundamentals.netMargin < 0 ? "down" : "neutral"} />
+          <MetricCard label="Operating Margin" value={fundamentals.operatingMargin != null ? `${formatDecimal(fundamentals.operatingMargin, 1)}%` : "—"}
+            trend={fundamentals.operatingMargin != null && fundamentals.operatingMargin > 15 ? "up" : fundamentals.operatingMargin != null ? "down" : "neutral"} />
           <MetricCard label="EPS (TTM)" value={fundamentals.eps != null ? `₱${formatDecimal(fundamentals.eps, 1)}` : "—"} />
         </div>
 

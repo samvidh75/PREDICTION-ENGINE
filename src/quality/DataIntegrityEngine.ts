@@ -71,7 +71,8 @@ export class DataIntegrityEngine {
       const tables = [
         { name: 'daily_prices', col: 'trade_date' },
         { name: 'financial_snapshots', col: 'period_end' },
-        { name: 'factor_snapshots', col: 'snapshot_date' },
+        { name: 'factor_snapshots', col: 'trade_date' },
+        { name: 'feature_snapshots', col: 'trade_date' },
       ];
       for (const t of tables) {
         try {
@@ -115,8 +116,6 @@ export class DataIntegrityEngine {
       score -= c.severity === 'critical' ? 15 : c.severity === 'warning' ? 5 : 2;
     }
     const overallScore = Math.max(0, Math.min(100, score));
-    const allCritical = checks.some(c => c.severity === 'critical');
-    const status = checks.length === 0 ? 'ONLINE' : allCritical ? 'DEGRADED' : 'DEGRADED';
 
     return { status: checks.length === 0 ? 'ONLINE' : 'DEGRADED', checks, overallScore, generatedAt };
   }

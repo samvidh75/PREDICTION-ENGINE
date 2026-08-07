@@ -241,8 +241,46 @@ async function yahooNews(symbol: string): Promise<{ headline: string; source: st
  * financials. Kept as a same-shape no-op so the dependency injection in
  * intelligence{Core,Market,Context}Routes.ts doesn't need to change.
  */
-async function pseApiFunds(_symbol: string): Promise<Record<string, unknown>> {
-  return {};
+async function pseApiFunds(symbol: string): Promise<Record<string, unknown>> {
+  const sym = symbol.toUpperCase().trim();
+  try {
+    // Real PSE EDGE disclosure data (loaded by scripts/load-pse-financials.ts).
+    // Valuation ratios PSE EDGE does not disclose stay null — never guessed.
+    const res = await dbAdapter.query(
+      `SELECT market_cap, pe_ratio, eps, dividend_yield, beta, fcf_yield, ev_ebitda,
+              roa, roe, roic, debt_to_equity, current_ratio, revenue_growth, profit_growth,
+              eps_growth, fcf_growth, gross_margin, operating_margin, net_margin, pb_ratio,
+              snapshot_date
+       FROM financial_snapshots
+       WHERE UPPER(REPLACE(symbol, ' ', '')) = $1
+       ORDER BY snapshot_date DESC LIMIT 1`,
+      [sym]
+    );
+    const r = res.rows?.[0];
+    if (!r) return {};
+    return {
+      pe_ratio: n(r.pe_ratio) ?? null,
+      pb_ratio: n(r.pb_ratio) ?? null,
+      roe: n(r.roe) ?? null,
+      return_on_equity: n(r.roe) ?? null,
+      roa: n(r.roa) ?? null,
+      roic: n(r.roic) ?? null,
+      debt_to_equity: n(r.debt_to_equity) ?? null,
+      eps: n(r.eps) ?? null,
+      dividend_yield: n(r.dividend_yield) ?? null,
+      revenue_growth: n(r.revenue_growth) ?? null,
+      profit_growth: n(r.profit_growth) ?? null,
+      eps_growth: n(r.eps_growth) ?? null,
+      net_margin: n(r.net_margin) ?? null,
+      operating_margin: n(r.operating_margin) ?? null,
+      gross_margin: n(r.gross_margin) ?? null,
+      market_cap: n(r.market_cap) ?? null,
+      snapshot_date: r.snapshot_date ? String(r.snapshot_date) : null,
+    };
+  } catch {
+    // DB unavailable → keep the historical empty-fundamentals contract.
+    return {};
+  }
 }
 
 function decodeHtmlText(value: string): string {
@@ -751,16 +789,18 @@ export default async function registerApiRoutes(server: FastifyInstance) {
       });
     }
 
-    // Merge financials from cache/provider with higher priority for real data
+    // Merge financials from cache/provider with higher priority for real data.
+    // Each field is filled only when the live DB row lacks it — real PSE EDGE
+    // fundamentals are never overridden by cached/synthetic figures.
     const fundData = (fundResultSafe && Object.keys(fundResultSafe).length > 0 ? fundResultSafe : fundResult) || {};
-    if (cachedFinancials && !fundData.pe_ratio) {
-      fundData.pe_ratio = cachedFinancials.peRatio;
-      fundData.pb_ratio = cachedFinancials.pbRatio;
-      fundData.roe = cachedFinancials.roe;
-      fundData.return_on_equity = cachedFinancials.roe;
-      fundData.debt_to_equity = cachedFinancials.debtToEquity;
-      fundData.eps = cachedFinancials.eps;
-      fundData.dividend_yield = cachedFinancials.dividendYield;
+    if (cachedFinancials) {
+      if (!fundData.pe_ratio) fundData.pe_ratio = cachedFinancials.peRatio;
+      if (!fundData.pb_ratio) fundData.pb_ratio = cachedFinancials.pbRatio;
+      if (!fundData.roe) fundData.roe = cachedFinancials.roe;
+      if (!fundData.return_on_equity) fundData.return_on_equity = cachedFinancials.roe;
+      if (!fundData.debt_to_equity) fundData.debt_to_equity = cachedFinancials.debtToEquity;
+      if (!fundData.eps) fundData.eps = cachedFinancials.eps;
+      if (!fundData.dividend_yield) fundData.dividend_yield = cachedFinancials.dividendYield;
     }
     const price = quote.price;
     const change = quote.change || 0;
@@ -838,7 +878,10 @@ export default async function registerApiRoutes(server: FastifyInstance) {
     const annualRev = financialsData.annual.revenue || [];
     const annualProf = financialsData.annual.profit || [];
     const revenue = annualRev.length > 0 ? annualRev[annualRev.length - 1].value : 5000;
-    const netMargin = (SECTOR_NET_MARGIN[sector] || 0.10);
+    // Prefer the real reported net margin (PSE EDGE disclosure, stored in
+    // percent) when available; otherwise fall back to the sector median.
+    const realNm = n(fundData.net_margin);
+    const netMargin = realNm != null ? realNm / 100 : (SECTOR_NET_MARGIN[sector] || 0.10);
     const latestProfit = annualProf.length > 0 ? annualProf[annualProf.length - 1].value : revenue * netMargin;
     const netDebt = de ? marketCapCr * (de / (1 + de)) : marketCapCr * 0.2;
     const cashEq = marketCapCr * 0.05;
@@ -855,7 +898,12 @@ export default async function registerApiRoutes(server: FastifyInstance) {
       sector: displaySector,
       industry: realSubsector ?? displaySector,
       price: { current: price, changeAbs: change, changePercent, marketCap: marketCapCr },
-      fundamentals: { pe, industryPe, pb, dividendYield: divYld, eps },
+      fundamentals: {
+        pe, industryPe, pb, dividendYield: divYld, eps,
+        netMargin: n(fundData.net_margin) ?? null,
+        operatingMargin: n(fundData.operating_margin) ?? null,
+        snapshotDate: fundData.snapshot_date ? String(fundData.snapshot_date) : null,
+      },
       roe, debtToEquity: de, revenueGrowth: revGrowth, profitGrowth: profGrowth,
       rsi: n(fundData.rsi) ?? 50,
       scores: {
