@@ -231,7 +231,7 @@ export async function retrieveResultEventEvidence(
     // and also checked `Array.isArray(rows)` against the adapter's
     // `{ rows, rowCount }` result, so EPS was never actually read).
     const res = await query(
-      `SELECT pe_ratio, eps, dividend_yield, beta FROM financial_snapshots WHERE symbol = ? ORDER BY rowid DESC LIMIT 1`,
+      `SELECT pe_ratio, eps, dividend_yield, beta, snapshot_date FROM financial_snapshots WHERE symbol = ? ORDER BY rowid DESC LIMIT 1`,
       [symbol]
     );
 
@@ -240,7 +240,15 @@ export async function retrieveResultEventEvidence(
       return { symbol, items: [], source: 'None' };
     }
 
-    const epsValue = (snapshot as Record<string, unknown>).eps ?? null;
+    const snap = snapshot as Record<string, unknown>;
+    const epsValue = snap.eps ?? null;
+
+    // Report the snapshot's actual filing date (financial_snapshots.snapshot_date)
+    // rather than "today" — a result event is dated when it was disclosed.
+    const filingDate =
+      typeof snap.snapshot_date === 'string' && /^\d{4}-\d{2}-\d{2}/.test(snap.snapshot_date)
+        ? snap.snapshot_date.slice(0, 10)
+        : new Date().toISOString().split('T')[0];
 
     // Build a result item from what's available
     items.push({
@@ -250,7 +258,7 @@ export async function retrieveResultEventEvidence(
       eps: epsValue !== null ? Number(epsValue) : null,
       revenueGrowthYoy: null,
       profitGrowthYoy: null,
-      filingDate: new Date().toISOString().split('T')[0],
+      filingDate,
     });
 
     return { symbol, items, source: items.length > 0 ? 'FinancialSnapshot' : 'None' };
