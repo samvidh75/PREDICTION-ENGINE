@@ -105,7 +105,7 @@ export function WatchStrip() {
                   <span style={{ fontFamily: "var(--font-mono)", fontSize: 12, color: "var(--text-primary)" }}>
                     ₱{q.price.toLocaleString("en-PH", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </span>
-                  <span style={{ fontFamily: "var(--font-mono)", fontSize: 11.5, fontWeight: 700, color: up ? "#34C759" : "#FF453A" }}>
+                  <span style={{ fontFamily: "var(--font-mono)", fontSize: 11.5, fontWeight: 700, color: up ? "var(--market-green)" : "var(--market-red)" }}>
                     {up ? "+" : ""}{q.changePercent.toFixed(2)}%
                   </span>
                 </>

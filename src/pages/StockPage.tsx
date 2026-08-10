@@ -6,6 +6,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { LazyBarChart, Bar, CartesianGrid, ResponsiveContainer, XAxis, YAxis, Tooltip } from "../components/DynamicChart";
 import StockChart from "../components/StockChart";
 import { Badge } from "../ui/Badge";
+import { MarketStatusBadge } from "../components/MarketStatusBadge";
 import { Button } from "../ui/Button";
 import { Card, CardLabel } from "../ui/Card";
 import { Stat } from "../ui/Stat";
@@ -213,8 +214,9 @@ function HeroSection({ stock, isUp, trendColor }: { stock: StockResearchDetail; 
   const boardTickSize = getTickSize(stock.price.current);
   return (
     <section className="stock-hero raycast-slideUp" style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "48px 0 40px", textAlign: "center", position: "relative" }}>
-      <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "16px" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "16px", flexWrap: "wrap", justifyContent: "center" }}>
         <Badge value={60} label={stock.exchange} />
+        <MarketStatusBadge size="sm" />
         <span style={{ color: colors.textSecondary, fontSize: "14px", fontWeight: 500 }}>{stock.companyName}</span>
       </div>
       <div style={{ fontSize: useResponsiveValue("40px", "64px"), fontWeight: 700, color: colors.textPrimary, lineHeight: "1.1", letterSpacing: "-0.02em", display: "flex", alignItems: "center", justifyContent: "center", gap: "12px" }}>

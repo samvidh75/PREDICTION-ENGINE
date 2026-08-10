@@ -11,15 +11,21 @@ const PSE_30 = [
 ];
 
 const CLASS_COLORS: Record<string, string> = {
-  STRONG_BUY: "#00c853",
-  BUY: "#64dd17",
-  HOLD: "#ffd600",
-  SELL: "#ff6d00",
-  STRONG_SELL: "#dd2c00",
+  STRONG_BUY: "#34C759",
+  BUY: "#7BD88F",
+  HOLD: "#FF9500",
+  SELL: "#FFB340",
+  STRONG_SELL: "#FF3B30",
 };
 
+/** Token-aligned momentum score → color ladder (0–100 sub-score). */
+function momentumColor(value: number | null): string {
+  if (value === null) return "rgba(255,255,255,0.3)";
+  return value >= 50 ? "#34C759" : value >= 35 ? "#FF9500" : "#FF3B30";
+}
+
 function ScoreGauge({ score }: { score: number }) {
-  const color = score >= 80 ? "#00c853" : score >= 65 ? "#64dd17" : score >= 50 ? "#ffd600" : score >= 35 ? "#ff6d00" : "#dd2c00";
+  const color = score >= 80 ? "#34C759" : score >= 65 ? "#7BD88F" : score >= 50 ? "#FF9500" : score >= 35 ? "#FFB340" : "#FF3B30";
   const offset = 138 - (138 * score) / 100;
   return (
     <svg width="56" height="56" viewBox="0 0 56 56" style={{ flexShrink: 0 }}>
@@ -42,7 +48,7 @@ function FactorBar({ label, value, max }: { label: string; value: unknown; max?:
         <span>{displayVal}</span>
       </div>
       <div style={{ height: "4px", background: "rgba(255,255,255,0.06)", borderRadius: "2px", overflow: "hidden" }}>
-        <div style={{ width: `${pct}%`, height: "100%", background: positive ? "rgba(0,200,83,0.7)" : "rgba(221,44,0,0.7)", borderRadius: "2px", transition: "width 0.3s" }} />
+        <div style={{ width: `${pct}%`, height: "100%", background: positive ? "rgba(52,199,89,0.7)" : "rgba(255,59,48,0.7)", borderRadius: "2px", transition: "width 0.3s" }} />
       </div>
     </div>
   );
@@ -129,19 +135,19 @@ function PredictionCard({ ticker, prediction, loading, failed, onRefresh }: { ti
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: "8px", textAlign: "center" }}>
             <div>
               <div style={{ fontSize: "10px", color: "rgba(255,255,255,0.5)" }}>Short Term</div>
-              <div style={{ fontSize: "16px", fontWeight: 600, color: prediction.momentumBreakdown.shortTerm !== null ? (prediction.momentumBreakdown.shortTerm >= 50 ? "#00c853" : prediction.momentumBreakdown.shortTerm >= 35 ? "#ffd600" : "#dd2c00") : "rgba(255,255,255,0.3)" }}>{prediction.momentumBreakdown.shortTerm !== null ? prediction.momentumBreakdown.shortTerm : "—"}</div>
+              <div style={{ fontSize: "16px", fontWeight: 600, color: momentumColor(prediction.momentumBreakdown.shortTerm) }}>{prediction.momentumBreakdown.shortTerm !== null ? prediction.momentumBreakdown.shortTerm : "—"}</div>
             </div>
             <div>
               <div style={{ fontSize: "10px", color: "rgba(255,255,255,0.5)" }}>Medium Term</div>
-              <div style={{ fontSize: "16px", fontWeight: 600, color: prediction.momentumBreakdown.mediumTerm !== null ? (prediction.momentumBreakdown.mediumTerm >= 50 ? "#00c853" : prediction.momentumBreakdown.mediumTerm >= 35 ? "#ffd600" : "#dd2c00") : "rgba(255,255,255,0.3)" }}>{prediction.momentumBreakdown.mediumTerm !== null ? prediction.momentumBreakdown.mediumTerm : "—"}</div>
+              <div style={{ fontSize: "16px", fontWeight: 600, color: momentumColor(prediction.momentumBreakdown.mediumTerm) }}>{prediction.momentumBreakdown.mediumTerm !== null ? prediction.momentumBreakdown.mediumTerm : "—"}</div>
             </div>
             <div>
               <div style={{ fontSize: "10px", color: "rgba(255,255,255,0.5)" }}>Trend</div>
-              <div style={{ fontSize: "16px", fontWeight: 600, color: prediction.momentumBreakdown.trend !== null ? (prediction.momentumBreakdown.trend >= 50 ? "#00c853" : prediction.momentumBreakdown.trend >= 35 ? "#ffd600" : "#dd2c00") : "rgba(255,255,255,0.3)" }}>{prediction.momentumBreakdown.trend !== null ? prediction.momentumBreakdown.trend : "—"}</div>
+              <div style={{ fontSize: "16px", fontWeight: 600, color: momentumColor(prediction.momentumBreakdown.trend) }}>{prediction.momentumBreakdown.trend !== null ? prediction.momentumBreakdown.trend : "—"}</div>
             </div>
             <div>
               <div style={{ fontSize: "10px", color: "rgba(255,255,255,0.5)" }}>Overall</div>
-              <div style={{ fontSize: "16px", fontWeight: 600, color: prediction.momentumBreakdown.overall !== null ? (prediction.momentumBreakdown.overall >= 50 ? "#00c853" : prediction.momentumBreakdown.overall >= 35 ? "#ffd600" : "#dd2c00") : "rgba(255,255,255,0.3)" }}>{prediction.momentumBreakdown.overall !== null ? prediction.momentumBreakdown.overall : "—"}</div>
+              <div style={{ fontSize: "16px", fontWeight: 600, color: momentumColor(prediction.momentumBreakdown.overall) }}>{prediction.momentumBreakdown.overall !== null ? prediction.momentumBreakdown.overall : "—"}</div>
             </div>
           </div>
         </div>
@@ -191,10 +197,10 @@ function LivePricePanel({ prices, onRefresh }: { prices: Array<{ ticker: string;
           const chg = p.change_pct ?? 0;
           const arrow = chg >= 0 ? "▲" : "▼";
           return (
-            <div key={p.ticker} style={{ background: "rgba(0,200,83,0.04)", border: "1px solid rgba(0,200,83,0.1)", borderRadius: "8px", padding: "10px 14px", flexShrink: 0, minWidth: "120px" }}>
+            <div key={p.ticker} style={{ background: "rgba(52,199,89,0.04)", border: "1px solid rgba(52,199,89,0.1)", borderRadius: "8px", padding: "10px 14px", flexShrink: 0, minWidth: "120px" }}>
               <div style={{ fontSize: "12px", fontWeight: 600 }}>{p.ticker}</div>
               <div style={{ fontSize: "15px", fontWeight: 700, margin: "2px 0" }}>₱{p.price.toFixed(2)}</div>
-              <div style={{ fontSize: "11px", color: chg >= 0 ? "#00c853" : "#dd2c00" }}>{arrow} {chg.toFixed(2)}%</div>
+              <div style={{ fontSize: "11px", color: chg >= 0 ? "#34C759" : "#FF3B30" }}>{arrow} {chg.toFixed(2)}%</div>
               <div style={{ fontSize: "9px", color: "rgba(255,255,255,0.3)", marginTop: "2px" }}>by {p.user_id.slice(0, 8)}</div>
             </div>
           );
@@ -260,12 +266,12 @@ function SubmissionsPanel({ userId }: { userId: string }) {
       </div>
       <button onClick={handleSubmit} disabled={status === "submitting"} style={{
         marginTop: "10px", padding: "8px 16px", fontSize: "13px", border: "none", borderRadius: "8px",
-        background: status === "done" ? "rgba(0,200,83,0.2)" : "rgba(0,200,83,0.15)",
-        color: status === "done" ? "#00c853" : "#00e676", cursor: "pointer", width: "100%",
+        background: status === "done" ? "rgba(52,199,89,0.2)" : "rgba(52,199,89,0.15)",
+        color: status === "done" ? "#34C759" : "#7BD88F", cursor: "pointer", width: "100%",
       }}>
         {status === "submitting" ? "Submitting..." : status === "done" ? "✓ Submitted" : "Submit Price"}
       </button>
-      {msg && <p style={{ fontSize: "11px", color: status === "done" ? "#00c853" : "#ff6d00", margin: "6px 0 0" }}>{msg}</p>}
+      {msg && <p style={{ fontSize: "11px", color: status === "done" ? "#34C759" : "#FFB340", margin: "6px 0 0" }}>{msg}</p>}
     </div>
   );
 }

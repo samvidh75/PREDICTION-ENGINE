@@ -317,7 +317,7 @@ export default function ComparePage() {
                       {formatPeso(s.price)}
                     </td>
                     <td style={{ padding: "12px 14px", textAlign: "right", borderBottom: "1px solid var(--glass-border)" }}>
-                      <span style={{ display: "inline-flex", alignItems: "center", gap: 4, fontFamily: "var(--font-mono)", fontSize: 12.5, fontWeight: 700, color: up ? "#34C759" : "#FF453A" }}>
+                      <span style={{ display: "inline-flex", alignItems: "center", gap: 4, fontFamily: "var(--font-mono)", fontSize: 12.5, fontWeight: 700, color: up ? "var(--market-green)" : "var(--market-red)" }}>
                         {up ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
                         {up ? "+" : ""}{s.changePercent.toFixed(2)}%
                       </span>

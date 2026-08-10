@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useLocation, NavLink } from "react-router-dom";
 import {
   Menu, X, Home as HomeIcon, Search, LayoutGrid,
   Star, TrendingUp, MessageCircle, Shield, DollarSign, ArrowRight,
 } from "lucide-react";
 import { BrandMark } from "../components/BrandMark";
+import { MarketStatusBadge } from "../components/MarketStatusBadge";
 
 /* ============================================================================
    PublicLayout — Editorial chrome for the open site (home, scanner, stock, etc.)
@@ -34,6 +35,12 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const closeSidebar = () => setSidebarOpen(false);
+
+  // Drawer-style sidebar: auto-close on route change so a link tap on
+  // mobile navigates AND dismisses the drawer in one interaction.
+  useEffect(() => {
+    closeSidebar();
+  }, [location.pathname]);
 
   return (
     <div
@@ -246,6 +253,9 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
                 StockEx
               </span>
             </button>
+
+            {/* Live PSE session indicator — reads at a glance in the masthead */}
+            <MarketStatusBadge />
           </div>
 
           <nav
@@ -393,13 +403,6 @@ function SidebarLink({ link }: { link: NavEntry }) {
   return (
     <NavLink
       to={link.to}
-      onClick={() => {
-        // drawer-style sidebar: close on link tap on every viewport
-        const ev = (typeof window !== "undefined") ? window.innerWidth : 1280;
-        if (ev < 1280) {
-          // keep drawer open on desktop; close on mobile handled in CSS already
-        }
-      }}
       style={({ isActive }) => ({
         display: "flex",
         alignItems: "center",

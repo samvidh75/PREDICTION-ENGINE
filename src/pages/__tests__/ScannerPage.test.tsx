@@ -15,6 +15,18 @@ vi.mock('react-router-dom', async () => {
   };
 });
 
+// Deterministic market session — the page's "live" chip text depends on the
+// session, which is wall-clock dependent. Force "open" so assertions are stable.
+vi.mock('../../hooks/useMarketStatus', () => ({
+  useMarketStatus: () => ({
+    session: 'open' as const,
+    isOpen: true,
+    phtTime: '10:00 AM',
+    label: 'Market open',
+    detail: 'Live trading 09:30 – 15:30 PHT',
+  }),
+}));
+
 const FIXTURE_QUOTES = [
   { symbol: 'BDO', name: 'BDO Unibank, Inc.', price: 123, change: -3, changePercent: -2.38, volume: 2816730, sector: 'financials' },
   { symbol: 'JFC', name: 'Jollibee Foods Corporation', price: 250, change: 5, changePercent: 2.04, volume: 500000, sector: 'services' },

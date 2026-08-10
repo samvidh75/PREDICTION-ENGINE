@@ -6,6 +6,7 @@ import { colors, typography, space, radius } from "../design/tokens";
 import type { FC, KeyboardEvent, FormEvent } from "react";
 import { localLLMService } from "../services/ai/LocalLLMService";
 import { isWebGpuEnabledInConfig, detectWebGpuSupport } from "../services/ai/webgpuConfig";
+import { useMarketStatus } from "../hooks/useMarketStatus";
 
 // ── Minimal inline markdown: only handles **bold** segments, everything else is plain text.
 // Chat messages are plain strings with no markdown renderer wired up; without this,
@@ -52,6 +53,14 @@ const SUGGESTED_QUESTIONS = [
   "Screen for growth stocks with low debt",
   "Explain the PSE sector taxonomy",
 ];
+
+/** Session-aware first suggestion — helps the model ground answers in
+ * whether live trading is happening right now. */
+function sessionSuggestion(status: { isOpen: boolean; label: string }): string {
+  return status.isOpen
+    ? "What's moving the PSEi-30 right now? Summarize today's gainers and losers"
+    : "What should I review while the market is closed? Suggest stocks to research before the next session";
+}
 
 // ── Quick-start suggestions ────────────────────────────────────────────────────
 const QuickAction: FC<{ icon: LucideIcon; label: string; onClick: () => void; color?: string }> =
@@ -272,6 +281,7 @@ export default function AIChatPage() {
   const [loading, setLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const marketStatus = useMarketStatus();
 
   // WebGPU local inference: onboarding stores a `webgpuEnabled` preference
   // but nothing ever consumed it — the chatbot always went straight to the
@@ -349,7 +359,7 @@ export default function AIChatPage() {
           body: JSON.stringify({
             message: userMessage,
             symbol: "",
-            context: "General PSE stock market research and analysis.",
+            context: `General PSE stock market research and analysis. Current market session: ${marketStatus.label} (${marketStatus.detail}). PSE time is ${marketStatus.phtTime}. ${marketStatus.isOpen ? "Live trading is in progress — intraday quotes are current." : "The market is closed — latest quotes are from the most recent session."}`,
           }),
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -378,7 +388,7 @@ export default function AIChatPage() {
         return aiMsg;
       }
     },
-    [localModeEnabled, webgpuSupported],
+    [localModeEnabled, webgpuSupported, marketStatus],
   );
 
   const handleSend = useCallback(async () => {
@@ -452,7 +462,7 @@ export default function AIChatPage() {
                   justifyContent: "center",
                 }}
               >
-                {SUGGESTED_QUESTIONS.map((q) => (
+                {[sessionSuggestion(marketStatus), ...SUGGESTED_QUESTIONS].map((q) => (
                   <QuickAction
                     key={q}
                     icon={Sparkles}

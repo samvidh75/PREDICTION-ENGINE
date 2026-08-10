@@ -7,6 +7,7 @@ import { Button } from "../ui/Button";
 import OnboardingWizard from "../components/GuidedOnboarding";
 import { loadFirstDashboardFlag, dismissFirstDashboardOverlay, markFirstDashboardPending } from "../services/onboarding/onboardingFirstRunMemory";
 import { CommandCenter } from "../components/dashboard/CommandCenter";
+import { useMarketStatus } from "../hooks/useMarketStatus";
 import { WatchStrip } from "../components/dashboard/WatchStrip";
 import { MarketPulse } from "../components/dashboard/MarketPulse";
 import { SectorHeatmap } from "../components/dashboard/SectorHeatmap";
@@ -24,7 +25,15 @@ const QUICK_ACTIONS = [
 ];
 
 function liveClock(): string {
-  return new Date().toLocaleTimeString("en-PH", { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false });
+  // Manila time, not the browser's local timezone — the whole product is
+  // PSE-first and visitors may be anywhere in the world.
+  return new Date().toLocaleTimeString("en-PH", {
+    timeZone: "Asia/Manila",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  });
 }
 
 export default function HomePage() {
@@ -33,6 +42,7 @@ export default function HomePage() {
   const [query, setQuery] = useState("");
   const [searchResults, setSearchResults] = useState<Array<{ symbol: string; name: string }>>([]);
   const [clock, setClock] = useState(liveClock);
+  const marketStatus = useMarketStatus();
   const normalizedQuery = query.trim().toUpperCase();
 
   /* Onboarding for first-time visitors */
@@ -125,8 +135,12 @@ export default function HomePage() {
               fontFamily: "var(--font-mono)", fontSize: 12, color: "var(--text-secondary)",
             }}
           >
-            <span className="stockex-pulse-dot" style={{ width: 6, height: 6, borderRadius: "50%", background: "#34C759" }} />
+            <span className="stockex-pulse-dot" style={{ width: 6, height: 6, borderRadius: "50%", background: marketStatus.isOpen ? "var(--market-green)" : "var(--text-muted)" }} />
             PSE · {clock}
+            <span aria-hidden="true" style={{ color: "var(--border-strong)" }}>|</span>
+            <span style={{ color: marketStatus.isOpen ? "var(--market-green)" : "var(--text-secondary)", fontWeight: 600 }}>
+              {marketStatus.label}
+            </span>
           </div>
         </div>
 

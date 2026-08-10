@@ -95,13 +95,15 @@ describe("LocalStorageVault", () => {
     expect(history[2].symbol).toBe("RELIANCE");
   });
 
+  // Heavy loop — generous timeout so the full parallel suite's CPU contention
+  // doesn't flake it (5000 sequential writes take ~2s solo, >5s when busy).
   it("caps search history at 5000 entries", async () => {
     for (let i = 0; i < 5001; i++) {
       await v.addSearchHistory(`S${i}`, i);
     }
     const history = await v.getSearchHistory();
     expect(history.length).toBeLessThanOrEqual(5000);
-  });
+  }, 30_000);
 
   it("clears all data", async () => {
     await v.saveWatchlist("Test", ["A"]);

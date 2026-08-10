@@ -73,6 +73,14 @@ export function localApiPlugin(): Plugin {
             return;
           }
 
+          // ── Market Status — delegates to the real api/market-status.ts
+          // handler (holiday-aware PSE session status in Asia/Manila,
+          // combining MarketHours + PSETradingCalendar). ──
+          if (url.startsWith("/api/market-status")) {
+            await callVercelHandler(server, path.resolve(root, "api/market-status.ts"), req, res);
+            return;
+          }
+
           // ── Market Universe — delegates to the real api/market-universe.ts
           // handler (live quotes for the full ~294-ticker PSE universe). ──
           if (url.startsWith("/api/market-universe")) {

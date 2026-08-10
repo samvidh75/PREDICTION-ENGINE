@@ -5,6 +5,7 @@ import { NavLink, Link, useNavigate, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { colors, typography, space, radius, layout, components, shadows, animation } from "../design/tokens";
 import { BrandMark } from "../components/BrandMark";
+import { MarketStatusBadge } from "../components/MarketStatusBadge";
 import { ResearchProfileModal } from "../components/ResearchProfileModal";
 import { useKeyboardShortcuts, KeyboardHelpOverlay } from "../hooks/useKeyboardShortcuts";
 import { FloatingAiAssistant } from "../components/FloatingAiAssistant";
@@ -125,6 +126,9 @@ export function AppShell({ children }: { children: ReactNode }) {
           </NavLink>
           <div style={{ display: "flex", justifyContent: "center", paddingTop: space[2] }}>
             <ResearchProfileModal />
+          </div>
+          <div style={{ display: "flex", justifyContent: "center", paddingTop: space[2] }}>
+            <MarketStatusBadge size="sm" />
           </div>
         </div>
       </aside>
@@ -349,10 +353,9 @@ const brandBadgeStyle = {
 } as const;
 
 const brandWordmarkStyle = {
-  fontFamily: '"Fraunces", "Source Serif Pro", Georgia, serif',
+  fontFamily: typography.fontFamily,
   fontSize: "18px",
-  fontWeight: 500,
-  fontStyle: "italic",
+  fontWeight: 600,
   letterSpacing: "-0.015em",
   lineHeight: 1,
   color: colors.textPrimary,
@@ -412,10 +415,9 @@ const mobileBrandBadgeStyle = {
 } as const;
 
 const mobileBrandWordmarkStyle = {
-  fontFamily: '"Fraunces", "Source Serif Pro", Georgia, serif',
+  fontFamily: typography.fontFamily,
   fontSize: "17px",
-  fontWeight: 500,
-  fontStyle: "italic",
+  fontWeight: 600,
   letterSpacing: "-0.015em",
   lineHeight: 1,
   color: colors.textPrimary,

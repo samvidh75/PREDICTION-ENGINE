@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import { motion, useMotionValue, useSpring, useTransform, animate } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { TrendingUp, TrendingDown, RefreshCw, ArrowUpRight, ArrowDownRight, Activity } from "lucide-react";
+import { MarketStatusBadge } from "../MarketStatusBadge";
+import { useMarketStatus } from "../../hooks/useMarketStatus";
 
 interface PulseQuote {
   symbol: string;
@@ -70,13 +72,13 @@ function BreadthBar({ advancers, decliners, unchanged }: { advancers: number; de
   return (
     <div style={{ position: "relative", display: "grid", gap: 6 }}>
       <div style={{ display: "flex", height: 6, borderRadius: 999, overflow: "hidden", background: "rgba(245,239,230,0.06)" }}>
-        <div style={{ width: `${upPct}%`, background: "#34C759", transition: "width 600ms cubic-bezier(0.16,1,0.3,1)" }} />
-        <div style={{ width: `${downPct}%`, background: "#FF453A", transition: "width 600ms cubic-bezier(0.16,1,0.3,1)" }} />
+        <div style={{ width: `${upPct}%`, background: "var(--market-green)", transition: "width 600ms cubic-bezier(0.16,1,0.3,1)" }} />
+        <div style={{ width: `${downPct}%`, background: "var(--market-red)", transition: "width 600ms cubic-bezier(0.16,1,0.3,1)" }} />
       </div>
       <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11.5, color: "var(--text-secondary)" }}>
-        <span style={{ color: "#34C759" }}>{advancers} advancing</span>
+        <span style={{ color: "var(--market-green)" }}>{advancers} advancing</span>
         <span>{unchanged} flat</span>
-        <span style={{ color: "#FF453A" }}>{decliners} declining</span>
+        <span style={{ color: "var(--market-red)" }}>{decliners} declining</span>
       </div>
     </div>
   );
@@ -84,7 +86,7 @@ function BreadthBar({ advancers, decliners, unchanged }: { advancers: number; de
 
 function QuoteRow({ q, onClick }: { q: PulseQuote; onClick: () => void; index: number }) {
   const up = q.changePercent >= 0;
-  const tint = up ? "#34C759" : "#FF453A";
+  const tint = up ? "var(--market-green)" : "var(--market-red)";
   return (
     <motion.button
       onClick={onClick}
@@ -129,6 +131,7 @@ export function MarketPulse() {
   const [error, setError] = useState(false);
   const [spinning, setSpinning] = useState(false);
   const firstLoad = useRef(true);
+  const marketStatus = useMarketStatus();
 
   const load = () => {
     if (!firstLoad.current) setSpinning(true);
@@ -149,7 +152,7 @@ export function MarketPulse() {
   }, []);
 
   const indexUp = (data?.indexChangePercent ?? 0) >= 0;
-  const glowColor = indexUp ? "52,199,89" : "255,69,58";
+  const glowColor = indexUp ? "52,199,89" : "255,59,48";
 
   return (
     <section aria-label="Live PSE market pulse" style={{ display: "grid", gap: 16 }}>
@@ -158,7 +161,8 @@ export function MarketPulse() {
           <span className="eyebrow" style={{ fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.10em", textTransform: "uppercase", color: "var(--accent)" }}>
             Market pulse
           </span>
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+            <MarketStatusBadge size="sm" />
             <span
               style={{
                 display: "inline-flex", alignItems: "center", gap: 6,
@@ -166,16 +170,16 @@ export function MarketPulse() {
                 border: `1px solid ${error ? "var(--border)" : "rgba(52,199,89,0.3)"}`,
                 background: error ? "transparent" : "rgba(52,199,89,0.1)",
                 fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.04em",
-                color: error ? "var(--text-secondary)" : "#34C759",
+                color: error ? "var(--text-secondary)" : "var(--market-green)",
               }}
             >
               <motion.span
                 className={error ? "" : "stockex-pulse-dot"}
                 animate={error ? {} : { opacity: [1, 0.5, 1] }}
                 transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                style={{ width: 6, height: 6, borderRadius: "50%", background: error ? "var(--text-secondary)" : "#34C759", display: "inline-block" }}
+                style={{ width: 6, height: 6, borderRadius: "50%", background: error ? "var(--text-secondary)" : "var(--market-green)", display: "inline-block" }}
               />
-              {error ? "Feed unavailable" : "Live · PSEi-30"}
+              {error ? "Feed unavailable" : `${marketStatus.isOpen ? "Live" : "Last session"} · PSEi-30`}
             </span>
             {data && <span style={{ fontSize: 11.5, color: "var(--text-secondary)" }}>{data.coverage} reporting</span>}
           </div>
@@ -224,7 +228,7 @@ export function MarketPulse() {
               <span
                 style={{
                   fontFamily: "var(--font-mono)", fontSize: 38, fontWeight: 700,
-                  color: loading ? "var(--text-secondary)" : indexUp ? "#34C759" : "#FF453A",
+                  color: loading ? "var(--text-secondary)" : indexUp ? "var(--market-green)" : "var(--market-red)",
                   display: "flex", alignItems: "center", gap: 8, lineHeight: 1,
                 }}
               >
@@ -239,14 +243,14 @@ export function MarketPulse() {
                   <div style={{ display: "flex", justifyContent: "space-between", gap: 12, paddingTop: 4, borderTop: "1px solid var(--glass-border)", fontSize: 12 }}>
                     {data.gainers[0] && (
                       <span style={{ color: "var(--text-secondary)" }}>
-                        Best <strong style={{ fontFamily: "var(--font-mono)", color: "#34C759" }}>{data.gainers[0].symbol}</strong>{" "}
-                        <span style={{ color: "#34C759" }}>+{data.gainers[0].changePercent.toFixed(2)}%</span>
+                        Best <strong style={{ fontFamily: "var(--font-mono)", color: "var(--market-green)" }}>{data.gainers[0].symbol}</strong>{" "}
+                        <span style={{ color: "var(--market-green)" }}>+{data.gainers[0].changePercent.toFixed(2)}%</span>
                       </span>
                     )}
                     {data.losers[0] && (
                       <span style={{ color: "var(--text-secondary)" }}>
-                        Worst <strong style={{ fontFamily: "var(--font-mono)", color: "#FF453A" }}>{data.losers[0].symbol}</strong>{" "}
-                        <span style={{ color: "#FF453A" }}>{data.losers[0].changePercent.toFixed(2)}%</span>
+                        Worst <strong style={{ fontFamily: "var(--font-mono)", color: "var(--market-red)" }}>{data.losers[0].symbol}</strong>{" "}
+                        <span style={{ color: "var(--market-red)" }}>{data.losers[0].changePercent.toFixed(2)}%</span>
                       </span>
                     )}
                   </div>
@@ -257,7 +261,7 @@ export function MarketPulse() {
 
           {/* Gainers */}
           <div className="stockex-card-lift" style={{ ...glassCard, padding: "8px 0", display: "grid", gap: 0 }} onMouseEnter={(e) => glassHover(e, true)} onMouseLeave={(e) => glassHover(e, false)}>
-            <span style={{ padding: "8px 14px 10px", fontSize: 11, fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", color: "#34C759", display: "flex", alignItems: "center", gap: 6 }}>
+            <span style={{ padding: "8px 14px 10px", fontSize: 11, fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", color: "var(--market-green)", display: "flex", alignItems: "center", gap: 6 }}>
               <ArrowUpRight size={13} /> Top gainers
             </span>
             {loading && <span style={{ padding: "8px 14px", fontSize: 12, color: "var(--text-secondary)" }}>Loading…</span>}
@@ -267,7 +271,7 @@ export function MarketPulse() {
 
           {/* Losers */}
           <div className="stockex-card-lift" style={{ ...glassCard, padding: "8px 0", display: "grid", gap: 0 }} onMouseEnter={(e) => glassHover(e, true)} onMouseLeave={(e) => glassHover(e, false)}>
-            <span style={{ padding: "8px 14px 10px", fontSize: 11, fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", color: "#FF453A", display: "flex", alignItems: "center", gap: 6 }}>
+            <span style={{ padding: "8px 14px 10px", fontSize: 11, fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", color: "var(--market-red)", display: "flex", alignItems: "center", gap: 6 }}>
               <ArrowDownRight size={13} /> Top losers
             </span>
             {loading && <span style={{ padding: "8px 14px", fontSize: 12, color: "var(--text-secondary)" }}>Loading…</span>}

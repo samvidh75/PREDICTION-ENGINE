@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { useMarketStatus } from "../hooks/useMarketStatus";
 
 interface TickerItem {
   label: string;
@@ -22,8 +23,9 @@ const SECTOR_LABELS: Record<string, string> = {
     live feed, so it's left out rather than presented as live data. */
 export function TickerBar() {
   const [items, setItems] = useState<TickerItem[] | null>(null);
+  const marketStatus = useMarketStatus(60000);
 
-  useEffect(() => {
+  const load = useCallback(() => {
     fetch("/api/market-pulse")
       .then((r) => r.json())
       .then((payload) => {
@@ -36,13 +38,30 @@ export function TickerBar() {
       .catch(() => {});
   }, []);
 
+  useEffect(() => {
+    load();
+    const id = window.setInterval(load, 60000);
+    const onVisible = () => {
+      if (document.visibilityState === "visible") load();
+    };
+    document.addEventListener("visibilitychange", onVisible);
+    return () => {
+      window.clearInterval(id);
+      document.removeEventListener("visibilitychange", onVisible);
+    };
+  }, [load]);
+
   if (!items || items.length === 0) return null;
 
   const doubled = [...items, ...items];
 
   return (
     <div
-      aria-label="Live PSE market ticker"
+      aria-label={
+        marketStatus.isOpen
+          ? "Live PSE market ticker"
+          : "PSE market ticker — last session"
+      }
       style={{
         width: "100%",
         overflow: "hidden",
@@ -57,7 +76,7 @@ export function TickerBar() {
       <div className="stockex-ticker-track" style={{ display: "flex", width: "max-content", gap: 36 }}>
         {doubled.map((item, i) => {
           const up = item.changePercent >= 0;
-          const tint = up ? "#34C759" : "#FF453A";
+          const tint = up ? "var(--market-green)" : "var(--market-red)";
           return (
             <span
               key={`${item.label}-${i}`}

@@ -1,10 +1,12 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { motion } from "framer-motion";
-import { Signal, SignalMedium, SignalLow, Plus, X, TrendingUp, TrendingDown, Activity, Search, Wifi, WifiOff } from "lucide-react";
+import { Signal, SignalMedium, SignalLow, Plus, X, TrendingUp, TrendingDown, Activity, Search, Wifi, WifiOff, Clock } from "lucide-react";
 import { Card } from "../ui/Card";
 import { Button } from "../ui/Button";
 import { colors, typography, radius } from "../design/tokens";
 import { livePriceStream, type LiveTick, type StreamStatus } from "../services/market/LivePriceStream";
+import { MarketStatusBadge } from "../components/MarketStatusBadge";
+import { useMarketStatus, type MarketSession } from "../hooks/useMarketStatus";
 
 // ── Shared motion presets (mirrors ScannerPage/StockPage's animation vocabulary) ──
 const fadeUp = {
@@ -50,6 +52,25 @@ function StatusIcon({ status }: { status: StreamStatus }) {
   }
 }
 
+/** Plain-language note for the live quotes view when the PSE isn't trading —
+ * prices shown are from the last session, not the current moment. */
+function closedSessionNote(session: MarketSession): string {
+  switch (session) {
+    case "holiday":
+      return "PSE non-trading holiday today — quotes shown are from the last trading session.";
+    case "weekend":
+      return "Weekend — the PSE is closed. Quotes shown are from the most recent trading session.";
+    case "closing":
+      return "The trading session has ended — today's quotes are final.";
+    case "lunch":
+      return "Lunch break — the PSE reopens at 13:00 PHT. Quotes are from the morning session.";
+    case "auction":
+      return "Pre-open auction in progress — live quotes resume at 09:30 PHT.";
+    default:
+      return "Market closed — quotes shown are from the most recent trading session.";
+  }
+}
+
 export default function LiveMarketPage() {
   const [subscribed, setSubscribed] = useState<string[]>([]);
   const [ticks, setTicks] = useState<Record<string, LiveTick>>({});
@@ -57,6 +78,7 @@ export default function LiveMarketPage() {
   const [query, setQuery] = useState("");
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [showSearch, setShowSearch] = useState(false);
+  const marketStatus = useMarketStatus();
   const cleanupRef = useRef<(() => void) | null>(null);
 
   const handleStatus = useCallback((s: StreamStatus) => {
@@ -150,6 +172,7 @@ export default function LiveMarketPage() {
           </p>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <MarketStatusBadge size="sm" />
           <motion.div
             animate={{ opacity: status === "connecting" ? [1, 0.55, 1] : 1 }}
             transition={{ duration: 1.4, repeat: status === "connecting" ? Infinity : 0 }}
@@ -170,6 +193,28 @@ export default function LiveMarketPage() {
           </motion.div>
         </div>
       </motion.section>
+
+      {!marketStatus.isOpen && (
+        <motion.div
+          initial={{ opacity: 0, y: -6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={pageTransition}
+          role="note"
+          style={{
+            display: "flex", alignItems: "center", gap: 10,
+            padding: "10px 14px", borderRadius: radius.md,
+            border: `1px solid ${colors.border}`,
+            background: colors.surface,
+            fontSize: 13, color: colors.textSecondary, lineHeight: 1.45,
+          }}
+        >
+          <Clock size={15} style={{ flexShrink: 0, color: colors.textTertiary }} />
+          <span>
+            <strong style={{ color: colors.textPrimary, fontWeight: 600 }}>{marketStatus.label}.</strong>{" "}
+            {closedSessionNote(marketStatus.session)}
+          </span>
+        </motion.div>
+      )}
 
       {showSearch && (
         <motion.div

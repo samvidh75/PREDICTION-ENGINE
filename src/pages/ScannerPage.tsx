@@ -3,6 +3,8 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, TrendingUp, TrendingDown, Activity, Info } from "lucide-react";
 import { colors, typography } from "../design/tokens";
+import { MarketStatusBadge } from "../components/MarketStatusBadge";
+import { useMarketStatus } from "../hooks/useMarketStatus";
 
 /**
  * Ranks the PSE universe (~294 tickers, from /api/market-universe) by
@@ -82,6 +84,7 @@ export default function ScannerPage() {
   const [error, setError] = useState(false);
   const [query, setQuery] = useState("");
   const [sortMode, setSortMode] = useState<SortMode>(() => resolveInitialMode(presetFromUrl));
+  const marketStatus = useMarketStatus();
 
   useEffect(() => {
     fetch("/api/market-universe")
@@ -130,23 +133,26 @@ export default function ScannerPage() {
           <h1 style={{ color: colors.textPrimary, fontSize: "clamp(32px, 4vw, 44px)", fontWeight: 600, letterSpacing: "-0.03em", margin: 0 }}>
             Scanner
           </h1>
-          <div
-            style={{
-              display: "inline-flex", alignItems: "center", gap: 8,
-              padding: "6px 12px", borderRadius: 999, border: "1px solid var(--glass-border)",
-              fontFamily: "var(--font-mono)", fontSize: 12, color: "var(--text-secondary)",
-            }}
-          >
-            <motion.span
-              animate={error ? {} : { opacity: [1, 0.4, 1] }}
-              transition={{ duration: 2, repeat: Infinity }}
-              style={{ width: 6, height: 6, borderRadius: "50%", background: error ? "var(--text-secondary)" : "#34C759" }}
-            />
-            {error ? "Feed unavailable" : loading ? "Loading live PSE data…" : `${reportingRatio} live`}
+          <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+            <MarketStatusBadge size="sm" />
+            <div
+              style={{
+                display: "inline-flex", alignItems: "center", gap: 8,
+                padding: "6px 12px", borderRadius: 999, border: "1px solid var(--glass-border)",
+                fontFamily: "var(--font-mono)", fontSize: 12, color: "var(--text-secondary)",
+              }}
+            >
+              <motion.span
+                animate={error ? {} : { opacity: [1, 0.4, 1] }}
+                transition={{ duration: 2, repeat: Infinity }}
+                style={{ width: 6, height: 6, borderRadius: "50%", background: error ? "var(--text-secondary)" : "var(--market-green)" }}
+              />
+              {error ? "Feed unavailable" : loading ? "Loading live PSE data…" : `${reportingRatio} ${marketStatus.isOpen ? "live" : "reporting"}`}
+            </div>
           </div>
         </div>
         <p style={{ fontSize: 13.5, color: colors.textSecondary, lineHeight: 1.5, maxWidth: 640 }}>
-          Ranked by real, live PSE price and volume — the full common-share universe, not just the index.
+          Ranked by the latest PSE price and volume — the full common-share universe, not just the index.
         </p>
       </div>
 
@@ -277,7 +283,7 @@ export default function ScannerPage() {
                     <span
                       style={{
                         textAlign: "right", fontFamily: "var(--font-mono)", fontSize: 12.5, fontWeight: 700,
-                        color: up ? "#34C759" : "#FF453A",
+                        color: up ? "var(--market-green)" : "var(--market-red)",
                       }}
                     >
                       {up ? "+" : ""}{s.changePercent.toFixed(2)}%

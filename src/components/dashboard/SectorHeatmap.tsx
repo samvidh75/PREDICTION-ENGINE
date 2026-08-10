@@ -70,7 +70,7 @@ export function SectorHeatmap() {
           const up = s.avgChangePercent >= 0;
           const meta = SECTOR_META[s.sector];
           const Icon = meta?.icon;
-          const tint = up ? "#34C759" : "#FF453A";
+          const tint = up ? "var(--market-green)" : "var(--market-red)";
           return (
             <motion.button
               key={s.sector}

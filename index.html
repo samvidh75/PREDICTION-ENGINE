@@ -6,7 +6,17 @@
 
     <!-- ── Security Headers ─────────────────────────────────────────────── -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https:; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' https: data:; connect-src 'self' https: wss:; upgrade-insecure-requests;" />
+    <!-- upgrade-insecure-requests removed: the VPS this is deployed to
+         currently serves plain HTTP only (nothing listens on 443). With
+         that directive present, browsers rewrite every relative asset URL
+         (the JS bundle, CSS, fonts) to https:// before requesting it, which
+         then fails outright — the entire app never mounts, rendering a
+         blank page for every visitor. Verified live: https://<vps-ip>/
+         returns curl exit 000 (connection failure), and the deployed
+         site's console showed ERR_CONNECTION_RESET on every asset. Add
+         this back once real TLS is configured (see deployment/setup-dns.sh)
+         — don't reintroduce it before then. -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https:; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' https: data:; connect-src 'self' https: wss:;" />
     <meta http-equiv="Strict-Transport-Security" content="max-age=31536000; includeSubDomains" />
     <meta http-equiv="X-Frame-Options" content="DENY" />
     <!-- (X-Frame-Options must be set via HTTP headers, not meta. Kept here for legacy crawlers.) -->

@@ -10,34 +10,65 @@ interface ChartingData {
   indicators: TechnicalIndicators | null;
   signal: ChartSignal | null;
   loading: boolean;
+  unavailable: boolean;
 }
 
-export default function AdvancedChartingPanel() {
-  const [chartData, setChartData] = useState<ChartingData>({ indicators: null, signal: null, loading: true });
+export default function AdvancedChartingPanel({ symbol = "SMPH" }: { symbol?: string }) {
+  const [chartData, setChartData] = useState<ChartingData>({
+    indicators: null,
+    signal: null,
+    loading: true,
+    unavailable: false,
+  });
   const [expanded, setExpanded] = useState(false);
   const [selectedIndicator, setSelectedIndicator] = useState<'rsi' | 'macd' | 'bb' | 'ma'>('rsi');
 
   useEffect(() => {
     const loadChartData = async () => {
       try {
-        // Simulated candlestick data (would come from market data API in production)
-        const mockCandles = generateMockCandles();
+        // Real PSE daily prices — never simulated. If the API can't serve
+        // history for this symbol, the panel shows an honest "unavailable"
+        // state instead of fabricating candles.
+        const candles = await fetchRealCandles(symbol);
+        if (candles.length === 0) {
+          setChartData({ indicators: null, signal: null, loading: false, unavailable: true });
+          return;
+        }
 
-        const indicators = technicalIndicatorsService.calculateAllIndicators(mockCandles);
-        const signal = technicalIndicatorsService.generateSignal(indicators, mockCandles.slice(-5));
+        const indicators = technicalIndicatorsService.calculateAllIndicators(candles);
+        const signal = technicalIndicatorsService.generateSignal(indicators, candles.slice(-5));
 
-        setChartData({ indicators, signal, loading: false });
+        setChartData({ indicators, signal, loading: false, unavailable: false });
       } catch (error) {
         console.error('Failed to load chart data:', error);
-        setChartData({ indicators: null, signal: null, loading: false });
+        setChartData({ indicators: null, signal: null, loading: false, unavailable: true });
       }
     };
 
     loadChartData();
-  }, []);
+  }, [symbol]);
 
-  if (chartData.loading || !chartData.indicators || !chartData.signal) {
+  if (chartData.loading) {
     return null;
+  }
+
+  if (chartData.unavailable || !chartData.indicators || !chartData.signal) {
+    return (
+      <div
+        style={{
+          padding: '12px',
+          border: '1px solid #e0e0e0',
+          borderRadius: '8px',
+          backgroundColor: '#fafafa',
+          marginBottom: '16px',
+        }}
+      >
+        <div style={{ fontSize: '14px', fontWeight: 'bold', marginBottom: '8px' }}>📈 Technical Analysis</div>
+        <div style={{ fontSize: '12px', color: '#666', lineHeight: 1.5 }}>
+          Real PSE price data for {symbol} isn't available right now — indicators are not shown rather than simulated.
+        </div>
+      </div>
+    );
   }
 
   const { indicators, signal } = chartData;
@@ -68,7 +99,12 @@ export default function AdvancedChartingPanel() {
           fontWeight: 'bold',
         }}
       >
-        <div>📈 Technical Analysis</div>
+        <div style={{ display: 'grid', gap: 2 }}>
+          <span>📈 Technical Analysis — {symbol}</span>
+          <span style={{ fontSize: '10px', fontWeight: 'normal', color: '#666' }}>
+            Computed from real PSE daily prices
+          </span>
+        </div>
         <span style={{ fontSize: '16px' }}>{expanded ? '▼' : '▶'}</span>
       </button>
 
@@ -305,32 +341,62 @@ export default function AdvancedChartingPanel() {
 }
 
 /**
- * Generate mock candlestick data for demonstration
+ * Fetch real PSE daily price history for a symbol from the live API and
+ * map it to CandleData. Falls back across timeframes (3M → 1Y → 1M) so a
+ * thin or missing window degrades gracefully. Returns [] when no real data
+ * exists — callers must render an honest unavailable state, never simulate.
  */
-function generateMockCandles(): CandleData[] {
-  const candles: CandleData[] = [];
-  let basePrice = 3500;
+async function fetchRealCandles(symbol: string): Promise<CandleData[]> {
+  const res = await fetch(`/api/stock/${encodeURIComponent(symbol)}`);
+  if (!res.ok) return [];
+  const payload = (await res.json()) as {
+    // The real /api/stock/:symbol response returns ONE flat daily history —
+    // priceChart: Array<{ date, close, volume }> — from EODHD. It does NOT
+    // ship a pre-bucketed `priceHistory` map; that is only built client-side
+    // by StockPage (see buildPriceHistoryFromFlatSeries). Read priceChart
+    // directly so this panel renders the actual price series instead of
+    // falling through to an empty/unavailable state. The priceHistory branch
+    // is kept as a defensive fallback in case a future endpoint adds buckets.
+    priceChart?: Array<{ date?: string; time?: string; label?: string; price?: number; close?: number; volume?: number }>;
+    priceHistory?: Record<
+      string,
+      Array<{ label?: string; time?: string; date?: string; price?: number; open?: number; high?: number; low?: number; close?: number; volume?: number }>
+    >;
+  };
+  const bucketed = payload?.priceHistory;
+  const series =
+    (bucketed && (bucketed['3M'] ?? bucketed['1Y'] ?? bucketed['1M'])) ??
+    payload?.priceChart ??
+    [];
+  return toCandles(series);
+}
 
-  for (let i = 0; i < 60; i++) {
-    const timestamp = Date.now() - (60 - i) * 24 * 60 * 60 * 1000;
-    const change = (Math.random() - 0.5) * 100;
-    const open = basePrice + change;
-    const close = basePrice + change + (Math.random() - 0.5) * 50;
-    const high = Math.max(open, close) + Math.random() * 50;
-    const low = Math.min(open, close) - Math.random() * 50;
-    const volume = Math.floor(Math.random() * 10000000) + 1000000;
-
-    candles.push({
-      timestamp,
-      open,
-      high,
-      low,
-      close,
-      volume,
-    });
-
-    basePrice = close;
-  }
-
-  return candles;
+/** Map a real price-history series to CandleData (ms timestamps, OHLC with flat price/close fallback). Exported for tests. */
+export function toCandles(
+  series: Array<{ label?: string; time?: string; date?: string; price?: number; open?: number; high?: number; low?: number; close?: number; volume?: number }>,
+): CandleData[] {
+  return series
+    .map((item) => {
+      const timeValue = item.time ?? item.date ?? item.label;
+      let timestamp =
+        typeof timeValue === 'number'
+          ? timeValue
+          : timeValue
+            ? Date.parse(String(timeValue))
+            : NaN;
+      if (Number.isNaN(timestamp)) timestamp = 0;
+      // The real daily feed (EODHD free tier) carries only close + volume.
+      // When no distinct OHLC is present, represent the day as a *flat* candle
+      // (open = high = low = close) — an honest price line, never a fabricated
+      // intraday range. Using 0 would draw a misleading candle that crashes
+      // from zero and yields invalid high/low (high < close).
+      const close = item.close ?? item.price ?? 0;
+      const open = item.open ?? close;
+      const high = item.high ?? close;
+      const low = item.low ?? close;
+      const volume = item.volume ?? 0;
+      return { timestamp, open, high, low, close, volume };
+    })
+    .filter((c) => c.close > 0 && c.timestamp > 0)
+    .sort((a, b) => a.timestamp - b.timestamp);
 }
