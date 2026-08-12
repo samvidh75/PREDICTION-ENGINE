@@ -33,9 +33,9 @@ interface ComparableQuote {
 }
 
 const glassCard: React.CSSProperties = {
-  border: "1px solid var(--glass-border)",
-  background: "var(--glass-bg)",
-  borderRadius: 14,
+  border: `1px solid ${colors.hairline}`,
+  background: colors.surface,
+  borderRadius: 12,
 };
 
 const SUGGESTIONS = [
@@ -143,7 +143,7 @@ export default function ComparePage() {
       style={{ display: "grid", gap: 24, maxWidth: 1000, margin: "0 auto" }}
     >
       <motion.div variants={fadeUp} transition={pageTransition} style={{ display: "grid", gap: 6 }}>
-        <h1 style={{ color: colors.textPrimary, fontSize: "clamp(28px, 3.5vw, 38px)", fontWeight: 600, letterSpacing: "-0.03em", margin: 0 }}>
+        <h1 style={{ color: colors.textPrimary, fontSize: "20px", fontWeight: 700, margin: 0 }}>
           Compare
         </h1>
         <p style={{ fontSize: 13.5, color: colors.textSecondary, lineHeight: 1.5 }}>
@@ -171,7 +171,7 @@ export default function ComparePage() {
               disabled={selectedSymbols.length >= 5}
               style={{
                 width: "100%", height: 42, boxSizing: "border-box",
-                border: "1px solid var(--glass-border)", background: "var(--glass-bg)",
+                border: `1px solid ${colors.hairline}`,background: colors.surface,
                 borderRadius: 999, padding: "0 16px 0 40px",
                 fontFamily: typography.fontFamily, fontSize: 14, color: colors.textPrimary, outline: "none",
               }}
@@ -184,7 +184,7 @@ export default function ComparePage() {
             disabled={stocks.length === 0}
             style={{
               display: "inline-flex", alignItems: "center", gap: 6, padding: "10px 16px",
-              borderRadius: 999, border: "1px solid var(--glass-border)", background: "var(--glass-bg)",
+              borderRadius: 999, border: `1px solid ${colors.hairline}`,background: colors.surface,
               color: colors.textPrimary, fontSize: 13, fontWeight: 500, cursor: stocks.length ? "pointer" : "not-allowed",
               opacity: stocks.length ? 1 : 0.5,
             }}
@@ -232,7 +232,7 @@ export default function ComparePage() {
             transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
             style={{
               display: "inline-flex", alignItems: "center", gap: 6, padding: "6px 10px 6px 12px",
-              borderRadius: 999, border: "1px solid var(--glass-border)", background: "var(--glass-bg)",
+              borderRadius: 999, border: `1px solid ${colors.hairline}`,background: colors.surface,
               fontSize: 12.5, fontWeight: 600, color: colors.textPrimary,
             }}
           >
@@ -271,7 +271,7 @@ export default function ComparePage() {
               onClick={() => setRetryKey((k) => k + 1)}
               style={{
                 display: "inline-flex", alignItems: "center", gap: 6, padding: "7px 14px",
-                borderRadius: 999, border: "1px solid var(--glass-border)", background: "var(--glass-bg)",
+                borderRadius: 999, border: `1px solid ${colors.hairline}`,background: colors.surface,
                 color: colors.textPrimary, fontSize: 12.5, fontWeight: 500, cursor: "pointer",
               }}
             >
