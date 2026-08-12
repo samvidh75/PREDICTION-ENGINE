@@ -39,7 +39,7 @@ function DepthLine({ inkColor, accentColor }) {
     const W = 600, H = 220, N = 64;
     const r = rng(seedTick);
     const pts: { x: number; y: number }[] = [];
-    let y = H * 0.55;
+    let y: number;
     for (let i = 0; i < N; i++) {
       const noise = (r() - 0.5) * H * 0.16;
       const trend = (i / N) * H * 0.30;

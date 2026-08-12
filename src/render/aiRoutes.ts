@@ -345,6 +345,7 @@ export async function registerAIRoutes(server: FastifyInstance) {
 
     const connectToPython = () => {
       try {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
         const { WebSocket } = require('ws');
         const py = new WebSocket(LORA_SERVER_URL.replace(/^http/, 'ws') + '/ws/live-prices');
         pySocket = py;

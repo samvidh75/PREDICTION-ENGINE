@@ -6,6 +6,9 @@
  */
 import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
 import { StockUniverseAdapter } from "../services/data/providers/StockUniverseAdapter.js";
+import { PSEI_30, PSE_COMMON_STOCKS } from "../constants/pseTickers.js";
+import { pseTradingCalendar } from "../data-plane/calendar/PSETradingCalendar.js";
+import { resolveMarketStatus, phtDateString } from "../services/market/marketStatusResolver.js";
 import { getPersistedStockResearch } from "../lib/stockResearchSnapshot.js";
 import { financialEngine } from "../services/intelligence/engines/FinancialEngine/index.js";
 import { technicalEngine } from "../services/intelligence/engines/TechnicalEngine/index.js";
@@ -1503,6 +1506,122 @@ export default async function registerApiRoutes(server: FastifyInstance) {
     } catch (err: any) {
       return reply.status(502).send({ error: err.message || String(err) });
     }
+  });
+
+  // GET /api/market-status — holiday-aware, timezone-correct PSE session
+  // status. Mirrors api/market-status.ts (the Vercel handler of the same
+  // name) — that file's route only exists on the Vercel deployment target,
+  // never on this Fastify/VPS one, so MarketStatusBadge and useMarketStatus
+  // 404'd in production despite working locally (vite-plugin-local-api
+  // serves api/*.ts directly in dev, masking the gap). Same real logic,
+  // just reachable from both deployment targets now.
+  server.get("/api/market-status", async (_req: FastifyRequest, reply: FastifyReply) => {
+    const now = new Date();
+    const phtDate = phtDateString(now);
+    const payload = resolveMarketStatus(
+      now,
+      pseTradingCalendar.isHoliday(phtDate),
+      (d) => pseTradingCalendar.isTradingDay(d),
+    );
+    setCache(reply, 60);
+    return payload;
+  });
+
+  // GET /api/market-pulse — live PSEi-30 gainers/losers/most-active
+  // snapshot. Mirrors api/market-pulse.ts (Vercel-only, same 404 gap as
+  // above — MarketPulse.tsx calls this on every dashboard load). Uses the
+  // same real phisix-api3.appspot.com feed as the rest of this file (see
+  // the /api/pse/* routes above); PSEI_30/PSE_COMMON_STOCKS come from
+  // src/constants/pseTickers.ts rather than api/_lib/data/universe.ts —
+  // this file (src/render/apiRouter.ts) can't import from api/_lib/ at all
+  // (tsconfig.backend.json's rootDir is "src", api/_lib/ is outside it).
+  interface PulseQuote { symbol: string; name: string; price: number; change: number; changePercent: number; volume: number }
+  let marketPulseCache: { data: unknown; expiresAt: number } | null = null;
+  async function fetchPulseQuote(symbol: string): Promise<PulseQuote | null> {
+    try {
+      const response = await fetch(`https://phisix-api3.appspot.com/stocks/${symbol.toLowerCase()}.json`, { signal: AbortSignal.timeout(6000) });
+      if (!response.ok) return null;
+      const data = (await response.json()) as any;
+      const stock = data?.stocks?.[0];
+      if (!stock) return null;
+      const price = stock.price?.amount ?? 0;
+      if (!price) return null;
+      const changePercent = stock.percentChange ?? 0;
+      const prevClose = changePercent !== 0 ? price / (1 + changePercent / 100) : price;
+      return {
+        symbol,
+        name: stock.name || PSE_COMMON_STOCKS[symbol]?.name || symbol,
+        price: Number(price.toFixed(2)),
+        change: Number((price - prevClose).toFixed(2)),
+        changePercent: Number(changePercent.toFixed(2)),
+        volume: Number(stock.volume ?? 0) || 0,
+      };
+    } catch {
+      return null;
+    }
+  }
+  server.get("/api/market-pulse", async (_req: FastifyRequest, reply: FastifyReply) => {
+    if (marketPulseCache && marketPulseCache.expiresAt > Date.now()) {
+      setCache(reply, 30);
+      return marketPulseCache.data;
+    }
+
+    const results = await Promise.all(PSEI_30.map(fetchPulseQuote));
+    const quotes = results.filter((q): q is PulseQuote => q !== null);
+    if (quotes.length === 0) {
+      return reply.status(503).send({ ok: false, error: "PSE live feed unavailable", quotes: [] });
+    }
+
+    const sortedByChange = [...quotes].sort((a, b) => b.changePercent - a.changePercent);
+    const gainers = sortedByChange.filter((q) => q.changePercent > 0).slice(0, 5);
+    const losers = [...sortedByChange].reverse().filter((q) => q.changePercent < 0).slice(0, 5);
+    const mostActive = [...quotes].sort((a, b) => b.volume - a.volume).slice(0, 5);
+    const indexChangePercent = Number((quotes.reduce((sum, q) => sum + q.changePercent, 0) / quotes.length).toFixed(2));
+    const advancers = quotes.filter((q) => q.changePercent > 0).length;
+    const decliners = quotes.filter((q) => q.changePercent < 0).length;
+    const unchanged = quotes.length - advancers - decliners;
+
+    // Real sector aggregation from PSE_COMMON_STOCKS's per-stock sector
+    // field (same six-sector taxonomy as api/_lib's PSE_SECTORS) — sectors
+    // with zero reporting members this round are omitted, not guessed.
+    const quotesBySymbol = new Map(quotes.map((q) => [q.symbol, q]));
+    const symbolsBySector = new Map<string, string[]>();
+    for (const sym of PSEI_30) {
+      const sector = PSE_COMMON_STOCKS[sym]?.sector;
+      if (!sector) continue;
+      if (!symbolsBySector.has(sector)) symbolsBySector.set(sector, []);
+      symbolsBySector.get(sector)!.push(sym);
+    }
+    const sectors = [...symbolsBySector.entries()]
+      .map(([sector, symbols]) => {
+        const members = symbols.map((s) => quotesBySymbol.get(s)).filter((q): q is PulseQuote => q !== undefined);
+        if (members.length === 0) return null;
+        return {
+          sector,
+          avgChangePercent: Number((members.reduce((sum, q) => sum + q.changePercent, 0) / members.length).toFixed(2)),
+          coverage: `${members.length}/${symbols.length}`,
+          members: members.map((m) => m.symbol),
+        };
+      })
+      .filter((s): s is NonNullable<typeof s> => s !== null)
+      .sort((a, b) => b.avgChangePercent - a.avgChangePercent);
+
+    const payload = {
+      ok: true,
+      asOf: new Date().toISOString(),
+      coverage: `${quotes.length}/${PSEI_30.length}`,
+      indexChangePercent,
+      breadth: { advancers, decliners, unchanged },
+      gainers,
+      losers,
+      mostActive,
+      sectors,
+      quotes,
+    };
+
+    marketPulseCache = { data: payload, expiresAt: Date.now() + 30_000 };
+    setCache(reply, 30);
+    return payload;
   });
 
   server.get("/api/pse/gainers", async (_req: FastifyRequest, reply: FastifyReply) => {
