@@ -60,7 +60,21 @@ async def load_model():
         device = "cuda" if torch.cuda.is_available() else "cpu"
         logger.info(f"Loading model on {device}...")
 
+        # The base model must match the adapter that was trained on it, or peft
+        # fails with a LoRA shape mismatch (e.g. a Gemma adapter loaded onto a
+        # Qwen base). Prefer the base model recorded in the adapter config.
         model_id = "Qwen/Qwen2.5-0.5B-Instruct"
+        if os.path.exists(ADAPTER_PATH):
+            adapter_config_path = os.path.join(ADAPTER_PATH, "adapter_config.json")
+            try:
+                with open(adapter_config_path, "r") as f:
+                    cfg = json.load(f)
+                recorded = cfg.get("base_model_name_or_path")
+                if recorded:
+                    model_id = recorded
+                    logger.info(f"Base model from adapter config: {model_id}")
+            except Exception as e:
+                logger.warning(f"Could not read adapter config, defaulting to {model_id}: {e}")
 
         tokenizer = AutoTokenizer.from_pretrained(model_id, trust_remote_code=True)
 

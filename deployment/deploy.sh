@@ -134,6 +134,12 @@ Environment=HOST=0.0.0.0
 WantedBy=multi-user.target
 EOF"
 
+# Bootstrap the Python venv for the LLM server (idempotent). Without this the
+# LLM unit points at /usr/bin/python3 which has no uvicorn/torch and the
+# service crash-loops forever (real production bug, see AGENTS.md §8).
+info "Bootstrapping LLM Python venv..."
+$SSH_CMD "bash -lc 'set -e; cd ${APP_DIR}; if [ ! -x llmvenv/bin/python ]; then python3 -m venv llmvenv; fi; . llmvenv/bin/activate; pip install --quiet --upgrade pip; pip install --quiet torch --index-url https://download.pytorch.org/whl/cpu 2>/dev/null || pip install --quiet torch; pip install --quiet fastapi uvicorn transformers peft pydantic sentencepiece protobuf accelerate requests'"
+
 # Create LLM service
 $SSH_CMD "cat > /etc/systemd/system/stockex-llm.service << 'EOF'
 [Unit]
@@ -144,9 +150,12 @@ After=network.target
 Type=simple
 User=root
 WorkingDirectory=${APP_DIR}
-ExecStart=/usr/bin/python3 -m uvicorn deployment.llm_server:app --host 0.0.0.0 --port 8000
+ExecStart=${APP_DIR}/llmvenv/bin/python -m uvicorn deployment.llm_server:app --host 0.0.0.0 --port 8000
 Restart=always
 RestartSec=10
+Environment=MODEL_PATH=${APP_DIR}/stockex_slm_agent_output
+Environment=ADAPTER_PATH=${APP_DIR}/gemma_pse_model_final
+Environment=HF_HOME=${APP_DIR}/.hf-cache
 
 [Install]
 WantedBy=multi-user.target
