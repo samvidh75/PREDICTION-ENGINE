@@ -34,7 +34,7 @@ const glassCard: React.CSSProperties = {
 
 function glassHover(e: React.MouseEvent<HTMLElement>, entering: boolean) {
   const el = e.currentTarget;
-  el.style.borderColor = entering ? "rgba(79,142,247,0.35)" : "var(--border)";
+  el.style.borderColor = entering ? "rgba(228,168,83,0.32)" : "var(--border)";
   el.style.background = entering ? "var(--bg-card-hover)" : "var(--bg-card)";
 }
 

@@ -1,79 +1,80 @@
 /* ============================================================================
-   DESIGN TOKENS — ZERODHA-INSPIRED PROFESSIONAL DARK THEME
-   Deep navy canvas, Bloomberg-grade data density, blue accent.
+   DESIGN TOKENS — SIGNATURE PREMIUM DARK
+   Warm charcoal canvas, champagne-gold accent, conventional market greens/reds.
+   Hand-crafted institutional identity — not the default cool-navy AI template.
    ============================================================================ */
 
 :root {
-  /* ── Surface ladder — deep navy elevation steps ─────────────────────── */
-  --bg-page:        #0B1117;
-  --bg-card:        #131C27;
-  --bg-card-hover:  #182232;
-  --bg-chip:        #162030;
-  --bg-sheet:       #0E1620;
-  --bg-paper-deep:  #1C2A3A;
-  --bg-elevated:    #1A2740;
+  /* ── Surface ladder — warm charcoal elevation steps ────────────────── */
+  --bg-page:        #0B0E12;
+  --bg-card:        #12161C;
+  --bg-card-hover:  #181D25;
+  --bg-chip:        #161B23;
+  --bg-sheet:       #0E1217;
+  --bg-paper-deep:  #1E242D;
+  --bg-elevated:    #1A2029;
 
-  /* ── Brand / CTA — professional blue ───────────────────────────────── */
-  --brand:          #4F8EF7;
-  --brand-light:    #6BA3F9;
-  --brand-dark:     #3A7AE8;
-  --brand-ink:      #FFFFFF;
+  /* ── Brand / CTA — champagne-gold ─────────────────────────────────── */
+  --brand:          #E4A853;
+  --brand-light:    #EEC07C;
+  --brand-dark:     #D39438;
+  --brand-ink:      #19130B;
 
-  /* ── Market semantic colors ─────────────────────────────────────────── */
-  --market-green:        #26A69A;
-  --market-green-light:  rgba(38,166,154,0.15);
-  --market-red:          #EF5350;
-  --market-red-light:    rgba(239,83,80,0.15);
-  --market-orange:       #FF9800;
-  --market-orange-light: rgba(255,152,0,0.15);
+  /* ── Market semantic colors ────────────────────────────────────────── */
+  --market-green:        #2BB673;
+  --market-green-light:  rgba(43,182,115,0.15);
+  --market-red:          #E8504E;
+  --market-red-light:    rgba(232,80,78,0.15);
+  --market-orange:       #F0A63C;
+  --market-orange-light: rgba(240,166,60,0.16);
 
-  /* ── UI semantic ────────────────────────────────────────────────────── */
-  --green:          #26A69A;
-  --green-light:    rgba(38,166,154,0.15);
-  --red:            #EF5350;
-  --red-light:      rgba(239,83,80,0.15);
-  --amber:          #FF9800;
-  --amber-light:    rgba(255,152,0,0.15);
+  /* ── UI semantic ───────────────────────────────────────────────────── */
+  --green:          #2BB673;
+  --green-light:    rgba(43,182,115,0.15);
+  --red:            #E8504E;
+  --red-light:      rgba(232,80,78,0.15);
+  --amber:          #F0A63C;
+  --amber-light:    rgba(240,166,60,0.16);
 
-  /* ── Signature accent — Professional blue ───────────────────────────── */
-  --accent:         #4F8EF7;
-  --accent-soft:    rgba(79,142,247,0.12);
-  --accent-strong:  rgba(79,142,247,0.25);
-  --accent-ink:     #FFFFFF;
+  /* ── Signature accent — champagne-gold ─────────────────────────────── */
+  --accent:         #E4A853;
+  --accent-soft:    rgba(228,168,83,0.13);
+  --accent-strong:  rgba(228,168,83,0.26);
+  --accent-ink:     #19130B;
 
-  /* ── Text hierarchy ─────────────────────────────────────────────────── */
-  --text-primary:   #E8ECF0;
-  --text-body:      #A8B3C0;
-  --text-secondary: #708090;
-  --text-muted:     #4A5A6A;
-  --text-inverse:   #0B1117;
-  --text-rule:      #1E2D40;
+  /* ── Text hierarchy ────────────────────────────────────────────────── */
+  --text-primary:   #EDF0F3;
+  --text-body:      #AAB3BD;
+  --text-secondary: #7B8591;
+  --text-muted:     #535D68;
+  --text-inverse:   #0B0E12;
+  --text-rule:      #1F262F;
 
-  /* ── Borders ────────────────────────────────────────────────────────── */
-  --border:         #1E2D40;
-  --border-strong:  rgba(255,255,255,0.18);
+  /* ── Borders ───────────────────────────────────────────────────────── */
+  --border:         #1F262F;
+  --border-strong:  rgba(255,255,255,0.16);
   --border-soft:    rgba(255,255,255,0.07);
-  --border-focus:   #4F8EF7;
+  --border-focus:   #E4A853;
 
-  /* ── Typography — Inter for body, mono for data ─────────────────────── */
+  /* ── Typography — Inter for body, mono for data ────────────────────── */
   --font-sans:      -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Segoe UI", Roboto, sans-serif;
   --font:           var(--font-sans);
   --font-mono:      "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, "Courier New", monospace;
   --font-display:   -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", sans-serif;
   --font-serif:     var(--font-display);
 
-  /* ── Radius ─────────────────────────────────────────────────────────── */
+  /* ── Radius ────────────────────────────────────────────────────────── */
   --radius-sm:      4px;
   --radius-md:      6px;
   --radius-lg:      10px;
   --radius-xl:      14px;
 
-  /* ── Shadows ────────────────────────────────────────────────────────── */
+  /* ── Shadows ───────────────────────────────────────────────────────── */
   --shadow-card:    0 1px 3px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.3);
   --shadow-raised:  0 4px 16px rgba(0,0,0,0.5);
   --shadow-modal:   0 20px 60px rgba(0,0,0,0.7);
 
-  /* ── Animation ──────────────────────────────────────────────────────── */
+  /* ── Animation ─────────────────────────────────────────────────────── */
   --ease-raycast:   cubic-bezier(0.32, 1.4, 0.6, 1);
   --ease-soft:      cubic-bezier(0.4, 0, 0.2, 1);
   --ease-paper:     cubic-bezier(0.2, 0.7, 0.1, 1);
@@ -83,7 +84,7 @@
   --t-slow:         350ms cubic-bezier(0.16, 1, 0.3, 1);
   --t-draw:         1000ms cubic-bezier(0.7, 0, 0.3, 1);
 
-  /* ── Aliases ─────────────────────────────────────────────────────────── */
+  /* ── Aliases ───────────────────────────────────────────────────────── */
   --page:               var(--bg-page);
   --chip:               var(--bg-chip);
   --surface:            var(--bg-card);
@@ -92,22 +93,22 @@
   --surface-paper-deep: var(--bg-paper-deep);
 
   --brand-hover:    var(--brand-dark);
-  --brand-tint:     rgba(79,142,247,0.10);
+  --brand-tint:     rgba(228,168,83,0.11);
 
   --text-900:       var(--text-primary);
   --text-700:       var(--text-body);
   --text-500:       var(--text-secondary);
   --text-300:       var(--text-muted);
 
-  --green-text:     #26A69A;
-  --red-text:       #EF5350;
-  --amber-text:     #FF9800;
-  --accent-text:    #4F8EF7;
+  --green-text:     #2BB673;
+  --red-text:       #E8504E;
+  --amber-text:     #F0A63C;
+  --accent-text:    #E4A853;
 
   --sh-card:        var(--shadow-card);
   --sh-raised:      var(--shadow-raised);
   --sh-float:       var(--shadow-modal);
-  --sh-focus:       0 0 0 3px rgba(79,142,247,0.25);
+  --sh-focus:       0 0 0 3px rgba(228,168,83,0.25);
 
   --r-xs:           var(--radius-sm);
   --r-md:           var(--radius-md);
@@ -134,9 +135,9 @@
   --sz-2xl:         24px;
   --sz-3xl:         30px;
 
-  /* ── Glass — minimal; only for overlays/modals ──────────────────────── */
-  --glass-bg:          rgba(13, 22, 32, 0.92);
-  --glass-bg-strong:   rgba(18, 28, 39, 0.96);
+  /* ── Glass — minimal; only for overlays/modals ─────────────────────── */
+  --glass-bg:          rgba(13, 16, 21, 0.92);
+  --glass-bg-strong:   rgba(17, 21, 27, 0.96);
   --glass-border:      rgba(255, 255, 255, 0.10);
   --glass-border-top:  rgba(255, 255, 255, 0.15);
   --glass-blur:        16px;

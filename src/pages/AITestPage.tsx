@@ -88,7 +88,7 @@ export default function AITestPage() {
               borderRadius: '8px',
               border: 'none',
               background: activeTab === tab ? colors.primary : 'rgba(255,255,255,0.04)',
-              color: activeTab === tab ? '#fff' : colors.body,
+              color: activeTab === tab ? colors.onPrimary : colors.body,
               fontSize: '13px',
               fontWeight: '600',
               cursor: 'pointer',

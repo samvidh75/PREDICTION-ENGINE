@@ -31,7 +31,7 @@
   cursor: pointer;
 }
 .card-interactive:hover {
-  border-color: rgba(79,142,247,0.30);
+  border-color: rgba(228,168,83,0.28);
   box-shadow: 0 4px 16px -4px rgba(0,0,0,0.3);
 }
 

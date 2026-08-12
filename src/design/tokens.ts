@@ -8,33 +8,36 @@
 // keeps compiling and re-themes automatically.
 // ============================================================================
 
-// ── COLORS — Zerodha-inspired professional dark financial theme ─────────
+// ── COLORS — Signature premium dark: warm charcoal + champagne-gold ───────
+// A deliberately hand-crafted institutional identity. Warm near-black surfaces
+// (not the generic cool-navy AI template), a distinctive gold accent, and
+// market semantic greens/reds that stay conventional for instant legibility.
 export const colors = {
-  // Brand — blue CTA
-  primary:        '#4F8EF7',
-  primaryPressed: '#3A7AE8',
-  onPrimary:      '#FFFFFF',
+  // Brand — champagne-gold CTA (distinctive, not the default AI blue)
+  primary:        '#E4A853',
+  primaryPressed: '#D39438',
+  onPrimary:      '#19130B',
 
-  // Text hierarchy on deep navy
-  ink:            '#E8ECF0',   // Primary headlines / body,
-  body:           '#A8B3C0',   // Default paragraph / inline-link,
-  charcoal:       '#C8D0DA',   // Stronger body emphasis,
-  mute:           '#708090',   // Metadata, secondary captions,
-  ash:            '#4A5A6A',   // Disabled text, lowest emphasis,
-  stone:          '#334455',   // Least-emphasis caption / disabled icon,
-  onDark:         '#E8ECF0',   // Interactive-state primary text,
-  onDarkMute:     'rgba(232,236,240,0.65)',
+  // Text hierarchy on warm charcoal (slightly warm whites, not blue-tinted)
+  ink:            '#EDF0F3',   // Primary headlines / body,
+  body:           '#AAB3BD',   // Default paragraph / inline-link,
+  charcoal:       '#CBD2DA',   // Stronger body emphasis,
+  mute:           '#7B8591',   // Metadata, secondary captions,
+  ash:            '#535D68',   // Disabled text, lowest emphasis,
+  stone:          '#3A434D',   // Least-emphasis caption / disabled icon,
+  onDark:         '#EDF0F3',   // Interactive-state primary text,
+  onDarkMute:     'rgba(237,240,243,0.62)',
 
-  // Surface ladder — deep navy elevation steps
-  canvas:           '#0B1117', // Page background,
-  surface:          '#131C27', // Card / elevated panel,
-  surfaceElevated:  '#182232', // Hover states, lifted interiors,
-  surfaceCard:      '#1C2A3A', // Active/pressed cards, tile fills,
-  buttonFg:         '#1E2D40', // Rare deep surface variant
+  // Surface ladder — warm charcoal elevation steps (no blue tint)
+  canvas:           '#0B0E12', // Page background,
+  surface:          '#12161C', // Card / elevated panel,
+  surfaceElevated:  '#181D25', // Hover states, lifted interiors,
+  surfaceCard:      '#1E242D', // Active/pressed cards, tile fills,
+  buttonFg:         '#242B34', // Rare deep surface variant
 
   // Glass — only for modals/overlays
-  glassBg:          'rgba(13, 22, 32, 0.92)',
-  glassBgStrong:    'rgba(18, 28, 39, 0.96)',
+  glassBg:          'rgba(13, 16, 21, 0.92)',
+  glassBgStrong:    'rgba(17, 21, 27, 0.96)',
   glassBorder:      'rgba(255, 255, 255, 0.10)',
   glassBorderTop:   'rgba(255, 255, 255, 0.15)',
   glassBlur:        'blur(16px) saturate(140%)',
@@ -43,34 +46,34 @@ export const colors = {
   backdropClear:       'rgba(0,0,0,0)',
   backdropModal:       'rgba(0,0,0,0.6)',
   backdropHeavy:       'rgba(0,0,0,0.75)',
-  backdropGlassmorphic:'rgba(11,17,23,0.90)',
-  backdropFooter:      'rgba(11,17,23,0.95)',
+  backdropGlassmorphic:'rgba(11,14,18,0.90)',
+  backdropFooter:      'rgba(11,14,18,0.95)',
   backdropMuted:       'rgba(255,255,255,0.04)',
 
-  // Borders
-  hairline:       '#1E2D40',
+  // Borders — charcoal hairline
+  hairline:       '#1F262F',
   hairlineSoft:   'rgba(255,255,255,0.07)',
-  hairlineStrong: 'rgba(255,255,255,0.18)',
+  hairlineStrong: 'rgba(255,255,255,0.16)',
 
-  // Brand accent — professional blue
-  accentRed:        '#4F8EF7',
-  accentRedSoft:    'rgba(79,142,247,0.12)',
-  accentRedStrong:  'rgba(79,142,247,0.25)',
-  accentBlue:       '#4F8EF7',
-  accentBlueSoft:   'rgba(79,142,247,0.12)',
-  accentYellow:     '#FF9800',
-  accentYellowSoft: 'rgba(255,152,0,0.15)',
+  // Brand accent — champagne-gold
+  accentRed:        '#E4A853',
+  accentRedSoft:    'rgba(228,168,83,0.13)',
+  accentRedStrong:  'rgba(228,168,83,0.26)',
+  accentBlue:       '#E4A853',
+  accentBlueSoft:   'rgba(228,168,83,0.13)',
+  accentYellow:     '#F0B45E',
+  accentYellowSoft: 'rgba(240,180,94,0.16)',
 
-  // Market semantic colors
-  marketGreen:       '#26A69A', // Bullish (positive),
-  marketGreenSoft:   'rgba(38,166,154,0.15)',
-  marketRed:         '#EF5350', // Bearish (negative),
-  marketRedSoft:     'rgba(239,83,80,0.15)',
-  marketOrange:      '#FF9800', // Neutral, caution,
-  marketOrangeSoft:  'rgba(255,152,0,0.15)',
+  // Market semantic colors — conventional green/red for instant legibility
+  marketGreen:       '#2BB673', // Bullish (positive),
+  marketGreenSoft:   'rgba(43,182,115,0.15)',
+  marketRed:         '#E8504E', // Bearish (negative),
+  marketRedSoft:     'rgba(232,80,78,0.15)',
+  marketOrange:      '#F0A63C', // Neutral, caution,
+  marketOrangeSoft:  'rgba(240,166,60,0.16)',
 
-  accentGreen:       '#26A69A',
-  accentGreenSoft:   'rgba(38,166,154,0.15)',
+  accentGreen:       '#2BB673',
+  accentGreenSoft:   'rgba(43,182,115,0.15)',
 
   // PSE sector taxonomy colors
   sectorFinancials:  '#1E5FAD',
@@ -81,24 +84,24 @@ export const colors = {
   sectorMiningAndOil:'#8A6020',
 
   // Legacy gradient anchors
-  heroStripeStart: '#4F8EF7',
-  heroStripeEnd:   '#3A6BD0',
-  keyBgStart:      '#131C27',
-  keyBgEnd:        '#0B1117',
+  heroStripeStart: '#E4A853',
+  heroStripeEnd:   '#C88A3A',
+  keyBgStart:      '#161B23',
+  keyBgEnd:        '#0B0E12',
 
   // Semantic aliases
-  success:         '#26A69A',
-  danger:          '#EF5350',
-  warning:         '#FF9800',
-  page:            '#0B1117',
-  card:            '#131C27',
-  textPrimary:     '#E8ECF0',
-  textSecondary:   '#A8B3C0',
-  textTertiary:    '#708090',
-  border:          '#1E2D40',
-  separator:       '#1E2D40',
-  fill:            '#182232',
-  bgSecondary:     '#182232',
+  success:         '#2BB673',
+  danger:          '#E8504E',
+  warning:         '#F0A63C',
+  page:            '#0B0E12',
+  card:            '#12161C',
+  textPrimary:     '#EDF0F3',
+  textSecondary:   '#AAB3BD',
+  textTertiary:    '#7B8591',
+  border:          '#1F262F',
+  separator:       '#1F262F',
+  fill:            '#181D25',
+  bgSecondary:     '#181D25',
 } as const;
 
 // ── TYPOGRAPHY ─────────────────────────────────────────────────────────

@@ -197,7 +197,7 @@ export default function HomePage() {
             onClick={() => { const t = resolveTarget(); if (t) navigate(`/stock/${t}`); }}
             style={{
               padding: "0 20px", height: 44, borderRadius: 8,
-              background: "var(--accent)", color: "#fff", border: "none",
+              background: "var(--accent)", color: "var(--accent-ink)", border: "none",
               fontSize: 14, fontWeight: 600, cursor: "pointer",
               display: "flex", alignItems: "center", gap: 6,
               transition: "background 150ms ease",
@@ -224,7 +224,7 @@ export default function HomePage() {
               transition: "border-color 150ms ease, background 150ms ease",
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = "rgba(79,142,247,0.35)";
+              e.currentTarget.style.borderColor = "rgba(228,168,83,0.32)";
               e.currentTarget.style.background = "var(--bg-card-hover)";
             }}
             onMouseLeave={(e) => {

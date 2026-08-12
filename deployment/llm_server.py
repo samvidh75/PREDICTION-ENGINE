@@ -63,38 +63,45 @@ async def load_model():
         # The base model must match the adapter that was trained on it, or peft
         # fails with a LoRA shape mismatch (e.g. a Gemma adapter loaded onto a
         # Qwen base). Prefer the base model recorded in the adapter config.
-        model_id = "Qwen/Qwen2.5-0.5B-Instruct"
+        adapter_base = None
         if os.path.exists(ADAPTER_PATH):
             adapter_config_path = os.path.join(ADAPTER_PATH, "adapter_config.json")
             try:
                 with open(adapter_config_path, "r") as f:
                     cfg = json.load(f)
-                recorded = cfg.get("base_model_name_or_path")
-                if recorded:
-                    model_id = recorded
-                    logger.info(f"Base model from adapter config: {model_id}")
+                adapter_base = cfg.get("base_model_name_or_path")
             except Exception as e:
-                logger.warning(f"Could not read adapter config, defaulting to {model_id}: {e}")
+                logger.warning(f"Could not read adapter config: {e}")
 
-        tokenizer = AutoTokenizer.from_pretrained(model_id, trust_remote_code=True)
-
-        if os.path.exists(ADAPTER_PATH):
-            from peft import PeftModel
-            base = AutoModelForCausalLM.from_pretrained(
-                model_id,
+        def _load(base_id: str, apply_adapter: bool = True) -> tuple:
+            tok = AutoTokenizer.from_pretrained(base_id, trust_remote_code=True)
+            mdl = AutoModelForCausalLM.from_pretrained(
+                base_id,
                 torch_dtype=torch.float32,
                 device_map="auto",
                 trust_remote_code=True,
             )
-            model = PeftModel.from_pretrained(base, ADAPTER_PATH)
-            logger.info(f"LoRA adapter loaded from {ADAPTER_PATH}")
+            if apply_adapter and os.path.exists(ADAPTER_PATH):
+                from peft import PeftModel
+                mdl = PeftModel.from_pretrained(mdl, ADAPTER_PATH)
+                logger.info(f"LoRA adapter loaded from {ADAPTER_PATH}")
+            return tok, mdl
+
+        # 1) Preferred: adapter base (if an adapter exists and its base is reachable).
+        if adapter_base:
+            try:
+                tokenizer, model = _load(adapter_base, apply_adapter=True)
+                logger.info(f"Loaded adapter base: {adapter_base}")
+            except Exception as e:
+                # Gated base (e.g. google/gemma-2b-it) or download failure.
+                # Fall back to the un-gated Qwen base WITHOUT the adapter (which
+                # belongs to a different model and would shape-mismatch).
+                logger.error(f"Adapter base ({adapter_base}) load failed: {e} — falling back to Qwen base")
+                tokenizer, model = _load("Qwen/Qwen2.5-0.5B-Instruct", apply_adapter=False)
+                logger.info("Fell back to Qwen2.5-0.5B base model (no adapter)")
         else:
-            model = AutoModelForCausalLM.from_pretrained(
-                model_id,
-                torch_dtype=torch.float32,
-                device_map="auto",
-                trust_remote_code=True,
-            )
+            # 2) No adapter: load the un-gated Qwen base directly.
+            tokenizer, model = _load("Qwen/Qwen2.5-0.5B-Instruct")
             logger.info("Base model loaded (no adapter found)")
 
         model.eval()
@@ -119,15 +126,20 @@ async def chat_completions(query: Query):
 
     messages = [{"role": "user", "content": query.prompt}]
 
-    inputs = tokenizer.apply_chat_template(
+    # return_dict=True yields a BatchEncoding with .input_ids; otherwise newer
+    # transformers returns a bare tuple that lacks `.shape`/`.input_ids`.
+    enc = tokenizer.apply_chat_template(
         messages,
         add_generation_prompt=True,
         return_tensors="pt",
+        return_dict=True,
     )
+    input_ids = enc["input_ids"].to(device)
+    input_len = input_ids.shape[1]
 
     with torch.no_grad():
         outputs = model.generate(
-            inputs,
+            input_ids=input_ids,
             max_new_tokens=query.max_tokens,
             temperature=query.temperature,
             top_p=query.top_p,
@@ -135,7 +147,7 @@ async def chat_completions(query: Query):
             pad_token_id=tokenizer.eos_token_id,
         )
 
-    response = tokenizer.decode(outputs[0][inputs.shape[1]:], skip_special_tokens=True)
+    response = tokenizer.decode(outputs[0][input_len:], skip_special_tokens=True)
 
     return {
         "id": f"chatcmpl-{int(time.time())}",
@@ -148,8 +160,8 @@ async def chat_completions(query: Query):
             "finish_reason": "stop",
         }],
         "usage": {
-            "prompt_tokens": inputs.shape[1],
-            "completion_tokens": outputs.shape[1] - inputs.shape[1],
+            "prompt_tokens": input_len,
+            "completion_tokens": outputs.shape[1] - input_len,
             "total_tokens": outputs.shape[1],
         },
     }

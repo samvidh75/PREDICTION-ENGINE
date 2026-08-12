@@ -147,7 +147,7 @@ const MessageBubble: FC<{ msg: Message; isLast: boolean }> = ({ msg, isLast }) =
         {isUser ? (
           <User size={16} style={{ color: colors.textSecondary }} />
         ) : (
-          <Sparkles size={16} style={{ color: "#ffffff" }} />
+          <Sparkles size={16} style={{ color: colors.onPrimary }} />
         )}
       </div>
 
@@ -215,7 +215,7 @@ const Sidebar: FC<{
           borderRadius: radius.lg,
           border: "none",
           background: colors.accentRed,
-          color: "#ffffff",
+          color: colors.onPrimary,
           fontFamily: typography.fontFamily,
           fontSize: typography.buttonMd.size,
           fontWeight: 500,
@@ -479,7 +479,7 @@ export default function AIChatPage() {
           {loading && (
             <div style={{ padding: space[3], display: "flex", gap: space[2], alignItems: "center" }}>
               <div style={{ width: 32, height: 32, borderRadius: radius.full, background: colors.accentRed, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <Sparkles size={16} style={{ color: "#ffffff" }} />
+                <Sparkles size={16} style={{ color: colors.onPrimary }} />
               </div>
               <div style={{ display: "flex", gap: 4 }}>
                 {[0, 1, 2].map((i) => (
@@ -558,7 +558,7 @@ export default function AIChatPage() {
                 borderRadius: radius.md,
                 border: "none",
                 background: input.trim() && !loading ? colors.accentRed : colors.surfaceElevated,
-                color: input.trim() && !loading ? "#ffffff" : colors.textTertiary,
+                color: input.trim() && !loading ? colors.onPrimary : colors.textTertiary,
                 cursor: input.trim() && !loading ? "pointer" : "default",
                 flexShrink: 0,
                 transition: "background 0.15s ease",
