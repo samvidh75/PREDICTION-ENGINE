@@ -26,11 +26,11 @@ export interface SectorIntelligenceProfile {
 }
 
 export interface SectorHealth {
-  healthScore: number;             // 0-100
-  sectorStrength: number;          // 0-100
+  healthScore: number;             // 0-100,
+  sectorStrength: number;          // 0-100,
   momentum: 'accelerating' | 'steady' | 'decelerating' | 'unclear';
-  tailwindScore: number;           // -100 to 100
-  headwindScore: number;           // 0-100
+  tailwindScore: number;           // -100 to 100,
+  headwindScore: number;           // 0-100,
   cyclicality: 'defensive' | 'cyclical' | 'highly_cyclical' | 'unclear';
   avgGrowth: number | null;
   avgMargin: number | null;

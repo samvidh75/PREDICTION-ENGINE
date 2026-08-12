@@ -8,7 +8,7 @@ import { useEffect, useRef } from "react";
 const REVEAL_SELECTOR = ".raycast-reveal";
 const OPSERVER_OPTIONS: IntersectionObserverInit = {
   root: null,
-  rootMargin: "0px 0px -40px 0px", // Trigger slightly after element enters viewport
+  rootMargin: "0px 0px -40px 0px", // Trigger slightly after element enters viewport,
   threshold: 0.1,
 };
 

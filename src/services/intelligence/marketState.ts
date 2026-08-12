@@ -16,12 +16,12 @@ export type ConfidenceState =
   | "ELEVATED_RISK";
 
 export type MarketInputs = {
-  trendConsistency: number; // 0..1
-  volatilityStability: number; // 0..1 (higher = calmer)
-  institutionalParticipation: number; // 0..1
-  liquidityBreadth: number; // 0..1
-  sentimentAlignment: number; // 0..1 (higher = aligned / calm)
-  sectorMomentum: number; // 0..1
+  trendConsistency: number; // 0..1,
+  volatilityStability: number; // 0..1 (higher = calmer),
+  institutionalParticipation: number; // 0..1,
+  liquidityBreadth: number; // 0..1,
+  sentimentAlignment: number; // 0..1 (higher = aligned / calm),
+  sectorMomentum: number; // 0..1,
   earningsQuality: number; // 0..1
 };
 

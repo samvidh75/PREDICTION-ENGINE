@@ -16,8 +16,8 @@ export interface NewsArticle {
 export interface SentimentAnalysis {
   article: NewsArticle;
   sentiment: 'bullish' | 'neutral' | 'bearish';
-  score: number; // -1 to +1
-  confidence: number; // 0 to 1
+  score: number; // -1 to +1,
+  confidence: number; // 0 to 1,
   summary: string;
 }
 
@@ -114,7 +114,7 @@ class NewsSentimentAnalyzer {
       article,
       sentiment,
       score,
-      confidence: Math.min(total / 5, 1), // Normalize confidence
+      confidence: Math.min(total / 5, 1), // Normalize confidence,
       summary: this.generateSummary(sentiment, bullishCount, bearishCount),
     };
   }

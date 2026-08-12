@@ -1,10 +1,10 @@
 import logger from '../../../../config/logger';
 
 export interface QualityResult {
-  score: number;              // 0-35
-  roeScore: number;           // 0-15
-  operatingMarginScore: number; // 0-10
-  netMarginScore: number;     // 0-10
+  score: number;              // 0-35,
+  roeScore: number;           // 0-15,
+  operatingMarginScore: number; // 0-10,
+  netMarginScore: number;     // 0-10,
   details: string[];
 }
 

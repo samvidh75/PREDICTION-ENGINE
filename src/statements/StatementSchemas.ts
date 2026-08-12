@@ -9,7 +9,7 @@
 
 export interface BalanceSheet {
   symbol: string;
-  periodEnd: string;        // ISO date
+  periodEnd: string;        // ISO date,
   periodType: 'annual' | 'quarterly' | 'ttm';
   reportingCurrency: string;
 

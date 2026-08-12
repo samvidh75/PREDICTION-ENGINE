@@ -24,8 +24,8 @@ export interface ConcallTranscript {
   title: string;
   callDate: string;
   callType: 'earnings' | 'agm' | 'analyst_day' | 'press' | 'other';
-  fiscalPeriod: string; // e.g., "Q3FY24"
-  duration: number | null; // minutes
+  fiscalPeriod: string; // e.g., "Q3FY24",
+  duration: number | null; // minutes,
   segments: TranscriptSegment[];
   summary: string | null;
   keyTopics: string[];

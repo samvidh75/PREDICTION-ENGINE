@@ -43,7 +43,7 @@ export interface RegistryChange {
   old_value: string | null;
   new_value: string | null;
   symbol: string;
-  detected_at: string; // ISO date
+  detected_at: string; // ISO date,
   action_required: 'auto_update' | 'manual_review';
 }
 
@@ -61,7 +61,7 @@ export interface RegistryUpdateResult {
 interface PrimaryMasterEntry {
   SYMBOL: string;
   ISIN: string;
-  SERIES: string; // EQ, BE, etc.
+  SERIES: string; // EQ, BE, etc.,
   FACE_VALUE: number;
   DATE_OF_LISTING: string;
 }
@@ -272,7 +272,7 @@ export class RegistryUpdater {
 
         newEntries.push({
           symbol,
-          company_name: symbol, // Will need enrichment from metadata provider
+          company_name: symbol, // Will need enrichment from metadata provider,
           isin: data.isin,
           pse_symbol: data.pse_symbol,
           pse_symbol2: data.pse_symbol2,

@@ -22,7 +22,7 @@ export interface AnalyticsEvent {
 export interface SearchEvent extends AnalyticsEvent {
   category: 'discovery';
   action: 'search_performed' | 'search_success' | 'search_failed' | 'search_selected';
-  label: string; // search query
+  label: string; // search query,
   metadata: {
     symbols_found: number;
     time_ms: number;
@@ -32,7 +32,7 @@ export interface SearchEvent extends AnalyticsEvent {
 export interface StockViewEvent extends AnalyticsEvent {
   category: 'discovery';
   action: 'stock_viewed';
-  label: string; // symbol
+  label: string; // symbol,
   metadata: {
     from_page: string;
     is_watchlist: boolean;
@@ -42,7 +42,7 @@ export interface StockViewEvent extends AnalyticsEvent {
 export interface CompareEvent extends AnalyticsEvent {
   category: 'discovery';
   action: 'compare_performed';
-  label: string; // "SYMA_vs_SYMB"
+  label: string; // "SYMA_vs_SYMB",
   metadata: {
     symbol_a: string;
     symbol_b: string;
@@ -54,7 +54,7 @@ export interface CompareEvent extends AnalyticsEvent {
 export interface SuperpageEngagementEvent extends AnalyticsEvent {
   category: 'engagement';
   action: 'superpage_view' | 'superpage_scroll_50' | 'superpage_scroll_100' | 'superpage_tab_switch';
-  label: string; // symbol
+  label: string; // symbol,
   metadata: {
     time_on_page_ms: number;
     sections_viewed: number;

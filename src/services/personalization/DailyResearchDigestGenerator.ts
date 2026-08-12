@@ -72,7 +72,7 @@ function filterByWindow<T extends { timestamp?: string }>(
 function alertToDigestItem(alert: AlertChangeView): ResearchDigestItem {
   return {
     symbol: alert.symbol,
-    companyName: alert.symbol, // Best effort — can be enriched later
+    companyName: alert.symbol, // Best effort — can be enriched later,
     alertType: alert.type,
     title: alert.title,
     body: alert.body,
@@ -116,7 +116,7 @@ export class DigestGenerator {
 
       thesisChanges.push({
         symbol,
-        from: null, // Would need previous snapshot lookup
+        from: null, // Would need previous snapshot lookup,
         to: latest.thesis.currentStatus as WatchlistThesisView["currentStatus"],
       });
     }

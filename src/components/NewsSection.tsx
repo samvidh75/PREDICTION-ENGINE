@@ -72,8 +72,6 @@ export default function NewsSection({ symbol }: NewsSectionProps) {
   return (
     <div style={{
       background: colors.surface,
-      backdropFilter: "blur(20px) saturate(160%)",
-      WebkitBackdropFilter: "blur(20px) saturate(160%)",
       border: `1px solid ${colors.border}`,
       borderRadius: '8px',
       padding: 'clamp(12px, 3vw, 16px)',
@@ -163,8 +161,6 @@ function NewsCard({ item, onAffiliateClick }: { item: NewsItem; onAffiliateClick
       style={{
         display: 'block',
         background: colors.canvas,
-        backdropFilter: "blur(20px) saturate(160%)",
-        WebkitBackdropFilter: "blur(20px) saturate(160%)",
         border: `1px solid ${colors.border}`,
         borderRadius: '6px',
         padding: 'clamp(8px, 2vw, 12px)',

@@ -23,7 +23,7 @@ export interface FreshnessReport {
 export class DataFreshnessMonitor {
   private thresholds = {
     dailyPrices: { stale: 2, critical: 7 },
-    financialSnapshots: { stale: 45, critical: 90 }, // quarterly data
+    financialSnapshots: { stale: 45, critical: 90 }, // quarterly data,
     factorSnapshots: { stale: 2, critical: 7 },
     predictionRegistry: { stale: 2, critical: 7 },
   };

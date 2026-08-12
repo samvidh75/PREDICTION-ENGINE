@@ -9,13 +9,13 @@ export interface TaxableGain {
   quantity: number;
   buyPrice: number;
   currentPrice: number;
-  holdingPeriod: number; // days
-  purchaseDate: number; // timestamp
-  saleDate: number; // timestamp
+  holdingPeriod: number; // days,
+  purchaseDate: number; // timestamp,
+  saleDate: number; // timestamp,
   gain: number;
   gainPercent: number;
-  gainType: 'short-term' | 'long-term'; // STCG < 12 months, LTCG >= 12 months
-  stcgTax: number; // Short-term capital gains tax (slab rate)
+  gainType: 'short-term' | 'long-term'; // STCG < 12 months, LTCG >= 12 months,
+  stcgTax: number; // Short-term capital gains tax (slab rate),
   ltcgTax: number; // Long-term capital gains tax (20% + cess)
 }
 
@@ -27,7 +27,7 @@ export interface TaxSummary {
   totalLTCGTax: number;
   totalTax: number;
   netGains: number;
-  effectiveTaxRate: number; // %
+  effectiveTaxRate: number; // %,
   recommendations: string[];
 }
 

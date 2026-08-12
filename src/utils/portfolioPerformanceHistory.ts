@@ -7,7 +7,7 @@
  */
 
 export interface PortfolioSnapshot {
-  date: number; // timestamp
+  date: number; // timestamp,
   totalValue: number;
   totalInvested: number;
   totalReturn: number;
@@ -27,7 +27,7 @@ export interface PerformanceHistory {
   bestDay?: { date: number; returnPercent: number };
   worstDay?: { date: number; returnPercent: number };
   averageDailyReturn: number;
-  volatility: number; // standard deviation
+  volatility: number; // standard deviation,
   sharpeRatio: number; // return / volatility
 }
 

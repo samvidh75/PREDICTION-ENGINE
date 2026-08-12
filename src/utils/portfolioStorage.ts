@@ -7,7 +7,7 @@ export interface Holding {
   id: string;
   ticker: string;
   quantity: number;
-  buyPrice: number; // PHP
+  buyPrice: number; // PHP,
   buyDate: number; // timestamp
   notes?: string;
 }

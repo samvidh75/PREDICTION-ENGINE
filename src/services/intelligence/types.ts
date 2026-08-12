@@ -38,15 +38,15 @@ export interface FinancialScore {
   overall: number;           // 0-100 weighted score
 
   // Component scores
-  qualityScore: number;      // 0-35 points
-  growthScore: number;       // 0-25 points
+  qualityScore: number;      // 0-35 points,
+  growthScore: number;       // 0-25 points,
   debtScore: number;         // 0-10 points
 
   // Detailed breakdown
   details: {
     quality: {
       roeScore: number;
-      roaScore: number;       // 0-5 scored value
+      roaScore: number;       // 0-5 scored value,
       marginScore: number;
       points: number;
     };
@@ -78,9 +78,9 @@ export interface FinancialScore {
   };
 
   // Quality metrics
-  dataCompleteness: number;  // 0-1 (what % of fields filled)
-  confidence: number;        // 0-1 (how sure are we?)
-  reasoning: string;         // Plain English explanation
+  dataCompleteness: number;  // 0-1 (what % of fields filled),
+  confidence: number;        // 0-1 (how sure are we?),
+  reasoning: string;         // Plain English explanation,
   timestamp: Date;
 }
 
@@ -88,8 +88,8 @@ export interface FinancialScore {
 export interface IntelligenceResult {
   symbol: string;
   engine: string;
-  score: number;             // 0-100
-  confidence: number;        // 0-1
+  score: number;             // 0-100,
+  confidence: number;        // 0-1,
   details: FinancialScore;
   timestamp: Date;
 }
@@ -137,8 +137,8 @@ export interface TechnicalScore {
   overall: number;             // 0-100 weighted score
 
   // Component scores
-  momentumScore: number;       // 0-20 points
-  trendScore: number;          // 0-20 points
+  momentumScore: number;       // 0-20 points,
+  trendScore: number;          // 0-20 points,
   volatilityScore: number;     // 0-10 points
 
   // Detailed breakdown
@@ -166,21 +166,21 @@ export interface TechnicalScore {
   momentumStatus: 'strong' | 'moderate' | 'weak';
 
   // Quality metrics
-  dataCompleteness: number;    // 0-1
-  confidence: number;          // 0-1
-  reasoning: string;           // Plain English
+  dataCompleteness: number;    // 0-1,
+  confidence: number;          // 0-1,
+  reasoning: string;           // Plain English,
   timestamp: Date;
 }
 
 // ============= EARNINGS METRICS INPUT =============
 export interface EarningsHistoryPeriod {
-  quarter: string;                   // "Q1FY26", "Q2FY26"
-  eps: number;                       // Earnings per share
-  epsYoY: number;                    // YoY growth (%)
-  revenue: number;                   // Revenue in Cr
-  revenueYoY: number;                // YoY growth (%)
-  margin: number;                    // Net margin (%)
-  surprise: number;                  // vs consensus (%)
+  quarter: string;                   // "Q1FY26", "Q2FY26",
+  eps: number;                       // Earnings per share,
+  epsYoY: number;                    // YoY growth (%),
+  revenue: number;                   // Revenue in Cr,
+  revenueYoY: number;                // YoY growth (%),
+  margin: number;                    // Net margin (%),
+  surprise: number;                  // vs consensus (%),
   guidanceHit: boolean;              // Met management guidance?
 }
 
@@ -190,7 +190,7 @@ export interface EarningsMetrics {
 
   // Guidance
   currentGuidance: {
-    epsGrowth: number;               // Guided EPS growth (%)
+    epsGrowth: number;               // Guided EPS growth (%),
     revenueGrowth: number;           // Guided revenue growth (%)
   };
 
@@ -213,16 +213,16 @@ export interface EarningsScore {
   overall: number;                   // 0-100 weighted score
 
   // Component scores
-  consistencyScore: number;          // 0-25 points
-  forwardScore: number;              // 0-20 points
-  beatScore: number;                 // 0-20 points
-  qualityScore: number;              // 0-20 points
+  consistencyScore: number;          // 0-25 points,
+  forwardScore: number;              // 0-20 points,
+  beatScore: number;                 // 0-20 points,
+  qualityScore: number;              // 0-20 points,
   guidanceScore: number;             // 0-15 points
 
   // Trends
-  epsGrowth5Y: number;               // 5-year CAGR (%)
+  epsGrowth5Y: number;               // 5-year CAGR (%),
   epsGrowthTrend: 'accelerating' | 'decelerating' | 'stable';
-  beatStreak: number;                // Quarters beating consensus
+  beatStreak: number;                // Quarters beating consensus,
   missStreak: number;                // Quarters missing consensus
 
   // Quality flags
@@ -238,8 +238,8 @@ export interface EarningsScore {
   };
 
   // Quality metrics
-  dataCompleteness: number;          // 0-1
-  confidence: number;                // 0-1
+  dataCompleteness: number;          // 0-1,
+  confidence: number;                // 0-1,
   reasoning: string;
   timestamp: Date;
 }
@@ -281,14 +281,14 @@ export interface RiskMetrics {
 
 // ============= RISK ENGINE OUTPUT =============
 export interface RiskScore {
-  overall: number;                     // 0-100 (higher = SAFER / lower risk)
+  overall: number;                     // 0-100 (higher = SAFER / lower risk),
   riskProfile: 'low_risk' | 'moderate' | 'elevated' | 'high' | 'dangerous';
 
   // Component scores
-  volatilityScore: number;             // 0-25 points
-  financialRiskScore: number;          // 0-20 points
-  businessRiskScore: number;           // 0-20 points
-  downsideRiskScore: number;           // 0-20 points
+  volatilityScore: number;             // 0-25 points,
+  financialRiskScore: number;          // 0-20 points,
+  businessRiskScore: number;           // 0-20 points,
+  downsideRiskScore: number;           // 0-20 points,
   tailRiskScore: number;               // 0-15 points
 
   // Detailed breakdown
@@ -329,9 +329,9 @@ export interface RiskScore {
   };
 
   // Quality metrics
-  dataCompleteness: number;            // 0-1
-  confidence: number;                  // 0-1
-  reasoning: string;                   // Plain English explanation
+  dataCompleteness: number;            // 0-1,
+  confidence: number;                  // 0-1,
+  reasoning: string;                   // Plain English explanation,
   timestamp: Date;
 }
 
@@ -341,19 +341,19 @@ export interface ValuationMetrics {
   pbRatio?: number | null;           // Price-to-Book ratio
   evEbitda?: number | null;          // Enterprise Value / EBITDA
   fcfYield?: number | null;          // Free Cash Flow Yield (0.05 = 5%)
-  dividendYield?: number | null;     // Dividend Yield (0.03 = 3%)
+  dividendYield?: number | null;     // Dividend Yield (0.03 = 3%),
   lastUpdated: Date;
   symbol?: string;
 }
 
 // ============= VALUATION ENGINE OUTPUT =============
 export interface ValuationScore {
-  overall: number;                   // 0-100 (higher = better value)
-  peScore: number;                   // 0-25
-  pbScore: number;                   // 0-25
-  evEbitdaScore: number;             // 0-20
-  fcfYieldScore: number;             // 0-15
-  dividendYieldScore: number;        // 0-15
+  overall: number;                   // 0-100 (higher = better value),
+  peScore: number;                   // 0-25,
+  pbScore: number;                   // 0-25,
+  evEbitdaScore: number;             // 0-20,
+  fcfYieldScore: number;             // 0-15,
+  dividendYieldScore: number;        // 0-15,
   valuation: 'undervalued' | 'fair_value' | 'premium' | 'expensive';
   details: {
     pe: { score: number; ratio?: number; level: string };
@@ -373,7 +373,7 @@ export interface CatalystEvent {
   type: 'earnings' | 'dividend' | 'deal' | 'approval' | 'product' | 'strategic' | 'other';
   description: string;
   expectedDate?: Date;
-  probability?: number;                    // 0-1
+  probability?: number;                    // 0-1,
   expectedImpact: 'high' | 'medium' | 'low';
   direction: 'bullish' | 'bearish' | 'neutral';
   source?: string;                         // "Management guidance", "Analyst estimates", etc.

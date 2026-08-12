@@ -8,7 +8,7 @@ export interface UnifiedQuote {
   timestamp: number; // ms since epoch
 
   // Price data
-  price: number; // last traded price
+  price: number; // last traded price,
   open: number;
   high: number;
   low: number;
@@ -22,12 +22,12 @@ export interface UnifiedQuote {
   askSize?: number; // quantity at ask
 
   // Intraday change
-  change: number; // absolute price change
+  change: number; // absolute price change,
   changePercent: number; // percentage change
 
   // Additional context
   source: 'yfinance' | 'yahoo-finance' | 'pse' | 'cached';
-  fetched: number; // when this quote was fetched (ms since epoch)
+  fetched: number; // when this quote was fetched (ms since epoch),
   cached: boolean; // true if from IndexedDB
 }
 
@@ -61,12 +61,12 @@ export interface BatchQuoteResponse {
 export interface CachedQuote {
   symbol: string;
   quote: UnifiedQuote;
-  expiresAt: number; // timestamp when cache expires
+  expiresAt: number; // timestamp when cache expires,
   source: UnifiedQuote['source'];
 }
 
 export interface CacheConfig {
-  priceExpiry: number; // ms, default 5 min (300000)
-  fundamentalExpiry: number; // ms, default 1 hour (3600000)
+  priceExpiry: number; // ms, default 5 min (300000),
+  fundamentalExpiry: number; // ms, default 1 hour (3600000),
   technicalExpiry: number; // ms, default 1 day (86400000)
 }

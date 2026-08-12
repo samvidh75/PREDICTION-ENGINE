@@ -252,7 +252,7 @@ class VisualPriorityEngine {
       primaryElement: primaryElements[0]?.id || null,
       secondaryElements: secondaryElements.map(e => e.id),
       backgroundElements: backgroundElements.map(e => e.id),
-      cognitiveLoad: 'moderate' as any, // Will be managed by CognitiveLoadOptimiser
+      cognitiveLoad: 'moderate' as any, // Will be managed by CognitiveLoadOptimiser,
       isLocked: false,
       lockedElement: null
     };

@@ -15,7 +15,7 @@
 import { EngineInputs, clampScore, weightedAverage } from '../types';
 
 export interface AccountingEngineOutput {
-  score: number;               // 0-100 (higher = better quality)
+  score: number;               // 0-100 (higher = better quality),
   cashConversionScore: number;
   accrualQualityScore: number;
   receivableRiskScore: number;

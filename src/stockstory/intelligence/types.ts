@@ -11,7 +11,7 @@
 export type ScoreBand = 'excellent' | 'good' | 'fair' | 'poor' | 'critical';
 
 export interface ScoredMetric {
-  score: number;        // 0–100
+  score: number;        // 0–100,
   label: ScoreBand;
   raw?: number | null;  // Pre-normalization value
 }
@@ -64,20 +64,20 @@ export interface IntelligenceInput {
     adx: number | null;
     atr: number | null;
     bollingerWidth: number | null;
-    bollingerPosition: number | null; // 0=low, 1=high
-    momentum1m: number | null;  // 1-month price return %
-    momentum3m: number | null;  // 3-month price return %
-    momentum6m: number | null;  // 6-month price return %
-    momentum12m: number | null; // 12-month price return %
-    volatility: number | null;  // 30-day annualised
+    bollingerPosition: number | null; // 0=low, 1=high,
+    momentum1m: number | null;  // 1-month price return %,
+    momentum3m: number | null;  // 3-month price return %,
+    momentum6m: number | null;  // 6-month price return %,
+    momentum12m: number | null; // 12-month price return %,
+    volatility: number | null;  // 30-day annualised,
     sma50: number | null;
     sma200: number | null;
-    sma50Distance: number | null; // % distance from 50d SMA
+    sma50Distance: number | null; // % distance from 50d SMA,
     sma200Distance: number | null;
     volume: number | null;
     avgVolume: number | null;
     volumeRatio: number | null;
-    relativeStrength: number | null; // vs market/sector
+    relativeStrength: number | null; // vs market/sector,
     trendStrength: number | null;
     avgTrueRange: number | null;
   };
@@ -101,11 +101,11 @@ export interface IntelligenceInput {
 
   // News & sentiment
   sentiment: {
-    overallScore: number | null;      // -1 to 1
-    recentHeadlines: number | null;   // count
+    overallScore: number | null;      // -1 to 1,
+    recentHeadlines: number | null;   // count,
     avgRecentSentiment: number | null;
     mentionVolume: number | null;
-    positiveRatio: number | null;     // 0-1
+    positiveRatio: number | null;     // 0-1,
     negativeRatio: number | null;
     neutralRatio: number | null;
     trending: boolean | null;
@@ -115,7 +115,7 @@ export interface IntelligenceInput {
   // Sector context
   sector: {
     name: string;
-    sectorStrength: number | null;          // 0-100
+    sectorStrength: number | null;          // 0-100,
     sectorMomentum: 'accelerating' | 'steady' | 'decelerating' | null;
     sectorPe: number | null;
     sectorAvgGrowth: number | null;
@@ -126,12 +126,12 @@ export interface IntelligenceInput {
   risks: {
     auditorChange: boolean;
     relatedPartyTransactions: boolean;
-    pledgedShares: number | null;           // % of shares pledged
+    pledgedShares: number | null;           // % of shares pledged,
     promoterHolding: number | null;
     institutionalHolding: number | null;
     outstandingWarrants: boolean;
-    esopDilution: number | null;            // %
-    litigationRisk: number | null;          // 0-1
+    esopDilution: number | null;            // %,
+    litigationRisk: number | null;          // 0-1,
     governanceScore: number | null;         // 0-100
   };
 }
@@ -139,28 +139,28 @@ export interface IntelligenceInput {
 // ─── Per-engine output contracts ───────────────────────────────────
 
 export interface FinancialEngineOutput {
-  score: number;            // 0-100
-  qualityScore: number;     // 0-100
-  growthScore: number;      // 0-100
-  debtScore: number;        // 0-100
-  confidence: number;       // 0-1
-  dataCompleteness: number; // 0-1
+  score: number;            // 0-100,
+  qualityScore: number;     // 0-100,
+  growthScore: number;      // 0-100,
+  debtScore: number;        // 0-100,
+  confidence: number;       // 0-1,
+  dataCompleteness: number; // 0-1,
   reasoning: string;
 }
 
 export interface TechnicalEngineOutput {
-  score: number;            // 0-100 (bullish=bearish)
-  trendScore: number;       // 0-100
-  momentumScore: number;    // 0-100
-  volatilityScore: number;  // 0-100
-  volumeScore: number;      // 0-100
+  score: number;            // 0-100 (bullish=bearish),
+  trendScore: number;       // 0-100,
+  momentumScore: number;    // 0-100,
+  volatilityScore: number;  // 0-100,
+  volumeScore: number;      // 0-100,
   patternRecognition: string;
   confidence: number;
   reasoning: string;
 }
 
 export interface ValuationEngineOutput {
-  score: number;            // 0-100 (higher = fairly/overvalued context)
+  score: number;            // 0-100 (higher = fairly/overvalued context),
   peScore: number;
   pbScore: number;
   evEbitdaScore: number;
@@ -171,11 +171,11 @@ export interface ValuationEngineOutput {
 }
 
 export interface RiskEngineOutput {
-  score: number;            // 0-100 (higher = riskier)
-  financialRisk: number;    // 0-100
-  valuationRisk: number;    // 0-100
-  volatilityRisk: number;   // 0-100
-  governanceRisk: number;   // 0-100
+  score: number;            // 0-100 (higher = riskier),
+  financialRisk: number;    // 0-100,
+  valuationRisk: number;    // 0-100,
+  volatilityRisk: number;   // 0-100,
+  governanceRisk: number;   // 0-100,
   redFlagCount: number;
   redFlags: string[];
   confidence: number;
@@ -183,35 +183,35 @@ export interface RiskEngineOutput {
 }
 
 export interface SectorEngineOutput {
-  score: number;            // 0-100 (sector contribution)
-  sectorStrength: number;   // 0-100
-  peerPercentile: number;   // 0-100
+  score: number;            // 0-100 (sector contribution),
+  sectorStrength: number;   // 0-100,
+  peerPercentile: number;   // 0-100,
   peerCount: number;
-  tailwindScore: number;    // -100 to 100
+  tailwindScore: number;    // -100 to 100,
   headwindScore: number;
   confidence: number;
   reasoning: string;
 }
 
 export interface NewsEngineOutput {
-  score: number;            // 0-100 (positive leaning)
-  sentimentScore: number;   // 0-100
+  score: number;            // 0-100 (positive leaning),
+  sentimentScore: number;   // 0-100,
   headlineCount: number;
-  avgSentiment: number;     // -1 to 1
+  avgSentiment: number;     // -1 to 1,
   positiveRatio: number;
   negativeRatio: number;
-  controversy: number;      // 0-1
+  controversy: number;      // 0-1,
   trending: boolean;
   confidence: number;
   reasoning: string;
 }
 
 export interface EarningsEngineOutput {
-  score: number;            // 0-100
+  score: number;            // 0-100,
   growthScore: number;
   surpriseScore: number;
   estimatesConfidence: number;
-  beatRate: number;         // 0-1
+  beatRate: number;         // 0-1,
   revenueTrend: 'growing' | 'stable' | 'declining' | 'unclear';
   recentSurprise: 'beat' | 'miss' | 'in-line' | 'unknown';
   nextEarningsDays: number | null;
@@ -220,10 +220,10 @@ export interface EarningsEngineOutput {
 }
 
 export interface EventEngineOutput {
-  score: number;            // 0-100 (impact-adjusted)
+  score: number;            // 0-100 (impact-adjusted),
   corporateActions: Array<{
     type: string;
-    impact: number;         // -10 to +10
+    impact: number;         // -10 to +10,
     date: string;
     description: string;
   }>;
@@ -233,14 +233,14 @@ export interface EventEngineOutput {
     expectedDate: string;
     description: string;
   }>;
-  eventRisk: number;        // 0-100
+  eventRisk: number;        // 0-100,
   confidence: number;
   reasoning: string;
 }
 
 export interface RAGEngineOutput {
-  score: number;            // 0-100
-  knowledgeCoverage: number; // 0-1
+  score: number;            // 0-100,
+  knowledgeCoverage: number; // 0-1,
   relevantPatterns: string[];
   competitorInsights: string[];
   macroContext: string[];

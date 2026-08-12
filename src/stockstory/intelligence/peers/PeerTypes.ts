@@ -25,16 +25,16 @@ export interface PeerGraph {
 export interface PeerNode {
   symbol: string;
   exchange: string;
-  similarityScore: number;        // 0-1 (how similar to focus company)
+  similarityScore: number;        // 0-1 (how similar to focus company),
   profile: CompanyIntelligenceProfile;
 }
 
 export interface PeerRanking {
-  dimension: string;               // e.g. "ROE", "Revenue Growth", "Operating Margin"
+  dimension: string;               // e.g. "ROE", "Revenue Growth", "Operating Margin",
   focusValue: number | null;
   peerMedian: number | null;
-  percentile: number | null;      // Where focus company ranks (0-100)
-  rank: number | null;            // Absolute rank (1-based)
+  percentile: number | null;      // Where focus company ranks (0-100),
+  rank: number | null;            // Absolute rank (1-based),
   totalPeers: number;
   interpretation: 'leading' | 'above_average' | 'average' | 'below_average' | 'lagging' | 'insufficient_data';
 }
@@ -42,7 +42,7 @@ export interface PeerRanking {
 export interface PeerStats {
   peerCount: number;
   medians: Record<string, number | null>;
-  focusCompanyPercentile: number;  // Overall composite percentile
+  focusCompanyPercentile: number;  // Overall composite percentile,
   bestPerformer: string | null;
   bestPerformerScore: number | null;
 }

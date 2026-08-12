@@ -255,8 +255,6 @@ const fabStyle: CSSProperties = {
   background: "linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.04) 100%)",
   color: colors.textPrimary,
   boxShadow: "0 0 0 1px rgba(255,255,255,0.03) inset, 0 18px 40px rgba(0,0,0,0.28)",
-  backdropFilter: "blur(18px)",
-  WebkitBackdropFilter: "blur(18px)",
   cursor: "pointer",
   transition: `transform ${animation.standard}, border-color ${animation.standard}, background ${animation.standard}`,
 };
@@ -277,8 +275,6 @@ const drawerStyle: CSSProperties = {
   borderRadius: 24,
   border: `1px solid ${colors.hairlineSoft}`,
   background: "linear-gradient(180deg, rgba(18,18,18,0.92) 0%, rgba(8,8,8,0.96) 100%)",
-  backdropFilter: "blur(24px)",
-  WebkitBackdropFilter: "blur(24px)",
   boxShadow: "0 0 0 1px rgba(255,255,255,0.03) inset, 0 36px 100px rgba(0,0,0,0.45)",
   display: "grid",
   gridTemplateRows: "auto 1fr auto",

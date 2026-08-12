@@ -13,7 +13,7 @@ export interface TailRiskResult {
   litigationScore: number;
   obsolescenceScore: number;
   disruptionScore: number;
-  points: number;            // 0-15
+  points: number;            // 0-15,
   reasoning: string;
 }
 

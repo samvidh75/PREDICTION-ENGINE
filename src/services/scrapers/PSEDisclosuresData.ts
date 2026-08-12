@@ -21,9 +21,9 @@ import { resolve } from 'node:path';
 export interface PseDisclosureRecord {
   symbol: string;
   companyName: string;
-  formType: string;      // e.g. "4-30" (Material Info), "4-31" (Press Release)
-  title: string;         // the disclosure category shown in PSE Edge's table
-  filingDate: string;    // e.g. "Jul 28, 2026 03:57 PM"
+  formType: string;      // e.g. "4-30" (Material Info), "4-31" (Press Release),
+  title: string;         // the disclosure category shown in PSE Edge's table,
+  filingDate: string;    // e.g. "Jul 28, 2026 03:57 PM",
   edgeNo: string;
   sourceUrl: string;
 }

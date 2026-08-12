@@ -11,9 +11,9 @@
 export interface QuarterlyResult {
   symbol: string;
   companyName: string;
-  period: string; // e.g., 'Q1FY24'
+  period: string; // e.g., 'Q1FY24',
   fiscalYear: number;
-  quarter: number; // 1-4
+  quarter: number; // 1-4,
   filingDate: string;
   revenue: number | null;
   operatingExpenses: number | null;
@@ -51,14 +51,14 @@ export interface NormalizedResult {
   totalAssets: number | null;
   totalLiabilities: number | null;
   // Computed margins
-  ebitdaMargin: number | null; // EBITDA / Revenue
+  ebitdaMargin: number | null; // EBITDA / Revenue,
   netProfitMargin: number | null; // Net Profit / Revenue
-  // YoY comparisons (only if prior year data exists)
+  // YoY comparisons (only if prior year data exists),
   revenueGrowthYoY: number | null;
   netProfitGrowthYoY: number | null;
   epsGrowthYoY: number | null;
   ebitdaGrowthYoY: number | null;
-  // QoQ comparisons (only if prior quarter data exists)
+  // QoQ comparisons (only if prior quarter data exists),
   revenueGrowthQoQ: number | null;
   netProfitGrowthQoQ: number | null;
   epsGrowthQoQ: number | null;

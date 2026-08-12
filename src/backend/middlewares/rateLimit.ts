@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 
 interface RateLimitConfig {
-  windowMs: number; // time window in milliseconds
+  windowMs: number; // time window in milliseconds,
   maxRequests: number; // max requests per window
 }
 
@@ -11,7 +11,7 @@ interface ClientRateLimit {
 }
 
 const defaultConfig: RateLimitConfig = {
-  windowMs: 60 * 1000, // 1 minute
+  windowMs: 60 * 1000, // 1 minute,
   maxRequests: 60,
 };
 

@@ -65,7 +65,7 @@ export interface EvidencePack {
 // ════════════════════════════════════════════════════════════════════════════
 
 export interface EvidenceDomainView {
-  domain: string; // humanized label
+  domain: string; // humanized label,
   state: 'Available' | 'Partial' | 'Unavailable';
   note: string;
 }

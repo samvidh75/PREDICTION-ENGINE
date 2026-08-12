@@ -86,8 +86,6 @@ export function ScannerPresets({ scanType, query, onApply }: ScannerPresetsProps
                 fontSize: typography.body.desktop.size,
                 color: colors.textPrimary,
                 background: colors.card,
-                backdropFilter: "blur(20px) saturate(160%)",
-                WebkitBackdropFilter: "blur(20px) saturate(160%)",
                 outline: "none",
               }}
             />

@@ -7,7 +7,7 @@ import { Input } from "../ui/Input";
 import { StaggerContainer } from "../ui/MicroInteractions";
 import { PriceFlash } from "../ui/PriceFlash";
 import { useResponsiveValue } from "../ui/responsive";
-import { colors, typography, layout, radius, space, animation } from "../design/tokens";
+import { colors, typography, radius, space, animation } from "../design/tokens";
 import { ResearchAiExplanationPanel } from "../components/ai-orchestrator/ResearchAiExplanationPanel";
 import type { ResearchAiContext } from "../components/ai-orchestrator";
 import { MetricsSkeleton, ChartSkeleton } from "../components/SkeletonLoader";
@@ -185,7 +185,7 @@ export default function PortfolioPage() {
         initial="hidden"
         animate="visible"
         variants={{ visible: { transition: { staggerChildren: 0.06 } } }}
-        style={{ maxWidth: layout.contentMaxWidth, margin: "0 auto", padding: layout.pagePaddingDesktop, display: "grid", gap: 16 }}
+        style={{ display: "grid", gap: 16 }}
       >
         <motion.div variants={fadeUp} transition={pageTransition}>
           <MetricsSkeleton />
@@ -203,11 +203,10 @@ export default function PortfolioPage() {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={pageTransition}
-        style={{ maxWidth: layout.contentMaxWidth, margin: "0 auto", padding: isMobile ? layout.pagePaddingMobile : layout.pagePaddingDesktop }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 24 }}>
-          <BarChart3 size={24} color={colors.primary} />
-          <h1 style={{ fontSize: typography.h2.desktop.size, fontWeight: 700, color: colors.ink, margin: 0 }}>Portfolio</h1>
+          <BarChart3 size={24} color={colors.accentBlue} />
+          <h1 style={{ fontSize: "20px", fontWeight: 700, color: colors.textPrimary, margin: 0 }}>Portfolio</h1>
         </div>
         <Card variant="elevated" style={{ padding: "48px 24px", textAlign: "center" }}>
           <div style={{ marginBottom: 20 }}>
@@ -246,14 +245,14 @@ export default function PortfolioPage() {
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={pageTransition}
-      style={{ maxWidth: layout.contentMaxWidth, margin: "0 auto", padding: isMobile ? layout.pagePaddingMobile : layout.pagePaddingDesktop }}>
+      >
       {/* Header */}
       <StaggerContainer>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: space[8], flexWrap: "wrap", gap: 12 }}>
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 8 }}>
-              <BarChart3 size={24} color={colors.primary} />
-              <h1 style={{ fontSize: typography.h2.desktop.size, fontWeight: 700, color: colors.ink, margin: 0 }}>
+              <BarChart3 size={24} color={colors.accentBlue} />
+              <h1 style={{ fontSize: "20px", fontWeight: 700, color: colors.textPrimary, margin: 0 }}>
                 Portfolio
               </h1>
             </div>

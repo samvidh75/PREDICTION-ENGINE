@@ -31,7 +31,7 @@ interface SymbolMasterRow {
   sector: string | null;
   industry: string | null;
   listing_status: string;
-  aliases: string;       // JSON array
+  aliases: string;       // JSON array,
   pse_code: string | null;
   pse_symbol: string | null;
   face_value: number | null;

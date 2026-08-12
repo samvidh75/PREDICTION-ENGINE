@@ -22,7 +22,7 @@ export interface NewsContext {
   ticker: string;
   recentNews: NewsArticle[];
   sentiment: 'bullish' | 'bearish' | 'neutral';
-  sentimentScore: number; // -1 to +1
+  sentimentScore: number; // -1 to +1,
   newsCount: number;
   lastUpdate: number;
 }

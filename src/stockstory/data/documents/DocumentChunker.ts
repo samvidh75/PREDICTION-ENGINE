@@ -26,7 +26,7 @@ export interface DocumentChunk {
 }
 
 export interface ChunkerConfig {
-  size: number; // Target chunk size in characters
+  size: number; // Target chunk size in characters,
   overlap: number; // Overlap between consecutive chunks in characters
 }
 

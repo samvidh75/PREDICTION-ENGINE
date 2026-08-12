@@ -6,7 +6,7 @@ import { query } from "../db/index";
 
 export interface SectorIntelligence {
   sector: string;
-  sectorStrength: number; // 0-100
+  sectorStrength: number; // 0-100,
   sectorMomentum: "Accelerating" | "Steady" | "Decelerating";
   sectorRisk: "Low" | "Moderate" | "High";
   sectorRotationSignal: "ACCUMULATE" | "HOLD" | "REDUCE";

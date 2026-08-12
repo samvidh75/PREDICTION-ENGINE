@@ -115,8 +115,6 @@ export default function OptionGreeksMatrix({
               key={idx}
               style={{
                 background: colors.surface,
-                backdropFilter: "blur(20px) saturate(160%)",
-                WebkitBackdropFilter: "blur(20px) saturate(160%)",
                 border: `1px solid ${colors.charcoal}`,
                 borderRadius: radius.sm,
                 padding: space[3],

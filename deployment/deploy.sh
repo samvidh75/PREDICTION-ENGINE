@@ -58,8 +58,18 @@ $SSH_CMD "mkdir -p ${APP_DIR}"
 # ── Step 3: Push code via rsync or git ───────────────────────────────
 info "Pushing code..."
 if command -v rsync &>/dev/null; then
-  # Fast incremental push
-  RSYNC_OPTS="-avz --delete --exclude=node_modules --exclude=.git --exclude=dist --exclude=stockex_slm_agent_output"
+  # Fast incremental push. --exclude=data/*.db (and *.sqlite*) is load-
+  # bearing: without it, --delete + a plain directory sync means the
+  # VPS's own live database (daily_prices, financial_snapshots, etc. —
+  # real accumulated state, distinct from whatever local dev DB happens
+  # to exist on the machine running this script) gets silently
+  # overwritten by --delete on the FIRST deploy after this script runs
+  # without it. Confirmed this actually happened once already before
+  # this exclude was added (no user-data tables exist in this schema so
+  # nothing irreplaceable was lost that time, but the next deploy might
+  # not be so lucky). The database is provisioned once by vps-setup.sh /
+  # migrations, not shipped by this script.
+  RSYNC_OPTS="-avz --delete --exclude=node_modules --exclude=.git --exclude=dist --exclude=stockex_slm_agent_output --exclude=data/*.db --exclude=data/*.db-* --exclude=data/*.sqlite --exclude=data/*.sqlite*"
   [ -n "$KEY_FILE" ] && RSYNC_OPTS="$RSYNC_OPTS -e 'ssh -i $KEY_FILE -p $VPS_PORT'"
   eval rsync $RSYNC_OPTS ./ "${VPS_USER}@${VPS_HOST}:${APP_DIR}/"
 else
@@ -77,7 +87,16 @@ info "✅ Code pushed"
 
 # ── Step 4: Install dependencies ──────────────────────────────────────
 info "Installing npm dependencies..."
-$SSH_CMD "cd ${APP_DIR} && npm ci --omit=dev 2>/dev/null || npm install"
+# --omit=dev is wrong here: Step 5 builds ON the VPS (tsc-alias, vite,
+# etc. are all devDependencies), so omitting them made compile:backend
+# fail with "tsc-alias: not found" every time, silently leaving
+# stockex-api.service running whatever backend build last succeeded
+# (verified live: this is exactly why a previous deploy left the API
+# serving code from months earlier while the frontend appeared to
+# update). Runtime NODE_ENV=production (set on the systemd service
+# below) is what matters for app behavior; dev tooling just needs to be
+# present to build.
+$SSH_CMD "cd ${APP_DIR} && npm ci 2>/dev/null || npm install"
 info "✅ Dependencies installed"
 
 # ── Step 5: Build ─────────────────────────────────────────────────────

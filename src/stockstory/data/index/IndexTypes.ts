@@ -21,7 +21,7 @@ export interface IndexConstituent {
   isin: string | null;
   sector: string | null;
   industry: string | null;
-  weight: number | null; // index weight percentage if available
+  weight: number | null; // index weight percentage if available,
   addedAt: string | null; // ISO date when added to index
 }
 
@@ -29,8 +29,8 @@ export interface IndexMembership {
   id: string;
   symbol: string;
   indexName: IndexName;
-  validFrom: string; // ISO date
-  validTo: string | null; // null if currently a member
+  validFrom: string; // ISO date,
+  validTo: string | null; // null if currently a member,
   sourceId: string;
   createdAt: string;
 }

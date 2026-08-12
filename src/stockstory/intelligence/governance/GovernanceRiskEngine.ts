@@ -16,7 +16,7 @@ export interface GovernanceRiskReport {
   generatedAt: string;
 
   /** Overall governance assessment */
-  governanceScore: number;       // 0-100 (higher = better governance)
+  governanceScore: number;       // 0-100 (higher = better governance),
   riskLevel: 'low' | 'moderate' | 'elevated' | 'high' | 'insufficient_data';
 
   /** Sub-component scores */
@@ -42,7 +42,7 @@ export interface OwnershipGovernance {
 }
 
 export interface BoardGovernance {
-  score: number;                 // Default: moderate unless data available
+  score: number;                 // Default: moderate unless data available,
   assessment: string;
   dataAvailable: boolean;
 }
@@ -165,7 +165,7 @@ export class GovernanceRiskEngine {
 
     return {
       auditorChange,
-      auditorQuality: 'unknown', // External data needed
+      auditorQuality: 'unknown', // External data needed,
       score: clampScore(score),
       assessment,
     };

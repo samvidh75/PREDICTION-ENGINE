@@ -37,7 +37,7 @@ export interface CompanyMetadata {
 }
 
 export interface HistoricalPoint {
-  date: string;        // YYYY-MM-DD
+  date: string;        // YYYY-MM-DD,
   open: number;
   high: number;
   low: number;

@@ -29,7 +29,7 @@ export interface NewsDedupResult {
 export interface NewsEntityMatch {
   matchedSymbol: string | null;
   matchedCompanyName: string | null;
-  confidence: number; // 0–1
+  confidence: number; // 0–1,
   matchedBy: 'symbol' | 'company_name' | 'alias' | 'isin' | 'none';
 }
 

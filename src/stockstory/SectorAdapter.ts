@@ -10,7 +10,7 @@
 
 export type SectorProfile = {
   name: string;
-  // Valuation: PE thresholds (cheap, fair, expensive, extreme)
+  // Valuation: PE thresholds (cheap, fair, expensive, extreme),
   peCheap: number;
   peFair: number;
   peExpensive: number;
@@ -25,7 +25,7 @@ export type SectorProfile = {
   evFair: number;
   evExpensive: number;
   evExtreme: number;
-  // Skip EV/EBITDA entirely (for financials where it doesn't apply)
+  // Skip EV/EBITDA entirely (for financials where it doesn't apply),
   skipEvEbitda: boolean;
   // Quality: margin thresholds
   gmLow: number;
@@ -50,7 +50,7 @@ export type SectorProfile = {
   roeFair: number;
   roeHigh: number;
   roeExceptional: number;
-  // Primary valuation metric (for weighting)
+  // Primary valuation metric (for weighting),
   primaryMetric: 'pe' | 'pb' | 'evEbitda';
   // Whether to use gross margin in quality scoring
   useGrossMargin: boolean;

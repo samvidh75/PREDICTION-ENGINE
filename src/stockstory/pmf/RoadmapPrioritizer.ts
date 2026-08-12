@@ -15,11 +15,11 @@ export interface RoadmapItem {
   title: string;
   description: string;
   category: 'content' | 'feature' | 'quality' | 'ux' | 'infrastructure';
-  sourceSignals: string[]; // e.g. "research_quality", "search_demand", "corrections", "feature_requests"
-  signalStrength: number; // 0-100 composite
+  sourceSignals: string[]; // e.g. "research_quality", "search_demand", "corrections", "feature_requests",
+  signalStrength: number; // 0-100 composite,
   estimatedEffort: 'small' | 'medium' | 'large';
-  priority: number; // 1 (highest) - 100
-  linkedMetricKeys: string[]; // pmf metric keys this would improve
+  priority: number; // 1 (highest) - 100,
+  linkedMetricKeys: string[]; // pmf metric keys this would improve,
   suggestedAt: string;
 }
 
@@ -156,7 +156,7 @@ export function prioritize(input: PrioritizationInput): RoadmapItem[] {
       sourceSignals: ['user_feedback'],
       signalStrength,
       estimatedEffort: signal.estimate,
-      priority: 0, // Will be computed
+      priority: 0, // Will be computed,
       linkedMetricKeys: signal.metricKeys,
       suggestedAt: new Date().toISOString(),
     });

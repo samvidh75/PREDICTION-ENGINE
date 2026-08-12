@@ -30,7 +30,7 @@ export interface RiskDimension {
   name: string;
   category: 'financial' | 'valuation' | 'governance' | 'volatility' | 'sector' | 'macro' | 'liquidity' | 'earnings';
   severity: 'critical' | 'high' | 'moderate' | 'low' | 'negligible';
-  score: number;                    // 0-100 (higher = more severe)
+  score: number;                    // 0-100 (higher = more severe),
   trend: 'worsening' | 'stable' | 'improving' | 'unknown';
   description: string;
   flags: string[];

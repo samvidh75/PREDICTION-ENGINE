@@ -30,8 +30,6 @@ export default function StockStoryPage() {
     <div style={{
       width: '100%',
       backgroundColor: colors.canvas,
-      backdropFilter: "blur(20px) saturate(160%)",
-      WebkitBackdropFilter: "blur(20px) saturate(160%)",
       color: colors.textPrimary,
       fontFamily: 'system-ui, -apple-system, sans-serif',
       overflow: 'hidden',
@@ -175,8 +173,6 @@ export default function StockStoryPage() {
               style={{
                 padding: '24px',
                 backgroundColor: colors.surface,
-                backdropFilter: "blur(20px) saturate(160%)",
-                WebkitBackdropFilter: "blur(20px) saturate(160%)",
                 borderRadius: '12px',
                 border: `1px solid ${colors.border}`,
               }}
@@ -237,8 +233,6 @@ export default function StockStoryPage() {
               style={{
                 padding: '20px',
                 backgroundColor: colors.surface,
-                backdropFilter: "blur(20px) saturate(160%)",
-                WebkitBackdropFilter: "blur(20px) saturate(160%)",
                 borderRadius: '12px',
                 border: `1px solid ${colors.border}`,
                 textAlign: 'center',

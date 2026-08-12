@@ -26,7 +26,7 @@ export default function Sectors() {
   const gap = useResponsiveValue("12px", "20px");
 
   return (
-    <main style={{ maxWidth: "1200px", margin: "0 auto", padding: layout.pagePaddingDesktop, color: colors.textPrimary }}>
+    <main style={{ color: colors.textPrimary }}>
       <motion.section {...entrance(0)} style={{ marginBottom: "48px" }}>
         <h1 style={{ fontSize: typography.h2.desktop.size, fontWeight: 700, marginBottom: "8px", color: colors.textPrimary }}>
           Sector Research

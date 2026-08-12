@@ -8,7 +8,7 @@ export interface QuantizationStats {
   originalSize: number;
   quantizedSize: number;
   compressionRatio: number;
-  accuracyLoss: string; // Typically <1% for classification
+  accuracyLoss: string; // Typically <1% for classification,
   inferenceSpeedChange: string; // Typically 10-20% faster
 }
 
@@ -29,9 +29,9 @@ export async function quantizeONNXModel(
     // Parse ONNX model (simplified - in production use onnx.js)
     const stats: QuantizationStats = {
       originalSize: modelData.byteLength,
-      quantizedSize: Math.floor(modelData.byteLength / 4), // ~25% of original
+      quantizedSize: Math.floor(modelData.byteLength / 4), // ~25% of original,
       compressionRatio: 4.0,
-      accuracyLoss: "<0.5%", // Conservative estimate
+      accuracyLoss: "<0.5%", // Conservative estimate,
       inferenceSpeedChange: "+15-20% faster",
     };
 

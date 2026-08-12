@@ -44,13 +44,13 @@ export interface DividendDetails {
 }
 
 export interface BonusDetails {
-  ratio: string; // e.g., "1:1", "2:1"
+  ratio: string; // e.g., "1:1", "2:1",
   bonusShares: number;
   fiscalYear: string | null;
 }
 
 export interface SplitDetails {
-  ratio: string; // e.g., "10:1" (10 for 1)
+  ratio: string; // e.g., "10:1" (10 for 1),
   oldFaceValue: number;
   newFaceValue: number;
 }
@@ -59,7 +59,7 @@ export interface RightsDetails {
   ratio: string;
   issuePrice: number;
   premium: number | null;
-  issueSize: number | null; // in millions PHP
+  issueSize: number | null; // in millions PHP,
   issueOpenDate: string | null;
   issueCloseDate: string | null;
 }
@@ -67,7 +67,7 @@ export interface RightsDetails {
 export interface BuybackDetails {
   buybackType: 'tender' | 'open_market';
   buybackPrice: number;
-  buybackSize: number; // in millions PHP
+  buybackSize: number; // in millions PHP,
   buybackOpenDate: string | null;
   buybackCloseDate: string | null;
 }

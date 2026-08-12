@@ -15,7 +15,7 @@ export interface CompanyInfo {
 }
 
 export interface KeyMetrics {
-  marketCap: number; // In PHP millions
+  marketCap: number; // In PHP millions,
   currentPrice: number;
   peRatio: number;
   pbRatio: number;

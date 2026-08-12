@@ -34,10 +34,10 @@ export type EodTtlMap = Record<EodCacheNamespace, number>;
 // ---------------------------------------------------------------------------
 
 const DEFAULT_TTLS: EodTtlMap = {
-  quote:      60_000,      // 60s — live prices, short TTL for freshness
-  profile:    604_800_000, // 7d  — company metadata rarely changes
-  financials: 604_800_000, // 7d  — fundamentals update quarterly
-  history:    604_800_000, // 7d  — daily OHLCV, stable after market close
+  quote:      60_000,      // 60s — live prices, short TTL for freshness,
+  profile:    604_800_000, // 7d  — company metadata rarely changes,
+  financials: 604_800_000, // 7d  — fundamentals update quarterly,
+  history:    604_800_000, // 7d  — daily OHLCV, stable after market close,
   news:       3_600_000,   // 1h  — news is time-sensitive, brief cache
 };
 

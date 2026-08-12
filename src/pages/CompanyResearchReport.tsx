@@ -82,8 +82,6 @@ export default function CompanyResearchReport() {
             style={{
               padding: "16px",
               background: colors.card,
-              backdropFilter: "blur(20px) saturate(160%)",
-              WebkitBackdropFilter: "blur(20px) saturate(160%)",
               borderRadius: radius.md,
               border: `1px solid ${colors.border}`,
               boxShadow: shadows.card,

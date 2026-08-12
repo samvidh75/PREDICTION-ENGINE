@@ -18,7 +18,7 @@ export type AssistantContext = {
   narrativeKey: number;
   portfolioSummary?: {
     environmentLabel: string;
-    concentration: number; // 0..1 (simulated, presentational only)
+    concentration: number; // 0..1 (simulated, presentational only),
     volatilitySensitivity: number; // 0..1
   };
 

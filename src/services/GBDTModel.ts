@@ -15,7 +15,7 @@ class DecisionTreeNode {
   splitVal: number = -1;
   left: DecisionTreeNode | null = null;
   right: DecisionTreeNode | null = null;
-  value: number = 0; // Leaf value
+  value: number = 0; // Leaf value,
   isLeaf: boolean = false;
 }
 

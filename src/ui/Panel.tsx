@@ -20,8 +20,6 @@ function Panel({
       className={className}
       style={{
         background: bg,
-        backdropFilter: colors.glassBlur,
-        WebkitBackdropFilter: colors.glassBlur,
         borderRadius: radius.md,
         border: `1px solid ${colors.glassBorder}`,
         boxShadow: `inset 0 1px 0 ${colors.glassBorderTop}`,

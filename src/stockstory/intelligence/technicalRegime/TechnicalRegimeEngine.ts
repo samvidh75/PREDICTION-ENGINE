@@ -15,7 +15,7 @@ export interface TechnicalRegimeReport {
   generatedAt: string;
 
   regime: TechnicalRegime;
-  regimeConfidence: number;          // 0-1
+  regimeConfidence: number;          // 0-1,
   regimeDescription: string;
 
   trend: TrendAnalysis;
@@ -64,7 +64,7 @@ export interface ConfluenceAssessment {
   /** How many indicators point in same direction */
   agreementCount: number;
   totalIndicators: number;
-  agreementRatio: number;           // 0-1
+  agreementRatio: number;           // 0-1,
   description: string;
 }
 

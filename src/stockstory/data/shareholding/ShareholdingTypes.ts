@@ -23,9 +23,9 @@ export interface ShareholdingPattern {
   id: string;
   symbol: string;
   companyName: string;
-  periodEndDate: string; // quarter end
+  periodEndDate: string; // quarter end,
   filingDate: string;
-  totalShares: number; // in millions PHP
+  totalShares: number; // in millions PHP,
   holdings: ShareholderHolding[];
   promoterPledgedPercentage: number | null;
   sourceId: string;
@@ -34,9 +34,9 @@ export interface ShareholdingPattern {
 export interface ShareholderHolding {
   category: ShareholderCategory;
   numberOfShareholders: number | null;
-  sharesHeld: number; // in units
+  sharesHeld: number; // in units,
   percentage: number;
-  changeQoQ: number | null; // percentage points
+  changeQoQ: number | null; // percentage points,
   changeYoY: number | null;
 }
 

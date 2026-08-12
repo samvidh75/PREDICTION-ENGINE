@@ -30,9 +30,9 @@ function makeMetrics(overrides: Partial<SectorMetrics> = {}): SectorMetrics {
 describe('SectorEngine', () => {
   it('scores a best-in-sector stock high', async () => {
     const result = await engine.analyze(makeMetrics({
-      stockPE: 15, peerPE: 25,        // Big discount
-      stockROE: 25, peerROE: 14,       // Way above peers
-      stockRevGrowth: 18, peerRevGrowth: 10, // Growing much faster
+      stockPE: 15, peerPE: 25,        // Big discount,
+      stockROE: 25, peerROE: 14,       // Way above peers,
+      stockRevGrowth: 18, peerRevGrowth: 10, // Growing much faster,
       marketCapRank: 1, sectorPeerCount: 30,
       brandStrength: 90,
     }));
@@ -43,11 +43,11 @@ describe('SectorEngine', () => {
 
   it('scores an expensive laggard low', async () => {
     const result = await engine.analyze(makeMetrics({
-      stockPE: 40, peerPE: 25,        // Big PE premium
-      stockPB: 6, peerPB: 3.5,        // Big PB premium
-      stockEVEbitda: 25, peerEVEbitda: 15, // Big EV/EBITDA premium
-      stockROE: 8, peerROE: 14,        // Below peers
-      stockRevGrowth: 3, peerRevGrowth: 10, // Lagging
+      stockPE: 40, peerPE: 25,        // Big PE premium,
+      stockPB: 6, peerPB: 3.5,        // Big PB premium,
+      stockEVEbitda: 25, peerEVEbitda: 15, // Big EV/EBITDA premium,
+      stockROE: 8, peerROE: 14,        // Below peers,
+      stockRevGrowth: 3, peerRevGrowth: 10, // Lagging,
       marketCapRank: 25, sectorPeerCount: 30,
       brandStrength: 30,
       sectorReturn1M: -0.05, sectorReturn3M: -0.10,

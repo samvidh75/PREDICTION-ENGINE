@@ -12,11 +12,11 @@ const engine = new ValuationEngine();
 
 function makeMetrics(overrides: Partial<ValuationMetrics> = {}): ValuationMetrics {
   return {
-    peRatio: 15,          // Reasonable PE
-    pbRatio: 2.5,         // Fair PB
-    evEbitda: 12,         // Reasonable EV/EBITDA
-    fcfYield: 0.04,       // 4% FCF yield
-    dividendYield: 0.02,  // 2% dividend
+    peRatio: 15,          // Reasonable PE,
+    pbRatio: 2.5,         // Fair PB,
+    evEbitda: 12,         // Reasonable EV/EBITDA,
+    fcfYield: 0.04,       // 4% FCF yield,
+    dividendYield: 0.02,  // 2% dividend,
     lastUpdated: new Date(),
     ...overrides,
   };

@@ -85,8 +85,6 @@ export function SectorHeatmap() {
                 borderBottom: `1px solid var(--glass-border)`,
                 borderLeft: `2px solid ${tint}55`,
                 background: `linear-gradient(160deg, ${heatTint(s.avgChangePercent)}, var(--glass-bg))`,
-                backdropFilter: "blur(var(--glass-blur)) saturate(160%)",
-                WebkitBackdropFilter: "blur(var(--glass-blur)) saturate(160%)",
                 cursor: "pointer",
                 display: "grid",
                 gap: 7,

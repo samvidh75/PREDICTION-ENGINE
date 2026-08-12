@@ -11,7 +11,7 @@ export type QualityTier = 'A' | 'B' | 'C' | 'D' | 'F';
 
 export interface FieldQuality {
   field: string;
-  completeness: number; // 0–1
+  completeness: number; // 0–1,
   isRequired: boolean;
   hasValidValue: boolean;
   issues: string[];

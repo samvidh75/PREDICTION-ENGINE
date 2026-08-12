@@ -64,7 +64,7 @@ export interface ThesisAssumption {
 export interface ThesisCatalyst {
   catalyst: string;
   expectedImpact: 'positive' | 'negative' | 'unknown';
-  probability: number; // 0-1
+  probability: number; // 0-1,
   timeframe: string;
 }
 

@@ -19,8 +19,6 @@ export function Input({ label, style, ...props }: InputProps) {
         fontFeatureSettings: typography.fontFeature,
         color: colors.onDark,
         background: colors.surfaceElevated,
-        backdropFilter: colors.glassBlur,
-        WebkitBackdropFilter: colors.glassBlur,
         outline: "none",
         caretColor: colors.onDark,
         transition: `border-color ${animation.standard}`,

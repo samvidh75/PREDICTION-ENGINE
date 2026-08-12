@@ -48,7 +48,7 @@ export type NeuralMarketSynthesis = {
   confidenceEnvironmentLabel: string;
   confidenceState: ConfidenceState;
 
-  // Healthometer System (no recommendations)
+  // Healthometer System (no recommendations),
   healthometer: {
     state: NeuralHealthometerState;
     rationale: string;
@@ -56,14 +56,14 @@ export type NeuralMarketSynthesis = {
     categoryEvaluation?: HealthometerCategoryEvaluation;
   };
 
-  // layered interpretations (all educational / probabilistic framing)
+  // layered interpretations (all educational / probabilistic framing),
   macroGeopolitical: MacroGeopoliticalInterpretation;
   institutionalBehaviour: string;
   behaviouralPsychology: string;
   sectorRotationMatrix: string;
   liquidityIntelligenceCore: string;
 
-  // future probability framing (NOT a prediction)
+  // future probability framing (NOT a prediction),
   futureProbabilityFramework: string;
 
   // timeline and scanner

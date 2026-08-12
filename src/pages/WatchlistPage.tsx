@@ -182,8 +182,8 @@ export default function WatchlistPage() {
       {/* Header row */}
       <div className="raycast-stagger-1" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: space[4] }}>
         <div>
-          <h1 style={{ color: colors.textPrimary, fontSize: typography.h1.desktop.size, fontWeight: 700, lineHeight: "1.2", margin: 0 }}>
-            Track
+          <h1 style={{ color: colors.textPrimary, fontSize: 20, fontWeight: 700, letterSpacing: "-0.01em", margin: 0 }}>
+            Watchlist
           </h1>
           <p style={{ color: colors.textSecondary, fontSize: 13, margin: `${space[1]} 0 0` }}>
             Monitor your thesis and stay ahead of changes.

@@ -4,7 +4,7 @@
  */
 
 export interface CandleData {
-  timestamp: number; // date
+  timestamp: number; // date,
   open: number;
   high: number;
   low: number;
@@ -13,23 +13,23 @@ export interface CandleData {
 }
 
 export interface TechnicalIndicators {
-  rsi: number; // 0-100
+  rsi: number; // 0-100,
   macd: {
-    line: number; // MACD line (12-26 EMA)
-    signal: number; // 9-day EMA of MACD
+    line: number; // MACD line (12-26 EMA),
+    signal: number; // 9-day EMA of MACD,
     histogram: number; // MACD - Signal
   };
   bollingerBands: {
     upper: number;
-    middle: number; // 20-day SMA
+    middle: number; // 20-day SMA,
     lower: number;
-    bandwidth: number; // (upper - lower) / middle
+    bandwidth: number; // (upper - lower) / middle,
     percentB: number; // (close - lower) / (upper - lower)
   };
   movingAverages: {
-    sma20: number; // 20-day simple moving average
-    sma50: number; // 50-day simple moving average
-    ema12: number; // 12-day exponential moving average
+    sma20: number; // 20-day simple moving average,
+    sma50: number; // 50-day simple moving average,
+    ema12: number; // 12-day exponential moving average,
     ema26: number; // 26-day exponential moving average
   };
   trend: 'bullish' | 'bearish' | 'neutral';
@@ -38,7 +38,7 @@ export interface TechnicalIndicators {
 
 export interface ChartSignal {
   type: 'buy' | 'sell' | 'hold';
-  confidence: number; // 0-100
+  confidence: number; // 0-100,
   reasons: string[];
   supportLevel: number;
   resistanceLevel: number;

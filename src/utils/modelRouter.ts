@@ -10,7 +10,7 @@
 export type ModelTier = 'tier1-qwen-05b' | 'tier2-qwen-1b' | 'tier3-groq-api';
 
 interface ComplexityScore {
-  score: number; // 0-100
+  score: number; // 0-100,
   tier: ModelTier;
   reasoning: string;
   keywords: string[];

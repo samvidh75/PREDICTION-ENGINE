@@ -3,8 +3,8 @@
 
 export interface TraceEntry {
   symbol: string;
-  category: string;  // price, metadata, history, news, financials
-  provider: string;  // constructor name
+  category: string;  // price, metadata, history, news, financials,
+  provider: string;  // constructor name,
   failed: boolean;
   timestamp: string;
 }

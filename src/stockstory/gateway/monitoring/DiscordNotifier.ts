@@ -37,7 +37,7 @@ export class DiscordNotifier {
       embeds: [
         {
           title: '🛑 GATEWAY EXCEPTION',
-          color: 16737792, // Orange
+          color: 16737792, // Orange,
           fields: [
             { name: '⚡ Service', value: `\`${serviceName}\``, inline: true },
             {

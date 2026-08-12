@@ -7,8 +7,8 @@
 // ─── Snapshot Inventory ─────────────────────────────────────────
 
 export interface SnapshotInventoryEntry {
-  period: string;           // e.g. "Now", "1M Ago", "3M Ago", "6M Ago", "12M Ago", "24M Ago"
-  snapshotDate: string;     // ISO date
+  period: string;           // e.g. "Now", "1M Ago", "3M Ago", "6M Ago", "12M Ago", "24M Ago",
+  snapshotDate: string;     // ISO date,
   symbols: number;
   factorsAvailable: string[];
   missingPeriods: string[];
@@ -33,12 +33,12 @@ export interface SnapshotInventory {
 export type BenchmarkIndex = 'PSEI' | 'PSEI_TOP_10' | 'PSE_ALL' | 'EQUAL_WEIGHT_UNIVERSE';
 
 export interface BenchmarkMetrics {
-  cagr: number;            // Compound Annual Growth Rate (%)
-  sharpe: number;          // Sharpe Ratio (risk-free = 6.0% for Philippines)
-  sortino: number;         // Sortino Ratio
-  maxDrawdown: number;      // Maximum Drawdown (%)
-  volatility: number;       // Annualized Volatility (%)
-  totalReturn: number;      // Total Return over period (%)
+  cagr: number;            // Compound Annual Growth Rate (%),
+  sharpe: number;          // Sharpe Ratio (risk-free = 6.0% for Philippines),
+  sortino: number;         // Sortino Ratio,
+  maxDrawdown: number;      // Maximum Drawdown (%),
+  volatility: number;       // Annualized Volatility (%),
+  totalReturn: number;      // Total Return over period (%),
   positiveMonths: number;
   totalMonths: number;
   winRate: number;          // % of months with positive return
@@ -61,10 +61,10 @@ export interface StrategyResult {
   strategy: StrategyType;
   rebalance: RebalanceFrequency;
   metrics: BenchmarkMetrics;
-  alpha: number;            // Excess return vs KSEALL (%)
+  alpha: number;            // Excess return vs KSEALL (%),
   trackingError: number;
   informationRatio: number;
-  turnover: number;         // Average portfolio turnover per rebalance
+  turnover: number;         // Average portfolio turnover per rebalance,
   hitRate: number;          // % of periods beating benchmark
 }
 
@@ -95,13 +95,13 @@ export interface RollingBacktestYearResult {
 // ─── Factor Attribution ────────────────────────────────────────
 
 export interface FactorContribution {
-  factor: string;           // quality, growth, value, momentum, risk, sectorStrength
-  contribution: number;     // % contribution to total return
-  correlation: number;      // Correlation with forward returns
-  tStatistic: number;       // Statistical significance
+  factor: string;           // quality, growth, value, momentum, risk, sectorStrength,
+  contribution: number;     // % contribution to total return,
+  correlation: number;      // Correlation with forward returns,
+  tStatistic: number;       // Statistical significance,
   pValue: number;
-  isSignificant: boolean;   // p < 0.05
-  bestHorizon: number;      // Best performing lookahead in days
+  isSignificant: boolean;   // p < 0.05,
+  bestHorizon: number;      // Best performing lookahead in days,
   worstHorizon: number;     // Worst performing lookahead
 }
 
@@ -122,7 +122,7 @@ export interface ConfidenceBucketResult {
   level: ConfidenceLevel;
   samples: number;
   averageReturn: number;
-  hitRate: number;          // % positive returns
+  hitRate: number;          // % positive returns,
   volatility: number;
   maxDrawdown: number;
   averageHealthScore: number;
@@ -133,7 +133,7 @@ export interface ConfidenceValidationResult {
   generatedAt: string;
   buckets: ConfidenceBucketResult[];
   doesConfidencePredict: boolean;
-  statisticalSignificance: number;  // p-value of ANOVA/rank test
+  statisticalSignificance: number;  // p-value of ANOVA/rank test,
   commentary: string;
 }
 
@@ -141,9 +141,9 @@ export interface ConfidenceValidationResult {
 
 export interface SectorBiasEntry {
   sector: string;
-  representation: number;    // % of top-ranked stocks
-  universeWeight: number;    // % of total universe
-  biasRatio: number;         // representation / universeWeight (> 1 = overweight)
+  representation: number;    // % of top-ranked stocks,
+  universeWeight: number;    // % of total universe,
+  biasRatio: number;         // representation / universeWeight (> 1 = overweight),
   averageReturn: number;
   returnContribution: number;
 }
@@ -175,7 +175,7 @@ export interface SurvivorshipBiasResult {
   symbolChangeCount: number;
   bankruptCount: number;
   entries: SurvivorshipEntry[];
-  isInflated: boolean;       // Whether survivorship materially inflates results
+  isInflated: boolean;       // Whether survivorship materially inflates results,
   inflationEstimate: number; // Estimated % overstatement
 }
 
@@ -183,13 +183,13 @@ export interface SurvivorshipBiasResult {
 
 export interface AlphaResult {
   benchmark: 'KSE100' | 'KSEALL';
-  excessReturn: number;      // Annualized excess return (%)
-  alpha: number;             // Jensen's Alpha
-  beta: number;              // Market sensitivity
+  excessReturn: number;      // Annualized excess return (%),
+  alpha: number;             // Jensen's Alpha,
+  beta: number;              // Market sensitivity,
   informationRatio: number;
   trackingError: number;
-  upCapture: number;         // % of benchmark gains captured
-  downCapture: number;       // % of benchmark losses captured (< 100 = protection)
+  upCapture: number;         // % of benchmark gains captured,
+  downCapture: number;       // % of benchmark losses captured (< 100 = protection),
   rSquared: number;
   tStatistic: number;
   pValue: number;
@@ -218,7 +218,7 @@ export interface BacktestStockSnapshot {
 // ─── Engine Optimisation ───────────────────────────────────────
 
 export interface EngineWeightOptimisation {
-  engine: string;             // GrowthEngine, QualityEngine, etc.
+  engine: string;             // GrowthEngine, QualityEngine, etc.,
   originalWeight: number;
   optimizedWeight: number;
   justification: string;
@@ -240,7 +240,7 @@ export interface InstitutionalScorecard {
     confidenceAccuracy: { score: number; weight: number; detail: string };
     dataQuality: { score: number; weight: number; detail: string };
   };
-  totalScore: number;         // Weighted out of 100
+  totalScore: number;         // Weighted out of 100,
   grade: string;              // A+/A/B/C/D/F
 }
 

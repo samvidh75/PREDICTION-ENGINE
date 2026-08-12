@@ -21,7 +21,7 @@ export class FreshnessTracker {
   private records: Map<string, FreshnessRecord> = new Map();
 
   private frequencyDays: Record<UpdateFrequency, number> = {
-    realtime: 0.042, // 1 hour
+    realtime: 0.042, // 1 hour,
     daily: 1,
     weekly: 7,
     monthly: 30,

@@ -10,7 +10,7 @@ export interface VolatilityRiskResult {
   sigmaScore: number;
   betaScore: number;
   drawdownScore: number;
-  points: number;            // 0-25
+  points: number;            // 0-25,
   reasoning: string;
 }
 

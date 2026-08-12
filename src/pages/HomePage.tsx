@@ -1,32 +1,17 @@
 import {
   Activity, Compass, Search, TrendingDown, TrendingUp, ArrowRight,
+  BarChart2, Bell, BookOpen, Zap,
 } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
-import { useNavigate } from "react-router-dom";
-import { Button } from "../ui/Button";
+import { useNavigate, Link } from "react-router-dom";
 import OnboardingWizard from "../components/GuidedOnboarding";
 import { loadFirstDashboardFlag, dismissFirstDashboardOverlay, markFirstDashboardPending } from "../services/onboarding/onboardingFirstRunMemory";
-import { CommandCenter } from "../components/dashboard/CommandCenter";
-import { useMarketStatus } from "../hooks/useMarketStatus";
-import { WatchStrip } from "../components/dashboard/WatchStrip";
 import { MarketPulse } from "../components/dashboard/MarketPulse";
 import { SectorHeatmap } from "../components/dashboard/SectorHeatmap";
-import { MarketHeatmap } from "../components/dashboard/MarketHeatmap";
 import { ForeignFlowWidget } from "../components/dashboard/ForeignFlowWidget";
-
-/* ─── Quick screens — one-click preset scans, re-cast in plain words ──── */
-
-const QUICK_ACTIONS = [
-  { icon: TrendingUp,  label: "Top Gainers",   desc: "Live % movers this session",    route: "/scanner?mode=gainers" },
-  { icon: Activity,    label: "Most Active",   desc: "Highest trading volume today",  route: "/scanner?mode=active" },
-  { icon: TrendingDown, label: "Top Losers",   desc: "Live decliners this session",   route: "/scanner?mode=losers" },
-  { icon: Search,      label: "Full Universe", desc: "All PSE common shares, A–Z",    route: "/scanner?mode=all" },
-  { icon: Compass,     label: "Sector Lens",   desc: "PSE sector-level performance",  route: "/sectors" },
-];
+import { useMarketStatus } from "../hooks/useMarketStatus";
 
 function liveClock(): string {
-  // Manila time, not the browser's local timezone — the whole product is
-  // PSE-first and visitors may be anywhere in the world.
   return new Date().toLocaleTimeString("en-PH", {
     timeZone: "Asia/Manila",
     hour: "2-digit",
@@ -35,6 +20,17 @@ function liveClock(): string {
     hour12: false,
   });
 }
+
+const QUICK_LINKS = [
+  { icon: TrendingUp,  label: "Top Gainers",   route: "/scanner?mode=gainers", color: "var(--market-green)" },
+  { icon: TrendingDown, label: "Top Losers",   route: "/scanner?mode=losers",  color: "var(--market-red)" },
+  { icon: Activity,    label: "Most Active",   route: "/scanner?mode=active",  color: "var(--accent)" },
+  { icon: Compass,     label: "Sectors",       route: "/sectors",              color: "#7B61FF" },
+  { icon: BarChart2,   label: "Portfolio",     route: "/portfolio",            color: "var(--amber)" },
+  { icon: Bell,        label: "Alerts",        route: "/alerts",               color: "#FF6B9D" },
+  { icon: BookOpen,    label: "AI Research",   route: "/chat",                 color: "#22D3EE" },
+  { icon: Zap,         label: "Full Scanner",  route: "/scanner?mode=all",     color: "var(--market-orange)" },
+];
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -45,7 +41,6 @@ export default function HomePage() {
   const marketStatus = useMarketStatus();
   const normalizedQuery = query.trim().toUpperCase();
 
-  /* Onboarding for first-time visitors */
   const [showOnboarding, setShowOnboarding] = useState(false);
   useEffect(() => {
     const existingFlag = loadFirstDashboardFlag();
@@ -53,208 +48,220 @@ export default function HomePage() {
     const flag = loadFirstDashboardFlag();
     if (flag?.pending && !flag.dismissedAt) setShowOnboarding(true);
   }, []);
-  const handleOnboardingComplete = () => {
-    dismissFirstDashboardOverlay();
-    setShowOnboarding(false);
-  };
 
-  const resolveSearchTarget = () => {
-    if (!normalizedQuery) return null;
-    const exactSymbol = searchResults.find((stock) => stock.symbol.toUpperCase() === normalizedQuery);
-    if (exactSymbol) return exactSymbol.symbol;
-    const exactName = searchResults.find((stock) => stock.name.toUpperCase() === normalizedQuery);
-    if (exactName) return exactName.symbol;
-    return searchResults[0]?.symbol ?? normalizedQuery;
-  };
-
-  /* Cmd-K shortcut to focus search */
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
-        e.preventDefault();
-        searchRef.current?.focus();
-      }
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, []);
-
-  /* Live clock — ticks once a second, purely cosmetic but reads as "live" */
   useEffect(() => {
     const t = window.setInterval(() => setClock(liveClock()), 1000);
     return () => window.clearInterval(t);
   }, []);
 
-  /* Debounced search */
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") { e.preventDefault(); searchRef.current?.focus(); }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
   useEffect(() => {
     let cancelled = false;
-    const normalized = query.trim();
-    if (normalized.length < 2) { setSearchResults([]); return; }
+    const t = query.trim();
+    if (t.length < 2) { setSearchResults([]); return; }
     const timer = window.setTimeout(async () => {
       try {
-        const res = await fetch(`/api/search?q=${encodeURIComponent(normalized)}&limit=6`);
+        const res = await fetch(`/api/search?q=${encodeURIComponent(t)}&limit=6`);
         const payload = await res.json();
         if (!cancelled) {
           const results = payload.results ?? [];
-          const exact = normalized.toUpperCase();
-          const sorted = [...results].sort((a, b) => {
-            const aExact = a.symbol.toUpperCase() === exact || a.name.toUpperCase() === exact ? 1 : 0;
-            const bExact = b.symbol.toUpperCase() === exact || b.name.toUpperCase() === exact ? 1 : 0;
-            return bExact - aExact;
-          });
-          setSearchResults(sorted);
+          const exact = t.toUpperCase();
+          setSearchResults([...results].sort((a, b) => {
+            const aE = a.symbol.toUpperCase() === exact ? 1 : 0;
+            const bE = b.symbol.toUpperCase() === exact ? 1 : 0;
+            return bE - aE;
+          }));
         }
-      } catch {
-        /* search is optional */
-      }
+      } catch { /* search is optional */ }
     }, 200);
     return () => { cancelled = true; clearTimeout(timer); };
   }, [query]);
 
+  const resolveTarget = () => {
+    if (!normalizedQuery) return null;
+    const exact = searchResults.find((s) => s.symbol.toUpperCase() === normalizedQuery);
+    if (exact) return exact.symbol;
+    return searchResults[0]?.symbol ?? normalizedQuery;
+  };
+
   if (showOnboarding) {
-    return <OnboardingWizard onComplete={handleOnboardingComplete} />;
+    return <OnboardingWizard onComplete={() => { dismissFirstDashboardOverlay(); setShowOnboarding(false); }} />;
   }
 
   return (
-    <div style={{ display: "grid", gap: 28 }}>
-      {/* ════════════ TOOLBAR — compact app header, not a landing-page hero ════════════ */}
-      <section className="stockex-stagger" style={{ display: "grid", gap: 16 }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
-          <div style={{ display: "grid", gap: 3 }}>
-            <h1 style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 26, letterSpacing: "-0.02em", color: "var(--text-primary)", margin: 0 }}>
-              Dashboard
-            </h1>
-            <span style={{ fontSize: 12.5, color: "var(--text-secondary)" }}>
-              Your PSE research desk, at a glance.
-            </span>
-          </div>
-          <div
-            style={{
-              display: "inline-flex", alignItems: "center", gap: 8,
-              padding: "6px 12px", borderRadius: 999, border: "1px solid var(--border)",
-              fontFamily: "var(--font-mono)", fontSize: 12, color: "var(--text-secondary)",
-            }}
-          >
-            <span className="stockex-pulse-dot" style={{ width: 6, height: 6, borderRadius: "50%", background: marketStatus.isOpen ? "var(--market-green)" : "var(--text-muted)" }} />
-            PSE · {clock}
-            <span aria-hidden="true" style={{ color: "var(--border-strong)" }}>|</span>
-            <span style={{ color: marketStatus.isOpen ? "var(--market-green)" : "var(--text-secondary)", fontWeight: 600 }}>
+    <div style={{ display: "grid", gap: 24 }}>
+
+      {/* ── Top bar: status + search ── */}
+      <div style={{ display: "grid", gap: 14 }}>
+        {/* Status strip */}
+        <div style={{
+          display: "flex", alignItems: "center", justifyContent: "space-between",
+          flexWrap: "wrap", gap: 8,
+          padding: "10px 14px",
+          background: "var(--bg-card)",
+          border: "1px solid var(--border)",
+          borderRadius: 8,
+        }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <span
+              style={{
+                display: "inline-block", width: 8, height: 8, borderRadius: "50%",
+                background: marketStatus.isOpen ? "var(--market-green)" : "var(--text-muted)",
+                boxShadow: marketStatus.isOpen ? "0 0 0 2px rgba(38,166,154,0.3)" : "none",
+              }}
+            />
+            <span style={{ fontSize: 13, fontWeight: 600, color: marketStatus.isOpen ? "var(--market-green)" : "var(--text-secondary)" }}>
               {marketStatus.label}
             </span>
+            <span style={{ fontSize: 12, color: "var(--text-muted)" }}>
+              Philippine Stock Exchange
+            </span>
           </div>
+          <span style={{ fontFamily: "var(--font-mono)", fontSize: 13, color: "var(--text-secondary)", letterSpacing: "0.05em" }}>
+            PHT {clock}
+          </span>
         </div>
 
-        {/* Search — a toolbar element, sized for daily use, not a hero centerpiece */}
-        <div style={{ display: "flex", alignItems: "stretch", gap: 10, flexWrap: "wrap" }}>
-          <label style={{ position: "relative", flex: "1 1 320px", minWidth: 240, display: "block" }}>
-            <Search size={16} style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", color: "var(--text-secondary)", pointerEvents: "none" }} />
+        {/* Search */}
+        <div style={{ display: "flex", gap: 8 }}>
+          <div style={{ position: "relative", flex: 1 }}>
+            <Search size={15} style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)", pointerEvents: "none" }} />
             <input
               ref={searchRef}
-              aria-label="Search a stock on the PSE"
-              placeholder="Search a company: BDO, Jollibee, Ayala…"
+              aria-label="Search a PSE stock"
+              placeholder="Search a company or ticker: BDO, JFC, SMPH…"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  const target = resolveSearchTarget();
-                  if (target) navigate(`/stock/${target}`);
-                }
+                if (e.key === "Enter") { const t = resolveTarget(); if (t) navigate(`/stock/${t}`); }
+                if (e.key === "Escape") { setQuery(""); setSearchResults([]); }
               }}
               style={{
-                width: "100%", height: 42,
+                width: "100%", height: 44, boxSizing: "border-box",
                 border: "1px solid var(--border)", background: "var(--bg-sheet)",
-                borderRadius: 8, padding: "0 46px 0 40px",
-                fontFamily: "var(--font-display)", fontSize: 14.5, color: "var(--text-primary)",
-                outline: "none", transition: "border-color 220ms var(--ease-soft), box-shadow 220ms var(--ease-soft)",
-                boxSizing: "border-box",
+                borderRadius: 8, padding: "0 44px 0 38px",
+                fontSize: 14, color: "var(--text-primary)", outline: "none",
+                fontFamily: "inherit",
+                transition: "border-color 150ms ease, box-shadow 150ms ease",
               }}
-              onFocus={(e) => { e.currentTarget.style.borderColor = "var(--accent)"; e.currentTarget.style.boxShadow = "0 0 0 3px var(--accent-soft)"; }}
-              onBlur={(e) => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.boxShadow = "none"; }}
+              onFocus={(e) => {
+                e.currentTarget.style.borderColor = "var(--accent)";
+                e.currentTarget.style.boxShadow = "0 0 0 3px var(--accent-soft)";
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.borderColor = "var(--border)";
+                e.currentTarget.style.boxShadow = "none";
+              }}
             />
-            <span
-              aria-hidden="true"
-              style={{
-                position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)",
-                padding: "2px 7px", border: "1px solid var(--border)", borderRadius: 3,
-                color: "var(--text-secondary)", fontFamily: "var(--font-mono)", fontSize: 10.5,
-              }}
-            >
-              ⌘K
-            </span>
+            <kbd style={{
+              position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)",
+              padding: "2px 6px", border: "1px solid var(--border)", borderRadius: 4,
+              color: "var(--text-muted)", fontSize: 10.5, fontFamily: "var(--font-mono)",
+              background: "var(--bg-chip)",
+            }}>⌘K</kbd>
 
             {searchResults.length > 0 && (
-              <div
-                style={{
-                  position: "absolute", top: "calc(100% + 6px)", left: 0, right: 0, zIndex: 20,
-                  border: "1px solid var(--border)", borderRadius: 8, background: "var(--bg-sheet)",
-                  boxShadow: "0 8px 24px rgba(0,0,0,0.35)", overflow: "hidden",
-                }}
-              >
+              <div style={{
+                position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, zIndex: 30,
+                border: "1px solid var(--border)", borderRadius: 8,
+                background: "var(--bg-card)", overflow: "hidden",
+                boxShadow: "0 8px 32px rgba(0,0,0,0.5)",
+              }}>
                 {searchResults.map((r) => (
                   <button
                     key={r.symbol}
                     onClick={() => navigate(`/stock/${r.symbol}`)}
                     style={{
                       display: "flex", justifyContent: "space-between", alignItems: "center",
-                      width: "100%", padding: "10px 14px", background: "transparent", border: "none",
-                      borderTop: "1px solid var(--border-soft)", cursor: "pointer", textAlign: "left",
+                      width: "100%", padding: "9px 14px", background: "transparent", border: "none",
+                      borderBottom: "1px solid var(--border)", cursor: "pointer", textAlign: "left",
                     }}
-                    onMouseEnter={(e) => e.currentTarget.style.background = "var(--bg-card)"}
-                    onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}
+                    onMouseEnter={(e) => (e.currentTarget.style.background = "var(--bg-card-hover)")}
+                    onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
                   >
-                    <span style={{ fontFamily: "var(--font-mono)", fontWeight: 600, fontSize: 13, color: "var(--text-primary)" }}>{r.symbol}</span>
-                    <span style={{ color: "var(--text-body)", fontSize: 12.5 }}>{r.name}</span>
+                    <span style={{ fontFamily: "var(--font-mono)", fontWeight: 700, fontSize: 13, color: "var(--text-primary)" }}>{r.symbol}</span>
+                    <span style={{ color: "var(--text-secondary)", fontSize: 12.5 }}>{r.name}</span>
                   </button>
                 ))}
               </div>
             )}
-          </label>
-          <Button onClick={() => { const t = resolveSearchTarget(); if (t) navigate(`/stock/${t}`); }} size="md">
+          </div>
+          <button
+            onClick={() => { const t = resolveTarget(); if (t) navigate(`/stock/${t}`); }}
+            style={{
+              padding: "0 20px", height: 44, borderRadius: 8,
+              background: "var(--accent)", color: "#fff", border: "none",
+              fontSize: 14, fontWeight: 600, cursor: "pointer",
+              display: "flex", alignItems: "center", gap: 6,
+              transition: "background 150ms ease",
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.background = "var(--brand-dark)")}
+            onMouseLeave={(e) => (e.currentTarget.style.background = "var(--accent)")}
+          >
             Research <ArrowRight size={14} />
-          </Button>
+          </button>
         </div>
+      </div>
 
-        {/* Quick screens — compact chips, not a hero action row */}
-        <div className="stockex-stagger" style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-          {QUICK_ACTIONS.map((a) => (
-            <button
-              key={a.label}
-              onClick={() => navigate(a.route)}
-              title={a.desc}
-              style={{
-                display: "inline-flex", alignItems: "center", gap: 6,
-                padding: "6px 12px", background: "transparent", border: "1px solid var(--border)",
-                borderRadius: 999, color: "var(--text-primary)", fontFamily: "var(--font-sans)",
-                fontSize: 12.5, fontWeight: 500, cursor: "pointer",
-                transition: "border-color 200ms var(--ease-soft), color 200ms var(--ease-soft), transform 200ms var(--ease-soft), background 200ms var(--ease-soft)",
-              }}
-              onMouseEnter={(e) => { e.currentTarget.style.borderColor = "var(--accent)"; e.currentTarget.style.color = "var(--accent)"; e.currentTarget.style.background = "var(--accent-soft)"; e.currentTarget.style.transform = "translateY(-1px)"; }}
-              onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.color = "var(--text-primary)"; e.currentTarget.style.background = "transparent"; e.currentTarget.style.transform = "translateY(0)"; }}
-            >
-              <a.icon size={13} strokeWidth={1.5} />
-              {a.label}
-            </button>
-          ))}
-        </div>
-      </section>
+      {/* ── Quick links grid ── */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(130px, 1fr))", gap: 8 }}>
+        {QUICK_LINKS.map((l) => (
+          <button
+            key={l.label}
+            onClick={() => navigate(l.route)}
+            style={{
+              display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 10,
+              padding: "14px 14px 12px",
+              background: "var(--bg-card)", border: "1px solid var(--border)",
+              borderRadius: 8, cursor: "pointer", textAlign: "left",
+              transition: "border-color 150ms ease, background 150ms ease",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = "rgba(79,142,247,0.35)";
+              e.currentTarget.style.background = "var(--bg-card-hover)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = "var(--border)";
+              e.currentTarget.style.background = "var(--bg-card)";
+            }}
+          >
+            <span style={{
+              width: 28, height: 28, borderRadius: 6,
+              background: `${l.color}18`,
+              border: `1px solid ${l.color}30`,
+              display: "flex", alignItems: "center", justifyContent: "center",
+              color: l.color, flexShrink: 0,
+            }}>
+              <l.icon size={14} strokeWidth={2} />
+            </span>
+            <span style={{ fontSize: 12.5, fontWeight: 600, color: "var(--text-primary)", lineHeight: 1.3 }}>
+              {l.label}
+            </span>
+          </button>
+        ))}
+      </div>
 
-      {/* ════════════ MARKET PULSE — live PSEi-30 gainers/losers ════════════ */}
+      {/* ── Market Pulse ── */}
       <MarketPulse />
 
-      {/* ════════════ FOREIGN FLOW — real net foreign buying/selling ════════════ */}
-      <ForeignFlowWidget />
+      {/* ── Two column: Foreign Flow + Sectors ── */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+        <ForeignFlowWidget />
+        <SectorHeatmap />
+      </div>
 
-      {/* ════════════ SECTOR HEATMAP — real sector-level performance ════════════ */}
-      <SectorHeatmap />
-
-      {/* ════════════ MARKET HEATMAP — all PSEi-30 constituents, per-stock ════════════ */}
-      <MarketHeatmap />
-
-      {/* ════════════ COMMAND CENTER — real feature launch grid ════════════ */}
-      <CommandCenter />
-
-      {/* ════════════ WATCH STRIP — curated PSE tickers ════════════ */}
-      <WatchStrip />
+      {/* ── Footer note ── */}
+      <div style={{ fontSize: 11.5, color: "var(--text-muted)", display: "flex", gap: 16, flexWrap: "wrap" }}>
+        <span>Prices via PHISIX · Fundamentals via PSE Edge</span>
+        <Link to="/trust" style={{ color: "var(--text-muted)", textDecoration: "underline" }}>Data sources & methodology</Link>
+      </div>
     </div>
   );
 }

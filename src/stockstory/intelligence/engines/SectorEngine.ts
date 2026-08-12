@@ -32,7 +32,7 @@ export class SectorEngine {
       score: rawScore,
       sectorStrength,
       peerPercentile: clampScore(peerCompare),
-      peerCount: 0, // populated externally when universe data is available
+      peerCount: 0, // populated externally when universe data is available,
       tailwindScore: tailwinds,
       headwindScore: headwinds,
       confidence: Math.round(confidence * 100) / 100,

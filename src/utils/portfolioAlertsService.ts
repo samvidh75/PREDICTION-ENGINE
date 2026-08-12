@@ -19,11 +19,11 @@ export interface Alert {
 
 export interface AlertConfig {
   priceAlerts: boolean;
-  priceChangePercent: number; // alert if stock moves more than this %
+  priceChangePercent: number; // alert if stock moves more than this %,
   portfolioMilestones: boolean;
-  milestonePercent: number; // alert every 5% gain/loss
+  milestonePercent: number; // alert every 5% gain/loss,
   rebalanceAlerts: boolean;
-  rebalanceThreshold: number; // alert if sector deviates > this %
+  rebalanceThreshold: number; // alert if sector deviates > this %,
   concentrationAlert: boolean;
   concentrationThreshold: number; // alert if sector > this %
 }

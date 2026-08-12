@@ -1,10 +1,10 @@
 const cache = new Map<string, { data: unknown; expiry: number }>()
 
 const TTL: Record<string, number> = {
-  quote:      30_000,   // 30 seconds
-  snapshot:   300_000,  // 5 minutes
-  financials: 3_600_000, // 1 hour
-  news:       600_000,   // 10 minutes
+  quote:      30_000,   // 30 seconds,
+  snapshot:   300_000,  // 5 minutes,
+  financials: 3_600_000, // 1 hour,
+  news:       600_000,   // 10 minutes,
   scanner:    60_000,    // 1 minute
 }
 

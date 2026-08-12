@@ -20,8 +20,6 @@ export default function PortfolioDetailPage() {
         transition={{ ...pageTransition, delay: 0.05 }}
         style={{
           backgroundColor: colors.surface,
-          backdropFilter: 'blur(20px) saturate(160%)',
-          WebkitBackdropFilter: 'blur(20px) saturate(160%)',
           borderRadius: '8px',
           padding: '32px',
           textAlign: 'center',

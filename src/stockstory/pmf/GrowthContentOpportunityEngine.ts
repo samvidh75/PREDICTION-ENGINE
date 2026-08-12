@@ -18,7 +18,7 @@ export interface ContentOpportunity {
   description: string;
   source: 'failed_search' | 'user_feedback' | 'trending' | 'correction';
   signalCount: number;
-  priority: number; // 1-100
+  priority: number; // 1-100,
   suggestedFormat: 'research_report' | 'blog_post' | 'guide' | 'faq' | 'comparison';
   suggestedSymbols: string[];
   rationale: string;

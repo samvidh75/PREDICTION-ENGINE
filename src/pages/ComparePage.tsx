@@ -35,8 +35,6 @@ interface ComparableQuote {
 const glassCard: React.CSSProperties = {
   border: "1px solid var(--glass-border)",
   background: "var(--glass-bg)",
-  backdropFilter: "blur(var(--glass-blur)) saturate(160%)",
-  WebkitBackdropFilter: "blur(var(--glass-blur)) saturate(160%)",
   borderRadius: 14,
 };
 
@@ -174,7 +172,6 @@ export default function ComparePage() {
               style={{
                 width: "100%", height: 42, boxSizing: "border-box",
                 border: "1px solid var(--glass-border)", background: "var(--glass-bg)",
-                backdropFilter: "blur(var(--glass-blur))", WebkitBackdropFilter: "blur(var(--glass-blur))",
                 borderRadius: 999, padding: "0 16px 0 40px",
                 fontFamily: typography.fontFamily, fontSize: 14, color: colors.textPrimary, outline: "none",
               }}

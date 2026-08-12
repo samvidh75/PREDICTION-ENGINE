@@ -23,7 +23,7 @@ export type IssueCategory =
 export interface ClassifiedIssue {
   feedbackId: string;
   category: IssueCategory;
-  confidence: number; // 0-1
+  confidence: number; // 0-1,
   detail: string;
   symbol?: string;
   component?: string;

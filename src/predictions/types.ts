@@ -32,13 +32,13 @@ export interface CreatePredictionInput {
 export interface PredictionRecord {
   id: string;
   symbol: string;
-  prediction_date: string;         // ISO date — when prediction was made
-  ranking_score: number;           // 0-100 composite Lensory score
+  prediction_date: string;         // ISO date — when prediction was made,
+  ranking_score: number;           // 0-100 composite Lensory score,
   classification: Classification;
-  confidence_score: number;        // 0-100 from ConfidenceEngineV2
+  confidence_score: number;        // 0-100 from ConfidenceEngineV2,
   confidence_level: ConfidenceLevel;
 
-  // Engine scores (0-100 each)
+  // Engine scores (0-100 each),
   quality_score: number;
   growth_score: number;
   value_score: number;
@@ -51,11 +51,11 @@ export interface PredictionRecord {
   benchmark_level: number | null;  // KSE-100 index level
 
   // Forward validation
-  prediction_horizon: number;      // days (7, 30, 90, 180, 365)
+  prediction_horizon: number;      // days (7, 30, 90, 180, 365),
   validation_status: ValidationStatus;
-  validated_at: string | null;     // ISO timestamp of validation
-  future_return: number | null;    // % return over horizon
-  benchmark_return: number | null; // % benchmark return over horizon
+  validated_at: string | null;     // ISO timestamp of validation,
+  future_return: number | null;    // % return over horizon,
+  benchmark_return: number | null; // % benchmark return over horizon,
   alpha: number | null;            // future_return - benchmark_return
 
   // Audit
@@ -115,9 +115,9 @@ export interface RankingAccuracyResult {
 
 export interface EngineAttribution {
   engine: string;
-  information_coefficient: number; // rank correlation between engine score and future return
-  rank_correlation: number;        // Spearman
-  forward_return_correlation: number; // Pearson
+  information_coefficient: number; // rank correlation between engine score and future return,
+  rank_correlation: number;        // Spearman,
+  forward_return_correlation: number; // Pearson,
   n_predictions: number;
   interpretation: string;
 }
@@ -129,7 +129,7 @@ export interface StatisticalValidation {
   confidence_interval_lower: number;
   confidence_interval_upper: number;
   information_ratio: number;
-  is_significant: boolean;         // p < 0.05
+  is_significant: boolean;         // p < 0.05,
   sample_size: number;
 }
 
@@ -141,7 +141,7 @@ export interface BenchmarkObservation {
 }
 
 export interface PredictionCredibilityScore {
-  overall_score: number;           // 0-100
+  overall_score: number;           // 0-100,
   components: {
     hit_rate: { score: number; weight: number };
     alpha: { score: number; weight: number };
@@ -150,7 +150,7 @@ export interface PredictionCredibilityScore {
     benchmark_outperformance: { score: number; weight: number };
     data_integrity: { score: number; weight: number };
   };
-  level: string;                   // 'Insufficient Forward Evidence' | 'Analytical Framework' | etc.
+  level: string;                   // 'Insufficient Forward Evidence' | 'Analytical Framework' | etc.,
   n_validated_predictions: number;
   threshold_met: boolean;          // >= 30 validated predictions
 }

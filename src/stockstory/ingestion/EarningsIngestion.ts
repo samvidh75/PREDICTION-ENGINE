@@ -11,15 +11,15 @@ import { safeDbValue } from './IngestionTypes';
 
 export interface EarningsResult {
   symbol: string;
-  period: string; // e.g. "Q1FY25"
-  periodEnd: string; // ISO date
+  period: string; // e.g. "Q1FY25",
+  periodEnd: string; // ISO date,
   revenue: number | null;
   netProfit: number | null;
   eps: number | null;
   revenueGrowthYoy: number | null;
   profitGrowthYoy: number | null;
   operatingMargin: number | null;
-  marginChange: number | null; // bps change
+  marginChange: number | null; // bps change,
   resultSummary: string | null;
   keyChanges: string[];
   filingDate: string;

@@ -5,7 +5,7 @@
  */
 
 interface TranscriptionPayload {
-  audio: string; // base64 encoded audio
+  audio: string; // base64 encoded audio,
   duration: number;
 }
 

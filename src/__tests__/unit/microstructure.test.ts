@@ -250,8 +250,8 @@ describe('AnomalyDetector', () => {
       // Flash crash
       const crashed = {
         ...base,
-        timestamp: 1090, // 90ms later
-        mid: 95.0, // 5.24% down — clearly beyond the 5% flash-crash threshold
+        timestamp: 1090, // 90ms later,
+        mid: 95.0, // 5.24% down — clearly beyond the 5% flash-crash threshold,
         bidPrice: 95,
         askPrice: 95.5,
       };

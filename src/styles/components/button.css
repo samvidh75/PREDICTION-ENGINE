@@ -48,18 +48,18 @@ button:disabled, .button:disabled, [role="button"]:disabled {
 .button-md { padding: 0 16px; height: 36px; font-size: 14px; }
 .button-sm { padding: 0 12px; height: 28px; font-size: 13px; border-radius: 5px; }
 
-/* PRIMARY — deep ink pill on paper */
+/* PRIMARY — blue CTA */
 .button-primary,
 button:not([class*="button-"]):not([class*="ghost"]):not([class*="danger"]):not([class*="secondary"]) {
-  background-color: var(--brand);
-  color: var(--text-inverse);
-  border: 1px solid var(--brand);
+  background-color: var(--accent);
+  color: #fff;
+  border: 1px solid var(--accent);
 }
 
 .button-primary:hover:not(:disabled),
 button:not([class*="button-"]):not([class*="ghost"]):not([class*="danger"]):not([class*="secondary"]):hover:not(:disabled) {
-  background-color: var(--brand-light);
-  border-color: var(--brand-light);
+  background-color: var(--brand-dark);
+  border-color: var(--brand-dark);
 }
 
 .button-primary:active:not(:disabled),

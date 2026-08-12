@@ -13,8 +13,8 @@ export type CorrectionStatus = 'reported' | 'in_review' | 'confirmed' | 'fixed' 
 export interface CorrectionRecord {
   id: string;
   symbol?: string;
-  component: string; // thesis, bullCase, bearCase, risks, financials, etc.
-  issueType: string; // INACCURATE_DATA, OUTDATED_INFO, MISSING_CONTEXT, etc.
+  component: string; // thesis, bullCase, bearCase, risks, financials, etc.,
+  issueType: string; // INACCURATE_DATA, OUTDATED_INFO, MISSING_CONTEXT, etc.,
   description: string;
   reporterId: string;
   reportedAt: string;
@@ -28,7 +28,7 @@ export interface CorrectionAnalytics {
   totalReported: number;
   totalFixed: number;
   totalDismissed: number;
-  avgTimeToResolution: number; // hours
+  avgTimeToResolution: number; // hours,
   byComponent: Record<string, { reported: number; fixed: number }>;
   byIssueType: Record<string, number>;
   trend: Array<{ date: string; reported: number; fixed: number }>;

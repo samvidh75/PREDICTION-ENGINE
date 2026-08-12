@@ -24,12 +24,12 @@ export type IntelligenceNotification = {
   confidenceState?: ConfidenceState;
   narrativeKey?: number;
 
-  // Calmer signatures (avoid noise)
+  // Calmer signatures (avoid noise),
   signature: string;
 };
 
 export type AlertContext = {
   confidenceState: ConfidenceState;
-  marketStateLabel: string; // educational label from engine (e.g. "Elevated Volatility")
+  marketStateLabel: string; // educational label from engine (e.g. "Elevated Volatility"),
   narrativeKey: number;
 };

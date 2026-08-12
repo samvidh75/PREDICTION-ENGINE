@@ -26,25 +26,25 @@ export type HealthometerCategoryTone =
 
 export type HealthometerCategoryScore = {
   id: HealthometerCategoryId;
-  score01: number; // 0..1
+  score01: number; // 0..1,
   tone: HealthometerCategoryTone;
   label: string;
 };
 
 export type HealthometerCategoryExplanation = {
   id: HealthometerCategoryId;
-  educationalSummary: string; // SEC-safe phrasing only
+  educationalSummary: string; // SEC-safe phrasing only,
   whyThisExists: string; // "which signals drove this"
 };
 
 export type HealthometerCategoryEvaluation = {
-  overallScore01: number; // 0..1 (educational composite)
+  overallScore01: number; // 0..1 (educational composite),
   confidenceTone: "composed" | "guarded" | "sensitive";
   categories: HealthometerCategoryScore[];
   explanations: HealthometerCategoryExplanation[];
   diagnostics: {
     weights: Record<HealthometerCategoryId, number>;
-    availableSignalCoverage: number; // 0..1
+    availableSignalCoverage: number; // 0..1,
     anomalyFlags: string[];
   };
 };
@@ -77,8 +77,8 @@ type FinancialSnapshot = {
 };
 
 type SectorSignals = {
-  sectorMomentum: number; // 0..1 proxy
-  institutionalParticipation: number; // 0..1
+  sectorMomentum: number; // 0..1 proxy,
+  institutionalParticipation: number; // 0..1,
   liquidityBreadth: number; // 0..1
 };
 

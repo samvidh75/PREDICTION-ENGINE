@@ -34,7 +34,7 @@ export default function TaxPlanner() {
           ticker: h.ticker,
           quantity: h.quantity,
           buyPrice: h.buyPrice,
-          currentPrice: 0, // Would need to fetch current prices
+          currentPrice: 0, // Would need to fetch current prices,
           buyDate: h.buyDate,
         }));
 

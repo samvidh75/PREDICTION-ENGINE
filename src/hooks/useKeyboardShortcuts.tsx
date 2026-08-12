@@ -195,8 +195,7 @@ export function KeyboardHelpOverlay({ open, onClose }: KeyboardHelpOverlayProps)
       style={{
         position: 'fixed', inset: 0, zIndex: 9999,
         background: colors.backdropModal,
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        backdropFilter: 'blur(4px)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center'
       }}
       onClick={onClose}
     >

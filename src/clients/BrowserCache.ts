@@ -3,8 +3,8 @@ import type { CachedQuote, CacheConfig, UnifiedQuote } from './types';
 const DB_NAME = 'StockStory_DataCache';
 const STORE_NAME = 'quotes';
 const DEFAULT_CONFIG: CacheConfig = {
-  priceExpiry: 5 * 60 * 1000, // 5 minutes
-  fundamentalExpiry: 60 * 60 * 1000, // 1 hour
+  priceExpiry: 5 * 60 * 1000, // 5 minutes,
+  fundamentalExpiry: 60 * 60 * 1000, // 1 hour,
   technicalExpiry: 24 * 60 * 60 * 1000, // 1 day
 };
 

@@ -171,7 +171,7 @@ describe('MarketBrainPanel', () => {
         ...SAMPLE_RESEARCH,
         research: {
           ...SAMPLE_RESEARCH.research,
-          headline: 'Provider data shows growth',  // the DTO layer should have caught this
+          headline: 'Provider data shows growth',  // the DTO layer should have caught this,
           methodNote: 'Data aggregated from research providers',
         },
       });

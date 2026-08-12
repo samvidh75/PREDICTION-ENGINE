@@ -18,7 +18,7 @@ export interface IntegrityCheck {
 export interface DataIntegrityReport {
   status: 'ONLINE' | 'DEGRADED' | 'OFFLINE' | 'MISCONFIGURED';
   checks: IntegrityCheck[];
-  overallScore: number; // 0-100
+  overallScore: number; // 0-100,
   generatedAt: string;
 }
 

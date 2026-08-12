@@ -32,7 +32,7 @@ export type ActionType =
 export interface ActionRecord {
   id: string;
   action: ActionType;
-  symbol: string | null; // null for non-ticker actions
+  symbol: string | null; // null for non-ticker actions,
   timestamp: string;
   metadata?: Record<string, unknown>;
 }
@@ -45,7 +45,7 @@ export interface ActionMemoryState {
 
 export interface ResearchSuggestion {
   symbol: string;
-  reason: string; // e.g., "Not checked in 7 days", "Recently added to watchlist"
+  reason: string; // e.g., "Not checked in 7 days", "Recently added to watchlist",
   lastAction: string;
   thesisStatus: string | null;
 }

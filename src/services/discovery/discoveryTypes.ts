@@ -61,7 +61,7 @@ export type DiscoveryResult = {
 export type DiscoverySearchInput = {
   query: string;
   confidenceState: ConfidenceState;
-  marketStateLabel: string; // educational label / string union from ConfidenceEngine marketState
+  marketStateLabel: string; // educational label / string union from ConfidenceEngine marketState,
   narrativeKey: number;
 
   preferredSectors?: string[];

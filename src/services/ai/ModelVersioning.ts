@@ -145,7 +145,7 @@ export const MODEL_VERSIONS = [
   {
     version: '1.0.0',
     buildDate: new Date('2026-07-01').getTime(),
-    size: 67108864, // 64MB
+    size: 67108864, // 64MB,
     checksum: 'sha256_v1',
     quantized: false,
     accuracy: 0.995,
@@ -154,16 +154,16 @@ export const MODEL_VERSIONS = [
   {
     version: '1.1.0',
     buildDate: new Date('2026-07-15').getTime(),
-    size: 16777216, // 16MB (quantized)
+    size: 16777216, // 16MB (quantized),
     checksum: 'sha256_v1_1',
     quantized: true,
-    accuracy: 0.9945, // <0.5% loss
+    accuracy: 0.9945, // <0.5% loss,
     changes: ['int8 Quantization applied', '4x size reduction', '15% faster inference'],
   },
   {
     version: '1.2.0',
     buildDate: new Date('2026-08-01').getTime(),
-    size: 14680064, // 14MB (optimized)
+    size: 14680064, // 14MB (optimized),
     checksum: 'sha256_v1_2',
     quantized: true,
     accuracy: 0.9945,

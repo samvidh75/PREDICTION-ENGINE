@@ -76,7 +76,7 @@ router.get('/orderbook/:ticker/depth', rateLimit(500), async (req: Request, res:
     return res.json({
       ticker: orderBook.ticker,
       timestamp: orderBook.timestamp,
-      bid: orderBook.bid.slice(0, 20), // Return top 20 levels
+      bid: orderBook.bid.slice(0, 20), // Return top 20 levels,
       ask: orderBook.ask.slice(0, 20),
     });
   } catch (error) {

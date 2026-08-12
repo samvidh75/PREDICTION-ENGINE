@@ -10,11 +10,11 @@ import pool from '../db/index';
 export interface AccuracyMetrics {
   horizon: string;
   totalPredictions: number;
-  hitRate: number;           // % correct direction
-  alphaRate: number;         // % beating benchmark
-  avgReturn: number;         // mean realised return
-  avgAlpha: number;          // mean excess return
-  calibrationError: number;  // avg |confidence - hit_rate|
+  hitRate: number;           // % correct direction,
+  alphaRate: number;         // % beating benchmark,
+  avgReturn: number;         // mean realised return,
+  avgAlpha: number;          // mean excess return,
+  calibrationError: number;  // avg |confidence - hit_rate|,
   precision: number;
   recall: number;
   f1: number;
@@ -31,7 +31,7 @@ export interface ClassificationPerformance {
 
 export interface FactorRanking {
   factor: string;
-  predictivePower: number;    // Information Coefficient
+  predictivePower: number;    // Information Coefficient,
   hitRate: number;
   alphaGeneration: number;
   rank: number;

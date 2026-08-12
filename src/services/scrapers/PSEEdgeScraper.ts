@@ -595,8 +595,8 @@ export async function scrapeCompanyFundamentals(symbol: string, companyName: str
  * single PSE Edge quarterly filing. Null fields mean that specific filing
  * didn't match the label regex — never a fabricated value. */
 export interface FinancialHistoryPoint {
-  period: string;             // the filing's announce date (e.g. "05/15/2026 04:30 PM")
-  asOfPeriod: string | null;  // e.g. "March 31, 2026"
+  period: string;             // the filing's announce date (e.g. "05/15/2026 04:30 PM"),
+  asOfPeriod: string | null;  // e.g. "March 31, 2026",
   revenue: number | null;
   netIncome: number | null;
   totalAssets: number | null;
@@ -611,7 +611,7 @@ export interface FinancialHistoryPoint {
 export interface ParsedFinancialHistory {
   symbol: string;
   latest: ParsedFundamentals | null;
-  series: FinancialHistoryPoint[]; // oldest → newest, quarterly (17-Q)
+  series: FinancialHistoryPoint[]; // oldest → newest, quarterly (17-Q),
   annualSeries: FinancialHistoryPoint[]; // oldest → newest, annual (17-A)
 }
 
@@ -852,9 +852,9 @@ export async function scrapeCompanySectors(): Promise<PseCompanyDirectoryEntry[]
 export interface CompanyDisclosure {
   symbol: string;
   companyName: string;
-  formType: string;      // e.g. "4-30" (Material Info), "4-31" (Press Release), "13-1" (insider)
-  title: string;         // the disclosure category shown in PSE Edge's table (e.g. "Press Release")
-  filingDate: string;    // e.g. "Jul 28, 2026 03:57 PM"
+  formType: string;      // e.g. "4-30" (Material Info), "4-31" (Press Release), "13-1" (insider),
+  title: string;         // the disclosure category shown in PSE Edge's table (e.g. "Press Release"),
+  filingDate: string;    // e.g. "Jul 28, 2026 03:57 PM",
   edgeNo: string;
   sourceUrl: string;
 }

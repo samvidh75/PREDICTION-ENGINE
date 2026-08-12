@@ -410,7 +410,7 @@ describe('ConfidenceEngine', () => {
     const inputs = makeInputs({
       financials: {
         ...makeInputs().financials,
-        roe: null, roic: null,       // 2 critical missing
+        roe: null, roic: null,       // 2 critical missing,
         debtToEquity: 0.5, fcfYield: 0.04,
       },
     });

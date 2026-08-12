@@ -28,7 +28,7 @@ export default function BrowserAITestPage() {
             ticker: 'BDO',
             quantity: 10,
             buyPrice: 150,
-            buyDate: Date.now() - 180 * 24 * 60 * 60 * 1000, // 6 months ago
+            buyDate: Date.now() - 180 * 24 * 60 * 60 * 1000, // 6 months ago,
             notes: 'Test holding',
           },
           {
@@ -36,7 +36,7 @@ export default function BrowserAITestPage() {
             ticker: 'JFC',
             quantity: 25,
             buyPrice: 180,
-            buyDate: Date.now() - 90 * 24 * 60 * 60 * 1000, // 3 months ago
+            buyDate: Date.now() - 90 * 24 * 60 * 60 * 1000, // 3 months ago,
             notes: 'Test holding',
           },
           {
@@ -44,7 +44,7 @@ export default function BrowserAITestPage() {
             ticker: 'ALI',
             quantity: 5,
             buyPrice: 32,
-            buyDate: Date.now() - 30 * 24 * 60 * 60 * 1000, // 1 month ago
+            buyDate: Date.now() - 30 * 24 * 60 * 60 * 1000, // 1 month ago,
             notes: 'Test holding',
           },
         ],

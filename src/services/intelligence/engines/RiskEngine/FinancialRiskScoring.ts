@@ -11,7 +11,7 @@ export interface FinancialRiskResult {
   liquidityScore: number;
   coverageScore: number;
   cashScore: number;
-  points: number;            // 0-20
+  points: number;            // 0-20,
   reasoning: string;
 }
 

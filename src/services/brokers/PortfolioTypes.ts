@@ -7,8 +7,8 @@
 export interface PortfolioHolding {
   symbol: string;            // PSE symbol (e.g., "BDO")
   isin?: string;             // ISIN identifier
-  exchange: 'PSE';   // Exchange
-  quantity: number;          // Number of shares
+  exchange: 'PSE';   // Exchange,
+  quantity: number;          // Number of shares,
   averagePrice: number;      // Average buy price
   lastPrice?: number;        // Current market price
   pnl?: number;              // Unrealized P&L
@@ -25,7 +25,7 @@ export interface PortfolioPosition {
   symbol: string;
   isin?: string;
   exchange: 'PSE' | 'FNO' | 'MCX';
-  quantity: number;          // Positive = long, negative = short
+  quantity: number;          // Positive = long, negative = short,
   averagePrice: number;
   lastPrice?: number;
   pnl?: number;

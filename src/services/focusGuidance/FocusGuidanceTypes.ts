@@ -55,89 +55,89 @@ export interface FocusState {
 
 // Visual Priority Configuration
 export interface VisualPriorityConfig {
-  brightness: number; // 0-1
-  contrast: number; // 0-1
-  glowIntensity: number; // 0-1
-  opacity: number; // 0-1
-  motionWeight: number; // 0-1
+  brightness: number; // 0-1,
+  contrast: number; // 0-1,
+  glowIntensity: number; // 0-1,
+  opacity: number; // 0-1,
+  motionWeight: number; // 0-1,
   spatialIsolation: number; // 0-1
 }
 
 // Adaptive Contrast Configuration
 export interface AdaptiveContrastConfig {
-  panelOpacity: number; // 0-1
-  typographyBrightness: number; // 0-1
-  environmentalShadow: number; // 0-1
-  holographicGlow: number; // 0-1
-  neonDiffusion: number; // 0-1
+  panelOpacity: number; // 0-1,
+  typographyBrightness: number; // 0-1,
+  environmentalShadow: number; // 0-1,
+  holographicGlow: number; // 0-1,
+  neonDiffusion: number; // 0-1,
   sectionSeparation: number; // 0-1
 }
 
 // Cinematic Lighting Configuration
 export interface CinematicLightingConfig {
-  glowDiffusion: number; // 0-1
-  volumetricFocus: number; // 0-1
-  sectionIsolation: number; // 0-1
-  spatialSpotlight: number; // 0-1
+  glowDiffusion: number; // 0-1,
+  volumetricFocus: number; // 0-1,
+  sectionIsolation: number; // 0-1,
+  spatialSpotlight: number; // 0-1,
   laserEdgeEmphasis: number; // 0-1
 }
 
 // Information Breathing Configuration
 export interface InformationBreathingConfig {
-  adaptiveSpacing: number; // 0-1 multiplier
-  modularBreathingRoom: number; // 0-1
-  calmSeparationZones: number; // 0-1
-  layoutDecompression: number; // 0-1
+  adaptiveSpacing: number; // 0-1 multiplier,
+  modularBreathingRoom: number; // 0-1,
+  calmSeparationZones: number; // 0-1,
+  layoutDecompression: number; // 0-1,
   dynamicWhitespace: number; // 0-1
 }
 
 // Motion Priority Configuration
 export interface MotionPriorityConfig {
-  pulseIntensity: number; // 0-1
-  animationSpeed: number; // 0-1
-  particleActivity: number; // 0-1
+  pulseIntensity: number; // 0-1,
+  animationSpeed: number; // 0-1,
+  particleActivity: number; // 0-1,
   transitionDuration: number; // ms
 }
 
 // Focus Lock Configuration
 export interface FocusLockConfig {
-  surroundingSoftening: number; // 0-1
-  backgroundReduction: number; // 0-1
-  unrelatedMotionSlowdown: number; // 0-1
+  surroundingSoftening: number; // 0-1,
+  backgroundReduction: number; // 0-1,
+  unrelatedMotionSlowdown: number; // 0-1,
   depthOfField: number; // 0-1
 }
 
 // Adaptive Emphasis Configuration
 export interface AdaptiveEmphasisConfig {
-  moduleScaling: number; // 0-1
-  dynamicGlowElevation: number; // 0-1
-  environmentalFocusShift: number; // 0-1
+  moduleScaling: number; // 0-1,
+  dynamicGlowElevation: number; // 0-1,
+  environmentalFocusShift: number; // 0-1,
   contextualBrightness: number; // 0-1
 }
 
 // Spatial Calmness Configuration
 export interface SpatialCalmnessConfig {
-  transitionSoftening: number; // 0-1
-  glowRestraint: number; // 0-1
-  layoutDecompression: number; // 0-1
-  visualBalance: number; // 0-1
+  transitionSoftening: number; // 0-1,
+  glowRestraint: number; // 0-1,
+  layoutDecompression: number; // 0-1,
+  visualBalance: number; // 0-1,
   environmentalSmoothing: number; // 0-1
 }
 
 // Cognitive Load Configuration
 export interface CognitiveLoadConfig {
-  visualSimplification: number; // 0-1
-  animationReduction: number; // 0-1
-  layoutDecompression: number; // 0-1
+  visualSimplification: number; // 0-1,
+  animationReduction: number; // 0-1,
+  layoutDecompression: number; // 0-1,
   holographicSoftening: number; // 0-1
 }
 
 // Environmental Readability Configuration
 export interface EnvironmentalReadabilityConfig {
-  adaptiveBlur: number; // 0-1
-  dynamicShadowCalibration: number; // 0-1
-  contrastCorrection: number; // 0-1
-  typographyReinforcement: number; // 0-1
+  adaptiveBlur: number; // 0-1,
+  dynamicShadowCalibration: number; // 0-1,
+  contrastCorrection: number; // 0-1,
+  typographyReinforcement: number; // 0-1,
   neonBalancing: number; // 0-1
 }
 
@@ -158,7 +158,7 @@ export interface FocusGuidanceState {
 
 // Focus Transition Configuration
 export interface FocusTransitionConfig {
-  duration: number; // ms
+  duration: number; // ms,
   easing: string;
   environmentalDissolve: boolean;
   gradualEmphasisMigration: boolean;
@@ -168,24 +168,24 @@ export interface FocusTransitionConfig {
 
 // Micro-Focus Configuration
 export interface MicroFocusConfig {
-  edgeSharpening: number; // 0-1
-  glowDiffusion: number; // 0-1
-  shadowAdjustment: number; // 0-1
+  edgeSharpening: number; // 0-1,
+  glowDiffusion: number; // 0-1,
+  shadowAdjustment: number; // 0-1,
   typographyClarity: number; // 0-1
 }
 
 // Scroll-Based Focus Configuration
 export interface ScrollFocusConfig {
-  activeSectionPriority: number; // 0-1
-  distantModuleSoftening: number; // 0-1
-  contextEnhancement: number; // 0-1
+  activeSectionPriority: number; // 0-1,
+  distantModuleSoftening: number; // 0-1,
+  contextEnhancement: number; // 0-1,
   narrativeFlowMaintenance: number; // 0-1
 }
 
 // Mobile Focus Configuration
 export interface MobileFocusConfig {
-  adaptiveSimplification: number; // 0-1
-  compressedMotion: number; // 0-1
+  adaptiveSimplification: number; // 0-1,
+  compressedMotion: number; // 0-1,
   focusFirstHierarchy: boolean;
   contextualModuleIsolation: number; // 0-1
 }

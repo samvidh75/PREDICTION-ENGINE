@@ -27,7 +27,7 @@ export interface PortfolioPosition {
 }
 
 export interface PortfolioFunds {
-  availableCash: number;    // PHP
+  availableCash: number;    // PHP,
   usedMargin: number;
   totalMargin: number;
 }

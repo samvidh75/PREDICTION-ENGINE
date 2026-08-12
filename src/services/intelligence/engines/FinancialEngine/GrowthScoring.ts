@@ -1,9 +1,9 @@
 import logger from '../../../../config/logger';
 
 export interface GrowthResult {
-  score: number;              // 0-25
-  revenueScore: number;       // 0-12
-  epsScore: number;           // 0-13
+  score: number;              // 0-25,
+  revenueScore: number;       // 0-12,
+  epsScore: number;           // 0-13,
   details: string[];
 }
 

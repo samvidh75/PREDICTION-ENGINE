@@ -90,8 +90,6 @@ const styles = {
   },
   card: {
     background: colors.surface,
-    backdropFilter: "blur(20px) saturate(160%)",
-    WebkitBackdropFilter: "blur(20px) saturate(160%)",
     border: `1px solid ${colors.hairline}`,
     borderRadius: radius.md,
     padding: space[5],
@@ -161,8 +159,6 @@ const styles = {
   },
   passwordCard: {
     background: colors.surface,
-    backdropFilter: "blur(20px) saturate(160%)",
-    WebkitBackdropFilter: "blur(20px) saturate(160%)",
     border: `1px solid ${colors.hairline}`,
     borderRadius: radius.md,
     padding: space[8],
@@ -174,8 +170,6 @@ const styles = {
     width: "100%",
     padding: `${space[3]} ${space[4]}`,
     background: colors.surfaceElevated,
-    backdropFilter: "blur(20px) saturate(160%)",
-    WebkitBackdropFilter: "blur(20px) saturate(160%)",
     border: `1px solid ${colors.hairline}`,
     borderRadius: radius.sm,
     color: colors.ink,

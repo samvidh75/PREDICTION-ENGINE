@@ -134,8 +134,6 @@ export default function GuidedOnboarding({ onComplete }: GuidedOnboardingProps) 
       display: "flex", alignItems: "center", justifyContent: "center",
       overflow: "hidden",
       background: 'rgba(0,0,0,0.7)',
-      backdropFilter: "blur(14px)",
-      WebkitBackdropFilter: "blur(14px)",
       fontFamily: monoFont,
       padding: 16,
     }}>
@@ -146,8 +144,6 @@ export default function GuidedOnboarding({ onComplete }: GuidedOnboardingProps) 
         borderRadius: 24,
         border: glassBorder,
         background: glassBg,
-        backdropFilter: "blur(28px) saturate(160%)",
-        WebkitBackdropFilter: "blur(28px) saturate(160%)",
         boxShadow: 'rgba(255,255,255,0.04) 0px 0px 0px 1px inset, rgba(0,0,0,0.5) 0px 32px 100px',
         boxSizing: "border-box",
         padding: "clamp(20px, 4vw, 32px)",

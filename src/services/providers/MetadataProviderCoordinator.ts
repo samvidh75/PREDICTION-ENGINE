@@ -82,7 +82,7 @@ export class MetadataProviderCoordinator {
     if (!raw) {
       raw = {
         symbol: rawSymbol,
-        companyName: '', // Left blank so validator flags it, never use ticker as company name
+        companyName: '', // Left blank so validator flags it, never use ticker as company name,
         sector: '',
         industry: '',
         exchange: inferExchangeFromSymbol(rawSymbol),

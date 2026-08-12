@@ -37,11 +37,11 @@ export type OpportunityType =
   'dividend_income' | 'special_situation' | 'quality_compound' | 'unclassified';
 
 export interface OpportunityCharacteristics {
-  valueScore: number;             // 0-100 — value orientation
-  growthScore: number;            // 0-100 — growth orientation
-  qualityScore: number;           // 0-100 — quality orientation
-  catalystScore: number;          // 0-100 — catalyst presence
-  turnaroundScore: number;        // 0-100 — turnaround potential
+  valueScore: number;             // 0-100 — value orientation,
+  growthScore: number;            // 0-100 — growth orientation,
+  qualityScore: number;           // 0-100 — quality orientation,
+  catalystScore: number;          // 0-100 — catalyst presence,
+  turnaroundScore: number;        // 0-100 — turnaround potential,
   incomeScore: number;            // 0-100 — income/dividend orientation
 }
 

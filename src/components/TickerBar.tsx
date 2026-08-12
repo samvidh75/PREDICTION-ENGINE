@@ -68,8 +68,6 @@ export function TickerBar() {
         borderTop: "1px solid var(--glass-border)",
         borderBottom: "1px solid var(--glass-border)",
         background: "var(--glass-bg)",
-        backdropFilter: "blur(var(--glass-blur)) saturate(160%)",
-        WebkitBackdropFilter: "blur(var(--glass-blur)) saturate(160%)",
         padding: "10px 0",
       }}
     >

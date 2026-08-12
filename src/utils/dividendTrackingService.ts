@@ -15,14 +15,14 @@
 
 export interface DividendPayment {
   ticker: string;
-  exDate: number; // timestamp
-  paymentDate: number; // timestamp
-  dividendPerShare: number; // in ₱
-  quantity: number; // shares held
-  totalDividend: number; // gross dividend
-  withholdingTax: number; // final withholding tax deducted (10% standard)
-  netDividend: number; // after withholding tax
-  status: 'announced' | 'ex-date-passed' | 'paid'; // lifecycle
+  exDate: number; // timestamp,
+  paymentDate: number; // timestamp,
+  dividendPerShare: number; // in ₱,
+  quantity: number; // shares held,
+  totalDividend: number; // gross dividend,
+  withholdingTax: number; // final withholding tax deducted (10% standard),
+  netDividend: number; // after withholding tax,
+  status: 'announced' | 'ex-date-passed' | 'paid'; // lifecycle,
   frequency: 'interim' | 'final'; // dividend type
 }
 
@@ -30,25 +30,25 @@ export interface DividendSummary {
   ticker: string;
   quantity: number;
   currentPrice: number;
-  annualDividendYield: number; // %
-  expectedAnnualDividend: number; // ₱
-  lastPaymentDate: number; // timestamp
-  lastDividendPerShare: number; // ₱
-  upcomingExDate: number | null; // next ex-date
-  totalDividendsPaid: number; // lifetime ₱
-  totalWithholdingTaxPaid: number; // lifetime ₱
+  annualDividendYield: number; // %,
+  expectedAnnualDividend: number; // ₱,
+  lastPaymentDate: number; // timestamp,
+  lastDividendPerShare: number; // ₱,
+  upcomingExDate: number | null; // next ex-date,
+  totalDividendsPaid: number; // lifetime ₱,
+  totalWithholdingTaxPaid: number; // lifetime ₱,
   nextPaymentEstimate: number; // ₱
 }
 
 export interface DividendPortfolioStats {
-  totalDividends: number; // ₱
-  totalWithholdingTax: number; // ₱
-  totalNetDividends: number; // ₱
-  averageDividendYield: number; // weighted avg %
-  monthlyIncome: number; // estimated avg
-  annualIncome: number; // estimated
-  holdingsWithDividends: number; // count
-  nextPaymentDue: number | null; // timestamp
+  totalDividends: number; // ₱,
+  totalWithholdingTax: number; // ₱,
+  totalNetDividends: number; // ₱,
+  averageDividendYield: number; // weighted avg %,
+  monthlyIncome: number; // estimated avg,
+  annualIncome: number; // estimated,
+  holdingsWithDividends: number; // count,
+  nextPaymentDue: number | null; // timestamp,
   nextPaymentAmount: number; // ₱
   /** Dividend income is already finally taxed at source — nothing further
       to declare for this income specifically. Kept for display only. */

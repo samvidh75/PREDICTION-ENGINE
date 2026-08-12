@@ -6,7 +6,7 @@ export type PortfolioHealthState = "Excellent" | "Strong" | "Healthy" | "Stable"
 export class PortfolioHealthEngine {
   public static evaluateHealth(
     sectorWeights: SectorWeight[],
-    volatility: number, // 0..100
+    volatility: number, // 0..100,
     drawdown: number // 0..100
   ): { score: number; status: PortfolioHealthState } {
     let score = 80; // Base score

@@ -24,7 +24,7 @@ export interface DocumentMetadata {
   title: string;
   fiscalYear: string;
   documentDate: string;
-  language: string; // 'en', 'hi', etc.
+  language: string; // 'en', 'hi', etc.,
   pageCount: number | null;
   fileUrl: string | null;
   localPath: string | null;

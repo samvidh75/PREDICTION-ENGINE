@@ -55,8 +55,8 @@ export default function PortfolioAnalytics() {
         setAnalytics({
           sectorAnalysis,
           riskScore,
-          sharpeRatio: 1.2, // Mock
-          volatility: 8.5, // Mock
+          sharpeRatio: 1.2, // Mock,
+          volatility: 8.5, // Mock,
           loading: false,
         });
       } catch (error) {

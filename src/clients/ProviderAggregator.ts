@@ -6,13 +6,13 @@ import { providerHealthMonitor } from '../services/health/ProviderHealthMonitor'
 
 export interface PriceValidation {
   symbol: string;
-  price: number; // median
+  price: number; // median,
   providers: {
     yfinance?: number;
     pse?: number;
   };
   outliers: Array<{ provider: string; price: number; deviation: number }>;
-  confidence: number; // 0-100
+  confidence: number; // 0-100,
   timestamp: number;
 }
 

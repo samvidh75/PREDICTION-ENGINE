@@ -11,7 +11,7 @@ export interface SectorInfo {
 
 export interface SectorAllocation {
   sector: string;
-  allocation: number; // percentage
+  allocation: number; // percentage,
   tickers: string[];
   value: number;
   return: number;
@@ -20,7 +20,7 @@ export interface SectorAllocation {
 
 export interface SectorAnalysis {
   sectors: SectorAllocation[];
-  diversified: boolean; // more than 3 sectors
+  diversified: boolean; // more than 3 sectors,
   riskProfile: 'conservative' | 'moderate' | 'aggressive';
   recommendations: string[];
 }

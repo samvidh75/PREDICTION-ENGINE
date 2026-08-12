@@ -6,7 +6,7 @@ import { query } from "../db/index";
 
 export interface MarketIntelligence {
   marketMood: "Bullish" | "Neutral" | "Bearish";
-  marketBreadth: number; // percentage of stocks trading above SMA50
+  marketBreadth: number; // percentage of stocks trading above SMA50,
   riskAppetite: "Aggressive" | "Risk-On" | "Risk-Off";
   leadershipTrends: string[];
 }

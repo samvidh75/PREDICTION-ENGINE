@@ -10,10 +10,10 @@ export interface ProviderHealthMetrics {
   successCount: number;
   failCount: number;
   totalRequests: number;
-  uptime: number; // percentage
-  avgResponseTime: number; // ms
-  lastUpdateTime: string; // ISO timestamp
-  lastUpdateAt: number; // unix ms
+  uptime: number; // percentage,
+  avgResponseTime: number; // ms,
+  lastUpdateTime: string; // ISO timestamp,
+  lastUpdateAt: number; // unix ms,
   status: ProviderStatus;
   isDeprioritized: boolean;
 }

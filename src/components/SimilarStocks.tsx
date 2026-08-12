@@ -20,9 +20,9 @@ interface SimilarStock {
   name: string;
   sector: string;
   healthScore: number;
-  similarityPercent: number; // 0-100 Euclidean distance converted to %
-  keyDifference: string;     // What's different from the reference stock
-  marketCap: string;          // e.g. "₱24.5B"
+  similarityPercent: number; // 0-100 Euclidean distance converted to %,
+  keyDifference: string;     // What's different from the reference stock,
+  marketCap: string;          // e.g. "₱24.5B",
   price: number;
   changePercent: number;
 }
@@ -103,8 +103,6 @@ export function SimilarStocks() {
             fontWeight: 600,
             color: colors.textTertiary,
             background: colors.surfaceCard,
-            backdropFilter: "blur(20px) saturate(160%)",
-            WebkitBackdropFilter: "blur(20px) saturate(160%)",
             padding: "2px 6px",
             borderRadius: radius.full,
             textTransform: "uppercase",
@@ -126,8 +124,6 @@ export function SimilarStocks() {
               gap: "12px",
               padding: "12px 14px",
               background: colors.surface,
-              backdropFilter: "blur(20px) saturate(160%)",
-              WebkitBackdropFilter: "blur(20px) saturate(160%)",
               borderRadius: radius.md,
               border: `1px solid ${colors.hairline}`,
               transition: `all ${animation.fast}`,
@@ -166,8 +162,6 @@ export function SimilarStocks() {
                   height: 38,
                   borderRadius: "50%",
                   background: colors.surface,
-                  backdropFilter: "blur(20px) saturate(160%)",
-                  WebkitBackdropFilter: "blur(20px) saturate(160%)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -225,8 +219,6 @@ export function SimilarStocks() {
           marginTop: "12px",
           padding: "8px 12px",
           background: colors.surface,
-          backdropFilter: "blur(20px) saturate(160%)",
-          WebkitBackdropFilter: "blur(20px) saturate(160%)",
           borderRadius: radius.sm,
           fontSize: "11px",
           color: colors.textTertiary,

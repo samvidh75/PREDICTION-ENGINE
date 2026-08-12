@@ -11,7 +11,7 @@ export interface DownsideRiskResult {
   scenarioScore: number;
   sharpeScore: number;
   varScore: number;
-  points: number;            // 0-20
+  points: number;            // 0-20,
   reasoning: string;
 }
 

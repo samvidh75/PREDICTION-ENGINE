@@ -61,8 +61,6 @@ function GlassCard({ children, className = "", style = {}, onClick }: {
       onClick={onClick}
       style={{
         background: colors.glassBg,
-        backdropFilter: colors.glassBlur,
-        WebkitBackdropFilter: colors.glassBlur,
         border: `1px solid ${colors.glassBorder}`,
         boxShadow: `inset 0 1px 0 ${colors.glassBorderTop}`,
         borderRadius: 20,
@@ -202,7 +200,7 @@ export default function AboutPage() {
           right: 0,
           zIndex: 100,
           background: scrolled ? colors.glassBgStrong : "transparent",
-          backdropFilter: scrolled ? colors.glassBlur : "none",
+          
           WebkitBackdropFilter: scrolled ? colors.glassBlur : "none",
           borderBottom: scrolled ? `1px solid ${colors.glassBorder}` : "1px solid transparent",
           transition: "all 0.3s ease",
@@ -336,8 +334,6 @@ export default function AboutPage() {
                 style={{
                   padding: "14px 28px", borderRadius: 14,
                   background: colors.glassBg, color: "#FFFFFF",
-                  backdropFilter: colors.glassBlur,
-                  WebkitBackdropFilter: colors.glassBlur,
                   border: `1px solid ${colors.glassBorder}`, fontSize: 15,
                   fontWeight: 500, cursor: "pointer",
                   transition: "transform 320ms cubic-bezier(0.34, 1.56, 0.64, 1)",

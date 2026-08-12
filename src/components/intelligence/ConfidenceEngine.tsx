@@ -20,9 +20,9 @@ export interface ConfidenceMetrics {
   dataPoints: number;
   /** Score breakdown */
   breakdown: {
-    fundamentals: number;   // 0-25: PE, ROE, etc. availability
-    prices: number;         // 0-25: real-time + historical price data
-    scores: number;         // 0-25: quality, valuation, growth, risk, momentum scores
+    fundamentals: number;   // 0-25: PE, ROE, etc. availability,
+    prices: number;         // 0-25: real-time + historical price data,
+    scores: number;         // 0-25: quality, valuation, growth, risk, momentum scores,
     sentiment: number;      // 0-25: news, analyst coverage
   };
 }

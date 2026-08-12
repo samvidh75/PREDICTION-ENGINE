@@ -8,7 +8,7 @@ import logger from '../../../../config/logger';
 
 export interface RelativeValuationResult {
   score: number;
-  peVsPeer: number | null;    // Ratio: stockPE / peerAvgPE (1.0 = in line)
+  peVsPeer: number | null;    // Ratio: stockPE / peerAvgPE (1.0 = in line),
   pbVsPeer: number | null;
   evEbitdaVsPeer: number | null;
   level: 'deep_discount' | 'discount' | 'fair' | 'premium' | 'expensive' | 'unknown';

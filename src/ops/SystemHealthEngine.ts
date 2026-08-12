@@ -3,7 +3,7 @@ import pool from '../db/index';
 export interface HealthComponent {
   name: string;
   status: 'healthy' | 'degraded' | 'down';
-  score: number; // 0-100
+  score: number; // 0-100,
   detail: string;
 }
 

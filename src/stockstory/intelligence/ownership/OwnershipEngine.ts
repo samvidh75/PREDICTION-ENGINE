@@ -29,8 +29,8 @@ export interface OwnershipReport {
 export interface OwnershipBreakdown {
   promoterHolding: number | null;
   institutionalHolding: number | null;
-  fiiHolding: number | null;          // Foreign Institutional Investor
-  diiHolding: number | null;          // Domestic Institutional Investor
+  fiiHolding: number | null;          // Foreign Institutional Investor,
+  diiHolding: number | null;          // Domestic Institutional Investor,
   publicHolding: number | null;
   pledgedShares: number | null;
   insiderTrading: InsiderActivity | null;
@@ -38,15 +38,15 @@ export interface OwnershipBreakdown {
 
 export interface OwnershipChange {
   category: string;
-  changePercent: number;              // change in holding %
+  changePercent: number;              // change in holding %,
   direction: 'increasing' | 'decreasing' | 'stable';
   significance: 'significant' | 'moderate' | 'minor';
   interpretation: string;
 }
 
 export interface InsiderActivity {
-  recentTrades: number;               // count
-  netBuyRatio: number | null;         // -1 to 1 (positive = net buying)
+  recentTrades: number;               // count,
+  netBuyRatio: number | null;         // -1 to 1 (positive = net buying),
   significance: 'notable' | 'routine' | 'unknown';
 }
 
@@ -77,7 +77,7 @@ export class OwnershipEngine {
     return {
       promoterHolding: r?.promoterHolding ?? null,
       institutionalHolding: r?.institutionalHolding ?? null,
-      fiiHolding: null,        // Not available in current input — data mapper to fill
+      fiiHolding: null,        // Not available in current input — data mapper to fill,
       diiHolding: null,
       publicHolding: r?.promoterHolding !== null && r?.institutionalHolding !== null
         ? Math.round((100 - r.promoterHolding - r.institutionalHolding) * 100) / 100

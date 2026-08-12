@@ -17,8 +17,6 @@ export function PriceSkeleton() {
   return (
     <div style={{
       background: colors.surface,
-      backdropFilter: "blur(20px) saturate(160%)",
-      WebkitBackdropFilter: "blur(20px) saturate(160%)",
       border: `1px solid ${colors.border}`,
       borderRadius: '8px',
       padding: '20px'
@@ -53,8 +51,6 @@ export function HealthometerSkeleton() {
   return (
     <div style={{
       background: colors.surface,
-      backdropFilter: "blur(20px) saturate(160%)",
-      WebkitBackdropFilter: "blur(20px) saturate(160%)",
       border: `1px solid ${colors.border}`,
       borderRadius: '8px',
       padding: '20px',
@@ -78,8 +74,6 @@ export function ChartSkeleton({ height = 280 }: { height?: number }) {
   return (
     <div style={{
       background: colors.surface,
-      backdropFilter: "blur(20px) saturate(160%)",
-      WebkitBackdropFilter: "blur(20px) saturate(160%)",
       border: `1px solid ${colors.border}`,
       borderRadius: '8px',
       padding: '16px'
@@ -106,8 +100,6 @@ export function MetricsSkeleton() {
   return (
     <div style={{
       background: colors.surface,
-      backdropFilter: "blur(20px) saturate(160%)",
-      WebkitBackdropFilter: "blur(20px) saturate(160%)",
       border: `1px solid ${colors.border}`,
       borderRadius: '8px',
       padding: '16px'
@@ -137,8 +129,6 @@ export function NewsSkeleton() {
   return (
     <div style={{
       background: colors.surface,
-      backdropFilter: "blur(20px) saturate(160%)",
-      WebkitBackdropFilter: "blur(20px) saturate(160%)",
       border: `1px solid ${colors.border}`,
       borderRadius: '8px',
       padding: '16px'
@@ -181,9 +171,7 @@ export function LoadingSpinner() {
       alignItems: 'center',
       justifyContent: 'center',
       height: '100vh',
-      background: colors.canvas,
-      backdropFilter: "blur(20px) saturate(160%)",
-      WebkitBackdropFilter: "blur(20px) saturate(160%)",
+      background: colors.canvas
     }}>
       <div style={{
         width: '60px',

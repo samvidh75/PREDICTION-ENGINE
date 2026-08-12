@@ -13,7 +13,7 @@ export interface SectorHealth {
   hitRate: number;
   avgAlpha: number;
   sampleSize: number;
-  driftScore: number;        // deviation from baseline
+  driftScore: number;        // deviation from baseline,
   status: 'healthy' | 'warning' | 'critical';
 }
 

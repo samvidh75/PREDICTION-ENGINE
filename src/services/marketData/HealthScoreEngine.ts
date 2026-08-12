@@ -1,5 +1,5 @@
 export type HealthScoreInputs = {
-  businessQuality: number; // 0 - 100
+  businessQuality: number; // 0 - 100,
   financialStrength: number;
   priceBehaviour: number;
   sectorStrength: number;

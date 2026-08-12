@@ -2,8 +2,8 @@ import { BacktestBar, StrategyFn, WalkForwardResult, WalkForwardWindow } from '.
 import { computeMetrics, pricesToReturns } from './PerformanceMetrics';
 
 export interface WalkForwardConfig {
-  trainWindowDays: number; // e.g. 252
-  testWindowDays: number; // e.g. 63
+  trainWindowDays: number; // e.g. 252,
+  testWindowDays: number; // e.g. 63,
   stepDays: number; // e.g. 21 (monthly re-fit)
   slippageBps?: number; // per position change, default 5
   commissionBps?: number; // per position change, default 3

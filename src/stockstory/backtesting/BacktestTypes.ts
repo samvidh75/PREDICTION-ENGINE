@@ -7,7 +7,7 @@
 
 export interface BacktestConfig {
   /** Date range for backtest */
-  fromDate: string; // ISO date
+  fromDate: string; // ISO date,
   toDate: string;
   /** Score field to bucket on */
   scoreField: keyof FactorSnapshot;
@@ -44,14 +44,14 @@ export interface ForwardReturn {
 }
 
 export interface ScoreBucket {
-  bucketIndex: number; // 0 = lowest scores
-  bucketLabel: string; // e.g. "Q1 (Lowest)" or "D1"
+  bucketIndex: number; // 0 = lowest scores,
+  bucketLabel: string; // e.g. "Q1 (Lowest)" or "D1",
   symbolCount: number;
   avgScore: number;
   avgForwardReturn: number | null;
   avgVolatility: number | null;
   avgMaxDrawdown: number | null;
-  hitRate: number | null; // % positive returns
+  hitRate: number | null; // % positive returns,
   medianReturn: number | null;
 }
 

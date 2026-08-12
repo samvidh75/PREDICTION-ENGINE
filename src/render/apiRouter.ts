@@ -667,6 +667,8 @@ function buildTechnicalMetrics(
 const CACHE_TTL = 300_000;
 const stockCache = new Map<string, { data: unknown; expiresAt: number }>();
 const searchCache = new Map<string, { data: unknown; expiresAt: number }>();
+const quoteCache = new Map<string, { data: unknown; ts: number }>();
+const relStrengthCache = new Map<string, { data: unknown; ts: number }>();
 const SEARCH_CACHE_TTL = 60_000;
 
 // ── Routes ──────────────────────────────────────────────────────────────────
@@ -1624,6 +1626,73 @@ export default async function registerApiRoutes(server: FastifyInstance) {
     return payload;
   });
 
+  // GET /api/market-universe — live snapshot of the full ~294-ticker PSE
+  // common-share universe (gainers + losers + all), same PHISIX feed.
+  // Previously only existed as api/market-universe.ts (Vercel), so it 404'd
+  // in production. Now registered here so the Scanner page works on the VPS.
+  let universeCache: { data: unknown; expiresAt: number } | null = null;
+
+  async function fetchUniverseQuote(symbol: string, name: string, sector: string | null): Promise<{
+    symbol: string; name: string; price: number; change: number;
+    changePercent: number; volume: number; sector: string | null;
+  } | null> {
+    try {
+      const r = await fetch(`https://phisix-api3.appspot.com/stocks/${symbol.toLowerCase()}.json`, {
+        signal: AbortSignal.timeout(8000),
+      });
+      if (!r.ok) return null;
+      const data = (await r.json()) as any;
+      const stock = data?.stocks?.[0];
+      if (!stock) return null;
+      const price = Number(stock.price?.amount ?? 0);
+      if (!price) return null;
+      const changePercent = Number(stock.percentChange ?? 0);
+      const prevClose = changePercent !== 0 ? price / (1 + changePercent / 100) : price;
+      return {
+        symbol,
+        name: String(stock.name || name),
+        price: Number(price.toFixed(2)),
+        change: Number((price - prevClose).toFixed(2)),
+        changePercent: Number(changePercent.toFixed(2)),
+        volume: Number(stock.volume ?? 0),
+        sector,
+      };
+    } catch {
+      return null;
+    }
+  }
+
+  server.get("/api/market-universe", async (_req: FastifyRequest, reply: FastifyReply) => {
+    const now = Date.now();
+    if (universeCache && universeCache.expiresAt > now) {
+      setCache(reply, 240);
+      return universeCache.data;
+    }
+    // Batch PHISIX requests to stay within rate limits
+    const symbols = Object.values(PSE_COMMON_STOCKS);
+    const BATCH = 10;
+    const results: Array<{ symbol: string; name: string; price: number; change: number; changePercent: number; volume: number; sector: string | null }> = [];
+    for (let i = 0; i < symbols.length; i += BATCH) {
+      const batch = symbols.slice(i, i + BATCH);
+      const settled = await Promise.allSettled(
+        batch.map((s) => fetchUniverseQuote(s.symbol, s.name, s.sector ?? null)),
+      );
+      for (const r of settled) {
+        if (r.status === "fulfilled" && r.value) results.push(r.value);
+      }
+      if (i + BATCH < symbols.length) await new Promise((res) => setTimeout(res, 80));
+    }
+    const payload = {
+      ok: true,
+      quotes: results,
+      reportingRatio: `${results.length}/${symbols.length}`,
+      timestamp: new Date().toISOString(),
+    };
+    universeCache = { data: payload, expiresAt: now + 240_000 };
+    setCache(reply, 240);
+    return payload;
+  });
+
   server.get("/api/pse/gainers", async (_req: FastifyRequest, reply: FastifyReply) => {
     try {
       const { pseDataPipeline } = await import("../services/providers/PseDataPipeline.js");
@@ -1646,6 +1715,41 @@ export default async function registerApiRoutes(server: FastifyInstance) {
     }
   });
 
+  // Lightweight single-symbol quote (used by PortfolioPage per-holding price refresh)
+  server.get("/api/market-data/quote/:symbol", async (req: FastifyRequest<{ Params: { symbol: string } }>, reply: FastifyReply) => {
+    const symbol = req.params.symbol.toUpperCase().trim();
+    if (!symbol) return reply.status(400).send({ error: "symbol required" });
+
+    const cacheKey = `market-data-quote:${symbol}`;
+    const cached = quoteCache.get(cacheKey) as { data: unknown; ts: number } | undefined;
+    if (cached && Date.now() - cached.ts < 20_000) {
+      setCache(reply, 20);
+      return cached.data;
+    }
+
+    try {
+      const r = await fetch(`https://phisix-api3.appspot.com/stocks/${symbol.toLowerCase()}.json`,
+        { signal: AbortSignal.timeout(6000) });
+      if (!r.ok) return reply.status(502).send({ error: `phisix HTTP ${r.status}` });
+      const json = await r.json() as { stock?: Array<{ price: { amount: number; currency: string }; percent_change: string; volume: string }> };
+      const s = json?.stock?.[0];
+      if (!s) return reply.status(404).send({ error: "symbol not found" });
+      const result = {
+        symbol,
+        price: s.price.amount,
+        change: parseFloat(s.percent_change) * s.price.amount / 100,
+        changePercent: parseFloat(s.percent_change),
+        volume: parseInt(s.volume, 10) || 0,
+        currency: s.price.currency,
+      };
+      quoteCache.set(cacheKey, { data: result, ts: Date.now() });
+      setCache(reply, 20);
+      return result;
+    } catch (err: any) {
+      return reply.status(502).send({ error: err.message || String(err) });
+    }
+  });
+
   server.get("/api/pse/history/:symbol", async (req: FastifyRequest<{ Params: { symbol: string } }>, reply: FastifyReply) => {
     try {
       const { pseDataPipeline } = await import("../services/providers/PseDataPipeline.js");
@@ -1655,6 +1759,84 @@ export default async function registerApiRoutes(server: FastifyInstance) {
       return { success: true, symbol, data: history, timestamp: new Date().toISOString() };
     } catch (err: any) {
       return reply.status(502).send({ error: err.message || String(err) });
+    }
+  });
+
+  // Foreign flow — reads from local JSON file generated by scripts/fetch_pse_data.py
+  server.get("/api/foreign-flow", async (req: FastifyRequest, reply: FastifyReply) => {
+    const symbol = ((req.query as any).symbol ?? "").toString().toUpperCase().trim();
+    const { existsSync, readFileSync } = await import("fs");
+    const { join } = await import("path");
+    const dataPath = join(process.cwd(), "data", "pse-foreign-flow.json");
+    if (!existsSync(dataPath)) {
+      setCache(reply, 60);
+      return reply.status(503).send({ ok: false, error: "data_not_generated",
+        message: "Run scripts/fetch_pse_data.py to generate PSE foreign flow data." });
+    }
+    try {
+      const file = JSON.parse(readFileSync(dataPath, "utf-8"));
+      let entries: Record<string, unknown>[] = file.data ?? [];
+      if (symbol) entries = entries.filter((e) => e.symbol === symbol);
+      entries.sort((a, b) => ((b.netForeign as number) - (a.netForeign as number)));
+      setCache(reply, 300);
+      return { ok: true, generatedAt: file.generatedAt, source: file.source, count: entries.length, data: entries };
+    } catch (err: any) {
+      return reply.status(500).send({ ok: false, error: err.message || String(err) });
+    }
+  });
+
+  // Relative strength (momentum) ranking — EODHD-based, cached 30 min
+  server.get("/api/relative-strength", async (_req: FastifyRequest, reply: FastifyReply) => {
+    const cachedRS = relStrengthCache.get("rs");
+    if (cachedRS && Date.now() - cachedRS.ts < 1_800_000) {
+      setCache(reply, 1800);
+      return cachedRS.data;
+    }
+    const apiKey = process.env.EODHD_KEY;
+    if (!apiKey) {
+      return reply.status(503).send({ ok: false, error: "EODHD_KEY not configured" });
+    }
+    const PSEI_30 = ["SM","ALI","BDO","JFC","AC","BPI","MER","TEL","URC","AGI","SMPH","MBT","ICT","DMC","GLO","RLC","AEV","GTCAP","LTG","MEG","EMP","PGOLD","MONDE","BLOOM","CNPF","SECB","VREIT","AREIT","DDMPR","FILRT"];
+    function periodReturn(closes: number[], days: number): number | null {
+      if (closes.length < days + 1) return null;
+      const start = closes[closes.length - 1 - days];
+      const end = closes[closes.length - 1];
+      if (!Number.isFinite(start) || start <= 0) return null;
+      return Number((((end / start) - 1) * 100).toFixed(2));
+    }
+    async function fetchHistory(symbol: string): Promise<{ date: string; close: number }[] | null> {
+      const eodSym = symbol === "PSEI" ? `${symbol}.INDX` : `${symbol}.PSE`;
+      try {
+        const r = await fetch(`https://eodhd.com/api/eod/${eodSym}?api_token=${apiKey}&fmt=json&period=d&order=a`,
+          { signal: AbortSignal.timeout(8000) });
+        if (!r.ok) return null;
+        const json = await r.json() as Array<{ date: string; close: number }>;
+        return Array.isArray(json) ? json.slice(-380) : null;
+      } catch { return null; }
+    }
+    try {
+      const rows = await Promise.all(
+        PSEI_30.map(async (symbol) => {
+          const bars = await fetchHistory(symbol);
+          if (!bars || bars.length === 0) return { symbol, dataUnavailable: true };
+          const closes = bars.map((b) => b.close);
+          return {
+            symbol,
+            asOf: bars[bars.length - 1]?.date ?? null,
+            lastClose: closes[closes.length - 1] ?? null,
+            momentum1m: periodReturn(closes, 21),
+            momentum3m: periodReturn(closes, 63),
+            momentum6m: periodReturn(closes, 126),
+            barsAvailable: bars.length,
+          };
+        })
+      );
+      const result = { ok: true, rows: rows.filter((r) => !("dataUnavailable" in r)), generatedAt: new Date().toISOString() };
+      relStrengthCache.set("rs", { data: result, ts: Date.now() });
+      setCache(reply, 1800);
+      return result;
+    } catch (err: any) {
+      return reply.status(502).send({ ok: false, error: err.message || String(err) });
     }
   });
 

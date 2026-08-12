@@ -8,7 +8,7 @@ export interface OrderLevel {
 
 export interface OrderBook {
   ticker: string;
-  timestamp: number; // Unix milliseconds
+  timestamp: number; // Unix milliseconds,
   bid: OrderLevel[];
   ask: OrderLevel[];
   lastTrade?: {
@@ -28,7 +28,7 @@ export interface OrderBookSnapshot {
   spread: number;
   spreadPercent: number;
   mid: number;
-  depth10Imbalance: number; // (bid vol - ask vol) / (bid vol + ask vol)
+  depth10Imbalance: number; // (bid vol - ask vol) / (bid vol + ask vol),
   totalBidVolume: number;
   totalAskVolume: number;
 }

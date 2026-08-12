@@ -28,7 +28,7 @@ async function getWebSocketClient() {
 }
 
 interface ComplexityAnalysis {
-  score: number; // 0-100
+  score: number; // 0-100,
   tier: 'tier1' | 'tier2' | 'tier3';
   reasoning: string;
 }

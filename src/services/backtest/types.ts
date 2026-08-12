@@ -1,7 +1,7 @@
 // Backtesting types
 
 export interface BacktestBar {
-  date: string; // ISO date
+  date: string; // ISO date,
   close: number;
 }
 
@@ -12,7 +12,7 @@ export interface BacktestMetrics {
   sortinoRatio: number;
   maxDrawdownPct: number;
   maxDrawdownDurationDays: number;
-  winRate: number; // fraction of positive-return periods
+  winRate: number; // fraction of positive-return periods,
   volatilityAnnualized: number;
   numPeriods: number;
 }
@@ -52,7 +52,7 @@ export interface MontecarloResult {
   horizonDays: number;
   meanFinalValue: number;
   medianFinalValue: number;
-  var95: number; // loss at 5th percentile, as positive fraction
+  var95: number; // loss at 5th percentile, as positive fraction,
   var99: number;
   cvar95: number;
   percentiles: { p5: number; p25: number; p50: number; p75: number; p95: number };

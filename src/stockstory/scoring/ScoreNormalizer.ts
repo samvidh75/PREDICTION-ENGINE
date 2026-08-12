@@ -14,7 +14,7 @@
 export type ScoreBand = 'Exceptional' | 'Strong' | 'Average' | 'Weak' | 'Poor';
 
 export interface NormalizedScore {
-  value: number;        // 0-100
+  value: number;        // 0-100,
   band: ScoreBand;
 }
 

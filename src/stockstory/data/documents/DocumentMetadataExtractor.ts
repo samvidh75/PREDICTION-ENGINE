@@ -24,7 +24,7 @@ export interface DocumentMetadata {
 
 export interface ExtractionResult {
   metadata: DocumentMetadata;
-  confidence: number; // 0-1 indicating extraction confidence
+  confidence: number; // 0-1 indicating extraction confidence,
   warnings: string[];
 }
 

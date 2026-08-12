@@ -8,102 +8,97 @@
 // keeps compiling and re-themes automatically.
 // ============================================================================
 
-// ── COLORS ─────────────────────────────────────────────────────────────
+// ── COLORS — Zerodha-inspired professional dark financial theme ─────────
 export const colors = {
-  // Brand — white CTA pill on black (Raycast convention)
-  primary:        '#FFFFFF',
-  primaryPressed: '#E8E8E8',
-  onPrimary:      '#000000',
+  // Brand — blue CTA
+  primary:        '#4F8EF7',
+  primaryPressed: '#3A7AE8',
+  onPrimary:      '#FFFFFF',
 
-  // Text hierarchy on black
-  ink:            '#FFFFFF',   // Primary headlines / body (contrast 21:1)
-  body:           '#B4B4B4',   // Default paragraph / inline-link
-  charcoal:       '#D6D6D6',   // Stronger body emphasis
-  mute:           '#8C8C8C',   // Metadata, secondary captions
-  ash:            '#6B6B6B',   // Disabled text, lowest emphasis
-  stone:          '#4A4A4A',   // Least-emphasis caption / disabled icon
-  onDark:         '#FFFFFF',   // Interactive-state primary text
-  onDarkMute:     'rgba(255,255,255,0.65)',
+  // Text hierarchy on deep navy
+  ink:            '#E8ECF0',   // Primary headlines / body,
+  body:           '#A8B3C0',   // Default paragraph / inline-link,
+  charcoal:       '#C8D0DA',   // Stronger body emphasis,
+  mute:           '#708090',   // Metadata, secondary captions,
+  ash:            '#4A5A6A',   // Disabled text, lowest emphasis,
+  stone:          '#334455',   // Least-emphasis caption / disabled icon,
+  onDark:         '#E8ECF0',   // Interactive-state primary text,
+  onDarkMute:     'rgba(232,236,240,0.65)',
 
-  // Surface ladder — near-black elevation steps. Panel surfaces (everything
-  // but the page canvas itself) are translucent glass tints, not flat fills —
-  // this is the one consistent elevation language across the whole app.
-  canvas:           '#000000', // Page background — pure black, stays opaque
-  surface:          'rgba(24, 24, 26, 0.78)',  // Card / elevated panel — glass
-  surfaceElevated:  'rgba(32, 32, 34, 0.85)',  // Hover states, lifted interiors — glass
-  surfaceCard:      'rgba(38, 38, 40, 0.9)',  // Active/pressed cards, tile fills — glass
-  buttonFg:         '#222222', // Rare deep surface variant
+  // Surface ladder — deep navy elevation steps
+  canvas:           '#0B1117', // Page background,
+  surface:          '#131C27', // Card / elevated panel,
+  surfaceElevated:  '#182232', // Hover states, lifted interiors,
+  surfaceCard:      '#1C2A3A', // Active/pressed cards, tile fills,
+  buttonFg:         '#1E2D40', // Rare deep surface variant
 
-  // Glass — shared translucency tokens for the app's elevation system.
-  glassBg:          'rgba(24, 24, 26, 0.78)',
-  glassBgStrong:    'rgba(32, 32, 34, 0.9)',
-  glassBorder:      'rgba(255, 255, 255, 0.14)',
-  glassBorderTop:   'rgba(255, 255, 255, 0.24)',
-  glassBlur:        'blur(20px) saturate(160%)',
+  // Glass — only for modals/overlays
+  glassBg:          'rgba(13, 22, 32, 0.92)',
+  glassBgStrong:    'rgba(18, 28, 39, 0.96)',
+  glassBorder:      'rgba(255, 255, 255, 0.10)',
+  glassBorderTop:   'rgba(255, 255, 255, 0.15)',
+  glassBlur:        'blur(16px) saturate(140%)',
 
   // Backdrop / overlay tokens
   backdropClear:       'rgba(0,0,0,0)',
-  backdropModal:       'rgba(0,0,0,0.5)',
-  backdropHeavy:       'rgba(0,0,0,0.65)',
-  backdropGlassmorphic:'rgba(0,0,0,0.85)',
-  backdropFooter:      'rgba(13,13,13,0.92)',
-  backdropMuted:       'rgba(255,255,255,0.06)',
+  backdropModal:       'rgba(0,0,0,0.6)',
+  backdropHeavy:       'rgba(0,0,0,0.75)',
+  backdropGlassmorphic:'rgba(11,17,23,0.90)',
+  backdropFooter:      'rgba(11,17,23,0.95)',
+  backdropMuted:       'rgba(255,255,255,0.04)',
 
-  // Borders — bright enough hairlines to actually read against black
-  hairline:       '#2A2A2A',
-  hairlineSoft:   'rgba(255,255,255,0.12)',
-  hairlineStrong: 'rgba(255,255,255,0.22)',
+  // Borders
+  hairline:       '#1E2D40',
+  hairlineSoft:   'rgba(255,255,255,0.07)',
+  hairlineStrong: 'rgba(255,255,255,0.18)',
 
-  // Brand accent — Raycast red-orange. The ONLY accent color.
-  accentRed:        '#FF6B4A',
-  accentRedSoft:    'rgba(255,107,74,0.14)',
-  accentRedStrong:  'rgba(255,107,74,0.26)',
-  accentBlue:       '#57C1FF',
-  accentBlueSoft:   'rgba(87,193,255,0.14)',
-  accentYellow:     '#FF9500',
-  accentYellowSoft: 'rgba(255,149,0,0.14)',
+  // Brand accent — professional blue
+  accentRed:        '#4F8EF7',
+  accentRedSoft:    'rgba(79,142,247,0.12)',
+  accentRedStrong:  'rgba(79,142,247,0.25)',
+  accentBlue:       '#4F8EF7',
+  accentBlueSoft:   'rgba(79,142,247,0.12)',
+  accentYellow:     '#FF9800',
+  accentYellowSoft: 'rgba(255,152,0,0.15)',
 
-  // Market semantic colors — used ONLY for market signals
-  // (distinct from brand accent: accent = UI, market = signals)
-  marketGreen:       '#34C759', // Bullish (positive)
-  marketGreenSoft:   'rgba(52,199,89,0.14)',
-  marketRed:         '#FF3B30', // Bearish (negative)
-  marketRedSoft:     'rgba(255,59,48,0.14)',
-  marketOrange:      '#FF9500', // Neutral, caution
-  marketOrangeSoft:  'rgba(255,149,0,0.14)',
+  // Market semantic colors
+  marketGreen:       '#26A69A', // Bullish (positive),
+  marketGreenSoft:   'rgba(38,166,154,0.15)',
+  marketRed:         '#EF5350', // Bearish (negative),
+  marketRedSoft:     'rgba(239,83,80,0.15)',
+  marketOrange:      '#FF9800', // Neutral, caution,
+  marketOrangeSoft:  'rgba(255,152,0,0.15)',
 
-  accentGreen:       '#34C759',
-  accentGreenSoft:   'rgba(52,199,89,0.14)',
+  accentGreen:       '#26A69A',
+  accentGreenSoft:   'rgba(38,166,154,0.15)',
 
-  // PSE sector taxonomy colors — matches the sector set used in
-  // SectorHeatmap (src/components/dashboard/SectorHeatmap.tsx): the PSE's
-  // own six-sector classification, not the Indian NSE/BSE taxonomy.
-  sectorFinancials:  '#1E40AF',
-  sectorIndustrial:  '#059669',
-  sectorHoldingFirms:'#7C3AED',
-  sectorProperty:    '#DC2626',
-  sectorServices:    '#0891B2',
-  sectorMiningAndOil:'#B45309',
+  // PSE sector taxonomy colors
+  sectorFinancials:  '#1E5FAD',
+  sectorIndustrial:  '#1A7A5A',
+  sectorHoldingFirms:'#5B3EA6',
+  sectorProperty:    '#B03A3A',
+  sectorServices:    '#0A7A9A',
+  sectorMiningAndOil:'#8A6020',
 
-  // Legacy gradient anchors retained so old code paths still render
-  heroStripeStart: '#FF6B4A',
-  heroStripeEnd:   '#B0301A',
-  keyBgStart:      '#1A1A1A',
-  keyBgEnd:        '#0D0D0D',
+  // Legacy gradient anchors
+  heroStripeStart: '#4F8EF7',
+  heroStripeEnd:   '#3A6BD0',
+  keyBgStart:      '#131C27',
+  keyBgEnd:        '#0B1117',
 
-  // Semantic aliases — kept for backward compatibility
-  success:         '#34C759',
-  danger:          '#FF3B30',
-  warning:         '#FF9500',
-  page:            '#000000',
-  card:            '#0D0D0D',
-  textPrimary:     '#FFFFFF',
-  textSecondary:   '#B4B4B4',
-  textTertiary:    '#8C8C8C',
-  border:          '#2A2A2A',
-  separator:       '#2A2A2A',
-  fill:            '#161616',
-  bgSecondary:     '#161616',
+  // Semantic aliases
+  success:         '#26A69A',
+  danger:          '#EF5350',
+  warning:         '#FF9800',
+  page:            '#0B1117',
+  card:            '#131C27',
+  textPrimary:     '#E8ECF0',
+  textSecondary:   '#A8B3C0',
+  textTertiary:    '#708090',
+  border:          '#1E2D40',
+  separator:       '#1E2D40',
+  fill:            '#182232',
+  bgSecondary:     '#182232',
 } as const;
 
 // ── TYPOGRAPHY ─────────────────────────────────────────────────────────
@@ -211,13 +206,13 @@ export const shadows = {
 
 // ── ANIMATION — multiple curves with intent ─────────────────────────────
 export const animation = {
-  spring:    '0.22s cubic-bezier(0.32, 1.4, 0.6, 1)',   // Slight overshoot for popovers / selects
-  fast:      '0.15s cubic-bezier(0.4, 0, 0.2, 1)',      // Crisp hover / press
-  slow:      '0.4s cubic-bezier(0.16, 1, 0.3, 1)',      // Add/dismiss, marquee ramp
-  standard:  '0.2s cubic-bezier(0.32, 1.4, 0.6, 1)',     // Backward-compat
-  paper:     '0.5s cubic-bezier(0.2, 0.7, 0.1, 1)',      // Long, decisive pauses (section transitions)
-  marquee:   '40s linear',                                // Constant ticker flow
-  draw:      '1.2s cubic-bezier(0.7, 0, 0.3, 1)',        // Stroke-draw / line reveal
+  spring:    '0.22s cubic-bezier(0.32, 1.4, 0.6, 1)',   // Slight overshoot for popovers / selects,
+  fast:      '0.15s cubic-bezier(0.4, 0, 0.2, 1)',      // Crisp hover / press,
+  slow:      '0.4s cubic-bezier(0.16, 1, 0.3, 1)',      // Add/dismiss, marquee ramp,
+  standard:  '0.2s cubic-bezier(0.32, 1.4, 0.6, 1)',     // Backward-compat,
+  paper:     '0.5s cubic-bezier(0.2, 0.7, 0.1, 1)',      // Long, decisive pauses (section transitions),
+  marquee:   '40s linear',                                // Constant ticker flow,
+  draw:      '1.2s cubic-bezier(0.7, 0, 0.3, 1)',        // Stroke-draw / line reveal,
   counter:   '0.9s cubic-bezier(0.2, 0.85, 0.35, 1)',   // Number ticker easing
 } as const;
 

@@ -31,11 +31,11 @@ export interface Distribution {
 // ─── Score Mapping ────────────────────────────────────────────────
 
 export interface PercentileScoreMap {
-  p90: number;  // Score at 90th percentile
-  p75: number;  // Score at 75th percentile
-  p50: number;  // Score at 50th percentile
-  p25: number;  // Score at 25th percentile
-  p10: number;  // Score at 10th percentile
+  p90: number;  // Score at 90th percentile,
+  p75: number;  // Score at 75th percentile,
+  p50: number;  // Score at 50th percentile,
+  p25: number;  // Score at 25th percentile,
+  p10: number;  // Score at 10th percentile,
   below: number; // Score below 10th percentile
 }
 

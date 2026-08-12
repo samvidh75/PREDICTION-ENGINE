@@ -77,8 +77,6 @@ const QuickAction: FC<{ icon: LucideIcon; label: string; onClick: () => void; co
         borderRadius: radius.lg,
         border: `1px solid ${colors.hairline}`,
         background: colors.surface,
-        backdropFilter: "blur(20px) saturate(160%)",
-        WebkitBackdropFilter: "blur(20px) saturate(160%)",
         color: colors.textPrimary,
         fontFamily: typography.fontFamily,
         fontSize: typography.bodySm.size,
@@ -197,8 +195,6 @@ const Sidebar: FC<{
         width: 260,
         flexShrink: 0,
         background: colors.canvas,
-        backdropFilter: "blur(20px) saturate(160%)",
-        WebkitBackdropFilter: "blur(20px) saturate(160%)",
         borderRight: `1px solid ${colors.hairline}`,
         display: "flex",
         flexDirection: "column",
@@ -512,9 +508,7 @@ export default function AIChatPage() {
           style={{
             padding: `${space[4]} ${space[8]}`,
             borderTop: `1px solid ${colors.hairline}`,
-            background: colors.canvas,
-            backdropFilter: "blur(20px) saturate(160%)",
-            WebkitBackdropFilter: "blur(20px) saturate(160%)",
+            background: colors.canvas
           }}
         >
           <div
@@ -525,8 +519,6 @@ export default function AIChatPage() {
               gap: space[2],
               alignItems: "flex-end",
               background: colors.surface,
-              backdropFilter: "blur(20px) saturate(160%)",
-              WebkitBackdropFilter: "blur(20px) saturate(160%)",
               borderRadius: radius.lg,
               border: `1px solid ${colors.hairline}`,
               padding: `${space[2]} ${space[2]} ${space[2]} ${space[4]}`,

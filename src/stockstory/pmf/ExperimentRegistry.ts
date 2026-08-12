@@ -16,7 +16,7 @@ export type ExperimentStatus = 'draft' | 'active' | 'paused' | 'completed' | 'ar
 export type AssignmentStrategy = 'random' | 'cohort' | 'user_attribute';
 
 export interface Variant {
-  id: string; // e.g. "control", "treatment_a"
+  id: string; // e.g. "control", "treatment_a",
   name: string;
   description?: string;
   trafficFraction?: number; // 0-1, sum of all variants = 1

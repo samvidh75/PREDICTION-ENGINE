@@ -178,8 +178,8 @@ function StickyHeader({ symbol, price, changeAbs, changePercent, trendColor }: {
   return (
     <div className="stock-sticky-header" style={{
       position: "fixed", top: 0, left: 0, right: 0, height: "48px",
-      background: colors.backdropGlassmorphic, backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)",
-      borderBottom: `1px solid ${colors.hairlineSoft}`, zIndex: 50,
+      background: colors.canvas,
+      borderBottom: `1px solid ${colors.hairline}`, zIndex: 50,
       display: "flex", alignItems: "center", justifyContent: "space-between",
       padding: "0 24px", opacity: 0, pointerEvents: "none",
       transition: "opacity 0.2s ease",
@@ -206,55 +206,59 @@ function StickyHeader({ symbol, price, changeAbs, changePercent, trendColor }: {
   );
 }
 
-// ── Hero Section (centred, massive price) ────────────────────────
+// ── Hero Section (left-aligned, professional financial platform style) ──
 function HeroSection({ stock, isUp, trendColor }: { stock: StockResearchDetail; isUp: boolean; trendColor: string }) {
   const convictionLabel = stock.confidenceMeter >= 80 ? "Very Healthy" : stock.confidenceMeter >= 65 ? "Healthy" : stock.confidenceMeter >= 50 ? "Watch" : stock.confidenceMeter >= 35 ? "Needs Review" : "Risk Rising";
   const convictionColor = stock.confidenceMeter >= 65 ? colors.success : stock.confidenceMeter >= 50 ? colors.warning : stock.confidenceMeter >= 35 ? colors.marketOrange : colors.danger;
   const boardLotSize = getBoardLotSize(stock.price.current);
   const boardTickSize = getTickSize(stock.price.current);
   return (
-    <section className="stock-hero raycast-slideUp" style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "48px 0 40px", textAlign: "center", position: "relative" }}>
-      <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "16px", flexWrap: "wrap", justifyContent: "center" }}>
+    <section style={{ padding: "24px 0 20px", borderBottom: `1px solid ${colors.hairline}`, marginBottom: "24px" }}>
+      {/* Company name + badges */}
+      <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px", flexWrap: "wrap" }}>
+        <span style={{ color: colors.textPrimary, fontSize: "20px", fontWeight: 700, letterSpacing: "-0.01em" }}>
+          {stock.companyName}
+        </span>
         <Badge value={60} label={stock.exchange} />
+        <span style={{ padding: "2px 8px", borderRadius: radius.sm, background: colors.surface, border: `1px solid ${colors.hairline}`, fontSize: "11px", fontWeight: 600, color: colors.textSecondary, letterSpacing: "0.04em" }}>
+          {stock.sector}
+        </span>
         <MarketStatusBadge size="sm" />
-        <span style={{ color: colors.textSecondary, fontSize: "14px", fontWeight: 500 }}>{stock.companyName}</span>
       </div>
-      <div style={{ fontSize: useResponsiveValue("40px", "64px"), fontWeight: 700, color: colors.textPrimary, lineHeight: "1.1", letterSpacing: "-0.02em", display: "flex", alignItems: "center", justifyContent: "center", gap: "12px" }}>
-        <PriceFlash value={stock.price.current}>₱{formatNumber(stock.price.current)}</PriceFlash>
-      </div>
-      <div style={{ display: "flex", alignItems: "center", gap: "12px", marginTop: "12px", flexWrap: "wrap", justifyContent: "center" }}>
-        <div style={{ color: trendColor, fontSize: "18px", fontWeight: 600, display: "inline-flex", alignItems: "center", gap: "6px" }}>
-          {isUp ? <ArrowUp size={20} /> : <ArrowDown size={20} />}
-          {isUp ? "+" : ""}{formatDecimal(stock.price.changeAbs, 2)} ({formatDecimal(stock.price.changePercent, 2)}%)
-        </div>
-        <div className="raycast-badgePulse" style={{
-          display: "inline-flex", alignItems: "center", gap: "6px", padding: "6px 14px",
-          borderRadius: radius.full, border: `1px solid ${convictionColor}40`,
-          background: `${convictionColor}14`, fontSize: "13px", fontWeight: 600,
+
+      {/* Price row */}
+      <div style={{ display: "flex", alignItems: "baseline", gap: "12px", flexWrap: "wrap", marginBottom: "10px" }}>
+        <PriceFlash value={stock.price.current}>
+          <span style={{ fontSize: "32px", fontWeight: 700, color: colors.textPrimary, lineHeight: "1", letterSpacing: "-0.02em", fontVariantNumeric: "lining-nums tabular-nums" }}>
+            ₱{formatNumber(stock.price.current)}
+          </span>
+        </PriceFlash>
+        <span style={{ color: trendColor, fontSize: "16px", fontWeight: 600, display: "inline-flex", alignItems: "center", gap: "4px" }}>
+          {isUp ? <ArrowUp size={15} /> : <ArrowDown size={15} />}
+          {isUp ? "+" : ""}{formatDecimal(stock.price.changeAbs, 2)}
+        </span>
+        <span style={{ color: trendColor, fontSize: "14px", fontWeight: 500 }}>
+          ({isUp ? "+" : ""}{formatDecimal(stock.price.changePercent, 2)}%)
+        </span>
+        <span style={{
+          display: "inline-flex", alignItems: "center", gap: "6px", padding: "3px 10px",
+          borderRadius: radius.sm, border: `1px solid ${convictionColor}40`,
+          background: `${convictionColor}14`, fontSize: "12px", fontWeight: 600,
           color: convictionColor,
         }}>
-          <span>{convictionLabel}</span>
-        </div>
-      </div>
-      <div style={{ fontSize: "13px", color: colors.textSecondary, marginTop: "10px" }}>
-        Market Cap: {stock.price.marketCap != null ? `₱${formatNumber(Math.round(stock.price.marketCap / 1_000_000))}M` : "—"}
-      </div>
-      <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "12px", flexWrap: "wrap", justifyContent: "center" }}>
-        <span style={{
-          display: "inline-flex", alignItems: "center", gap: "6px", padding: "5px 12px",
-          borderRadius: radius.full, border: `1px solid ${colors.hairlineSoft}`,
-          background: colors.surface, fontSize: "12px", fontWeight: 600, color: colors.textSecondary,
-        }}>
-          PSE Board Lot: {boardLotSize.toLocaleString()} shares
-        </span>
-        <span style={{
-          display: "inline-flex", alignItems: "center", gap: "6px", padding: "5px 12px",
-          borderRadius: radius.full, border: `1px solid ${colors.hairlineSoft}`,
-          background: colors.surface, fontSize: "12px", fontWeight: 600, color: colors.textSecondary,
-        }}>
-          Tick: ₱{boardTickSize}
+          {convictionLabel}
         </span>
       </div>
+
+      {/* Meta row */}
+      <div style={{ display: "flex", alignItems: "center", gap: "16px", flexWrap: "wrap", fontSize: "12px", color: colors.textSecondary }}>
+        {stock.price.marketCap != null && (
+          <span>Mkt Cap: <strong style={{ color: colors.textPrimary }}>₱{formatNumber(Math.round(stock.price.marketCap / 1_000_000))}M</strong></span>
+        )}
+        <span>Board Lot: <strong style={{ color: colors.textPrimary }}>{boardLotSize.toLocaleString()}</strong></span>
+        <span>Tick: <strong style={{ color: colors.textPrimary }}>₱{boardTickSize}</strong></span>
+      </div>
+
       <FiftyTwoWeekRange oneYearSeries={stock.priceHistory?.["1Y"] ?? []} currentPrice={stock.price.current} />
     </section>
   );
@@ -794,11 +798,8 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
             whileTap={{ scale: 0.955 }}
             transition={{ duration: 0.18, ease: [0.34, 1.56, 0.64, 1] }}
             style={{
-              border: `1px solid ${colors.glassBorder}`,
-              background: colors.glassBg,
-              backdropFilter: colors.glassBlur,
-              WebkitBackdropFilter: colors.glassBlur,
-              boxShadow: `inset 0 1px 0 ${colors.glassBorderTop}`,
+              border: `1px solid ${colors.hairline}`,
+              background: colors.surface,
               padding: "6px 12px",
               borderRadius: radius.full,
               display: "inline-flex", alignItems: "center",
@@ -806,13 +807,13 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
               transition: "background 180ms ease, border-color 180ms ease, color 180ms ease",
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = colors.glassBorderTop;
-              e.currentTarget.style.background = colors.glassBgStrong;
+              e.currentTarget.style.borderColor = colors.hairlineStrong;
+              e.currentTarget.style.background = colors.surfaceElevated;
               e.currentTarget.style.color = colors.textPrimary;
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = colors.glassBorder;
-              e.currentTarget.style.background = colors.glassBg;
+              e.currentTarget.style.borderColor = colors.hairline;
+              e.currentTarget.style.background = colors.surface;
               e.currentTarget.style.color = colors.textSecondary;
             }}
           >
@@ -1302,10 +1303,8 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
       <div className="stock-fixed-footer" style={{
         position: "fixed", bottom: "16px", left: "50%", transform: "translateX(-50%)",
         display: "flex", gap: "8px", padding: "8px 16px",
-        borderRadius: radius.full, background: colors.backdropFooter,
-        backdropFilter: "blur(24px) saturate(180%)",
-        WebkitBackdropFilter: "blur(24px) saturate(180%)",
-        border: `1px solid ${colors.border}`,
+        borderRadius: radius.full, background: colors.surfaceCard,
+        border: `1px solid ${colors.hairline}`,
         boxShadow: shadows.card,
         zIndex: 50,
         transition: "opacity 0.25s ease",

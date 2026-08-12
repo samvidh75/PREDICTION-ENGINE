@@ -12,7 +12,7 @@ export interface BusinessRiskResult {
   predictabilityScore: number;
   moatScore: number;
   executionScore: number;
-  points: number;            // 0-20
+  points: number;            // 0-20,
   reasoning: string;
 }
 

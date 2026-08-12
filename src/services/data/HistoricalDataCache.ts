@@ -14,12 +14,12 @@ interface CacheEntry {
 }
 
 interface CacheConfig {
-  maxAge: number; // milliseconds
+  maxAge: number; // milliseconds,
   maxSize: number; // entries per symbol
 }
 
 const DEFAULT_CONFIG: CacheConfig = {
-  maxAge: 24 * 60 * 60 * 1000, // 24 hours
+  maxAge: 24 * 60 * 60 * 1000, // 24 hours,
   maxSize: 365, // 1 year of daily data
 };
 
@@ -81,7 +81,7 @@ class HistoricalDataCacheClass {
   async save(symbol: string, data: OHLC[]): Promise<void> {
     const entry: CacheEntry = {
       symbol: symbol.toUpperCase(),
-      data: data.slice(0, this.config.maxSize), // Limit size
+      data: data.slice(0, this.config.maxSize), // Limit size,
       timestamp: Date.now(),
       expiresAt: Date.now() + this.config.maxAge,
     };

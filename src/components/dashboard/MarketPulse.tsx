@@ -26,18 +26,16 @@ interface PulseData {
 }
 
 const glassCard: React.CSSProperties = {
-  border: "1px solid var(--glass-border)",
-  background: "var(--glass-bg)",
-  backdropFilter: "blur(var(--glass-blur)) saturate(160%)",
-  WebkitBackdropFilter: "blur(var(--glass-blur)) saturate(160%)",
-  borderRadius: 16,
-  transition: "border-color 220ms ease, background 220ms ease",
+  border: "1px solid var(--border)",
+  background: "var(--bg-card)",
+  borderRadius: 8,
+  transition: "border-color 150ms ease, background 150ms ease",
 };
 
 function glassHover(e: React.MouseEvent<HTMLElement>, entering: boolean) {
   const el = e.currentTarget;
-  el.style.borderColor = entering ? "var(--glass-border-top)" : "var(--glass-border)";
-  el.style.background = entering ? "var(--glass-bg-strong)" : "var(--glass-bg)";
+  el.style.borderColor = entering ? "rgba(79,142,247,0.35)" : "var(--border)";
+  el.style.background = entering ? "var(--bg-card-hover)" : "var(--bg-card)";
 }
 
 function formatPeso(n: number) {
@@ -240,7 +238,7 @@ export function MarketPulse() {
               <div style={{ position: "relative", display: "grid", gap: 14 }}>
                 <BreadthBar {...data.breadth} />
                 {(data.gainers[0] || data.losers[0]) && (
-                  <div style={{ display: "flex", justifyContent: "space-between", gap: 12, paddingTop: 4, borderTop: "1px solid var(--glass-border)", fontSize: 12 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", gap: 12, paddingTop: 4, borderTop: "1px solid var(--border)", fontSize: 12 }}>
                     {data.gainers[0] && (
                       <span style={{ color: "var(--text-secondary)" }}>
                         Best <strong style={{ fontFamily: "var(--font-mono)", color: "var(--market-green)" }}>{data.gainers[0].symbol}</strong>{" "}

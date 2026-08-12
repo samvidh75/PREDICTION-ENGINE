@@ -7,13 +7,13 @@ import type { DataFreshnessInfo, StalenessInfo } from "./DataQualityTypes.ts";
 
 // Reasonable staleness thresholds (milliseconds)
 const THRESHOLDS: Record<string, number> = {
-  market_prices: 24 * 60 * 60 * 1000,        // 1 day
-  fundamentals: 7 * 24 * 60 * 60 * 1000,      // 7 days
-  technicals: 24 * 60 * 60 * 1000,            // 1 day
-  news: 12 * 60 * 60 * 1000,                  // 12 hours
-  filings: 30 * 24 * 60 * 60 * 1000,          // 30 days
-  quarterly_results: 14 * 24 * 60 * 60 * 1000, // 14 days
-  shareholding: 90 * 24 * 60 * 60 * 1000,     // 90 days
+  market_prices: 24 * 60 * 60 * 1000,        // 1 day,
+  fundamentals: 7 * 24 * 60 * 60 * 1000,      // 7 days,
+  technicals: 24 * 60 * 60 * 1000,            // 1 day,
+  news: 12 * 60 * 60 * 1000,                  // 12 hours,
+  filings: 30 * 24 * 60 * 60 * 1000,          // 30 days,
+  quarterly_results: 14 * 24 * 60 * 60 * 1000, // 14 days,
+  shareholding: 90 * 24 * 60 * 60 * 1000,     // 90 days,
   corporate_actions: 30 * 24 * 60 * 60 * 1000, // 30 days
 };
 

@@ -20,7 +20,7 @@ export interface EngineInputs {
   symbol: string;
   tradeDate: string;
 
-  // Feature snapshots (from FeatureEngine / feature_snapshots table)
+  // Feature snapshots (from FeatureEngine / feature_snapshots table),
   features: {
     rsi: number | null;
     macd: number | null;
@@ -36,7 +36,7 @@ export interface EngineInputs {
     trendStrength: number | null;
   };
 
-  // Factor snapshots (from FactorEngine / factor_snapshots table)
+  // Factor snapshots (from FactorEngine / factor_snapshots table),
   factors: {
     qualityFactor: number;
     valueFactor: number;
@@ -89,7 +89,7 @@ export interface EngineInputs {
 // ─── Individual Engine Outputs ────────────────────────────────────
 
 export interface GrowthEngineOutput {
-  score: number;        // 0-100
+  score: number;        // 0-100,
   revenueGrowth: number;
   epsGrowth: number;
   fcfGrowth: number;
@@ -98,7 +98,7 @@ export interface GrowthEngineOutput {
 }
 
 export interface QualityEngineOutput {
-  score: number;        // 0-100
+  score: number;        // 0-100,
   roa: number | null;
   roe: number | null;
   roic: number | null;
@@ -109,7 +109,7 @@ export interface QualityEngineOutput {
 }
 
 export interface StabilityEngineOutput {
-  score: number;        // 0-100
+  score: number;        // 0-100,
   debtScore: number;
   cashScore: number;
   volatilityScore: number;
@@ -119,7 +119,7 @@ export interface StabilityEngineOutput {
 }
 
 export interface MomentumEngineOutput {
-  score: number;        // 0-100
+  score: number;        // 0-100,
   momentumScore: number;
   trendScore: number;
   volatilityScore: number;
@@ -127,7 +127,7 @@ export interface MomentumEngineOutput {
 }
 
 export interface ValuationEngineOutput {
-  score: number;        // 0-100
+  score: number;        // 0-100,
   peScore: number;
   pbScore: number;
   evEbitdaScore: number;
@@ -137,7 +137,7 @@ export interface ValuationEngineOutput {
 }
 
 export interface RiskEngineOutput {
-  score: number;        // 0-100 (higher = riskier)
+  score: number;        // 0-100 (higher = riskier),
   accountingAnomalyScore: number;
   debtStressScore: number;
   cashFlowStressScore: number;
@@ -148,7 +148,7 @@ export interface RiskEngineOutput {
 
 export interface ConfidenceEngineOutput {
   level: ConfidenceLevel;
-  score: number;          // 0-100
+  score: number;          // 0-100,
   dataCompleteness: number;
   signalAgreement: number;
   riskConsistency: number;
@@ -159,15 +159,15 @@ export interface ConfidenceEngineOutput {
 // ─── Final Output Contract ────────────────────────────────────────
 
 export interface LensoryOutput {
-  healthScore: number;            // 0-100
+  healthScore: number;            // 0-100,
   classification: CompanyClassification;
   confidence: ConfidenceLevel;
-  growth: number;                 // 0-100
-  quality: number;                // 0-100
-  stability: number;              // 0-100
-  valuation: number;              // 0-100
-  momentum: number;               // 0-100
-  risk: number;                   // 0-100 (higher = riskier)
+  growth: number;                 // 0-100,
+  quality: number;                // 0-100,
+  stability: number;              // 0-100,
+  valuation: number;              // 0-100,
+  momentum: number;               // 0-100,
+  risk: number;                   // 0-100 (higher = riskier),
   narrative: string;
   engineDetails: {
     growth: GrowthEngineOutput;

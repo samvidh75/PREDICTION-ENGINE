@@ -50,7 +50,7 @@ export function buildFromReport(
       avgVolume: input.technicals.avgVolume,
       // Sector
       sectorPE: input.sector.sectorPe,
-      // Peer (not available yet — use sector as proxy)
+      // Peer (not available yet — use sector as proxy),
       peerROE: input.sector.sectorAvgGrowth ?? null, // temporary
     },
   };

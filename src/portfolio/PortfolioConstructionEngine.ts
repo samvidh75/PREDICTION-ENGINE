@@ -236,7 +236,7 @@ export class PortfolioConstructionEngine {
 
     const allocations: PositionAllocation[] = positions.map(p => ({
       symbol: p.symbol,
-      weight: Math.round(cappedWeight * 10000) / 10000, // round to 4 decimals
+      weight: Math.round(cappedWeight * 10000) / 10000, // round to 4 decimals,
       sizing_method: sizingMethod,
       confidence_score: Math.round(p.confidenceScore * 100) / 100,
       risk_score: Math.round(p.riskScore * 100) / 100,

@@ -16,7 +16,7 @@ export class PortfolioCoach {
   public static generateFeedback(
     holdings: UserHolding[],
     sectorWeights: SectorWeight[],
-    volatility: number, // 0..100
+    volatility: number, // 0..100,
     drawdown: number // 0..100
   ): PortfolioCoachFeedback {
     const healthResult = PortfolioHealthEngine.evaluateHealth(sectorWeights, volatility, drawdown);

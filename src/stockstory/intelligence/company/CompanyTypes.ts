@@ -79,9 +79,9 @@ export interface FundamentalSnapshot {
 }
 
 export interface QualityAssessment {
-  qualityScore: number;         // 0-100
-  earningsQuality: number;      // 0-100
-  balanceSheetQuality: number;  // 0-100
+  qualityScore: number;         // 0-100,
+  earningsQuality: number;      // 0-100,
+  balanceSheetQuality: number;  // 0-100,
   governanceScore: number | null;
   promoterHolding: number | null;
   institutionalHolding: number | null;
@@ -90,7 +90,7 @@ export interface QualityAssessment {
 }
 
 export interface GrowthTrajectory {
-  trajectoryScore: number;       // 0-100
+  trajectoryScore: number;       // 0-100,
   revenueCAGR: number | null;
   profitCAGR: number | null;
   trajectory: 'accelerating' | 'steady' | 'decelerating' | 'unclear';
@@ -100,7 +100,7 @@ export interface GrowthTrajectory {
 
 export interface MoatAssessment {
   symbol?: string;             // set by MoatEngine.analyze for report tagging
-  moatScore: number;             // 0-100
+  moatScore: number;             // 0-100,
   moatWidth: 'wide' | 'narrow' | 'none' | 'unclear';
   pricingPower: 'strong' | 'moderate' | 'weak' | 'unclear';
   switchingCosts: 'high' | 'moderate' | 'low' | 'unclear';
@@ -110,9 +110,9 @@ export interface MoatAssessment {
 }
 
 export interface CompanyAggregateScores {
-  overall: number;               // 0-100 weighted composite
+  overall: number;               // 0-100 weighted composite,
   classification: 'excellent' | 'healthy' | 'stable' | 'weakening' | 'at_risk';
-  confidence: number;            // 0-1
+  confidence: number;            // 0-1,
   dataCompleteness: number;      // 0-1
 }
 

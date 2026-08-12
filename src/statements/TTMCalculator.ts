@@ -19,7 +19,7 @@ import pool from '../db/index';
 
 export interface TTMData {
   symbol: string;
-  periodEnd: string;          // Latest quarter end date
+  periodEnd: string;          // Latest quarter end date,
   revenue: number | null;
   costOfRevenue: number | null;
   grossProfit: number | null;
@@ -42,7 +42,7 @@ export interface TTMData {
   fcfMargin: number | null;
 
   // Quality flags
-  quartersUsed: number;       // How many quarters contributed (should be 4)
+  quartersUsed: number;       // How many quarters contributed (should be 4),
   dataQuality: 'full' | 'partial' | 'unavailable';
   warnings: string[];
 }

@@ -7,15 +7,15 @@ describe('Risk Engine', () => {
   describe('Low-Risk Blue Chip', () => {
     it('should score TCS-like low-risk metrics correctly', () => {
       const metrics: RiskMetrics = {
-        volatility: 16,            // Low vol — safe
-        beta: 0.65,                // Defensive
-        maxDrawdown: 18,           // Moderate drawdown
+        volatility: 16,            // Low vol — safe,
+        beta: 0.65,                // Defensive,
+        maxDrawdown: 18,           // Moderate drawdown,
         weeklyRange: 20,
-        debtToEquity: 0.15,        // Minimal debt
-        currentRatio: 3.2,         // Strong liquidity
-        interestCoverage: 45,      // Excellent coverage
-        cashReserves: 18,          // Large cash buffer
-        customerConcentration: 8,  // Diversified
+        debtToEquity: 0.15,        // Minimal debt,
+        currentRatio: 3.2,         // Strong liquidity,
+        interestCoverage: 45,      // Excellent coverage,
+        cashReserves: 18,          // Large cash buffer,
+        customerConcentration: 8,  // Diversified,
         revenuePredictability: 0.85,
         competitiveMoat: 0.85,
         executionRisk: 0.80,

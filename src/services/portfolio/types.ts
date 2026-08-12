@@ -23,8 +23,8 @@ export interface PortfolioMetrics {
   sortinoRatio: number;
   calmarRatio: number;
   maxDrawdown: number;
-  valueAtRisk: number; // VaR at 95% confidence
-  conditionalVaR: number; // CVaR at 95%
+  valueAtRisk: number; // VaR at 95% confidence,
+  conditionalVaR: number; // CVaR at 95%,
   beta: number;
   correlation: number;
 }

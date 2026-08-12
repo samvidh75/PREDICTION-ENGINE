@@ -1,7 +1,7 @@
 import logger from '../../../../config/logger';
 
 export interface DebtResult {
-  score: number;              // 0-10
+  score: number;              // 0-10,
   deDetails: string[];
 }
 

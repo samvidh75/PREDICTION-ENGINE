@@ -4,8 +4,8 @@ export interface TrendingStock {
   symbol: string;
   price: number;
   changePercent: number;
-  volume: number; // in millions
-  inMinutesUp: number; // minutes stock has been trending up
+  volume: number; // in millions,
+  inMinutesUp: number; // minutes stock has been trending up,
   source: string;
 }
 

@@ -43,9 +43,9 @@ const CACHE_KEYS = {
 };
 
 const CACHE_TTL = {
-  PRICE: 5 * 60 * 1000, // 5 minutes (price updates frequently)
-  METRICS: 7 * 24 * 60 * 60 * 1000, // 7 days (metrics stable)
-  NEWS: 2 * 60 * 60 * 1000, // 2 hours (news updates)
+  PRICE: 5 * 60 * 1000, // 5 minutes (price updates frequently),
+  METRICS: 7 * 24 * 60 * 60 * 1000, // 7 days (metrics stable),
+  NEWS: 2 * 60 * 60 * 1000, // 2 hours (news updates),
   COMPANY: 30 * 24 * 60 * 60 * 1000, // 30 days (company info static)
 };
 

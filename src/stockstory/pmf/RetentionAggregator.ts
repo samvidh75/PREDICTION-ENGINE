@@ -124,7 +124,7 @@ export class RetentionAggregator implements PmfSubAggregator {
     return {
       periodStart: ctx.periodStart,
       periodEnd: ctx.periodEnd,
-      cohorts: cohorts.slice(-12), // Last 12 cohorts
+      cohorts: cohorts.slice(-12), // Last 12 cohorts,
       overall: {
         d1: totalD1Users > 0 ? Math.round(totalD1 / totalD1Users) : null,
         d7: totalD7Users > 0 ? Math.round(totalD7 / totalD7Users) : null,

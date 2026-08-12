@@ -21,8 +21,8 @@ interface PriceTarget {
   scenario: "bull" | "base" | "bear";
   label: string;
   price: number;
-  potentialReturn: number; // percentage
-  probability: number;     // 0-100, sum across 3 scenarios ≈ 100
+  potentialReturn: number; // percentage,
+  probability: number;     // 0-100, sum across 3 scenarios ≈ 100,
   methodology: string;
   assumptions: string[];
 }
@@ -110,8 +110,6 @@ export function PriceTargets({ currentPrice = 342.50 }: { currentPrice?: number 
         style={{
           padding: "12px 16px",
           background: colors.surface,
-          backdropFilter: "blur(20px) saturate(160%)",
-          WebkitBackdropFilter: "blur(20px) saturate(160%)",
           borderRadius: radius.md,
           border: `1px solid ${colors.hairline}`,
           display: "flex",
@@ -187,8 +185,6 @@ export function PriceTargets({ currentPrice = 342.50 }: { currentPrice?: number 
                     style={{
                       padding: "3px 8px",
                       background: colors.surface,
-                      backdropFilter: "blur(20px) saturate(160%)",
-                      WebkitBackdropFilter: "blur(20px) saturate(160%)",
                       borderRadius: radius.full,
                       fontSize: "11px",
                       color: colors.textSecondary,

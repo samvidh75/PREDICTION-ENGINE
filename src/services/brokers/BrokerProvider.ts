@@ -25,7 +25,7 @@ export interface ConnectionStatus {
 export interface BrokerAuthResult {
   accessToken: string;
   refreshToken?: string;
-  expiresAt: number;          // Unix timestamp ms
+  expiresAt: number;          // Unix timestamp ms,
   tokenType: string;          // e.g. "Bearer"
   brokerUserId?: string;
 }

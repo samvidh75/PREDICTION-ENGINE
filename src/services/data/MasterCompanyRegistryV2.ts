@@ -65,7 +65,7 @@ export class MasterCompanyRegistryV2 {
         marketCap,
         currency: 'PHP',
         isin: row.isin,
-        bseCode: null, // Resolves as part of lookup mapping V2
+        bseCode: null, // Resolves as part of lookup mapping V2,
         nseSymbol: row.symbol,
       };
     } catch (err) {

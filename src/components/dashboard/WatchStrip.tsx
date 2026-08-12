@@ -86,8 +86,6 @@ export function WatchStrip() {
                 padding: "9px 16px",
                 border: "1px solid var(--glass-border)",
                 background: "var(--glass-bg)",
-                backdropFilter: "blur(var(--glass-blur)) saturate(160%)",
-                WebkitBackdropFilter: "blur(var(--glass-blur)) saturate(160%)",
                 cursor: "pointer",
                 whiteSpace: "nowrap",
                 transition: "border-color 200ms ease",

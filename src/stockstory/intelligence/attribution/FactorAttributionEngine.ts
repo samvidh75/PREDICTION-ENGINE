@@ -22,11 +22,11 @@ export interface FactorAttribution {
 
 export interface FactorScore {
   factor: string;
-  weight: number;           // 0-1
-  rawScore: number;         // 0-100
-  contribution: number;     // Weighted contribution to composite
+  weight: number;           // 0-1,
+  rawScore: number;         // 0-100,
+  contribution: number;     // Weighted contribution to composite,
   interpretation: 'strong_tailwind' | 'tailwind' | 'neutral' | 'headwind' | 'strong_headwind';
-  evidence: string[];       // Evidence fields supporting this score
+  evidence: string[];       // Evidence fields supporting this score,
   explanation: string;
 }
 

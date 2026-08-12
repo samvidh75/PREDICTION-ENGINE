@@ -34,7 +34,7 @@ export interface Catalyst {
   expectedDate: string | null;
   expectedImpact: 'positive' | 'negative' | 'neutral' | 'unknown';
   magnitude: 'high' | 'moderate' | 'low' | 'unknown';
-  probability: number;          // 0-1
+  probability: number;          // 0-1,
   description: string;
   evidenceSource: string;      // What data supports this catalyst
 }

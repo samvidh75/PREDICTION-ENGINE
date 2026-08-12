@@ -18,13 +18,13 @@
 export type ConfidenceLevel = 'Very High' | 'High' | 'Medium' | 'Low';
 
 export interface ConfidenceResult {
-  score: number;                  // 0-100
+  score: number;                  // 0-100,
   level: ConfidenceLevel;
-  providerConfidence: number;     // 0-1
-  snapshotConfidence: number;     // 0-1
-  rankingConfidence: number;      // 0-1
-  dataCompleteness: number;       // 0-1 (fields populated / total)
-  signalAgreement: number;        // 0-1
+  providerConfidence: number;     // 0-1,
+  snapshotConfidence: number;     // 0-1,
+  rankingConfidence: number;      // 0-1,
+  dataCompleteness: number;       // 0-1 (fields populated / total),
+  signalAgreement: number;        // 0-1,
   commentary: string;
 }
 
@@ -53,7 +53,7 @@ export class ConfidenceEngineV2 {
   compute(
     fieldsPopulated: number,
     totalFields: number,
-    sources: Record<string, string>,       // field → provider name
+    sources: Record<string, string>,       // field → provider name,
     stalenessDays: number,
     factorScores?: { qualityFactor: number; growthFactor: number; valueFactor: number; momentumFactor: number; riskFactor: number },
   ): ConfidenceResult {

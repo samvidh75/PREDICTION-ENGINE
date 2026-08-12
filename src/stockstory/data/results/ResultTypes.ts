@@ -14,7 +14,7 @@ export interface QuarterlyResult {
   companyName: string;
   resultType: ResultType;
   frequency: ResultFrequency;
-  period: string; // e.g., "2025Q1", "FY2025"
+  period: string; // e.g., "2025Q1", "FY2025",
   periodEndDate: string;
   filingDate: string;
   audited: boolean;
@@ -40,10 +40,10 @@ export interface QuarterlyResult {
   taxExpense: number | null;
   netProfit: number | null;
   netProfitMargin: number | null;
-  eps: number | null; // basic EPS
+  eps: number | null; // basic EPS,
   dilutedEps: number | null;
 
-  // Balance Sheet items (typically only in annual/half-yearly)
+  // Balance Sheet items (typically only in annual/half-yearly),
   totalAssets: number | null;
   totalLiabilities: number | null;
   netWorth: number | null;
@@ -81,11 +81,11 @@ export interface ResultComparison {
 }
 
 export interface ComparisonMetrics {
-  revenueQoQ: number | null; // % change
+  revenueQoQ: number | null; // % change,
   revenueYoY: number | null;
   netProfitQoQ: number | null;
   netProfitYoY: number | null;
-  ebitdaMarginChangeQoQ: number | null; // bps change
+  ebitdaMarginChangeQoQ: number | null; // bps change,
   ebitdaMarginChangeYoY: number | null;
   epsQoQ: number | null;
   epsYoY: number | null;

@@ -74,8 +74,6 @@ export function OpaqueNavbar() {
         top: 0, left: 0, right: 0,
         height: components.navBar.heightDesktop,
         background: "rgba(2, 6, 23, 0.95)",
-        backdropFilter: "blur(12px)",
-        WebkitBackdropFilter: "blur(12px)",
         borderBottom: "1px solid rgba(255,255,255,0.08)",
         zIndex: 100,
         display: "flex",
@@ -167,7 +165,7 @@ export function OpaqueNavbar() {
           <div
             style={{
               position: "absolute", top: "100%", left: 0, right: 0, marginTop: 4,
-              background: "rgba(18, 18, 20, 0.95)", backdropFilter: "blur(20px)",
+              background: "rgba(18, 18, 20, 0.95)",
               border: "1px solid rgba(255,255,255,0.1)", borderRadius: radius.sm,
               overflow: "hidden", zIndex: 200,
             }}

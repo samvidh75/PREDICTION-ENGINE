@@ -4,7 +4,7 @@ export interface CommunityIdea {
   id: string;
   userId: string;
   ticker: string;
-  conviction: number; // 1-10
+  conviction: number; // 1-10,
   entryPrice: number;
   targetPrice?: number;
   stopLoss?: number;

@@ -69,7 +69,7 @@ export const SIGNAL_REGISTRY: Record<string, SignalTemplate> = {
     id: "low_debt_leader",
     category: "balance_sheet",
     name: "Low Debt Leader",
-    directionRule: { type: "threshold", field: "debtToEquity", positiveAbove: 0, negativeBelow: 0.5 }, // positive when below 0.5
+    directionRule: { type: "threshold", field: "debtToEquity", positiveAbove: 0, negativeBelow: 0.5 }, // positive when below 0.5,
     strengthRule: { type: "distance", field: "debtToEquity", referenceValue: 0, thresholds: { very_strong: 0.2, strong: 0.5, moderate: 1.0 } },
     impactRule: { maxPositive: 6, maxNegative: 0, scaleWithStrength: true },
     defaultHorizon: "long_term",

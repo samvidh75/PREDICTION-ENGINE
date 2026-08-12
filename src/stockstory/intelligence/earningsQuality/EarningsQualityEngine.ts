@@ -15,7 +15,7 @@ import { clampScore } from '../scoring';
 export interface EarningsQualityReport {
   symbol: string;
   generatedAt: string;
-  qualityScore: number;           // 0-100
+  qualityScore: number;           // 0-100,
   cashConversion: CashConversion;
   marginStability: MarginStability;
   growthQuality: GrowthQuality;
@@ -24,11 +24,11 @@ export interface EarningsQualityReport {
 }
 
 export interface CashConversion {
-  score: number;                  // 0-100
+  score: number;                  // 0-100,
   operatingCashFlow: number | null;
   freeCashFlow: number | null;
   netIncome: number | null;
-  fcfToNetIncome: number | null;  // Ideal: > 0.8
+  fcfToNetIncome: number | null;  // Ideal: > 0.8,
   assessment: string;
 }
 

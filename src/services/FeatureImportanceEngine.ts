@@ -7,7 +7,7 @@ import { query } from "../db/index";
 export interface FeatureImportance {
   feature: string;
   correlation: number;
-  importance_score: number; // Normalized scale 0-100
+  importance_score: number; // Normalized scale 0-100,
   rank: number;
 }
 

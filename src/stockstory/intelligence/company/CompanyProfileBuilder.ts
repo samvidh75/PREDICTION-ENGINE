@@ -55,7 +55,7 @@ export class CompanyProfileBuilder {
   private buildIdentity(input: IntelligenceInput): CompanyIdentity {
     const cap = input.financials.marketCap;
     return {
-      name: null, // Populated upstream by data mapper
+      name: null, // Populated upstream by data mapper,
       isin: null,
       sector: input.sector.name || 'Unclassified',
       industry: null,

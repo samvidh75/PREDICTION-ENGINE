@@ -110,8 +110,6 @@ export default function UpgradeModal({ isOpen, onClose, reason = 'advanced-analy
         justifyContent: 'center',
         zIndex: 1000,
         background: 'rgba(0, 0, 0, 0.4)',
-        backdropFilter: 'blur(4px)',
-        WebkitBackdropFilter: 'blur(4px)',
         animation: isOpen ? 'fadeIn 0.3s ease-out' : 'fadeOut 0.2s ease-out',
       }}
       onClick={onClose}
@@ -126,8 +124,6 @@ export default function UpgradeModal({ isOpen, onClose, reason = 'advanced-analy
           borderRadius: '20px',
           background: `linear-gradient(135deg, ${colors.surface} 0%, rgba(255,255,255,0.02) 100%)`,
           border: `1px solid rgba(255,255,255,0.1)`,
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
           boxShadow: '0 20px 60px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05)',
           overflow: 'hidden',
           animation: showContent ? 'slideUp 0.4s cubic-bezier(0.23, 1, 0.32, 1)' : 'slideDown 0.2s ease-out',

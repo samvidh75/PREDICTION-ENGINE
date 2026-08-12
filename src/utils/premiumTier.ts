@@ -20,7 +20,7 @@ export interface PremiumFeatures {
   name: string;
   tier1QueriesPerDay: number;
   tier2QueriesPerDay: number;
-  tier3QueriesPerDay: number; // Groq API calls
+  tier3QueriesPerDay: number; // Groq API calls,
   portfolioAnalysis: boolean;
   advancedReporting: boolean;
   emailReports: boolean;
@@ -35,9 +35,9 @@ export interface PremiumFeatures {
 const TIER_FEATURES: Record<SubscriptionPlan, PremiumFeatures> = {
   free: {
     name: 'Free',
-    tier1QueriesPerDay: 50, // Unlimited local (0.5B)
-    tier2QueriesPerDay: 20, // Limited 1B
-    tier3QueriesPerDay: 5, // Very limited Groq
+    tier1QueriesPerDay: 50, // Unlimited local (0.5B),
+    tier2QueriesPerDay: 20, // Limited 1B,
+    tier3QueriesPerDay: 5, // Very limited Groq,
     portfolioAnalysis: false,
     advancedReporting: false,
     emailReports: false,
@@ -51,7 +51,7 @@ const TIER_FEATURES: Record<SubscriptionPlan, PremiumFeatures> = {
     name: 'Premium',
     tier1QueriesPerDay: 500,
     tier2QueriesPerDay: 100,
-    tier3QueriesPerDay: 50, // Most users need ~30-40
+    tier3QueriesPerDay: 50, // Most users need ~30-40,
     portfolioAnalysis: true,
     advancedReporting: true,
     emailReports: true,
@@ -59,22 +59,22 @@ const TIER_FEATURES: Record<SubscriptionPlan, PremiumFeatures> = {
     newsAnalysis: true,
     customAlerts: 20,
     apiAccess: false,
-    monthlyPrice: 299, // ~$3.60/month in PHP
+    monthlyPrice: 299, // ~$3.60/month in PHP,
     yearlyPrice: 2499, // ~$30/year (save 30%)
   },
   pro: {
     name: 'Pro',
     tier1QueriesPerDay: 1000,
     tier2QueriesPerDay: 500,
-    tier3QueriesPerDay: 200, // For power users
+    tier3QueriesPerDay: 200, // For power users,
     portfolioAnalysis: true,
     advancedReporting: true,
     emailReports: true,
     shareReports: true,
     newsAnalysis: true,
     customAlerts: 100,
-    apiAccess: true, // Can build apps on top
-    monthlyPrice: 799, // ~$9.60/month
+    apiAccess: true, // Can build apps on top,
+    monthlyPrice: 799, // ~$9.60/month,
     yearlyPrice: 6999, // ~$85/year (save 27%)
   },
 };

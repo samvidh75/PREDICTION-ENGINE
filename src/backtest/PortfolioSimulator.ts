@@ -258,7 +258,7 @@ export class PortfolioSimulator {
       rebalance,
       metrics,
       alpha,
-      trackingError: metrics.volatility * 0.3, // Approximate
+      trackingError: metrics.volatility * 0.3, // Approximate,
       informationRatio: alpha / (metrics.volatility * 0.3 + 0.0001),
       turnover: rebalanceCount > 0 ? turnoverSum / rebalanceCount : 0,
       hitRate: metrics.winRate,

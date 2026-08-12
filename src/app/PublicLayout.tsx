@@ -196,8 +196,6 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
             top: 0,
             zIndex: 80,
             background: "var(--glass-bg)",
-            backdropFilter: "blur(var(--glass-blur)) saturate(160%)",
-            WebkitBackdropFilter: "blur(var(--glass-blur)) saturate(160%)",
             gap: 16,
           }}
         >

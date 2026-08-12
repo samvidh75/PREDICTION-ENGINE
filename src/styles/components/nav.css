@@ -1,6 +1,6 @@
 /* ============================================================================
-   NAVIGATION — Masthead editorial chrome
-   Hairline rules instead of glassmorphism, fox-orange active marker.
+   NAVIGATION — Professional financial platform chrome
+   Deep navy sidebar, blue active indicators, no glassmorphism.
    ============================================================================ */
 
 .navbar {
@@ -9,11 +9,8 @@
   justify-content: space-between;
   padding: 0 24px;
   height: 52px;
-  background: var(--glass-bg);
-  backdrop-filter: blur(var(--glass-blur)) saturate(160%);
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(160%);
-  border-bottom: 1px solid var(--glass-border);
-  box-shadow: inset 0 1px 0 var(--glass-border-top);
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border);
   position: sticky;
   top: 0;
   z-index: 100;
@@ -47,17 +44,15 @@
   border-radius: var(--radius-md);
   transition: background-color 180ms var(--ease-soft), color 180ms var(--ease-soft);
 }
-.navbar-link:hover { background-color: var(--bg-card); color: var(--text-primary); }
-.navbar-link.active { color: var(--text-primary); background-color: var(--bg-card); }
+.navbar-link:hover { background-color: var(--bg-chip); color: var(--text-primary); }
+.navbar-link.active { color: var(--accent); background-color: var(--accent-soft); }
 
 .navbar-actions { display: flex; align-items: center; gap: 8px; }
 
 .sidebar {
   width: 240px;
-  background: var(--glass-bg);
-  backdrop-filter: blur(var(--glass-blur)) saturate(160%);
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(160%);
-  border-right: 1px solid var(--glass-border);
+  background: var(--bg-card);
+  border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
   height: calc(100vh - 52px);
@@ -70,11 +65,11 @@
 .sidebar-section { margin-bottom: 16px; }
 .sidebar-section-title {
   padding: 8px 16px 4px;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.10em;
-  color: var(--accent);
+  color: var(--text-muted);
 }
 
 .sidebar-item { list-style: none; margin: 0; }
@@ -93,10 +88,10 @@
   transition: background-color 180ms var(--ease-soft), color 180ms var(--ease-soft);
   position: relative;
 }
-.sidebar-link:hover { background-color: var(--bg-card); color: var(--text-primary); }
+.sidebar-link:hover { background-color: var(--bg-chip); color: var(--text-primary); }
 .sidebar-link.active {
-  background-color: var(--bg-card);
-  color: var(--text-primary);
+  background-color: var(--accent-soft);
+  color: var(--accent);
 }
 .sidebar-link.active::before {
   content: "";
@@ -117,7 +112,7 @@
 }
 .sidebar-badge { margin-left: auto; flex-shrink: 0; }
 
-/* TABS — pill style with hairline rule between active */
+/* TABS — underline style */
 .tabs { display: flex; gap: 0; padding: 0; overflow-x: auto; border-bottom: 1px solid var(--border); }
 .tab {
   padding: 10px 16px;
@@ -133,13 +128,14 @@
   white-space: nowrap;
 }
 .tab:hover { color: var(--text-primary); }
-.tab.active { color: var(--text-primary); }
+.tab.active { color: var(--accent); }
 .tab.active::after {
   content: "";
   position: absolute;
   left: 16px; right: 16px; bottom: -1px;
   height: 2px;
   background: var(--accent);
+  border-radius: 1px 1px 0 0;
 }
 .tab-disabled { color: var(--text-muted); cursor: not-allowed; opacity: 0.4; }
 
@@ -170,13 +166,13 @@
   cursor: pointer;
 }
 .pagination-link:hover, .pagination-prev:hover, .pagination-next:hover {
-  background-color: var(--bg-card);
-  border-color: var(--border-strong);
+  background-color: var(--bg-chip);
+  border-color: var(--accent);
 }
 .pagination-link.active {
-  background-color: var(--brand);
-  color: var(--text-inverse);
-  border-color: var(--brand);
+  background-color: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
 }
 .pagination-link:disabled, .pagination-prev:disabled, .pagination-next:disabled { opacity: 0.4; cursor: not-allowed; }
 

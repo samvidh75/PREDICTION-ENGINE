@@ -113,12 +113,12 @@ export default function AlertPage() {
       initial="hidden"
       animate="visible"
       variants={{ visible: { transition: { staggerChildren: 0.06 } } }}
-      style={{ maxWidth: 1000, margin: "0 auto", padding: "32px 24px", display: "grid", gap: 24 }}
+      style={{ display: "grid", gap: 24 }}
     >
       <motion.section variants={fadeUp} transition={pageTransition} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
         <div>
-          <h1 style={{ fontSize: typography.h2.desktop.size, fontWeight: 600, color: colors.textPrimary, margin: 0, display: "flex", alignItems: "center", gap: 12 }}>
-            <Bell size={24} color={colors.primary} /> Alerts
+          <h1 style={{ fontSize: "20px", fontWeight: 700, color: colors.textPrimary, margin: 0, display: "flex", alignItems: "center", gap: 12 }}>
+            <Bell size={24} color={colors.accentBlue} /> Alerts
           </h1>
           <p style={{ fontSize: 14, color: colors.textSecondary, margin: "4px 0 0" }}>
             {alerts.length} alert{alerts.length !== 1 ? "s" : ""} configured

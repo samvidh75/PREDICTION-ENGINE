@@ -51,8 +51,6 @@ function MetricCard({ label, value, sub, accent }: {
     <div
       style={{
         background: colors.canvas,
-        backdropFilter: "blur(20px) saturate(160%)",
-        WebkitBackdropFilter: "blur(20px) saturate(160%)",
         borderRadius: radius.md,
         padding: space[3],
         border: `1px solid ${colors.hairline}`,
@@ -168,8 +166,6 @@ function DashboardContent() {
     <div
       style={{
         background: colors.surface,
-        backdropFilter: "blur(20px) saturate(160%)",
-        WebkitBackdropFilter: "blur(20px) saturate(160%)",
         border: `1px solid ${colors.hairline}`,
         borderRadius: radius.xl,
         padding: space[5],
@@ -225,8 +221,6 @@ function DashboardContent() {
       <div
         style={{
           background: colors.canvas,
-          backdropFilter: "blur(20px) saturate(160%)",
-          WebkitBackdropFilter: "blur(20px) saturate(160%)",
           borderRadius: radius.lg,
           padding: space[3],
           border: `1px solid ${colors.hairline}`,

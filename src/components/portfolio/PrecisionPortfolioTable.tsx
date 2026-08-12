@@ -57,9 +57,7 @@ const headerStyle: React.CSSProperties = {
   fontSize: 9,
   position: 'sticky' as const,
   top: 0,
-  background: colors.surface,
-  backdropFilter: "blur(20px) saturate(160%)",
-  WebkitBackdropFilter: "blur(20px) saturate(160%)",
+  background: colors.surface
 };
 
 function formatPrice(v: number | null, decimals = 2): string {
@@ -132,8 +130,6 @@ export function PrecisionPortfolioTable({ userId }: PrecisionPortfolioTableProps
     <div
       style={{
         background: colors.surface,
-        backdropFilter: "blur(20px) saturate(160%)",
-        WebkitBackdropFilter: "blur(20px) saturate(160%)",
         border: `1px solid ${colors.hairline}`,
         borderRadius: radius.xl,
         overflow: 'hidden',

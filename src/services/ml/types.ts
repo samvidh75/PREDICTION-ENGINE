@@ -40,6 +40,6 @@ export interface EnsembleSignal {
   direction: SignalDirection;
   probability: number;
   score: number;
-  confidence: number; // 0-100, agreement-weighted
+  confidence: number; // 0-100, agreement-weighted,
   components: NamedSignal[];
 }

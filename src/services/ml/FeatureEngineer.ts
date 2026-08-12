@@ -40,7 +40,7 @@ export class FeatureEngineer {
       bollinger_pctb: this.bollingerPercentB(closes, 20),
       // Volume
       volume_ratio_20d: this.volumeRatio(volumes, 20),
-      // Fundamentals (missing -> neutral 0, flagged via presence features)
+      // Fundamentals (missing -> neutral 0, flagged via presence features),
       pe_ratio: fundamentals?.peRatio ?? 0,
       pb_ratio: fundamentals?.pbRatio ?? 0,
       roe: fundamentals?.roe ?? 0,

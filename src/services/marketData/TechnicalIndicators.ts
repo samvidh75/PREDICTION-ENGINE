@@ -10,7 +10,7 @@ export interface TechnicalSnapshot {
   atr14: number | null;
   bollingerWidth: number | null;
   movingAverageDistance50: number | null;
-  closePrices: number[];  // last 60 closes, most recent last
+  closePrices: number[];  // last 60 closes, most recent last,
   computedAt: string;
 }
 

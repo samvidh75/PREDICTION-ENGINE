@@ -31,14 +31,14 @@ export interface RagDocumentChunk {
 
 export interface RagRetrievalQuery {
   symbol: string;
-  domains: string[]; // e.g. ['news_events', 'filings']
+  domains: string[]; // e.g. ['news_events', 'filings'],
   maxResultsPerDomain: number;
   allowDomains?: string[]; // URL allowlist for source links
 }
 
 export interface RagRetrievalResult {
   symbol: string;
-  queriedAt: string; // ISO timestamp
+  queriedAt: string; // ISO timestamp,
   results: RagDocumentChunk[];
   totalChunks: number;
   domainCount: number;

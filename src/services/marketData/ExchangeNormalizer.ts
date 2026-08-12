@@ -3,7 +3,7 @@ export type NormalizedStockData = {
   companyName: string;
   exchange: "PSE" | "PSE" | "SME";
   price: number;
-  change: number; // Daily change percentage
+  change: number; // Daily change percentage,
   health: "Very Healthy" | "Healthy" | "Stable" | "Weakening" | "Unhealthy";
 };
 

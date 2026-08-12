@@ -17,7 +17,7 @@ export interface PowerAssessment {
 
 export interface MoatAssessment {
   symbol: string;
-  moatScore: number;             // 0-100
+  moatScore: number;             // 0-100,
   moatWidth: 'wide' | 'narrow' | 'none' | 'unclear';
   pricingPower: 'strong' | 'moderate' | 'weak' | 'unclear';
   switchingCosts: 'high' | 'moderate' | 'low' | 'unclear';

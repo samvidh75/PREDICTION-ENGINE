@@ -52,7 +52,7 @@ export type LongTermStoryState = {
 export type EarningsNarrativeEngineOutput = {
   executiveNarrative: string;
 
-  // Editorial “what changed” framing (no scores-only)
+  // Editorial “what changed” framing (no scores-only),
   keyOperationalChanges: string[];
 
   // 1) Business Quality Interpreter
@@ -67,7 +67,7 @@ export type EarningsNarrativeEngineOutput = {
   // 4) Margin & Efficiency Environment
   marginAndEfficiencyNarrative: string;
 
-  // 5) Guidance Interpretation System (interpret future-facing emphasis, not outcomes)
+  // 5) Guidance Interpretation System (interpret future-facing emphasis, not outcomes),
   guidanceInterpretationNarrative: string;
 
   // 6) Risk Evolution Layer
