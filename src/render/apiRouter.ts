@@ -690,7 +690,11 @@ function readCachedPrices(): CachedPriceData | null {
     const cachePath = path.join(cacheDir, "pse-live-prices.json");
     if (fs.existsSync(cachePath)) {
       const content = fs.readFileSync(cachePath, "utf-8");
-      return JSON.parse(content) as CachedPriceData;
+      const data = JSON.parse(content) as CachedPriceData;
+      console.log("[Cache] Read pse-live-prices.json:", { count: data.count, hasPrices: data.prices && Object.keys(data.prices).length > 0 });
+      return data;
+    } else {
+      console.log("[Cache] pse-live-prices.json not found at:", cachePath);
     }
   } catch (err) {
     console.error("[Cache] Failed to read pse-live-prices.json:", err);
@@ -807,6 +811,7 @@ export default async function registerApiRoutes(server: FastifyInstance) {
       const cachedData = readCachedPrices();
       if (cachedData?.prices[cleanSymbol]) {
         const cachedPrice = cachedData.prices[cleanSymbol];
+        console.log(`[Cache] Using cached price for ${cleanSymbol}: ${cachedPrice}`);
         gatewayQuote = {
           symbol: cleanSymbol,
           exchange: "PSE",
@@ -817,6 +822,8 @@ export default async function registerApiRoutes(server: FastifyInstance) {
           source: "daily_prices",
           freshness: "delayed",
         };
+      } else {
+        console.log(`[Cache] No cached price found for ${cleanSymbol}`);
       }
     }
 
