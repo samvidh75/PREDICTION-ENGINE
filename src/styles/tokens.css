@@ -1,66 +1,68 @@
 /* ============================================================================
-   DESIGN TOKENS — PROFESSIONAL FINANCIAL TRADING TERMINAL
-   Deep institutional navy/slate background, sharp market greens/reds,
-   professional teal accent. Zero gradients, zero glassmorphism.
+   DESIGN TOKENS — THE MANILA DESK
+   An editorial research-desk identity for Philippine equities: warm
+   near-black canvas, fox-orange signature ink, serif display headlines
+   (Fraunces) for storytelling, monospace (JetBrains Mono) for the tape.
+   Zero gradients, zero glassmorphism, zero generic teal fintech.
    ============================================================================ */
 
 :root {
-  /* ── Surface ladder — deep institutional navy (fintech standard) ────── */
-  --bg-page:        #0F1419;
-  --bg-card:        #151B27;
-  --bg-card-hover:  #1A2332;
-  --bg-chip:        #161D2A;
-  --bg-sheet:       #0F1419;
-  --bg-paper-deep:  #1E2736;
-  --bg-elevated:    #1A2332;
+  /* ── Surface ladder — warm near-black, paper-adjacent, not cold navy ── */
+  --bg-page:        #0B0B0C;
+  --bg-card:        #141414;
+  --bg-card-hover:  #1B1A19;
+  --bg-chip:        #171615;
+  --bg-sheet:       #0B0B0C;
+  --bg-paper-deep:  #201F1D;
+  --bg-elevated:    #1B1A19;
 
-  /* ── Brand / CTA — professional teal ──────────────────────────────── */
-  --brand:          #0891B2;
-  --brand-light:    #14B8A6;
-  --brand-dark:     #0E7490;
-  --brand-ink:      #F0F2F5;
+  /* ── Brand / CTA — fox-orange signature ink (matches the wordmark) ──── */
+  --brand:          #FF6B4A;
+  --brand-light:    #FF8A6B;
+  --brand-dark:     #D9522F;
+  --brand-ink:      #14100D;
 
-  /* ── Market semantic colors — sharp institutional greens/reds ──────── */
-  --market-green:        #10B981;
-  --market-green-light:  rgba(16,185,129,0.14);
-  --market-red:          #EF4444;
-  --market-red-light:    rgba(239,68,68,0.14);
-  --market-orange:       #F59E0B;
-  --market-orange-light: rgba(245,158,11,0.14);
+  /* ── Market semantic colors — muted, editorial (not neon) ──────────── */
+  --market-green:        #3FB67A;
+  --market-green-light:  rgba(63,182,122,0.14);
+  --market-red:          #E15B4F;
+  --market-red-light:    rgba(225,91,79,0.14);
+  --market-orange:       #E0A339;
+  --market-orange-light: rgba(224,163,57,0.14);
 
   /* ── UI semantic ───────────────────────────────────────────────────── */
-  --green:          #10B981;
-  --green-light:    rgba(16,185,129,0.14);
-  --red:            #EF4444;
-  --red-light:      rgba(239,68,68,0.14);
-  --amber:          #F59E0B;
-  --amber-light:    rgba(245,158,11,0.14);
+  --green:          #3FB67A;
+  --green-light:    rgba(63,182,122,0.14);
+  --red:            #E15B4F;
+  --red-light:      rgba(225,91,79,0.14);
+  --amber:          #E0A339;
+  --amber-light:    rgba(224,163,57,0.14);
 
-  /* ── Signature accent — professional teal ──────────────────────────── */
-  --accent:         #0891B2;
-  --accent-soft:    rgba(8,145,178,0.12);
-  --accent-strong:  rgba(8,145,178,0.24);
-  --accent-ink:     #F0F2F5;
+  /* ── Signature accent — fox-orange ──────────────────────────────────── */
+  --accent:         #FF6B4A;
+  --accent-soft:    rgba(255,107,74,0.12);
+  --accent-strong:  rgba(255,107,74,0.26);
+  --accent-ink:     #14100D;
 
-  /* ── Text hierarchy — clean institutional whites and grays ─────────── */
-  --text-primary:   #F0F2F5;
-  --text-body:      #9CA3AF;
-  --text-secondary: #6B7280;
-  --text-muted:     #4B5563;
-  --text-inverse:   #0F1419;
-  --text-rule:      #2D3748;
+  /* ── Text hierarchy — warm off-whites and stone grays ───────────────── */
+  --text-primary:   #F3F0EA;
+  --text-body:      #A6A099;
+  --text-secondary: #7A7570;
+  --text-muted:     #524E4A;
+  --text-inverse:   #0B0B0C;
+  --text-rule:      #2A2826;
 
-  /* ── Borders — thin institutional hairlines ─────────────────────────── */
-  --border:         #2D3748;
-  --border-strong:  rgba(255,255,255,0.12);
-  --border-soft:    rgba(255,255,255,0.05);
-  --border-focus:   #0891B2;
+  /* ── Borders — thin warm hairlines ──────────────────────────────────── */
+  --border:         #2A2826;
+  --border-strong:  rgba(255,255,255,0.14);
+  --border-soft:    rgba(255,255,255,0.06);
+  --border-focus:   #FF6B4A;
 
-  /* ── Typography — Inter for body, mono for data ────────────────────── */
-  --font-sans:      -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Segoe UI", Roboto, sans-serif;
+  /* ── Typography — Inter for UI, Fraunces for editorial display, mono for the tape ── */
+  --font-sans:      "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
   --font:           var(--font-sans);
   --font-mono:      "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, "Courier New", monospace;
-  --font-display:   -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", sans-serif;
+  --font-display:   "Fraunces", "SF Pro Display", "Inter", serif;
   --font-serif:     var(--font-display);
 
   /* ── Radius ────────────────────────────────────────────────────────── */
@@ -70,9 +72,9 @@
   --radius-xl:      14px;
 
   /* ── Shadows ───────────────────────────────────────────────────────── */
-  --shadow-card:    0 1px 3px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.3);
-  --shadow-raised:  0 4px 16px rgba(0,0,0,0.5);
-  --shadow-modal:   0 20px 60px rgba(0,0,0,0.7);
+  --shadow-card:    0 1px 3px rgba(0,0,0,0.5), 0 1px 2px rgba(0,0,0,0.4);
+  --shadow-raised:  0 4px 20px rgba(0,0,0,0.55);
+  --shadow-modal:   0 24px 64px rgba(0,0,0,0.72);
 
   /* ── Animation ─────────────────────────────────────────────────────── */
   --ease-raycast:   cubic-bezier(0.32, 1.4, 0.6, 1);
@@ -93,22 +95,22 @@
   --surface-paper-deep: var(--bg-paper-deep);
 
   --brand-hover:    var(--brand-dark);
-  --brand-tint:     rgba(228,168,83,0.11);
+  --brand-tint:     rgba(255,107,74,0.11);
 
   --text-900:       var(--text-primary);
   --text-700:       var(--text-body);
   --text-500:       var(--text-secondary);
   --text-300:       var(--text-muted);
 
-  --green-text:     #2BB673;
-  --red-text:       #E8504E;
-  --amber-text:     #F0A63C;
-  --accent-text:    #E4A853;
+  --green-text:     #3FB67A;
+  --red-text:       #E15B4F;
+  --amber-text:     #E0A339;
+  --accent-text:    #FF8A6B;
 
   --sh-card:        var(--shadow-card);
   --sh-raised:      var(--shadow-raised);
   --sh-float:       var(--shadow-modal);
-  --sh-focus:       0 0 0 3px rgba(228,168,83,0.25);
+  --sh-focus:       0 0 0 3px rgba(255,107,74,0.25);
 
   --r-xs:           var(--radius-sm);
   --r-md:           var(--radius-md);
@@ -136,8 +138,8 @@
   --sz-3xl:         30px;
 
   /* ── Glass — minimal; only for overlays/modals ─────────────────────── */
-  --glass-bg:          rgba(13, 16, 21, 0.92);
-  --glass-bg-strong:   rgba(17, 21, 27, 0.96);
+  --glass-bg:          rgba(11, 11, 12, 0.92);
+  --glass-bg-strong:   rgba(15, 14, 13, 0.96);
   --glass-border:      rgba(255, 255, 255, 0.10);
   --glass-border-top:  rgba(255, 255, 255, 0.15);
   --glass-blur:        16px;

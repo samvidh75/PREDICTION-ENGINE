@@ -1,43 +1,41 @@
 // ============================================================================
-// PREDICTION-ENGINE DESIGN TOKENS — RAYCAST-INSPIRED DARK THEME
-// Pure black canvas, high-contrast white ink, one vivid red-orange accent.
-// Apple-grade restraint: single typeface (Inter), no gradients, no drop
-// shadows — elevation comes from a black→near-black surface ladder.
-// Mirrors src/styles/tokens.css 1:1. Every export name is preserved so the
-// rest of the codebase (which reads these via inline `style={{ ... }}`)
-// keeps compiling and re-themes automatically.
+// THE MANILA DESK — DESIGN TOKENS
+// Warm near-black canvas, fox-orange signature ink, serif display headlines
+// (Fraunces) for storytelling, monospace for the tape. Editorial research
+// desk, not generic teal fintech. Mirrors src/styles/tokens.css 1:1. Every
+// export name is preserved so the rest of the codebase (which reads these
+// via inline `style={{ ... }}`) keeps compiling and re-themes automatically.
 // ============================================================================
 
-// ── COLORS — Professional Financial Trading Terminal ───────────────
-// Deep institutional navy/slate background, clean white text, sharp greens/reds
-// for market semantics, and professional teal accent. Zero gradients, zero
-// glassmorphism. Built for high-density data scanning, not casual consumption.
+// ── COLORS — The Manila Desk ─────────────────────────────────────────
+// Warm near-black surfaces, fox-orange signature accent, muted editorial
+// greens/reds for market semantics. Zero gradients, zero glassmorphism.
 export const colors = {
-  // Brand — professional teal/steel blue (institutional fintech)
-  primary:        '#0891B2',    // Teal accent for CTAs
-  primaryPressed: '#0E7490',
-  onPrimary:      '#F0F2F5',
+  // Brand — fox-orange signature ink (matches the wordmark)
+  primary:        '#FF6B4A',    // Fox-orange accent for CTAs
+  primaryPressed: '#D9522F',
+  onPrimary:      '#14100D',
 
-  // Text hierarchy — clean institutional whites and grays
-  ink:            '#F0F2F5',    // Primary headlines / body (off-white)
-  body:           '#9CA3AF',    // Default paragraph / secondary,
-  charcoal:       '#D1D5DB',    // Stronger body emphasis,
-  mute:           '#6B7280',    // Metadata, secondary captions,
-  ash:            '#4B5563',    // Disabled text, lowest emphasis,
-  stone:          '#374151',    // Least-emphasis caption / disabled icon,
-  onDark:         '#F0F2F5',    // Interactive-state primary text,
-  onDarkMute:     'rgba(240,242,245,0.62)',
+  // Text hierarchy — warm off-whites and stone grays
+  ink:            '#F3F0EA',    // Primary headlines / body (warm off-white)
+  body:           '#A6A099',    // Default paragraph / secondary,
+  charcoal:       '#D8D3CC',    // Stronger body emphasis,
+  mute:           '#7A7570',    // Metadata, secondary captions,
+  ash:            '#524E4A',    // Disabled text, lowest emphasis,
+  stone:          '#3A3733',    // Least-emphasis caption / disabled icon,
+  onDark:         '#F3F0EA',    // Interactive-state primary text,
+  onDarkMute:     'rgba(243,240,234,0.62)',
 
-  // Surface ladder — deep institutional navy (perfect for trading terminals)
-  canvas:           '#0F1419', // Page background (deep slate-navy)
-  surface:          '#151B27', // Card / elevated panel,
-  surfaceElevated:  '#1A2332', // Hover states, lifted interiors,
-  surfaceCard:      '#1E2736', // Active/pressed cards, tile fills,
-  buttonFg:         '#242D39', // Rare deep surface variant
+  // Surface ladder — warm near-black (editorial research desk)
+  canvas:           '#0B0B0C', // Page background (warm near-black)
+  surface:          '#141414', // Card / elevated panel,
+  surfaceElevated:  '#1B1A19', // Hover states, lifted interiors,
+  surfaceCard:      '#201F1D', // Active/pressed cards, tile fills,
+  buttonFg:         '#26241F', // Rare deep surface variant
 
   // Glass — minimal use (only modals/overlays)
-  glassBg:          'rgba(15, 20, 25, 0.92)',
-  glassBgStrong:    'rgba(21, 27, 39, 0.96)',
+  glassBg:          'rgba(11, 11, 12, 0.92)',
+  glassBgStrong:    'rgba(15, 14, 13, 0.96)',
   glassBorder:      'rgba(255, 255, 255, 0.08)',
   glassBorderTop:   'rgba(255, 255, 255, 0.12)',
   glassBlur:        'blur(8px)',  // Minimal blur for fintech
@@ -46,62 +44,62 @@ export const colors = {
   backdropClear:       'rgba(0,0,0,0)',
   backdropModal:       'rgba(0,0,0,0.5)',
   backdropHeavy:       'rgba(0,0,0,0.7)',
-  backdropGlassmorphic:'rgba(15,20,25,0.85)',
-  backdropFooter:      'rgba(15,20,25,0.90)',
+  backdropGlassmorphic:'rgba(11,11,12,0.85)',
+  backdropFooter:      'rgba(11,11,12,0.90)',
   backdropMuted:       'rgba(255,255,255,0.03)',
 
-  // Borders — thin institutional hairlines
-  hairline:       '#2D3748',
-  hairlineSoft:   'rgba(255,255,255,0.05)',
-  hairlineStrong: 'rgba(255,255,255,0.12)',
+  // Borders — thin warm hairlines
+  hairline:       '#2A2826',
+  hairlineSoft:   'rgba(255,255,255,0.06)',
+  hairlineStrong: 'rgba(255,255,255,0.14)',
 
-  // Brand accent — professional teal (finance standard)
-  accentRed:        '#0891B2',  // Primary accent (teal)
-  accentRedSoft:    'rgba(8,145,178,0.12)',
-  accentRedStrong:  'rgba(8,145,178,0.24)',
-  accentBlue:       '#0891B2',
-  accentBlueSoft:   'rgba(8,145,178,0.12)',
-  accentYellow:     '#F59E0B',  // Warning (amber)
-  accentYellowSoft: 'rgba(245,158,11,0.14)',
+  // Brand accent — fox-orange
+  accentRed:        '#FF6B4A',  // Primary accent (fox-orange)
+  accentRedSoft:    'rgba(255,107,74,0.12)',
+  accentRedStrong:  'rgba(255,107,74,0.26)',
+  accentBlue:       '#FF6B4A',
+  accentBlueSoft:   'rgba(255,107,74,0.12)',
+  accentYellow:     '#E0A339',  // Warning (amber)
+  accentYellowSoft: 'rgba(224,163,57,0.14)',
 
-  // Market semantic colors — sharp, institutional greens/reds for instant legibility
-  marketGreen:       '#10B981', // Bullish (positive) - emerald green
-  marketGreenSoft:   'rgba(16,185,129,0.14)',
-  marketRed:         '#EF4444', // Bearish (negative) - clean red
-  marketRedSoft:     'rgba(239,68,68,0.14)',
-  marketOrange:      '#F59E0B', // Neutral, caution - amber
-  marketOrangeSoft:  'rgba(245,158,11,0.14)',
+  // Market semantic colors — muted, editorial (not neon)
+  marketGreen:       '#3FB67A', // Bullish (positive)
+  marketGreenSoft:   'rgba(63,182,122,0.14)',
+  marketRed:         '#E15B4F', // Bearish (negative)
+  marketRedSoft:     'rgba(225,91,79,0.14)',
+  marketOrange:      '#E0A339', // Neutral, caution - amber
+  marketOrangeSoft:  'rgba(224,163,57,0.14)',
 
-  accentGreen:       '#10B981',
-  accentGreenSoft:   'rgba(16,185,129,0.14)',
+  accentGreen:       '#3FB67A',
+  accentGreenSoft:   'rgba(63,182,122,0.14)',
 
-  // PSE sector taxonomy colors
-  sectorFinancials:  '#1E5FAD',
-  sectorIndustrial:  '#1A7A5A',
-  sectorHoldingFirms:'#5B3EA6',
-  sectorProperty:    '#B03A3A',
-  sectorServices:    '#0A7A9A',
-  sectorMiningAndOil:'#8A6020',
+  // PSE sector taxonomy colors — warm-palette family, still distinguishable
+  sectorFinancials:  '#C98A4B',
+  sectorIndustrial:  '#3FB67A',
+  sectorHoldingFirms:'#B08AD4',
+  sectorProperty:    '#E15B4F',
+  sectorServices:    '#5FA8D3',
+  sectorMiningAndOil:'#E0A339',
 
   // Legacy gradient anchors
-  heroStripeStart: '#E4A853',
-  heroStripeEnd:   '#C88A3A',
-  keyBgStart:      '#161B23',
-  keyBgEnd:        '#0B0E12',
+  heroStripeStart: '#FF8A6B',
+  heroStripeEnd:   '#D9522F',
+  keyBgStart:      '#1B1A19',
+  keyBgEnd:        '#0B0B0C',
 
   // Semantic aliases
-  success:         '#2BB673',
-  danger:          '#E8504E',
-  warning:         '#F0A63C',
-  page:            '#0B0E12',
-  card:            '#12161C',
-  textPrimary:     '#EDF0F3',
-  textSecondary:   '#AAB3BD',
-  textTertiary:    '#7B8591',
-  border:          '#1F262F',
-  separator:       '#1F262F',
-  fill:            '#181D25',
-  bgSecondary:     '#181D25',
+  success:         '#3FB67A',
+  danger:          '#E15B4F',
+  warning:         '#E0A339',
+  page:            '#0B0B0C',
+  card:            '#141414',
+  textPrimary:     '#F3F0EA',
+  textSecondary:   '#A6A099',
+  textTertiary:    '#7A7570',
+  border:          '#2A2826',
+  separator:       '#2A2826',
+  fill:            '#171615',
+  bgSecondary:     '#171615',
 } as const;
 
 // ── TYPOGRAPHY ─────────────────────────────────────────────────────────

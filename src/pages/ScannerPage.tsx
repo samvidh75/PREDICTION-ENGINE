@@ -44,12 +44,12 @@ function fmtVol(n: number) {
 }
 
 const SECTOR_COLORS: Record<string, string> = {
-  "Financials": "#1E5FAD",
-  "Industrial": "#1A7A5A",
-  "Holding Firms": "#5B3EA6",
-  "Property": "#8A3A3A",
-  "Services": "#0A7A9A",
-  "Mining & Oil": "#8A6020",
+  "Financials": "#C98A4B",
+  "Industrial": "#3FB67A",
+  "Holding Firms": "#B08AD4",
+  "Property": "#E15B4F",
+  "Services": "#5FA8D3",
+  "Mining & Oil": "#E0A339",
 };
 
 export default function ScannerPage() {
@@ -124,13 +124,16 @@ export default function ScannerPage() {
   const losses = quotes.filter((q) => q.changePercent < 0).length;
 
   return (
-    <div style={{ display: "grid", gap: 20 }}>
+    <div style={{ display: "grid", gap: 20, padding: "28px clamp(16px, 4vw, 40px) 40px", maxWidth: 1280, margin: "0 auto" }}>
 
       {/* ── Header ── */}
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
         <div>
-          <h1 style={{ fontSize: 20, fontWeight: 700, color: "var(--text-primary)", margin: "0 0 4px", letterSpacing: "-0.01em" }}>
-            PSE Market Scanner
+          <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.10em", textTransform: "uppercase", color: "var(--accent)" }}>
+            Screening desk
+          </span>
+          <h1 style={{ fontFamily: "var(--font-display)", fontStyle: "italic", fontWeight: 500, fontSize: 28, color: "var(--text-primary)", margin: "4px 0 4px", letterSpacing: "-0.01em" }}>
+            PSE market scanner
           </h1>
           <p style={{ fontSize: 12.5, color: "var(--text-secondary)", margin: 0 }}>
             {loading ? "Loading…" : error ? "Feed unavailable" : `${reportingRatio ?? "—"} reporting · ${marketStatus.isOpen ? "Market open" : "Market closed"}`}

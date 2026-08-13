@@ -1,6 +1,6 @@
 import {
-  Activity, Compass, Search, TrendingDown, TrendingUp, Eye,
-  BarChart2, Bell, BookOpen, Zap,
+  Compass, Search, TrendingDown, TrendingUp, Eye,
+  BarChart2, Bell, BookOpen, Zap, ArrowUpRight,
 } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
@@ -21,15 +21,24 @@ function liveClock(): string {
   });
 }
 
+function timeOfDayGreeting(): string {
+  const h = new Date().toLocaleString("en-US", { timeZone: "Asia/Manila", hour: "numeric", hour12: false });
+  const hour = parseInt(h, 10);
+  if (hour < 5) return "Good evening";
+  if (hour < 12) return "Good morning";
+  if (hour < 18) return "Good afternoon";
+  return "Good evening";
+}
+
 const QUICK_LINKS = [
-  { icon: TrendingUp,  label: "Top Gainers",   route: "/scanner?mode=gainers", color: "#10B981" },
-  { icon: TrendingDown, label: "Top Losers",   route: "/scanner?mode=losers",  color: "#EF4444" },
-  { icon: Activity,    label: "Most Active",   route: "/scanner?mode=active",  color: "#0891B2" },
-  { icon: Compass,     label: "Sectors",       route: "/sectors",              color: "#0891B2" },
-  { icon: BarChart2,   label: "Portfolio",     route: "/portfolio",            color: "#0891B2" },
-  { icon: Bell,        label: "Alerts",        route: "/alerts",               color: "#EF4444" },
-  { icon: BookOpen,    label: "AI Research",   route: "/chat",                 color: "#0891B2" },
-  { icon: Zap,         label: "Full Scanner",  route: "/scanner?mode=all",     color: "#10B981" },
+  { icon: TrendingUp,   label: "Top gainers",  route: "/scanner?mode=gainers", tint: "var(--market-green)" },
+  { icon: TrendingDown, label: "Top losers",   route: "/scanner?mode=losers",  tint: "var(--market-red)" },
+  { icon: Zap,          label: "Most active",  route: "/scanner?mode=active",  tint: "var(--accent)" },
+  { icon: Compass,      label: "Sectors",      route: "/sectors",              tint: "var(--accent)" },
+  { icon: BarChart2,    label: "Portfolio",    route: "/portfolio",            tint: "var(--accent)" },
+  { icon: Bell,         label: "Alerts",       route: "/alerts",               tint: "var(--market-red)" },
+  { icon: BookOpen,     label: "AI research",  route: "/chat",                 tint: "var(--accent)" },
+  { icon: Search,       label: "Full scanner", route: "/scanner?mode=all",     tint: "var(--market-green)" },
 ];
 
 export default function HomePage() {
@@ -96,53 +105,46 @@ export default function HomePage() {
   }
 
   return (
-    <div style={{ display: "grid", gap: 8, padding: "12px 16px" }}>
+    <div style={{ display: "grid", gap: 28, padding: "32px clamp(16px, 4vw, 40px) 40px", maxWidth: 1280, margin: "0 auto" }}>
 
-      {/* ── TRADING TERMINAL HEADER ── */}
-      <div style={{
-        display: "flex", alignItems: "center", justifyContent: "space-between",
-        padding: "8px 12px", minHeight: 32,
-        background: "#0F1419",
-        border: "1px solid rgba(139, 204, 206, 0.15)",
-        borderRadius: 2,
-      }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <span style={{
-            display: "inline-block", width: 6, height: 6, borderRadius: "50%",
-            background: marketStatus.isOpen ? "#10B981" : "#64748B",
-          }} />
-          <span style={{
-            fontSize: 11, fontWeight: 600, color: marketStatus.isOpen ? "#10B981" : "#9CA3AF",
-            fontFamily: '"SF Mono", "JetBrains Mono", "Roboto Mono", monospace',
-          }}>
-            {marketStatus.label}
+      {/* ── Masthead row: editorial greeting + live session clock ── */}
+      <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
+        <div style={{ display: "grid", gap: 6 }}>
+          <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.10em", textTransform: "uppercase", color: "var(--accent)" }}>
+            {marketStatus.label} · PSE
           </span>
-          <span style={{
-            fontSize: 11, color: "#9CA3AF",
-            fontFamily: '"SF Mono", "JetBrains Mono", "Roboto Mono", monospace',
-          }}>
-            PSE
+          <h1
+            style={{
+              fontFamily: "var(--font-display)", fontStyle: "italic", fontWeight: 500,
+              fontSize: "clamp(28px, 4vw, 38px)", letterSpacing: "-0.015em",
+              color: "var(--text-primary)", margin: 0, lineHeight: 1.1,
+            }}
+          >
+            {timeOfDayGreeting()}. Here's the tape.
+          </h1>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <span
+            aria-hidden="true"
+            style={{ width: 6, height: 6, borderRadius: "50%", background: marketStatus.isOpen ? "var(--market-green)" : "var(--text-muted)" }}
+          />
+          <span style={{ fontFamily: "var(--font-mono)", fontSize: 13, color: "var(--text-body)", letterSpacing: "0.04em" }}>
+            {clock} PHT
           </span>
         </div>
-        <span style={{
-          fontFamily: '"SF Mono", "JetBrains Mono", "Roboto Mono", monospace',
-          fontSize: 11, color: "#9CA3AF", letterSpacing: "0.05em",
-        }}>
-          {clock}
-        </span>
       </div>
 
-      {/* ── TICKER SEARCH BAR ── */}
-      <div style={{ display: "flex", gap: 6 }}>
+      {/* ── Ticker search ── */}
+      <div style={{ display: "flex", gap: 8 }}>
         <div style={{ position: "relative", flex: 1 }}>
-          <Search size={13} style={{
-            position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)",
-            color: "#9CA3AF", pointerEvents: "none",
+          <Search size={15} style={{
+            position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)",
+            color: "var(--text-secondary)", pointerEvents: "none",
           }} />
           <input
             ref={searchRef}
             aria-label="Search a PSE stock"
-            placeholder="BDO, JFC, SMPH…"
+            placeholder="Search BDO, JFC, SMPH…"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={(e) => {
@@ -150,28 +152,29 @@ export default function HomePage() {
               if (e.key === "Escape") { setQuery(""); setSearchResults([]); }
             }}
             style={{
-              width: "100%", height: 36, boxSizing: "border-box",
-              border: "1px solid rgba(139, 204, 206, 0.2)", background: "#151B27",
-              borderRadius: 2, padding: "0 36px 0 32px",
-              fontSize: 12, color: "#E8EAED", outline: "none",
-              fontFamily: '"SF Mono", "JetBrains Mono", "Roboto Mono", monospace',
-              transition: "border-color 120ms ease",
+              width: "100%", height: 44, boxSizing: "border-box",
+              border: "1px solid var(--border)", background: "var(--bg-card)",
+              borderRadius: 8, padding: "0 44px 0 40px",
+              fontSize: 14, color: "var(--text-primary)", outline: "none",
+              fontFamily: "var(--font-sans)",
+              transition: "border-color 160ms ease",
             }}
-            onFocus={(e) => { e.currentTarget.style.borderColor = "rgba(8, 145, 178, 0.4)"; }}
-            onBlur={(e) => { e.currentTarget.style.borderColor = "rgba(139, 204, 206, 0.2)"; }}
+            onFocus={(e) => { e.currentTarget.style.borderColor = "var(--accent)"; }}
+            onBlur={(e) => { e.currentTarget.style.borderColor = "var(--border)"; }}
           />
           <kbd style={{
-            position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)",
-            padding: "1px 4px", border: "1px solid rgba(139, 204, 206, 0.15)", borderRadius: 1,
-            color: "#9CA3AF", fontSize: 9, fontFamily: '"SF Mono", "JetBrains Mono", "Roboto Mono", monospace',
+            position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)",
+            padding: "2px 6px", border: "1px solid var(--border)", borderRadius: 4,
+            color: "var(--text-secondary)", fontSize: 10, fontFamily: "var(--font-mono)",
             background: "transparent",
           }}>⌘K</kbd>
 
           {searchResults.length > 0 && (
             <div style={{
-              position: "absolute", top: "calc(100% + 2px)", left: 0, right: 0, zIndex: 30,
-              border: "1px solid rgba(139, 204, 206, 0.2)", borderRadius: 2,
-              background: "#151B27", overflow: "hidden",
+              position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, zIndex: 30,
+              border: "1px solid var(--border)", borderRadius: 8,
+              background: "var(--bg-card)", overflow: "hidden",
+              boxShadow: "var(--shadow-raised)",
             }}>
               {searchResults.map((r) => (
                 <button
@@ -179,20 +182,17 @@ export default function HomePage() {
                   onClick={() => navigate(`/stock/${r.symbol}`)}
                   style={{
                     display: "flex", justifyContent: "space-between", alignItems: "center",
-                    width: "100%", padding: "7px 10px", background: "transparent", border: "none",
-                    borderBottom: "1px solid rgba(139, 204, 206, 0.1)", cursor: "pointer", textAlign: "left",
-                    transition: "background 80ms ease",
+                    width: "100%", padding: "10px 14px", background: "transparent", border: "none",
+                    borderBottom: "1px solid var(--border-soft)", cursor: "pointer", textAlign: "left",
+                    transition: "background 100ms ease",
                   }}
-                  onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(8, 145, 178, 0.1)")}
+                  onMouseEnter={(e) => (e.currentTarget.style.background = "var(--bg-card-hover)")}
                   onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
                 >
-                  <span style={{
-                    fontFamily: '"SF Mono", "JetBrains Mono", "Roboto Mono", monospace',
-                    fontWeight: 700, fontSize: 11, color: "#E8EAED",
-                  }}>
+                  <span style={{ fontFamily: "var(--font-mono)", fontWeight: 700, fontSize: 13, color: "var(--text-primary)" }}>
                     {r.symbol}
                   </span>
-                  <span style={{ color: "#9CA3AF", fontSize: 11 }}>{r.name}</span>
+                  <span style={{ color: "var(--text-secondary)", fontSize: 12.5 }}>{r.name}</span>
                 </button>
               ))}
             </div>
@@ -201,83 +201,79 @@ export default function HomePage() {
         <button
           onClick={() => { const t = resolveTarget(); if (t) navigate(`/stock/${t}`); }}
           style={{
-            padding: "0 14px", height: 36, borderRadius: 2,
-            background: "#0891B2", color: "#F0F2F5", border: "1px solid #0891B2",
-            fontSize: 11, fontWeight: 600, cursor: "pointer",
-            display: "flex", alignItems: "center", gap: 4,
-            transition: "background 120ms ease, border-color 120ms ease",
-            fontFamily: '"SF Mono", "JetBrains Mono", "Roboto Mono", monospace',
+            padding: "0 18px", height: 44, borderRadius: 8,
+            background: "var(--brand)", color: "var(--brand-ink)", border: "1px solid var(--brand)",
+            fontSize: 13.5, fontWeight: 600, cursor: "pointer",
+            display: "flex", alignItems: "center", gap: 6,
+            transition: "background 140ms ease",
+            fontFamily: "var(--font-sans)",
           }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = "#0D7E8F";
-            e.currentTarget.style.borderColor = "#0D7E8F";
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = "#0891B2";
-            e.currentTarget.style.borderColor = "#0891B2";
-          }}
+          onMouseEnter={(e) => { e.currentTarget.style.background = "var(--brand-light)"; }}
+          onMouseLeave={(e) => { e.currentTarget.style.background = "var(--brand)"; }}
         >
-          <Eye size={12} /> View
+          <Eye size={14} /> View
         </button>
       </div>
 
-      {/* ── QUICK ACCESS TOOLBAR ── */}
-      <div style={{
-        display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(88px, 1fr))", gap: 4,
-      }}>
+      {/* ── Quick access ── */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: 8 }}>
         {QUICK_LINKS.map((l) => (
           <button
             key={l.label}
             onClick={() => navigate(l.route)}
             style={{
-              display: "flex", alignItems: "center", gap: 6,
-              padding: "6px 10px",
-              background: "#151B27", border: "1px solid rgba(139, 204, 206, 0.15)",
-              borderRadius: 2, cursor: "pointer", textAlign: "left",
-              transition: "border-color 120ms ease, background 120ms ease",
-              minHeight: 32,
+              display: "flex", alignItems: "center", gap: 10,
+              padding: "12px 14px",
+              background: "var(--bg-card)", border: "1px solid var(--border)",
+              borderRadius: 8, cursor: "pointer", textAlign: "left",
+              transition: "border-color 160ms ease, background 160ms ease",
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = `${l.color}40`;
-              e.currentTarget.style.background = `${l.color}08`;
+              e.currentTarget.style.borderColor = l.tint;
+              e.currentTarget.style.background = "var(--bg-card-hover)";
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = "rgba(139, 204, 206, 0.15)";
-              e.currentTarget.style.background = "#151B27";
+              e.currentTarget.style.borderColor = "var(--border)";
+              e.currentTarget.style.background = "var(--bg-card)";
             }}
           >
-            <l.icon size={11} style={{ color: l.color, flexShrink: 0 }} strokeWidth={2.5} />
+            <l.icon size={15} style={{ color: l.tint, flexShrink: 0 }} strokeWidth={2} />
             <span style={{
-              fontSize: 10, fontWeight: 600, color: "#E8EAED", lineHeight: 1.2,
-              fontFamily: '"Plus Jakarta Sans", "SF Pro Display", sans-serif',
+              fontSize: 13, fontWeight: 500, color: "var(--text-primary)", lineHeight: 1.2,
               overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
             }}>
               {l.label}
             </span>
+            <ArrowUpRight size={12} style={{ color: "var(--text-muted)", marginLeft: "auto", flexShrink: 0 }} />
           </button>
         ))}
       </div>
 
-      {/* ── MARKET PULSE WIDGET ── */}
+      {/* ── Market pulse ── */}
       <MarketPulse />
 
-      {/* ── TWO COLUMN: Foreign Flow + Sectors ── */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+      {/* ── Two column: Foreign flow + Sectors ── */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }} className="stockex-two-col">
         <ForeignFlowWidget />
         <SectorHeatmap />
       </div>
 
-      {/* ── FOOTER: Data Sources ── */}
+      <style>{`
+        @media (max-width: 860px) {
+          .stockex-two-col { grid-template-columns: 1fr !important; }
+        }
+      `}</style>
+
+      {/* ── Footer: sources ── */}
       <div style={{
-        fontSize: 10, color: "#9CA3AF", display: "flex", gap: 12, flexWrap: "wrap",
-        padding: "4px 0", borderTop: "1px solid rgba(139, 204, 206, 0.1)",
-        marginTop: 4, paddingTop: 8,
-        fontFamily: '"SF Mono", "JetBrains Mono", "Roboto Mono", monospace',
+        fontSize: 12, color: "var(--text-secondary)", display: "flex", gap: 14, flexWrap: "wrap",
+        padding: "16px 0 0", borderTop: "1px solid var(--border)",
+        fontFamily: "var(--font-mono)",
       }}>
         <span>PHISIX · PSE Edge</span>
         <Link to="/trust" style={{
-          color: "#0891B2", textDecoration: "none",
-          borderBottom: "1px solid rgba(8, 145, 178, 0.3)",
+          color: "var(--accent)", textDecoration: "none",
+          borderBottom: "1px solid var(--accent-soft)",
         }}>
           Data sources
         </Link>

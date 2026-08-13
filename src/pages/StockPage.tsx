@@ -32,15 +32,15 @@ import { compressEventEvidencePack } from "../systems/market-brain/eventEvidence
 import type { EvidenceRetrievalAggregate } from "../research/contracts/evidenceRetrievalContracts";
 import { PriceSkeleton, ChartSkeleton, MetricsSkeleton } from "../components/SkeletonLoader";
 
-// ── Professional Trading Terminal Palette ──
+// ── The Manila Desk palette ──
 const TERMINAL_COLORS = {
-  canvas: "#0F1419",
-  panel: "#151B27",
-  accent: "#0891B2",
-  gainGreen: "#10B981",
-  lossRed: "#EF4444",
-  monoText: "#E8EAED",
-  secondaryText: "#9CA3AF",
+  canvas: "#0B0B0C",
+  panel: "#141414",
+  accent: "#FF6B4A",
+  gainGreen: "#3FB67A",
+  lossRed: "#E15B4F",
+  monoText: "#F3F0EA",
+  secondaryText: "#A6A099",
 };
 
 // ── Motion presets (minimal) ──
@@ -524,7 +524,7 @@ function StockError({ symbol, onRetry }: { symbol: string; onRetry?: () => void 
         alignItems: "center",
         justifyContent: "center",
       }}>
-        <AlertCircle size={20} color="#EF4444" />
+        <AlertCircle size={20} color={TERMINAL_COLORS.lossRed} />
       </div>
       <div style={{ color: TERMINAL_COLORS.monoText, fontSize: "13px", fontWeight: 600 }}>
         Failed to load {symbol}
