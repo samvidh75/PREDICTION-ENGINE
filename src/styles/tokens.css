@@ -1,60 +1,60 @@
 /* ============================================================================
-   DESIGN TOKENS — SIGNATURE PREMIUM DARK
-   Warm charcoal canvas, champagne-gold accent, conventional market greens/reds.
-   Hand-crafted institutional identity — not the default cool-navy AI template.
+   DESIGN TOKENS — PROFESSIONAL FINANCIAL TRADING TERMINAL
+   Deep institutional navy/slate background, sharp market greens/reds,
+   professional teal accent. Zero gradients, zero glassmorphism.
    ============================================================================ */
 
 :root {
-  /* ── Surface ladder — warm charcoal elevation steps ────────────────── */
-  --bg-page:        #0B0E12;
-  --bg-card:        #12161C;
-  --bg-card-hover:  #181D25;
-  --bg-chip:        #161B23;
-  --bg-sheet:       #0C1015;
-  --bg-paper-deep:  #1E242D;
-  --bg-elevated:    #1A2029;
+  /* ── Surface ladder — deep institutional navy (fintech standard) ────── */
+  --bg-page:        #0F1419;
+  --bg-card:        #151B27;
+  --bg-card-hover:  #1A2332;
+  --bg-chip:        #161D2A;
+  --bg-sheet:       #0F1419;
+  --bg-paper-deep:  #1E2736;
+  --bg-elevated:    #1A2332;
 
-  /* ── Brand / CTA — champagne-gold ─────────────────────────────────── */
-  --brand:          #E4A853;
-  --brand-light:    #EEC07C;
-  --brand-dark:     #D39438;
-  --brand-ink:      #19130B;
+  /* ── Brand / CTA — professional teal ──────────────────────────────── */
+  --brand:          #0891B2;
+  --brand-light:    #14B8A6;
+  --brand-dark:     #0E7490;
+  --brand-ink:      #F0F2F5;
 
-  /* ── Market semantic colors ────────────────────────────────────────── */
-  --market-green:        #2BB673;
-  --market-green-light:  rgba(43,182,115,0.15);
-  --market-red:          #E8504E;
-  --market-red-light:    rgba(232,80,78,0.15);
-  --market-orange:       #F0A63C;
-  --market-orange-light: rgba(240,166,60,0.16);
+  /* ── Market semantic colors — sharp institutional greens/reds ──────── */
+  --market-green:        #10B981;
+  --market-green-light:  rgba(16,185,129,0.14);
+  --market-red:          #EF4444;
+  --market-red-light:    rgba(239,68,68,0.14);
+  --market-orange:       #F59E0B;
+  --market-orange-light: rgba(245,158,11,0.14);
 
   /* ── UI semantic ───────────────────────────────────────────────────── */
-  --green:          #2BB673;
-  --green-light:    rgba(43,182,115,0.15);
-  --red:            #E8504E;
-  --red-light:      rgba(232,80,78,0.15);
-  --amber:          #F0A63C;
-  --amber-light:    rgba(240,166,60,0.16);
+  --green:          #10B981;
+  --green-light:    rgba(16,185,129,0.14);
+  --red:            #EF4444;
+  --red-light:      rgba(239,68,68,0.14);
+  --amber:          #F59E0B;
+  --amber-light:    rgba(245,158,11,0.14);
 
-  /* ── Signature accent — champagne-gold ─────────────────────────────── */
-  --accent:         #E4A853;
-  --accent-soft:    rgba(228,168,83,0.13);
-  --accent-strong:  rgba(228,168,83,0.26);
-  --accent-ink:     #19130B;
+  /* ── Signature accent — professional teal ──────────────────────────── */
+  --accent:         #0891B2;
+  --accent-soft:    rgba(8,145,178,0.12);
+  --accent-strong:  rgba(8,145,178,0.24);
+  --accent-ink:     #F0F2F5;
 
-  /* ── Text hierarchy ────────────────────────────────────────────────── */
-  --text-primary:   #EDF0F3;
-  --text-body:      #AAB3BD;
-  --text-secondary: #7B8591;
-  --text-muted:     #535D68;
-  --text-inverse:   #0B0E12;
-  --text-rule:      #1F262F;
+  /* ── Text hierarchy — clean institutional whites and grays ─────────── */
+  --text-primary:   #F0F2F5;
+  --text-body:      #9CA3AF;
+  --text-secondary: #6B7280;
+  --text-muted:     #4B5563;
+  --text-inverse:   #0F1419;
+  --text-rule:      #2D3748;
 
-  /* ── Borders ───────────────────────────────────────────────────────── */
-  --border:         #1F262F;
-  --border-strong:  rgba(255,255,255,0.16);
-  --border-soft:    rgba(255,255,255,0.07);
-  --border-focus:   #E4A853;
+  /* ── Borders — thin institutional hairlines ─────────────────────────── */
+  --border:         #2D3748;
+  --border-strong:  rgba(255,255,255,0.12);
+  --border-soft:    rgba(255,255,255,0.05);
+  --border-focus:   #0891B2;
 
   /* ── Typography — Inter for body, mono for data ────────────────────── */
   --font-sans:      -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Segoe UI", Roboto, sans-serif;

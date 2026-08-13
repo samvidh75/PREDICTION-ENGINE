@@ -8,72 +8,72 @@
 // keeps compiling and re-themes automatically.
 // ============================================================================
 
-// ── COLORS — Signature premium dark: warm charcoal + champagne-gold ───────
-// A deliberately hand-crafted institutional identity. Warm near-black surfaces
-// (not the generic cool-navy AI template), a distinctive gold accent, and
-// market semantic greens/reds that stay conventional for instant legibility.
+// ── COLORS — Professional Financial Trading Terminal ───────────────
+// Deep institutional navy/slate background, clean white text, sharp greens/reds
+// for market semantics, and professional teal accent. Zero gradients, zero
+// glassmorphism. Built for high-density data scanning, not casual consumption.
 export const colors = {
-  // Brand — champagne-gold CTA (distinctive, not the default AI blue)
-  primary:        '#E4A853',
-  primaryPressed: '#D39438',
-  onPrimary:      '#19130B',
+  // Brand — professional teal/steel blue (institutional fintech)
+  primary:        '#0891B2',    // Teal accent for CTAs
+  primaryPressed: '#0E7490',
+  onPrimary:      '#F0F2F5',
 
-  // Text hierarchy on warm charcoal (slightly warm whites, not blue-tinted)
-  ink:            '#EDF0F3',   // Primary headlines / body,
-  body:           '#AAB3BD',   // Default paragraph / inline-link,
-  charcoal:       '#CBD2DA',   // Stronger body emphasis,
-  mute:           '#7B8591',   // Metadata, secondary captions,
-  ash:            '#535D68',   // Disabled text, lowest emphasis,
-  stone:          '#3A434D',   // Least-emphasis caption / disabled icon,
-  onDark:         '#EDF0F3',   // Interactive-state primary text,
-  onDarkMute:     'rgba(237,240,243,0.62)',
+  // Text hierarchy — clean institutional whites and grays
+  ink:            '#F0F2F5',    // Primary headlines / body (off-white)
+  body:           '#9CA3AF',    // Default paragraph / secondary,
+  charcoal:       '#D1D5DB',    // Stronger body emphasis,
+  mute:           '#6B7280',    // Metadata, secondary captions,
+  ash:            '#4B5563',    // Disabled text, lowest emphasis,
+  stone:          '#374151',    // Least-emphasis caption / disabled icon,
+  onDark:         '#F0F2F5',    // Interactive-state primary text,
+  onDarkMute:     'rgba(240,242,245,0.62)',
 
-  // Surface ladder — warm charcoal elevation steps (no blue tint)
-  canvas:           '#0B0E12', // Page background,
-  surface:          '#12161C', // Card / elevated panel,
-  surfaceElevated:  '#181D25', // Hover states, lifted interiors,
-  surfaceCard:      '#1E242D', // Active/pressed cards, tile fills,
-  buttonFg:         '#242B34', // Rare deep surface variant
+  // Surface ladder — deep institutional navy (perfect for trading terminals)
+  canvas:           '#0F1419', // Page background (deep slate-navy)
+  surface:          '#151B27', // Card / elevated panel,
+  surfaceElevated:  '#1A2332', // Hover states, lifted interiors,
+  surfaceCard:      '#1E2736', // Active/pressed cards, tile fills,
+  buttonFg:         '#242D39', // Rare deep surface variant
 
-  // Glass — only for modals/overlays
-  glassBg:          'rgba(13, 16, 21, 0.92)',
-  glassBgStrong:    'rgba(17, 21, 27, 0.96)',
-  glassBorder:      'rgba(255, 255, 255, 0.10)',
-  glassBorderTop:   'rgba(255, 255, 255, 0.15)',
-  glassBlur:        'blur(16px) saturate(140%)',
+  // Glass — minimal use (only modals/overlays)
+  glassBg:          'rgba(15, 20, 25, 0.92)',
+  glassBgStrong:    'rgba(21, 27, 39, 0.96)',
+  glassBorder:      'rgba(255, 255, 255, 0.08)',
+  glassBorderTop:   'rgba(255, 255, 255, 0.12)',
+  glassBlur:        'blur(8px)',  // Minimal blur for fintech
 
   // Backdrop / overlay tokens
   backdropClear:       'rgba(0,0,0,0)',
-  backdropModal:       'rgba(0,0,0,0.6)',
-  backdropHeavy:       'rgba(0,0,0,0.75)',
-  backdropGlassmorphic:'rgba(11,14,18,0.90)',
-  backdropFooter:      'rgba(11,14,18,0.95)',
-  backdropMuted:       'rgba(255,255,255,0.04)',
+  backdropModal:       'rgba(0,0,0,0.5)',
+  backdropHeavy:       'rgba(0,0,0,0.7)',
+  backdropGlassmorphic:'rgba(15,20,25,0.85)',
+  backdropFooter:      'rgba(15,20,25,0.90)',
+  backdropMuted:       'rgba(255,255,255,0.03)',
 
-  // Borders — charcoal hairline
-  hairline:       '#1F262F',
-  hairlineSoft:   'rgba(255,255,255,0.07)',
-  hairlineStrong: 'rgba(255,255,255,0.16)',
+  // Borders — thin institutional hairlines
+  hairline:       '#2D3748',
+  hairlineSoft:   'rgba(255,255,255,0.05)',
+  hairlineStrong: 'rgba(255,255,255,0.12)',
 
-  // Brand accent — champagne-gold
-  accentRed:        '#E4A853',
-  accentRedSoft:    'rgba(228,168,83,0.13)',
-  accentRedStrong:  'rgba(228,168,83,0.26)',
-  accentBlue:       '#E4A853',
-  accentBlueSoft:   'rgba(228,168,83,0.13)',
-  accentYellow:     '#F0B45E',
-  accentYellowSoft: 'rgba(240,180,94,0.16)',
+  // Brand accent — professional teal (finance standard)
+  accentRed:        '#0891B2',  // Primary accent (teal)
+  accentRedSoft:    'rgba(8,145,178,0.12)',
+  accentRedStrong:  'rgba(8,145,178,0.24)',
+  accentBlue:       '#0891B2',
+  accentBlueSoft:   'rgba(8,145,178,0.12)',
+  accentYellow:     '#F59E0B',  // Warning (amber)
+  accentYellowSoft: 'rgba(245,158,11,0.14)',
 
-  // Market semantic colors — conventional green/red for instant legibility
-  marketGreen:       '#2BB673', // Bullish (positive),
-  marketGreenSoft:   'rgba(43,182,115,0.15)',
-  marketRed:         '#E8504E', // Bearish (negative),
-  marketRedSoft:     'rgba(232,80,78,0.15)',
-  marketOrange:      '#F0A63C', // Neutral, caution,
-  marketOrangeSoft:  'rgba(240,166,60,0.16)',
+  // Market semantic colors — sharp, institutional greens/reds for instant legibility
+  marketGreen:       '#10B981', // Bullish (positive) - emerald green
+  marketGreenSoft:   'rgba(16,185,129,0.14)',
+  marketRed:         '#EF4444', // Bearish (negative) - clean red
+  marketRedSoft:     'rgba(239,68,68,0.14)',
+  marketOrange:      '#F59E0B', // Neutral, caution - amber
+  marketOrangeSoft:  'rgba(245,158,11,0.14)',
 
-  accentGreen:       '#2BB673',
-  accentGreenSoft:   'rgba(43,182,115,0.15)',
+  accentGreen:       '#10B981',
+  accentGreenSoft:   'rgba(16,185,129,0.14)',
 
   // PSE sector taxonomy colors
   sectorFinancials:  '#1E5FAD',
