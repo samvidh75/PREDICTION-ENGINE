@@ -1,32 +1,31 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
-import { AlertCircle, Bell, Clock, Crosshair, Eye, Plus, RefreshCw, Search, ShieldCheck, Sparkles, Star, TrendingDown, TrendingUp, X } from "lucide-react";
-import { Card } from "../ui/Card";
-import { Button } from "../ui/Button";
-import { Badge } from "../ui/Badge";
-import { ConvictionBadge } from "../ui/ConvictionBadge";
+import { AlertCircle, Eye, Plus, RefreshCw, Search, TrendingDown, TrendingUp, X } from "lucide-react";
 import { colors, typography, space, radius, media } from "../design/tokens";
-import { AnalystBriefCard } from "../components/analyst/AnalystBriefCard";
 import { ResearchAlertsPanel } from "../components/alerts/ResearchAlertsPanel";
-import { ResearchAiExplanationPanel, buildAlertContext, buildWatchlistContext, buildWatchlistAiExplanationContext } from "../components/ai-orchestrator";
+import { ResearchAiExplanationPanel, buildWatchlistAiExplanationContext } from "../components/ai-orchestrator";
 import type { ResearchAiContext } from "../components/ai-orchestrator";
 import { ResearchAiSurfaceTrigger } from "../components/ResearchAiSurfaceTrigger";
 import { ThesisChangeResearchPanel } from "../components/watchlist/ThesisChangeResearchPanel";
-import { watchlistReviewBriefGenerator } from "../stockstory/analyst/watchlist/WatchlistReviewBriefGenerator";
-import type { AlertChangeView, WatchlistThesisView } from "../research/contracts/productContracts";
+import type { WatchlistThesisView } from "../research/contracts/productContracts";
 import type { WatchlistIntelligence } from "../services/personalization/WatchlistIntelligenceEngine";
 import { recordAction } from "../services/personalization/UserActionMemory";
 import { getWatchlists, createWatchlist, addTickerToWatchlist, subscribeWatchlist } from "../services/portfolio/watchlistStore";
-import { MetricsSkeleton } from "../components/SkeletonLoader";
+
+const TERMINAL_COLORS = {
+  cyan: "#0891B2",
+  green: "#10B981",
+  red: "#EF4444",
+  bg: "#0F1419",
+};
 
 const STATUS_COLORS: Record<string, string> = {
-  Strengthening: colors.accentGreen,
-  Stable: colors.accentBlue,
-  "Needs review": colors.warning,
-  Weakening: colors.danger,
-  "Research signals pending": colors.textTertiary,
-  "Tracking begins now": colors.textTertiary,
+  Strengthening: TERMINAL_COLORS.green,
+  Stable: TERMINAL_COLORS.cyan,
+  "Needs review": TERMINAL_COLORS.red,
+  Weakening: TERMINAL_COLORS.red,
+  "Research signals pending": "#64748B",
+  "Tracking begins now": "#64748B",
 };
 
 const STATUS_PRIORITY: Record<string, number> = {
@@ -177,461 +176,449 @@ export default function WatchlistPage() {
   };
 
   return (
-    <div className="raycast-slideUp" style={{ display: "grid", gap: "24px" }}>
+    <div style={{ display: "grid", gap: "12px", padding: "12px" }}>
 
       {/* Header row */}
-      <div className="raycast-stagger-1" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: space[4] }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px", flexWrap: "wrap" }}>
         <div>
-          <h1 style={{ color: colors.textPrimary, fontSize: 20, fontWeight: 700, letterSpacing: "-0.01em", margin: 0 }}>
-            Watchlist
+          <h1 style={{ color: TERMINAL_COLORS.cyan, fontSize: 16, fontWeight: 700, margin: 0, fontFamily: "monospace" }}>
+            WATCHLIST
           </h1>
-          <p style={{ color: colors.textSecondary, fontSize: 13, margin: `${space[1]} 0 0` }}>
-            Monitor your thesis and stay ahead of changes.
-          </p>
         </div>
-        <div style={{ display: "flex", gap: space[3], alignItems: "center" }}>
+        <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
           {watchlistAiContext && (
             <ResearchAiSurfaceTrigger context={watchlistAiContext} variant="badge" label="AI Summary" />
           )}
-          <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.96 }} style={{ display: "inline-block" }}>
-            <Button variant="secondary" onClick={() => setShowAddModal(true)}>
-              <Plus size={14} style={{ marginRight: "4px" }} />
-              Add Stock
-            </Button>
-          </motion.div>
-          <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.96 }} style={{ display: "inline-block" }}>
-            <Button onClick={fetchIntelligence} disabled={loading}>
-              {loading ? "Loading..." : "Refresh Intelligence"}
-            </Button>
-          </motion.div>
+          <button
+            onClick={() => setShowAddModal(true)}
+            style={{
+              padding: "6px 10px",
+              fontSize: 12,
+              fontWeight: 600,
+              color: TERMINAL_COLORS.cyan,
+              background: "transparent",
+              border: `1px solid ${TERMINAL_COLORS.cyan}`,
+              borderRadius: 4,
+              cursor: "pointer",
+              fontFamily: "monospace",
+              display: "flex",
+              alignItems: "center",
+              gap: "4px",
+            }}
+          >
+            <Plus size={12} />
+            ADD
+          </button>
+          <button
+            onClick={fetchIntelligence}
+            disabled={loading}
+            style={{
+              padding: "6px 10px",
+              fontSize: 12,
+              fontWeight: 600,
+              color: loading ? "#64748B" : TERMINAL_COLORS.green,
+              background: "transparent",
+              border: `1px solid ${loading ? "#64748B" : TERMINAL_COLORS.green}`,
+              borderRadius: 4,
+              cursor: loading ? "not-allowed" : "pointer",
+              fontFamily: "monospace",
+              opacity: loading ? 0.5 : 1,
+              display: "flex",
+              alignItems: "center",
+              gap: "4px",
+            }}
+          >
+            <RefreshCw size={12} />
+            {loading ? "..." : "REFRESH"}
+          </button>
         </div>
       </div>
 
       {/* Add Stock Modal */}
       {showAddModal && (
-        <div style={{
-          position: "fixed",
-          inset: 0,
-          zIndex: 999,
-          background: colors.backdropModal,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: 16,
-        }}
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 999,
+            background: "rgba(0,0,0,0.8)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "12px",
+          }}
           onClick={() => setShowAddModal(false)}
           onKeyDown={(e) => e.key === "Escape" && setShowAddModal(false)}
           role="presentation"
         >
-          <Card style={{
-            width: "100%",
-            maxWidth: 420,
-            display: "grid",
-            gap: space[4],
-            position: "relative",
-          }}
+          <div
+            style={{
+              width: "100%",
+              maxWidth: 380,
+              background: TERMINAL_COLORS.bg,
+              border: `1px solid ${TERMINAL_COLORS.cyan}`,
+              borderRadius: 4,
+              padding: "12px",
+              position: "relative",
+            }}
             onClick={(e) => e.stopPropagation()}
           >
-            <motion.button
-              whileHover={{ scale: 1.15 }}
-              whileTap={{ scale: 0.9 }}
+            <button
               onClick={() => setShowAddModal(false)}
               style={{
                 position: "absolute",
-                top: 16,
-                right: 16,
+                top: "10px",
+                right: "10px",
                 background: "none",
                 border: "none",
                 cursor: "pointer",
-                color: colors.textSecondary,
-                padding: 4,
+                color: TERMINAL_COLORS.cyan,
+                padding: "2px",
               }}
               aria-label="Close"
             >
-              <X size={16} />
-            </motion.button>
-            <h2 style={{ fontSize: 16, fontWeight: 600, color: colors.textPrimary, margin: 0 }}>
-              Add Stock to Track
+              <X size={14} />
+            </button>
+            <h2 style={{ fontSize: 13, fontWeight: 600, color: TERMINAL_COLORS.cyan, margin: "0 0 10px 0", fontFamily: "monospace" }}>
+              ADD STOCK
             </h2>
-            <div style={{ position: "relative" }}>
-              <input
-                ref={addInputRef}
-                autoFocus
-                placeholder="Search by symbol or company name…"
-                value={addQuery}
-                onChange={(e) => setAddQuery(e.target.value)}
-                style={{
-                  width: "100%",
-                  height: 40,
-                  borderRadius: 8,
-                  border: `1px solid ${colors.border}`,
-                  padding: "0 12px 0 36px",
-                  fontSize: 14,
-                  color: colors.textPrimary,
-                  background: `${colors.card} url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%238E8E93' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E") 12px center no-repeat`,
-                  outline: "none",
-                  boxSizing: "border-box",
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && addQuery.trim()) {
-                    addTickerToWatchlist(getDefaultWatchlist().id, addQuery.trim());
-                    recordAction("watchlist_review", addQuery.trim().toUpperCase());
-                    setShowAddModal(false);
-                    setAddQuery("");
-                  }
-                }}
-              />
-            </div>
-            <div style={{ display: "flex", gap: space[2], flexWrap: "wrap" }}>
-              {WATCHLIST_TICKERS.filter((t) => t.includes(addQuery.toUpperCase())).slice(0, 6).map((t) => (
+            <input
+              ref={addInputRef}
+              autoFocus
+              placeholder="SYMBOL..."
+              value={addQuery}
+              onChange={(e) => setAddQuery(e.target.value.toUpperCase())}
+              style={{
+                width: "100%",
+                height: 32,
+                borderRadius: 3,
+                border: `1px solid ${TERMINAL_COLORS.cyan}`,
+                padding: "6px 8px",
+                fontSize: 12,
+                color: TERMINAL_COLORS.cyan,
+                background: TERMINAL_COLORS.bg,
+                fontFamily: "monospace",
+                outline: "none",
+                boxSizing: "border-box",
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && addQuery.trim()) {
+                  addTickerToWatchlist(getDefaultWatchlist().id, addQuery.trim());
+                  recordAction("watchlist_review", addQuery.trim().toUpperCase());
+                  setShowAddModal(false);
+                  setAddQuery("");
+                }
+              }}
+            />
+            <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", marginTop: "8px" }}>
+              {WATCHLIST_TICKERS.filter((t) => t.includes(addQuery)).slice(0, 6).map((t) => (
                 <button
                   key={t}
                   onClick={() => { addTickerToWatchlist(getDefaultWatchlist().id, t); setShowAddModal(false); setAddQuery(""); }}
                   style={{
-                    padding: "4px 10px",
-                    borderRadius: 6,
-                    border: `1px solid ${colors.border}`,
-                    background: colors.fill,
-                    fontSize: 12,
+                    padding: "4px 8px",
+                    borderRadius: 3,
+                    border: `1px solid ${TERMINAL_COLORS.cyan}`,
+                    background: "transparent",
+                    fontSize: 11,
                     fontWeight: 600,
-                    color: colors.textPrimary,
+                    color: TERMINAL_COLORS.cyan,
                     cursor: "pointer",
+                    fontFamily: "monospace",
                   }}
                 >
                   {t}
                 </button>
               ))}
             </div>
-            <p style={{ fontSize: 11, color: colors.textSecondary, margin: 0 }}>
-              Press <kbd style={{ padding: "1px 5px", borderRadius: 3, background: colors.fill, border: `1px solid ${colors.border}`, fontSize: 10 }}>Enter</kbd> to research a new symbol.
-            </p>
-          </Card>
+          </div>
         </div>
       )}
 
-      {/* Summary chips */}
+      {/* Summary row */}
       {intel && (
-        <div className="raycast-slideUp raycast-stagger-2" style={{ display: "flex", gap: space[3], flexWrap: "wrap" }}>
+        <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", fontSize: 11, fontFamily: "monospace" }}>
           {needsReviewCount > 0 && (
-            <Badge variant="warning" value={`${needsReviewCount} need${needsReviewCount === 1 ? "s" : ""} review`} />
+            <span style={{ color: TERMINAL_COLORS.red }}>
+              {needsReviewCount} NEEDS REVIEW
+            </span>
           )}
           {changedCount > 0 && (
-            <Badge variant="info" value={`${changedCount} thesis change${changedCount === 1 ? "" : "s"}`} />
+            <span style={{ color: TERMINAL_COLORS.cyan }}>
+              {changedCount} THESIS CHANGE{changedCount === 1 ? "" : "S"}
+            </span>
           )}
           {alertCount > 0 && (
-            <Badge variant="warning" value={`${alertCount} research alert${alertCount === 1 ? "" : "s"}`} />
+            <span style={{ color: TERMINAL_COLORS.red }}>
+              {alertCount} ALERT{alertCount === 1 ? "" : "S"}
+            </span>
           )}
-          <span style={{ fontSize: "12px", color: colors.textSecondary, display: "flex", alignItems: "center" }}>
-            Updated {new Date(intel.generatedAt).toLocaleTimeString()}
+          <span style={{ color: "#64748B" }}>
+            {new Date(intel.generatedAt).toLocaleTimeString()}
           </span>
         </div>
       )}
 
       {intel && (
-        <div className="raycast-slideUp" style={{ animationDelay: "0.3s", animationFillMode: "both" }}>
-          <ThesisChangeResearchPanel
-            items={thesisChangeItems}
-            onResearch={handleResearch}
-            onCompare={handleCompare}
-            onTrack={handleTrack}
-            onInvest={handleInvestReview}
-          />
-        </div>
+        <ThesisChangeResearchPanel
+          items={thesisChangeItems}
+          onResearch={handleResearch}
+          onCompare={handleCompare}
+          onTrack={handleTrack}
+          onInvest={handleInvestReview}
+        />
       )}
 
       {intel && (
-        <div className="raycast-slideUp" style={{ animationDelay: "0.4s", animationFillMode: "both" }}>
-          <ResearchAlertsPanel
-            alerts={intel.alerts}
-            onResearch={handleResearch}
-            onCompare={handleCompare}
-            onTrack={handleTrack}
-            onInvest={handleInvestReview}
-          />
-        </div>
+        <ResearchAlertsPanel
+          alerts={intel.alerts}
+          onResearch={handleResearch}
+          onCompare={handleCompare}
+          onTrack={handleTrack}
+          onInvest={handleInvestReview}
+        />
       )}
 
-      <div className="raycast-slideUp" style={{ animationDelay: "0.5s", animationFillMode: "both" }}>
-        {watchlistAiContext && <ResearchAiExplanationPanel context={watchlistAiContext} />}
-      </div>
+      {watchlistAiContext && <ResearchAiExplanationPanel context={watchlistAiContext} />}
 
       {/* Error state */}
       {error && (
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={pageTransition}
-        >
-          <Card>
-            <div style={{ display: "grid", justifyItems: "center", gap: space[3], padding: `${space[4]} 0`, textAlign: "center" }}>
-              <div style={{
-                width: 44, height: 44, borderRadius: "50%", background: `${colors.warning}14`,
-                display: "flex", alignItems: "center", justifyContent: "center",
-              }}>
-                <AlertCircle size={22} color={colors.warning} />
-              </div>
-              <div style={{ color: colors.textPrimary, fontSize: 15, fontWeight: 600 }}>
-                We couldn't load your watchlist
-              </div>
-              <p style={{ color: colors.textSecondary, fontSize: 13, lineHeight: 1.5, margin: 0, maxWidth: 380 }}>
-                {error}
-              </p>
-              <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.96 }} style={{ display: "inline-block" }}>
-                <Button variant="secondary" onClick={fetchIntelligence}>
-                  <RefreshCw size={14} style={{ marginRight: "4px" }} />
-                  Try again
-                </Button>
-              </motion.div>
-            </div>
-          </Card>
-        </motion.div>
-      )}
-
-      {/* Loading skeleton — first fetch, before any intel has landed */}
-      {loading && !intel && !error && (
-        <motion.div
-          initial="hidden"
-          animate="visible"
-          variants={{ visible: { transition: { staggerChildren: 0.06 } } }}
-          style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))", gap: space[4] }}
-        >
-          {Array.from({ length: 3 }).map((_, i) => (
-            <motion.div key={i} variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0 } }} transition={pageTransition}>
-              <MetricsSkeleton />
-            </motion.div>
-          ))}
-        </motion.div>
-      )}
-
-      {/* Empty / initial state */}
-      {!intel && !loading && !error && (
-        <Card className="raycast-slideUp" style={{ animationDelay: "0.2s", animationFillMode: "both", padding: space[8] }}>
-          <div style={{ display: "grid", gap: space[5], justifyItems: "center", textAlign: "center", maxWidth: 440, margin: "0 auto" }}>
-            <div style={{
-              width: 64,
-              height: 64,
-              borderRadius: "50%",
-              background: `radial-gradient(circle, ${colors.hairlineSoft} 0%, transparent 70%)`,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}>
-              <Crosshair size={28} strokeWidth={1.5} color={colors.primary} />
-            </div>
-            <div style={{ display: "grid", gap: space[2] }}>
-              <h2 style={{ color: colors.textPrimary, margin: 0, fontSize: 18, fontWeight: 700 }}>
-                Start tracking your thesis
-              </h2>
-              <p style={{ color: colors.textSecondary, margin: 0, fontSize: 13, lineHeight: 1.6 }}>
-                Add stocks to your track list and we'll monitor their fundamentals, surface conviction changes,
-                and tell you when it's time to review your thesis.
-              </p>
-            </div>
-            <div style={{ display: "flex", gap: space[3], flexWrap: "wrap", justifyContent: "center" }}>
-              <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.96 }} style={{ display: "inline-block" }}>
-                <Button onClick={fetchIntelligence}>
-                  <Star size={14} style={{ marginRight: "4px" }} />
-                  Load Tracked Stocks
-                </Button>
-              </motion.div>
-              <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.96 }} style={{ display: "inline-block" }}>
-                <Button variant="secondary" onClick={() => setShowAddModal(true)}>
-                  <Plus size={14} style={{ marginRight: "4px" }} />
-                  Add First Stock
-                </Button>
-              </motion.div>
-            </div>
-            <div style={{
-              display: "flex",
-              flexWrap: "wrap",
-              gap: 0,
-              color: colors.textSecondary,
-              borderTop: `1px solid ${colors.separator}`,
-              paddingTop: space[4],
-              width: "100%",
-              borderRadius: 20,
-              border: `1px solid ${colors.hairlineSoft}`,
-              background: "linear-gradient(180deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.015) 100%)",
-              overflow: "hidden",
-            }}>
-              {[
-                { icon: Sparkles, title: "Review updates", body: "See thesis changes as they land." },
-                { icon: ShieldCheck, title: "Compare names", body: "Keep watchlist peers in one view." },
-                { icon: Bell, title: "Stay alerted", body: "Know when conviction shifts." },
-              ].map(({ icon: Icon, title, body }, index, items) => (
-                <div
-                  key={title}
-                  style={{
-                    display: "grid",
-                    gap: space[2],
-                    padding: `${space[4]} ${space[3]}`,
-                    flex: "1 1 160px",
-                    minHeight: 108,
-                    borderRight: index === items.length - 1 ? "none" : `1px solid ${colors.hairlineSoft}`,
-                  }}
-                >
-                  <div style={{
-                    width: 28,
-                    height: 28,
-                    display: "inline-flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    borderRadius: 10,
-                    border: `1px solid ${colors.hairlineSoft}`,
-                    background: "rgba(255,255,255,0.04)",
-                    color: colors.textPrimary,
-                  }}>
-                    <Icon size={14} strokeWidth={1.8} />
-                  </div>
-                  <div style={{ display: "grid", gap: 6 }}>
-                    <strong style={{ fontSize: 14, fontWeight: 600, color: colors.textPrimary }}>{title}</strong>
-                    <p style={{ margin: 0, fontSize: 12, lineHeight: 1.5, color: colors.textSecondary }}>
-                      {body}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </Card>
-      )}
-
-      {/* Intelligence grid */}
-      {sorted.length > 0 && (
         <div style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))",
-          gap: space[4],
+          border: `1px solid ${TERMINAL_COLORS.red}`,
+          borderRadius: 4,
+          padding: "12px",
+          background: TERMINAL_COLORS.bg,
         }}>
-          {sorted.map((item, idx) => (
-            <motion.div
-              key={item.symbol}
-              initial={{ opacity: 0, y: 14 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ ...pageTransition, delay: Math.min(idx, 12) * 0.04 }}
+          <div style={{ display: "grid", gap: "8px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              <AlertCircle size={16} color={TERMINAL_COLORS.red} />
+              <span style={{ color: TERMINAL_COLORS.red, fontSize: 12, fontFamily: "monospace", fontWeight: 600 }}>
+                ERROR
+              </span>
+            </div>
+            <p style={{ color: "#94A3B8", fontSize: 11, margin: 0, fontFamily: "monospace" }}>
+              {error}
+            </p>
+            <button
+              onClick={fetchIntelligence}
+              style={{
+                padding: "6px 10px",
+                fontSize: 11,
+                fontWeight: 600,
+                color: TERMINAL_COLORS.red,
+                background: "transparent",
+                border: `1px solid ${TERMINAL_COLORS.red}`,
+                borderRadius: 3,
+                cursor: "pointer",
+                fontFamily: "monospace",
+                width: "fit-content",
+              }}
             >
-            <Card>
-              <div style={{ display: "grid", gap: space[3] }}>
-                {/* Top row: symbol + conviction badge */}
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <div
-                    onClick={() => handleResearch(item.symbol)}
-                    onKeyDown={(e) => e.key === "Enter" && handleResearch(item.symbol)}
-                    role="link"
-                    tabIndex={0}
-                    style={{ cursor: "pointer" }}
-                  >
-                    <div style={{ fontSize: typography.h3.desktop.size, fontWeight: 600, color: colors.textPrimary }}>
-                      {item.symbol}
-                    </div>
-                    <div style={{ fontSize: "12px", color: colors.textSecondary }}>
-                      {item.companyName}
-                    </div>
-                  </div>
-                  <ConvictionBadge
-                    level={
-                      item.currentStatus === "Strengthening" ? "healthy" :
-                      item.currentStatus === "Stable" ? "stable" :
-                      item.currentStatus === "Needs review" ? "caution" :
-                      item.currentStatus === "Weakening" ? "caution" :
-                      "watch-list"
-                    }
-                    size="md"
-                  />
-                </div>
-
-                {/* Score bar */}
-                {item.score !== null && (
-                  <div>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 4 }}>
-                      <span style={{ fontSize: "22px", fontWeight: 700, color: colors.textPrimary }}>
-                        {item.score}
-                        <span style={{ fontSize: "13px", fontWeight: 400, color: colors.textSecondary }}>/100</span>
-                      </span>
-                      <span style={{ display: "flex", alignItems: "center", gap: 3, fontSize: 12, color: colors.textSecondary }}>
-                        {item.scoreDirection === "improving" ? (
-                          <><TrendingUp size={12} color={colors.marketGreen} /> Improving</>
-                        ) : item.scoreDirection === "declining" ? (
-                          <><TrendingDown size={12} color={colors.danger} /> Declining</>
-                        ) : (
-                          "Stable"
-                        )}
-                      </span>
-                    </div>
-                    <div style={{ height: 4, background: colors.border, borderRadius: 2, overflow: "hidden" }}>
-                      <div style={{
-                        height: "100%",
-                        width: `${item.score}%`,
-                        borderRadius: 2,
-                        background: `linear-gradient(90deg, ${colors.success} 0%, ${colors.warning} 50%, ${colors.danger} 100%)`,
-                      }} />
-                    </div>
-                  </div>
-                )}
-
-                {/* Thesis status + last reviewed */}
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 12, color: colors.textSecondary }}>
-                  <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                    <Clock size={12} />
-                    {item.lastUpdated
-                      ? `Last reviewed ${new Date(item.lastUpdated).toLocaleDateString()}`
-                      : "Not yet reviewed"}
-                  </span>
-                  {item.lastThesis && (
-                    <span style={{ fontStyle: "italic" }}>
-                      "{item.lastThesis.slice(0, 60)}{item.lastThesis.length > 60 ? "…" : ""}"
-                    </span>
-                  )}
-                </div>
-
-                {/* Action buttons */}
-                <div style={{ display: "flex", gap: space[2], flexWrap: "wrap" }}>
-                  <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.96 }} style={{ display: "inline-block" }}>
-                    <Button variant="primary" onClick={() => handleResearch(item.symbol)}>
-                      <Eye size={14} style={{ marginRight: "4px" }} />
-                      Research
-                    </Button>
-                  </motion.div>
-                  <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.96 }} style={{ display: "inline-block" }}>
-                    <Button variant="secondary" onClick={() => {
-                      recordAction("watchlist_remove", item.symbol);
-                    }}>
-                      <Star size={14} style={{ marginRight: "4px", fill: colors.primary }} />
-                      Unwatch
-                    </Button>
-                  </motion.div>
-                </div>
-
-                {/* Review brief */}
-                {(() => {
-                  const brief = watchlistReviewBriefGenerator.generate({
-                    symbol: item.symbol,
-                    thesisState: item.currentStatus,
-                    riskRising: item.currentStatus === "Weakening" || item.currentStatus === "Needs review",
-                    whatChanged: [],
-                  });
-                  return (
-                    <div style={{ fontSize: "12px", color: colors.textSecondary, borderTop: `1px solid ${colors.border}`, paddingTop: space[2] }}>
-                      <strong>Review brief:</strong> {brief.whatChangedSinceLastReview[0]}
-                      {brief.risksRequiringAttention.length > 0 && (
-                        <span> — {brief.risksRequiringAttention[0]}</span>
-                      )}
-                    </div>
-                  );
-                })()}
-              </div>
-            </Card>
-            </motion.div>
-          ))}
+              RETRY
+            </button>
+          </div>
         </div>
       )}
 
-      {/* Responsive overrides */}
-      <style>{`
-        @media (max-width: 767px) {
-          h1 { font-size: 28px !important; }
-        }
-      `}</style>
+      {/* Loading state */}
+      {loading && !intel && !error && (
+        <div style={{ borderTop: `1px solid #334155`, paddingTop: "8px", marginTop: "8px" }}>
+          <div style={{ color: TERMINAL_COLORS.cyan, fontSize: 11, fontFamily: "monospace", fontWeight: 600 }}>
+            {'>'} LOADING WATCHLIST DATA...
+          </div>
+        </div>
+      )}
+
+      {/* Empty state */}
+      {!intel && !loading && !error && (
+        <div style={{
+          border: `1px solid ${TERMINAL_COLORS.cyan}`,
+          borderRadius: 4,
+          padding: "16px",
+          textAlign: "center",
+          background: TERMINAL_COLORS.bg,
+        }}>
+          <div style={{ display: "grid", gap: "8px" }}>
+            <h2 style={{ color: TERMINAL_COLORS.cyan, margin: 0, fontSize: 13, fontFamily: "monospace", fontWeight: 600 }}>
+              WATCHLIST EMPTY
+            </h2>
+            <p style={{ color: "#94A3B8", margin: 0, fontSize: 11, fontFamily: "monospace" }}>
+              Add stocks to monitor fundamentals and track thesis changes.
+            </p>
+            <div style={{ display: "flex", gap: "8px", justifyContent: "center", marginTop: "8px" }}>
+              <button
+                onClick={fetchIntelligence}
+                style={{
+                  padding: "6px 10px",
+                  fontSize: 11,
+                  fontWeight: 600,
+                  color: TERMINAL_COLORS.green,
+                  background: "transparent",
+                  border: `1px solid ${TERMINAL_COLORS.green}`,
+                  borderRadius: 3,
+                  cursor: "pointer",
+                  fontFamily: "monospace",
+                }}
+              >
+                LOAD
+              </button>
+              <button
+                onClick={() => setShowAddModal(true)}
+                style={{
+                  padding: "6px 10px",
+                  fontSize: 11,
+                  fontWeight: 600,
+                  color: TERMINAL_COLORS.cyan,
+                  background: "transparent",
+                  border: `1px solid ${TERMINAL_COLORS.cyan}`,
+                  borderRadius: 3,
+                  cursor: "pointer",
+                  fontFamily: "monospace",
+                }}
+              >
+                ADD STOCK
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Data table */}
+      {sorted.length > 0 && (
+        <div style={{ borderTop: `1px solid #334155`, marginTop: "8px", paddingTop: "8px" }}>
+          {/* Table header */}
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: "80px 1fr 60px 80px 100px",
+            gap: "8px",
+            paddingBottom: "6px",
+            borderBottom: `1px solid ${TERMINAL_COLORS.cyan}`,
+            marginBottom: "4px",
+            fontSize: 10,
+            fontFamily: "monospace",
+            fontWeight: 600,
+            color: TERMINAL_COLORS.cyan,
+            textTransform: "uppercase",
+          }}>
+            <div>Symbol</div>
+            <div>Status</div>
+            <div>Score</div>
+            <div>Trend</div>
+            <div>Actions</div>
+          </div>
+
+          {/* Table rows */}
+          <div style={{ display: "grid", gap: "2px" }}>
+            {sorted.map((item) => (
+              <div
+                key={item.symbol}
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "80px 1fr 60px 80px 100px",
+                  gap: "8px",
+                  padding: "6px 0",
+                  borderBottom: `1px solid #334155`,
+                  alignItems: "center",
+                  fontSize: 11,
+                  fontFamily: "monospace",
+                }}
+              >
+                {/* Symbol */}
+                <div
+                  onClick={() => handleResearch(item.symbol)}
+                  style={{
+                    cursor: "pointer",
+                    color: TERMINAL_COLORS.cyan,
+                    fontWeight: 600,
+                    textDecoration: "underline",
+                    textDecorationStyle: "dotted",
+                  }}
+                >
+                  {item.symbol}
+                </div>
+
+                {/* Status */}
+                <div style={{
+                  color: STATUS_COLORS[item.currentStatus] || "#64748B",
+                  fontWeight: 500,
+                }}>
+                  {item.currentStatus}
+                </div>
+
+                {/* Score */}
+                <div style={{
+                  color: item.score && item.score > 70 ? TERMINAL_COLORS.green :
+                          item.score && item.score > 40 ? TERMINAL_COLORS.cyan :
+                          TERMINAL_COLORS.red,
+                  textAlign: "right",
+                  fontWeight: 600,
+                }}>
+                  {item.score !== null ? `${item.score}/100` : "—"}
+                </div>
+
+                {/* Trend */}
+                <div style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "3px",
+                  color: item.scoreDirection === "improving" ? TERMINAL_COLORS.green :
+                          item.scoreDirection === "declining" ? TERMINAL_COLORS.red :
+                          "#64748B",
+                }}>
+                  {item.scoreDirection === "improving" ? (
+                    <TrendingUp size={10} />
+                  ) : item.scoreDirection === "declining" ? (
+                    <TrendingDown size={10} />
+                  ) : (
+                    "–"
+                  )}
+                  {item.scoreDirection === "improving" ? "UP" :
+                   item.scoreDirection === "declining" ? "DOWN" : "FLAT"}
+                </div>
+
+                {/* Actions */}
+                <div style={{ display: "flex", gap: "4px" }}>
+                  <button
+                    onClick={() => handleResearch(item.symbol)}
+                    style={{
+                      padding: "3px 6px",
+                      fontSize: 9,
+                      fontWeight: 600,
+                      color: TERMINAL_COLORS.cyan,
+                      background: "transparent",
+                      border: `1px solid ${TERMINAL_COLORS.cyan}`,
+                      borderRadius: 2,
+                      cursor: "pointer",
+                      fontFamily: "monospace",
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    <Eye size={10} style={{ display: "inline", marginRight: "2px" }} />
+                    View
+                  </button>
+                  <button
+                    onClick={() => recordAction("watchlist_remove", item.symbol)}
+                    style={{
+                      padding: "3px 6px",
+                      fontSize: 9,
+                      fontWeight: 600,
+                      color: "#94A3B8",
+                      background: "transparent",
+                      border: "1px solid #94A3B8",
+                      borderRadius: 2,
+                      cursor: "pointer",
+                      fontFamily: "monospace",
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    Del
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
