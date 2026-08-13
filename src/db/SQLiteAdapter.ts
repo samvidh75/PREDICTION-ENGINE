@@ -27,8 +27,7 @@ function ensureDir(): void {
 
 async function getDb(): Promise<SqlJsDatabase> {
   if (_db) return _db;
-  ensureSql();
-  await initPromise;
+  await ensureSql();
   _dbPath = resolveDbPath();
   ensureDir();
   if (fs.existsSync(_dbPath)) {

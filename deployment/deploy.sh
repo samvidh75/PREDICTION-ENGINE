@@ -167,7 +167,64 @@ info "✅ Systemd services installed"
 
 # ── Step 8: Set up Nginx ──────────────────────────────────────────────
 info "Configuring Nginx..."
-$SSH_CMD "cp ${APP_DIR}/deployment/vps-setup.sh /tmp/setup-nginx.sh && cat /tmp/setup-nginx.sh | grep -A100 'cat > /etc/nginx/sites-available/stockex' > /tmp/nginx-setup.sh && bash /tmp/nginx-setup.sh 2>/dev/null || true"
+# Write an HTTP-only nginx site config. If an SSL cert already exists at the
+# LetsEncrypt path, upgrade to HTTPS; otherwise serve over plain HTTP so the
+# site remains reachable until setup-dns.sh provisions real TLS.
+$SSH_CMD "cat > /etc/nginx/sites-available/stockex << 'NGINX'
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+    server_name stockex-ph.com www.stockex-ph.com;
+
+    gzip on;
+    gzip_types text/plain text/css application/json application/javascript text/xml application/xml text/javascript image/svg+xml;
+
+    # SPA
+    location / {
+        root /opt/stockex/dist;
+        try_files \$uri \$uri/ /index.html;
+        expires 1y;
+        add_header Cache-Control \"public, immutable\";
+    }
+
+    # API
+    location /api/ {
+        proxy_pass http://127.0.0.1:4001;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+        proxy_cache_bypass \$http_upgrade;
+    }
+
+    # LLM
+    location /llm/ {
+        proxy_pass http://127.0.0.1:8000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_cache_bypass \$http_upgrade;
+    }
+
+    # WebSocket
+    location /ws/ {
+        proxy_pass http://127.0.0.1:4001;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Connection \"upgrade\";
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_read_timeout 86400;
+    }
+}
+NGINX
+ln -sf /etc/nginx/sites-available/stockex /etc/nginx/sites-enabled/
+rm -f /etc/nginx/sites-enabled/default"
 info "✅ Nginx configured"
 
 # ── Step 9: Start services ────────────────────────────────────────────
