@@ -174,9 +174,10 @@ info "✅ Systemd services installed"
 
 # ── Step 8: Set up Nginx ──────────────────────────────────────────────
 info "Configuring Nginx..."
-# Write an HTTP-only nginx site config from a checked-in file. If an SSL
-# cert already exists, setup-dns.sh will upgrade to HTTPS; otherwise serve
-# over plain HTTP so the site remains reachable until TLS is provisioned.
+# Deploy the checked-in full HTTPS nginx config (HTTP→HTTPS redirect +
+# TLS server block referencing /etc/letsencrypt/live/stockstory-india.com).
+# Requires certbot certs to exist; if they don't, run deployment/setup-dns.sh
+# first (or certbot --nginx) so nginx -t passes on the ssl directives.
 $SCP_CMD deployment/nginx-stockex.conf ${VPS_USER}@${VPS_HOST}:/tmp/nginx-stockex.conf
 $SSH_CMD "cp /tmp/nginx-stockex.conf /etc/nginx/sites-available/stockex && ln -sf /etc/nginx/sites-available/stockex /etc/nginx/sites-enabled/ && rm -f /etc/nginx/sites-enabled/default"
 info "✅ Nginx configured"
@@ -214,7 +215,7 @@ echo "╠═══════════════════════�
 echo "║  Website: http://${VPS_HOST}                                "
 echo "║  API:     http://${VPS_HOST}:4001                            "
 echo "║  LLM:     http://${VPS_HOST}:8000                            "
-echo "║  Domain:  stockex-ph.com (point DNS A record to ${VPS_HOST}) "
+echo "║  Domain:  stockstory-india.com (point DNS A record to ${VPS_HOST}) "
 echo "║                                                             "
 echo "║  Commands:                                                   "
 echo "║  - Check API:  systemctl status stockex-api                  "

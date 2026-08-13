@@ -5,7 +5,7 @@ const SITE_NAME = "STOCKEX";
 const DEFAULT_TITLE = "STOCKEX — Research-Driven Stock Analysis";
 const DEFAULT_DESC =
   "Independent research analysis for PSE stocks. Scorecards, theses, risks, peer comparisons, and scenario modelling. Not investment advice.";
-const BASE_URL = "https://stockstory-ph.com";
+const BASE_URL = "https://stockstory-india.com";
 
 /**
  * Apply SEO metadata to document head.

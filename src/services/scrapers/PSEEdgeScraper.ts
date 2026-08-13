@@ -193,7 +193,7 @@ export interface ParsedOwnership {
 
 const EDGE_BASE = 'https://edge.pse.com.ph';
 const SEARCH_ENDPOINT = `${EDGE_BASE}/companyDisclosures/search.ax`;
-const USER_AGENT = 'Mozilla/5.0 (compatible; StockExResearchBot/1.0; +https://stockstory-ph.com)';
+const USER_AGENT = 'Mozilla/5.0 (compatible; StockExResearchBot/1.0; +https://stockstory-india.com)';
 
 /**
  * Fetch a specific company's disclosures, server-side filtered by its real

@@ -6,8 +6,8 @@
 # ===========================================================================
 set -euo pipefail
 
-DOMAIN="${DOMAIN:-stockex-ph.com}"
-ADMIN_EMAIL="${ADMIN_EMAIL:-admin@stockex-ph.com}"
+DOMAIN="${DOMAIN:-stockstory-india.com}"
+ADMIN_EMAIL="${ADMIN_EMAIL:-admin@stockstory-india.com}"
 VPS_HOST="${VPS_HOST:-103.211.56.127}"
 
 RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'; NC='\033[0m'
@@ -17,7 +17,7 @@ error() { echo -e "${RED}[ERROR]${NC} $1"; }
 
 echo ""
 echo "╔══════════════════════════════════════════════════════════════╗"
-echo "║     StockEX Philippines — DNS & SSL Setup                    ║"
+echo "║     StockEX — DNS & SSL Setup                                 ║"
 echo "║     Domain: ${DOMAIN} → ${VPS_HOST}                         ║"
 echo "╚══════════════════════════════════════════════════════════════╝"
 echo ""

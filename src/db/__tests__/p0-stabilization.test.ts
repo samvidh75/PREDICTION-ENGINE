@@ -350,7 +350,7 @@ describe('GROUP G — Database Adapter Health Check', () => {
 });
 
 describe('GROUP H — Env Configuration', () => {
-  const PROD_ORIGIN = "https://stockstory-ph.com";
+  const PROD_ORIGIN = "https://stockstory-india.com";
 
   function parseOrigins(rawEnv: string): string[] {
     const allowedOrigins: string[] = [PROD_ORIGIN];
@@ -365,7 +365,7 @@ describe('GROUP H — Env Configuration', () => {
 
   it('EXTRA_ALLOWED_ORIGINS parses comma-separated values', () => {
     const origins = parseOrigins('https://preview.example.com,https://admin.example.com');
-    expect(origins).toContain('https://stockstory-ph.com');
+    expect(origins).toContain('https://stockstory-india.com');
     expect(origins).toContain('https://preview.example.com');
     expect(origins).toContain('https://admin.example.com');
   });
@@ -378,8 +378,8 @@ describe('GROUP H — Env Configuration', () => {
   });
 
   it('EXTRA_ALLOWED_ORIGINS deduplicates including canonical origin', () => {
-    const origins = parseOrigins('https://stockstory-ph.com,https://admin.example.com');
-    const count = origins.filter(o => o === 'https://stockstory-ph.com').length;
+    const origins = parseOrigins('https://stockstory-india.com,https://admin.example.com');
+    const count = origins.filter(o => o === 'https://stockstory-india.com').length;
     expect(count).toBe(1);
     expect(origins).toContain('https://admin.example.com');
   });

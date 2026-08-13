@@ -84,7 +84,7 @@ function formatScannerAlert(
     + `Signal: ${desc}\n`
     + `CMP: \u20b1${price}\n`
     + `Strength: ${strength}/100\n`
-    + `View: https://stockstory-ph.com/${ticker}`
+    + `View: https://stockstory-india.com/${ticker}`
   );
 }
 

@@ -31,7 +31,7 @@ const __dirname = dirname(__filename);
 
 const PORT = parseInt(process.env.PORT ?? "10000", 10);
 const HOST = process.env.HOST ?? "0.0.0.0";
-const SELF_ORIGIN = process.env.SELF_ORIGIN ?? "https://stockstory-api.onrender.com";
+const SELF_ORIGIN = process.env.SELF_ORIGIN ?? "https://api.stockstory-india.com";
 const BUILD_TIME = __filename.includes("node_modules") ? "" : __filename;
 
 // ── Capture deploy commit & build timestamp at import time ─────────────
@@ -110,11 +110,12 @@ async function bootstrap() {
 
   const server = Fastify({ logger: { level: process.env.LOG_LEVEL ?? "info" } });
 
-  // ── CORS: allow the production domain + Render origin ──────────────
+  // ── CORS: allow the production domain + API subdomain ──────────────
   await server.register(cors, {
     origin: [
-      "https://stockstory-ph.com",
-      "https://www.stockstory-ph.com",
+      "https://stockstory-india.com",
+      "https://www.stockstory-india.com",
+      "https://api.stockstory-india.com",
       SELF_ORIGIN,
       ...(process.env.EXTRA_ALLOWED_ORIGINS?.split(",").map(s => s.trim()) ?? []),
     ],

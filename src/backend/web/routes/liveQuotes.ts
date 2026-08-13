@@ -1,7 +1,7 @@
 /**
  * WebSocket Live Quotes Route
  *
- * Endpoint: ws://api.stockstory-ph.com/api/quotes/ws
+ * Endpoint: ws://api.stockstory-india.com/api/quotes/ws
  * Protocol: JSON messages every 100-500ms per symbol
  */
 

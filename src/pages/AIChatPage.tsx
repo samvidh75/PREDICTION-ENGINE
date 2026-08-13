@@ -345,7 +345,7 @@ export default function AIChatPage() {
         }
       }
 
-      const apiBase = import.meta.env.VITE_API_BASE_URL || (window.location.hostname.includes("stockstory-ph.com") ? "/api" : "/api");
+      const apiBase = import.meta.env.VITE_API_BASE_URL || "/api";
       const apiUrl = `${apiBase}/chat`;
 
       try {

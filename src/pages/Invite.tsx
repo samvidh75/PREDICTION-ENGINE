@@ -19,7 +19,7 @@ export default function Invite() {
 
   const handleCopy = async () => {
     try {
-      await navigator.clipboard.writeText(`https://stockstory-ph.com${inviteUrl}`);
+      await navigator.clipboard.writeText(`${window.location.origin}${inviteUrl}`);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch { /* fallback */ }
@@ -46,7 +46,7 @@ export default function Invite() {
           <input
             type="text"
             readOnly
-            value={`https://stockstory-ph.com${inviteUrl}`}
+            value={`${window.location.origin}${inviteUrl}`}
             style={{
               flex: 1, padding: "10px 12px", border: `1px solid ${colors.border}`,
               borderRadius: "6px", fontSize: "14px", background: colors.fill, color: colors.textPrimary,

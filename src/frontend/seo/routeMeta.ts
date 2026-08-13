@@ -24,7 +24,7 @@ export function resolveRouteMeta(
         "@context": "https://schema.org",
         "@type": "WebSite",
         name: "STOCKEX",
-        url: "https://stockstory-ph.com",
+        url: "https://stockstory-india.com",
       },
     };
   }
