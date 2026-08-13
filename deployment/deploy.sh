@@ -69,7 +69,9 @@ if command -v rsync &>/dev/null; then
   # nothing irreplaceable was lost that time, but the next deploy might
   # not be so lucky). The database is provisioned once by vps-setup.sh /
   # migrations, not shipped by this script.
-  RSYNC_OPTS="-avz --delete --exclude=node_modules --exclude=.git --exclude=dist --exclude=stockex_slm_agent_output --exclude=data/*.db --exclude=data/*.db-* --exclude=data/*.sqlite --exclude=data/*.sqlite*"
+    # --exclude=.env and .env.local: production env is set via systemd Environment=
+  # directives below, never via a local dev .env that gets rsync'd by accident.
+  RSYNC_OPTS="-avz --delete --exclude=node_modules --exclude=.git --exclude=dist --exclude=.env --exclude=.env.local --exclude=.env.production --exclude=stockex_slm_agent_output --exclude=data/*.db --exclude=data/*.db-* --exclude=data/*.sqlite --exclude=data/*.sqlite*"
   [ -n "$KEY_FILE" ] && RSYNC_OPTS="$RSYNC_OPTS -e 'ssh -i $KEY_FILE -p $VPS_PORT'"
   eval rsync $RSYNC_OPTS ./ "${VPS_USER}@${VPS_HOST}:${APP_DIR}/"
 else
@@ -129,6 +131,11 @@ RestartSec=10
 Environment=NODE_ENV=production
 Environment=PORT=4001
 Environment=HOST=0.0.0.0
+Environment=DB_ADAPTER=sqlite
+Environment=ALLOW_SQLITE_FALLBACK=true
+Environment=ALLOW_SQLITE_IN_PRODUCTION=true
+Environment=SQLITE_DB_PATH=/opt/stockex/data/stockstory.db
+Environment=STOCKEX_DB=/opt/stockex/data/stockstory.db
 
 [Install]
 WantedBy=multi-user.target
@@ -179,9 +186,9 @@ server {
     gzip on;
     gzip_types text/plain text/css application/json application/javascript text/xml application/xml text/javascript image/svg+xml;
 
-    # SPA
+        # SPA — built output is at dist/public/ (vite.config.ts outDir)
     location / {
-        root /opt/stockex/dist;
+        root /opt/stockex/dist/public;
         try_files \$uri \$uri/ /index.html;
         expires 1y;
         add_header Cache-Control \"public, immutable\";
@@ -229,6 +236,13 @@ info "✅ Nginx configured"
 
 # ── Step 9: Start services ────────────────────────────────────────────
 info "Starting services..."
+# Fix permissions: rsync from macOS leaves files owned by 501:staff and
+# /opt/stockex may have 700 perms (from vps-setup.sh). nginx (www-data)
+# must be able to traverse /opt/stockex and read dist/public/.
+$SSH_CMD "chmod 755 ${APP_DIR} 2>/dev/null || true"
+$SSH_CMD "chown -R root:root ${APP_DIR}/dist 2>/dev/null || true"
+$SSH_CMD "chmod -R 755 ${APP_DIR}/dist 2>/dev/null || true"
+$SSH_CMD "systemctl daemon-reload"
 $SSH_CMD "systemctl restart stockex-api stockex-llm nginx"
 info "✅ Services started"
 
