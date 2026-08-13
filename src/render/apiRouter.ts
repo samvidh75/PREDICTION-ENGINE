@@ -675,6 +675,28 @@ const SEARCH_CACHE_TTL = 60_000;
 // ── Routes ──────────────────────────────────────────────────────────────────
 
 import { registerAnalystRoutes } from "../stockstory/analyst/api/analystRoutes.js";
+import fs from "fs";
+import path from "path";
+
+interface CachedPriceData {
+  timestamp: string;
+  count: number;
+  prices: Record<string, number>;
+}
+
+function readCachedPrices(): CachedPriceData | null {
+  try {
+    const cacheDir = process.env.CACHE_DIR || "/opt/stockex/data";
+    const cachePath = path.join(cacheDir, "pse-live-prices.json");
+    if (fs.existsSync(cachePath)) {
+      const content = fs.readFileSync(cachePath, "utf-8");
+      return JSON.parse(content) as CachedPriceData;
+    }
+  } catch (err) {
+    console.error("[Cache] Failed to read pse-live-prices.json:", err);
+  }
+  return null;
+}
 
 export default async function registerApiRoutes(server: FastifyInstance) {
   await registerAnalystRoutes(server);
@@ -771,13 +793,32 @@ export default async function registerApiRoutes(server: FastifyInstance) {
       return cached.data;
     }
 
-    const [gatewayQuote, fundResult, priceHistory, news, cachedFinancials] = await Promise.all([
-      providerCoordinator.getQuote(cleanSymbol).catch(() => null),
+    const [fundResult, priceHistory, news, cachedFinancials] = await Promise.all([
       pseApiFunds(cleanSymbol).catch(() => null),
       providerCoordinator.getHistory(cleanSymbol).catch(() => null),
       providerCoordinator.getNews(cleanSymbol).catch(() => null),
       providerCoordinator.getFinancials(cleanSymbol).catch(() => null),
     ]);
+
+    let gatewayQuote = await providerCoordinator.getQuote(cleanSymbol).catch(() => null);
+
+    // Fallback to cached price when provider fails
+    if (!gatewayQuote?.price) {
+      const cachedData = readCachedPrices();
+      if (cachedData?.prices[cleanSymbol]) {
+        const cachedPrice = cachedData.prices[cleanSymbol];
+        gatewayQuote = {
+          symbol: cleanSymbol,
+          exchange: "PSE",
+          price: cachedPrice,
+          change: 0,
+          changePercent: 0,
+          updatedAt: cachedData.timestamp,
+          source: "daily_prices",
+          freshness: "delayed",
+        };
+      }
+    }
 
     const gatewayMeta = await providerCoordinator.getMetadata(cleanSymbol).catch(() => null);
 
