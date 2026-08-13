@@ -2,33 +2,24 @@ import { useEffect, useState, useMemo, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import {
-  ArrowDown, ArrowLeft, ArrowUp, TrendingUp, ChevronDown, ChevronUp,
-  ExternalLink, RefreshCw, AlertCircle, Activity, BarChart3, LineChart as LineChartIcon,
-  Copy, Download, Share2, Bell, Eye, Clock, DollarSign, Volume2, PieChart
+  ArrowDown, ArrowLeft, ArrowUp, TrendingUp, ExternalLink, RefreshCw, AlertCircle,
+  BarChart3, Copy, Bell, Clock, DollarSign, Volume2,
 } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { LazyBarChart, Bar, CartesianGrid, ResponsiveContainer, XAxis, YAxis, Tooltip } from "../components/DynamicChart";
 import StockChart from "../components/StockChart";
 import { Badge } from "../ui/Badge";
-import { MarketStatusBadge } from "../components/MarketStatusBadge";
 import { Button } from "../ui/Button";
-import { Card, CardLabel } from "../ui/Card";
 import { Stat } from "../ui/Stat";
 import { useResponsiveValue } from "../ui/responsive";
-import { PriceFlash } from "../ui/PriceFlash";
 import { BrokerHandoffModal } from "../components/BrokerHandoffModal";
-import { ThesisHistory } from "../components/ThesisHistory";
 import { ChartErrorBoundary } from "../components/ChartErrorBoundary";
 import { listAvailableBrokers } from "../commercial/BrokerHandoffService";
 import { fallbackAnalysis, generateStockAnalysis } from "../services/llm/AIAnalysisService";
 import type { AIAnalysis } from "../services/llm/AIAnalysisService";
 import { colors, typography, radius, shadows } from "../design/tokens";
-import { InteractiveButton, MetricCard } from "../ui/MicroInteractions";
 import { useSeo } from "../frontend/seo/useSeo";
 import { buildCompanySeo } from "../frontend/seo/companySeo";
-import { NativeAd } from "../components/NativeAd";
-import { OrderSimulator } from "../components/OrderSimulator";
-import { FiftyTwoWeekRange } from "../components/FiftyTwoWeekRange";
 import { getBoardLotSize, getTickSize } from "../utils/pseBoardLot";
 import { formatNumber } from "../services/ui/dataFormatting";
 import { toResearchAiContext } from "../components/ai-orchestrator/researchAiContext";
@@ -39,8 +30,7 @@ import {
 import { buildEvidenceRetrievalAggregate } from "../systems/market-brain/evidenceRetrievalOrchestrator";
 import { compressEventEvidencePack } from "../systems/market-brain/eventEvidencePack";
 import type { EvidenceRetrievalAggregate } from "../research/contracts/evidenceRetrievalContracts";
-import { EvidenceSummaryPanel } from "../ui/EvidenceSummaryPanel";
-import { PriceSkeleton, ChartSkeleton, MetricsSkeleton, NewsSkeleton } from "../components/SkeletonLoader";
+import { PriceSkeleton, ChartSkeleton, MetricsSkeleton } from "../components/SkeletonLoader";
 
 // ── Professional Trading Terminal Palette ──
 const TERMINAL_COLORS = {
@@ -53,7 +43,7 @@ const TERMINAL_COLORS = {
   secondaryText: "#9CA3AF",
 };
 
-// ── Shared motion presets ──
+// ── Motion presets (minimal) ──
 const fadeUp = {
   hidden: { opacity: 0, y: 16 },
   visible: { opacity: 1, y: 0 },
@@ -245,133 +235,243 @@ function normalizeStockData(raw: Record<string, any>): StockResearchDetail {
   };
 }
 
-// ── Trading Terminal Header ──
-function TerminalHeader({ symbol, price, changeAbs, changePercent, companyName }: {
-  symbol: string; price: number; changeAbs: number; changePercent: number; companyName: string;
-}) {
-  const isUp = changeAbs >= 0;
+// ── HERO SECTION: Numbers First ──
+function HeroSection({ stock }: { stock: StockResearchDetail }) {
+  const isUp = stock.price.changeAbs >= 0;
   const priceColor = isUp ? TERMINAL_COLORS.gainGreen : TERMINAL_COLORS.lossRed;
 
   return (
     <div style={{
-      display: "grid",
-      gap: "12px",
-      padding: "16px",
-      borderBottom: `1px solid rgba(255,255,255,0.05)`,
+      padding: "12px 16px",
       background: TERMINAL_COLORS.canvas,
+      borderBottom: `1px solid rgba(255,255,255,0.05)`,
       fontFamily: "'SF Mono', 'JetBrains Mono', 'Roboto Mono', monospace",
     }}>
-      <div style={{ display: "flex", alignItems: "baseline", gap: "16px", flexWrap: "wrap" }}>
-        <div style={{ display: "flex", alignItems: "baseline", gap: "8px" }}>
-          <span style={{ fontSize: "24px", fontWeight: 700, color: TERMINAL_COLORS.monoText, letterSpacing: "-0.01em" }}>
-            {symbol}
-          </span>
-          <span style={{ fontSize: "13px", fontWeight: 500, color: TERMINAL_COLORS.secondaryText }}>
-            {companyName}
-          </span>
-        </div>
+      {/* Symbol & Company Name */}
+      <div style={{ display: "flex", gap: "8px", alignItems: "baseline", marginBottom: "8px" }}>
+        <span style={{
+          fontSize: "18px",
+          fontWeight: 700,
+          color: TERMINAL_COLORS.monoText,
+          letterSpacing: "-0.01em",
+        }}>
+          {stock.symbol}
+        </span>
+        <span style={{
+          fontSize: "12px",
+          color: TERMINAL_COLORS.secondaryText,
+          fontWeight: 500,
+          fontFamily: "system-ui, -apple-system, sans-serif",
+        }}>
+          {stock.companyName}
+        </span>
       </div>
 
-      <div style={{ display: "flex", alignItems: "center", gap: "24px", flexWrap: "wrap" }}>
-        <div style={{ display: "flex", alignItems: "baseline", gap: "8px" }}>
-          <span style={{ fontSize: "28px", fontWeight: 700, color: TERMINAL_COLORS.monoText, letterSpacing: "-0.02em", fontVariantNumeric: "tabular-nums" }}>
-            ₱{formatNumber(price)}
+      {/* Price & Change */}
+      <div style={{ display: "grid", gap: "4px" }}>
+        <div style={{ display: "flex", gap: "8px", alignItems: "baseline" }}>
+          <span style={{
+            fontSize: "42px",
+            fontWeight: 700,
+            color: TERMINAL_COLORS.monoText,
+            letterSpacing: "-0.02em",
+            fontVariantNumeric: "tabular-nums",
+            lineHeight: 1,
+          }}>
+            ₱{formatNumber(stock.price.current)}
           </span>
-        </div>
-
-        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "4px", color: priceColor, fontSize: "13px", fontWeight: 600 }}>
-            {isUp ? <ArrowUp size={14} /> : <ArrowDown size={14} />}
-            {isUp ? "+" : ""}{formatDecimal(changeAbs, 2)}
+          <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+            <div style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "4px",
+              color: priceColor,
+              fontSize: "13px",
+              fontWeight: 600,
+              fontVariantNumeric: "tabular-nums",
+            }}>
+              {isUp ? <ArrowUp size={14} /> : <ArrowDown size={14} />}
+              {isUp ? "+" : ""}{formatDecimal(stock.price.changeAbs, 2)}
+              <span style={{ fontSize: "12px" }}>({isUp ? "+" : ""}{formatDecimal(stock.price.changePercent, 2)}%)</span>
+            </div>
           </div>
-          <div style={{ color: priceColor, fontSize: "12px", fontWeight: 500 }}>
-            ({isUp ? "+" : ""}{formatDecimal(changePercent, 2)}%)
-          </div>
         </div>
+        {stock.price.marketCap != null && (
+          <div style={{
+            color: TERMINAL_COLORS.secondaryText,
+            fontSize: "11px",
+            fontWeight: 400,
+            fontVariantNumeric: "tabular-nums",
+          }}>
+            Market Cap: ₱{formatNumber(Math.round(stock.price.marketCap / 1_000_000))}M
+          </div>
+        )}
       </div>
     </div>
   );
 }
 
-// ── Compact Metrics Table ──
-function MetricsTable({ stock }: { stock: StockResearchDetail }) {
+// ── FUNDAMENTALS GRID: P/E | P/B | ROE | D/E ──
+function FundamentalsGrid({ stock }: { stock: StockResearchDetail }) {
   const fundamentals = stock.fundamentals ?? {};
-
-  const rows = [
-    { label: "Market Cap", value: stock.price.marketCap != null ? `₱${formatNumber(Math.round(stock.price.marketCap / 1_000_000))}M` : "—", align: "right" as const },
-    { label: "PE (TTM)", value: formatDecimal(fundamentals.pe, 1), align: "right" as const },
-    { label: "PB Ratio", value: formatDecimal(fundamentals.pb, 1), align: "right" as const },
-    { label: "Dividend Yield", value: fundamentals.dividendYield != null ? `${formatDecimal(fundamentals.dividendYield, 2)}%` : "—", align: "right" as const },
-    { label: "ROE", value: stock.roe != null ? `${formatDecimal(stock.roe, 1)}%` : "—", align: "right" as const },
-    { label: "EPS (TTM)", value: fundamentals.eps != null ? `₱${formatDecimal(fundamentals.eps, 1)}` : "—", align: "right" as const },
-    { label: "Net Margin", value: fundamentals.netMargin != null ? `${formatDecimal(fundamentals.netMargin, 1)}%` : "—", align: "right" as const },
-    { label: "Debt/Equity", value: formatDecimal(stock.debtToEquity, 2), align: "right" as const },
-    { label: "52W High", value: fundamentals.high52w != null ? `₱${formatNumber(fundamentals.high52w)}` : "—", align: "right" as const },
-    { label: "52W Low", value: fundamentals.low52w != null ? `₱${formatNumber(fundamentals.low52w)}` : "—", align: "right" as const },
+  const items = [
+    { label: "P/E", value: formatDecimal(fundamentals.pe, 1), sublabel: "Price/Earnings" },
+    { label: "P/B", value: formatDecimal(fundamentals.pb, 1), sublabel: "Price/Book" },
+    { label: "ROE", value: stock.roe != null ? `${formatDecimal(stock.roe, 1)}%` : "—", sublabel: "Return on Equity" },
+    { label: "D/E", value: formatDecimal(stock.debtToEquity, 2), sublabel: "Debt/Equity" },
   ];
 
   return (
     <div style={{
-      borderCollapse: "collapse",
-      width: "100%",
-      fontSize: "12px",
+      display: "grid",
+      gridTemplateColumns: "repeat(4, 1fr)",
+      gap: "12px",
+      padding: "12px",
+      background: TERMINAL_COLORS.panel,
+      border: `1px solid rgba(255,255,255,0.05)`,
+      borderRadius: "0",
       fontFamily: "'SF Mono', 'JetBrains Mono', 'Roboto Mono', monospace",
     }}>
-      <table style={{ width: "100%", borderCollapse: "collapse" }}>
-        <tbody>
-          {rows.map((row, idx) => (
-            <tr key={idx} style={{
-              borderBottom: idx < rows.length - 1 ? `1px solid rgba(255,255,255,0.05)` : "none",
-              height: "32px",
-            }}>
-              <td style={{
-                padding: "8px 12px 8px 0",
-                color: TERMINAL_COLORS.secondaryText,
-                textAlign: "left",
-                fontWeight: 500,
-              }}>
-                {row.label}
-              </td>
-              <td style={{
-                padding: "8px 0 8px 12px",
-                color: TERMINAL_COLORS.monoText,
-                textAlign: row.align,
-                fontWeight: 500,
-                fontVariantNumeric: "tabular-nums",
-              }}>
-                {row.value}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      {items.map((item, idx) => (
+        <div key={idx} style={{ display: "grid", gap: "3px" }}>
+          <div style={{
+            color: TERMINAL_COLORS.secondaryText,
+            fontSize: "9px",
+            fontWeight: 700,
+            textTransform: "uppercase",
+            letterSpacing: "0.05em",
+          }}>
+            {item.label}
+          </div>
+          <div style={{
+            color: TERMINAL_COLORS.monoText,
+            fontSize: "16px",
+            fontWeight: 700,
+            fontVariantNumeric: "tabular-nums",
+            lineHeight: 1.2,
+          }}>
+            {item.value}
+          </div>
+          <div style={{
+            color: TERMINAL_COLORS.secondaryText,
+            fontSize: "8px",
+            fontWeight: 400,
+            fontFamily: "system-ui, -apple-system, sans-serif",
+          }}>
+            {item.sublabel}
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
 
-// ── Score Indicator (Compact Ring) ──
-function ScoreRing({ label, value }: { label: string; value: number }) {
-  const r = 32;
-  const circumference = 2 * Math.PI * r;
-  const strokeDashoffset = circumference - (value / 100) * circumference;
-  const ringColor = value >= 75 ? TERMINAL_COLORS.gainGreen : value >= 50 ? "#F59728" : TERMINAL_COLORS.lossRed;
+// ── METRICS/SCORES TABLE ──
+function MetricsTable({ stock }: { stock: StockResearchDetail }) {
+  const fundamentals = stock.fundamentals ?? {};
+
+  const rows = [
+    { label: "Market Cap", value: stock.price.marketCap != null ? `₱${formatNumber(Math.round(stock.price.marketCap / 1_000_000))}M` : "—" },
+    { label: "EPS (TTM)", value: fundamentals.eps != null ? `₱${formatDecimal(fundamentals.eps, 2)}` : "—" },
+    { label: "Dividend Yield", value: fundamentals.dividendYield != null ? `${formatDecimal(fundamentals.dividendYield, 2)}%` : "—" },
+    { label: "Net Margin", value: fundamentals.netMargin != null ? `${formatDecimal(fundamentals.netMargin, 1)}%` : "—" },
+    { label: "52W High", value: fundamentals.high52w != null ? `₱${formatNumber(fundamentals.high52w)}` : "—" },
+    { label: "52W Low", value: fundamentals.low52w != null ? `₱${formatNumber(fundamentals.low52w)}` : "—" },
+  ];
 
   return (
-    <div style={{ display: "grid", justifyItems: "center", gap: "8px" }}>
-      <svg width={80} height={80} viewBox="0 0 80 80">
-        <circle cx={40} cy={40} r={r} fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="6" />
-        <circle cx={40} cy={40} r={r} fill="none" stroke={ringColor} strokeWidth="6"
-          strokeDasharray={circumference} strokeDashoffset={strokeDashoffset}
-          strokeLinecap="round" transform="rotate(-90 40 40)"
-          style={{ transition: "stroke-dashoffset 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)" }} />
-        <text x="40" y="45" textAnchor="middle" fontSize="20" fontWeight="600" fill={TERMINAL_COLORS.monoText}>
-          {Math.round(value)}
-        </text>
-      </svg>
-      <span style={{ color: TERMINAL_COLORS.secondaryText, fontSize: "11px", letterSpacing: "0.04em", textTransform: "uppercase", fontWeight: 600 }}>
-        {label}
-      </span>
-    </div>
+    <table style={{
+      width: "100%",
+      borderCollapse: "collapse",
+      fontSize: "11px",
+      fontFamily: "'SF Mono', 'JetBrains Mono', 'Roboto Mono', monospace",
+    }}>
+      <tbody>
+        {rows.map((row, idx) => (
+          <tr key={idx} style={{
+            borderBottom: idx < rows.length - 1 ? `1px solid rgba(255,255,255,0.05)` : "none",
+            height: "28px",
+          }}>
+            <td style={{
+              padding: "6px 8px",
+              color: TERMINAL_COLORS.secondaryText,
+              textAlign: "left",
+              fontWeight: 500,
+              fontSize: "10px",
+            }}>
+              {row.label}
+            </td>
+            <td style={{
+              padding: "6px 8px",
+              color: TERMINAL_COLORS.monoText,
+              textAlign: "right",
+              fontWeight: 600,
+              fontVariantNumeric: "tabular-nums",
+              fontSize: "11px",
+            }}>
+              {row.value}
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+}
+
+// ── SCORES TABLE (Quality, Valuation, Growth, etc.) ──
+function ScoresTable({ stock }: { stock: StockResearchDetail }) {
+  const scores = stock.scores ?? {};
+  const scoreItems = [
+    { label: "Quality", value: scores.quality },
+    { label: "Valuation", value: scores.valuation },
+    { label: "Growth", value: scores.growth },
+    { label: "Momentum", value: scores.momentum },
+    { label: "Risk", value: scores.risk },
+  ];
+
+  const getScoreColor = (value: number | null) => {
+    if (value == null) return TERMINAL_COLORS.secondaryText;
+    if (value >= 70) return TERMINAL_COLORS.gainGreen;
+    if (value >= 50) return TERMINAL_COLORS.accent;
+    return TERMINAL_COLORS.lossRed;
+  };
+
+  return (
+    <table style={{
+      width: "100%",
+      borderCollapse: "collapse",
+      fontSize: "11px",
+      fontFamily: "'SF Mono', 'JetBrains Mono', 'Roboto Mono', monospace",
+    }}>
+      <tbody>
+        {scoreItems.map((item, idx) => (
+          <tr key={idx} style={{
+            borderBottom: idx < scoreItems.length - 1 ? `1px solid rgba(255,255,255,0.05)` : "none",
+            height: "28px",
+          }}>
+            <td style={{
+              padding: "6px 8px",
+              color: TERMINAL_COLORS.secondaryText,
+              textAlign: "left",
+              fontWeight: 500,
+              fontSize: "10px",
+            }}>
+              {item.label}
+            </td>
+            <td style={{
+              padding: "6px 8px",
+              color: getScoreColor(item.value),
+              textAlign: "right",
+              fontWeight: 600,
+              fontVariantNumeric: "tabular-nums",
+              fontSize: "11px",
+            }}>
+              {item.value != null ? `${item.value}/100` : "—"}
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
   );
 }
 
@@ -381,13 +481,13 @@ function StockSkeleton() {
       initial="hidden"
       animate="visible"
       variants={{ visible: { transition: { staggerChildren: 0.06 } } }}
-      style={{ display: "grid", gap: "16px", maxWidth: 1400, margin: "0 auto", padding: "16px" }}
+      style={{ display: "grid", gap: "12px", maxWidth: 1200, margin: "0 auto", padding: "12px" }}
     >
       <motion.div variants={fadeUp} transition={pageTransition}>
         <PriceSkeleton />
       </motion.div>
       <motion.div variants={fadeUp} transition={pageTransition}>
-        <ChartSkeleton height={300} />
+        <ChartSkeleton height={280} />
       </motion.div>
       <motion.div variants={fadeUp} transition={pageTransition}>
         <MetricsSkeleton />
@@ -404,32 +504,32 @@ function StockError({ symbol, onRetry }: { symbol: string; onRetry?: () => void 
       transition={pageTransition}
       style={{
         maxWidth: 480,
-        margin: "80px auto",
-        padding: "24px",
+        margin: "60px auto",
+        padding: "16px",
         textAlign: "center",
-        border: `1px solid rgba(255,255,255,0.1)`,
-        borderRadius: "6px",
+        border: `1px solid rgba(255,255,255,0.05)`,
+        borderRadius: "0",
         background: TERMINAL_COLORS.panel,
         display: "grid",
-        gap: "12px",
+        gap: "8px",
         justifyItems: "center",
       }}
     >
       <div style={{
-        width: "44px",
-        height: "44px",
-        borderRadius: "50%",
+        width: "40px",
+        height: "40px",
+        borderRadius: "0",
         background: `rgba(239,68,68,0.15)`,
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
       }}>
-        <AlertCircle size={22} color="#EF4444" />
+        <AlertCircle size={20} color="#EF4444" />
       </div>
-      <div style={{ color: TERMINAL_COLORS.monoText, fontSize: "15px", fontWeight: 600 }}>
+      <div style={{ color: TERMINAL_COLORS.monoText, fontSize: "13px", fontWeight: 600 }}>
         Failed to load {symbol}
       </div>
-      <p style={{ color: TERMINAL_COLORS.secondaryText, fontSize: "12px", lineHeight: "1.5", margin: 0 }}>
+      <p style={{ color: TERMINAL_COLORS.secondaryText, fontSize: "11px", lineHeight: "1.5", margin: 0 }}>
         Data feed unavailable. Please try again.
       </p>
       {onRetry && (
@@ -438,21 +538,22 @@ function StockError({ symbol, onRetry }: { symbol: string; onRetry?: () => void 
           whileTap={{ scale: 0.96 }}
           onClick={onRetry}
           style={{
-            marginTop: "8px",
+            marginTop: "6px",
             display: "inline-flex",
             alignItems: "center",
-            gap: "6px",
-            padding: "8px 16px",
-            borderRadius: "4px",
+            gap: "4px",
+            padding: "6px 12px",
+            borderRadius: "0",
             border: `1px solid rgba(255,255,255,0.1)`,
             background: TERMINAL_COLORS.accent,
             color: "white",
-            fontSize: "12px",
+            fontSize: "11px",
             fontWeight: 600,
             cursor: "pointer",
+            height: "32px",
           }}
         >
-          <RefreshCw size={14} /> Retry
+          <RefreshCw size={12} /> Retry
         </motion.button>
       )}
     </motion.div>
@@ -467,13 +568,9 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
   period: string;
 }) {
   const navigate = useNavigate();
-  const heroRef = useRef<HTMLDivElement>(null);
   const [ai, setAi] = useState<AIAnalysis | null>(null);
   const [aiLoading, setAiLoading] = useState(false);
-  const [aiError, setAiError] = useState<string | null>(null);
   const [timeframe, setTimeframe] = useState<(typeof TIMEFRAMES)[number]>("1Y");
-  const [chartType, setChartType] = useState<"line" | "candle">("line");
-  const [showFinancialTable, setShowFinancialTable] = useState(false);
   const [financialMetric, setFinancialMetric] = useState<FinancialMetric>("revenue");
   const [financialPeriod, setFinancialPeriod] = useState<FinancialPeriod>("annual");
   const [isBrokerOpen, setIsBrokerOpen] = useState(false);
@@ -487,12 +584,10 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
   const effectiveShareholding = shareholding ?? shareholdingSeriesArr.find((item) => item.period === period) ?? shareholdingSeriesArr[0];
   const selectedFinancialSeries = stock.financials?.[financialPeriod]?.[financialMetric] ?? [];
   const effectiveChartData = (financialChartData?.length ?? 0) > 0 ? financialChartData : (selectedFinancialSeries ?? []).map((item: any) => ({ period: item?.period || "N/A", value: Math.round(item?.value || 0) }));
-  const newsItems = (stock.news ?? []).slice(0, 7);
+  const newsItems = (stock.news ?? []).slice(0, 5);
   const disclaimer = "StockEx research is for informational purposes only and is not investment advice.";
   const fundamentals = stock.fundamentals ?? {};
   const financialsReal = stock.dataSources.financials === "real" || stock.dataSources.financials === "pseApi";
-  const shareholdingReal = stock.dataSources.shareholding === "real" || stock.dataSources.shareholding === "pseApi";
-  const newsReal = stock.dataSources.news === "real";
   const companyProfile = stock.companyProfile ?? {
     founded: "—",
     ceo: "—",
@@ -514,14 +609,12 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
       technical: stock.scores.momentum ?? 50,
     };
     setAiLoading(true);
-    setAiError(null);
     generateStockAnalysis(stock.symbol, stock.companyName, stock.price.current, scores, stock.thesis?.thesis)
-      .then((result) => { if (!cancelled) { setAi(result); setAiError(null); setAiLoading(false); } })
+      .then((result) => { if (!cancelled) { setAi(result); setAiLoading(false); } })
       .catch((err) => {
         if (!cancelled) {
           console.error('AI analysis error:', err);
           setAi(fallbackAnalysis(scores));
-          setAiError('AI analysis unavailable');
           setAiLoading(false);
         }
       });
@@ -529,31 +622,15 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
   }, [stock.symbol]);
 
   const boardLotSize = getBoardLotSize(stock.price.current);
-  const boardTickSize = getTickSize(stock.price.current);
   const newsEventPack = buildNewsEventPack(stock.symbol, stock.news);
-  const researchContext = toResearchAiContext({
-    symbol: stock.symbol,
-    companyName: stock.companyName,
-    headline: stock.thesis.thesis,
-    thesis: [stock.thesis.bullCase],
-    risksToReview: [stock.thesis.bearCase],
-    whatToWatch: [stock.thesis.whatToWatch],
-    methodNote: "Summary based on the signals shown on this page.",
-  }, "stock");
-
-  const enrichedResearchContext = researchContext
-    ? (enrichResearchContextWithEvents(researchContext, newsEventPack) ?? researchContext)
-    : null;
 
   const [retrievalContext, setRetrievalContext] = useState<string | null>(null);
-  const [evidenceAggregate, setEvidenceAggregate] = useState<EvidenceRetrievalAggregate | null>(null);
   useEffect(() => {
     let cancelled = false;
     (async () => {
       try {
         const result = await buildEvidenceRetrievalAggregate(stock.symbol, { symbol: stock.symbol, maxPerSource: 8, lookbackDays: 90 });
         if (!cancelled) {
-          setEvidenceAggregate(result.aggregate);
           setRetrievalContext(compressEventEvidencePack(result.pack));
         }
       } catch { /* graceful degradation */ }
@@ -561,30 +638,21 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
     return () => { cancelled = true; };
   }, [stock.symbol]);
 
-  const finalResearchContext: typeof enrichedResearchContext = enrichedResearchContext && retrievalContext
-    ? { ...enrichedResearchContext, extraContext: [enrichedResearchContext.extraContext, retrievalContext].filter(Boolean).join('\n') }
-    : enrichedResearchContext;
-
   return (
     <div style={{
       display: "grid",
-      gap: "16px",
+      gap: "12px",
       background: TERMINAL_COLORS.canvas,
       color: TERMINAL_COLORS.monoText,
       minHeight: "100vh",
     }}>
-      {/* ── Terminal Header ── */}
-      <TerminalHeader
-        symbol={stock.symbol}
-        price={stock.price.current}
-        changeAbs={stock.price.changeAbs}
-        changePercent={stock.price.changePercent}
-        companyName={stock.companyName}
-      />
+      {/* ── HERO SECTION ── */}
+      <HeroSection stock={stock} />
 
-      {/* ── Main Content ── */}
-      <div style={{ display: "grid", gap: "16px", padding: "0 16px 48px", maxWidth: "1400px", margin: "0 auto", width: "100%" }}>
-        {/* ── Back Button ── */}
+      {/* ── MAIN CONTENT ── */}
+      <div style={{ display: "grid", gap: "12px", padding: "0 12px 36px", maxWidth: "1400px", margin: "0 auto", width: "100%" }}>
+
+        {/* Back Button */}
         <motion.button
           onClick={() => navigate(-1)}
           whileHover={{ scale: 1.02 }}
@@ -592,63 +660,63 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
           style={{
             border: `1px solid rgba(255,255,255,0.1)`,
             background: "transparent",
-            padding: "6px 12px",
-            borderRadius: "4px",
+            padding: "4px 10px",
+            borderRadius: "0",
             display: "inline-flex",
             alignItems: "center",
-            gap: "6px",
+            gap: "4px",
             color: TERMINAL_COLORS.secondaryText,
             cursor: "pointer",
-            fontSize: "12px",
+            fontSize: "11px",
             fontWeight: 500,
             width: "fit-content",
+            height: "28px",
           }}
         >
-          <ArrowLeft size={14} /> Back
+          <ArrowLeft size={12} /> Back
         </motion.button>
 
-        {/* ── Price Chart Section ── */}
+        {/* ── PRICE CHART SECTION ── */}
         <div style={{
           border: `1px solid rgba(255,255,255,0.05)`,
-          borderRadius: "6px",
-          padding: "12px",
+          borderRadius: "0",
+          padding: "8px",
           background: TERMINAL_COLORS.panel,
         }}>
           <div style={{
             display: "flex",
-            gap: "8px",
-            marginBottom: "12px",
+            gap: "6px",
+            marginBottom: "8px",
             flexWrap: "wrap",
             alignItems: "center",
-            fontSize: "12px",
+            fontSize: "11px",
           }}>
-            <div style={{ display: "flex", gap: "4px" }}>
-              {TIMEFRAMES.map((value) => (
-                <button
-                  key={value}
-                  onClick={() => setTimeframe(value)}
-                  style={{
-                    padding: "6px 12px",
-                    borderRadius: "4px",
-                    border: "none",
-                    cursor: "pointer",
-                    fontSize: "11px",
-                    fontWeight: 600,
-                    background: value === timeframe ? TERMINAL_COLORS.accent : "rgba(255,255,255,0.05)",
-                    color: value === timeframe ? "white" : TERMINAL_COLORS.secondaryText,
-                  }}
-                >
-                  {value}
-                </button>
-              ))}
-            </div>
+            {TIMEFRAMES.map((value) => (
+              <button
+                key={value}
+                onClick={() => setTimeframe(value)}
+                style={{
+                  padding: "4px 10px",
+                  borderRadius: "0",
+                  border: "none",
+                  cursor: "pointer",
+                  fontSize: "10px",
+                  fontWeight: 600,
+                  background: value === timeframe ? TERMINAL_COLORS.accent : "rgba(255,255,255,0.05)",
+                  color: value === timeframe ? "white" : TERMINAL_COLORS.secondaryText,
+                  height: "28px",
+                }}
+              >
+                {value}
+              </button>
+            ))}
           </div>
           <ChartErrorBoundary>
             <div style={{
               width: "100%",
-              height: "300px",
+              height: "280px",
               backgroundColor: TERMINAL_COLORS.canvas,
-              borderRadius: "4px",
+              borderRadius: "0",
               border: `1px solid rgba(255,255,255,0.05)`,
               overflow: "hidden",
             }}>
@@ -657,218 +725,212 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
                 ohlcData={transformToOHLC(stock.priceHistory?.[getApiTimeframe(timeframe)] ?? [])}
                 timeframe={timeframe as any}
                 showIndicators={true}
-                height={280}
+                height={260}
               />
             </div>
           </ChartErrorBoundary>
         </div>
 
-        {/* ── Two-Column Dashboard ── */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
-          {/* ── Metrics Table ── */}
+        {/* ── FUNDAMENTALS GRID ── */}
+        <FundamentalsGrid stock={stock} />
+
+        {/* ── THREE-COLUMN LAYOUT: Metrics | Scores | Company Profile ── */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "12px" }}>
+          {/* Extended Metrics */}
           <div style={{
             border: `1px solid rgba(255,255,255,0.05)`,
-            borderRadius: "6px",
-            padding: "12px",
+            borderRadius: "0",
+            padding: "8px",
             background: TERMINAL_COLORS.panel,
           }}>
             <div style={{
-              fontSize: "12px",
-              fontWeight: 600,
-              letterSpacing: "0.04em",
+              fontSize: "9px",
+              fontWeight: 700,
+              letterSpacing: "0.05em",
               textTransform: "uppercase",
               color: TERMINAL_COLORS.secondaryText,
-              marginBottom: "12px",
+              marginBottom: "8px",
             }}>
-              Fundamentals
+              Metrics
             </div>
             <MetricsTable stock={stock} />
           </div>
 
-          {/* ── Score Indicators ── */}
+          {/* Scores */}
           <div style={{
             border: `1px solid rgba(255,255,255,0.05)`,
-            borderRadius: "6px",
-            padding: "12px",
+            borderRadius: "0",
+            padding: "8px",
             background: TERMINAL_COLORS.panel,
-            display: "flex",
-            gap: "16px",
-            justifyContent: "space-around",
-            alignItems: "center",
           }}>
-            <ScoreRing label="Health" value={stock.scores.health ?? 0} />
-            <ScoreRing label="Momentum" value={stock.scores.momentum ?? 0} />
-            <ScoreRing label="Risk Adj" value={stock.scores.riskAdjusted ?? stock.scores.health ?? 0} />
+            <div style={{
+              fontSize: "9px",
+              fontWeight: 700,
+              letterSpacing: "0.05em",
+              textTransform: "uppercase",
+              color: TERMINAL_COLORS.secondaryText,
+              marginBottom: "8px",
+            }}>
+              Scores
+            </div>
+            <ScoresTable stock={stock} />
+          </div>
+
+          {/* Company Profile */}
+          <div style={{
+            border: `1px solid rgba(255,255,255,0.05)`,
+            borderRadius: "0",
+            padding: "8px",
+            background: TERMINAL_COLORS.panel,
+          }}>
+            <div style={{
+              fontSize: "9px",
+              fontWeight: 700,
+              letterSpacing: "0.05em",
+              textTransform: "uppercase",
+              color: TERMINAL_COLORS.secondaryText,
+              marginBottom: "8px",
+            }}>
+              About
+            </div>
+            <p style={{
+              color: TERMINAL_COLORS.monoText,
+              fontSize: "10px",
+              fontWeight: 400,
+              lineHeight: "1.4",
+              margin: "0 0 8px 0",
+              fontFamily: "system-ui, -apple-system, sans-serif",
+            }}>
+              {stock.description}
+            </p>
+            <table style={{
+              width: "100%",
+              borderCollapse: "collapse",
+              fontSize: "10px",
+              fontFamily: "'SF Mono', 'JetBrains Mono', 'Roboto Mono', monospace",
+            }}>
+              <tbody>
+                <tr style={{ borderBottom: `1px solid rgba(255,255,255,0.05)` }}>
+                  <td style={{ padding: "4px 0", color: TERMINAL_COLORS.secondaryText, fontSize: "9px" }}>Founded</td>
+                  <td style={{ padding: "4px 0", color: TERMINAL_COLORS.monoText, fontWeight: 500, fontSize: "10px", textAlign: "right" }}>{companyProfile.founded}</td>
+                </tr>
+                <tr style={{ borderBottom: `1px solid rgba(255,255,255,0.05)` }}>
+                  <td style={{ padding: "4px 0", color: TERMINAL_COLORS.secondaryText, fontSize: "9px" }}>CEO</td>
+                  <td style={{ padding: "4px 0", color: TERMINAL_COLORS.monoText, fontWeight: 500, fontSize: "10px", textAlign: "right" }}>{companyProfile.ceo}</td>
+                </tr>
+                <tr style={{ borderBottom: `1px solid rgba(255,255,255,0.05)` }}>
+                  <td style={{ padding: "4px 0", color: TERMINAL_COLORS.secondaryText, fontSize: "9px" }}>HQ</td>
+                  <td style={{ padding: "4px 0", color: TERMINAL_COLORS.monoText, fontWeight: 500, fontSize: "10px", textAlign: "right" }}>{companyProfile.hq}</td>
+                </tr>
+                <tr>
+                  <td style={{ padding: "4px 0", color: TERMINAL_COLORS.secondaryText, fontSize: "9px" }}>Sector</td>
+                  <td style={{ padding: "4px 0", color: TERMINAL_COLORS.monoText, fontWeight: 500, fontSize: "10px", textAlign: "right" }}>{stock.sector}</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
 
-        {/* ── Company Profile ── */}
+        {/* ── FINANCIALS CHART ── */}
         <div style={{
           border: `1px solid rgba(255,255,255,0.05)`,
-          borderRadius: "6px",
-          padding: "12px",
-          background: TERMINAL_COLORS.panel,
-        }}>
-          <div style={{
-            fontSize: "12px",
-            fontWeight: 600,
-            letterSpacing: "0.04em",
-            textTransform: "uppercase",
-            color: TERMINAL_COLORS.secondaryText,
-            marginBottom: "12px",
-          }}>
-            About {stock.companyName}
-          </div>
-          <p style={{
-            color: TERMINAL_COLORS.monoText,
-            fontSize: "13px",
-            fontWeight: 400,
-            lineHeight: "1.6",
-            margin: "0 0 12px 0",
-          }}>
-            {stock.description}
-          </p>
-          <div style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
-            gap: "12px",
-            fontSize: "11px",
-            fontFamily: "'SF Mono', 'JetBrains Mono', 'Roboto Mono', monospace",
-          }}>
-            <div>
-              <div style={{ color: TERMINAL_COLORS.secondaryText, marginBottom: "4px" }}>Founded</div>
-              <div style={{ color: TERMINAL_COLORS.monoText, fontWeight: 500 }}>{companyProfile.founded}</div>
-            </div>
-            <div>
-              <div style={{ color: TERMINAL_COLORS.secondaryText, marginBottom: "4px" }}>CEO</div>
-              <div style={{ color: TERMINAL_COLORS.monoText, fontWeight: 500 }}>{companyProfile.ceo}</div>
-            </div>
-            <div>
-              <div style={{ color: TERMINAL_COLORS.secondaryText, marginBottom: "4px" }}>HQ</div>
-              <div style={{ color: TERMINAL_COLORS.monoText, fontWeight: 500 }}>{companyProfile.hq}</div>
-            </div>
-            <div>
-              <div style={{ color: TERMINAL_COLORS.secondaryText, marginBottom: "4px" }}>Sector</div>
-              <div style={{ color: TERMINAL_COLORS.monoText, fontWeight: 500 }}>{stock.sector}</div>
-            </div>
-          </div>
-        </div>
-
-        {/* ── Financials ── */}
-        <div style={{
-          border: `1px solid rgba(255,255,255,0.05)`,
-          borderRadius: "6px",
-          padding: "12px",
+          borderRadius: "0",
+          padding: "8px",
           background: TERMINAL_COLORS.panel,
         }}>
           <div style={{
             display: "flex",
             justifyContent: "space-between",
-            gap: "12px",
+            gap: "8px",
             flexWrap: "wrap",
-            marginBottom: "12px",
+            marginBottom: "8px",
+            alignItems: "center",
           }}>
             <div style={{
-              fontSize: "12px",
-              fontWeight: 600,
-              letterSpacing: "0.04em",
+              fontSize: "9px",
+              fontWeight: 700,
+              letterSpacing: "0.05em",
               textTransform: "uppercase",
               color: TERMINAL_COLORS.secondaryText,
             }}>
               Financials
             </div>
             <span style={{
-              fontSize: "10px",
+              fontSize: "9px",
               fontWeight: 600,
-              padding: "2px 8px",
-              borderRadius: "3px",
-              background: financialsReal ? "rgba(16,185,129,0.2)" : "rgba(245,152,45,0.2)",
+              padding: "2px 6px",
+              borderRadius: "0",
+              background: financialsReal ? "rgba(16,185,129,0.15)" : "rgba(245,152,45,0.15)",
               color: financialsReal ? TERMINAL_COLORS.gainGreen : "#F59728",
+              border: `1px solid ${financialsReal ? "rgba(16,185,129,0.3)" : "rgba(245,152,45,0.3)"}`,
             }}>
               {financialsReal ? "Verified" : "Estimated"}
             </span>
           </div>
-          <div style={{ display: "flex", gap: "8px", marginBottom: "12px", flexWrap: "wrap" }}>
-            <button
-              onClick={() => setFinancialMetric("revenue")}
-              style={{
-                padding: "4px 10px",
-                borderRadius: "4px",
-                border: "none",
-                cursor: "pointer",
-                fontSize: "11px",
-                fontWeight: 600,
-                background: financialMetric === "revenue" ? TERMINAL_COLORS.accent : "rgba(255,255,255,0.05)",
-                color: financialMetric === "revenue" ? "white" : TERMINAL_COLORS.secondaryText,
-              }}
-            >
-              Revenue
-            </button>
-            <button
-              onClick={() => setFinancialMetric("profit")}
-              style={{
-                padding: "4px 10px",
-                borderRadius: "4px",
-                border: "none",
-                cursor: "pointer",
-                fontSize: "11px",
-                fontWeight: 600,
-                background: financialMetric === "profit" ? TERMINAL_COLORS.accent : "rgba(255,255,255,0.05)",
-                color: financialMetric === "profit" ? "white" : TERMINAL_COLORS.secondaryText,
-              }}
-            >
-              Profit
-            </button>
-            <button
-              onClick={() => setFinancialPeriod("annual")}
-              style={{
-                padding: "4px 10px",
-                borderRadius: "4px",
-                border: "none",
-                cursor: "pointer",
-                fontSize: "11px",
-                fontWeight: 600,
-                background: financialPeriod === "annual" ? TERMINAL_COLORS.accent : "rgba(255,255,255,0.05)",
-                color: financialPeriod === "annual" ? "white" : TERMINAL_COLORS.secondaryText,
-              }}
-            >
-              Annual
-            </button>
-            <button
-              onClick={() => setFinancialPeriod("quarterly")}
-              style={{
-                padding: "4px 10px",
-                borderRadius: "4px",
-                border: "none",
-                cursor: "pointer",
-                fontSize: "11px",
-                fontWeight: 600,
-                background: financialPeriod === "quarterly" ? TERMINAL_COLORS.accent : "rgba(255,255,255,0.05)",
-                color: financialPeriod === "quarterly" ? "white" : TERMINAL_COLORS.secondaryText,
-              }}
-            >
-              Quarterly
-            </button>
+          <div style={{ display: "flex", gap: "6px", marginBottom: "8px", flexWrap: "wrap" }}>
+            {["revenue" as const, "profit" as const].map((metric) => (
+              <button
+                key={metric}
+                onClick={() => setFinancialMetric(metric)}
+                style={{
+                  padding: "2px 8px",
+                  borderRadius: "0",
+                  border: "none",
+                  cursor: "pointer",
+                  fontSize: "10px",
+                  fontWeight: 600,
+                  background: financialMetric === metric ? TERMINAL_COLORS.accent : "rgba(255,255,255,0.05)",
+                  color: financialMetric === metric ? "white" : TERMINAL_COLORS.secondaryText,
+                  height: "24px",
+                  textTransform: "capitalize",
+                }}
+              >
+                {metric}
+              </button>
+            ))}
+            <div style={{ marginLeft: "auto", display: "flex", gap: "6px" }}>
+              {["annual" as const, "quarterly" as const].map((p) => (
+                <button
+                  key={p}
+                  onClick={() => setFinancialPeriod(p)}
+                  style={{
+                    padding: "2px 8px",
+                    borderRadius: "0",
+                    border: "none",
+                    cursor: "pointer",
+                    fontSize: "10px",
+                    fontWeight: 600,
+                    background: financialPeriod === p ? TERMINAL_COLORS.accent : "rgba(255,255,255,0.05)",
+                    color: financialPeriod === p ? "white" : TERMINAL_COLORS.secondaryText,
+                    height: "24px",
+                    textTransform: "capitalize",
+                  }}
+                >
+                  {p}
+                </button>
+              ))}
+            </div>
           </div>
           <ChartErrorBoundary>
             <div style={{
               width: "100%",
-              height: "250px",
+              height: "200px",
               backgroundColor: TERMINAL_COLORS.canvas,
-              borderRadius: "4px",
+              borderRadius: "0",
               border: `1px solid rgba(255,255,255,0.05)`,
             }}>
               <ResponsiveContainer width="100%" height="100%">
                 <LazyBarChart data={effectiveChartData}>
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
-                  <XAxis dataKey="period" tick={{ fontSize: 11, fill: TERMINAL_COLORS.secondaryText }} />
-                  <YAxis tick={{ fontSize: 11, fill: TERMINAL_COLORS.secondaryText }} />
+                  <XAxis dataKey="period" tick={{ fontSize: 10, fill: TERMINAL_COLORS.secondaryText }} />
+                  <YAxis tick={{ fontSize: 10, fill: TERMINAL_COLORS.secondaryText }} />
                   <Tooltip
                     contentStyle={{
                       backgroundColor: TERMINAL_COLORS.panel,
                       border: `1px solid rgba(255,255,255,0.1)`,
-                      borderRadius: "4px",
+                      borderRadius: "0",
                       color: TERMINAL_COLORS.monoText,
+                      fontSize: "10px",
                     }}
                     labelStyle={{ color: TERMINAL_COLORS.monoText }}
                     formatter={(value: any) => `₱${value.toLocaleString()}M`}
@@ -880,28 +942,28 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
           </ChartErrorBoundary>
         </div>
 
-        {/* ── News Feed (Minimal Table) ── */}
+        {/* ── NEWS & EVENTS ── */}
         {newsItems.length > 0 && (
           <div style={{
             border: `1px solid rgba(255,255,255,0.05)`,
-            borderRadius: "6px",
-            padding: "12px",
+            borderRadius: "0",
+            padding: "8px",
             background: TERMINAL_COLORS.panel,
           }}>
             <div style={{
-              fontSize: "12px",
-              fontWeight: 600,
-              letterSpacing: "0.04em",
+              fontSize: "9px",
+              fontWeight: 700,
+              letterSpacing: "0.05em",
               textTransform: "uppercase",
               color: TERMINAL_COLORS.secondaryText,
-              marginBottom: "12px",
+              marginBottom: "8px",
             }}>
-              Latest News
+              News & Events
             </div>
             <div style={{
               display: "grid",
-              gap: "8px",
-              fontSize: "11px",
+              gap: "6px",
+              fontSize: "10px",
               fontFamily: "'SF Mono', 'JetBrains Mono', 'Roboto Mono', monospace",
             }}>
               {newsItems.map((item, idx) => (
@@ -913,16 +975,22 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
                   style={{
                     display: "flex",
                     gap: "8px",
-                    paddingBottom: "8px",
+                    paddingBottom: "6px",
                     borderBottom: idx < newsItems.length - 1 ? `1px solid rgba(255,255,255,0.05)` : "none",
                     textDecoration: "none",
                     color: TERMINAL_COLORS.monoText,
+                    alignItems: "flex-start",
                   }}
                 >
-                  <span style={{ color: TERMINAL_COLORS.accent, minWidth: "50px" }}>
+                  <span style={{
+                    color: TERMINAL_COLORS.accent,
+                    minWidth: "40px",
+                    fontWeight: 600,
+                    fontSize: "10px",
+                  }}>
                     {formatNewsTime(item.publishedAt) || item.time}
                   </span>
-                  <span style={{ color: TERMINAL_COLORS.monoText, flex: 1 }}>
+                  <span style={{ color: TERMINAL_COLORS.monoText, flex: 1, fontSize: "10px" }}>
                     {item.headline}
                   </span>
                 </a>
@@ -931,83 +999,93 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
           </div>
         )}
 
-        {/* ── Investment Thesis ── */}
+        {/* ── INVESTMENT THESIS ── */}
         <div style={{
           border: `1px solid rgba(255,255,255,0.05)`,
-          borderRadius: "6px",
-          padding: "12px",
+          borderRadius: "0",
+          padding: "8px",
           background: TERMINAL_COLORS.panel,
         }}>
           <div style={{
-            fontSize: "12px",
-            fontWeight: 600,
-            letterSpacing: "0.04em",
+            fontSize: "9px",
+            fontWeight: 700,
+            letterSpacing: "0.05em",
             textTransform: "uppercase",
             color: TERMINAL_COLORS.secondaryText,
-            marginBottom: "12px",
+            marginBottom: "8px",
           }}>
             Investment Thesis
           </div>
-          <div style={{ display: "grid", gap: "12px", fontSize: "12px", lineHeight: "1.5" }}>
+          <div style={{
+            display: "grid",
+            gap: "8px",
+            fontSize: "10px",
+            lineHeight: "1.5",
+            fontFamily: "system-ui, -apple-system, sans-serif",
+          }}>
             <div>
-              <div style={{ color: TERMINAL_COLORS.secondaryText, marginBottom: "4px", fontWeight: 600 }}>Stance</div>
-              <div style={{ color: stock.thesis.stance === "High conviction" ? TERMINAL_COLORS.gainGreen : TERMINAL_COLORS.lossRed }}>
+              <div style={{ color: TERMINAL_COLORS.secondaryText, marginBottom: "2px", fontWeight: 700, fontSize: "9px", textTransform: "uppercase", letterSpacing: "0.03em" }}>Stance</div>
+              <div style={{ color: stock.thesis.stance === "High conviction" ? TERMINAL_COLORS.gainGreen : TERMINAL_COLORS.lossRed, fontWeight: 600, fontSize: "11px" }}>
                 {stock.thesis.stance}
               </div>
             </div>
             <div>
-              <div style={{ color: TERMINAL_COLORS.secondaryText, marginBottom: "4px", fontWeight: 600 }}>Thesis</div>
-              <div style={{ color: TERMINAL_COLORS.monoText }}>{stock.thesis.thesis}</div>
+              <div style={{ color: TERMINAL_COLORS.secondaryText, marginBottom: "2px", fontWeight: 700, fontSize: "9px", textTransform: "uppercase", letterSpacing: "0.03em" }}>Thesis</div>
+              <div style={{ color: TERMINAL_COLORS.monoText, fontSize: "10px" }}>{stock.thesis.thesis}</div>
             </div>
-            <div>
-              <div style={{ color: TERMINAL_COLORS.secondaryText, marginBottom: "4px", fontWeight: 600 }}>Bull Case</div>
-              <div style={{ color: TERMINAL_COLORS.monoText }}>{stock.thesis.bullCase}</div>
-            </div>
-            <div>
-              <div style={{ color: TERMINAL_COLORS.secondaryText, marginBottom: "4px", fontWeight: 600 }}>Bear Case</div>
-              <div style={{ color: TERMINAL_COLORS.monoText }}>{stock.thesis.bearCase}</div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
+              <div>
+                <div style={{ color: TERMINAL_COLORS.secondaryText, marginBottom: "2px", fontWeight: 700, fontSize: "9px", textTransform: "uppercase", letterSpacing: "0.03em" }}>Bull Case</div>
+                <div style={{ color: TERMINAL_COLORS.monoText, fontSize: "10px" }}>{stock.thesis.bullCase}</div>
+              </div>
+              <div>
+                <div style={{ color: TERMINAL_COLORS.secondaryText, marginBottom: "2px", fontWeight: 700, fontSize: "9px", textTransform: "uppercase", letterSpacing: "0.03em" }}>Bear Case</div>
+                <div style={{ color: TERMINAL_COLORS.monoText, fontSize: "10px" }}>{stock.thesis.bearCase}</div>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* ── Disclaimer ── */}
+        {/* ── DISCLAIMER ── */}
         <p style={{
           color: TERMINAL_COLORS.secondaryText,
-          fontSize: "10px",
+          fontSize: "9px",
           textAlign: "center",
-          margin: "16px 0",
-          lineHeight: "1.5",
+          margin: "8px 0",
+          lineHeight: "1.4",
+          fontFamily: "system-ui, -apple-system, sans-serif",
         }}>
           {disclaimer}
         </p>
 
-        {/* ── Trade Button ── */}
+        {/* ── TRADE BUTTON ── */}
         {selectedBroker && (
           <motion.button
             onClick={() => setIsBrokerOpen(true)}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             style={{
-              padding: "12px 24px",
-              borderRadius: "4px",
+              padding: "8px 16px",
+              borderRadius: "0",
               border: "none",
               background: TERMINAL_COLORS.accent,
               color: "white",
-              fontSize: "13px",
+              fontSize: "12px",
               fontWeight: 600,
               cursor: "pointer",
               display: "inline-flex",
               alignItems: "center",
-              gap: "8px",
+              gap: "6px",
               alignSelf: "center",
+              height: "36px",
             }}
           >
-            <TrendingUp size={16} /> Trade via {selectedBroker}
+            <TrendingUp size={14} /> Trade via {selectedBroker}
           </motion.button>
         )}
       </div>
 
-      {/* ── Broker Handoff Modal ── */}
+      {/* ── BROKER HANDOFF MODAL ── */}
       {isBrokerOpen && availableBrokers[0] && (
         <BrokerHandoffModal
           broker={availableBrokers[0]}
@@ -1022,7 +1100,7 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
   );
 }
 
-// ── Export ──
+// ── EXPORT ──
 export default function StockPage() {
   const { symbol } = useParams<{ symbol: string }>();
   const seoMeta = useMemo(() => symbol ? buildCompanySeo(symbol, undefined, undefined) : null, [symbol]);
