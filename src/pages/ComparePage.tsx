@@ -143,8 +143,11 @@ export default function ComparePage() {
       style={{ display: "grid", gap: 24, maxWidth: 1000, margin: "0 auto" }}
     >
       <motion.div variants={fadeUp} transition={pageTransition} style={{ display: "grid", gap: 6 }}>
-        <h1 style={{ color: colors.textPrimary, fontSize: "20px", fontWeight: 700, margin: 0 }}>
-          Compare
+        <span style={{ fontFamily: typography.monoFamily, fontSize: 11, letterSpacing: "0.10em", textTransform: "uppercase", color: colors.primary }}>
+          Peer scorecard
+        </span>
+        <h1 style={{ fontFamily: typography.serifFamily, fontStyle: "italic", fontWeight: 500, color: colors.textPrimary, fontSize: 26, margin: "2px 0 2px", letterSpacing: "-0.01em" }}>
+          Line them up.
         </h1>
         <p style={{ fontSize: 13.5, color: colors.textSecondary, lineHeight: 1.5 }}>
           Real, live PSE prices side by side — up to 5 stocks at once.
