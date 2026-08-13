@@ -21,7 +21,7 @@ import { sectorEngine } from "../services/intelligence/engines/SectorEngine/inde
 import { ragEngine } from "../services/intelligence/engines/RAGEngine/index.js";
 import { orchestrator } from "../services/intelligence/Orchestrator.js";
 import type { AllEngineInputs } from "../services/intelligence/Orchestrator.js";
-import { MarketDataGateway } from "../services/data/MarketDataGateway.js";
+import { ProviderCoordinator } from "../services/providers/ProviderCoordinator.js";
 
 // ── Cache helper ───────────────────────────────────────────────────────
 function setCache(reply: FastifyReply, maxAge: number = 300): void {
@@ -669,6 +669,7 @@ const stockCache = new Map<string, { data: unknown; expiresAt: number }>();
 const searchCache = new Map<string, { data: unknown; expiresAt: number }>();
 const quoteCache = new Map<string, { data: unknown; ts: number }>();
 const relStrengthCache = new Map<string, { data: unknown; ts: number }>();
+const providerCoordinator = new ProviderCoordinator();
 const SEARCH_CACHE_TTL = 60_000;
 
 // ── Routes ──────────────────────────────────────────────────────────────────
@@ -771,14 +772,14 @@ export default async function registerApiRoutes(server: FastifyInstance) {
     }
 
     const [gatewayQuote, fundResult, priceHistory, news, cachedFinancials] = await Promise.all([
-      MarketDataGateway.getQuote(cleanSymbol).catch(() => null),
+      providerCoordinator.getQuote(cleanSymbol).catch(() => null),
       pseApiFunds(cleanSymbol).catch(() => null),
-      MarketDataGateway.getHistory(cleanSymbol).catch(() => null),
-      MarketDataGateway.getNews(cleanSymbol).catch(() => null),
-      MarketDataGateway.getFinancials(cleanSymbol).catch(() => null),
+      providerCoordinator.getHistory(cleanSymbol).catch(() => null),
+      providerCoordinator.getNews(cleanSymbol).catch(() => null),
+      providerCoordinator.getFinancials(cleanSymbol).catch(() => null),
     ]);
 
-    const gatewayMeta = await MarketDataGateway.getCompany(cleanSymbol).catch(() => null);
+    const gatewayMeta = await providerCoordinator.getMetadata(cleanSymbol).catch(() => null);
 
     const quote = gatewayQuote;
     const meta = gatewayMeta;

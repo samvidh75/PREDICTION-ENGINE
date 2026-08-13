@@ -6,6 +6,7 @@ import { FinancialProvider } from './FinancialProvider';
 import { StockQuote, CompanyMetadata, HistoricalPoint, FinancialSnapshot } from '../data/types';
 import { YahooProvider } from './YahooProvider';
 import { GoogleNewsRssProvider } from './GoogleNewsRssProvider';
+import { PhisixProvider } from './PhisixProvider';
 
 import { ProviderHealthMonitor } from './ProviderHealthMonitor';
 import { DataFlowTracer } from '../audit/DataFlowTracer';
@@ -49,7 +50,11 @@ export class ProviderCoordinator {
     this.healthMonitor = new ProviderHealthMonitor();
     this.tracer = new DataFlowTracer();
 
-    // ── Price/Metadata/History/Financials: yfinance (PSE tickers use the .PS suffix) ──
+    // ── Price: PHISIX (real PSE live quotes) → fallback to Yahoo ──
+    const phisix = new PhisixProvider();
+    this.circuitBreakers.set(phisix, new ProviderCircuitBreaker({ failureThreshold: 3, openTimeoutMs: 30_000 }));
+    this.priceProviders.push(phisix);
+
     const yahoo = new YahooProvider();
     this.circuitBreakers.set(yahoo, new ProviderCircuitBreaker({ failureThreshold: 3, openTimeoutMs: 60_000 }));
     this.priceProviders.push(yahoo);
