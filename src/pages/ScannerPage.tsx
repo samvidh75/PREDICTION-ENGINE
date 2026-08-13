@@ -1,7 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, TrendingUp, TrendingDown, Activity, RefreshCw, ArrowUpDown } from "lucide-react";
+import {
+  Search, TrendingUp, TrendingDown, Activity, RefreshCw, ArrowUpDown,
+  ChevronUp, ChevronDown, ZoomIn, Filter, BarChart3, Clock,
+} from "lucide-react";
 import { useMarketStatus } from "../hooks/useMarketStatus";
 
 interface UniverseQuote {
@@ -12,13 +15,15 @@ interface UniverseQuote {
   changePercent: number;
   volume: number;
   sector: string | null;
+  pe?: number | null;
+  marketCap?: number | null;
 }
 
-type SortMode = "gainers" | "losers" | "active" | "all";
-type SortField = "changePercent" | "price" | "volume" | "symbol";
+type SortMode = "gainers" | "losers" | "active" | "all" | "breakout";
+type SortField = "changePercent" | "price" | "volume" | "symbol" | "pe" | "marketCap";
 type SortDir = "asc" | "desc";
 
-const VALID_MODES: SortMode[] = ["gainers", "losers", "active", "all"];
+const VALID_MODES: SortMode[] = ["gainers", "losers", "active", "all", "breakout"];
 const LEGACY_MAP: Record<string, SortMode> = {
   "quality-compounders": "all",
   "high-growth": "gainers",
@@ -36,6 +41,7 @@ function resolveInitialMode(p: string | null): SortMode {
 function fmtPeso(n: number) {
   return `₱${n.toLocaleString("en-PH", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
+
 function fmtVol(n: number) {
   if (n >= 1_000_000_000) return `${(n / 1_000_000_000).toFixed(1)}B`;
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
@@ -64,6 +70,9 @@ export default function ScannerPage() {
     resolveInitialMode(searchParams.get("mode") ?? searchParams.get("preset")),
   );
   const [colSort, setColSort] = useState<{ field: SortField; dir: SortDir } | null>(null);
+  const [pageSize, setPageSize] = useState(50);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [selectedSector, setSelectedSector] = useState<string | null>(null);
   const marketStatus = useMarketStatus();
 
   const load = () => {
@@ -85,9 +94,12 @@ export default function ScannerPage() {
 
   const results = useMemo(() => {
     const q = query.trim().toLowerCase();
-    let list = quotes.filter(
-      (s) => !q || s.symbol.toLowerCase().includes(q) || s.name.toLowerCase().includes(q),
-    );
+    let list = quotes.filter((s) => {
+      const matchesQuery = !q || s.symbol.toLowerCase().includes(q) || s.name.toLowerCase().includes(q);
+      const matchesSector = !selectedSector || s.sector === selectedSector;
+      return matchesQuery && matchesSector;
+    });
+
     if (colSort) {
       const { field, dir } = colSort;
       const mul = dir === "desc" ? -1 : 1;
@@ -98,19 +110,28 @@ export default function ScannerPage() {
     } else {
       switch (sortMode) {
         case "gainers": list = [...list].sort((a, b) => b.changePercent - a.changePercent); break;
-        case "losers":  list = [...list].sort((a, b) => a.changePercent - b.changePercent); break;
-        case "active":  list = [...list].sort((a, b) => b.volume - a.volume); break;
-        case "all":     list = [...list].sort((a, b) => a.symbol.localeCompare(b.symbol)); break;
+        case "losers": list = [...list].sort((a, b) => a.changePercent - b.changePercent); break;
+        case "active": list = [...list].sort((a, b) => b.volume - a.volume); break;
+        case "breakout":
+          list = [...list].sort((a, b) => {
+            const aVolRatio = (a.volume ?? 0) / (Math.max(a.price ?? 1, 1) * 1000);
+            const bVolRatio = (b.volume ?? 0) / (Math.max(b.price ?? 1, 1) * 1000);
+            return bVolRatio - aVolRatio;
+          });
+          break;
+        case "all": list = [...list].sort((a, b) => a.symbol.localeCompare(b.symbol)); break;
       }
     }
     return list;
-  }, [quotes, query, sortMode, colSort]);
+  }, [quotes, query, sortMode, colSort, selectedSector]);
 
-  const displayed = results.slice(0, 100);
+  const totalPages = Math.ceil(results.length / pageSize);
+  const displayed = results.slice(currentPage * pageSize, (currentPage + 1) * pageSize);
 
   const handleModeClick = (m: SortMode) => {
     setSortMode(m);
     setColSort(null);
+    setCurrentPage(0);
   };
 
   const handleColSort = (field: SortField) => {
@@ -118,10 +139,18 @@ export default function ScannerPage() {
       if (prev?.field === field) return { field, dir: prev.dir === "desc" ? "asc" : "desc" };
       return { field, dir: "desc" };
     });
+    setCurrentPage(0);
   };
 
   const gains = quotes.filter((q) => q.changePercent > 0).length;
   const losses = quotes.filter((q) => q.changePercent < 0).length;
+  const allSectors = useMemo(() => {
+    const sectorSet = new Set<string>();
+    quotes.forEach((q) => {
+      if (q.sector) sectorSet.add(q.sector);
+    });
+    return Array.from(sectorSet).sort();
+  }, [quotes]);
 
   return (
     <div style={{ display: "grid", gap: 20 }}>
@@ -161,10 +190,10 @@ export default function ScannerPage() {
           <Search size={13} style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)", pointerEvents: "none" }} />
           <input
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(e) => { setQuery(e.target.value); setCurrentPage(0); }}
             placeholder="Search symbol or name…"
             style={{
-              width: "100%", height: 34, boxSizing: "border-box",
+              width: "100%", height: 36, boxSizing: "border-box",
               border: "1px solid var(--border)", background: "var(--bg-sheet)",
               borderRadius: 6, padding: "0 12px 0 30px",
               fontSize: 13, color: "var(--text-primary)", outline: "none",
@@ -181,7 +210,8 @@ export default function ScannerPage() {
             { id: "gainers" as SortMode, label: "Gainers", icon: TrendingUp },
             { id: "losers" as SortMode, label: "Losers", icon: TrendingDown },
             { id: "active" as SortMode, label: "Active", icon: Activity },
-            { id: "all" as SortMode, label: "All", icon: Search },
+            { id: "breakout" as SortMode, label: "Breakouts", icon: ZoomIn },
+            { id: "all" as SortMode, label: "All", icon: BarChart3 },
           ]).map(({ id, label, icon: Icon }) => {
             const active = sortMode === id && !colSort;
             return (
@@ -190,20 +220,40 @@ export default function ScannerPage() {
                 onClick={() => handleModeClick(id)}
                 style={{
                   display: "inline-flex", alignItems: "center", gap: 5,
-                  padding: "0 12px", height: 34, borderRadius: 6,
+                  padding: "0 12px", height: 36, borderRadius: 6,
                   border: active ? "1px solid var(--accent)" : "1px solid var(--border)",
                   background: active ? "var(--accent-soft)" : "var(--bg-chip)",
                   color: active ? "var(--accent)" : "var(--text-secondary)",
-                  fontSize: 12.5, fontWeight: active ? 600 : 400, cursor: "pointer",
+                  fontSize: 12, fontWeight: active ? 600 : 400, cursor: "pointer",
                   transition: "all 150ms ease",
                 }}
               >
-                <Icon size={12} />
+                <Icon size={13} strokeWidth={2.2} />
                 {label}
               </button>
             );
           })}
         </div>
+
+        {/* Sector filter */}
+        {allSectors.length > 0 && (
+          <select
+            value={selectedSector ?? ""}
+            onChange={(e) => { setSelectedSector(e.target.value || null); setCurrentPage(0); }}
+            style={{
+              height: 36, boxSizing: "border-box",
+              border: "1px solid var(--border)", background: "var(--bg-chip)",
+              borderRadius: 6, padding: "0 10px",
+              fontSize: 12, color: selectedSector ? "var(--accent)" : "var(--text-secondary)",
+              cursor: "pointer", outline: "none", fontFamily: "inherit",
+            }}
+          >
+            <option value="">All sectors</option>
+            {allSectors.map((s) => (
+              <option key={s} value={s}>{s}</option>
+            ))}
+          </select>
+        )}
       </div>
 
       {/* ── Data Table ── */}
@@ -212,8 +262,8 @@ export default function ScannerPage() {
         {/* Table Header */}
         <div style={{
           display: "grid",
-          gridTemplateColumns: "44px 1fr 110px 100px 90px 80px 90px",
-          padding: "9px 16px",
+          gridTemplateColumns: "44px 1fr 110px 100px 90px 90px 90px 80px",
+          padding: "10px 16px",
           background: "var(--bg-sheet)",
           borderBottom: "1px solid var(--border)",
           fontSize: 11,
@@ -227,9 +277,10 @@ export default function ScannerPage() {
           <span>Symbol / Company</span>
           <span>Sector</span>
           <SortHeader label="Price" field="price" colSort={colSort} onSort={handleColSort} align="right" />
-          <SortHeader label="Change" field="changePercent" colSort={colSort} onSort={handleColSort} align="right" />
-          <SortHeader label="Abs" field="changePercent" colSort={colSort} onSort={handleColSort} align="right" />
+          <SortHeader label="Change %" field="changePercent" colSort={colSort} onSort={handleColSort} align="right" />
+          <SortHeader label="Change ₱" field="changePercent" colSort={colSort} onSort={handleColSort} align="right" />
           <SortHeader label="Volume" field="volume" colSort={colSort} onSort={handleColSort} align="right" />
+          <SortHeader label="P/E" field="pe" colSort={colSort} onSort={handleColSort} align="right" />
         </div>
 
         {/* Loading */}
@@ -273,30 +324,31 @@ export default function ScannerPage() {
                   onClick={() => navigate(`/stock/${s.symbol}`)}
                   style={{
                     display: "grid",
-                    gridTemplateColumns: "44px 1fr 110px 100px 90px 80px 90px",
+                    gridTemplateColumns: "44px 1fr 110px 100px 90px 90px 90px 80px",
                     padding: "10px 16px",
                     alignItems: "center",
                     border: "none",
-                    borderBottom: "1px solid var(--border)",
+                    borderBottom: "1px solid rgba(255,255,255,0.05)",
                     background: "transparent",
                     cursor: "pointer",
                     textAlign: "left",
                     width: "100%",
                     transition: "background 100ms ease",
                     minHeight: 0,
+                    height: 36,
                   }}
-                  onMouseEnter={(e) => (e.currentTarget.style.background = "var(--bg-card-hover)")}
+                  onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(8,145,178,0.08)")}
                   onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
                 >
-                  <span style={{ fontSize: 11, color: "var(--text-muted)", fontFamily: "var(--font-mono)" }}>
-                    {i + 1}
+                  <span style={{ fontSize: 11, color: "var(--text-muted)", fontFamily: "var(--font-mono)", fontWeight: 500 }}>
+                    {currentPage * pageSize + i + 1}
                   </span>
 
                   <span style={{ minWidth: 0 }}>
-                    <span style={{ display: "block", fontSize: 13, fontWeight: 700, color: "var(--text-primary)", fontFamily: "var(--font-mono)", letterSpacing: "0.01em" }}>
+                    <span style={{ display: "block", fontSize: 12.5, fontWeight: 700, color: "var(--text-primary)", fontFamily: "var(--font-mono)", letterSpacing: "0.01em" }}>
                       {s.symbol}
                     </span>
-                    <span style={{ display: "block", fontSize: 11.5, color: "var(--text-secondary)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 200 }}>
+                    <span style={{ display: "block", fontSize: 10.5, color: "var(--text-secondary)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 200 }}>
                       {s.name}
                     </span>
                   </span>
@@ -305,20 +357,24 @@ export default function ScannerPage() {
                     {s.sector ?? "—"}
                   </span>
 
-                  <span style={{ textAlign: "right", fontFamily: "var(--font-mono)", fontSize: 13, fontWeight: 600, color: "var(--text-primary)" }}>
+                  <span style={{ textAlign: "right", fontFamily: "var(--font-mono)", fontSize: 12, fontWeight: 600, color: "var(--text-primary)" }}>
                     {fmtPeso(s.price)}
                   </span>
 
-                  <span style={{ textAlign: "right", fontFamily: "var(--font-mono)", fontSize: 12.5, fontWeight: 600, color: priceColor }}>
+                  <span style={{ textAlign: "right", fontFamily: "var(--font-mono)", fontSize: 12, fontWeight: 600, color: priceColor }}>
                     {neutral ? "–" : `${up ? "+" : ""}${s.changePercent.toFixed(2)}%`}
                   </span>
 
-                  <span style={{ textAlign: "right", fontFamily: "var(--font-mono)", fontSize: 12, color: priceColor }}>
+                  <span style={{ textAlign: "right", fontFamily: "var(--font-mono)", fontSize: 11, color: priceColor }}>
                     {neutral ? "–" : `${up ? "+" : ""}${fmtPeso(Math.abs(s.change))}`}
                   </span>
 
-                  <span style={{ textAlign: "right", fontFamily: "var(--font-mono)", fontSize: 12, color: "var(--text-secondary)" }}>
+                  <span style={{ textAlign: "right", fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--text-secondary)" }}>
                     {fmtVol(s.volume)}
+                  </span>
+
+                  <span style={{ textAlign: "right", fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--text-secondary)" }}>
+                    {s.pe ? s.pe.toFixed(1) : "—"}
                   </span>
                 </motion.button>
               );
@@ -326,12 +382,54 @@ export default function ScannerPage() {
           </AnimatePresence>
         )}
 
-        {/* Footer row */}
+        {/* Footer with pagination */}
         {!loading && !error && (
-          <div style={{ padding: "10px 16px", fontSize: 11.5, color: "var(--text-muted)", background: "var(--bg-sheet)", borderTop: displayed.length > 0 ? "1px solid var(--border)" : "none" }}>
-            {results.length === 0
-              ? "No matching stocks"
-              : `Showing ${displayed.length} of ${results.length} stocks · Prices via PHISIX`}
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 16px", fontSize: 11, color: "var(--text-muted)", background: "var(--bg-sheet)", borderTop: displayed.length > 0 ? "1px solid var(--border)" : "none" }}>
+            <div>
+              {results.length === 0
+                ? "No matching stocks"
+                : `Showing ${currentPage * pageSize + 1}–${Math.min((currentPage + 1) * pageSize, results.length)} of ${results.length} stocks`}
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <select
+                value={pageSize}
+                onChange={(e) => { setPageSize(Number(e.target.value)); setCurrentPage(0); }}
+                style={{
+                  height: 28, padding: "0 6px", fontSize: 11, border: "1px solid var(--border)", background: "var(--bg-chip)",
+                  borderRadius: 4, color: "var(--text-secondary)", cursor: "pointer", outline: "none",
+                }}
+              >
+                <option value={50}>50 per page</option>
+                <option value={100}>100 per page</option>
+              </select>
+              <button
+                onClick={() => setCurrentPage(Math.max(0, currentPage - 1))}
+                disabled={currentPage === 0}
+                style={{
+                  width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center",
+                  border: "1px solid var(--border)", background: "var(--bg-chip)", borderRadius: 4,
+                  cursor: currentPage === 0 ? "default" : "pointer", color: "var(--text-secondary)",
+                  opacity: currentPage === 0 ? 0.5 : 1, transition: "all 100ms ease",
+                }}
+              >
+                <ChevronUp size={12} />
+              </button>
+              <span style={{ fontSize: 10, color: "var(--text-muted)", minWidth: 30, textAlign: "center" }}>
+                {currentPage + 1} / {totalPages || 1}
+              </span>
+              <button
+                onClick={() => setCurrentPage(Math.min(totalPages - 1, currentPage + 1))}
+                disabled={currentPage >= totalPages - 1}
+                style={{
+                  width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center",
+                  border: "1px solid var(--border)", background: "var(--bg-chip)", borderRadius: 4,
+                  cursor: currentPage >= totalPages - 1 ? "default" : "pointer", color: "var(--text-secondary)",
+                  opacity: currentPage >= totalPages - 1 ? 0.5 : 1, transition: "all 100ms ease",
+                }}
+              >
+                <ChevronDown size={12} />
+              </button>
+            </div>
           </div>
         )}
       </div>

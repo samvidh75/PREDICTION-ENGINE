@@ -1,0 +1,44 @@
+{
+  "name": "PSE Trading Terminal",
+  "description": "Professional Philippine Stock Exchange Trading Platform with real-time data and AI insights",
+  "version": "1.0.0",
+  "type": "web",
+  "framework": "react",
+  "packageManager": "npm",
+  "buildCommand": "npm run build",
+  "devCommand": "npm run dev",
+  "testCommand": "npm run test",
+  "env": {
+    "VITE_API_BASE": "http://localhost:4001",
+    "VITE_PHISIX_API": "https://phisix-api3.appspot.com"
+  },
+  "features": {
+    "typescript": true,
+    "tailwind": false,
+    "eslint": true,
+    "prettier": true
+  },
+  "projectStructure": {
+    "src": {
+      "pages": "React page components",
+      "components": "Reusable UI components",
+      "services": "Business logic and API services",
+      "hooks": "Custom React hooks",
+      "styles": "Global styles and design tokens",
+      "design": "Design system (tokens, typography)",
+      "lib": "Utility libraries and helpers",
+      "db": "Database adapters and queries",
+      "render": "Server-side rendering and API routes"
+    }
+  },
+  "techStack": {
+    "frontend": ["React", "TypeScript", "Vite", "Lucide React"],
+    "backend": ["Fastify", "SQLite", "Node.js"],
+    "dataProviders": ["PHISIX API", "Yahoo Finance", "Google News RSS"],
+    "designSystem": "Professional Trading Terminal (Navy + Teal + Semantic Colors)"
+  },
+  "deployment": {
+    "vps": "103.211.56.127:4001",
+    "platform": "Linux/Ubuntu"
+  }
+}

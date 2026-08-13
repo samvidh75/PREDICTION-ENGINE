@@ -1,35 +1,26 @@
-import { useEffect, useState, useMemo, useRef } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import {
-  ArrowDown, ArrowLeft, ArrowUp, TrendingUp, ExternalLink, RefreshCw, AlertCircle,
-  BarChart3, Copy, Bell, Clock, DollarSign, Volume2,
+  ArrowDown, ArrowLeft, ArrowUp, RefreshCw, AlertCircle,
+  ArrowUpRight, ArrowDownRight,
 } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { LazyBarChart, Bar, CartesianGrid, ResponsiveContainer, XAxis, YAxis, Tooltip } from "../components/DynamicChart";
 import StockChart from "../components/StockChart";
-import { Badge } from "../ui/Badge";
-import { Button } from "../ui/Button";
-import { Stat } from "../ui/Stat";
-import { useResponsiveValue } from "../ui/responsive";
 import { BrokerHandoffModal } from "../components/BrokerHandoffModal";
 import { ChartErrorBoundary } from "../components/ChartErrorBoundary";
 import { listAvailableBrokers } from "../commercial/BrokerHandoffService";
 import { fallbackAnalysis, generateStockAnalysis } from "../services/llm/AIAnalysisService";
 import type { AIAnalysis } from "../services/llm/AIAnalysisService";
-import { colors, typography, radius, shadows } from "../design/tokens";
 import { useSeo } from "../frontend/seo/useSeo";
 import { buildCompanySeo } from "../frontend/seo/companySeo";
-import { getBoardLotSize, getTickSize } from "../utils/pseBoardLot";
 import { formatNumber } from "../services/ui/dataFormatting";
-import { toResearchAiContext } from "../components/ai-orchestrator/researchAiContext";
 import {
-  enrichResearchContextWithEvents,
   buildNewsEventPack,
 } from "../components/ai-orchestrator/eventEvidenceAiContext";
 import { buildEvidenceRetrievalAggregate } from "../systems/market-brain/evidenceRetrievalOrchestrator";
 import { compressEventEvidencePack } from "../systems/market-brain/eventEvidencePack";
-import type { EvidenceRetrievalAggregate } from "../research/contracts/evidenceRetrievalContracts";
 import { PriceSkeleton, ChartSkeleton, MetricsSkeleton } from "../components/SkeletonLoader";
 
 // ── Professional Trading Terminal Palette ──
@@ -235,30 +226,35 @@ function normalizeStockData(raw: Record<string, any>): StockResearchDetail {
   };
 }
 
-// ── HERO SECTION: Numbers First ──
-function HeroSection({ stock }: { stock: StockResearchDetail }) {
+// ── STOCK HEADER: Compact professional header (60px) ──
+function StockHeader({ stock }: { stock: StockResearchDetail }) {
   const isUp = stock.price.changeAbs >= 0;
   const priceColor = isUp ? TERMINAL_COLORS.gainGreen : TERMINAL_COLORS.lossRed;
 
   return (
     <div style={{
-      padding: "12px 16px",
+      padding: "8px 12px",
       background: TERMINAL_COLORS.canvas,
-      borderBottom: `1px solid rgba(255,255,255,0.05)`,
-      fontFamily: "'SF Mono', 'JetBrains Mono', 'Roboto Mono', monospace",
+      borderBottom: `1px solid rgba(255,255,255,0.08)`,
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between",
+      gap: "24px",
+      minHeight: "60px",
     }}>
-      {/* Symbol & Company Name */}
-      <div style={{ display: "flex", gap: "8px", alignItems: "baseline", marginBottom: "8px" }}>
+      {/* LEFT: Ticker & Company */}
+      <div style={{ display: "flex", alignItems: "baseline", gap: "12px" }}>
         <span style={{
-          fontSize: "18px",
+          fontSize: "20px",
           fontWeight: 700,
           color: TERMINAL_COLORS.monoText,
-          letterSpacing: "-0.01em",
+          fontFamily: "'SF Mono', 'JetBrains Mono', 'Roboto Mono', monospace",
+          letterSpacing: "-0.02em",
         }}>
           {stock.symbol}
         </span>
         <span style={{
-          fontSize: "12px",
+          fontSize: "13px",
           color: TERMINAL_COLORS.secondaryText,
           fontWeight: 500,
           fontFamily: "system-ui, -apple-system, sans-serif",
@@ -267,211 +263,337 @@ function HeroSection({ stock }: { stock: StockResearchDetail }) {
         </span>
       </div>
 
-      {/* Price & Change */}
-      <div style={{ display: "grid", gap: "4px" }}>
-        <div style={{ display: "flex", gap: "8px", alignItems: "baseline" }}>
-          <span style={{
-            fontSize: "42px",
-            fontWeight: 700,
-            color: TERMINAL_COLORS.monoText,
-            letterSpacing: "-0.02em",
-            fontVariantNumeric: "tabular-nums",
-            lineHeight: 1,
-          }}>
-            ₱{formatNumber(stock.price.current)}
-          </span>
-          <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
-            <div style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "4px",
-              color: priceColor,
-              fontSize: "13px",
-              fontWeight: 600,
-              fontVariantNumeric: "tabular-nums",
-            }}>
-              {isUp ? <ArrowUp size={14} /> : <ArrowDown size={14} />}
-              {isUp ? "+" : ""}{formatDecimal(stock.price.changeAbs, 2)}
-              <span style={{ fontSize: "12px" }}>({isUp ? "+" : ""}{formatDecimal(stock.price.changePercent, 2)}%)</span>
-            </div>
+      {/* CENTER: Live Price (very large) */}
+      <div style={{ display: "flex", alignItems: "baseline", gap: "8px", flex: 1 }}>
+        <span style={{
+          fontSize: "42px",
+          fontWeight: 700,
+          color: TERMINAL_COLORS.monoText,
+          fontFamily: "'SF Mono', 'JetBrains Mono', 'Roboto Mono', monospace",
+          fontVariantNumeric: "tabular-nums",
+          letterSpacing: "-0.02em",
+          lineHeight: 1,
+        }}>
+          ₱{formatNumber(stock.price.current)}
+        </span>
+      </div>
+
+      {/* RIGHT: Change % with color coding */}
+      <div style={{
+        display: "flex",
+        alignItems: "center",
+        gap: "6px",
+        color: priceColor,
+        fontSize: "14px",
+        fontWeight: 700,
+        fontFamily: "'SF Mono', 'JetBrains Mono', 'Roboto Mono', monospace",
+        fontVariantNumeric: "tabular-nums",
+      }}>
+        {isUp ? <ArrowUpRight size={16} /> : <ArrowDownRight size={16} />}
+        <span>{isUp ? "+" : ""}{formatDecimal(stock.price.changePercent, 2)}%</span>
+        <span style={{ fontSize: "12px", opacity: 0.8 }}>({isUp ? "+" : ""}{formatDecimal(stock.price.changeAbs, 2)})</span>
+      </div>
+
+      {/* QUICK STATS: High | Low | Vol | P/E */}
+      <div style={{
+        display: "flex",
+        gap: "16px",
+        fontSize: "11px",
+        fontFamily: "'SF Mono', 'JetBrains Mono', 'Roboto Mono', monospace",
+      }}>
+        <div style={{ textAlign: "right" }}>
+          <div style={{ color: TERMINAL_COLORS.secondaryText, fontSize: "9px", textTransform: "uppercase", fontWeight: 600 }}>H</div>
+          <div style={{ color: TERMINAL_COLORS.monoText, fontWeight: 600, fontVariantNumeric: "tabular-nums" }}>
+            ₱{formatNumber(stock.fundamentals?.high52w ?? 0)}
           </div>
         </div>
-        {stock.price.marketCap != null && (
-          <div style={{
-            color: TERMINAL_COLORS.secondaryText,
-            fontSize: "11px",
-            fontWeight: 400,
-            fontVariantNumeric: "tabular-nums",
-          }}>
-            Market Cap: ₱{formatNumber(Math.round(stock.price.marketCap / 1_000_000))}M
+        <div style={{ textAlign: "right" }}>
+          <div style={{ color: TERMINAL_COLORS.secondaryText, fontSize: "9px", textTransform: "uppercase", fontWeight: 600 }}>L</div>
+          <div style={{ color: TERMINAL_COLORS.monoText, fontWeight: 600, fontVariantNumeric: "tabular-nums" }}>
+            ₱{formatNumber(stock.fundamentals?.low52w ?? 0)}
           </div>
-        )}
+        </div>
+        <div style={{ textAlign: "right" }}>
+          <div style={{ color: TERMINAL_COLORS.secondaryText, fontSize: "9px", textTransform: "uppercase", fontWeight: 600 }}>P/E</div>
+          <div style={{ color: TERMINAL_COLORS.monoText, fontWeight: 600 }}>
+            {stock.fundamentals?.pe ? stock.fundamentals.pe.toFixed(1) : "—"}
+          </div>
+        </div>
       </div>
     </div>
   );
 }
 
-// ── FUNDAMENTALS GRID: P/E | P/B | ROE | D/E ──
-function FundamentalsGrid({ stock }: { stock: StockResearchDetail }) {
-  const fundamentals = stock.fundamentals ?? {};
-  const items = [
-    { label: "P/E", value: formatDecimal(fundamentals.pe, 1), sublabel: "Price/Earnings" },
-    { label: "P/B", value: formatDecimal(fundamentals.pb, 1), sublabel: "Price/Book" },
-    { label: "ROE", value: stock.roe != null ? `${formatDecimal(stock.roe, 1)}%` : "—", sublabel: "Return on Equity" },
-    { label: "D/E", value: formatDecimal(stock.debtToEquity, 2), sublabel: "Debt/Equity" },
-  ];
+// ── ORDER TICKET: BUY/SELL panel (right side of 2-column layout) ──
+function OrderTicket({ stock }: { stock: StockResearchDetail }) {
+  const [orderType, setOrderType] = useState<"buy" | "sell">("buy");
+  const [quantity, setQuantity] = useState<string>("1");
+  const [price, setPrice] = useState<string>(stock.price.current.toString());
+  const [isMarketOrder, setIsMarketOrder] = useState(true);
+
+  const qty = parseInt(quantity) || 0;
+  const effectivePrice = isMarketOrder ? stock.price.current : (parseFloat(price) || 0);
+  const totalAmount = qty * effectivePrice;
+  const isUp = stock.price.changeAbs >= 0;
+  const btnColor = orderType === "buy" ? TERMINAL_COLORS.gainGreen : TERMINAL_COLORS.lossRed;
 
   return (
     <div style={{
-      display: "grid",
-      gridTemplateColumns: "repeat(4, 1fr)",
-      gap: "12px",
-      padding: "12px",
-      background: TERMINAL_COLORS.panel,
       border: `1px solid rgba(255,255,255,0.05)`,
       borderRadius: "0",
-      fontFamily: "'SF Mono', 'JetBrains Mono', 'Roboto Mono', monospace",
+      padding: "12px",
+      background: TERMINAL_COLORS.panel,
+      display: "flex",
+      flexDirection: "column",
+      gap: "12px",
     }}>
-      {items.map((item, idx) => (
-        <div key={idx} style={{ display: "grid", gap: "3px" }}>
-          <div style={{
-            color: TERMINAL_COLORS.secondaryText,
-            fontSize: "9px",
-            fontWeight: 700,
-            textTransform: "uppercase",
-            letterSpacing: "0.05em",
-          }}>
-            {item.label}
-          </div>
-          <div style={{
+      {/* BUY/SELL Tabs */}
+      <div style={{ display: "flex", gap: "4px", borderBottom: `1px solid rgba(255,255,255,0.05)` }}>
+        {["buy", "sell"].map((tab) => (
+          <button
+            key={tab}
+            onClick={() => setOrderType(tab as "buy" | "sell")}
+            style={{
+              flex: 1,
+              padding: "8px",
+              border: "none",
+              background: orderType === tab ? (tab === "buy" ? "rgba(16,185,129,0.15)" : "rgba(239,68,68,0.15)") : "transparent",
+              color: orderType === tab ? (tab === "buy" ? TERMINAL_COLORS.gainGreen : TERMINAL_COLORS.lossRed) : TERMINAL_COLORS.secondaryText,
+              fontSize: "12px",
+              fontWeight: 600,
+              textTransform: "uppercase",
+              cursor: "pointer",
+              borderBottom: `2px solid ${orderType === tab ? (tab === "buy" ? TERMINAL_COLORS.gainGreen : TERMINAL_COLORS.lossRed) : "transparent"}`,
+              transition: "all 0.2s",
+            }}
+          >
+            {tab}
+          </button>
+        ))}
+      </div>
+
+      {/* Quantity Input */}
+      <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+        <label style={{ fontSize: "9px", fontWeight: 600, color: TERMINAL_COLORS.secondaryText, textTransform: "uppercase" }}>QTY</label>
+        <input
+          type="number"
+          value={quantity}
+          onChange={(e) => setQuantity(e.target.value)}
+          min="1"
+          style={{
+            height: "36px",
+            padding: "0 8px",
+            border: `1px solid rgba(255,255,255,0.1)`,
+            background: TERMINAL_COLORS.canvas,
             color: TERMINAL_COLORS.monoText,
-            fontSize: "16px",
-            fontWeight: 700,
-            fontVariantNumeric: "tabular-nums",
-            lineHeight: 1.2,
-          }}>
-            {item.value}
-          </div>
-          <div style={{
-            color: TERMINAL_COLORS.secondaryText,
-            fontSize: "8px",
-            fontWeight: 400,
-            fontFamily: "system-ui, -apple-system, sans-serif",
-          }}>
-            {item.sublabel}
-          </div>
+            fontFamily: "'SF Mono', 'JetBrains Mono', 'Roboto Mono', monospace",
+            fontSize: "13px",
+            fontWeight: 600,
+            borderRadius: "0",
+          }}
+        />
+      </div>
+
+      {/* Price Toggle & Input */}
+      <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <label style={{ fontSize: "9px", fontWeight: 600, color: TERMINAL_COLORS.secondaryText, textTransform: "uppercase" }}>PRICE</label>
+          <label style={{ display: "flex", alignItems: "center", gap: "4px", fontSize: "10px", cursor: "pointer" }}>
+            <input
+              type="checkbox"
+              checked={isMarketOrder}
+              onChange={(e) => setIsMarketOrder(e.target.checked)}
+              style={{ cursor: "pointer" }}
+            />
+            <span style={{ color: TERMINAL_COLORS.secondaryText }}>Market</span>
+          </label>
         </div>
-      ))}
+        <input
+          type="number"
+          value={price}
+          onChange={(e) => setPrice(e.target.value)}
+          disabled={isMarketOrder}
+          step="0.01"
+          style={{
+            height: "36px",
+            padding: "0 8px",
+            border: `1px solid rgba(255,255,255,0.1)`,
+            background: isMarketOrder ? "rgba(255,255,255,0.02)" : TERMINAL_COLORS.canvas,
+            color: TERMINAL_COLORS.monoText,
+            fontFamily: "'SF Mono', 'JetBrains Mono', 'Roboto Mono', monospace",
+            fontSize: "13px",
+            fontWeight: 600,
+            borderRadius: "0",
+            opacity: isMarketOrder ? 0.5 : 1,
+            cursor: isMarketOrder ? "not-allowed" : "text",
+          }}
+        />
+      </div>
+
+      {/* Total Amount Display */}
+      <div style={{
+        padding: "8px",
+        background: "rgba(255,255,255,0.02)",
+        border: `1px solid rgba(255,255,255,0.05)`,
+        borderRadius: "0",
+      }}>
+        <div style={{ fontSize: "9px", color: TERMINAL_COLORS.secondaryText, fontWeight: 600, textTransform: "uppercase", marginBottom: "3px" }}>Total</div>
+        <div style={{
+          fontSize: "18px",
+          fontWeight: 700,
+          color: TERMINAL_COLORS.monoText,
+          fontFamily: "'SF Mono', 'JetBrains Mono', 'Roboto Mono', monospace",
+          fontVariantNumeric: "tabular-nums",
+        }}>
+          ₱{formatNumber(Math.round(totalAmount))}
+        </div>
+      </div>
+
+      {/* Action Buttons */}
+      <div style={{ display: "grid", gap: "6px" }}>
+        <motion.button
+          whileHover={{ opacity: 0.9 }}
+          whileTap={{ scale: 0.98 }}
+          style={{
+            height: "44px",
+            border: "none",
+            background: btnColor,
+            color: "white",
+            fontSize: "13px",
+            fontWeight: 700,
+            cursor: "pointer",
+            textTransform: "uppercase",
+            borderRadius: "0",
+            transition: "opacity 0.2s",
+          }}
+        >
+          {orderType.toUpperCase()}
+        </motion.button>
+      </div>
     </div>
   );
 }
 
-// ── METRICS/SCORES TABLE ──
-function MetricsTable({ stock }: { stock: StockResearchDetail }) {
+// ── STOCK INFO GRID: Valuation | Fundamentals | Technical (3 columns) ──
+function StockInfoGrid({ stock }: { stock: StockResearchDetail }) {
   const fundamentals = stock.fundamentals ?? {};
+  const isPositive = (val: number | null) => val != null && val > 0;
 
-  const rows = [
-    { label: "Market Cap", value: stock.price.marketCap != null ? `₱${formatNumber(Math.round(stock.price.marketCap / 1_000_000))}M` : "—" },
-    { label: "EPS (TTM)", value: fundamentals.eps != null ? `₱${formatDecimal(fundamentals.eps, 2)}` : "—" },
-    { label: "Dividend Yield", value: fundamentals.dividendYield != null ? `${formatDecimal(fundamentals.dividendYield, 2)}%` : "—" },
-    { label: "Net Margin", value: fundamentals.netMargin != null ? `${formatDecimal(fundamentals.netMargin, 1)}%` : "—" },
-    { label: "52W High", value: fundamentals.high52w != null ? `₱${formatNumber(fundamentals.high52w)}` : "—" },
-    { label: "52W Low", value: fundamentals.low52w != null ? `₱${formatNumber(fundamentals.low52w)}` : "—" },
+  const getValueColor = (val: number | null, isPercentage: boolean = false) => {
+    if (val == null) return TERMINAL_COLORS.secondaryText;
+    if (isPercentage) return val >= 0 ? TERMINAL_COLORS.gainGreen : TERMINAL_COLORS.lossRed;
+    return TERMINAL_COLORS.monoText;
+  };
+
+  const valuationMetrics = [
+    { label: "P/E Ratio", value: fundamentals.pe, format: (v: number) => v.toFixed(1) },
+    { label: "P/B Ratio", value: fundamentals.pb, format: (v: number) => v.toFixed(1) },
+    { label: "Dividend Yield", value: fundamentals.dividendYield, format: (v: number) => v.toFixed(2) + "%" },
+    { label: "Market Cap", value: stock.price.marketCap ? stock.price.marketCap / 1_000_000_000 : null, format: (v: number) => v.toFixed(1) + "B" },
   ];
 
-  return (
-    <table style={{
-      width: "100%",
-      borderCollapse: "collapse",
-      fontSize: "11px",
-      fontFamily: "'SF Mono', 'JetBrains Mono', 'Roboto Mono', monospace",
+  const fundamentalsMetrics = [
+    { label: "EPS (TTM)", value: fundamentals.eps, format: (v: number) => "₱" + v.toFixed(2) },
+    { label: "ROE", value: stock.roe, format: (v: number) => v.toFixed(1) + "%" },
+    { label: "Debt/Equity", value: stock.debtToEquity, format: (v: number) => v.toFixed(2) },
+    { label: "Revenue Growth", value: stock.revenueGrowth, format: (v: number) => v.toFixed(1) + "%" },
+  ];
+
+  const technicalMetrics = [
+    { label: "52W High", value: fundamentals.high52w, format: (v: number) => "₱" + formatNumber(v) },
+    { label: "52W Low", value: fundamentals.low52w, format: (v: number) => "₱" + formatNumber(v) },
+    { label: "RSI", value: stock.rsi, format: (v: number) => v.toFixed(0) },
+    { label: "Beta", value: null, format: (v: number) => "—" },
+  ];
+
+  const MetricColumn = ({ title, metrics }: { title: string; metrics: any[] }) => (
+    <div style={{
+      border: `1px solid rgba(255,255,255,0.05)`,
+      borderRadius: "0",
+      padding: "12px",
+      background: TERMINAL_COLORS.panel,
+      display: "flex",
+      flexDirection: "column",
+      gap: "12px",
     }}>
-      <tbody>
-        {rows.map((row, idx) => (
-          <tr key={idx} style={{
-            borderBottom: idx < rows.length - 1 ? `1px solid rgba(255,255,255,0.05)` : "none",
-            height: "28px",
-          }}>
-            <td style={{
-              padding: "6px 8px",
-              color: TERMINAL_COLORS.secondaryText,
-              textAlign: "left",
-              fontWeight: 500,
-              fontSize: "10px",
-            }}>
-              {row.label}
-            </td>
-            <td style={{
-              padding: "6px 8px",
-              color: TERMINAL_COLORS.monoText,
-              textAlign: "right",
+      <div style={{
+        fontSize: "11px",
+        fontWeight: 700,
+        textTransform: "uppercase",
+        color: TERMINAL_COLORS.secondaryText,
+        letterSpacing: "0.05em",
+      }}>
+        {title}
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+        {metrics.map((metric, idx) => (
+          <div key={idx} style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", fontSize: "11px" }}>
+            <span style={{ color: TERMINAL_COLORS.secondaryText, fontWeight: 500 }}>{metric.label}</span>
+            <span style={{
+              color: metric.value != null ? getValueColor(metric.value, metric.label.includes("%")) : TERMINAL_COLORS.secondaryText,
               fontWeight: 600,
+              fontFamily: "'SF Mono', 'JetBrains Mono', 'Roboto Mono', monospace",
               fontVariantNumeric: "tabular-nums",
-              fontSize: "11px",
             }}>
-              {row.value}
-            </td>
-          </tr>
+              {metric.value != null ? metric.format(metric.value) : "—"}
+            </span>
+          </div>
         ))}
-      </tbody>
-    </table>
+      </div>
+    </div>
+  );
+
+  return (
+    <div style={{
+      display: "grid",
+      gridTemplateColumns: "repeat(3, 1fr)",
+      gap: "12px",
+    }}>
+      <MetricColumn title="Valuation" metrics={valuationMetrics} />
+      <MetricColumn title="Fundamentals" metrics={fundamentalsMetrics} />
+      <MetricColumn title="Technical" metrics={technicalMetrics} />
+    </div>
   );
 }
 
-// ── SCORES TABLE (Quality, Valuation, Growth, etc.) ──
-function ScoresTable({ stock }: { stock: StockResearchDetail }) {
-  const scores = stock.scores ?? {};
-  const scoreItems = [
-    { label: "Quality", value: scores.quality },
-    { label: "Valuation", value: scores.valuation },
-    { label: "Growth", value: scores.growth },
-    { label: "Momentum", value: scores.momentum },
-    { label: "Risk", value: scores.risk },
+// ── TAB NAVIGATION ──
+type TabType = "about" | "news" | "research" | "financials";
+
+function TabNavigation({ activeTab, onTabChange }: { activeTab: TabType; onTabChange: (tab: TabType) => void }) {
+  const tabs: { id: TabType; label: string }[] = [
+    { id: "about", label: "About" },
+    { id: "news", label: "News" },
+    { id: "research", label: "Research" },
+    { id: "financials", label: "Financials" },
   ];
 
-  const getScoreColor = (value: number | null) => {
-    if (value == null) return TERMINAL_COLORS.secondaryText;
-    if (value >= 70) return TERMINAL_COLORS.gainGreen;
-    if (value >= 50) return TERMINAL_COLORS.accent;
-    return TERMINAL_COLORS.lossRed;
-  };
-
   return (
-    <table style={{
-      width: "100%",
-      borderCollapse: "collapse",
-      fontSize: "11px",
-      fontFamily: "'SF Mono', 'JetBrains Mono', 'Roboto Mono', monospace",
+    <div style={{
+      display: "flex",
+      gap: "0",
+      borderBottom: `1px solid rgba(255,255,255,0.05)`,
+      marginBottom: "12px",
     }}>
-      <tbody>
-        {scoreItems.map((item, idx) => (
-          <tr key={idx} style={{
-            borderBottom: idx < scoreItems.length - 1 ? `1px solid rgba(255,255,255,0.05)` : "none",
-            height: "28px",
-          }}>
-            <td style={{
-              padding: "6px 8px",
-              color: TERMINAL_COLORS.secondaryText,
-              textAlign: "left",
-              fontWeight: 500,
-              fontSize: "10px",
-            }}>
-              {item.label}
-            </td>
-            <td style={{
-              padding: "6px 8px",
-              color: getScoreColor(item.value),
-              textAlign: "right",
-              fontWeight: 600,
-              fontVariantNumeric: "tabular-nums",
-              fontSize: "11px",
-            }}>
-              {item.value != null ? `${item.value}/100` : "—"}
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
+      {tabs.map((tab) => (
+        <button
+          key={tab.id}
+          onClick={() => onTabChange(tab.id)}
+          style={{
+            padding: "8px 16px",
+            border: "none",
+            background: "transparent",
+            color: activeTab === tab.id ? TERMINAL_COLORS.monoText : TERMINAL_COLORS.secondaryText,
+            fontSize: "12px",
+            fontWeight: activeTab === tab.id ? 600 : 500,
+            cursor: "pointer",
+            borderBottom: activeTab === tab.id ? `2px solid ${TERMINAL_COLORS.accent}` : "none",
+            transition: "all 0.2s",
+          }}
+        >
+          {tab.label}
+        </button>
+      ))}
+    </div>
   );
 }
 
@@ -574,6 +696,7 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
   const [financialMetric, setFinancialMetric] = useState<FinancialMetric>("revenue");
   const [financialPeriod, setFinancialPeriod] = useState<FinancialPeriod>("annual");
   const [isBrokerOpen, setIsBrokerOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<TabType>("about");
   const [period, setPeriod] = useState(initialPeriod);
 
   const availableBrokers = listAvailableBrokers();
@@ -621,7 +744,6 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
     return () => { cancelled = true; };
   }, [stock.symbol]);
 
-  const boardLotSize = getBoardLotSize(stock.price.current);
   const newsEventPack = buildNewsEventPack(stock.symbol, stock.news);
 
   const [retrievalContext, setRetrievalContext] = useState<string | null>(null);
@@ -641,22 +763,28 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
   return (
     <div style={{
       display: "grid",
-      gap: "12px",
+      gap: "0",
       background: TERMINAL_COLORS.canvas,
       color: TERMINAL_COLORS.monoText,
       minHeight: "100vh",
     }}>
-      {/* ── HERO SECTION ── */}
-      <HeroSection stock={stock} />
+      {/* ── STOCK HEADER (60px) ── */}
+      <StockHeader stock={stock} />
 
       {/* ── MAIN CONTENT ── */}
-      <div style={{ display: "grid", gap: "12px", padding: "0 12px 36px", maxWidth: "1400px", margin: "0 auto", width: "100%" }}>
-
+      <div style={{
+        display: "grid",
+        gap: "12px",
+        padding: "12px",
+        maxWidth: "1600px",
+        margin: "0 auto",
+        width: "100%",
+      }}>
         {/* Back Button */}
         <motion.button
           onClick={() => navigate(-1)}
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
           style={{
             border: `1px solid rgba(255,255,255,0.1)`,
             background: "transparent",
@@ -676,413 +804,364 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
           <ArrowLeft size={12} /> Back
         </motion.button>
 
-        {/* ── PRICE CHART SECTION ── */}
+        {/* ── 2-COLUMN LAYOUT: Chart (2/3) + Order Ticket (1/3) ── */}
         <div style={{
-          border: `1px solid rgba(255,255,255,0.05)`,
-          borderRadius: "0",
-          padding: "8px",
-          background: TERMINAL_COLORS.panel,
+          display: "grid",
+          gridTemplateColumns: "2fr 1fr",
+          gap: "12px",
         }}>
+          {/* LEFT: Price Chart & Volume */}
           <div style={{
+            border: `1px solid rgba(255,255,255,0.05)`,
+            borderRadius: "0",
+            padding: "12px",
+            background: TERMINAL_COLORS.panel,
             display: "flex",
-            gap: "6px",
-            marginBottom: "8px",
-            flexWrap: "wrap",
-            alignItems: "center",
-            fontSize: "11px",
-          }}>
-            {TIMEFRAMES.map((value) => (
-              <button
-                key={value}
-                onClick={() => setTimeframe(value)}
-                style={{
-                  padding: "4px 10px",
-                  borderRadius: "0",
-                  border: "none",
-                  cursor: "pointer",
-                  fontSize: "10px",
-                  fontWeight: 600,
-                  background: value === timeframe ? TERMINAL_COLORS.accent : "rgba(255,255,255,0.05)",
-                  color: value === timeframe ? "white" : TERMINAL_COLORS.secondaryText,
-                  height: "28px",
-                }}
-              >
-                {value}
-              </button>
-            ))}
-          </div>
-          <ChartErrorBoundary>
-            <div style={{
-              width: "100%",
-              height: "280px",
-              backgroundColor: TERMINAL_COLORS.canvas,
-              borderRadius: "0",
-              border: `1px solid rgba(255,255,255,0.05)`,
-              overflow: "hidden",
-            }}>
-              <StockChart
-                symbol={stock.symbol}
-                ohlcData={transformToOHLC(stock.priceHistory?.[getApiTimeframe(timeframe)] ?? [])}
-                timeframe={timeframe as any}
-                showIndicators={true}
-                height={260}
-              />
-            </div>
-          </ChartErrorBoundary>
-        </div>
-
-        {/* ── FUNDAMENTALS GRID ── */}
-        <FundamentalsGrid stock={stock} />
-
-        {/* ── THREE-COLUMN LAYOUT: Metrics | Scores | Company Profile ── */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "12px" }}>
-          {/* Extended Metrics */}
-          <div style={{
-            border: `1px solid rgba(255,255,255,0.05)`,
-            borderRadius: "0",
-            padding: "8px",
-            background: TERMINAL_COLORS.panel,
+            flexDirection: "column",
+            gap: "12px",
           }}>
             <div style={{
-              fontSize: "9px",
-              fontWeight: 700,
-              letterSpacing: "0.05em",
-              textTransform: "uppercase",
-              color: TERMINAL_COLORS.secondaryText,
-              marginBottom: "8px",
+              display: "flex",
+              gap: "6px",
+              flexWrap: "wrap",
+              alignItems: "center",
             }}>
-              Metrics
-            </div>
-            <MetricsTable stock={stock} />
-          </div>
-
-          {/* Scores */}
-          <div style={{
-            border: `1px solid rgba(255,255,255,0.05)`,
-            borderRadius: "0",
-            padding: "8px",
-            background: TERMINAL_COLORS.panel,
-          }}>
-            <div style={{
-              fontSize: "9px",
-              fontWeight: 700,
-              letterSpacing: "0.05em",
-              textTransform: "uppercase",
-              color: TERMINAL_COLORS.secondaryText,
-              marginBottom: "8px",
-            }}>
-              Scores
-            </div>
-            <ScoresTable stock={stock} />
-          </div>
-
-          {/* Company Profile */}
-          <div style={{
-            border: `1px solid rgba(255,255,255,0.05)`,
-            borderRadius: "0",
-            padding: "8px",
-            background: TERMINAL_COLORS.panel,
-          }}>
-            <div style={{
-              fontSize: "9px",
-              fontWeight: 700,
-              letterSpacing: "0.05em",
-              textTransform: "uppercase",
-              color: TERMINAL_COLORS.secondaryText,
-              marginBottom: "8px",
-            }}>
-              About
-            </div>
-            <p style={{
-              color: TERMINAL_COLORS.monoText,
-              fontSize: "10px",
-              fontWeight: 400,
-              lineHeight: "1.4",
-              margin: "0 0 8px 0",
-              fontFamily: "system-ui, -apple-system, sans-serif",
-            }}>
-              {stock.description}
-            </p>
-            <table style={{
-              width: "100%",
-              borderCollapse: "collapse",
-              fontSize: "10px",
-              fontFamily: "'SF Mono', 'JetBrains Mono', 'Roboto Mono', monospace",
-            }}>
-              <tbody>
-                <tr style={{ borderBottom: `1px solid rgba(255,255,255,0.05)` }}>
-                  <td style={{ padding: "4px 0", color: TERMINAL_COLORS.secondaryText, fontSize: "9px" }}>Founded</td>
-                  <td style={{ padding: "4px 0", color: TERMINAL_COLORS.monoText, fontWeight: 500, fontSize: "10px", textAlign: "right" }}>{companyProfile.founded}</td>
-                </tr>
-                <tr style={{ borderBottom: `1px solid rgba(255,255,255,0.05)` }}>
-                  <td style={{ padding: "4px 0", color: TERMINAL_COLORS.secondaryText, fontSize: "9px" }}>CEO</td>
-                  <td style={{ padding: "4px 0", color: TERMINAL_COLORS.monoText, fontWeight: 500, fontSize: "10px", textAlign: "right" }}>{companyProfile.ceo}</td>
-                </tr>
-                <tr style={{ borderBottom: `1px solid rgba(255,255,255,0.05)` }}>
-                  <td style={{ padding: "4px 0", color: TERMINAL_COLORS.secondaryText, fontSize: "9px" }}>HQ</td>
-                  <td style={{ padding: "4px 0", color: TERMINAL_COLORS.monoText, fontWeight: 500, fontSize: "10px", textAlign: "right" }}>{companyProfile.hq}</td>
-                </tr>
-                <tr>
-                  <td style={{ padding: "4px 0", color: TERMINAL_COLORS.secondaryText, fontSize: "9px" }}>Sector</td>
-                  <td style={{ padding: "4px 0", color: TERMINAL_COLORS.monoText, fontWeight: 500, fontSize: "10px", textAlign: "right" }}>{stock.sector}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        {/* ── FINANCIALS CHART ── */}
-        <div style={{
-          border: `1px solid rgba(255,255,255,0.05)`,
-          borderRadius: "0",
-          padding: "8px",
-          background: TERMINAL_COLORS.panel,
-        }}>
-          <div style={{
-            display: "flex",
-            justifyContent: "space-between",
-            gap: "8px",
-            flexWrap: "wrap",
-            marginBottom: "8px",
-            alignItems: "center",
-          }}>
-            <div style={{
-              fontSize: "9px",
-              fontWeight: 700,
-              letterSpacing: "0.05em",
-              textTransform: "uppercase",
-              color: TERMINAL_COLORS.secondaryText,
-            }}>
-              Financials
-            </div>
-            <span style={{
-              fontSize: "9px",
-              fontWeight: 600,
-              padding: "2px 6px",
-              borderRadius: "0",
-              background: financialsReal ? "rgba(16,185,129,0.15)" : "rgba(245,152,45,0.15)",
-              color: financialsReal ? TERMINAL_COLORS.gainGreen : "#F59728",
-              border: `1px solid ${financialsReal ? "rgba(16,185,129,0.3)" : "rgba(245,152,45,0.3)"}`,
-            }}>
-              {financialsReal ? "Verified" : "Estimated"}
-            </span>
-          </div>
-          <div style={{ display: "flex", gap: "6px", marginBottom: "8px", flexWrap: "wrap" }}>
-            {["revenue" as const, "profit" as const].map((metric) => (
-              <button
-                key={metric}
-                onClick={() => setFinancialMetric(metric)}
-                style={{
-                  padding: "2px 8px",
-                  borderRadius: "0",
-                  border: "none",
-                  cursor: "pointer",
-                  fontSize: "10px",
-                  fontWeight: 600,
-                  background: financialMetric === metric ? TERMINAL_COLORS.accent : "rgba(255,255,255,0.05)",
-                  color: financialMetric === metric ? "white" : TERMINAL_COLORS.secondaryText,
-                  height: "24px",
-                  textTransform: "capitalize",
-                }}
-              >
-                {metric}
-              </button>
-            ))}
-            <div style={{ marginLeft: "auto", display: "flex", gap: "6px" }}>
-              {["annual" as const, "quarterly" as const].map((p) => (
+              {TIMEFRAMES.map((value) => (
                 <button
-                  key={p}
-                  onClick={() => setFinancialPeriod(p)}
+                  key={value}
+                  onClick={() => setTimeframe(value)}
                   style={{
-                    padding: "2px 8px",
+                    padding: "6px 12px",
                     borderRadius: "0",
                     border: "none",
                     cursor: "pointer",
-                    fontSize: "10px",
+                    fontSize: "11px",
                     fontWeight: 600,
-                    background: financialPeriod === p ? TERMINAL_COLORS.accent : "rgba(255,255,255,0.05)",
-                    color: financialPeriod === p ? "white" : TERMINAL_COLORS.secondaryText,
-                    height: "24px",
-                    textTransform: "capitalize",
+                    background: value === timeframe ? TERMINAL_COLORS.accent : "rgba(255,255,255,0.05)",
+                    color: value === timeframe ? "white" : TERMINAL_COLORS.secondaryText,
+                    height: "32px",
+                    transition: "all 0.2s",
                   }}
                 >
-                  {p}
+                  {value}
                 </button>
               ))}
             </div>
+            <ChartErrorBoundary>
+              <div style={{
+                width: "100%",
+                height: "320px",
+                backgroundColor: TERMINAL_COLORS.canvas,
+                borderRadius: "0",
+                border: `1px solid rgba(255,255,255,0.05)`,
+                overflow: "hidden",
+              }}>
+                <StockChart
+                  symbol={stock.symbol}
+                  ohlcData={transformToOHLC(stock.priceHistory?.[getApiTimeframe(timeframe)] ?? [])}
+                  timeframe={timeframe as any}
+                  showIndicators={true}
+                  height={300}
+                />
+              </div>
+            </ChartErrorBoundary>
           </div>
-          <ChartErrorBoundary>
-            <div style={{
-              width: "100%",
-              height: "200px",
-              backgroundColor: TERMINAL_COLORS.canvas,
-              borderRadius: "0",
-              border: `1px solid rgba(255,255,255,0.05)`,
-            }}>
-              <ResponsiveContainer width="100%" height="100%">
-                <LazyBarChart data={effectiveChartData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
-                  <XAxis dataKey="period" tick={{ fontSize: 10, fill: TERMINAL_COLORS.secondaryText }} />
-                  <YAxis tick={{ fontSize: 10, fill: TERMINAL_COLORS.secondaryText }} />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: TERMINAL_COLORS.panel,
-                      border: `1px solid rgba(255,255,255,0.1)`,
-                      borderRadius: "0",
-                      color: TERMINAL_COLORS.monoText,
-                      fontSize: "10px",
-                    }}
-                    labelStyle={{ color: TERMINAL_COLORS.monoText }}
-                    formatter={(value: any) => `₱${value.toLocaleString()}M`}
-                  />
-                  <Bar dataKey="value" fill={TERMINAL_COLORS.accent} isAnimationActive={false} />
-                </LazyBarChart>
-              </ResponsiveContainer>
-            </div>
-          </ChartErrorBoundary>
+
+          {/* RIGHT: Order Ticket */}
+          <OrderTicket stock={stock} />
         </div>
 
-        {/* ── NEWS & EVENTS ── */}
-        {newsItems.length > 0 && (
-          <div style={{
-            border: `1px solid rgba(255,255,255,0.05)`,
-            borderRadius: "0",
-            padding: "8px",
-            background: TERMINAL_COLORS.panel,
-          }}>
-            <div style={{
-              fontSize: "9px",
-              fontWeight: 700,
-              letterSpacing: "0.05em",
-              textTransform: "uppercase",
-              color: TERMINAL_COLORS.secondaryText,
-              marginBottom: "8px",
-            }}>
-              News & Events
-            </div>
-            <div style={{
-              display: "grid",
-              gap: "6px",
-              fontSize: "10px",
-              fontFamily: "'SF Mono', 'JetBrains Mono', 'Roboto Mono', monospace",
-            }}>
-              {newsItems.map((item, idx) => (
-                <a
-                  key={idx}
-                  href={item.link || "#"}
-                  target={item.link ? "_blank" : undefined}
-                  rel={item.link ? "noopener noreferrer" : undefined}
-                  style={{
-                    display: "flex",
-                    gap: "8px",
-                    paddingBottom: "6px",
-                    borderBottom: idx < newsItems.length - 1 ? `1px solid rgba(255,255,255,0.05)` : "none",
-                    textDecoration: "none",
-                    color: TERMINAL_COLORS.monoText,
-                    alignItems: "flex-start",
-                  }}
-                >
-                  <span style={{
-                    color: TERMINAL_COLORS.accent,
-                    minWidth: "40px",
-                    fontWeight: 600,
-                    fontSize: "10px",
-                  }}>
-                    {formatNewsTime(item.publishedAt) || item.time}
-                  </span>
-                  <span style={{ color: TERMINAL_COLORS.monoText, flex: 1, fontSize: "10px" }}>
-                    {item.headline}
-                  </span>
-                </a>
-              ))}
-            </div>
-          </div>
-        )}
+        {/* ── STOCK INFO GRID: Valuation | Fundamentals | Technical ── */}
+        <StockInfoGrid stock={stock} />
 
-        {/* ── INVESTMENT THESIS ── */}
+        {/* ── TABBED CONTENT SECTION ── */}
         <div style={{
           border: `1px solid rgba(255,255,255,0.05)`,
           borderRadius: "0",
-          padding: "8px",
+          padding: "12px",
           background: TERMINAL_COLORS.panel,
         }}>
-          <div style={{
-            fontSize: "9px",
-            fontWeight: 700,
-            letterSpacing: "0.05em",
-            textTransform: "uppercase",
-            color: TERMINAL_COLORS.secondaryText,
-            marginBottom: "8px",
-          }}>
-            Investment Thesis
-          </div>
-          <div style={{
-            display: "grid",
-            gap: "8px",
-            fontSize: "10px",
-            lineHeight: "1.5",
-            fontFamily: "system-ui, -apple-system, sans-serif",
-          }}>
-            <div>
-              <div style={{ color: TERMINAL_COLORS.secondaryText, marginBottom: "2px", fontWeight: 700, fontSize: "9px", textTransform: "uppercase", letterSpacing: "0.03em" }}>Stance</div>
-              <div style={{ color: stock.thesis.stance === "High conviction" ? TERMINAL_COLORS.gainGreen : TERMINAL_COLORS.lossRed, fontWeight: 600, fontSize: "11px" }}>
-                {stock.thesis.stance}
-              </div>
-            </div>
-            <div>
-              <div style={{ color: TERMINAL_COLORS.secondaryText, marginBottom: "2px", fontWeight: 700, fontSize: "9px", textTransform: "uppercase", letterSpacing: "0.03em" }}>Thesis</div>
-              <div style={{ color: TERMINAL_COLORS.monoText, fontSize: "10px" }}>{stock.thesis.thesis}</div>
-            </div>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
+          <TabNavigation activeTab={activeTab} onTabChange={setActiveTab} />
+
+          {/* TAB: ABOUT */}
+          {activeTab === "about" && (
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.2 }}
+              style={{ display: "grid", gap: "16px" }}
+            >
               <div>
-                <div style={{ color: TERMINAL_COLORS.secondaryText, marginBottom: "2px", fontWeight: 700, fontSize: "9px", textTransform: "uppercase", letterSpacing: "0.03em" }}>Bull Case</div>
-                <div style={{ color: TERMINAL_COLORS.monoText, fontSize: "10px" }}>{stock.thesis.bullCase}</div>
+                <p style={{
+                  color: TERMINAL_COLORS.monoText,
+                  fontSize: "11px",
+                  fontWeight: 400,
+                  lineHeight: "1.6",
+                  margin: "0 0 12px 0",
+                  fontFamily: "system-ui, -apple-system, sans-serif",
+                }}>
+                  {stock.description}
+                </p>
               </div>
-              <div>
-                <div style={{ color: TERMINAL_COLORS.secondaryText, marginBottom: "2px", fontWeight: 700, fontSize: "9px", textTransform: "uppercase", letterSpacing: "0.03em" }}>Bear Case</div>
-                <div style={{ color: TERMINAL_COLORS.monoText, fontSize: "10px" }}>{stock.thesis.bearCase}</div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+                {/* Company Profile */}
+                <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                  <div style={{ fontSize: "11px", fontWeight: 700, textTransform: "uppercase", color: TERMINAL_COLORS.secondaryText, letterSpacing: "0.05em" }}>
+                    Profile
+                  </div>
+                  <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "10px" }}>
+                    <tbody>
+                      {[
+                        { label: "Founded", value: companyProfile.founded },
+                        { label: "CEO", value: companyProfile.ceo },
+                        { label: "Sector", value: stock.sector },
+                        { label: "Employees", value: companyProfile.employees },
+                      ].map((row, idx) => (
+                        <tr key={idx} style={{ borderBottom: `1px solid rgba(255,255,255,0.05)`, height: "28px" }}>
+                          <td style={{ padding: "6px 0", color: TERMINAL_COLORS.secondaryText, fontWeight: 500 }}>{row.label}</td>
+                          <td style={{ padding: "6px 0", color: TERMINAL_COLORS.monoText, textAlign: "right", fontWeight: 600 }}>{row.value}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Scores */}
+                <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                  <div style={{ fontSize: "11px", fontWeight: 700, textTransform: "uppercase", color: TERMINAL_COLORS.secondaryText, letterSpacing: "0.05em" }}>
+                    Scores
+                  </div>
+                  <div style={{ display: "grid", gap: "8px" }}>
+                    {[
+                      { label: "Quality", value: stock.scores.quality },
+                      { label: "Valuation", value: stock.scores.valuation },
+                      { label: "Growth", value: stock.scores.growth },
+                      { label: "Momentum", value: stock.scores.momentum },
+                    ].map((item, idx) => {
+                      const color = !item.value ? TERMINAL_COLORS.secondaryText : item.value >= 70 ? TERMINAL_COLORS.gainGreen : item.value >= 50 ? TERMINAL_COLORS.accent : TERMINAL_COLORS.lossRed;
+                      return (
+                        <div key={idx} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "11px" }}>
+                          <span style={{ color: TERMINAL_COLORS.secondaryText }}>{item.label}</span>
+                          <span style={{ color, fontWeight: 600, fontFamily: "'SF Mono', 'JetBrains Mono', 'Roboto Mono', monospace" }}>
+                            {item.value != null ? `${item.value}/100` : "—"}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
+            </motion.div>
+          )}
+
+          {/* TAB: NEWS */}
+          {activeTab === "news" && (
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.2 }}
+              style={{ display: "grid", gap: "8px" }}
+            >
+              {newsItems.length > 0 ? (
+                newsItems.map((item, idx) => (
+                  <a
+                    key={idx}
+                    href={item.link || "#"}
+                    target={item.link ? "_blank" : undefined}
+                    rel={item.link ? "noopener noreferrer" : undefined}
+                    style={{
+                      display: "flex",
+                      gap: "12px",
+                      padding: "10px",
+                      borderBottom: `1px solid rgba(255,255,255,0.05)`,
+                      textDecoration: "none",
+                      color: TERMINAL_COLORS.monoText,
+                      alignItems: "flex-start",
+                      transition: "background 0.2s",
+                      background: "transparent",
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.02)")}
+                    onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                  >
+                    <span style={{
+                      color: TERMINAL_COLORS.accent,
+                      minWidth: "50px",
+                      fontWeight: 600,
+                      fontSize: "10px",
+                      fontFamily: "'SF Mono', 'JetBrains Mono', 'Roboto Mono', monospace",
+                    }}>
+                      {formatNewsTime(item.publishedAt) || item.time}
+                    </span>
+                    <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "2px" }}>
+                      <span style={{ fontSize: "11px", fontWeight: 600, color: TERMINAL_COLORS.monoText }}>{item.headline}</span>
+                      <span style={{ fontSize: "9px", color: TERMINAL_COLORS.secondaryText }}>{item.source || "PSE"}</span>
+                    </div>
+                  </a>
+                ))
+              ) : (
+                <div style={{ color: TERMINAL_COLORS.secondaryText, fontSize: "11px", textAlign: "center", padding: "20px" }}>
+                  No recent news available
+                </div>
+              )}
+            </motion.div>
+          )}
+
+          {/* TAB: RESEARCH */}
+          {activeTab === "research" && (
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.2 }}
+              style={{ display: "grid", gap: "12px" }}
+            >
+              {ai ? (
+                <div style={{ display: "grid", gap: "12px" }}>
+                  <div>
+                    <div style={{ fontSize: "9px", fontWeight: 700, textTransform: "uppercase", color: TERMINAL_COLORS.secondaryText, marginBottom: "4px" }}>
+                      Stance
+                    </div>
+                    <div style={{
+                      color: stock.thesis.stance === "High conviction" ? TERMINAL_COLORS.gainGreen : TERMINAL_COLORS.lossRed,
+                      fontWeight: 700,
+                      fontSize: "13px",
+                    }}>
+                      {stock.thesis.stance}
+                    </div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: "9px", fontWeight: 700, textTransform: "uppercase", color: TERMINAL_COLORS.secondaryText, marginBottom: "4px" }}>
+                      Thesis
+                    </div>
+                    <p style={{ color: TERMINAL_COLORS.monoText, fontSize: "11px", lineHeight: "1.6", margin: 0 }}>
+                      {stock.thesis.thesis}
+                    </p>
+                  </div>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+                    <div>
+                      <div style={{ fontSize: "9px", fontWeight: 700, textTransform: "uppercase", color: TERMINAL_COLORS.secondaryText, marginBottom: "4px" }}>
+                        Bull Case
+                      </div>
+                      <p style={{ color: TERMINAL_COLORS.monoText, fontSize: "11px", lineHeight: "1.6", margin: 0 }}>
+                        {stock.thesis.bullCase}
+                      </p>
+                    </div>
+                    <div>
+                      <div style={{ fontSize: "9px", fontWeight: 700, textTransform: "uppercase", color: TERMINAL_COLORS.secondaryText, marginBottom: "4px" }}>
+                        Bear Case
+                      </div>
+                      <p style={{ color: TERMINAL_COLORS.monoText, fontSize: "11px", lineHeight: "1.6", margin: 0 }}>
+                        {stock.thesis.bearCase}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div style={{ color: TERMINAL_COLORS.secondaryText, fontSize: "11px", textAlign: "center", padding: "20px" }}>
+                  {aiLoading ? "Generating AI research..." : "No research available"}
+                </div>
+              )}
+            </motion.div>
+          )}
+
+          {/* TAB: FINANCIALS */}
+          {activeTab === "financials" && (
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.2 }}
+              style={{ display: "flex", flexDirection: "column", gap: "12px" }}
+            >
+              <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", alignItems: "center" }}>
+                {["revenue" as const, "profit" as const].map((metric) => (
+                  <button
+                    key={metric}
+                    onClick={() => setFinancialMetric(metric)}
+                    style={{
+                      padding: "6px 12px",
+                      borderRadius: "0",
+                      border: "none",
+                      cursor: "pointer",
+                      fontSize: "11px",
+                      fontWeight: 600,
+                      background: financialMetric === metric ? TERMINAL_COLORS.accent : "rgba(255,255,255,0.05)",
+                      color: financialMetric === metric ? "white" : TERMINAL_COLORS.secondaryText,
+                      height: "32px",
+                      textTransform: "capitalize",
+                      transition: "all 0.2s",
+                    }}
+                  >
+                    {metric}
+                  </button>
+                ))}
+                <div style={{ marginLeft: "auto", display: "flex", gap: "6px" }}>
+                  {["annual" as const, "quarterly" as const].map((p) => (
+                    <button
+                      key={p}
+                      onClick={() => setFinancialPeriod(p)}
+                      style={{
+                        padding: "6px 12px",
+                        borderRadius: "0",
+                        border: "none",
+                        cursor: "pointer",
+                        fontSize: "11px",
+                        fontWeight: 600,
+                        background: financialPeriod === p ? TERMINAL_COLORS.accent : "rgba(255,255,255,0.05)",
+                        color: financialPeriod === p ? "white" : TERMINAL_COLORS.secondaryText,
+                        height: "32px",
+                        textTransform: "capitalize",
+                        transition: "all 0.2s",
+                      }}
+                    >
+                      {p}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <ChartErrorBoundary>
+                <div style={{
+                  width: "100%",
+                  height: "240px",
+                  backgroundColor: TERMINAL_COLORS.canvas,
+                  borderRadius: "0",
+                  border: `1px solid rgba(255,255,255,0.05)`,
+                }}>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LazyBarChart data={effectiveChartData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+                      <XAxis dataKey="period" tick={{ fontSize: 10, fill: TERMINAL_COLORS.secondaryText }} />
+                      <YAxis tick={{ fontSize: 10, fill: TERMINAL_COLORS.secondaryText }} />
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: TERMINAL_COLORS.panel,
+                          border: `1px solid rgba(255,255,255,0.1)`,
+                          borderRadius: "0",
+                          color: TERMINAL_COLORS.monoText,
+                          fontSize: "10px",
+                        }}
+                        labelStyle={{ color: TERMINAL_COLORS.monoText }}
+                        formatter={(value: any) => `₱${value.toLocaleString()}M`}
+                      />
+                      <Bar dataKey="value" fill={TERMINAL_COLORS.accent} isAnimationActive={false} />
+                    </LazyBarChart>
+                  </ResponsiveContainer>
+                </div>
+              </ChartErrorBoundary>
+            </motion.div>
+          )}
         </div>
 
-        {/* ── DISCLAIMER ── */}
+        {/* ── FOOTER DISCLAIMER ── */}
         <p style={{
           color: TERMINAL_COLORS.secondaryText,
           fontSize: "9px",
           textAlign: "center",
-          margin: "8px 0",
-          lineHeight: "1.4",
+          margin: "12px 0",
+          lineHeight: "1.5",
           fontFamily: "system-ui, -apple-system, sans-serif",
         }}>
           {disclaimer}
         </p>
-
-        {/* ── TRADE BUTTON ── */}
-        {selectedBroker && (
-          <motion.button
-            onClick={() => setIsBrokerOpen(true)}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            style={{
-              padding: "8px 16px",
-              borderRadius: "0",
-              border: "none",
-              background: TERMINAL_COLORS.accent,
-              color: "white",
-              fontSize: "12px",
-              fontWeight: 600,
-              cursor: "pointer",
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "6px",
-              alignSelf: "center",
-              height: "36px",
-            }}
-          >
-            <TrendingUp size={14} /> Trade via {selectedBroker}
-          </motion.button>
-        )}
       </div>
 
       {/* ── BROKER HANDOFF MODAL ── */}

@@ -1,8 +1,8 @@
-import initSqlJs, { type SqlJsModule, type SqlJsDatabase } from 'sql.js';
+import initSqlJs, { type Database } from 'sql.js';
 import path from 'path';
 import fs from 'fs';
 
-let SQL: SqlJsModule | null = null;
+let SQL: any = null;
 let initPromise: Promise<void> | null = null;
 
 async function ensureSql(): Promise<void> {
@@ -17,7 +17,7 @@ function resolveDbPath(): string {
   return process.env.SQLITE_DB_PATH ?? path.join(process.cwd(), 'data', 'stockstory.db');
 }
 
-let _db: SqlJsDatabase | null = null;
+let _db: Database | null = null;
 let _dbPath: string = resolveDbPath();
 
 function ensureDir(): void {
@@ -25,7 +25,7 @@ function ensureDir(): void {
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 }
 
-async function getDb(): Promise<SqlJsDatabase> {
+async function getDb(): Promise<Database> {
   if (_db) return _db;
   await ensureSql();
   _dbPath = resolveDbPath();
@@ -36,6 +36,7 @@ async function getDb(): Promise<SqlJsDatabase> {
   } else {
     _db = new SQL!.Database();
   }
+  if (!_db) throw new Error('Failed to initialize database');
   _db.run('PRAGMA journal_mode = WAL');
   _db.run('PRAGMA foreign_keys = ON');
   return _db;
@@ -123,14 +124,14 @@ interface SQLiteResult {
   rowCount: number;
 }
 
-function execAndMap(db: SqlJsDatabase, sql: string, params?: unknown[]): SQLiteResult {
+function execAndMap(db: Database, sql: string, params?: unknown[]): SQLiteResult {
   const isSelect = /^\s*SELECT/i.test(sql) || /^\s*PRAGMA/i.test(sql) || /^\s*WITH\s/i.test(sql);
   const isReturning = /RETURNING/i.test(sql);
 
   if (isSelect || isReturning) {
     if (params && params.length > 0) {
       const stmt = db.prepare(sql);
-      stmt.bind(params);
+      stmt.bind(params as any);
       const rows: Record<string, unknown>[] = [];
       while (stmt.step()) {
         rows.push(stmt.getAsObject() as Record<string, unknown>);
@@ -151,7 +152,7 @@ function execAndMap(db: SqlJsDatabase, sql: string, params?: unknown[]): SQLiteR
 
   if (params && params.length > 0) {
     const stmt = db.prepare(sql);
-    stmt.bind(params);
+    stmt.bind(params as any);
     stmt.step();
     stmt.free();
   } else {
@@ -171,7 +172,7 @@ function execAndMap(db: SqlJsDatabase, sql: string, params?: unknown[]): SQLiteR
 }
 
 class SQLitePool {
-  private db: SqlJsDatabase | null = null;
+  private db: Database | null = null;
 
   constructor() {
     this.init();
@@ -181,7 +182,7 @@ class SQLitePool {
     await ensureSql();
   }
 
-  private async getConnection(): Promise<SqlJsDatabase> {
+  private async getConnection(): Promise<Database> {
     if (!this.db) {
       this.db = await getDb();
       await this.ensureTables();

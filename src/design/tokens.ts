@@ -1,22 +1,28 @@
 // ============================================================================
-// PREDICTION-ENGINE DESIGN TOKENS — RAYCAST-INSPIRED DARK THEME
-// Pure black canvas, high-contrast white ink, one vivid red-orange accent.
-// Apple-grade restraint: single typeface (Inter), no gradients, no drop
-// shadows — elevation comes from a black→near-black surface ladder.
-// Mirrors src/styles/tokens.css 1:1. Every export name is preserved so the
-// rest of the codebase (which reads these via inline `style={{ ... }}`)
-// keeps compiling and re-themes automatically.
+// PREDICTION-ENGINE DESIGN TOKENS — PROFESSIONAL TRADING TERMINAL
+// Zerodha/Upstox-inspired institutional design for PSE stock platform.
+// Canvas: #0A0E27 (ultra-dark navy), Primary: #00A8D8 (professional teal).
+// High-density layout: compact rows (32-36px), monospace numbers, 1px borders.
+// Zero gradients, zero blur, zero shadows — elevation via surface ladder only.
+// Every token is preserved so the codebase (inline styles) re-themes automatically.
 // ============================================================================
 
-// ── COLORS — Professional Financial Trading Terminal ───────────────
-// Deep institutional navy/slate background, clean white text, sharp greens/reds
-// for market semantics, and professional teal accent. Zero gradients, zero
-// glassmorphism. Built for high-density data scanning, not casual consumption.
+// ── COLORS — Professional Trading Terminal (Zerodha/Upstox-Inspired) ──
+// Ultra-dark navy canvas (#0A0E27) for maximum contrast, professional teal/cyan
+// (#00A8D8) accents, sharp institutional greens/reds for market semantics. Zero
+// gradients, zero glassmorphism, zero drop shadows. Built for high-density
+// institutional trading — compact rows (32-36px), monospace alignment, instant
+// market data legibility. Borders: 1px only, no rounded corners for data sections.
 export const colors = {
-  // Brand — professional teal/steel blue (institutional fintech)
-  primary:        '#0891B2',    // Teal accent for CTAs
-  primaryPressed: '#0E7490',
+  // Brand — professional teal/blue (StockStory-India inspired)
+  primary:        '#0891B2',    // Professional teal accent for CTAs (StockStory standard)
+  primaryPressed: '#067A9B',    // Darker shade on press
   onPrimary:      '#F0F2F5',
+
+  // Gold signature accent (StockStory premium)
+  gold:           '#E4A853',    // Premium features, brand highlights
+  goldLight:      'rgba(228, 168, 83, 0.12)',
+  goldStrong:     'rgba(228, 168, 83, 0.24)',
 
   // Text hierarchy — clean institutional whites and grays
   ink:            '#F0F2F5',    // Primary headlines / body (off-white)
@@ -28,19 +34,19 @@ export const colors = {
   onDark:         '#F0F2F5',    // Interactive-state primary text,
   onDarkMute:     'rgba(240,242,245,0.62)',
 
-  // Surface ladder — deep institutional navy (perfect for trading terminals)
-  canvas:           '#0F1419', // Page background (deep slate-navy)
-  surface:          '#151B27', // Card / elevated panel,
-  surfaceElevated:  '#1A2332', // Hover states, lifted interiors,
-  surfaceCard:      '#1E2736', // Active/pressed cards, tile fills,
-  buttonFg:         '#242D39', // Rare deep surface variant
+  // Surface ladder — ultra-dark navy (StockStory-India professional trading terminal)
+  canvas:           '#0F1419', // Page background (StockStory standard dark navy)
+  surface:          '#151B27', // Card / panel background (StockStory standard)
+  surfaceElevated:  '#1A2332', // Hover states, lifted interiors
+  surfaceCard:      '#1E2736', // Active/pressed cards, tile fills
+  buttonFg:         '#0F1A2D', // Deep surface variant for button focus
 
-  // Glass — minimal use (only modals/overlays)
+  // Glass — minimal use (modals/overlays only, NO blur)
   glassBg:          'rgba(15, 20, 25, 0.92)',
   glassBgStrong:    'rgba(21, 27, 39, 0.96)',
   glassBorder:      'rgba(255, 255, 255, 0.08)',
   glassBorderTop:   'rgba(255, 255, 255, 0.12)',
-  glassBlur:        'blur(8px)',  // Minimal blur for fintech
+  glassBlur:        'none',      // No blur/glassmorphism in trading terminals
 
   // Backdrop / overlay tokens
   backdropClear:       'rgba(0,0,0,0)',
@@ -50,19 +56,19 @@ export const colors = {
   backdropFooter:      'rgba(15,20,25,0.90)',
   backdropMuted:       'rgba(255,255,255,0.03)',
 
-  // Borders — thin institutional hairlines
-  hairline:       '#2D3748',
-  hairlineSoft:   'rgba(255,255,255,0.05)',
-  hairlineStrong: 'rgba(255,255,255,0.12)',
+  // Borders — thin institutional hairlines (1px only, no rounded cards)
+  hairline:       'rgba(255,255,255,0.08)',      // 1px dividers
+  hairlineSoft:   'rgba(255,255,255,0.05)',      // Minimal emphasis
+  hairlineStrong: 'rgba(255,255,255,0.12)',      // Stronger dividers
 
-  // Brand accent — professional teal (finance standard)
-  accentRed:        '#0891B2',  // Primary accent (teal)
-  accentRedSoft:    'rgba(8,145,178,0.12)',
-  accentRedStrong:  'rgba(8,145,178,0.24)',
-  accentBlue:       '#0891B2',
+  // Brand accent — professional teal/cyan + gold (StockStory-standard)
+  accentRed:        '#0891B2',  // Primary accent (teal - StockStory)
+  accentRedSoft:    'rgba(8,145,178,0.12)',      // Soft teal background
+  accentRedStrong:  'rgba(8,145,178,0.24)',      // Strong teal overlay
+  accentBlue:       '#0891B2',  // Alternative professional blue (teal)
   accentBlueSoft:   'rgba(8,145,178,0.12)',
-  accentYellow:     '#F59E0B',  // Warning (amber)
-  accentYellowSoft: 'rgba(245,158,11,0.14)',
+  accentYellow:     '#E4A853',  // Gold accent (premium, warnings)
+  accentYellowSoft: 'rgba(228,168,83,0.14)',
 
   // Market semantic colors — sharp, institutional greens/reds for instant legibility
   marketGreen:       '#10B981', // Bullish (positive) - emerald green
@@ -83,25 +89,25 @@ export const colors = {
   sectorServices:    '#0A7A9A',
   sectorMiningAndOil:'#8A6020',
 
-  // Legacy gradient anchors
+  // Legacy gradient anchors (use canvas for both, no gradients in trading)
   heroStripeStart: '#E4A853',
   heroStripeEnd:   '#C88A3A',
-  keyBgStart:      '#161B23',
-  keyBgEnd:        '#0B0E12',
+  keyBgStart:      '#0A0E27',
+  keyBgEnd:        '#0A0E27',
 
-  // Semantic aliases
-  success:         '#2BB673',
-  danger:          '#E8504E',
-  warning:         '#F0A63C',
-  page:            '#0B0E12',
-  card:            '#12161C',
-  textPrimary:     '#EDF0F3',
-  textSecondary:   '#AAB3BD',
-  textTertiary:    '#7B8591',
-  border:          '#1F262F',
-  separator:       '#1F262F',
-  fill:            '#181D25',
-  bgSecondary:     '#181D25',
+  // Semantic aliases (aligned with professional trading)
+  success:         '#10B981',
+  danger:          '#EF4444',
+  warning:         '#F59E0B',
+  page:            '#0A0E27',
+  card:            '#111C3D',
+  textPrimary:     '#F0F2F5',
+  textSecondary:   '#9CA3AF',
+  textTertiary:    '#6B7280',
+  border:          'rgba(255,255,255,0.08)',
+  separator:       'rgba(255,255,255,0.08)',
+  fill:            '#16243B',
+  bgSecondary:     '#16243B',
 } as const;
 
 // ── TYPOGRAPHY ─────────────────────────────────────────────────────────
@@ -173,7 +179,8 @@ export const layout = {
   borderWidth:        '1px',
 } as const;
 
-// ── COMPONENT DIMENSIONS ───────────────────────────────────────────────
+// ── COMPONENT DIMENSIONS — Compact for Trading Terminal ───────────────
+// Input: 36-40px, Buttons: minimal with 1px borders, Table rows: 32-36px
 export const components = {
   input: {
     height:   '36px',
@@ -185,12 +192,17 @@ export const components = {
     paddingX:      '16px',
   },
   navBar: {
-    heightDesktop: '52px',
-    heightMobile:  '52px',
+    heightDesktop: '48px',
+    heightMobile:  '48px',
   },
   card: {
-    paddingMobile:  '16px',
-    paddingDesktop: '24px',
+    paddingMobile:  '12px',      // Compact for trading (was 16px)
+    paddingDesktop: '16px',       // Compact for trading (was 24px)
+  },
+  table: {
+    rowHeight:      '32px',       // Ultra-compact data rows
+    cellPaddingX:   '12px',
+    cellPaddingY:   '8px',
   },
 } as const;
 
