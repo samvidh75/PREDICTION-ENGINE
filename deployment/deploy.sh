@@ -71,7 +71,11 @@ if command -v rsync &>/dev/null; then
   # migrations, not shipped by this script.
     # --exclude=.env and .env.local: production env is set via systemd Environment=
   # directives below, never via a local dev .env that gets rsync'd by accident.
-  RSYNC_OPTS="-avz --delete --exclude=node_modules --exclude=.git --exclude=dist --exclude=.env --exclude=.env.local --exclude=.env.production --exclude=stockex_slm_agent_output --exclude=data/*.db --exclude=data/*.db-* --exclude=data/*.sqlite --exclude=data/*.sqlite*"
+  # llmvenv: the LoRA inference venv is created ON the VPS (step 7 below),
+  # never exists locally — without this exclude, --delete wipes it and
+  # stockex-llm.service dies with "No such file or directory" (this exact
+  # regression happened once; do not remove this exclude).
+  RSYNC_OPTS="-avz --delete --exclude=node_modules --exclude=.git --exclude=dist --exclude=llmvenv --exclude=.env --exclude=.env.local --exclude=.env.production --exclude=stockex_slm_agent_output --exclude=gemma_pse_model_final --exclude=.hf-cache --exclude=data/*.db --exclude=data/*.db-* --exclude=data/*.sqlite --exclude=data/*.sqlite*"
   [ -n "$KEY_FILE" ] && RSYNC_OPTS="$RSYNC_OPTS -e 'ssh -i $KEY_FILE -p $VPS_PORT'"
   eval rsync $RSYNC_OPTS ./ "${VPS_USER}@${VPS_HOST}:${APP_DIR}/"
 else
