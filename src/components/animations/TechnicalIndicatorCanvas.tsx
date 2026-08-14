@@ -9,13 +9,13 @@
 
 import { useEffect, useRef } from "react";
 
-const INK = "#1C1A16";
-const MUTED = "#6B6559";
-const FAINT = "rgba(28,26,22,0.06)";
-const GREEN = "#17754A";
-const RED = "#B3311F";
-const AMBER = "#9C6B14";
-const RUST = "#B5502E";
+const INK = "#0B0D12";
+const MUTED = "#64748B";
+const FAINT = "rgba(11,13,18,0.06)";
+const GREEN = "#0F9D58";
+const RED = "#DC2626";
+const AMBER = "#B45309";
+const RUST = "#0B5FA5";
 
 function useDevicePixelCanvas(width: number, height: number) {
   const ref = useRef<HTMLCanvasElement | null>(null);
@@ -286,7 +286,7 @@ export function VolumeProfile({ buckets, width = 140, height = 320, currentPrice
         const y = i * rowH;
         const barW = (b.volume / maxVol) * maxBarW * progress;
         const isPoc = b === poc;
-        ctx.fillStyle = isPoc ? RUST : "rgba(181,80,46,0.28)";
+        ctx.fillStyle = isPoc ? RUST : "rgba(11,95,165,0.28)";
         ctx.fillRect(0, y + rowH * 0.15, barW, rowH * 0.7);
       });
 

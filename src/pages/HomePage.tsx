@@ -22,14 +22,14 @@ function liveClock(): string {
 }
 
 const QUICK_LINKS = [
-  { icon: TrendingUp,  label: "Top Gainers",   route: "/scanner?mode=gainers", color: "#17754A" },
-  { icon: TrendingDown, label: "Top Losers",   route: "/scanner?mode=losers",  color: "#B3311F" },
-  { icon: Activity,    label: "Most Active",   route: "/scanner?mode=active",  color: "#B5502E" },
-  { icon: Compass,     label: "Sectors",       route: "/sectors",              color: "#B5502E" },
-  { icon: BarChart2,   label: "Portfolio",     route: "/portfolio",            color: "#B5502E" },
-  { icon: Bell,        label: "Alerts",        route: "/alerts",               color: "#B3311F" },
-  { icon: BookOpen,    label: "AI Research",   route: "/chat",                 color: "#B5502E" },
-  { icon: Zap,         label: "Full Scanner",  route: "/scanner?mode=all",     color: "#17754A" },
+  { icon: TrendingUp,  label: "Top Gainers",   route: "/scanner?mode=gainers", color: "#0F9D58" },
+  { icon: TrendingDown, label: "Top Losers",   route: "/scanner?mode=losers",  color: "#DC2626" },
+  { icon: Activity,    label: "Most Active",   route: "/scanner?mode=active",  color: "#0B5FA5" },
+  { icon: Compass,     label: "Sectors",       route: "/sectors",              color: "#0B5FA5" },
+  { icon: BarChart2,   label: "Portfolio",     route: "/portfolio",            color: "#0B5FA5" },
+  { icon: Bell,        label: "Alerts",        route: "/alerts",               color: "#DC2626" },
+  { icon: BookOpen,    label: "AI Research",   route: "/chat",                 color: "#0B5FA5" },
+  { icon: Zap,         label: "Full Scanner",  route: "/scanner?mode=all",     color: "#0F9D58" },
 ];
 
 export default function HomePage() {
@@ -102,17 +102,17 @@ export default function HomePage() {
       <div style={{
         display: "flex", alignItems: "center", justifyContent: "space-between",
         padding: "9px 14px", minHeight: 36,
-        background: "#F3EEE4",
+        background: "#EEF1F4",
         border: "1px solid rgba(0,0,0,0.10)",
         borderRadius: 4,
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <span style={{
             display: "inline-block", width: 6, height: 6, borderRadius: "50%",
-            background: marketStatus.isOpen ? "#17754A" : "#96907F",
+            background: marketStatus.isOpen ? "#0F9D58" : "#94A3B8",
           }} />
           <span style={{
-            fontSize: 11, fontWeight: 600, color: marketStatus.isOpen ? "#17754A" : "#96907F",
+            fontSize: 11, fontWeight: 600, color: marketStatus.isOpen ? "#0F9D58" : "#94A3B8",
             fontFamily: '"SF Mono", "JetBrains Mono", "Roboto Mono", monospace',
           }}>
             {marketStatus.label}
@@ -203,19 +203,19 @@ export default function HomePage() {
           onClick={() => { const t = resolveTarget(); if (t) navigate(`/stock/${t}`); }}
           style={{
             padding: "0 16px", height: 38, borderRadius: 4,
-            background: "#B5502E", color: "#F0F2F5", border: "1px solid #B5502E",
+            background: "#0B5FA5", color: "#F0F2F5", border: "1px solid #0B5FA5",
             fontSize: 11, fontWeight: 600, cursor: "pointer",
             display: "flex", alignItems: "center", gap: 5,
             transition: "background 120ms ease, border-color 120ms ease",
             fontFamily: '"SF Mono", "JetBrains Mono", "Roboto Mono", monospace',
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.background = "#8A3A20";
-            e.currentTarget.style.borderColor = "#8A3A20";
+            e.currentTarget.style.background = "#084A80";
+            e.currentTarget.style.borderColor = "#084A80";
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.background = "#B5502E";
-            e.currentTarget.style.borderColor = "#B5502E";
+            e.currentTarget.style.background = "#0B5FA5";
+            e.currentTarget.style.borderColor = "#0B5FA5";
           }}
         >
           <Eye size={12} /> View
@@ -277,7 +277,7 @@ export default function HomePage() {
       }}>
         <span>PHISIX · PSE Edge</span>
         <Link to="/trust" style={{
-          color: "#B5502E", textDecoration: "none",
+          color: "#0B5FA5", textDecoration: "none",
           borderBottom: "1px solid rgba(181, 80, 46, 0.3)",
         }}>
           Data sources

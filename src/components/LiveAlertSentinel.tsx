@@ -86,14 +86,14 @@ export default function LiveAlertSentinel() {
     bottom: "24px",
     right: "24px",
     backgroundColor: "#FFFFFF",
-    border: "1px solid #B3311F",
-    borderLeft: "4px solid #B3311F",
+    border: "1px solid #DC2626",
+    borderLeft: "4px solid #DC2626",
     padding: "16px 20px",
     borderRadius: "6px",
     maxWidth: "360px",
     width: "100%",
     fontFamily: typography.fontFamily,
-    color: "#1C1A16",
+    color: "#0B0D12",
     boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.12)",
     zIndex: 9999,
     display: "flex",
@@ -109,7 +109,7 @@ export default function LiveAlertSentinel() {
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          borderBottom: "1px solid rgba(28,26,22,0.10)",
+          borderBottom: "1px solid rgba(11,13,18,0.10)",
           paddingBottom: "6px",
         }}
       >
@@ -117,7 +117,7 @@ export default function LiveAlertSentinel() {
           style={{
             fontSize: "10px",
             fontWeight: "bold",
-            color: "#B3311F",
+            color: "#DC2626",
             letterSpacing: "0.05em",
           }}
         >
@@ -128,7 +128,7 @@ export default function LiveAlertSentinel() {
           style={{
             backgroundColor: "transparent",
             border: "none",
-            color: "#96907F",
+            color: "#94A3B8",
             cursor: "pointer",
             fontSize: "12px",
             fontFamily: typography.fontFamily,
@@ -137,7 +137,7 @@ export default function LiveAlertSentinel() {
           ✕
         </button>
       </div>
-      <p style={{ fontSize: "11px", margin: 0, lineHeight: "1.5", color: "#4A453C" }}>
+      <p style={{ fontSize: "11px", margin: 0, lineHeight: "1.5", color: "#374151" }}>
         {activeAlert.message}
       </p>
       <div
@@ -147,7 +147,7 @@ export default function LiveAlertSentinel() {
           alignItems: "center",
           marginTop: "4px",
           fontSize: "9px",
-          color: "#6B6559",
+          color: "#64748B",
         }}
       >
         <span>ID: {activeAlert.alertId.substring(0, 8)}...</span>

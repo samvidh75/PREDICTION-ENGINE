@@ -26,13 +26,13 @@ import { PriceSkeleton, ChartSkeleton, MetricsSkeleton } from "../components/Ske
 
 // ── Professional Trading Terminal Palette ──
 const TERMINAL_COLORS = {
-  canvas: "#FAF8F4",
+  canvas: "#F5F6F8",
   panel: "#FFFFFF",
-  accent: "#B5502E",
-  gainGreen: "#17754A",
-  lossRed: "#B3311F",
-  monoText: "#1C1A16",
-  secondaryText: "#6B6559",
+  accent: "#0B5FA5",
+  gainGreen: "#0F9D58",
+  lossRed: "#DC2626",
+  monoText: "#0B0D12",
+  secondaryText: "#64748B",
 };
 
 // ── Motion presets (minimal) ──
@@ -685,7 +685,7 @@ function StockError({ symbol, onRetry }: { symbol: string; onRetry?: () => void 
         alignItems: "center",
         justifyContent: "center",
       }}>
-        <AlertCircle size={20} color="#B3311F" />
+        <AlertCircle size={20} color="#DC2626" />
       </div>
       <div style={{ color: TERMINAL_COLORS.monoText, fontSize: "13px", fontWeight: 600 }}>
         Failed to load {symbol}

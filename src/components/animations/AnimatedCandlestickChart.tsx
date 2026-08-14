@@ -76,9 +76,9 @@ export function AnimatedCandlestickChart({
       width={width}
       height={height}
       style={{
-        background: "#FAF8F4",
+        background: "#F5F6F8",
         borderRadius: 8,
-        border: "1px solid rgba(28,26,22,0.08)",
+        border: "1px solid rgba(11,13,18,0.08)",
       }}
     >
       {/* Grid lines */}
@@ -91,7 +91,7 @@ export function AnimatedCandlestickChart({
             y1={y}
             x2={width - padding}
             y2={y}
-            stroke="rgba(28,26,22,0.04)"
+            stroke="rgba(11,13,18,0.04)"
             strokeWidth="1"
           />
         );
@@ -114,8 +114,8 @@ export function AnimatedCandlestickChart({
           const isUp = candle.close >= candle.open;
           const bodyTop = isUp ? closeY : openY;
           const bodyHeight = Math.abs(closeY - openY) || 1;
-          const bodyColor = isUp ? "#17754A" : "#B3311F";
-          const wickColor = isUp ? "#17754A99" : "#B3311F99";
+          const bodyColor = isUp ? "#0F9D58" : "#DC2626";
+          const wickColor = isUp ? "#0F9D5899" : "#DC262699";
 
           return (
             <motion.g
@@ -124,7 +124,7 @@ export function AnimatedCandlestickChart({
               onMouseEnter={() => setHoveredIndex(idx)}
               style={{
                 cursor: "pointer",
-                filter: hoveredIndex === idx ? "drop-shadow(0 2px 8px rgba(181,80,46,0.2))" : "none",
+                filter: hoveredIndex === idx ? "drop-shadow(0 2px 8px rgba(11,95,165,0.2))" : "none",
               }}
             >
               {/* Wick */}
@@ -156,7 +156,7 @@ export function AnimatedCandlestickChart({
                   y={bodyTop - 12}
                   textAnchor="middle"
                   fontSize="11"
-                  fill="#1C1A16"
+                  fill="#0B0D12"
                   fontWeight="600"
                   fontFamily="JetBrains Mono"
                   initial={{ opacity: 0, y: 5 }}
@@ -181,7 +181,7 @@ export function AnimatedCandlestickChart({
             y={height - 10}
             textAnchor="middle"
             fontSize="10"
-            fill="#6B6559"
+            fill="#64748B"
             fontFamily="JetBrains Mono"
           >
             {candle.time}

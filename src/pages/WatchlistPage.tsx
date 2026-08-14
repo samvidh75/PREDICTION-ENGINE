@@ -13,10 +13,10 @@ import { recordAction } from "../services/personalization/UserActionMemory";
 import { getWatchlists, createWatchlist, addTickerToWatchlist, subscribeWatchlist } from "../services/portfolio/watchlistStore";
 
 const TERMINAL_COLORS = {
-  cyan: "#B5502E",
-  green: "#17754A",
-  red: "#B3311F",
-  bg: "#FAF8F4",
+  cyan: "#0B5FA5",
+  green: "#0F9D58",
+  red: "#DC2626",
+  bg: "#F5F6F8",
 };
 
 const STATUS_COLORS: Record<string, string> = {

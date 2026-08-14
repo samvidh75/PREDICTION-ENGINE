@@ -1,67 +1,67 @@
 /* ============================================================================
-   DESIGN TOKENS — "LEDGER" — A FINANCIAL ALMANAC, NOT A SAAS DASHBOARD
-   Warm paper surface, deep ink text, a single rust/amber signature accent
-   (not blue, not teal). Editorial display type for headers, monospace for
-   every number. Zero gradients, zero glassmorphism, zero generic fintech blue.
+   DESIGN TOKENS — "STEEL" — INSTITUTIONAL COOL-WHITE TRADING TERMINAL
+   Neutral cool-white/light-gray surfaces, crisp near-black text, a single
+   steel-blue signature accent. Zero warmth, zero gradients, zero
+   glassmorphism, zero generic purple SaaS look.
    ============================================================================ */
 
 :root {
-  /* ── Surface ladder — warm paper, not stark white ────────────────────── */
-  --bg-page:        #FAF8F4;
+  /* ── Surface ladder — cool white/light-gray, not warm paper ──────────── */
+  --bg-page:        #F5F6F8;
   --bg-card:        #FFFFFF;
-  --bg-card-hover:  #F3EEE4;
-  --bg-chip:        #F1EBDF;
-  --bg-sheet:       #FDFBF8;
-  --bg-paper-deep:  #F3EEE4;
-  --bg-elevated:    #F3EEE4;
+  --bg-card-hover:  #EEF1F4;
+  --bg-chip:        #EDF0F4;
+  --bg-sheet:       #FAFBFC;
+  --bg-paper-deep:  #EEF1F4;
+  --bg-elevated:    #EEF1F4;
 
-  /* ── Brand / CTA — signature rust/amber, the "ledger stamp" color ────── */
-  --brand:          #B5502E;
-  --brand-light:    #C96B48;
-  --brand-dark:     #8A3A20;
-  --brand-ink:      #FDFBF8;
+  /* ── Brand / CTA — signature steel-blue ───────────────────────────────── */
+  --brand:          #0B5FA5;
+  --brand-light:    #2E7FC0;
+  --brand-dark:     #084A80;
+  --brand-ink:      #FFFFFF;
 
   /* ── Market semantic colors — sharp institutional greens/reds ──────── */
-  --market-green:        #17754A;
-  --market-green-light:  rgba(23,117,74,0.10);
-  --market-red:          #B3311F;
-  --market-red-light:    rgba(179,49,31,0.10);
-  --market-orange:       #9C6B14;
-  --market-orange-light: rgba(156,107,20,0.10);
+  --market-green:        #0F9D58;
+  --market-green-light:  rgba(15,157,88,0.10);
+  --market-red:          #DC2626;
+  --market-red-light:    rgba(220,38,38,0.10);
+  --market-orange:       #B45309;
+  --market-orange-light: rgba(180,83,9,0.10);
 
   /* ── UI semantic ───────────────────────────────────────────────────── */
-  --green:          #17754A;
-  --green-light:    rgba(23,117,74,0.10);
-  --red:            #B3311F;
-  --red-light:      rgba(179,49,31,0.10);
-  --amber:          #9C6B14;
-  --amber-light:    rgba(156,107,20,0.10);
+  --green:          #0F9D58;
+  --green-light:    rgba(15,157,88,0.10);
+  --red:            #DC2626;
+  --red-light:      rgba(220,38,38,0.10);
+  --amber:          #B45309;
+  --amber-light:    rgba(180,83,9,0.10);
 
-  /* ── Signature accent — rust/amber ────────────────────────────────────── */
-  --accent:         #B5502E;
-  --accent-soft:    rgba(181,80,46,0.10);
-  --accent-strong:  rgba(181,80,46,0.20);
-  --accent-ink:     #FDFBF8;
+  /* ── Signature accent — steel-blue / teal ────────────────────────────── */
+  --accent:         #0B5FA5;
+  --accent-soft:    rgba(11,95,165,0.10);
+  --accent-strong:  rgba(11,95,165,0.20);
+  --accent-ink:     #FFFFFF;
 
-  /* ── Text hierarchy — deep ink on warm paper ─────────────────────────── */
-  --text-primary:   #1C1A16;
-  --text-body:      #4A453C;
-  --text-secondary: #6B6559;
-  --text-muted:     #96907F;
-  --text-inverse:   #FDFBF8;
-  --text-rule:      #E3DCCC;
+  /* ── Text hierarchy — near-black on cool white ───────────────────────── */
+  --text-primary:   #0B0D12;
+  --text-body:      #374151;
+  --text-secondary: #64748B;
+  --text-muted:     #94A3B8;
+  --text-inverse:   #FFFFFF;
+  --text-rule:      #E2E5EA;
 
-  /* ── Borders — thin ink-tinted hairlines, not neutral gray ───────────── */
-  --border:         #E3DCCC;
-  --border-strong:  rgba(28,26,22,0.16);
-  --border-soft:    rgba(28,26,22,0.07);
-  --border-focus:   #B5502E;
+  /* ── Borders — thin neutral hairlines ─────────────────────────────────── */
+  --border:         #E2E5EA;
+  --border-strong:  rgba(11,13,18,0.16);
+  --border-soft:    rgba(11,13,18,0.06);
+  --border-focus:   #0B5FA5;
 
-  /* ── Typography — editorial serif for headers, mono for data ────────── */
-  --font-sans:      -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Segoe UI", Roboto, sans-serif;
+  /* ── Typography — geometric sans for headers, mono for data ─────────── */
+  --font-sans:      "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Segoe UI", Roboto, sans-serif;
   --font:           var(--font-sans);
   --font-mono:      "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, "Courier New", monospace;
-  --font-display:   "Fraunces", "Iowan Old Style", "Georgia", "Times New Roman", serif;
+  --font-display:   "Plus Jakarta Sans", "SF Pro Display", -apple-system, BlinkMacSystemFont, sans-serif;
   --font-serif:     var(--font-display);
 
   /* ── Radius ────────────────────────────────────────────────────────── */
@@ -94,22 +94,22 @@
   --surface-paper-deep: var(--bg-paper-deep);
 
   --brand-hover:    var(--brand-dark);
-  --brand-tint:     rgba(228,168,83,0.11);
+  --brand-tint:     rgba(11,95,165,0.11);
 
   --text-900:       var(--text-primary);
   --text-700:       var(--text-body);
   --text-500:       var(--text-secondary);
   --text-300:       var(--text-muted);
 
-  --green-text:     #2BB673;
-  --red-text:       #E8504E;
-  --amber-text:     #F0A63C;
-  --accent-text:    #E4A853;
+  --green-text:     #12B76A;
+  --red-text:       #F04438;
+  --amber-text:     #DC8B15;
+  --accent-text:    #2E7FC0;
 
   --sh-card:        var(--shadow-card);
   --sh-raised:      var(--shadow-raised);
   --sh-float:       var(--shadow-modal);
-  --sh-focus:       0 0 0 3px rgba(228,168,83,0.25);
+  --sh-focus:       0 0 0 3px rgba(11,95,165,0.25);
 
   --r-xs:           var(--radius-sm);
   --r-md:           var(--radius-md);

@@ -80,9 +80,9 @@ export function TickerNumber({
   decimals = 2,
   prefix = "",
   suffix = "",
-  positiveColor = "#17754A",
-  negativeColor = "#B3311F",
-  neutralColor = "#1C1A16",
+  positiveColor = "#0F9D58",
+  negativeColor = "#DC2626",
+  neutralColor = "#0B0D12",
   style,
 }: TickerNumberProps) {
   const prevValue = useRef(value);
@@ -106,7 +106,7 @@ export function TickerNumber({
   return (
     <motion.span
       key={value}
-      initial={{ backgroundColor: flash ? (flash === "up" ? "rgba(23,117,74,0.14)" : "rgba(179,49,31,0.14)") : "transparent" }}
+      initial={{ backgroundColor: flash ? (flash === "up" ? "rgba(15,157,88,0.14)" : "rgba(220,38,38,0.14)") : "transparent" }}
       animate={{ backgroundColor: "rgba(0,0,0,0)" }}
       transition={{ duration: 0.6, ease: "easeOut" }}
       style={{
@@ -167,9 +167,9 @@ export function TickerTape({ items, speed = 40 }: TickerTapeProps) {
             whiteSpace: "nowrap",
           }}
         >
-          <span style={{ color: "#1C1A16", fontWeight: 600 }}>{item.symbol}</span>
-          <span style={{ color: "#4A453C" }}>{item.price.toFixed(2)}</span>
-          <span style={{ color: item.changePct >= 0 ? "#17754A" : "#B3311F" }}>
+          <span style={{ color: "#0B0D12", fontWeight: 600 }}>{item.symbol}</span>
+          <span style={{ color: "#374151" }}>{item.price.toFixed(2)}</span>
+          <span style={{ color: item.changePct >= 0 ? "#0F9D58" : "#DC2626" }}>
             {item.changePct >= 0 ? "+" : ""}
             {item.changePct.toFixed(2)}%
           </span>
@@ -179,7 +179,7 @@ export function TickerTape({ items, speed = 40 }: TickerTapeProps) {
   );
 
   return (
-    <div style={{ overflow: "hidden", width: "100%", background: "#F3EEE4", borderBottom: "1px solid #E3DCCC" }}>
+    <div style={{ overflow: "hidden", width: "100%", background: "#EEF1F4", borderBottom: "1px solid #E2E5EA" }}>
       <div ref={trackRef} style={{ display: "flex", padding: "6px 0" }}>
         {renderRow("a")}
         {renderRow("b")}
@@ -203,8 +203,8 @@ export function GaugeFill({
   percent,
   size = 64,
   strokeWidth = 5,
-  color = "#B5502E",
-  trackColor = "rgba(28,26,22,0.08)",
+  color = "#0B5FA5",
+  trackColor = "rgba(11,13,18,0.08)",
   label,
 }: GaugeFillProps) {
   const radius = (size - strokeWidth) / 2;
@@ -240,7 +240,7 @@ export function GaugeFill({
             fontFamily: "'JetBrains Mono', monospace",
             fontSize: size * 0.22,
             fontWeight: 600,
-            color: "#1C1A16",
+            color: "#0B0D12",
           }}
         >
           {label}
