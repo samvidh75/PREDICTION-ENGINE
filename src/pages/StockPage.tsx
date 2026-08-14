@@ -25,13 +25,13 @@ import { PriceSkeleton, ChartSkeleton, MetricsSkeleton } from "../components/Ske
 
 // ── Professional Trading Terminal Palette ──
 const TERMINAL_COLORS = {
-  canvas: "#0F1419",
-  panel: "#151B27",
-  accent: "#0891B2",
-  gainGreen: "#10B981",
-  lossRed: "#EF4444",
-  monoText: "#E8EAED",
-  secondaryText: "#9CA3AF",
+  canvas: "#FAF8F4",
+  panel: "#FFFFFF",
+  accent: "#B5502E",
+  gainGreen: "#17754A",
+  lossRed: "#B3311F",
+  monoText: "#1C1A16",
+  secondaryText: "#6B6559",
 };
 
 // ── Motion presets (minimal) ──
@@ -235,7 +235,7 @@ function StockHeader({ stock }: { stock: StockResearchDetail }) {
     <div style={{
       padding: "8px 12px",
       background: TERMINAL_COLORS.canvas,
-      borderBottom: `1px solid rgba(255,255,255,0.08)`,
+      borderBottom: `1px solid rgba(0,0,0,0.08)`,
       display: "flex",
       alignItems: "center",
       justifyContent: "space-between",
@@ -339,7 +339,7 @@ function OrderTicket({ stock }: { stock: StockResearchDetail }) {
 
   return (
     <div style={{
-      border: `1px solid rgba(255,255,255,0.05)`,
+      border: `1px solid rgba(0,0,0,0.05)`,
       borderRadius: "0",
       padding: "12px",
       background: TERMINAL_COLORS.panel,
@@ -348,7 +348,7 @@ function OrderTicket({ stock }: { stock: StockResearchDetail }) {
       gap: "12px",
     }}>
       {/* BUY/SELL Tabs */}
-      <div style={{ display: "flex", gap: "4px", borderBottom: `1px solid rgba(255,255,255,0.05)` }}>
+      <div style={{ display: "flex", gap: "4px", borderBottom: `1px solid rgba(0,0,0,0.05)` }}>
         {["buy", "sell"].map((tab) => (
           <button
             key={tab}
@@ -383,7 +383,7 @@ function OrderTicket({ stock }: { stock: StockResearchDetail }) {
           style={{
             height: "36px",
             padding: "0 8px",
-            border: `1px solid rgba(255,255,255,0.1)`,
+            border: `1px solid rgba(0,0,0,0.1)`,
             background: TERMINAL_COLORS.canvas,
             color: TERMINAL_COLORS.monoText,
             fontFamily: "'SF Mono', 'JetBrains Mono', 'Roboto Mono', monospace",
@@ -417,8 +417,8 @@ function OrderTicket({ stock }: { stock: StockResearchDetail }) {
           style={{
             height: "36px",
             padding: "0 8px",
-            border: `1px solid rgba(255,255,255,0.1)`,
-            background: isMarketOrder ? "rgba(255,255,255,0.02)" : TERMINAL_COLORS.canvas,
+            border: `1px solid rgba(0,0,0,0.1)`,
+            background: isMarketOrder ? "rgba(0,0,0,0.02)" : TERMINAL_COLORS.canvas,
             color: TERMINAL_COLORS.monoText,
             fontFamily: "'SF Mono', 'JetBrains Mono', 'Roboto Mono', monospace",
             fontSize: "13px",
@@ -433,8 +433,8 @@ function OrderTicket({ stock }: { stock: StockResearchDetail }) {
       {/* Total Amount Display */}
       <div style={{
         padding: "8px",
-        background: "rgba(255,255,255,0.02)",
-        border: `1px solid rgba(255,255,255,0.05)`,
+        background: "rgba(0,0,0,0.02)",
+        border: `1px solid rgba(0,0,0,0.05)`,
         borderRadius: "0",
       }}>
         <div style={{ fontSize: "9px", color: TERMINAL_COLORS.secondaryText, fontWeight: 600, textTransform: "uppercase", marginBottom: "3px" }}>Total</div>
@@ -508,7 +508,7 @@ function StockInfoGrid({ stock }: { stock: StockResearchDetail }) {
 
   const MetricColumn = ({ title, metrics }: { title: string; metrics: any[] }) => (
     <div style={{
-      border: `1px solid rgba(255,255,255,0.05)`,
+      border: `1px solid rgba(0,0,0,0.05)`,
       borderRadius: "0",
       padding: "12px",
       background: TERMINAL_COLORS.panel,
@@ -571,7 +571,7 @@ function TabNavigation({ activeTab, onTabChange }: { activeTab: TabType; onTabCh
     <div style={{
       display: "flex",
       gap: "0",
-      borderBottom: `1px solid rgba(255,255,255,0.05)`,
+      borderBottom: `1px solid rgba(0,0,0,0.05)`,
       marginBottom: "12px",
     }}>
       {tabs.map((tab) => (
@@ -629,7 +629,7 @@ function StockError({ symbol, onRetry }: { symbol: string; onRetry?: () => void 
         margin: "60px auto",
         padding: "16px",
         textAlign: "center",
-        border: `1px solid rgba(255,255,255,0.05)`,
+        border: `1px solid rgba(0,0,0,0.05)`,
         borderRadius: "0",
         background: TERMINAL_COLORS.panel,
         display: "grid",
@@ -646,7 +646,7 @@ function StockError({ symbol, onRetry }: { symbol: string; onRetry?: () => void 
         alignItems: "center",
         justifyContent: "center",
       }}>
-        <AlertCircle size={20} color="#EF4444" />
+        <AlertCircle size={20} color="#B3311F" />
       </div>
       <div style={{ color: TERMINAL_COLORS.monoText, fontSize: "13px", fontWeight: 600 }}>
         Failed to load {symbol}
@@ -666,7 +666,7 @@ function StockError({ symbol, onRetry }: { symbol: string; onRetry?: () => void 
             gap: "4px",
             padding: "6px 12px",
             borderRadius: "0",
-            border: `1px solid rgba(255,255,255,0.1)`,
+            border: `1px solid rgba(0,0,0,0.1)`,
             background: TERMINAL_COLORS.accent,
             color: "white",
             fontSize: "11px",
@@ -786,7 +786,7 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           style={{
-            border: `1px solid rgba(255,255,255,0.1)`,
+            border: `1px solid rgba(0,0,0,0.1)`,
             background: "transparent",
             padding: "4px 10px",
             borderRadius: "0",
@@ -812,7 +812,7 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
         }}>
           {/* LEFT: Price Chart & Volume */}
           <div style={{
-            border: `1px solid rgba(255,255,255,0.05)`,
+            border: `1px solid rgba(0,0,0,0.05)`,
             borderRadius: "0",
             padding: "12px",
             background: TERMINAL_COLORS.panel,
@@ -837,7 +837,7 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
                     cursor: "pointer",
                     fontSize: "11px",
                     fontWeight: 600,
-                    background: value === timeframe ? TERMINAL_COLORS.accent : "rgba(255,255,255,0.05)",
+                    background: value === timeframe ? TERMINAL_COLORS.accent : "rgba(0,0,0,0.05)",
                     color: value === timeframe ? "white" : TERMINAL_COLORS.secondaryText,
                     height: "32px",
                     transition: "all 0.2s",
@@ -853,7 +853,7 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
                 height: "320px",
                 backgroundColor: TERMINAL_COLORS.canvas,
                 borderRadius: "0",
-                border: `1px solid rgba(255,255,255,0.05)`,
+                border: `1px solid rgba(0,0,0,0.05)`,
                 overflow: "hidden",
               }}>
                 <StockChart
@@ -876,7 +876,7 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
 
         {/* ── TABBED CONTENT SECTION ── */}
         <div style={{
-          border: `1px solid rgba(255,255,255,0.05)`,
+          border: `1px solid rgba(0,0,0,0.05)`,
           borderRadius: "0",
           padding: "12px",
           background: TERMINAL_COLORS.panel,
@@ -918,7 +918,7 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
                         { label: "Sector", value: stock.sector },
                         { label: "Employees", value: companyProfile.employees },
                       ].map((row, idx) => (
-                        <tr key={idx} style={{ borderBottom: `1px solid rgba(255,255,255,0.05)`, height: "28px" }}>
+                        <tr key={idx} style={{ borderBottom: `1px solid rgba(0,0,0,0.05)`, height: "28px" }}>
                           <td style={{ padding: "6px 0", color: TERMINAL_COLORS.secondaryText, fontWeight: 500 }}>{row.label}</td>
                           <td style={{ padding: "6px 0", color: TERMINAL_COLORS.monoText, textAlign: "right", fontWeight: 600 }}>{row.value}</td>
                         </tr>
@@ -974,14 +974,14 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
                       display: "flex",
                       gap: "12px",
                       padding: "10px",
-                      borderBottom: `1px solid rgba(255,255,255,0.05)`,
+                      borderBottom: `1px solid rgba(0,0,0,0.05)`,
                       textDecoration: "none",
                       color: TERMINAL_COLORS.monoText,
                       alignItems: "flex-start",
                       transition: "background 0.2s",
                       background: "transparent",
                     }}
-                    onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.02)")}
+                    onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(0,0,0,0.02)")}
                     onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
                   >
                     <span style={{
@@ -1084,7 +1084,7 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
                       cursor: "pointer",
                       fontSize: "11px",
                       fontWeight: 600,
-                      background: financialMetric === metric ? TERMINAL_COLORS.accent : "rgba(255,255,255,0.05)",
+                      background: financialMetric === metric ? TERMINAL_COLORS.accent : "rgba(0,0,0,0.05)",
                       color: financialMetric === metric ? "white" : TERMINAL_COLORS.secondaryText,
                       height: "32px",
                       textTransform: "capitalize",
@@ -1106,7 +1106,7 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
                         cursor: "pointer",
                         fontSize: "11px",
                         fontWeight: 600,
-                        background: financialPeriod === p ? TERMINAL_COLORS.accent : "rgba(255,255,255,0.05)",
+                        background: financialPeriod === p ? TERMINAL_COLORS.accent : "rgba(0,0,0,0.05)",
                         color: financialPeriod === p ? "white" : TERMINAL_COLORS.secondaryText,
                         height: "32px",
                         textTransform: "capitalize",
@@ -1124,17 +1124,17 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
                   height: "240px",
                   backgroundColor: TERMINAL_COLORS.canvas,
                   borderRadius: "0",
-                  border: `1px solid rgba(255,255,255,0.05)`,
+                  border: `1px solid rgba(0,0,0,0.05)`,
                 }}>
                   <ResponsiveContainer width="100%" height="100%">
                     <LazyBarChart data={effectiveChartData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.05)" vertical={false} />
                       <XAxis dataKey="period" tick={{ fontSize: 10, fill: TERMINAL_COLORS.secondaryText }} />
                       <YAxis tick={{ fontSize: 10, fill: TERMINAL_COLORS.secondaryText }} />
                       <Tooltip
                         contentStyle={{
                           backgroundColor: TERMINAL_COLORS.panel,
-                          border: `1px solid rgba(255,255,255,0.1)`,
+                          border: `1px solid rgba(0,0,0,0.1)`,
                           borderRadius: "0",
                           color: TERMINAL_COLORS.monoText,
                           fontSize: "10px",

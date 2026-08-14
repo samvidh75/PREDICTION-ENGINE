@@ -48,7 +48,7 @@ const SECTOR_COLORS: Record<string, { primary: string; light: string }> = {
   "Healthcare": { primary: "#0D7377", light: "rgba(13,115,119,0.15)" },
   "Retail": { primary: "#C73866", light: "rgba(199,56,102,0.15)" },
   "Utilities": { primary: "#6A4C93", light: "rgba(106,76,147,0.15)" },
-  "Technology": { primary: "#0891B2", light: "rgba(8,145,178,0.15)" },
+  "Technology": { primary: "#B5502E", light: "rgba(181, 80, 46,0.15)" },
   "Telecom": { primary: "#14B8A6", light: "rgba(20,184,166,0.15)" },
   "Construction": { primary: "#F59E0B", light: "rgba(245,158,11,0.15)" },
 };
@@ -211,7 +211,7 @@ export default function Sectors() {
                     const el = e.currentTarget as HTMLButtonElement;
                     el.style.borderColor = "var(--accent)";
                     el.style.transform = "scale(1.04)";
-                    el.style.boxShadow = "0 4px 12px rgba(8,145,178,0.2)";
+                    el.style.boxShadow = "0 4px 12px rgba(181, 80, 46,0.2)";
                   }}
                   onMouseLeave={(e) => {
                     const el = e.currentTarget as HTMLButtonElement;
@@ -307,7 +307,7 @@ export default function Sectors() {
                     padding: "12px 16px",
                     alignItems: "center",
                     border: "none",
-                    borderBottom: "1px solid rgba(255,255,255,0.05)",
+                    borderBottom: "1px solid rgba(0,0,0,0.06)",
                     background: "transparent",
                     cursor: "pointer",
                     textAlign: "left",
@@ -316,7 +316,7 @@ export default function Sectors() {
                     minHeight: 0,
                     height: 40,
                   }}
-                  onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(8,145,178,0.08)")}
+                  onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(181, 80, 46,0.08)")}
                   onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
                 >
                   <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -431,7 +431,7 @@ export default function Sectors() {
 
       {/* ── Info ── */}
       <div style={{
-        padding: 12, background: "rgba(8,145,178,0.08)", borderRadius: 6, border: "1px solid var(--border)",
+        padding: 12, background: "rgba(181, 80, 46,0.08)", borderRadius: 6, border: "1px solid var(--border)",
         display: "flex", alignItems: "flex-start", gap: 8, fontSize: 12, color: "var(--text-secondary)",
       }}>
         <AlertCircle size={16} style={{ flexShrink: 0, marginTop: 2, color: "var(--accent)" }} />

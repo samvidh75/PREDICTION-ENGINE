@@ -328,7 +328,7 @@ export default function ScannerPage() {
                     padding: "10px 16px",
                     alignItems: "center",
                     border: "none",
-                    borderBottom: "1px solid rgba(255,255,255,0.05)",
+                    borderBottom: "1px solid var(--border-soft)",
                     background: "transparent",
                     cursor: "pointer",
                     textAlign: "left",
@@ -337,7 +337,7 @@ export default function ScannerPage() {
                     minHeight: 0,
                     height: 36,
                   }}
-                  onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(8,145,178,0.08)")}
+                  onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(181, 80, 46,0.08)")}
                   onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
                 >
                   <span style={{ fontSize: 11, color: "var(--text-muted)", fontFamily: "var(--font-mono)", fontWeight: 500 }}>

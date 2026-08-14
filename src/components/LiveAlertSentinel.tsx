@@ -85,15 +85,16 @@ export default function LiveAlertSentinel() {
     position: "fixed",
     bottom: "24px",
     right: "24px",
-    backgroundColor: "#0D0D0D",
-    border: "1px solid #EF4444",
+    backgroundColor: "#FFFFFF",
+    border: "1px solid #B3311F",
+    borderLeft: "4px solid #B3311F",
     padding: "16px 20px",
-    borderRadius: "8px",
+    borderRadius: "6px",
     maxWidth: "360px",
     width: "100%",
     fontFamily: typography.fontFamily,
-    color: "#f4f4f5",
-    boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.9)",
+    color: "#1C1A16",
+    boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.12)",
     zIndex: 9999,
     display: "flex",
     flexDirection: "column",
@@ -108,7 +109,7 @@ export default function LiveAlertSentinel() {
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          borderBottom: "1px solid #1A1A1A",
+          borderBottom: "1px solid rgba(28,26,22,0.10)",
           paddingBottom: "6px",
         }}
       >
@@ -116,7 +117,7 @@ export default function LiveAlertSentinel() {
           style={{
             fontSize: "10px",
             fontWeight: "bold",
-            color: "#EF4444",
+            color: "#B3311F",
             letterSpacing: "0.05em",
           }}
         >
@@ -127,7 +128,7 @@ export default function LiveAlertSentinel() {
           style={{
             backgroundColor: "transparent",
             border: "none",
-            color: "#64748b",
+            color: "#96907F",
             cursor: "pointer",
             fontSize: "12px",
             fontFamily: typography.fontFamily,
@@ -136,7 +137,7 @@ export default function LiveAlertSentinel() {
           ✕
         </button>
       </div>
-      <p style={{ fontSize: "11px", margin: 0, lineHeight: "1.5", color: "#e4e4e7" }}>
+      <p style={{ fontSize: "11px", margin: 0, lineHeight: "1.5", color: "#4A453C" }}>
         {activeAlert.message}
       </p>
       <div
@@ -146,7 +147,7 @@ export default function LiveAlertSentinel() {
           alignItems: "center",
           marginTop: "4px",
           fontSize: "9px",
-          color: "#4b5563",
+          color: "#6B6559",
         }}
       >
         <span>ID: {activeAlert.alertId.substring(0, 8)}...</span>

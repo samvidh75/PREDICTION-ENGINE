@@ -14,72 +14,72 @@
 // institutional trading — compact rows (32-36px), monospace alignment, instant
 // market data legibility. Borders: 1px only, no rounded corners for data sections.
 export const colors = {
-  // Brand — professional teal/blue (StockStory-India inspired)
-  primary:        '#0891B2',    // Professional teal accent for CTAs (StockStory standard)
-  primaryPressed: '#067A9B',    // Darker shade on press
-  onPrimary:      '#F0F2F5',
+  // Brand — signature rust/amber "ledger stamp" (not fintech blue)
+  primary:        '#B5502E',
+  primaryPressed: '#8A3A20',
+  onPrimary:      '#FDFBF8',
 
-  // Gold signature accent (StockStory premium)
-  gold:           '#E4A853',    // Premium features, brand highlights
-  goldLight:      'rgba(228, 168, 83, 0.12)',
-  goldStrong:     'rgba(228, 168, 83, 0.24)',
+  // Gold — kept as a distinct secondary accent for premium features only
+  gold:           '#9C6B14',
+  goldLight:      'rgba(156, 107, 20, 0.12)',
+  goldStrong:     'rgba(156, 107, 20, 0.24)',
 
-  // Text hierarchy — clean institutional whites and grays
-  ink:            '#F0F2F5',    // Primary headlines / body (off-white)
-  body:           '#9CA3AF',    // Default paragraph / secondary,
-  charcoal:       '#D1D5DB',    // Stronger body emphasis,
-  mute:           '#6B7280',    // Metadata, secondary captions,
-  ash:            '#4B5563',    // Disabled text, lowest emphasis,
-  stone:          '#374151',    // Least-emphasis caption / disabled icon,
-  onDark:         '#F0F2F5',    // Interactive-state primary text,
-  onDarkMute:     'rgba(240,242,245,0.62)',
+  // Text hierarchy — deep ink on warm paper
+  ink:            '#1C1A16',    // Primary headlines / body (deep ink)
+  body:           '#4A453C',    // Default paragraph / secondary,
+  charcoal:       '#332F28',    // Stronger body emphasis,
+  mute:           '#6B6559',    // Metadata, secondary captions,
+  ash:            '#96907F',    // Disabled text, lowest emphasis,
+  stone:          '#D3CBB8',    // Least-emphasis caption / disabled icon,
+  onDark:         '#FDFBF8',    // Interactive-state primary text (on colored/dark chips),
+  onDarkMute:     'rgba(253,251,248,0.72)',
 
-  // Surface ladder — ultra-dark navy (StockStory-India professional trading terminal)
-  canvas:           '#0F1419', // Page background (StockStory standard dark navy)
-  surface:          '#151B27', // Card / panel background (StockStory standard)
-  surfaceElevated:  '#1A2332', // Hover states, lifted interiors
-  surfaceCard:      '#1E2736', // Active/pressed cards, tile fills
-  buttonFg:         '#0F1A2D', // Deep surface variant for button focus
+  // Surface ladder — warm paper, not stark white
+  canvas:           '#FAF8F4', // Page background (warm paper)
+  surface:          '#FFFFFF', // Card / panel background
+  surfaceElevated:  '#F3EEE4', // Hover states, lifted interiors
+  surfaceCard:      '#F1EBDF', // Active/pressed cards, tile fills
+  buttonFg:         '#FFFFFF', // Light surface variant for button focus
 
   // Glass — minimal use (modals/overlays only, NO blur)
-  glassBg:          'rgba(15, 20, 25, 0.92)',
-  glassBgStrong:    'rgba(21, 27, 39, 0.96)',
-  glassBorder:      'rgba(255, 255, 255, 0.08)',
-  glassBorderTop:   'rgba(255, 255, 255, 0.12)',
+  glassBg:          'rgba(255, 255, 255, 0.94)',
+  glassBgStrong:    'rgba(255, 255, 255, 0.98)',
+  glassBorder:      'rgba(28, 26, 22, 0.08)',
+  glassBorderTop:   'rgba(28, 26, 22, 0.12)',
   glassBlur:        'none',      // No blur/glassmorphism in trading terminals
 
   // Backdrop / overlay tokens
   backdropClear:       'rgba(0,0,0,0)',
-  backdropModal:       'rgba(0,0,0,0.5)',
-  backdropHeavy:       'rgba(0,0,0,0.7)',
-  backdropGlassmorphic:'rgba(15,20,25,0.85)',
-  backdropFooter:      'rgba(15,20,25,0.90)',
-  backdropMuted:       'rgba(255,255,255,0.03)',
+  backdropModal:       'rgba(28,26,22,0.4)',
+  backdropHeavy:       'rgba(28,26,22,0.6)',
+  backdropGlassmorphic:'rgba(255,255,255,0.85)',
+  backdropFooter:      'rgba(255,255,255,0.90)',
+  backdropMuted:       'rgba(28,26,22,0.03)',
 
-  // Borders — thin institutional hairlines (1px only, no rounded cards)
-  hairline:       'rgba(255,255,255,0.08)',      // 1px dividers
-  hairlineSoft:   'rgba(255,255,255,0.05)',      // Minimal emphasis
-  hairlineStrong: 'rgba(255,255,255,0.12)',      // Stronger dividers
+  // Borders — thin ink-tinted hairlines (1px only, no rounded cards)
+  hairline:       'rgba(28,26,22,0.08)',      // 1px dividers
+  hairlineSoft:   'rgba(28,26,22,0.05)',      // Minimal emphasis
+  hairlineStrong: 'rgba(28,26,22,0.16)',      // Stronger dividers
 
-  // Brand accent — professional teal/cyan + gold (StockStory-standard)
-  accentRed:        '#0891B2',  // Primary accent (teal - StockStory)
-  accentRedSoft:    'rgba(8,145,178,0.12)',      // Soft teal background
-  accentRedStrong:  'rgba(8,145,178,0.24)',      // Strong teal overlay
-  accentBlue:       '#0891B2',  // Alternative professional blue (teal)
-  accentBlueSoft:   'rgba(8,145,178,0.12)',
-  accentYellow:     '#E4A853',  // Gold accent (premium, warnings)
-  accentYellowSoft: 'rgba(228,168,83,0.14)',
+  // Brand accent — signature rust/amber
+  accentRed:        '#B5502E',
+  accentRedSoft:    'rgba(181,80,46,0.12)',
+  accentRedStrong:  'rgba(181,80,46,0.24)',
+  accentBlue:       '#B5502E',  // Alias retained for callers; same rust accent
+  accentBlueSoft:   'rgba(181,80,46,0.12)',
+  accentYellow:     '#9C6B14',
+  accentYellowSoft: 'rgba(156,107,20,0.14)',
 
   // Market semantic colors — sharp, institutional greens/reds for instant legibility
-  marketGreen:       '#10B981', // Bullish (positive) - emerald green
-  marketGreenSoft:   'rgba(16,185,129,0.14)',
-  marketRed:         '#EF4444', // Bearish (negative) - clean red
-  marketRedSoft:     'rgba(239,68,68,0.14)',
-  marketOrange:      '#F59E0B', // Neutral, caution - amber
-  marketOrangeSoft:  'rgba(245,158,11,0.14)',
+  marketGreen:       '#17754A', // Bullish (positive) - darkened for paper-bg contrast
+  marketGreenSoft:   'rgba(23,117,74,0.10)',
+  marketRed:         '#B3311F', // Bearish (negative) - darkened for paper-bg contrast
+  marketRedSoft:     'rgba(179,49,31,0.10)',
+  marketOrange:      '#9C6B14', // Neutral, caution - darkened for paper-bg contrast
+  marketOrangeSoft:  'rgba(156,107,20,0.10)',
 
-  accentGreen:       '#10B981',
-  accentGreenSoft:   'rgba(16,185,129,0.14)',
+  accentGreen:       '#17754A',
+  accentGreenSoft:   'rgba(23,117,74,0.10)',
 
   // PSE sector taxonomy colors
   sectorFinancials:  '#1E5FAD',
@@ -95,19 +95,19 @@ export const colors = {
   keyBgStart:      '#0A0E27',
   keyBgEnd:        '#0A0E27',
 
-  // Semantic aliases (aligned with professional trading)
-  success:         '#10B981',
-  danger:          '#EF4444',
-  warning:         '#F59E0B',
-  page:            '#0A0E27',
-  card:            '#111C3D',
-  textPrimary:     '#F0F2F5',
-  textSecondary:   '#9CA3AF',
-  textTertiary:    '#6B7280',
-  border:          'rgba(255,255,255,0.08)',
-  separator:       'rgba(255,255,255,0.08)',
-  fill:            '#16243B',
-  bgSecondary:     '#16243B',
+  // Semantic aliases (ledger theme)
+  success:         '#17754A',
+  danger:          '#B3311F',
+  warning:         '#9C6B14',
+  page:            '#FAF8F4',
+  card:            '#FFFFFF',
+  textPrimary:     '#1C1A16',
+  textSecondary:   '#6B6559',
+  textTertiary:    '#96907F',
+  border:          'rgba(28,26,22,0.08)',
+  separator:       'rgba(28,26,22,0.08)',
+  fill:            '#F1EBDF',
+  bgSecondary:     '#F3EEE4',
 } as const;
 
 // ── TYPOGRAPHY ─────────────────────────────────────────────────────────

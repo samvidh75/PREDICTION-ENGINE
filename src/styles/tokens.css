@@ -1,66 +1,67 @@
 /* ============================================================================
-   DESIGN TOKENS — PROFESSIONAL FINANCIAL TRADING TERMINAL
-   Deep institutional navy/slate background, sharp market greens/reds,
-   professional teal accent. Zero gradients, zero glassmorphism.
+   DESIGN TOKENS — "LEDGER" — A FINANCIAL ALMANAC, NOT A SAAS DASHBOARD
+   Warm paper surface, deep ink text, a single rust/amber signature accent
+   (not blue, not teal). Editorial display type for headers, monospace for
+   every number. Zero gradients, zero glassmorphism, zero generic fintech blue.
    ============================================================================ */
 
 :root {
-  /* ── Surface ladder — deep institutional navy (fintech standard) ────── */
-  --bg-page:        #0F1419;
-  --bg-card:        #151B27;
-  --bg-card-hover:  #1A2332;
-  --bg-chip:        #161D2A;
-  --bg-sheet:       #0F1419;
-  --bg-paper-deep:  #1E2736;
-  --bg-elevated:    #1A2332;
+  /* ── Surface ladder — warm paper, not stark white ────────────────────── */
+  --bg-page:        #FAF8F4;
+  --bg-card:        #FFFFFF;
+  --bg-card-hover:  #F3EEE4;
+  --bg-chip:        #F1EBDF;
+  --bg-sheet:       #FDFBF8;
+  --bg-paper-deep:  #F3EEE4;
+  --bg-elevated:    #F3EEE4;
 
-  /* ── Brand / CTA — professional teal ──────────────────────────────── */
-  --brand:          #0891B2;
-  --brand-light:    #14B8A6;
-  --brand-dark:     #0E7490;
-  --brand-ink:      #F0F2F5;
+  /* ── Brand / CTA — signature rust/amber, the "ledger stamp" color ────── */
+  --brand:          #B5502E;
+  --brand-light:    #C96B48;
+  --brand-dark:     #8A3A20;
+  --brand-ink:      #FDFBF8;
 
   /* ── Market semantic colors — sharp institutional greens/reds ──────── */
-  --market-green:        #10B981;
-  --market-green-light:  rgba(16,185,129,0.14);
-  --market-red:          #EF4444;
-  --market-red-light:    rgba(239,68,68,0.14);
-  --market-orange:       #F59E0B;
-  --market-orange-light: rgba(245,158,11,0.14);
+  --market-green:        #17754A;
+  --market-green-light:  rgba(23,117,74,0.10);
+  --market-red:          #B3311F;
+  --market-red-light:    rgba(179,49,31,0.10);
+  --market-orange:       #9C6B14;
+  --market-orange-light: rgba(156,107,20,0.10);
 
   /* ── UI semantic ───────────────────────────────────────────────────── */
-  --green:          #10B981;
-  --green-light:    rgba(16,185,129,0.14);
-  --red:            #EF4444;
-  --red-light:      rgba(239,68,68,0.14);
-  --amber:          #F59E0B;
-  --amber-light:    rgba(245,158,11,0.14);
+  --green:          #17754A;
+  --green-light:    rgba(23,117,74,0.10);
+  --red:            #B3311F;
+  --red-light:      rgba(179,49,31,0.10);
+  --amber:          #9C6B14;
+  --amber-light:    rgba(156,107,20,0.10);
 
-  /* ── Signature accent — professional teal ──────────────────────────── */
-  --accent:         #0891B2;
-  --accent-soft:    rgba(8,145,178,0.12);
-  --accent-strong:  rgba(8,145,178,0.24);
-  --accent-ink:     #F0F2F5;
+  /* ── Signature accent — rust/amber ────────────────────────────────────── */
+  --accent:         #B5502E;
+  --accent-soft:    rgba(181,80,46,0.10);
+  --accent-strong:  rgba(181,80,46,0.20);
+  --accent-ink:     #FDFBF8;
 
-  /* ── Text hierarchy — clean institutional whites and grays ─────────── */
-  --text-primary:   #F0F2F5;
-  --text-body:      #9CA3AF;
-  --text-secondary: #6B7280;
-  --text-muted:     #4B5563;
-  --text-inverse:   #0F1419;
-  --text-rule:      #2D3748;
+  /* ── Text hierarchy — deep ink on warm paper ─────────────────────────── */
+  --text-primary:   #1C1A16;
+  --text-body:      #4A453C;
+  --text-secondary: #6B6559;
+  --text-muted:     #96907F;
+  --text-inverse:   #FDFBF8;
+  --text-rule:      #E3DCCC;
 
-  /* ── Borders — thin institutional hairlines ─────────────────────────── */
-  --border:         #2D3748;
-  --border-strong:  rgba(255,255,255,0.12);
-  --border-soft:    rgba(255,255,255,0.05);
-  --border-focus:   #0891B2;
+  /* ── Borders — thin ink-tinted hairlines, not neutral gray ───────────── */
+  --border:         #E3DCCC;
+  --border-strong:  rgba(28,26,22,0.16);
+  --border-soft:    rgba(28,26,22,0.07);
+  --border-focus:   #B5502E;
 
-  /* ── Typography — Inter for body, mono for data ────────────────────── */
+  /* ── Typography — editorial serif for headers, mono for data ────────── */
   --font-sans:      -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Segoe UI", Roboto, sans-serif;
   --font:           var(--font-sans);
   --font-mono:      "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, "Courier New", monospace;
-  --font-display:   -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", sans-serif;
+  --font-display:   "Fraunces", "Iowan Old Style", "Georgia", "Times New Roman", serif;
   --font-serif:     var(--font-display);
 
   /* ── Radius ────────────────────────────────────────────────────────── */
@@ -69,10 +70,10 @@
   --radius-lg:      10px;
   --radius-xl:      14px;
 
-  /* ── Shadows ───────────────────────────────────────────────────────── */
-  --shadow-card:    0 1px 3px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.3);
-  --shadow-raised:  0 4px 16px rgba(0,0,0,0.5);
-  --shadow-modal:   0 20px 60px rgba(0,0,0,0.7);
+  /* ── Shadows — subtle, since surfaces are light ─────────────────────── */
+  --shadow-card:    0 1px 2px rgba(16,24,40,0.06), 0 1px 3px rgba(16,24,40,0.08);
+  --shadow-raised:  0 4px 12px rgba(16,24,40,0.10);
+  --shadow-modal:   0 20px 48px rgba(16,24,40,0.18);
 
   /* ── Animation ─────────────────────────────────────────────────────── */
   --ease-raycast:   cubic-bezier(0.32, 1.4, 0.6, 1);
@@ -136,9 +137,9 @@
   --sz-3xl:         30px;
 
   /* ── Glass — minimal; only for overlays/modals ─────────────────────── */
-  --glass-bg:          rgba(13, 16, 21, 0.92);
-  --glass-bg-strong:   rgba(17, 21, 27, 0.96);
-  --glass-border:      rgba(255, 255, 255, 0.10);
-  --glass-border-top:  rgba(255, 255, 255, 0.15);
+  --glass-bg:          rgba(255, 255, 255, 0.94);
+  --glass-bg-strong:   rgba(255, 255, 255, 0.98);
+  --glass-border:      rgba(0, 0, 0, 0.08);
+  --glass-border-top:  rgba(0, 0, 0, 0.12);
   --glass-blur:        16px;
 }
