@@ -1,0 +1,10 @@
+{
+  "$schema": "https://docs.claude.com/en/docs/agents-and-tools/mcp",
+  "mcpServers": {
+    "nano-banana": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["scripts/mcp/nano-banana-server.mjs"]
+    }
+  }
+}
