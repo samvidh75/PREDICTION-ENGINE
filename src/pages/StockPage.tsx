@@ -10,6 +10,7 @@ import { LazyBarChart, Bar, CartesianGrid, ResponsiveContainer, XAxis, YAxis, To
 import StockChart from "../components/StockChart";
 import { BrokerHandoffModal } from "../components/BrokerHandoffModal";
 import { ChartErrorBoundary } from "../components/ChartErrorBoundary";
+import { RSIGauge } from "../components/animations/TechnicalIndicatorCanvas";
 import { listAvailableBrokers } from "../commercial/BrokerHandoffService";
 import { fallbackAnalysis, generateStockAnalysis } from "../services/llm/AIAnalysisService";
 import type { AIAnalysis } from "../services/llm/AIAnalysisService";
@@ -551,7 +552,45 @@ function StockInfoGrid({ stock }: { stock: StockResearchDetail }) {
     }}>
       <MetricColumn title="Valuation" metrics={valuationMetrics} />
       <MetricColumn title="Fundamentals" metrics={fundamentalsMetrics} />
-      <MetricColumn title="Technical" metrics={technicalMetrics} />
+      <div style={{
+        border: `1px solid rgba(0,0,0,0.05)`,
+        borderRadius: "0",
+        padding: "12px",
+        background: TERMINAL_COLORS.panel,
+        display: "flex",
+        flexDirection: "column",
+        gap: "12px",
+      }}>
+        <div style={{
+          fontSize: "11px",
+          fontWeight: 700,
+          textTransform: "uppercase",
+          color: TERMINAL_COLORS.secondaryText,
+          letterSpacing: "0.05em",
+        }}>
+          Technical
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+          {technicalMetrics.map((metric, idx) => (
+            <div key={idx} style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", fontSize: "11px" }}>
+              <span style={{ color: TERMINAL_COLORS.secondaryText, fontWeight: 500 }}>{metric.label}</span>
+              <span style={{
+                color: metric.value != null ? getValueColor(metric.value, metric.label.includes("%")) : TERMINAL_COLORS.secondaryText,
+                fontWeight: 600,
+                fontFamily: "'SF Mono', 'JetBrains Mono', 'Roboto Mono', monospace",
+                fontVariantNumeric: "tabular-nums",
+              }}>
+                {metric.value != null ? metric.format(metric.value) : "—"}
+              </span>
+            </div>
+          ))}
+        </div>
+        {stock.rsi != null && (
+          <div style={{ display: "flex", justifyContent: "center", paddingTop: "4px" }}>
+            <RSIGauge value={stock.rsi} width={160} height={104} />
+          </div>
+        )}
+      </div>
     </div>
   );
 }
