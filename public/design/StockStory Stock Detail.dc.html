@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="./vendor/react.production.min.js"></script>
+  <script src="./vendor/react-dom.production.min.js"></script>
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <script src="_ds/raycast-command-ui-917818a8-4c87-4b33-aa1f-77e2df663ec5/_ds_bundle.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    body { margin:0; background:#FAFAF7; font-family:"Instrument Sans", -apple-system, BlinkMacSystemFont, sans-serif; -webkit-font-smoothing:antialiased; color:#0A0A0A; }
+    * { box-sizing:border-box; }
+    .n { font-family:"IBM Plex Mono", ui-monospace, monospace; font-variant-numeric:tabular-nums; letter-spacing:-0.02em; }
+    .lb { font-size:12.5px; color:#6B6B66; }
+    a { color:#0A0A0A; text-decoration:none; }
+    a:hover { color:#1A7F37; }
+    ::selection { background:#D8EEDF; }
+    .cd { background:#FFFFFF; border:1px solid #E8E8E3; border-radius:12px; }
+    ::-webkit-scrollbar { width:9px; height:9px; }
+    ::-webkit-scrollbar-thumb { background:#DEDED7; border-radius:8px; }
+    @media (prefers-reduced-motion: reduce) { * { animation:none !important; transition:none !important; } }
+  </style>
+</helmet>
+
+<div style="min-height:100dvh; background:#FAFAF7; padding-bottom:{{ pageBottomPad }};">
+
+  <sc-if value="{{ showBottomNav }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed; left:0; right:0; bottom:0; z-index:60; background:#FFFFFFF2; backdrop-filter:saturate(180%) blur(12px); border-top:1px solid #E4E4DE; padding-bottom:env(safe-area-inset-bottom);">
+      <div style="display:grid; grid-template-columns:repeat(5, minmax(0,1fr));">
+        <sc-for list="{{ bottomItems }}" as="bi" hint-placeholder-count="5">
+          <a href="{{ bi.href }}" style="display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; min-height:56px; padding:8px 2px; color:{{ bi.color }};">
+            <svg width="21" height="21" viewBox="0 0 24 24" fill="none"><path d="{{ bi.icon }}" stroke="{{ bi.color }}" stroke-width="{{ bi.stroke }}" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+            <span style="font-size:10px; font-weight:{{ bi.weight }}; letter-spacing:0.01em;">{{ bi.label }}</span>
+          </a>
+        </sc-for>
+      </div>
+    </div>
+  </sc-if>
+  <div style="position:sticky; top:0; z-index:30; background:#FAFAF7; border-bottom:1px solid #E8E8E3;">
+    <div style="width:100%; max-width:1480px; margin:0 auto; padding:0 clamp(14px,2vw,26px); height:64px; display:flex; align-items:center; gap:clamp(14px,2.4vw,34px);">
+      <a href="StockStory Shell.dc.html" style="display:flex; align-items:center; gap:10px; flex-shrink:0;">
+        <svg width="30" height="30" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="9" fill="#0A0A0A"></rect><path d="M21 11.4 C21 8.6 11.6 8.8 11.6 13 C11.6 17.2 21 15.6 21 19.8 C21 24 11.6 23.6 11.6 20.8" stroke="#FFFFFF" stroke-width="2.1" stroke-linecap="round" fill="none"></path></svg>
+        <span style="line-height:1.1;"><span style="display:block; font-size:17px; font-weight:600; letter-spacing:-0.02em;">StockEX<span style="font-size:8.5px; font-weight:500; vertical-align:super; letter-spacing:0; margin-left:1px; color:#9A9A94;">&#8482;</span></span><span style="display:block; font-size:11.5px; color:#6B6B66;">Philippines</span></span>
+      </a>
+      <sc-if value="{{ showNav }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex; align-items:center; gap:clamp(12px,1.6vw,26px); margin-left:clamp(8px,2vw,28px);">
+          <sc-for list="{{ topNav }}" as="t" hint-placeholder-count="6">
+            <a href="{{ t.href }}" style="display:flex; align-items:center; gap:5px; font-size:14px; font-weight:{{ t.weight }}; color:{{ t.color }}; padding:20px 0; border-bottom:2px solid {{ t.rule }}; white-space:nowrap;" style-hover="color:#1A7F37;">{{ t.label }}<sc-if value="{{ t.caret }}" hint-placeholder-val="{{ false }}"><svg width="9" height="9" viewBox="0 0 12 12" fill="none"><path d="M2.5 4.5 L6 8 L9.5 4.5" stroke="#6B6B66" stroke-width="1.5" stroke-linecap="round"></path></svg></sc-if></a>
+          </sc-for>
+        </div>
+      </sc-if>
+      <div style="flex:1;"></div>
+      <a href="StockStory Search.dc.html" style="display:flex; align-items:center; gap:8px; height:34px; padding:0 11px; border-radius:8px; border:1px solid #E4E4DE; background:#FFFFFF; color:#8A8A84;" style-hover="border-color:#0A0A0A; color:#0A0A0A;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="10.8" cy="10.8" r="6.6" stroke="currentColor" stroke-width="1.8"></circle><path d="M15.6 15.6 L20.4 20.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path></svg>
+        <span style="font-size:12.5px; display:{{ searchLabelShow }};">Search</span>
+        <span class="n" style="padding:2px 6px; border-radius:5px; background:#F4F4EF; font-size:10px; color:#9A9A94; display:{{ searchKbdShow }};">⌘K</span>
+      </a>
+      <sc-if value="{{ showNav }}" hint-placeholder-val="{{ true }}">
+        <a href="StockStory Sign In.dc.html" style="font-size:14px; font-weight:500; white-space:nowrap;">Sign in</a>
+      </sc-if>
+      <a href="StockStory Pricing.dc.html" style="display:inline-flex; align-items:center; gap:7px; height:42px; padding:0 18px; border-radius:9px; background:#0A0A0A; color:#FFFFFF; font-size:14px; font-weight:500; white-space:nowrap;" style-hover="background:#1A1A1A; color:#FFFFFF;">Start Free Trial <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M3 9 L9 3 M9 3 H4.6 M9 3 V7.4" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round"></path></svg></a>
+    </div>
+  </div>
+
+  <div style="width:100%; max-width:1480px; margin:0 auto; padding:clamp(12px,1.6vw,18px) clamp(14px,2vw,26px) 0;">
+    <div class="cd" style="display:grid; grid-template-columns:{{ tapeGrid }}; overflow:hidden;">
+      <sc-for list="{{ indices }}" as="ix" hint-placeholder-count="4">
+        <div style="padding:13px 17px; border-right:1px solid #E8E8E3; border-top:{{ ix.topRule }}; display:flex; flex-direction:column; gap:9px; min-width:0;">
+          <div style="min-width:0;">
+            <div style="font-size:10.5px; font-weight:600; color:#6B6B66; letter-spacing:0.09em; text-transform:uppercase; margin-bottom:5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ ix.name }}</div>
+            <div style="display:flex; align-items:baseline; gap:7px; flex-shrink:0; white-space:nowrap;">
+              <span class="n" style="font-size:17.5px; font-weight:600; letter-spacing:-0.025em;">{{ ix.value }}</span>
+              <span class="n" style="font-size:12.5px; font-weight:500; color:{{ ix.color }};">{{ ix.change }}</span>
+            </div>
+          </div>
+          <div style="width:100%; min-width:0; display:{{ rangeDisplay }}; flex-direction:column; gap:4px;">
+            <div style="position:relative; height:4px; border-radius:2px; background:#EDEDE8;">
+              <span style="position:absolute; left:0; width:{{ ix.pos }}; height:4px; border-radius:2px; background:{{ ix.color }}; opacity:0.26;"></span>
+              <span style="position:absolute; left:{{ ix.pos }}; top:-2px; width:2px; height:8px; border-radius:1px; background:{{ ix.color }}; transform:translateX(-1px);"></span>
+            </div>
+            <div style="display:flex; align-items:baseline; justify-content:space-between; gap:6px;">
+              <span class="n" style="font-size:11px; color:#6B6B66; white-space:nowrap;">{{ ix.low }}</span>
+              <span class="lb" style="font-size:10px; letter-spacing:0.06em; color:#6B6B66;">DAY</span>
+              <span class="n" style="font-size:11px; color:#6B6B66; white-space:nowrap;">{{ ix.high }}</span>
+            </div>
+          </div>
+        </div>
+      </sc-for>
+      <div style="padding:13px 17px; display:flex; flex-direction:column; justify-content:center; gap:3px; grid-column:{{ statusSpan }}; border-top:{{ statusTopRule }};">
+        <div style="display:flex; align-items:center; gap:6px; font-size:13px; font-weight:500; color:#1A7F37; white-space:nowrap;"><span style="width:6px; height:6px; border-radius:50%; background:#1A7F37;"></span>Market is Open</div>
+        <div class="lb" style="font-size:11.5px; white-space:nowrap;">Closes 3:30 PM PHT</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="width:100%; max-width:1480px; margin:0 auto; padding:14px clamp(14px,2vw,26px) 0; display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+    <sc-for list="{{ crumbs }}" as="cb" hint-placeholder-count="4">
+      <span style="display:flex; align-items:center; gap:8px;">
+        <a href="{{ cb.href }}" style="font-size:12px; color:{{ cb.color }};" style-hover="color:#1A7F37;">{{ cb.label }}</a>
+        <sc-if value="{{ cb.sep }}" hint-placeholder-val="{{ true }}"><svg width="9" height="9" viewBox="0 0 12 12" fill="none"><path d="M4 2.5 L7.5 6 L4 9.5" stroke="#C0C0B9" stroke-width="1.4" stroke-linecap="round"></path></svg></sc-if>
+      </span>
+    </sc-for>
+  </div>
+
+  <div style="width:100%; max-width:1480px; margin:0 auto; padding:14px clamp(14px,2vw,26px) 0; display:grid; grid-template-columns:{{ heroGrid }}; gap:clamp(12px,1.4vw,18px); align-items:start;">
+    <div class="cd" style="padding:clamp(16px,1.8vw,22px); min-width:0; display:grid; grid-template-columns:{{ identityGrid }}; gap:clamp(16px,2vw,28px);">
+      <div style="min-width:0;">
+        <div style="display:flex; align-items:flex-start; gap:14px; margin-bottom:16px;">
+          <div style="width:52px; height:52px; border-radius:11px; background:#0A2C5C; color:#FFFFFF; display:flex; align-items:center; justify-content:center; font-size:15px; font-weight:700; flex-shrink:0;">BDO</div>
+          <div style="min-width:0;">
+            <h1 style="margin:0 0 6px; font-size:clamp(21px,1.5vw + 13px,31px); font-weight:600; letter-spacing:-0.03em; line-height:1.12;">BDO Unibank, Inc.</h1>
+            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+              <span style="font-size:13px; font-weight:600;">BDO</span>
+              <span style="padding:2px 8px; border-radius:5px; border:1px solid #DCDCD5; font-size:11px; font-weight:500; color:#6B6B66;">PSE</span>
+              <span class="lb" style="font-size:11.5px;">Financials · Banks</span>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex; gap:9px; flex-wrap:wrap;">
+          <div onClick="{{ toggleFollow }}" style="display:inline-flex; align-items:center; gap:7px; height:40px; padding:0 15px; border-radius:8px; border:1px solid {{ followBorder }}; background:{{ followBg }}; font-size:13px; font-weight:500; cursor:pointer;" style-hover="border-color:#0A0A0A;">
+            <svg width="15" height="15" viewBox="0 0 20 20" fill="none"><path d="M10 2.6 L12.2 7.2 L17.2 7.9 L13.6 11.4 L14.5 16.4 L10 14 L5.5 16.4 L6.4 11.4 L2.8 7.9 L7.8 7.2 Z" stroke="{{ followIcon }}" fill="{{ followFill }}" stroke-width="1.4" stroke-linejoin="round"></path></svg>{{ followLabel }}
+          </div>
+          <a href="StockStory Compare.dc.html" style="display:inline-flex; align-items:center; gap:7px; height:40px; padding:0 15px; border-radius:8px; border:1px solid #DCDCD5; font-size:13px; font-weight:500;" style-hover="border-color:#0A0A0A; color:#0A0A0A;">
+            <svg width="15" height="15" viewBox="0 0 20 20" fill="none"><path d="M3.4 7 H13 M10.6 4.6 L13 7 L10.6 9.4 M16.6 13 H7 M9.4 10.6 L7 13 L9.4 15.4" stroke="#0A0A0A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>Compare
+          </a>
+          <a href="StockStory Alerts.dc.html" style="display:inline-flex; align-items:center; gap:7px; height:40px; padding:0 15px; border-radius:8px; border:1px solid #DCDCD5; font-size:13px; font-weight:500;" style-hover="border-color:#0A0A0A; color:#0A0A0A;">
+            <svg width="15" height="15" viewBox="0 0 20 20" fill="none"><path d="M6 8.4 A4 4 0 0 1 14 8.4 C14 12.4 15.4 14 15.4 14 H4.6 C4.6 14 6 12.4 6 8.4 Z M8.4 16.2 A1.8 1.8 0 0 0 11.6 16.2" stroke="#0A0A0A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>Alert
+          </a>
+        </div>
+      </div>
+
+      <div style="min-width:0; border-left:{{ priceRule }}; padding-left:{{ priceInset }};">
+        <div style="display:flex; align-items:center; gap:6px; margin-bottom:7px;">
+          <span style="width:6px; height:6px; border-radius:50%; background:#1A7F37;"></span>
+          <span style="font-size:11.5px; font-weight:500; color:#1A7F37;">Live</span>
+        </div>
+        <div class="n" style="font-size:clamp(30px,2.2vw + 18px,44px); font-weight:600; letter-spacing:-0.035em; line-height:1;">₱142.50</div>
+        <div class="n" style="font-size:14px; font-weight:500; color:#1A7F37; margin-top:7px;">+2.55 (+1.82%)</div>
+        <div style="margin-top:16px; padding-top:14px; border-top:1px solid #F0F0EB;">
+          <sc-for list="{{ quoteFacts }}" as="qf" hint-placeholder-count="4">
+            <div style="display:flex; align-items:baseline; justify-content:space-between; gap:12px; padding:5px 0;">
+              <span class="lb" style="font-size:12px;">{{ qf.label }}</span>
+              <span class="n" style="font-size:12.5px; font-weight:500; text-align:right;">{{ qf.value }}</span>
+            </div>
+          </sc-for>
+        </div>
+        <div class="lb" style="font-size:11px; margin-top:11px;">As of 14 Aug 2026, 11:15 AM PHT</div>
+      </div>
+    </div>
+
+    <div class="cd" style="padding:clamp(16px,1.8vw,22px); min-width:0;">
+      <div style="display:flex; align-items:center; gap:7px; margin-bottom:16px;">
+        <span style="font-size:14.5px; font-weight:600;">StockEX Score</span>
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.4" stroke="#B0B0A9" stroke-width="1.3"></circle><path d="M8 7.2 V11.2" stroke="#B0B0A9" stroke-width="1.4" stroke-linecap="round"></path><circle cx="8" cy="5" r="0.8" fill="#B0B0A9"></circle></svg>
+      </div>
+      <div style="display:grid; grid-template-columns:auto minmax(0,1fr); gap:clamp(14px,1.8vw,24px); align-items:center;">
+        <div style="position:relative; width:124px; height:124px; flex-shrink:0;">
+          <svg viewBox="0 0 130 130" width="124" height="124" style="transform:rotate(-90deg);">
+            <circle cx="65" cy="65" r="54" stroke="#EDEDE8" stroke-width="12" fill="none"></circle>
+            <circle cx="65" cy="65" r="54" stroke="#1A7F37" stroke-width="12" fill="none" stroke-linecap="round" stroke-dasharray="{{ gaugeDash }}"></circle>
+          </svg>
+          <div style="position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+            <span class="n" style="font-size:34px; font-weight:600; line-height:1;">88</span>
+            <span class="lb" style="font-size:10px; margin-top:2px;">/ 100</span>
+            <span style="font-size:10.5px; font-weight:600; color:#1A7F37; margin-top:2px;">Excellent</span>
+          </div>
+        </div>
+        <div style="min-width:0;">
+          <sc-for list="{{ factorBars }}" as="fb" hint-placeholder-count="5">
+            <div style="padding:6px 0;">
+              <div style="display:flex; align-items:baseline; justify-content:space-between; gap:10px; margin-bottom:5px;">
+                <span style="font-size:12.5px; color:#3A3A36;">{{ fb.name }}</span>
+                <span style="display:flex; align-items:center; gap:6px;"><span class="n" style="font-size:12.5px; font-weight:600;">{{ fb.score }}</span><svg width="9" height="9" viewBox="0 0 12 12" fill="none"><path d="M4 2.5 L7.5 6 L4 9.5" stroke="#B0B0A9" stroke-width="1.5" stroke-linecap="round"></path></svg></span>
+              </div>
+              <div style="height:4px; background:#EDEDE8; border-radius:2px; overflow:hidden;"><div style="height:4px; width:{{ fb.width }}; background:#1A7F37; border-radius:2px;"></div></div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      <div class="lb" style="font-size:11.5px; margin-top:14px; padding-top:12px; border-top:1px solid #F0F0EB;">Research coverage: <span style="color:#1A7F37; font-weight:600;">88% of key metrics</span> sourced from primary filings</div>
+    </div>
+  </div>
+
+  <div style="width:100%; max-width:1480px; margin:0 auto; padding:clamp(14px,1.8vw,22px) clamp(14px,2vw,26px) 0;">
+    <div style="display:flex; gap:clamp(14px,1.8vw,28px); border-bottom:1px solid #E8E8E3; overflow-x:auto;">
+      <sc-for list="{{ tabs }}" as="tb" hint-placeholder-count="7">
+        <span onClick="{{ tb.select }}" style="padding:11px 0; border-bottom:2px solid {{ tb.rule }}; font-size:13.5px; font-weight:{{ tb.weight }}; color:{{ tb.color }}; cursor:pointer; white-space:nowrap;" style-hover="color:#1A7F37;">{{ tb.label }}</span>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="width:100%; max-width:1480px; margin:0 auto; padding:clamp(12px,1.6vw,18px) clamp(14px,2vw,26px) clamp(28px,3.4vw,52px); display:grid; grid-template-columns:{{ bodyGrid }}; gap:clamp(12px,1.4vw,18px); align-items:start;">
+
+    <div style="min-width:0; display:grid; grid-template-columns:{{ mainGrid }}; gap:clamp(12px,1.4vw,18px); align-items:start;">
+
+      <sc-if value="{{ showThesis }}" hint-placeholder-val="{{ true }}">
+      <div class="cd" style="padding:clamp(16px,1.8vw,22px); min-width:0;">
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:14px; flex-wrap:wrap;">
+          <span style="font-size:14.5px; font-weight:600;">Investment thesis</span>
+          <span class="lb" style="font-size:11px;">Reviewed 12 Aug · Updated daily</span>
+        </div>
+        <div style="padding:14px; border-radius:9px; background:#FBFAF4; border:1px solid #EDE9D8; font-size:13.5px; line-height:1.62; margin-bottom:16px;">BDO is the country's largest bank by assets, with a low-cost deposit franchise, disciplined provisioning, and a lending book that has compounded through two rate cycles.</div>
+        <sc-for list="{{ thesisPoints }}" as="tp" hint-placeholder-count="5">
+          <div style="display:grid; grid-template-columns:19px minmax(0,1fr); gap:10px; padding:7px 0;">
+            <svg width="17" height="17" viewBox="0 0 18 18" fill="none" style="margin-top:1px;"><circle cx="9" cy="9" r="7.4" stroke="#1A7F37" stroke-width="1.4"></circle><path d="M5.9 9.2 L7.9 11.2 L12.1 7" stroke="#1A7F37" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+            <span style="font-size:13px; line-height:1.58; color:#3A3A36; overflow-wrap:break-word;">{{ tp.text }}</span>
+          </div>
+        </sc-for>
+        <a href="StockStory About.dc.html" style="display:inline-flex; align-items:center; gap:7px; height:38px; padding:0 15px; margin-top:14px; border-radius:8px; border:1px solid #DCDCD5; font-size:13px; font-weight:500;" style-hover="border-color:#0A0A0A; color:#0A0A0A;">Read full thesis <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6 H10 M7 3 L10 6 L7 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg></a>
+      </div>
+      </sc-if>
+
+      <sc-if value="{{ showValuation }}" hint-placeholder-val="{{ true }}">
+      <div class="cd" style="padding:clamp(16px,1.8vw,22px); min-width:0; grid-column:{{ valuationSpan }};">
+        <div style="display:flex; align-items:center; gap:7px; margin-bottom:14px;">
+          <span style="font-size:14.5px; font-weight:600;">Fair value estimate</span>
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.4" stroke="#B0B0A9" stroke-width="1.3"></circle><path d="M8 7.2 V11.2" stroke="#B0B0A9" stroke-width="1.4" stroke-linecap="round"></path><circle cx="8" cy="5" r="0.8" fill="#B0B0A9"></circle></svg>
+        </div>
+        <div style="display:flex; align-items:baseline; gap:11px; margin-bottom:16px; flex-wrap:wrap;">
+          <span class="n" style="font-size:clamp(26px,1.6vw + 16px,36px); font-weight:600; letter-spacing:-0.03em;">₱158.40</span>
+          <span style="padding:3px 9px; border-radius:6px; background:#EDF6F0; font-size:12px; font-weight:600; color:#166B2E;">+11.2% to estimate</span>
+        </div>
+        <sc-for list="{{ valuationRows }}" as="vr" hint-placeholder-count="3">
+          <div style="display:flex; align-items:baseline; justify-content:space-between; gap:12px; padding:8px 0; border-top:1px solid #F0F0EB;">
+            <span class="lb" style="font-size:12.5px;">{{ vr.label }}</span>
+            <span class="n" style="font-size:13px; font-weight:500; color:{{ vr.color }};">{{ vr.value }}</span>
+          </div>
+        </sc-for>
+        <div style="margin-top:18px; padding-top:16px; border-top:1px solid #F0F0EB;">
+          <div style="position:relative; height:22px; display:flex; align-items:center;">
+            <span style="position:absolute; left:0; right:0; height:3px; background:#EDEDE8; border-radius:2px;"></span>
+            <span style="position:absolute; left:14%; right:26%; height:3px; background:#C9E3D2; border-radius:2px;"></span>
+            <span style="position:absolute; left:calc(53% - 6px); width:12px; height:12px; border-radius:50%; background:#1A7F37; border:2px solid #FFFFFF;"></span>
+          </div>
+          <div style="display:flex; justify-content:space-between; gap:8px; margin-top:6px;">
+            <sc-for list="{{ scenarios }}" as="sc" hint-placeholder-count="3">
+              <span style="text-align:{{ sc.align }};">
+                <span class="lb" style="display:block; font-size:11px;">{{ sc.label }}</span>
+                <span class="n" style="display:block; font-size:12.5px; font-weight:500;">{{ sc.value }}</span>
+              </span>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+      </sc-if>
+
+      <sc-if value="{{ showPerformance }}" hint-placeholder-val="{{ true }}">
+      <div class="cd" style="padding:clamp(16px,1.8vw,22px); min-width:0; grid-column:{{ fullSpan }};">
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:16px; flex-wrap:wrap;">
+          <span style="font-size:14.5px; font-weight:600;">Performance</span>
+          <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+            <span style="display:flex; align-items:center; gap:6px; font-size:11.5px;"><span style="width:14px; height:2px; background:#1A7F37;"></span>BDO <span class="n" style="font-weight:600;">+142.6%</span></span>
+            <span style="display:flex; align-items:center; gap:6px; font-size:11.5px; color:#6B6B66;"><span style="width:14px; height:2px; background:#C4C4BD;"></span>PSE Index <span class="n" style="font-weight:600;">+38.4%</span></span>
+            <div style="display:flex; gap:2px; padding:2px; background:#F2F2ED; border-radius:7px;">
+              <sc-for list="{{ ranges }}" as="rg" hint-placeholder-count="6">
+                <span onClick="{{ rg.select }}" style="padding:4px 10px; border-radius:5px; font-size:11.5px; font-weight:500; background:{{ rg.bg }}; color:{{ rg.color }}; cursor:pointer;">{{ rg.label }}</span>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+        <div style="display:grid; grid-template-columns:minmax(0,1fr) 44px; gap:8px;">
+          <svg viewBox="0 0 800 224" width="100%" height="224" fill="none" preserveAspectRatio="none" style="display:block;">
+            <sc-for list="{{ gridLines }}" as="gl" hint-placeholder-count="5">
+              <line x1="0" y1="{{ gl.y }}" x2="800" y2="{{ gl.y }}" stroke="#F2F2ED" stroke-width="1"></line>
+            </sc-for>
+            <path d="{{ chartArea }}" fill="#1A7F37" opacity="0.06"></path>
+            <path d="{{ chartBench }}" stroke="#C4C4BD" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="4 3"></path>
+            <path d="{{ chartLine }}" stroke="#1A7F37" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"></path>
+            <circle cx="{{ chartLastX }}" cy="{{ chartLastY }}" r="8" fill="#1A7F37" opacity="0.14"></circle>
+            <circle cx="{{ chartLastX }}" cy="{{ chartLastY }}" r="3.4" fill="#1A7F37"></circle>
+            <circle cx="{{ benchLastX }}" cy="{{ benchLastY }}" r="3" fill="#C4C4BD"></circle>
+          </svg>
+          <div style="display:flex; flex-direction:column; justify-content:space-between; align-items:flex-end;">
+            <sc-for list="{{ yAxis }}" as="ya" hint-placeholder-count="5">
+              <span class="lb" style="font-size:10px;">{{ ya.label }}</span>
+            </sc-for>
+          </div>
+        </div>
+        <div style="display:flex; justify-content:space-between; padding-top:9px; margin-top:4px; border-top:1px solid #F0F0EB; padding-right:52px;">
+          <sc-for list="{{ xAxis }}" as="xa" hint-placeholder-count="6">
+            <span class="lb" style="font-size:10.5px;">{{ xa.label }}</span>
+          </sc-for>
+        </div>
+      </div>
+      </sc-if>
+
+      <sc-if value="{{ showFundamentals }}" hint-placeholder-val="{{ true }}">
+      <div class="cd" style="padding:clamp(16px,1.8vw,22px); min-width:0; grid-column:{{ fullSpan }};">
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:6px; flex-wrap:wrap;">
+          <span style="font-size:14.5px; font-weight:600;">Fundamentals snapshot</span>
+          <span class="lb" style="font-size:11px;">FY2025, consolidated</span>
+        </div>
+        <div style="overflow-x:auto; margin-top:10px;">
+          <div style="min-width:{{ fundMinWidth }};">
+            <div style="display:grid; grid-template-columns:{{ fundGrid }}; gap:12px; padding:9px 0; border-bottom:1px solid #E8E8E3;">
+              <span class="lb" style="font-size:11px; font-weight:600;">Metric</span>
+              <span class="lb" style="font-size:11px; font-weight:600; text-align:right;">FY2025</span>
+              <span class="lb" style="font-size:11px; font-weight:600; text-align:center;">FY22 — FY25</span>
+              <span class="lb" style="font-size:11px; font-weight:600; text-align:right;">Change</span>
+            </div>
+            <sc-for list="{{ fundamentals }}" as="fu" hint-placeholder-count="6">
+              <div style="display:grid; grid-template-columns:{{ fundGrid }}; gap:12px; align-items:center; padding:11px 0; border-bottom:1px solid #F0F0EB;" style-hover="background:#FAFAF7;">
+                <span style="display:flex; align-items:center; gap:9px; min-width:0;">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;"><path d="{{ fu.icon }}" stroke="#8A9A8E" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                  <span style="font-size:13px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ fu.name }}</span>
+                </span>
+                <span class="n" style="font-size:13px; font-weight:500; text-align:right;">{{ fu.value }}</span>
+                <span style="display:flex; align-items:flex-end; justify-content:center; gap:4px; height:34px;">
+                  <sc-for list="{{ fu.bars }}" as="b" hint-placeholder-count="4">
+                    <span style="display:flex; flex-direction:column; align-items:center; gap:3px;">
+                      <span style="width:9px; height:{{ b.h }}; border-radius:2px 2px 0 0; background:{{ b.fill }};"></span>
+                      <span class="lb" style="font-size:8.5px; letter-spacing:0.01em;">{{ b.year }}</span>
+                    </span>
+                  </sc-for>
+                </span>
+                <span class="n" style="font-size:12.5px; text-align:right; color:{{ fu.changeColor }};">{{ fu.change }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+      </sc-if>
+
+      <sc-if value="{{ showRisks }}" hint-placeholder-val="{{ true }}">
+      <div class="cd" style="padding:clamp(16px,1.8vw,22px); min-width:0; grid-column:{{ fullSpan }};">
+        <div style="font-size:14.5px; font-weight:600; margin-bottom:16px;">Strengths and risks</div>
+        <div style="display:grid; grid-template-columns:{{ srGrid }}; gap:clamp(16px,2.4vw,34px);">
+          <div style="min-width:0;">
+            <div style="display:flex; align-items:center; gap:7px; margin-bottom:11px;">
+              <span style="width:6px; height:6px; border-radius:50%; background:#1A7F37;"></span>
+              <span style="font-size:12.5px; font-weight:600; color:#1A6E33;">Key strengths</span>
+            </div>
+            <sc-for list="{{ strengths }}" as="st" hint-placeholder-count="4">
+              <div style="display:grid; grid-template-columns:18px minmax(0,1fr); gap:9px; padding:7px 0; border-top:1px solid #F0F0EB;">
+                <svg width="16" height="16" viewBox="0 0 18 18" fill="none" style="margin-top:2px;"><circle cx="9" cy="9" r="7.4" stroke="#1A7F37" stroke-width="1.4"></circle><path d="M5.9 9.2 L7.9 11.2 L12.1 7" stroke="#1A7F37" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                <span style="font-size:12.5px; line-height:1.58; color:#3A3A36; overflow-wrap:break-word;">{{ st.text }}</span>
+              </div>
+            </sc-for>
+          </div>
+          <div style="min-width:0;">
+            <div style="display:flex; align-items:center; gap:7px; margin-bottom:11px;">
+              <span style="width:6px; height:6px; border-radius:50%; background:#D93025;"></span>
+              <span style="font-size:12.5px; font-weight:600; color:#A33227;">Key risks</span>
+            </div>
+            <sc-for list="{{ risks }}" as="rk" hint-placeholder-count="4">
+              <div style="display:grid; grid-template-columns:18px minmax(0,1fr); gap:9px; padding:7px 0; border-top:1px solid #F0F0EB;">
+                <svg width="16" height="16" viewBox="0 0 18 18" fill="none" style="margin-top:2px;"><circle cx="9" cy="9" r="7.4" stroke="#D93025" stroke-width="1.4"></circle><path d="M9 5.6 V9.8 M9 12.2 V12.4" stroke="#D93025" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                <span style="font-size:12.5px; line-height:1.58; color:#3A3A36; overflow-wrap:break-word;">{{ rk.text }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+      </sc-if>
+
+      <sc-if value="{{ showFilings }}" hint-placeholder-val="{{ false }}">
+      <div class="cd" style="padding:clamp(16px,1.8vw,22px); min-width:0; grid-column:{{ fullSpan }};">
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:6px; flex-wrap:wrap;">
+          <span style="font-size:14.5px; font-weight:600;">Filings</span>
+          <span class="lb" style="font-size:11px;">As disclosed to the exchange</span>
+        </div>
+        <sc-for list="{{ filings }}" as="fl" hint-placeholder-count="5">
+          <div style="display:grid; grid-template-columns:30px minmax(0,1fr) 58px auto; gap:11px; align-items:center; padding:12px 0; border-top:1px solid #F0F0EB;" style-hover="background:#FAFAF7;">
+            <span style="width:30px; height:30px; border-radius:7px; background:#F2F5F3; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M6.4 3.6 H14 L17.6 7.2 V20.4 H6.4 Z M14 3.6 V7.2 H17.6 M9.2 12.4 H14.8 M9.2 15.8 H14.8" stroke="#1A7F37" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+            </span>
+            <span style="font-size:13px; min-width:0; overflow-wrap:break-word;">{{ fl.title }}</span>
+            <span class="n" style="font-size:11px; padding:3px 0; text-align:center; border-radius:5px; background:#F2F2ED; color:#6B6B66;">{{ fl.kind }}</span>
+            <span class="lb" style="font-size:11.5px; white-space:nowrap;">{{ fl.date }}</span>
+          </div>
+        </sc-for>
+      </div>
+      </sc-if>
+
+      <sc-if value="{{ showPeers }}" hint-placeholder-val="{{ false }}">
+      <div class="cd" style="padding:clamp(16px,1.8vw,22px); min-width:0; grid-column:{{ fullSpan }};">
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:14px; flex-wrap:wrap;">
+          <span style="font-size:14.5px; font-weight:600;">Listed peers</span>
+          <span class="lb" style="font-size:11px;">Philippine banks</span>
+        </div>
+        <div style="overflow-x:auto;">
+          <div style="min-width:520px;">
+            <div style="display:grid; grid-template-columns:minmax(150px,1.6fr) 74px 74px 74px 62px; gap:12px; padding:9px 0; border-bottom:1px solid #E8E8E3;">
+              <span class="lb" style="font-size:11px; font-weight:600;">Company</span>
+              <span class="lb" style="font-size:11px; font-weight:600; text-align:right;">P/E</span>
+              <span class="lb" style="font-size:11px; font-weight:600; text-align:right;">P/B</span>
+              <span class="lb" style="font-size:11px; font-weight:600; text-align:right;">ROE</span>
+              <span class="lb" style="font-size:11px; font-weight:600; text-align:right;">Score</span>
+            </div>
+            <sc-for list="{{ peers }}" as="pr" hint-placeholder-count="5">
+              <div style="display:grid; grid-template-columns:minmax(150px,1.6fr) 74px 74px 74px 62px; gap:12px; align-items:center; padding:11px 0; border-bottom:1px solid #F0F0EB; background:{{ pr.rowBg }};">
+                <span style="min-width:0;">
+                  <span style="display:block; font-size:13px; font-weight:{{ pr.weight }};">{{ pr.ticker }}</span>
+                  <span class="lb" style="display:block; font-size:11.5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ pr.name }}</span>
+                </span>
+                <span class="n" style="font-size:12.5px; text-align:right;">{{ pr.pe }}</span>
+                <span class="n" style="font-size:12.5px; text-align:right;">{{ pr.pb }}</span>
+                <span class="n" style="font-size:12.5px; text-align:right;">{{ pr.roe }}</span>
+                <span class="n" style="font-size:13px; font-weight:600; text-align:right; color:{{ pr.scoreColor }};">{{ pr.score }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+      </sc-if>
+    </div>
+
+    <div style="min-width:0; display:flex; flex-direction:column; gap:clamp(12px,1.4vw,18px);">
+      <div class="cd" style="padding:16px;">
+        <div style="font-size:13.5px; font-weight:600; margin-bottom:12px;">Key metrics</div>
+        <sc-for list="{{ keyMetrics }}" as="km" hint-placeholder-count="7">
+          <div style="display:flex; align-items:baseline; justify-content:space-between; gap:12px; padding:8px 0; border-top:1px solid #F0F0EB;">
+            <span class="lb" style="font-size:12px;">{{ km.label }}</span>
+            <span class="n" style="font-size:12.5px; font-weight:500; text-align:right;">{{ km.value }}</span>
+          </div>
+        </sc-for>
+        <a href="StockStory Compare.dc.html" style="display:flex; align-items:center; gap:6px; margin-top:12px; padding-top:11px; border-top:1px solid #E8E8E3; font-size:12.5px; font-weight:500;" style-hover="color:#1A7F37;">View more metrics <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6 H10 M7 3 L10 6 L7 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg></a>
+      </div>
+
+      <div class="cd" style="padding:16px;">
+        <div style="font-size:13.5px; font-weight:600; margin-bottom:4px;">What changed</div>
+        <div class="lb" style="font-size:11px; margin-bottom:12px;">Read from this quarter's filings</div>
+        <sc-for list="{{ changes }}" as="ch" hint-placeholder-count="3">
+          <div style="padding:11px 0; border-top:1px solid #F0F0EB;">
+            <div style="display:flex; align-items:center; gap:7px; margin-bottom:5px;">
+              <span style="width:6px; height:6px; border-radius:50%; background:{{ ch.color }}; flex-shrink:0;"></span>
+              <span style="font-size:11.5px; font-weight:600; color:{{ ch.color }};">{{ ch.tag }}</span>
+              <span class="lb" style="font-size:10.5px; margin-left:auto; white-space:nowrap;">{{ ch.date }}</span>
+            </div>
+            <div style="font-size:12.5px; line-height:1.6; color:#3A3A36; overflow-wrap:break-word;">{{ ch.text }}</div>
+          </div>
+        </sc-for>
+      </div>
+
+      <div class="cd" style="padding:16px;">
+        <div style="font-size:13.5px; font-weight:600; margin-bottom:4px;">Upcoming</div>
+        <div class="lb" style="font-size:11px; margin-bottom:12px;">Next 60 days</div>
+        <sc-for list="{{ events }}" as="ev" hint-placeholder-count="3">
+          <div style="display:grid; grid-template-columns:28px minmax(0,1fr) auto; gap:9px; align-items:center; padding:10px 0; border-top:1px solid #F0F0EB;">
+            <span style="width:28px; height:28px; border-radius:7px; background:#F2F5F3; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+              <svg width="14" height="14" viewBox="0 0 20 20" fill="none"><path d="M3.6 6.4 H16.4 V16.4 H3.6 Z M3.6 6.4 V4.6 H16.4 V6.4 M7 3 V6 M13 3 V6" stroke="#1A7F37" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+            </span>
+            <span style="font-size:12.5px; min-width:0; overflow-wrap:break-word;">{{ ev.label }}</span>
+            <span class="lb" style="font-size:11.5px; white-space:nowrap;">{{ ev.date }}</span>
+          </div>
+        </sc-for>
+      </div>
+
+      <div class="cd" style="padding:16px;">
+        <div style="font-size:13.5px; font-weight:600; margin-bottom:12px;">Data confidence</div>
+        <div style="display:flex; align-items:baseline; justify-content:space-between; gap:12px; padding-bottom:11px; border-bottom:1px solid #F0F0EB;">
+          <span class="lb" style="font-size:12px;">Overall</span>
+          <span style="font-size:12.5px; font-weight:600; color:#1A7F37;">High</span>
+        </div>
+        <sc-for list="{{ confidence }}" as="cf" hint-placeholder-count="3">
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; padding:9px 0; border-bottom:1px solid #F0F0EB;">
+            <span class="lb" style="font-size:12px; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ cf.label }}</span>
+            <svg width="16" height="16" viewBox="0 0 18 18" fill="none" style="flex-shrink:0;"><circle cx="9" cy="9" r="7.4" fill="#EDF6F0"></circle><path d="M5.9 9.2 L7.9 11.2 L12.1 7" stroke="#1A7F37" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+          </div>
+        </sc-for>
+        <a href="StockStory Methodology.dc.html" style="display:flex; align-items:center; gap:6px; margin-top:12px; font-size:12.5px; font-weight:500;" style-hover="color:#1A7F37;">How we source data <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6 H10 M7 3 L10 6 L7 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg></a>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{}">
+class Component extends DCLogic {
+  state = { width: typeof window !== 'undefined' ? window.innerWidth : 1480, tab: 'Thesis', range: '5Y', follow: false };
+
+  componentDidMount() { this._r = () => this.setState({ width: window.innerWidth }); window.addEventListener('resize', this._r); }
+  componentWillUnmount() { window.removeEventListener('resize', this._r); }
+
+  spark(vals, w, h, pad) {
+    const p = pad == null ? 3 : pad;
+    const lo = Math.min.apply(null, vals), hi = Math.max.apply(null, vals), span = (hi - lo) || 1;
+    return vals.map((v, i) => {
+      const x = p + (i / (vals.length - 1)) * (w - p * 2);
+      const y = h - p - ((v - lo) / span) * (h - p * 2);
+      return (i ? 'L' : 'M') + x.toFixed(1) + ' ' + y.toFixed(1);
+    }).join(' ');
+  }
+
+  // seeded random walk — irregular like real tape, stable across renders
+  walk(seed, n, drift, vol) {
+    let s = seed * 7919 + 13, v = 100, out = [];
+    const rnd = () => { s = (s * 1103515245 + 12345) & 0x7fffffff; return s / 0x7fffffff; };
+    for (let i = 0; i < n; i++) {
+      const shock = (rnd() < 0.08) ? (rnd() - 0.5) * vol * 3.4 : 0;
+      v += (rnd() - 0.5) * vol + drift + shock;
+      out.push(v);
+    }
+    return out;
+  }
+
+  renderVals() {
+    const w = this.state.width, s = this.state;
+    const wide = w >= 1340, mid = w >= 1080;
+    const navItems = [
+      { label: 'Research', href: 'StockStory Stock Detail.dc.html', caret: true, active: true },
+      { label: 'Scanner', href: 'StockStory Scanner.dc.html', caret: false },
+      { label: 'Compare', href: 'StockStory Compare.dc.html', caret: false },
+      { label: 'Watchlist', href: 'StockStory Watchlist.dc.html', caret: false },
+      { label: 'Portfolio', href: 'StockStory Portfolio.dc.html', caret: false },
+      { label: 'Pricing', href: 'StockStory Pricing.dc.html', caret: false },
+        { label: 'Methodology', href: 'StockStory Methodology.dc.html', caret: false },
+    ];
+    const C = 2 * Math.PI * 54;
+    const bdo = this.walk(17, 150, 0.58, 5.6);
+    const bench = this.walk(23, 150, 0.18, 3.9);
+    const line = this.spark(bdo, 800, 224, 10);
+
+    return {
+      rangeDisplay: w < 400 ? 'none' : 'flex',
+      searchLabelShow: w >= 1240 ? 'inline' : 'none',
+      searchKbdShow: w >= 1240 ? 'inline' : 'none',
+      showBottomNav: w < 1080,
+      pageBottomPad: w < 1080 ? 'calc(66px + env(safe-area-inset-bottom))' : '0px',
+      bottomItems: [
+        { label: 'Home', href: 'StockStory Shell.dc.html', icon: 'M4.4 19.6 V9.8 L12 4.2 L19.6 9.8 V19.6 Z M9.4 19.6 V13.6 H14.6 V19.6' },
+        { label: 'Scanner', href: 'StockStory Scanner.dc.html', icon: 'M10.8 4.2 A6.6 6.6 0 1 1 10.79 4.2 Z M15.6 15.6 L20.4 20.4' },
+        { label: 'Watchlist', href: 'StockStory Watchlist.dc.html', icon: 'M12 3.8 L14.5 9.1 L20.3 9.9 L16.1 14 L17.2 19.8 L12 17 L6.8 19.8 L7.9 14 L3.7 9.9 L9.5 9.1 Z' },
+        { label: 'Portfolio', href: 'StockStory Portfolio.dc.html', icon: 'M3.8 19.6 H20.2 M6.8 19.6 V12.8 M11.2 19.6 V7.8 M15.6 19.6 V10.6 M20 19.6 V5.2' },
+        { label: 'Alerts', href: 'StockStory Alerts.dc.html', icon: 'M7.2 10.2 A4.8 4.8 0 0 1 16.8 10.2 C16.8 15 18.4 17 18.4 17 H5.6 C5.6 17 7.2 15 7.2 10.2 Z M10.2 19.6 A2.2 2.2 0 0 0 13.8 19.6' },
+      ].map(b => ({
+        ...b,
+        color: b.label === 'Scanner' ? '#0A0A0A' : '#9A9A94',
+        weight: b.label === 'Scanner' ? 600 : 500,
+        stroke: b.label === 'Scanner' ? 1.9 : 1.6,
+      })),
+      showNav: w >= 1080,
+      topNav: navItems.map(n => ({ ...n, weight: n.active ? 600 : 500, color: n.active ? '#0A0A0A' : '#3A3A36', rule: n.active ? '#1A7F37' : 'transparent' })),
+      tapeGrid: w < 940 ? 'repeat(2, minmax(0,1fr))' : (w < 1180 ? 'repeat(4, minmax(0,1fr))' : 'repeat(4, minmax(0,1fr)) auto'),
+      statusSpan: w < 1180 ? '1 / -1' : 'auto',
+      statusTopRule: w < 1180 ? '1px solid #E8E8E3' : '0',
+      indices: [
+        { name: 'PSE Index', value: '6,842.15', change: '+0.84%', color: '#1A7F37', low: '6,801', high: '6,858', pos: '72%' },
+        { name: 'All Shares', value: '3,614.20', change: '+0.62%', color: '#1A7F37', low: '3,592', high: '3,621', pos: '77%' },
+        { name: 'Financials', value: '2,188.44', change: '+1.12%', color: '#1A7F37', low: '2,166', high: '2,194', pos: '80%' },
+        { name: 'Property', value: '2,470.06', change: '-0.31%', color: '#D93025', low: '2,462', high: '2,498', pos: '22%' },
+      ].map((ix, i) => ({ ...ix, topRule: (w < 940 && i > 1) ? '1px solid #E8E8E3' : '0' })),
+
+      crumbs: [
+        { label: 'Home', href: 'StockStory Shell.dc.html', color: '#6B6B66', sep: true },
+        { label: 'Research', href: 'StockStory Scanner.dc.html', color: '#6B6B66', sep: true },
+        { label: 'Financials', href: 'StockStory Sector Detail.dc.html', color: '#6B6B66', sep: true },
+        { label: 'BDO', href: 'StockStory Stock Detail.dc.html', color: '#0A0A0A', sep: false },
+      ],
+
+      heroGrid: w < 1080 ? '1fr' : 'minmax(0,1.32fr) minmax(0,1fr)',
+      identityGrid: w < 620 ? '1fr' : 'minmax(0,1.1fr) minmax(0,1fr)',
+      priceRule: w < 620 ? '0' : '1px solid #F0F0EB',
+      priceInset: w < 620 ? '0' : 'clamp(16px,2vw,28px)',
+      bodyGrid: wide ? 'minmax(0,1fr) 306px' : '1fr',
+      mainGrid: mid ? 'repeat(2, minmax(0,1fr))' : '1fr',
+      fullSpan: mid ? '1 / -1' : 'auto',
+      srGrid: w < 760 ? '1fr' : 'repeat(2, minmax(0,1fr))',
+      fundGrid: w < 700 ? 'minmax(0,1.4fr) 88px 92px 66px' : 'minmax(0,1.6fr) minmax(88px,0.7fr) 104px minmax(66px,0.5fr)',
+      fundMinWidth: w < 700 ? '400px' : 'auto',
+
+      toggleFollow: () => this.setState({ follow: !s.follow }),
+      followLabel: s.follow ? 'Following' : 'Follow',
+      followBg: s.follow ? '#EDF6F0' : '#FFFFFF',
+      followBorder: s.follow ? '#CDE5D6' : '#DCDCD5',
+      followIcon: s.follow ? '#1A7F37' : '#0A0A0A',
+      followFill: s.follow ? '#1A7F37' : 'none',
+
+      quoteFacts: [
+        { label: 'Market cap', value: '₱758.4B' },
+        { label: 'Day range', value: '₱140.20 – ₱143.10' },
+        { label: '52-week range', value: '₱118.00 – ₱148.90' },
+        { label: 'Volume', value: '4.82M' },
+      ],
+      gaugeDash: (C * 0.88).toFixed(1) + ' ' + C.toFixed(1),
+      factorBars: [
+        { name: 'Quality', score: 92, width: '92%' },
+        { name: 'Growth', score: 85, width: '85%' },
+        { name: 'Valuation', score: 78, width: '78%' },
+        { name: 'Risk', score: 82, width: '82%' },
+        { name: 'Momentum', score: 87, width: '87%' },
+      ],
+
+      showThesis: s.tab === 'Thesis',
+      showValuation: s.tab === 'Thesis' || s.tab === 'Valuation',
+      valuationSpan: (s.tab === 'Thesis' || !mid) ? 'auto' : '1 / -1',
+      showPerformance: s.tab === 'Thesis' || s.tab === 'Fundamentals',
+      showFundamentals: s.tab === 'Thesis' || s.tab === 'Fundamentals' || s.tab === 'Financials',
+      showRisks: s.tab === 'Thesis' || s.tab === 'Risks',
+      showFilings: s.tab === 'Filings',
+      showPeers: s.tab === 'Peers',
+      filings: [
+        { title: 'Q2 2026 quarterly report', kind: '17-Q', date: '8 Aug 2026' },
+        { title: 'Notice of annual stockholders meeting', kind: '17-C', date: '30 Jul 2026' },
+        { title: 'Declaration of cash dividend', kind: '17-C', date: '22 Jul 2026' },
+        { title: 'Q1 2026 quarterly report', kind: '17-Q', date: '12 May 2026' },
+        { title: 'FY2025 annual report', kind: '17-A', date: '28 Mar 2026' },
+      ],
+      peers: [
+        { ticker: 'BDO', name: 'BDO Unibank', pe: '10.4x', pb: '1.62x', roe: '15.8%', score: 88, self: true },
+        { ticker: 'BPI', name: 'Bank of the Philippine Islands', pe: '11.2x', pb: '1.48x', roe: '14.2%', score: 84, self: false },
+        { ticker: 'MBT', name: 'Metropolitan Bank & Trust', pe: '8.9x', pb: '1.02x', roe: '12.6%', score: 79, self: false },
+        { ticker: 'CBC', name: 'China Banking Corporation', pe: '7.4x', pb: '0.94x', roe: '13.8%', score: 76, self: false },
+        { ticker: 'SECB', name: 'Security Bank Corporation', pe: '9.6x', pb: '0.88x', roe: '9.4%', score: 68, self: false },
+      ].map(p => ({
+        ...p,
+        rowBg: p.self ? '#FBFAF4' : '#FFFFFF',
+        weight: p.self ? 600 : 500,
+        scoreColor: p.score >= 85 ? '#166B2E' : (p.score >= 75 ? '#1A7F37' : '#6B6B66'),
+      })),
+      tabs: ['Thesis', 'Fundamentals', 'Financials', 'Risks', 'Valuation', 'Filings', 'Peers'].map(l => ({
+        label: l, select: () => this.setState({ tab: l }),
+        weight: l === s.tab ? 600 : 500, color: l === s.tab ? '#0A0A0A' : '#6B6B66',
+        rule: l === s.tab ? '#1A7F37' : 'transparent',
+      })),
+
+      thesisPoints: [
+        { text: 'Deposit base of ₱3.4 trillion, the largest on the exchange, funds lending at a structurally lower cost than mid-tier peers.' },
+        { text: 'Loan growth has beaten sector average for three consecutive quarters, led by consumer and middle-market lending.' },
+        { text: 'Net interest margin held at 4.6% through the August policy cut, against a sector median that compressed 18 basis points.' },
+        { text: 'Provisioning stayed conservative at 0.9% of gross loans while non-performing loans fell to a five-year low.' },
+        { text: 'Branch and digital channels now overlap in 84 provinces, giving reach that would take a challenger a decade to build.' },
+      ],
+      valuationRows: [
+        { label: 'Current price', value: '₱142.50', color: '#0A0A0A' },
+        { label: 'Margin of safety', value: '11.2%', color: '#1A7F37' },
+        { label: 'Estimate uncertainty', value: 'Medium', color: '#0A0A0A' },
+      ],
+      scenarios: [
+        { label: 'Bear case', value: '₱121.00', align: 'left' },
+        { label: 'Base case', value: '₱158.40', align: 'center' },
+        { label: 'Bull case', value: '₱186.00', align: 'right' },
+      ],
+
+      ranges: ['1D', '1W', '1M', '3M', '1Y', 'YTD'].map(l => ({
+        label: l, select: () => this.setState({ range: l }),
+        bg: l === s.range ? '#FFFFFF' : 'transparent', color: l === s.range ? '#0A0A0A' : '#6B6B66',
+      })),
+      gridLines: [12, 60, 108, 156, 204].map(y => ({ y })),
+      chartLine: line,
+      chartLastX: 790,
+      chartLastY: +(224 - 10 - ((bdo[bdo.length - 1] - Math.min.apply(null, bdo)) / ((Math.max.apply(null, bdo) - Math.min.apply(null, bdo)) || 1)) * (224 - 20)).toFixed(1),
+      benchLastX: 790,
+      benchLastY: +(224 - 10 - ((bench[bench.length - 1] - Math.min.apply(null, bench)) / ((Math.max.apply(null, bench) - Math.min.apply(null, bench)) || 1)) * (224 - 20)).toFixed(1),
+      chartBench: this.spark(bench, 800, 224, 10),
+      chartArea: line + ' L790 214 L10 214 Z',
+      yAxis: ['+150%', '+100%', '+50%', '0%', '-50%'].map(label => ({ label })),
+      xAxis: ['2021', '2022', '2023', '2024', '2025', '2026'].map(label => ({ label })),
+
+      fundamentals: [
+        { name: 'Revenue', value: '₱248.6B', change: '+11.4%', changeColor: '#1A7F37', sparkColor: '#1A7F37', icon: 'M3.6 19.4 H20.4 M6.6 19.4 V13 M11 19.4 V8.6 M15.4 19.4 V11 M19.8 19.4 V5.4', bars: [{ year: '22', h: '9.0px', fill: '#DCE7DF' }, { year: '23', h: '13.2px', fill: '#DCE7DF' }, { year: '24', h: '18.6px', fill: '#DCE7DF' }, { year: '25', h: '24.0px', fill: '#1A7F37' }] },
+        { name: 'Net profit', value: '₱82.4B', change: '+14.2%', changeColor: '#1A7F37', sparkColor: '#1A7F37', icon: 'M8.2 5.4 H12.4 A3.4 3.4 0 0 1 12.4 12.2 H8.2 M8.2 8.8 H14.2 M6.4 12.2 H12 M8.2 12.2 V18.6', bars: [{ year: '22', h: '9.0px', fill: '#DCE7DF' }, { year: '23', h: '13.3px', fill: '#DCE7DF' }, { year: '24', h: '19.4px', fill: '#DCE7DF' }, { year: '25', h: '24.0px', fill: '#1A7F37' }] },
+        { name: 'Net interest margin', value: '4.62%', change: '+0.08 pp', changeColor: '#1A7F37', sparkColor: '#1A7F37', icon: 'M5.4 18.6 L18.6 5.4 M7.8 5.4 A2.4 2.4 0 1 1 7.79 5.4 Z M16.2 18.6 A2.4 2.4 0 1 1 16.19 18.6 Z', bars: [{ year: '22', h: '9.0px', fill: '#DCE7DF' }, { year: '23', h: '13.8px', fill: '#DCE7DF' }, { year: '24', h: '21.1px', fill: '#DCE7DF' }, { year: '25', h: '24.0px', fill: '#1A7F37' }] },
+        { name: 'Return on equity', value: '15.8%', change: '+1.2 pp', changeColor: '#1A7F37', sparkColor: '#1A7F37', icon: 'M4.4 14.6 A7.6 7.6 0 0 1 19.6 14.6 M12 14.6 L16.4 9.4', bars: [{ year: '22', h: '9.0px', fill: '#DCE7DF' }, { year: '23', h: '14.2px', fill: '#DCE7DF' }, { year: '24', h: '20.1px', fill: '#DCE7DF' }, { year: '25', h: '24.0px', fill: '#1A7F37' }] },
+        { name: 'Non-performing loans', value: '1.84%', change: '-0.31 pp', changeColor: '#1A7F37', sparkColor: '#1A7F37', icon: 'M11.2 3.8 L3.4 18.4 H20.6 L12.8 3.8 Z M12 9.4 V13.4 M12 15.8 V16', bars: [{ year: '22', h: '24.0px', fill: '#DCE7DF' }, { year: '23', h: '18.7px', fill: '#DCE7DF' }, { year: '24', h: '11.9px', fill: '#DCE7DF' }, { year: '25', h: '9.0px', fill: '#1A7F37' }] },
+        { name: 'Cost-to-income', value: '58.2%', change: '+1.8 pp', changeColor: '#D93025', sparkColor: '#D93025', icon: 'M4.6 8.6 H19.4 V18.4 H4.6 Z M4.6 8.6 L7.6 5.6 H16.4 L19.4 8.6 M12 11.6 V15.4', bars: [{ year: '22', h: '24.0px', fill: '#DCE7DF' }, { year: '23', h: '19.2px', fill: '#DCE7DF' }, { year: '24', h: '9.0px', fill: '#DCE7DF' }, { year: '25', h: '14.4px', fill: '#E8C4BF' }] },
+      ],
+
+      strengths: [
+        { text: 'Largest deposit franchise on the PSE, funding loans below the cost of every listed peer.' },
+        { text: 'Loan growth ahead of sector average for three straight quarters.' },
+        { text: 'Non-performing loans at a five-year low with provisioning above regulatory minimum.' },
+        { text: 'Capital adequacy at 15.4%, comfortably above the BSP requirement.' },
+      ],
+      risks: [
+        { text: 'Cost-to-income has risen for two quarters as branch and technology spending accelerates.' },
+        { text: 'Further policy rate cuts would compress margin if deposit repricing lags.' },
+        { text: 'Consumer lending concentration leaves earnings exposed to a household credit downturn.' },
+        { text: 'Trading a modest premium to book against mid-tier banks with faster growth.' },
+      ],
+
+      keyMetrics: [
+        { label: 'P/E (trailing)', value: '10.4x' },
+        { label: 'P/B', value: '1.62x' },
+        { label: 'Dividend yield', value: '4.20%' },
+        { label: 'Payout ratio', value: '38.4%' },
+        { label: 'Return on assets', value: '1.84%' },
+        { label: 'Capital adequacy', value: '15.4%' },
+        { label: 'Shares outstanding', value: '5.32B' },
+      ],
+      changes: [
+        { tag: 'Thesis improving', color: '#1A7F37', date: '12 Aug', text: 'Loan growth beat for a third straight quarter. Net interest margin held through the rate cut.' },
+        { tag: 'Filing read', color: '#1A7F37', date: '8 Aug', text: 'Q2 disclosure confirms non-performing loans at 1.84%, the lowest since 2021.' },
+        { tag: 'Watch item', color: '#B26B00', date: '30 Jul', text: 'Cost-to-income rose 1.8 points as the digital build continues. Second quarter of increase.' },
+      ],
+      events: [
+        { label: 'Q3 2026 results', date: '12 Nov' },
+        { label: 'Dividend ex-date', date: '8 Sep' },
+        { label: 'Annual stockholders meeting', date: '24 Sep' },
+      ],
+      confidence: [
+        { label: 'Primary filings complete' },
+        { label: 'Figures cross-checked' },
+        { label: 'Reviewed by an analyst' },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>

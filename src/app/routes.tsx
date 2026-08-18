@@ -1,4 +1,4 @@
-import { Suspense, lazy, type ReactNode } from "react";
+import { Suspense, lazy, useEffect, type ReactNode } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { AppShell } from "./AppShell";
 import { PublicLayout } from "./PublicLayout";
@@ -111,15 +111,27 @@ function WorkspaceRoute({ children }: { children: ReactNode }) {
   return <AppShell>{children}</AppShell>;
 }
 
+/**
+ * The StockStory design frontend is served as static HTML under /design/
+ * (all 16 design pages, fully navigable). The app lands on it so opening the
+ * site shows the design pages exactly as designed. This is a hard page
+ * navigation because /design/ is a static path, not a React route.
+ */
+function DesignLanding() {
+  useEffect(() => {
+    window.location.replace("/design/");
+  }, []);
+  return null;
+}
+
 export function AppRoutes() {
   const { enableWaitlistPage } = getBetaConfig();
   const changelogEnabled = isFeatureEnabled("changelog");
-  const publicFallback = SHOW_ABOUT_PAGE ? "/about" : "/pse-market";
 
   return (
     <Suspense fallback={<RouteFallback />}>
       <Routes>
-        <Route path="/" element={<Navigate to={publicFallback} replace />} />
+        <Route path="/" element={<DesignLanding />} />
         {SHOW_ABOUT_PAGE ? (
           <Route path="/about" element={<Suspense fallback={<RouteFallback />}><PublicLayout><AboutPage /></PublicLayout></Suspense>} />
         ) : (

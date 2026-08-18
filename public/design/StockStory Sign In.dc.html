@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="./vendor/react.production.min.js"></script>
+  <script src="./vendor/react-dom.production.min.js"></script>
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    body { margin:0; background:#FAFAF7; font-family:"Instrument Sans", -apple-system, BlinkMacSystemFont, sans-serif; -webkit-font-smoothing:antialiased; color:#0A0A0A; }
+    * { box-sizing:border-box; }
+    .n { font-family:"IBM Plex Mono", ui-monospace, monospace; font-variant-numeric:tabular-nums; letter-spacing:-0.02em; }
+    .lb { font-size:12.5px; color:#6B6B66; }
+    a { color:#0A0A0A; text-decoration:none; }
+    a:hover { color:#1A7F37; }
+    ::selection { background:#D8EEDF; }
+    .cd { background:#FFFFFF; border:1px solid #E8E8E3; border-radius:12px; }
+    input { font-family:inherit; }
+    input:focus { outline:none; border-color:#0A0A0A !important; }
+    @media (prefers-reduced-motion: reduce) { * { animation:none !important; transition:none !important; } }
+  </style>
+</helmet>
+
+<div style="min-height:100dvh; background:#FAFAF7; display:grid; grid-template-columns:{{ shellGrid }};">
+
+  <div style="min-width:0; display:flex; flex-direction:column; padding:clamp(18px,2.4vw,34px) clamp(16px,3vw,44px);">
+    <a href="StockStory Shell.dc.html" style="display:inline-flex; align-items:center; gap:10px; flex-shrink:0; align-self:flex-start;">
+      <svg width="30" height="30" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="9" fill="#0A0A0A"></rect><path d="M21 11.4 C21 8.6 11.6 8.8 11.6 13 C11.6 17.2 21 15.6 21 19.8 C21 24 11.6 23.6 11.6 20.8" stroke="#FFFFFF" stroke-width="2.1" stroke-linecap="round" fill="none"></path></svg>
+      <span style="line-height:1.1;"><span style="display:block; font-size:17px; font-weight:600; letter-spacing:-0.02em;">StockEX<span style="font-size:8.5px; font-weight:500; vertical-align:super; letter-spacing:0; margin-left:1px; color:#9A9A94;">&#8482;</span></span><span style="display:block; font-size:11.5px; color:#6B6B66;">Philippines</span></span>
+    </a>
+
+    <div style="flex:1; display:flex; align-items:center; justify-content:center; padding:clamp(24px,4vw,52px) 0;">
+      <div style="width:100%; max-width:376px; min-width:0;">
+        <div style="display:flex; gap:3px; padding:3px; background:#F2F2ED; border-radius:9px; margin-bottom:26px;">
+          <sc-for list="{{ modes }}" as="m" hint-placeholder-count="2">
+            <span onClick="{{ m.select }}" style="flex:1; text-align:center; padding:9px 12px; border-radius:7px; background:{{ m.bg }}; font-size:13px; font-weight:{{ m.weight }}; color:{{ m.color }}; cursor:pointer;">{{ m.label }}</span>
+          </sc-for>
+        </div>
+
+        <h1 style="margin:0 0 8px; font-size:clamp(23px,1.4vw + 15px,29px); font-weight:600; letter-spacing:-0.03em; line-height:1.14;">{{ heading }}</h1>
+        <p class="lb" style="margin:0 0 24px; font-size:13.5px; line-height:1.6;">{{ subheading }}</p>
+
+        <sc-if value="{{ isSignUp }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-bottom:14px;">
+            <label style="display:block; font-size:12.5px; font-weight:500; margin-bottom:7px;">Full name</label>
+            <input type="text" placeholder="Juan Dela Cruz" value="{{ name }}" onChange="{{ onName }}" style="width:100%; height:46px; padding:0 13px; border:1px solid #DCDCD5; border-radius:9px; background:#FFFFFF; font-size:14px; color:#0A0A0A;">
+          </div>
+        </sc-if>
+
+        <div style="margin-bottom:14px;">
+          <label style="display:block; font-size:12.5px; font-weight:500; margin-bottom:7px;">Email</label>
+          <input type="email" placeholder="you@example.ph" value="{{ email }}" onChange="{{ onEmail }}" style="width:100%; height:46px; padding:0 13px; border:1px solid {{ emailBorder }}; border-radius:9px; background:#FFFFFF; font-size:14px; color:#0A0A0A;">
+          <sc-if value="{{ emailError }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex; align-items:center; gap:6px; margin-top:7px;">
+              <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.6" stroke="#D93025" stroke-width="1.4"></circle><path d="M8 4.8 V8.6 M8 10.8 V11" stroke="#D93025" stroke-width="1.5" stroke-linecap="round"></path></svg>
+              <span style="font-size:11.5px; color:#D93025;">Enter an email address so we can send your sign-in link.</span>
+            </div>
+          </sc-if>
+        </div>
+
+        <div style="margin-bottom:18px;">
+          <div style="display:flex; align-items:baseline; justify-content:space-between; gap:10px; margin-bottom:7px;">
+            <label style="font-size:12.5px; font-weight:500;">Password</label>
+            <sc-if value="{{ isSignIn }}" hint-placeholder-val="{{ true }}">
+              <span style="font-size:11.5px; color:#6B6B66; cursor:pointer;" style-hover="color:#1A7F37;">Forgot?</span>
+            </sc-if>
+          </div>
+          <div style="position:relative;">
+            <input type="{{ pwType }}" placeholder="{{ pwPlaceholder }}" value="{{ password }}" onChange="{{ onPassword }}" style="width:100%; height:46px; padding:0 46px 0 13px; border:1px solid #DCDCD5; border-radius:9px; background:#FFFFFF; font-size:14px; color:#0A0A0A;">
+            <span onClick="{{ toggleReveal }}" style="position:absolute; right:5px; top:5px; width:36px; height:36px; display:flex; align-items:center; justify-content:center; cursor:pointer; border-radius:7px;" style-hover="background:#F2F2ED;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M2.6 12 C5 7.8 8.4 5.8 12 5.8 C15.6 5.8 19 7.8 21.4 12 C19 16.2 15.6 18.2 12 18.2 C8.4 18.2 5 16.2 2.6 12 Z" stroke="#9A9A94" stroke-width="1.6" stroke-linejoin="round"></path><circle cx="12" cy="12" r="2.8" stroke="#9A9A94" stroke-width="1.6"></circle><path d="{{ slashPath }}" stroke="#9A9A94" stroke-width="1.6" stroke-linecap="round"></path></svg>
+            </span>
+          </div>
+          <sc-if value="{{ isSignUp }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex; align-items:center; gap:8px; margin-top:9px;">
+              <span style="flex:1; display:flex; gap:3px;">
+                <sc-for list="{{ strengthBars }}" as="sb" hint-placeholder-count="4">
+                  <span style="flex:1; height:3px; border-radius:2px; background:{{ sb.bg }};"></span>
+                </sc-for>
+              </span>
+              <span style="font-size:11px; font-weight:500; color:{{ strengthColor }}; white-space:nowrap;">{{ strengthLabel }}</span>
+            </div>
+          </sc-if>
+        </div>
+
+        <div onClick="{{ submit }}" style="display:flex; align-items:center; justify-content:center; gap:9px; height:48px; border-radius:10px; background:#0A0A0A; color:#FFFFFF; font-size:14.5px; font-weight:600; cursor:pointer;" style-hover="background:#1A1A1A;" style-active="background:#000000;">
+          {{ submitLabel }}
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6 H10 M7 3 L10 6 L7 9" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round"></path></svg>
+        </div>
+
+        <sc-if value="{{ isSignUp }}" hint-placeholder-val="{{ false }}">
+          <div class="lb" style="font-size:11.5px; line-height:1.6; margin-top:13px; text-align:center;">Fourteen days of the Research plan. No card, and nothing charges when it ends.</div>
+        </sc-if>
+
+        <div style="display:flex; align-items:center; gap:12px; margin:22px 0;">
+          <span style="flex:1; height:1px; background:#E8E8E3;"></span>
+          <span class="lb" style="font-size:11px;">or</span>
+          <span style="flex:1; height:1px; background:#E8E8E3;"></span>
+        </div>
+
+        <div style="display:flex; align-items:center; justify-content:center; gap:9px; height:46px; border-radius:10px; border:1px solid #DCDCD5; background:#FFFFFF; font-size:14px; font-weight:500; cursor:pointer;" style-hover="border-color:#0A0A0A;">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M4.6 6.4 H19.4 V17.6 H4.6 Z" stroke="#0A0A0A" stroke-width="1.6" stroke-linejoin="round"></path><path d="M4.6 6.4 L12 12.4 L19.4 6.4" stroke="#0A0A0A" stroke-width="1.6" stroke-linejoin="round"></path></svg>
+          Email me a sign-in link
+        </div>
+
+        <div class="lb" style="font-size:12.5px; text-align:center; margin-top:22px;">{{ switchPrompt }} <span onClick="{{ switchMode }}" style="color:#0A0A0A; font-weight:500; cursor:pointer; text-decoration:underline; text-underline-offset:3px;">{{ switchAction }}</span></div>
+      </div>
+    </div>
+
+    <div class="lb" style="font-size:11.5px; line-height:1.6; max-width:52ch;">StockEX is a research service. We hold no funds, place no orders, and are not a broker-dealer.</div>
+  </div>
+
+  <div style="min-width:0; display:{{ asideDisplay }}; flex-direction:column; justify-content:center; gap:clamp(16px,2vw,26px); padding:clamp(24px,3vw,52px); background:#F4F4EF; border-left:1px solid #E8E8E3;">
+    <div>
+      <div class="lb" style="font-size:10.5px; font-weight:600; text-transform:uppercase; letter-spacing:0.09em; margin-bottom:14px;">What you get on the other side</div>
+      <p style="margin:0; font-size:clamp(19px,1vw + 14px,25px); font-weight:500; line-height:1.42; letter-spacing:-0.022em; max-width:26ch;">Every PSE filing, read the week it lands, with what changed since you last looked.</p>
+    </div>
+
+    <div class="cd" style="padding:16px;">
+      <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:13px;">
+        <span style="display:flex; align-items:center; gap:9px; min-width:0;">
+          <span style="width:30px; height:30px; border-radius:7px; background:#0A2C5C; color:#FFFFFF; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700;">BDO</span>
+          <span style="min-width:0;">
+            <span style="display:block; font-size:13px; font-weight:600;">BDO</span>
+            <span class="lb" style="display:block; font-size:11px;">BDO Unibank, Inc.</span>
+          </span>
+        </span>
+        <span style="display:flex; align-items:center; gap:6px; font-size:11.5px; font-weight:500; color:#1A7F37; white-space:nowrap;"><span style="width:6px; height:6px; border-radius:50%; background:#1A7F37;"></span>Strengthening</span>
+      </div>
+      <div class="lb" style="font-size:10.5px; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:6px; padding-top:12px; border-top:1px solid #F0F0EB;">What changed</div>
+      <div style="font-size:12.5px; line-height:1.62; color:#3A3A36;">Loan growth beat for a third straight quarter. Net interest margin held at 4.62% through the August rate cut, against a sector median that compressed 18 basis points.</div>
+    </div>
+
+    <div>
+      <sc-for list="{{ proof }}" as="pr" hint-placeholder-count="3">
+        <div style="display:grid; grid-template-columns:18px minmax(0,1fr); gap:10px; padding:8px 0;">
+          <svg width="16" height="16" viewBox="0 0 18 18" fill="none" style="margin-top:2px;"><path d="M4.4 9.4 L7.2 12.2 L13.6 5.8" stroke="#1A7F37" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+          <span style="font-size:13px; line-height:1.6; color:#3A3A36; overflow-wrap:break-word;">{{ pr.text }}</span>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{}">
+class Component extends DCLogic {
+  state = {
+    width: typeof window !== 'undefined' ? window.innerWidth : 1480,
+    mode: 'Sign in',
+    name: '',
+    email: '',
+    password: '',
+    reveal: false,
+    touched: false,
+  };
+
+  componentDidMount() { this._r = () => this.setState({ width: window.innerWidth }); window.addEventListener('resize', this._r); }
+  componentWillUnmount() { window.removeEventListener('resize', this._r); }
+
+  renderVals() {
+    const w = this.state.width, s = this.state;
+    const isSignUp = s.mode === 'Create account';
+    const pw = s.password || '';
+    let score = 0;
+    if (pw.length >= 8) score += 1;
+    if (/[A-Z]/.test(pw)) score += 1;
+    if (/[0-9]/.test(pw)) score += 1;
+    if (/[^A-Za-z0-9]/.test(pw)) score += 1;
+    const strengthMeta = [
+      { label: 'Too short', color: '#9A9A94' },
+      { label: 'Weak', color: '#D93025' },
+      { label: 'Fair', color: '#B26B00' },
+      { label: 'Good', color: '#1A7F37' },
+      { label: 'Strong', color: '#166B2E' },
+    ][score];
+
+    return {
+      shellGrid: w < 960 ? '1fr' : 'minmax(0,1fr) minmax(0,0.92fr)',
+      asideDisplay: w < 960 ? 'none' : 'flex',
+
+      modes: ['Sign in', 'Create account'].map(l => ({
+        label: l,
+        select: () => this.setState({ mode: l, touched: false }),
+        bg: l === s.mode ? '#FFFFFF' : 'transparent',
+        color: l === s.mode ? '#0A0A0A' : '#6B6B66',
+        weight: l === s.mode ? 600 : 500,
+      })),
+      isSignUp,
+      isSignIn: !isSignUp,
+      heading: isSignUp ? 'Start reading the filings' : 'Welcome back',
+      subheading: isSignUp
+        ? 'Fourteen days of full research on every PSE-listed company.'
+        : 'Pick up where you left off \u2014 two theses moved since Tuesday.',
+
+      name: s.name,
+      onName: e => this.setState({ name: e.target.value }),
+      email: s.email,
+      onEmail: e => this.setState({ email: e.target.value, touched: true }),
+      emailError: s.touched && s.email.trim() !== '' && s.email.indexOf('@') === -1,
+      emailBorder: (s.touched && s.email.trim() !== '' && s.email.indexOf('@') === -1) ? '#D93025' : '#DCDCD5',
+
+      password: s.password,
+      onPassword: e => this.setState({ password: e.target.value }),
+      pwType: s.reveal ? 'text' : 'password',
+      pwPlaceholder: isSignUp ? 'At least 8 characters' : 'Your password',
+      toggleReveal: () => this.setState({ reveal: !s.reveal }),
+      slashPath: s.reveal ? 'M4.4 19.6 L19.6 4.4' : 'M12 12 L12 12',
+
+      strengthBars: [0, 1, 2, 3].map(i => ({
+        bg: i < score ? strengthMeta.color : '#E8E8E3',
+      })),
+      strengthLabel: pw === '' ? 'Not set' : strengthMeta.label,
+      strengthColor: pw === '' ? '#9A9A94' : strengthMeta.color,
+
+      submit: () => this.setState({ touched: true }),
+      submitLabel: isSignUp ? 'Start free trial' : 'Sign in',
+      switchPrompt: isSignUp ? 'Already have an account?' : 'New to StockEX?',
+      switchAction: isSignUp ? 'Sign in' : 'Create an account',
+      switchMode: () => this.setState({ mode: isSignUp ? 'Sign in' : 'Create account', touched: false }),
+
+      proof: [
+        { text: 'Around 280 PSE-listed companies, scored from audited filings.' },
+        { text: 'No buy or sell calls \u2014 states and the evidence behind them.' },
+        { text: 'Not a broker. We hold no funds and place no orders.' },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>
