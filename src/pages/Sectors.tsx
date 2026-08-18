@@ -240,7 +240,7 @@ export default function Sectors() {
       </div>
 
       {/* ── Sector Table ── */}
-      <div style={{ border: "1px solid var(--border)", borderRadius: 8, overflow: "hidden", background: "var(--bg-card)" }}>
+      <div style={{ border: "1px solid var(--border)", borderRadius: 12, overflow: "hidden", background: "var(--bg-card)" }}>
         <div style={{
           display: "grid",
           gridTemplateColumns: "160px 100px 110px 110px 120px 120px",

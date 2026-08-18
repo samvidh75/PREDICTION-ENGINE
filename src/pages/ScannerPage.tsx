@@ -257,7 +257,7 @@ export default function ScannerPage() {
       </div>
 
       {/* ── Data Table ── */}
-      <div style={{ border: "1px solid var(--border)", borderRadius: 8, overflow: "hidden", background: "var(--bg-card)" }}>
+      <div style={{ border: "1px solid var(--border)", borderRadius: 12, overflow: "hidden", background: "var(--bg-card)" }}>
 
         {/* Table Header */}
         <div style={{
