@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <script src="_ds/raycast-command-ui-917818a8-4c87-4b33-aa1f-77e2df663ec5/_ds_bundle.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    body { margin:0; background:#FAFAF7; font-family:"Instrument Sans", -apple-system, BlinkMacSystemFont, sans-serif; -webkit-font-smoothing:antialiased; color:#0A0A0A; }
+    * { box-sizing:border-box; }
+    .n { font-family:"IBM Plex Mono", ui-monospace, monospace; font-variant-numeric:tabular-nums; letter-spacing:-0.02em; }
+    .lb { font-size:12.5px; color:#6B6B66; }
+    a { color:#0A0A0A; text-decoration:none; }
+    a:hover { color:#1A7F37; }
+    ::selection { background:#D8EEDF; }
+    .cd { background:#FFFFFF; border:1px solid #E8E8E3; border-radius:12px; }
+    ::-webkit-scrollbar { width:9px; height:9px; }
+    ::-webkit-scrollbar-thumb { background:#DEDED7; border-radius:8px; }
+    @media (prefers-reduced-motion: reduce) { * { animation:none !important; transition:none !important; } }
+  </style>
+</helmet>
+
+<div style="min-height:100dvh; background:#FAFAF7; padding-bottom:{{ pageBottomPad }};">
+
+  <sc-if value="{{ showBottomNav }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed; left:0; right:0; bottom:0; z-index:60; background:#FFFFFFF2; backdrop-filter:saturate(180%) blur(12px); border-top:1px solid #E4E4DE; padding-bottom:env(safe-area-inset-bottom);">
+      <div style="display:grid; grid-template-columns:repeat(5, minmax(0,1fr));">
+        <sc-for list="{{ bottomItems }}" as="bi" hint-placeholder-count="5">
+          <a href="{{ bi.href }}" style="display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; min-height:56px; padding:8px 2px; color:{{ bi.color }};">
+            <svg width="21" height="21" viewBox="0 0 24 24" fill="none"><path d="{{ bi.icon }}" stroke="{{ bi.color }}" stroke-width="{{ bi.stroke }}" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+            <span style="font-size:10px; font-weight:{{ bi.weight }}; letter-spacing:0.01em;">{{ bi.label }}</span>
+          </a>
+        </sc-for>
+      </div>
+    </div>
+  </sc-if>
+  <div style="position:sticky; top:0; z-index:30; background:#FAFAF7; border-bottom:1px solid #E8E8E3;">
+    <div style="width:100%; max-width:1480px; margin:0 auto; padding:0 clamp(14px,2vw,26px); height:64px; display:flex; align-items:center; gap:clamp(14px,2.4vw,34px);">
+      <a href="StockStory Shell.dc.html" style="display:flex; align-items:center; gap:10px; flex-shrink:0;">
+        <svg width="30" height="30" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="9" fill="#0A0A0A"></rect><path d="M21 11.4 C21 8.6 11.6 8.8 11.6 13 C11.6 17.2 21 15.6 21 19.8 C21 24 11.6 23.6 11.6 20.8" stroke="#FFFFFF" stroke-width="2.1" stroke-linecap="round" fill="none"></path></svg>
+        <span style="line-height:1.1;"><span style="display:block; font-size:17px; font-weight:600; letter-spacing:-0.02em;">StockEX<span style="font-size:8.5px; font-weight:500; vertical-align:super; letter-spacing:0; margin-left:1px; color:#9A9A94;">&#8482;</span></span><span style="display:block; font-size:11.5px; color:#6B6B66;">Philippines</span></span>
+      </a>
+      <sc-if value="{{ showNav }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex; align-items:center; gap:clamp(12px,1.6vw,26px); margin-left:clamp(8px,2vw,28px);">
+          <sc-for list="{{ topNav }}" as="t" hint-placeholder-count="6">
+            <a href="{{ t.href }}" style="display:flex; align-items:center; gap:5px; font-size:14px; font-weight:{{ t.weight }}; color:{{ t.color }}; padding:20px 0; border-bottom:2px solid {{ t.rule }}; white-space:nowrap;" style-hover="color:#1A7F37;">{{ t.label }}<sc-if value="{{ t.caret }}" hint-placeholder-val="{{ false }}"><svg width="9" height="9" viewBox="0 0 12 12" fill="none"><path d="M2.5 4.5 L6 8 L9.5 4.5" stroke="#6B6B66" stroke-width="1.5" stroke-linecap="round"></path></svg></sc-if></a>
+          </sc-for>
+        </div>
+      </sc-if>
+      <div style="flex:1;"></div>
+      <a href="StockStory Search.dc.html" style="display:flex; align-items:center; gap:8px; height:34px; padding:0 11px; border-radius:8px; border:1px solid #E4E4DE; background:#FFFFFF; color:#8A8A84;" style-hover="border-color:#0A0A0A; color:#0A0A0A;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="10.8" cy="10.8" r="6.6" stroke="currentColor" stroke-width="1.8"></circle><path d="M15.6 15.6 L20.4 20.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path></svg>
+        <span style="font-size:12.5px; display:{{ searchLabelShow }};">Search</span>
+        <span class="n" style="padding:2px 6px; border-radius:5px; background:#F4F4EF; font-size:10px; color:#9A9A94; display:{{ searchKbdShow }};">⌘K</span>
+      </a>
+      <sc-if value="{{ showNav }}" hint-placeholder-val="{{ true }}">
+        <a href="StockStory Sign In.dc.html" style="font-size:14px; font-weight:500; white-space:nowrap;">Sign in</a>
+      </sc-if>
+      <a href="StockStory Pricing.dc.html" style="display:inline-flex; align-items:center; gap:7px; height:42px; padding:0 18px; border-radius:9px; background:#0A0A0A; color:#FFFFFF; font-size:14px; font-weight:500; white-space:nowrap;" style-hover="background:#1A1A1A; color:#FFFFFF;">Start Free Trial <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M3 9 L9 3 M9 3 H4.6 M9 3 V7.4" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round"></path></svg></a>
+    </div>
+  </div>
+
+  <div style="width:100%; max-width:1480px; margin:0 auto; padding:clamp(12px,1.6vw,18px) clamp(14px,2vw,26px) 0;">
+    <div class="cd" style="display:grid; grid-template-columns:{{ tapeGrid }}; overflow:hidden;">
+      <sc-for list="{{ indices }}" as="ix" hint-placeholder-count="4">
+        <div style="padding:13px 17px; border-right:1px solid #E8E8E3; border-top:{{ ix.topRule }}; display:flex; flex-direction:column; gap:9px; min-width:0;">
+          <div style="min-width:0;">
+            <div style="font-size:10.5px; font-weight:600; color:#6B6B66; letter-spacing:0.09em; text-transform:uppercase; margin-bottom:5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ ix.name }}</div>
+            <div style="display:flex; align-items:baseline; gap:7px; flex-shrink:0; white-space:nowrap;">
+              <span class="n" style="font-size:17.5px; font-weight:600; letter-spacing:-0.025em;">{{ ix.value }}</span>
+              <span class="n" style="font-size:12.5px; font-weight:500; color:{{ ix.color }};">{{ ix.change }}</span>
+            </div>
+          </div>
+          <div style="width:100%; min-width:0; display:{{ rangeDisplay }}; flex-direction:column; gap:4px;">
+            <div style="position:relative; height:4px; border-radius:2px; background:#EDEDE8;">
+              <span style="position:absolute; left:0; width:{{ ix.pos }}; height:4px; border-radius:2px; background:{{ ix.color }}; opacity:0.26;"></span>
+              <span style="position:absolute; left:{{ ix.pos }}; top:-2px; width:2px; height:8px; border-radius:1px; background:{{ ix.color }}; transform:translateX(-1px);"></span>
+            </div>
+            <div style="display:flex; align-items:baseline; justify-content:space-between; gap:6px;">
+              <span class="n" style="font-size:11px; color:#6B6B66; white-space:nowrap;">{{ ix.low }}</span>
+              <span class="lb" style="font-size:10px; letter-spacing:0.06em; color:#6B6B66;">DAY</span>
+              <span class="n" style="font-size:11px; color:#6B6B66; white-space:nowrap;">{{ ix.high }}</span>
+            </div>
+          </div>
+        </div>
+      </sc-for>
+      <div style="padding:13px 17px; display:flex; flex-direction:column; justify-content:center; gap:3px; grid-column:{{ statusSpan }}; border-top:{{ statusTopRule }};">
+        <div style="display:flex; align-items:center; gap:6px; font-size:13px; font-weight:500; color:#1A7F37; white-space:nowrap;"><span style="width:6px; height:6px; border-radius:50%; background:#1A7F37;"></span>Market is Open</div>
+        <div class="lb" style="font-size:11.5px; white-space:nowrap;">Closes 3:30 PM PHT</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="width:100%; max-width:1480px; margin:0 auto; padding:clamp(12px,1.6vw,18px) clamp(14px,2vw,26px) clamp(28px,3.4vw,48px); display:grid; grid-template-columns:{{ shellGrid }}; gap:clamp(12px,1.4vw,18px); align-items:start;">
+
+    <div class="cd" style="padding:18px; min-width:0; position:{{ railPosition }}; top:80px;">
+      <div style="margin-bottom:6px; font-size:16.5px; font-weight:600; letter-spacing:-0.02em;">Stock Scanner</div>
+      <div class="lb" style="font-size:12.5px; line-height:1.55; margin-bottom:14px;">Filter the PSE by factor score, sector, and financial quality.</div>
+      <div onClick="{{ toggleSaved }}" style="display:inline-flex; align-items:center; gap:8px; height:34px; padding:0 13px; border-radius:8px; border:1px solid #DCDCD5; background:#FFFFFF; font-size:12.5px; font-weight:500; cursor:pointer;" style-hover="border-color:#0A0A0A;" style-active="background:#F2F2ED;">
+        <svg width="14" height="14" viewBox="0 0 20 20" fill="none"><path d="M5 3.4 H15 V17 L10 13.2 L5 17 Z" stroke="#0A0A0A" stroke-width="1.5" stroke-linejoin="round"></path></svg>Saved screens
+      </div>
+
+      <div style="display:flex; align-items:baseline; justify-content:space-between; gap:10px; margin:20px 0 4px; padding-top:16px; border-top:1px solid #E8E8E3;">
+        <span style="font-size:13.5px; font-weight:600;">Filters</span>
+        <span onClick="{{ resetAll }}" style="font-size:12px; color:#6B6B66; cursor:pointer;" style-hover="color:#1A7F37;">Reset all</span>
+      </div>
+
+      <div style="padding:13px 0; border-bottom:1px solid #F0F0EB;">
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:5px;">
+          <span style="display:flex; align-items:center; gap:7px; font-size:12.5px; font-weight:500;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 3.6 A8.4 8.4 0 1 1 11.99 3.6 Z M3.6 12 H20.4 M12 3.6 C14.6 6.4 14.6 17.6 12 20.4 C9.4 17.6 9.4 6.4 12 3.6" stroke="#1A7F37" stroke-width="1.6" stroke-linecap="round"></path></svg>Universe</span>
+          <span style="font-size:11.5px; color:#6B6B66;">Edit</span>
+        </div>
+        <div class="lb" style="font-size:12px; padding-left:21px;">Philippines — PSE Main &amp; SME</div>
+        <div class="lb" style="font-size:11.5px; padding-left:21px;">280 listed companies</div>
+      </div>
+
+      <div style="padding:15px 0; border-bottom:1px solid #F0F0EB;">
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:12px;">
+          <span style="display:flex; align-items:center; gap:7px; font-size:12.5px; font-weight:500;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M4 20 V10 M9.4 20 V5 M14.8 20 V13 M20.2 20 V8" stroke="#1A7F37" stroke-width="1.6" stroke-linecap="round"></path></svg>Score range</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:9px;">
+          <span class="n" style="min-width:32px; height:26px; display:flex; align-items:center; justify-content:center; border:1px solid #DCDCD5; border-radius:6px; font-size:11.5px;">{{ scoreMin }}</span>
+          <span style="flex:1; position:relative; height:26px; display:flex; align-items:center;">
+            <span style="position:absolute; left:0; right:0; height:3px; background:#EDEDE8; border-radius:2px;"></span>
+            <span style="position:absolute; left:{{ scoreFillLeft }}; right:0; height:3px; background:#1A7F37; border-radius:2px;"></span>
+            <input type="range" min="0" max="95" step="5" value="{{ scoreMin }}" onChange="{{ onScoreChange }}" style="position:absolute; left:0; right:0; width:100%; margin:0; appearance:none; background:transparent; height:26px; cursor:pointer;">
+          </span>
+          <span class="n" style="min-width:32px; height:26px; display:flex; align-items:center; justify-content:center; border:1px solid #DCDCD5; border-radius:6px; font-size:11.5px;">100</span>
+        </div>
+      </div>
+
+      <sc-for list="{{ filterRows }}" as="fr" hint-placeholder-count="6">
+        <div style="display:grid; grid-template-columns:minmax(0,1fr) auto; gap:8px; align-items:center; padding:11px 0; border-bottom:1px solid #F0F0EB; cursor:pointer;" style-hover="background:#FAFAF7;">
+          <span style="display:flex; align-items:center; gap:7px; font-size:12.5px; font-weight:500; min-width:0;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;"><path d="{{ fr.icon }}" stroke="#1A7F37" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+            <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ fr.label }}</span>
+          </span>
+          <span style="display:flex; align-items:center; gap:6px; flex-shrink:0;">
+            <span class="lb" style="font-size:11.5px; white-space:nowrap;">{{ fr.value }}</span>
+            <svg width="9" height="9" viewBox="0 0 12 12" fill="none"><path d="M4 2.5 L7.5 6 L4 9.5" stroke="#B0B0A9" stroke-width="1.5" stroke-linecap="round"></path></svg>
+          </span>
+        </div>
+      </sc-for>
+
+      <div onClick="{{ runScan }}" style="display:flex; align-items:center; justify-content:center; gap:9px; height:46px; margin-top:18px; border-radius:9px; background:#0A0A0A; color:#FFFFFF; font-size:14px; font-weight:600; cursor:pointer;" style-hover="background:#1A1A1A;" style-active="background:#000000;">
+        Run scan
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="#FFFFFF" stroke-width="1.9"></circle><path d="M21 21 L16.5 16.5" stroke="#FFFFFF" stroke-width="1.9" stroke-linecap="round"></path></svg>
+      </div>
+      <div style="display:flex; align-items:center; justify-content:center; gap:8px; height:42px; margin-top:9px; border-radius:9px; border:1px solid #DCDCD5; font-size:13px; font-weight:500; cursor:pointer;" style-hover="border-color:#0A0A0A;">
+        <svg width="14" height="14" viewBox="0 0 20 20" fill="none"><path d="M4.6 15.4 V4.6 H12.4 L15.4 7.6 V15.4 Z M7.4 4.6 V8.4 H12.4" stroke="#0A0A0A" stroke-width="1.5" stroke-linejoin="round"></path></svg>
+        Save as new screen
+      </div>
+    </div>
+
+    <div style="min-width:0; display:flex; flex-direction:column; gap:clamp(12px,1.4vw,18px);">
+
+      <div class="cd" style="display:grid; grid-template-columns:{{ kpiGrid }}; overflow:hidden;">
+        <sc-for list="{{ kpis }}" as="k" hint-placeholder-count="4">
+          <div style="padding:15px 17px; border-right:1px solid #E8E8E3; border-top:{{ k.topRule }}; display:flex; align-items:flex-start; justify-content:space-between; gap:10px; min-width:0;">
+            <div style="min-width:0;">
+              <div class="lb" style="font-size:12px; margin-bottom:5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ k.label }}</div>
+              <div class="n" style="font-size:22px; font-weight:600; letter-spacing:-0.025em; color:{{ k.color }};">{{ k.value }}</div>
+              <div class="lb" style="font-size:11px; margin-top:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ k.sub }}</div>
+            </div>
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" style="flex-shrink:0; margin-top:2px;"><path d="{{ k.icon }}" stroke="#B8C4BC" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+          </div>
+        </sc-for>
+      </div>
+
+      <div class="cd" style="min-width:0; overflow:hidden;">
+        <div style="display:grid; grid-template-columns:{{ toolbarGrid }}; gap:12px; align-items:center; padding:14px 16px; border-bottom:1px solid #E8E8E3;">
+          <div style="display:flex; align-items:center; gap:10px; min-width:0;">
+            <span class="lb" style="font-size:12.5px; white-space:nowrap; display:{{ searchLabelDisplay }};">Search company</span>
+            <div style="flex:1; min-width:0; display:flex; align-items:center; gap:8px; height:38px; padding:0 12px; border:1px solid #DCDCD5; border-radius:8px; background:#FFFFFF;">
+              <input placeholder="e.g. BDO, Jollibee, ICTSI" value="{{ query }}" onChange="{{ onQueryChange }}" style="flex:1; min-width:0; border:none; outline:none; background:none; font-family:inherit; font-size:13px; color:#0A0A0A;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;"><circle cx="11" cy="11" r="7" stroke="#9A9A94" stroke-width="1.8"></circle><path d="M21 21 L16.5 16.5" stroke="#9A9A94" stroke-width="1.8" stroke-linecap="round"></path></svg>
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; gap:9px; justify-content:flex-end; flex-wrap:wrap;">
+            <span class="lb" style="font-size:12.5px; white-space:nowrap;">Sort by</span>
+            <select value="{{ sortKey }}" onChange="{{ onSortChange }}" style="height:38px; padding:0 10px; border:1px solid #DCDCD5; border-radius:8px; background:#FFFFFF; font-family:inherit; font-size:13px; color:#0A0A0A; cursor:pointer;">
+              <option value="score">Score (high to low)</option>
+              <option value="change">1D change</option>
+              <option value="price">Price</option>
+              <option value="name">Company name</option>
+            </select>
+            <div style="display:flex; align-items:center; gap:7px; height:38px; padding:0 13px; border:1px solid #DCDCD5; border-radius:8px; font-size:12.5px; font-weight:500; cursor:pointer; white-space:nowrap;" style-hover="border-color:#0A0A0A;">
+              <svg width="14" height="14" viewBox="0 0 20 20" fill="none"><path d="M10 3.4 V12.6 M6.4 9.4 L10 13 L13.6 9.4 M4 16.2 H16" stroke="#0A0A0A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>Export
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:8px; padding:11px 16px; border-bottom:1px solid #E8E8E3; flex-wrap:wrap;">
+          <sc-for list="{{ chips }}" as="c" hint-placeholder-count="3">
+            <span style="display:inline-flex; align-items:center; gap:7px; height:28px; padding:0 11px; border-radius:7px; background:#EDF6F0; border:1px solid #D3E8DA; font-size:11.5px; font-weight:500; color:#1A6E33; white-space:nowrap;">{{ c.label }}<span onClick="{{ c.remove }}" style="cursor:pointer; color:#5A9C6E; font-size:13px; line-height:1;">×</span></span>
+          </sc-for>
+          <span onClick="{{ resetAll }}" style="font-size:11.5px; color:#6B6B66; cursor:pointer; padding:0 4px;" style-hover="color:#1A7F37;">Clear all</span>
+        </div>
+
+        <div style="overflow-x:auto;">
+          <div style="min-width:{{ tableMinWidth }};">
+            <div style="display:grid; grid-template-columns:{{ rowGrid }}; gap:10px; align-items:center; padding:10px 16px; border-bottom:1px solid #E8E8E3; background:#FBFBF8;">
+              <span class="lb" style="font-size:11px; font-weight:600;">Rank</span>
+              <span class="lb" style="font-size:11px; font-weight:600;">Company</span>
+              <span class="lb" style="font-size:11px; font-weight:600; display:{{ sectorDisplay }};">Sector</span>
+              <span class="lb" style="font-size:11px; font-weight:600; text-align:center;">Score</span>
+              <span class="lb" style="font-size:11px; font-weight:600; text-align:right;">Price ₱</span>
+              <span class="lb" style="font-size:11px; font-weight:600; text-align:right;">1D</span>
+              <span class="lb" style="font-size:11px; font-weight:600; display:{{ factorsDisplay }};">Factors</span>
+              <span class="lb" style="font-size:11px; font-weight:600; display:{{ stateDisplay }};">Research state</span>
+              <span class="lb" style="font-size:11px; font-weight:600; text-align:right; display:{{ coverDisplay }};">Coverage</span>
+            </div>
+            <sc-for list="{{ rows }}" as="r" hint-placeholder-count="6">
+              <a href="StockStory Stock Detail.dc.html" style="display:grid; grid-template-columns:{{ rowGrid }}; gap:10px; align-items:center; padding:12px 16px; border-bottom:1px solid #F0F0EB; color:#0A0A0A;" style-hover="background:#FAFAF7;">
+                <span class="n" style="font-size:12.5px; color:#9A9A94;">{{ r.rank }}</span>
+                <span style="display:flex; align-items:center; gap:10px; min-width:0;">
+                  <span style="width:30px; height:30px; border-radius:7px; background:{{ r.logoBg }}; color:#FFFFFF; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; flex-shrink:0;">{{ r.ticker }}</span>
+                  <span style="min-width:0;">
+                    <span style="display:block; font-size:13px; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ r.ticker }}</span>
+                    <span class="lb" style="display:block; font-size:11.5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ r.name }}</span>
+                  </span>
+                </span>
+                <span class="lb" style="font-size:12px; display:{{ sectorDisplay }}; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ r.sector }}</span>
+                <span style="display:flex; flex-direction:column; align-items:center; gap:2px; padding:5px 0; border-radius:7px; background:{{ r.scoreBg }}; border:1px solid {{ r.scoreBorder }};">
+                  <span class="n" style="font-size:15px; font-weight:600; color:{{ r.scoreColor }}; line-height:1;">{{ r.score }}</span>
+                  <span style="font-size:9px; font-weight:600; color:{{ r.scoreColor }};">{{ r.scoreLabel }}</span>
+                </span>
+                <span class="n" style="font-size:13px; font-weight:500; text-align:right;">{{ r.price }}</span>
+                <span class="n" style="font-size:12.5px; text-align:right; color:{{ r.changeColor }};">{{ r.change }}</span>
+                <span style="display:{{ factorsDisplay }};">
+                  <span style="display:flex; gap:3px;">
+                    <sc-for list="{{ r.factors }}" as="fx" hint-placeholder-count="5">
+                      <span style="width:23px; padding:3px 0; border-radius:5px; background:{{ fx.bg }}; text-align:center;">
+                        <span style="display:block; font-size:8px; font-weight:700; color:{{ fx.color }}; line-height:1.2;">{{ fx.key }}</span>
+                        <span class="n" style="display:block; font-size:9.5px; font-weight:600; color:{{ fx.color }}; line-height:1.2;">{{ fx.val }}</span>
+                      </span>
+                    </sc-for>
+                  </span>
+                </span>
+                <span style="display:{{ stateDisplay }}; align-items:center; gap:6px; font-size:11.5px; font-weight:500; color:{{ r.stateColor }}; white-space:nowrap;"><span style="width:6px; height:6px; border-radius:50%; background:{{ r.stateColor }}; flex-shrink:0;"></span>{{ r.state }}</span>
+                <span style="display:{{ coverDisplay }}; align-items:center; justify-content:flex-end; gap:7px;">
+                  <svg viewBox="0 0 28 28" width="22" height="22" style="transform:rotate(-90deg); flex-shrink:0;">
+                    <circle cx="14" cy="14" r="11" stroke="#EDEDE8" stroke-width="3.4" fill="none"></circle>
+                    <circle cx="14" cy="14" r="11" stroke="#1A7F37" stroke-width="3.4" fill="none" stroke-linecap="round" stroke-dasharray="{{ r.coverDash }}"></circle>
+                  </svg>
+                  <span class="n" style="font-size:12px; font-weight:500;">{{ r.coverage }}</span>
+                </span>
+              </a>
+            </sc-for>
+            <sc-if value="{{ isEmpty }}" hint-placeholder-val="{{ false }}">
+              <div style="padding:44px 16px; text-align:center;">
+                <div style="font-size:14px; font-weight:600; margin-bottom:6px;">No companies match these filters</div>
+                <div class="lb" style="font-size:13px;">Try lowering the score floor or widening the sector selection.</div>
+              </div>
+            </sc-if>
+          </div>
+        </div>
+
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 16px; border-top:1px solid #E8E8E3; flex-wrap:wrap;">
+          <span class="lb" style="font-size:12.5px;">{{ resultSummary }}</span>
+          <div style="display:flex; align-items:center; gap:5px;">
+            <span onClick="{{ prevPage }}" style="width:30px; height:30px; display:flex; align-items:center; justify-content:center; border:1px solid #DCDCD5; border-radius:7px; cursor:pointer;" style-hover="border-color:#0A0A0A;"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M7.5 2.5 L4 6 L7.5 9.5" stroke="#0A0A0A" stroke-width="1.5" stroke-linecap="round"></path></svg></span>
+            <sc-for list="{{ pageButtons }}" as="pb" hint-placeholder-count="4">
+              <span onClick="{{ pb.go }}" class="n" style="min-width:30px; height:30px; display:flex; align-items:center; justify-content:center; padding:0 7px; border:1px solid {{ pb.border }}; background:{{ pb.bg }}; color:{{ pb.color }}; border-radius:7px; font-size:12px; cursor:pointer;">{{ pb.label }}</span>
+            </sc-for>
+            <span onClick="{{ nextPage }}" style="width:30px; height:30px; display:flex; align-items:center; justify-content:center; border:1px solid #DCDCD5; border-radius:7px; cursor:pointer;" style-hover="border-color:#0A0A0A;"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M4.5 2.5 L8 6 L4.5 9.5" stroke="#0A0A0A" stroke-width="1.5" stroke-linecap="round"></path></svg></span>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:grid; grid-template-columns:{{ analyticsGrid }}; gap:clamp(12px,1.4vw,18px);">
+        <div class="cd" style="padding:16px; min-width:0;">
+          <div style="font-size:13.5px; font-weight:600; margin-bottom:14px;">Factor distribution</div>
+          <sc-for list="{{ distribution }}" as="d" hint-placeholder-count="5">
+            <div style="display:grid; grid-template-columns:66px minmax(0,1fr) 30px; gap:9px; align-items:center; padding:6px 0;">
+              <span class="lb" style="font-size:11.5px;">{{ d.name }}</span>
+              <span style="height:6px; background:#EDEDE8; border-radius:3px; overflow:hidden;"><span style="display:block; height:6px; width:{{ d.width }}; background:#1A7F37; border-radius:3px;"></span></span>
+              <span class="n" style="font-size:11.5px; text-align:right; color:#3A3A36;">{{ d.avg }}</span>
+            </div>
+          </sc-for>
+          <div style="display:flex; justify-content:space-between; padding-top:9px; margin-top:5px; border-top:1px solid #F0F0EB;">
+            <sc-for list="{{ scaleTicks }}" as="tk" hint-placeholder-count="5">
+              <span class="lb" style="font-size:10px;">{{ tk.label }}</span>
+            </sc-for>
+          </div>
+        </div>
+
+        <div class="cd" style="padding:16px; min-width:0;">
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:14px;">
+            <span style="font-size:13.5px; font-weight:600;">Score heatmap</span>
+            <span class="lb" style="font-size:11px;">By sector</span>
+          </div>
+          <div style="display:grid; grid-template-columns:repeat(10, minmax(0,1fr)); gap:3px;">
+            <sc-for list="{{ heatmap }}" as="h" hint-placeholder-count="40">
+              <span style="aspect-ratio:1; border-radius:3px; background:{{ h.bg }};"></span>
+            </sc-for>
+          </div>
+          <div style="display:flex; align-items:center; gap:9px; margin-top:13px; padding-top:11px; border-top:1px solid #F0F0EB;">
+            <span class="lb" style="font-size:10.5px; white-space:nowrap;">Low</span>
+            <span style="flex:1; height:6px; border-radius:3px; background:linear-gradient(90deg,#F7DCD8,#F1EFE4,#BEE0C9,#1A7F37);"></span>
+            <span class="lb" style="font-size:10.5px; white-space:nowrap;">High</span>
+          </div>
+        </div>
+
+        <div class="cd" style="padding:16px; min-width:0;">
+          <div style="font-size:13.5px; font-weight:600; margin-bottom:3px;">Market breadth</div>
+          <div class="lb" style="font-size:11px; margin-bottom:14px;">Advances vs declines</div>
+          <div style="display:grid; grid-template-columns:auto minmax(0,1fr) auto; gap:12px; align-items:center;">
+            <div style="text-align:center;">
+              <div class="n" style="font-size:20px; font-weight:600; color:#1A7F37;">124</div>
+              <div class="lb" style="font-size:11px;">Advances</div>
+            </div>
+            <div style="display:flex; justify-content:center;">
+              <svg viewBox="0 0 72 72" width="72" height="72" style="transform:rotate(-90deg);">
+                <circle cx="36" cy="36" r="28" stroke="#F2F2ED" stroke-width="11" fill="none"></circle>
+                <circle cx="36" cy="36" r="28" stroke="#D93025" stroke-width="11" fill="none" stroke-dasharray="{{ breadthRedDash }}"></circle>
+                <circle cx="36" cy="36" r="28" stroke="#1A7F37" stroke-width="11" fill="none" stroke-dasharray="{{ breadthGreenDash }}"></circle>
+              </svg>
+            </div>
+            <div style="text-align:center;">
+              <div class="n" style="font-size:20px; font-weight:600; color:#D93025;">86</div>
+              <div class="lb" style="font-size:11px;">Declines</div>
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:13px; padding-top:11px; border-top:1px solid #F0F0EB;">
+            <span class="lb" style="font-size:11.5px;">Unchanged 31</span>
+            <span class="lb" style="font-size:11.5px;">Total 241</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="min-width:0; display:{{ insightsDisplay }}; flex-direction:column; gap:clamp(12px,1.4vw,18px);">
+      <div class="cd" style="padding:16px;">
+        <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 4 V6.4 M12 17.6 V20 M4 12 H6.4 M17.6 12 H20 M6.6 6.6 L8.3 8.3 M15.7 15.7 L17.4 17.4 M17.4 6.6 L15.7 8.3 M8.3 15.7 L6.6 17.4" stroke="#1A7F37" stroke-width="1.6" stroke-linecap="round"></path><circle cx="12" cy="12" r="3.2" stroke="#1A7F37" stroke-width="1.6"></circle></svg>
+          <span style="font-size:13.5px; font-weight:600;">Why these rank high</span>
+        </div>
+        <div class="lb" style="font-size:11.5px; margin-bottom:14px;">Read from this quarter's filings</div>
+        <sc-for list="{{ insights }}" as="ins" hint-placeholder-count="4">
+          <div style="display:grid; grid-template-columns:26px minmax(0,1fr); gap:10px; padding:11px 0; border-top:1px solid #F0F0EB;">
+            <span style="width:26px; height:26px; border-radius:7px; background:#F2F5F3; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="{{ ins.icon }}" stroke="#1A7F37" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+            </span>
+            <span style="min-width:0;">
+              <span style="display:block; font-size:12.5px; font-weight:600; margin-bottom:3px;">{{ ins.title }}</span>
+              <span class="lb" style="display:block; font-size:12px; line-height:1.55;">{{ ins.body }}</span>
+            </span>
+          </div>
+        </sc-for>
+      </div>
+
+      <div class="cd" style="padding:16px;">
+        <div style="font-size:13.5px; font-weight:600; margin-bottom:3px;">Top sectors in scan</div>
+        <div class="lb" style="font-size:11px; margin-bottom:13px;">By average score</div>
+        <sc-for list="{{ topSectors }}" as="ts" hint-placeholder-count="5">
+          <div style="display:grid; grid-template-columns:minmax(0,1fr) 52px 26px; gap:9px; align-items:center; padding:6px 0;">
+            <span style="font-size:12px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ ts.name }}</span>
+            <span style="height:5px; background:#EDEDE8; border-radius:3px; overflow:hidden;"><span style="display:block; height:5px; width:{{ ts.width }}; background:#1A7F37; border-radius:3px;"></span></span>
+            <span class="n" style="font-size:11.5px; text-align:right;">{{ ts.avg }}</span>
+          </div>
+        </sc-for>
+      </div>
+
+      <div class="cd" style="padding:16px;">
+        <div style="font-size:13.5px; font-weight:600; margin-bottom:6px;">Save this screen</div>
+        <div class="lb" style="font-size:12px; line-height:1.55; margin-bottom:13px;">Get an alert when a company enters or leaves these filters.</div>
+        <div onClick="{{ toggleSaved }}" style="display:flex; align-items:center; justify-content:center; gap:8px; height:42px; border-radius:9px; border:1px solid #DCDCD5; font-size:13px; font-weight:500; cursor:pointer;" style-hover="border-color:#0A0A0A;" style-active="background:#F2F2ED;">
+          <svg width="15" height="15" viewBox="0 0 20 20" fill="none"><path d="M5 3.4 H15 V17 L10 13.2 L5 17 Z" stroke="#0A0A0A" stroke-width="1.5" stroke-linejoin="round"></path></svg>{{ savedLabel }}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{}">
+class Component extends DCLogic {
+  state = { width: typeof window !== 'undefined' ? window.innerWidth : 1480, query: '', sortKey: 'score', scoreMin: 50, page: 1, saved: false, sectors: null };
+
+  componentDidMount() { this._r = () => this.setState({ width: window.innerWidth }); window.addEventListener('resize', this._r); }
+  componentWillUnmount() { window.removeEventListener('resize', this._r); }
+
+  spark(vals, w, h, pad) {
+    const p = pad == null ? 3 : pad;
+    const lo = Math.min.apply(null, vals), hi = Math.max.apply(null, vals), span = (hi - lo) || 1;
+    return vals.map((v, i) => {
+      const x = p + (i / (vals.length - 1)) * (w - p * 2);
+      const y = h - p - ((v - lo) / span) * (h - p * 2);
+      return (i ? 'L' : 'M') + x.toFixed(1) + ' ' + y.toFixed(1);
+    }).join(' ');
+  }
+
+  // seeded random walk — irregular like real tape, stable across renders
+  walk(seed, n, drift, vol) {
+    let s = seed * 7919 + 13, v = 100, out = [];
+    const rnd = () => { s = (s * 1103515245 + 12345) & 0x7fffffff; return s / 0x7fffffff; };
+    for (let i = 0; i < n; i++) {
+      const shock = (rnd() < 0.08) ? (rnd() - 0.5) * vol * 3.4 : 0;
+      v += (rnd() - 0.5) * vol + drift + shock;
+      out.push(v);
+    }
+    return out;
+  }
+
+  band(s) {
+    if (s >= 85) return { label: 'Excellent', bg: '#EDF6F0', border: '#CDE5D6', color: '#166B2E' };
+    if (s >= 75) return { label: 'Very good', bg: '#F1F7F3', border: '#D8E8DD', color: '#1A7F37' };
+    if (s >= 60) return { label: 'Good', bg: '#F7F6EE', border: '#E5E2CF', color: '#7A6A22' };
+    return { label: 'Fair', bg: '#FAF3F2', border: '#EDD9D6', color: '#A33227' };
+  }
+
+  renderVals() {
+    const w = this.state.width, s = this.state;
+    const universe = [
+      { ticker: 'BDO', name: 'BDO Unibank, Inc.', sector: 'Financials', score: 92, price: 142.50, change: 1.82, logoBg: '#0A2C5C', state: 'Strengthening', coverage: 88, f: [92, 90, 85, 88, 87] },
+      { ticker: 'ICT', name: 'Int\u2019l Container Terminal Services', sector: 'Industrials', score: 89, price: 312.00, change: 3.48, logoBg: '#1F4E3D', state: 'Strengthening', coverage: 84, f: [90, 88, 80, 86, 91] },
+      { ticker: 'SM', name: 'SM Investments Corporation', sector: 'Holding Firms', score: 87, price: 945.00, change: 2.31, logoBg: '#8A1A12', state: 'Strengthening', coverage: 91, f: [88, 86, 78, 84, 89] },
+      { ticker: 'BPI', name: 'Bank of the Philippine Islands', sector: 'Financials', score: 84, price: 128.90, change: 1.21, logoBg: '#B8860B', state: 'Stable', coverage: 86, f: [86, 82, 80, 85, 79] },
+      { ticker: 'AC', name: 'Ayala Corporation', sector: 'Holding Firms', score: 81, price: 612.00, change: 0.94, logoBg: '#2C3E6B', state: 'Stable', coverage: 79, f: [84, 78, 76, 82, 77] },
+      { ticker: 'MER', name: 'Manila Electric Company', sector: 'Utilities', score: 79, price: 408.60, change: 0.42, logoBg: '#C8571B', state: 'Stable', coverage: 82, f: [82, 74, 79, 84, 72] },
+      { ticker: 'URC', name: 'Universal Robina Corporation', sector: 'Consumer', score: 76, price: 96.40, change: 0.68, logoBg: '#6B3E8A', state: 'Stable', coverage: 77, f: [78, 72, 77, 80, 71] },
+      { ticker: 'JFC', name: 'Jollibee Foods Corporation', sector: 'Consumer', score: 71, price: 228.40, change: -0.61, logoBg: '#C1272D', state: 'Needs review', coverage: 74, f: [74, 68, 70, 72, 66] },
+      { ticker: 'ALI', name: 'Ayala Land, Inc.', sector: 'Property', score: 68, price: 27.15, change: -0.22, logoBg: '#3B6E4F', state: 'Needs review', coverage: 71, f: [70, 64, 72, 68, 62] },
+      { ticker: 'TEL', name: 'PLDT Inc.', sector: 'Services', score: 61, price: 1285.00, change: -1.14, logoBg: '#1B3A6B', state: 'Risk rising', coverage: 69, f: [64, 56, 66, 58, 54] },
+    ];
+
+    const q = s.query.trim().toLowerCase();
+    let rows = universe.filter(r => r.score >= s.scoreMin);
+    if (q) rows = rows.filter(r => (r.ticker + ' ' + r.name + ' ' + r.sector).toLowerCase().indexOf(q) > -1);
+    const sorters = {
+      score: (a, b) => b.score - a.score,
+      change: (a, b) => b.change - a.change,
+      price: (a, b) => b.price - a.price,
+      name: (a, b) => a.name.localeCompare(b.name),
+    };
+    rows = rows.slice().sort(sorters[s.sortKey]);
+
+    const peso = v => '\u20B1' + v.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const fkeys = ['Q', 'G', 'V', 'R', 'M'];
+    const C = 2 * Math.PI * 11;
+    const stateColor = st => st === 'Strengthening' ? '#1A7F37' : (st === 'Stable' ? '#6B6B66' : (st === 'Needs review' ? '#B26B00' : '#D93025'));
+
+    const shaped = rows.map((r, i) => {
+      const b = this.band(r.score);
+      return {
+        rank: i + 1, ticker: r.ticker, name: r.name, sector: r.sector, logoBg: r.logoBg,
+        score: r.score, scoreLabel: b.label, scoreBg: b.bg, scoreBorder: b.border, scoreColor: b.color,
+        price: peso(r.price),
+        change: (r.change >= 0 ? '+' : '') + r.change.toFixed(2) + '%',
+        changeColor: r.change >= 0 ? '#1A7F37' : '#D93025',
+        state: r.state, stateColor: stateColor(r.state),
+        coverage: r.coverage + '%',
+        coverDash: (C * r.coverage / 100).toFixed(1) + ' ' + C.toFixed(1),
+        factors: r.f.map((v, k) => ({
+          key: fkeys[k], val: v,
+          bg: v >= 85 ? '#EDF6F0' : (v >= 70 ? '#F5F7F5' : '#FAF3F2'),
+          color: v >= 85 ? '#166B2E' : (v >= 70 ? '#4A5A4E' : '#A33227'),
+        })),
+      };
+    });
+
+    const heat = [];
+    for (let i = 0; i < 40; i++) {
+      const v = (Math.sin(i * 1.7) + Math.cos(i * 0.9)) * 0.5 + 0.5;
+      heat.push({ bg: v > 0.72 ? '#1A7F37' : (v > 0.54 ? '#7FBF95' : (v > 0.38 ? '#C9E3D2' : (v > 0.24 ? '#F1EFE4' : '#F7DCD8'))) });
+    }
+
+    const total = 241, breadthC = 2 * Math.PI * 28;
+    const navItems = [
+      { label: 'Research', href: 'StockStory Stock Detail.dc.html', caret: true },
+      { label: 'Scanner', href: 'StockStory Scanner.dc.html', caret: false, active: true },
+      { label: 'Compare', href: 'StockStory Compare.dc.html', caret: false },
+      { label: 'Watchlist', href: 'StockStory Watchlist.dc.html', caret: false },
+      { label: 'Portfolio', href: 'StockStory Portfolio.dc.html', caret: false },
+      { label: 'Pricing', href: 'StockStory Pricing.dc.html', caret: false },
+        { label: 'Methodology', href: 'StockStory Methodology.dc.html', caret: false },
+    ];
+
+    const wide = w >= 1340, mid = w >= 1080;
+    const pageCount = 6;
+    const pages = [1, 2, 3].filter(n => n <= pageCount).map(n => ({
+      label: String(n), go: () => this.setState({ page: n }),
+      bg: n === s.page ? '#0A0A0A' : '#FFFFFF', color: n === s.page ? '#FFFFFF' : '#0A0A0A',
+      border: n === s.page ? '#0A0A0A' : '#DCDCD5',
+    }));
+
+    return {
+      rangeDisplay: w < 400 ? 'none' : 'flex',
+      searchLabelShow: w >= 1240 ? 'inline' : 'none',
+      searchKbdShow: w >= 1240 ? 'inline' : 'none',
+      showBottomNav: w < 1080,
+      pageBottomPad: w < 1080 ? 'calc(66px + env(safe-area-inset-bottom))' : '0px',
+      bottomItems: [
+        { label: 'Home', href: 'StockStory Shell.dc.html', icon: 'M4.4 19.6 V9.8 L12 4.2 L19.6 9.8 V19.6 Z M9.4 19.6 V13.6 H14.6 V19.6' },
+        { label: 'Scanner', href: 'StockStory Scanner.dc.html', icon: 'M10.8 4.2 A6.6 6.6 0 1 1 10.79 4.2 Z M15.6 15.6 L20.4 20.4' },
+        { label: 'Watchlist', href: 'StockStory Watchlist.dc.html', icon: 'M12 3.8 L14.5 9.1 L20.3 9.9 L16.1 14 L17.2 19.8 L12 17 L6.8 19.8 L7.9 14 L3.7 9.9 L9.5 9.1 Z' },
+        { label: 'Portfolio', href: 'StockStory Portfolio.dc.html', icon: 'M3.8 19.6 H20.2 M6.8 19.6 V12.8 M11.2 19.6 V7.8 M15.6 19.6 V10.6 M20 19.6 V5.2' },
+        { label: 'Alerts', href: 'StockStory Alerts.dc.html', icon: 'M7.2 10.2 A4.8 4.8 0 0 1 16.8 10.2 C16.8 15 18.4 17 18.4 17 H5.6 C5.6 17 7.2 15 7.2 10.2 Z M10.2 19.6 A2.2 2.2 0 0 0 13.8 19.6' },
+      ].map(b => ({
+        ...b,
+        color: b.label === 'Scanner' ? '#0A0A0A' : '#9A9A94',
+        weight: b.label === 'Scanner' ? 600 : 500,
+        stroke: b.label === 'Scanner' ? 1.9 : 1.6,
+      })),
+      showNav: w >= 1080,
+      topNav: navItems.map(n => ({ ...n, weight: n.active ? 600 : 500, color: n.active ? '#0A0A0A' : '#3A3A36', rule: n.active ? '#1A7F37' : 'transparent' })),
+      tapeGrid: w < 940 ? 'repeat(2, minmax(0,1fr))' : (w < 1180 ? 'repeat(4, minmax(0,1fr))' : 'repeat(4, minmax(0,1fr)) auto'),
+      statusSpan: w < 1180 ? '1 / -1' : 'auto',
+      statusTopRule: w < 1180 ? '1px solid #E8E8E3' : '0',
+      indices: [
+        { name: 'PSE Index', value: '6,842.15', change: '+0.84%', color: '#1A7F37', low: '6,801', high: '6,858', pos: '72%' },
+        { name: 'All Shares', value: '3,614.20', change: '+0.62%', color: '#1A7F37', low: '3,592', high: '3,621', pos: '77%' },
+        { name: 'Financials', value: '2,188.44', change: '+1.12%', color: '#1A7F37', low: '2,166', high: '2,194', pos: '80%' },
+        { name: 'Property', value: '2,470.06', change: '-0.31%', color: '#D93025', low: '2,462', high: '2,498', pos: '22%' },
+      ].map((ix, i) => ({ ...ix, topRule: (w < 940 && i > 1) ? '1px solid #E8E8E3' : '0' })),
+
+      shellGrid: wide ? '300px minmax(0,1fr) 296px' : (mid ? '286px minmax(0,1fr)' : '1fr'),
+      railPosition: mid ? 'sticky' : 'static',
+      insightsDisplay: wide ? 'flex' : 'none',
+      kpiGrid: w < 640 ? 'repeat(2, minmax(0,1fr))' : 'repeat(4, minmax(0,1fr))',
+      toolbarGrid: w < 820 ? '1fr' : 'minmax(0,1fr) auto',
+      searchLabelDisplay: w < 980 ? 'none' : 'inline',
+      analyticsGrid: w < 760 ? '1fr' : (w < 1180 ? 'repeat(2, minmax(0,1fr))' : 'repeat(3, minmax(0,1fr))'),
+
+      rowGrid: wide
+        ? '40px minmax(150px,1.5fr) minmax(88px,1fr) 62px 96px 66px 133px 122px 92px'
+        : (mid ? '36px minmax(140px,1.5fr) minmax(80px,1fr) 60px 92px 62px 133px 118px' : '32px minmax(120px,1fr) 56px 84px 58px'),
+      tableMinWidth: wide ? '940px' : (mid ? '820px' : '420px'),
+      sectorDisplay: w >= 1080 ? 'block' : 'none',
+      factorsDisplay: w >= 1080 ? 'block' : 'none',
+      stateDisplay: w >= 1080 ? 'flex' : 'none',
+      coverDisplay: wide ? 'flex' : 'none',
+
+      kpis: [
+        { label: 'Companies searched', value: '280', sub: 'PSE Main & SME', color: '#0A0A0A', icon: 'M4.6 19.4 V9.4 L12 4.6 L19.4 9.4 V19.4 Z M9.6 19.4 V13.4 H14.4 V19.4' },
+        { label: 'Passing filters', value: String(shaped.length * 12), sub: 'Score \u2265 ' + s.scoreMin, color: '#1A7F37', icon: 'M4.6 6.4 H19.4 M7.4 12 H16.6 M10.2 17.6 H13.8' },
+        { label: 'In your watchlist', value: '24', sub: 'Of 50 tracked slots', color: '#0A0A0A', icon: 'M12 3.6 L14.6 9.2 L20.6 10 L16.2 14.2 L17.4 20.2 L12 17.2 L6.6 20.2 L7.8 14.2 L3.4 10 L9.4 9.2 Z' },
+        { label: 'Last rebuilt', value: '9:30 AM', sub: 'After the opening auction', color: '#0A0A0A', icon: 'M12 3.6 A8.4 8.4 0 1 1 11.99 3.6 Z M12 7.6 V12 L15.4 14.2' },
+      ].map((k, i) => ({ ...k, topRule: (w < 640 && i > 1) ? '1px solid #E8E8E3' : '0' })),
+
+      scoreMin: s.scoreMin,
+      scoreFillLeft: Math.round(s.scoreMin / 100 * 100) + '%',
+      onScoreChange: e => this.setState({ scoreMin: Number(e.target.value), page: 1 }),
+      filterRows: [
+        { label: 'Sector', value: 'All sectors', icon: 'M4.6 6.4 H19.4 M4.6 12 H19.4 M4.6 17.6 H13' },
+        { label: 'Quality', value: 'ROE > 15%', icon: 'M12 3.4 L20 8 V16 L12 20.6 L4 16 V8 Z' },
+        { label: 'Growth', value: 'Revenue CAGR > 8%', icon: 'M4 18 L9 12 L13 15 L20 6 M20 6 H15.4 M20 6 V10.6' },
+        { label: 'Valuation', value: 'P/E < 20', icon: 'M12 4.4 A7.6 7.6 0 1 1 11.99 4.4 Z M12 8.4 V15.6 M9.6 12 H14.4' },
+        { label: 'Market cap', value: 'Large & mid', icon: 'M4.6 19.4 V13 H9 V19.4 M10 19.4 V8.4 H14.4 V19.4 M15.4 19.4 V4.6 H19.8 V19.4' },
+        { label: 'Risk', value: 'Debt/equity < 1.0x', icon: 'M12 3.6 L19.4 6.4 V12 C19.4 16.4 16.2 19.4 12 20.4 C7.8 19.4 4.6 16.4 4.6 12 V6.4 Z' },
+      ],
+      resetAll: () => this.setState({ scoreMin: 0, query: '', sortKey: 'score', page: 1 }),
+      runScan: () => this.setState({ page: 1 }),
+      toggleSaved: () => this.setState({ saved: !s.saved }),
+      savedLabel: s.saved ? 'Screen saved' : 'Save this scan',
+
+      query: s.query,
+      onQueryChange: e => this.setState({ query: e.target.value, page: 1 }),
+      sortKey: s.sortKey,
+      onSortChange: e => this.setState({ sortKey: e.target.value }),
+      chips: [
+        { label: 'Score \u2265 ' + s.scoreMin, remove: () => this.setState({ scoreMin: 0 }) },
+        { label: 'Market: PSE Main & SME', remove: () => {} },
+        { label: 'Market cap: Large & mid', remove: () => {} },
+      ],
+
+      rows: shaped,
+      isEmpty: shaped.length === 0,
+      resultSummary: shaped.length === 0 ? 'No results' : ('Showing 1 to ' + shaped.length + ' of ' + (shaped.length * 12) + ' results'),
+      pageButtons: pages,
+      prevPage: () => this.setState({ page: Math.max(1, s.page - 1) }),
+      nextPage: () => this.setState({ page: Math.min(pageCount, s.page + 1) }),
+
+      distribution: [
+        { name: 'Quality', avg: 86, width: '86%' },
+        { name: 'Growth', avg: 81, width: '81%' },
+        { name: 'Valuation', avg: 77, width: '77%' },
+        { name: 'Risk', avg: 79, width: '79%' },
+        { name: 'Momentum', avg: 74, width: '74%' },
+      ],
+      scaleTicks: ['0', '25', '50', '75', '100'].map(label => ({ label })),
+      heatmap: heat,
+      breadthGreenDash: (breadthC * 124 / total).toFixed(1) + ' ' + breadthC.toFixed(1),
+      breadthRedDash: (breadthC * (124 + 86) / total).toFixed(1) + ' ' + breadthC.toFixed(1),
+
+      insights: [
+        { title: 'Earnings quality improving', icon: 'M4 18 L9 12 L13 15 L20 6', body: 'Cash conversion is outpacing reported profit across the top-ranked banks and terminals.' },
+        { title: 'Valuation gap to sector', icon: 'M12 4.4 A7.6 7.6 0 1 1 11.99 4.4 Z M12 8.4 V15.6', body: 'Seven of ten leaders trade below their own three-year average multiple.' },
+        { title: 'Momentum broadening', icon: 'M13.4 3.4 L6 13.4 H11 L10 20.6 L18 10.4 H12.6 Z', body: 'Advances lead declines for a fifth session, now spread across five sectors rather than two.' },
+        { title: 'Leverage still conservative', icon: 'M12 3.6 L19.4 6.4 V12 C19.4 16.4 16.2 19.4 12 20.4 C7.8 19.4 4.6 16.4 4.6 12 V6.4 Z', body: 'Median debt-to-equity in this scan sits at 0.58x, below the PSE median of 0.74x.' },
+      ],
+      topSectors: [
+        { name: 'Financials', avg: 88, width: '88%' },
+        { name: 'Industrials', avg: 85, width: '85%' },
+        { name: 'Holding Firms', avg: 82, width: '82%' },
+        { name: 'Utilities', avg: 79, width: '79%' },
+        { name: 'Consumer', avg: 74, width: '74%' },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>

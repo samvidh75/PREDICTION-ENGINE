@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <script src="_ds/raycast-command-ui-917818a8-4c87-4b33-aa1f-77e2df663ec5/_ds_bundle.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    body { margin:0; background:#FAFAF7; font-family:"Instrument Sans", -apple-system, BlinkMacSystemFont, sans-serif; -webkit-font-smoothing:antialiased; color:#0A0A0A; }
+    * { box-sizing:border-box; }
+    .n { font-family:"IBM Plex Mono", ui-monospace, monospace; font-variant-numeric:tabular-nums; letter-spacing:-0.02em; }
+    .lb { font-size:12.5px; color:#6B6B66; }
+    a { color:#0A0A0A; text-decoration:none; }
+    a:hover { color:#1A7F37; }
+    ::selection { background:#D8EEDF; }
+    .cd { background:#FFFFFF; border:1px solid #E8E8E3; border-radius:12px; }
+    ::-webkit-scrollbar { width:9px; height:9px; }
+    ::-webkit-scrollbar-thumb { background:#DEDED7; border-radius:8px; }
+    @media (prefers-reduced-motion: reduce) { * { animation:none !important; transition:none !important; } }
+  </style>
+</helmet>
+
+<div style="min-height:100dvh; background:#FAFAF7; padding-bottom:{{ pageBottomPad }};">
+
+  <sc-if value="{{ showBottomNav }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed; left:0; right:0; bottom:0; z-index:60; background:#FFFFFFF2; backdrop-filter:saturate(180%) blur(12px); border-top:1px solid #E4E4DE; padding-bottom:env(safe-area-inset-bottom);">
+      <div style="display:grid; grid-template-columns:repeat(5, minmax(0,1fr));">
+        <sc-for list="{{ bottomItems }}" as="bi" hint-placeholder-count="5">
+          <a href="{{ bi.href }}" style="display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; min-height:56px; padding:8px 2px; color:{{ bi.color }};">
+            <svg width="21" height="21" viewBox="0 0 24 24" fill="none"><path d="{{ bi.icon }}" stroke="{{ bi.color }}" stroke-width="{{ bi.stroke }}" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+            <span style="font-size:10px; font-weight:{{ bi.weight }}; letter-spacing:0.01em;">{{ bi.label }}</span>
+          </a>
+        </sc-for>
+      </div>
+    </div>
+  </sc-if>
+  <div style="position:sticky; top:0; z-index:30; background:#FAFAF7; border-bottom:1px solid #E8E8E3;">
+    <div style="width:100%; max-width:1480px; margin:0 auto; padding:0 clamp(14px,2vw,26px); height:64px; display:flex; align-items:center; gap:clamp(14px,2.4vw,34px);">
+      <a href="StockStory Shell.dc.html" style="display:flex; align-items:center; gap:10px; flex-shrink:0;">
+        <svg width="30" height="30" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="9" fill="#0A0A0A"></rect><path d="M21 11.4 C21 8.6 11.6 8.8 11.6 13 C11.6 17.2 21 15.6 21 19.8 C21 24 11.6 23.6 11.6 20.8" stroke="#FFFFFF" stroke-width="2.1" stroke-linecap="round" fill="none"></path></svg>
+        <span style="line-height:1.1;"><span style="display:block; font-size:17px; font-weight:600; letter-spacing:-0.02em;">StockEX<span style="font-size:8.5px; font-weight:500; vertical-align:super; letter-spacing:0; margin-left:1px; color:#9A9A94;">&#8482;</span></span><span style="display:block; font-size:11.5px; color:#6B6B66;">Philippines</span></span>
+      </a>
+      <sc-if value="{{ showNav }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex; align-items:center; gap:clamp(12px,1.6vw,26px); margin-left:clamp(8px,2vw,28px);">
+          <sc-for list="{{ topNav }}" as="t" hint-placeholder-count="6">
+            <a href="{{ t.href }}" style="display:flex; align-items:center; gap:5px; font-size:14px; font-weight:{{ t.weight }}; color:{{ t.color }}; padding:20px 0; border-bottom:2px solid {{ t.rule }}; white-space:nowrap;" style-hover="color:#1A7F37;">{{ t.label }}<sc-if value="{{ t.caret }}" hint-placeholder-val="{{ false }}"><svg width="9" height="9" viewBox="0 0 12 12" fill="none"><path d="M2.5 4.5 L6 8 L9.5 4.5" stroke="#6B6B66" stroke-width="1.5" stroke-linecap="round"></path></svg></sc-if></a>
+          </sc-for>
+        </div>
+      </sc-if>
+      <div style="flex:1;"></div>
+      <a href="StockStory Search.dc.html" style="display:flex; align-items:center; gap:8px; height:34px; padding:0 11px; border-radius:8px; border:1px solid #E4E4DE; background:#FFFFFF; color:#8A8A84;" style-hover="border-color:#0A0A0A; color:#0A0A0A;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="10.8" cy="10.8" r="6.6" stroke="currentColor" stroke-width="1.8"></circle><path d="M15.6 15.6 L20.4 20.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path></svg>
+        <span style="font-size:12.5px; display:{{ searchLabelShow }};">Search</span>
+        <span class="n" style="padding:2px 6px; border-radius:5px; background:#F4F4EF; font-size:10px; color:#9A9A94; display:{{ searchKbdShow }};">⌘K</span>
+      </a>
+      <sc-if value="{{ showNav }}" hint-placeholder-val="{{ true }}">
+        <a href="StockStory Sign In.dc.html" style="font-size:14px; font-weight:500; white-space:nowrap;">Sign in</a>
+      </sc-if>
+      <a href="StockStory Pricing.dc.html" style="display:inline-flex; align-items:center; gap:7px; height:42px; padding:0 18px; border-radius:9px; background:#0A0A0A; color:#FFFFFF; font-size:14px; font-weight:500; white-space:nowrap;" style-hover="background:#1A1A1A; color:#FFFFFF;">Start Free Trial <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M3 9 L9 3 M9 3 H4.6 M9 3 V7.4" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round"></path></svg></a>
+    </div>
+  </div>
+
+  <div style="width:100%; max-width:1480px; margin:0 auto; padding:clamp(12px,1.6vw,18px) clamp(14px,2vw,26px) 0;">
+    <div class="cd" style="display:grid; grid-template-columns:{{ tapeGrid }}; overflow:hidden;">
+      <sc-for list="{{ indices }}" as="ix" hint-placeholder-count="4">
+        <div style="padding:13px 17px; border-right:1px solid #E8E8E3; border-top:{{ ix.topRule }}; display:flex; flex-direction:column; gap:9px; min-width:0;">
+          <div style="min-width:0;">
+            <div style="font-size:10.5px; font-weight:600; color:#6B6B66; letter-spacing:0.09em; text-transform:uppercase; margin-bottom:5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ ix.name }}</div>
+            <div style="display:flex; align-items:baseline; gap:7px; flex-shrink:0; white-space:nowrap;">
+              <span class="n" style="font-size:17.5px; font-weight:600; letter-spacing:-0.025em;">{{ ix.value }}</span>
+              <span class="n" style="font-size:12.5px; font-weight:500; color:{{ ix.color }};">{{ ix.change }}</span>
+            </div>
+          </div>
+          <div style="width:100%; min-width:0; display:{{ rangeDisplay }}; flex-direction:column; gap:4px;">
+            <div style="position:relative; height:4px; border-radius:2px; background:#EDEDE8;">
+              <span style="position:absolute; left:0; width:{{ ix.pos }}; height:4px; border-radius:2px; background:{{ ix.color }}; opacity:0.26;"></span>
+              <span style="position:absolute; left:{{ ix.pos }}; top:-2px; width:2px; height:8px; border-radius:1px; background:{{ ix.color }}; transform:translateX(-1px);"></span>
+            </div>
+            <div style="display:flex; align-items:baseline; justify-content:space-between; gap:6px;">
+              <span class="n" style="font-size:11px; color:#6B6B66; white-space:nowrap;">{{ ix.low }}</span>
+              <span class="lb" style="font-size:10px; letter-spacing:0.06em; color:#6B6B66;">DAY</span>
+              <span class="n" style="font-size:11px; color:#6B6B66; white-space:nowrap;">{{ ix.high }}</span>
+            </div>
+          </div>
+        </div>
+      </sc-for>
+      <div style="padding:13px 17px; display:flex; flex-direction:column; justify-content:center; gap:3px; grid-column:{{ statusSpan }}; border-top:{{ statusTopRule }};">
+        <div style="display:flex; align-items:center; gap:6px; font-size:13px; font-weight:500; color:#1A7F37; white-space:nowrap;"><span style="width:6px; height:6px; border-radius:50%; background:#1A7F37;"></span>Market is Open</div>
+        <div class="lb" style="font-size:11.5px; white-space:nowrap;">Closes 3:30 PM PHT</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="width:100%; max-width:1480px; margin:0 auto; padding:clamp(14px,1.8vw,22px) clamp(14px,2vw,26px) clamp(28px,3.4vw,52px); display:flex; flex-direction:column; gap:clamp(12px,1.4vw,18px);">
+
+    <div class="cd" style="padding:clamp(16px,1.8vw,24px); min-width:0;">
+      <h1 style="margin:0 0 7px; font-size:clamp(22px,1.4vw + 14px,30px); font-weight:600; letter-spacing:-0.03em;">Compare</h1>
+      <p class="lb" style="margin:0 0 18px; font-size:13.5px; line-height:1.6; max-width:58ch;">Up to four PSE companies side by side. Best value in each row is marked — better does not mean buy.</p>
+      <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+        <sc-for list="{{ chips }}" as="c" hint-placeholder-count="3">
+          <span style="display:inline-flex; align-items:center; gap:8px; height:34px; padding:0 6px 0 11px; border-radius:8px; background:#EDF6F0; border:1px solid #D3E8DA;">
+            <span style="width:20px; height:20px; border-radius:5px; background:{{ c.logoBg }}; color:#FFFFFF; display:flex; align-items:center; justify-content:center; font-size:8px; font-weight:700;">{{ c.ticker }}</span>
+            <span style="font-size:12.5px; font-weight:600; color:#166B2E;">{{ c.ticker }}</span>
+            <span onClick="{{ c.remove }}" style="width:20px; height:20px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:#5A9C6E; font-size:14px; line-height:1; border-radius:4px;" style-hover="background:#D3E8DA;">×</span>
+          </span>
+        </sc-for>
+        <sc-if value="{{ canAdd }}" hint-placeholder-val="{{ true }}">
+          <select value="{{ pickValue }}" onChange="{{ onPick }}" style="height:34px; padding:0 10px; border:1px dashed #C4C4BD; border-radius:8px; background:#FFFFFF; font-family:inherit; font-size:12.5px; color:#3A3A36; cursor:pointer;">
+            <option value="">+ Add a company</option>
+            <sc-for list="{{ available }}" as="av" hint-placeholder-count="5">
+              <option value="{{ av.ticker }}">{{ av.label }}</option>
+            </sc-for>
+          </select>
+        </sc-if>
+      </div>
+    </div>
+
+    <div class="cd" style="min-width:0; overflow:hidden;">
+      <div style="overflow-x:auto;">
+        <div style="min-width:{{ tableMinWidth }};">
+
+          <div style="display:grid; grid-template-columns:{{ grid }}; gap:0; border-bottom:1px solid #E8E8E3;">
+            <div style="padding:16px; background:#FBFBF8;"></div>
+            <sc-for list="{{ cols }}" as="cl" hint-placeholder-count="3">
+              <a href="StockStory Stock Detail.dc.html" style="padding:16px; border-left:1px solid #F0F0EB; background:{{ cl.headBg }}; color:#0A0A0A; min-width:0;">
+                <span style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
+                  <span style="width:34px; height:34px; border-radius:8px; background:{{ cl.logoBg }}; color:#FFFFFF; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; flex-shrink:0;">{{ cl.ticker }}</span>
+                  <span style="min-width:0;">
+                    <span style="display:block; font-size:14px; font-weight:600;">{{ cl.ticker }}</span>
+                    <span class="lb" style="display:block; font-size:11.5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ cl.sector }}</span>
+                  </span>
+                </span>
+                <span class="lb" style="display:block; font-size:12px; margin-bottom:9px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ cl.name }}</span>
+                <span style="display:flex; align-items:baseline; gap:9px; flex-wrap:wrap;">
+                  <span class="n" style="font-size:20px; font-weight:600; letter-spacing:-0.025em;">{{ cl.price }}</span>
+                  <span class="n" style="font-size:12.5px; color:{{ cl.changeColor }};">{{ cl.change }}</span>
+                </span>
+                <span style="display:flex; align-items:center; gap:6px; margin-top:11px; font-size:11.5px; font-weight:500; color:{{ cl.stateColor }};"><span style="width:6px; height:6px; border-radius:50%; background:{{ cl.stateColor }};"></span>{{ cl.state }}</span>
+              </a>
+            </sc-for>
+          </div>
+
+          <sc-for list="{{ sections }}" as="sec" hint-placeholder-count="4">
+            <div>
+              <div style="display:grid; grid-template-columns:{{ grid }};">
+                <div style="padding:9px 16px; background:#F5F5F0; border-bottom:1px solid #E8E8E3; grid-column:1 / -1;">
+                  <span class="lb" style="font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.06em;">{{ sec.title }}</span>
+                </div>
+              </div>
+              <sc-for list="{{ sec.rows }}" as="rw" hint-placeholder-count="4">
+                <div style="display:grid; grid-template-columns:{{ grid }}; border-bottom:1px solid #F0F0EB;" style-hover="background:#FAFAF7;">
+                  <div style="padding:11px 16px; min-width:0; display:flex; align-items:center; gap:7px;">
+                    <span style="font-size:12.5px; color:#3A3A36; overflow-wrap:break-word;">{{ rw.label }}</span>
+                  </div>
+                  <sc-for list="{{ rw.cells }}" as="cel" hint-placeholder-count="3">
+                    <div style="padding:11px 16px; border-left:1px solid #F0F0EB; min-width:0; display:flex; align-items:center; gap:7px; background:{{ cel.bg }};">
+                      <span class="n" style="font-size:13px; font-weight:{{ cel.weight }}; color:{{ cel.color }};">{{ cel.value }}</span>
+                      <sc-if value="{{ cel.best }}" hint-placeholder-val="{{ false }}">
+                        <svg width="13" height="13" viewBox="0 0 16 16" fill="none" style="flex-shrink:0;"><circle cx="8" cy="8" r="6.6" fill="#EDF6F0"></circle><path d="M5.2 8.2 L7.2 10.2 L10.8 6.2" stroke="#1A7F37" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                      </sc-if>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-for>
+            </div>
+          </sc-for>
+
+          <div style="display:grid; grid-template-columns:{{ grid }};">
+            <div style="padding:9px 16px; background:#F5F5F0; border-bottom:1px solid #E8E8E3; grid-column:1 / -1;">
+              <span class="lb" style="font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.06em;">What changed</span>
+            </div>
+          </div>
+          <div style="display:grid; grid-template-columns:{{ grid }};">
+            <div style="padding:14px 16px; min-width:0;">
+              <span class="lb" style="font-size:12.5px;">Latest read</span>
+            </div>
+            <sc-for list="{{ cols }}" as="cl" hint-placeholder-count="3">
+              <div style="padding:14px 16px; border-left:1px solid #F0F0EB; min-width:0;">
+                <div style="font-size:12.5px; line-height:1.6; color:#3A3A36; overflow-wrap:break-word;">{{ cl.note }}</div>
+                <div class="lb" style="font-size:11px; margin-top:8px;">{{ cl.noteDate }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cd" style="padding:16px;">
+      <span class="lb" style="font-size:11.5px; line-height:1.6;">A check mark marks the stronger figure on that line only. It is not a recommendation, and a cheaper multiple is not automatically better value.</span>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{}">
+class Component extends DCLogic {
+  state = {
+    width: typeof window !== 'undefined' ? window.innerWidth : 1480,
+    picked: ['BDO', 'BPI', 'MBT'],
+  };
+
+  componentDidMount() { this._r = () => this.setState({ width: window.innerWidth }); window.addEventListener('resize', this._r); }
+  componentWillUnmount() { window.removeEventListener('resize', this._r); }
+
+  spark(vals, w, h, pad) {
+    const p = pad == null ? 3 : pad;
+    const lo = Math.min.apply(null, vals), hi = Math.max.apply(null, vals), span = (hi - lo) || 1;
+    return vals.map((v, i) => {
+      const x = p + (i / (vals.length - 1)) * (w - p * 2);
+      const y = h - p - ((v - lo) / span) * (h - p * 2);
+      return (i ? 'L' : 'M') + x.toFixed(1) + ' ' + y.toFixed(1);
+    }).join(' ');
+  }
+
+  // seeded random walk — irregular like real tape, stable across renders
+  walk(seed, n, drift, vol) {
+    let s = seed * 7919 + 13, v = 100, out = [];
+    const rnd = () => { s = (s * 1103515245 + 12345) & 0x7fffffff; return s / 0x7fffffff; };
+    for (let i = 0; i < n; i++) {
+      const shock = (rnd() < 0.08) ? (rnd() - 0.5) * vol * 3.4 : 0;
+      v += (rnd() - 0.5) * vol + drift + shock;
+      out.push(v);
+    }
+    return out;
+  }
+
+  renderVals() {
+    const w = this.state.width, s = this.state;
+    const navItems = [
+      { label: 'Research', href: 'StockStory Stock Detail.dc.html', caret: true },
+      { label: 'Scanner', href: 'StockStory Scanner.dc.html', caret: false },
+      { label: 'Compare', href: 'StockStory Compare.dc.html', caret: false, active: true },
+      { label: 'Sectors', href: 'StockStory Sectors.dc.html', caret: false },
+      { label: 'Watchlist', href: 'StockStory Watchlist.dc.html', caret: false },
+      { label: 'Portfolio', href: 'StockStory Portfolio.dc.html', caret: false },
+    ];
+
+    const universe = {
+      BDO: { name: 'BDO Unibank, Inc.', sector: 'Financials', logoBg: '#0A2C5C', price: 142.50, change: 1.82, state: 'Strengthening', score: 88,
+        m: { pe: 10.4, pb: 1.62, yield: 4.20, roe: 15.8, nim: 4.62, cir: 58.2, npl: 1.84, car: 15.4, growth: 11.4, cap: 758.4 },
+        note: 'Loan growth beat for a third quarter. Margin held through the August cut.', noteDate: '12 Aug 2026' },
+      BPI: { name: 'Bank of the Philippine Islands', sector: 'Financials', logoBg: '#B8860B', price: 128.90, change: 1.21, state: 'Stable', score: 84,
+        m: { pe: 11.2, pb: 1.48, yield: 3.60, roe: 14.2, nim: 4.38, cir: 52.6, npl: 2.12, car: 16.2, growth: 9.2, cap: 612.8 },
+        note: 'Fee income offset a softer margin. Cost discipline the best of the large banks.', noteDate: '11 Aug 2026' },
+      MBT: { name: 'Metropolitan Bank & Trust', sector: 'Financials', logoBg: '#1A4A7A', price: 78.40, change: 0.64, state: 'Stable', score: 79,
+        m: { pe: 8.9, pb: 1.02, yield: 5.10, roe: 12.6, nim: 4.12, cir: 54.8, npl: 2.46, car: 17.8, growth: 6.8, cap: 352.6 },
+        note: 'Trading below book with the sector\u2019s strongest capital buffer. Growth is the laggard.', noteDate: '9 Aug 2026' },
+      CBC: { name: 'China Banking Corporation', sector: 'Financials', logoBg: '#7A1A2A', price: 62.15, change: 0.42, state: 'Stable', score: 76,
+        m: { pe: 7.4, pb: 0.94, yield: 4.80, roe: 13.8, nim: 4.24, cir: 49.2, npl: 2.28, car: 16.6, growth: 8.4, cap: 167.2 },
+        note: 'Cheapest of the peer set on earnings with an improving efficiency ratio.', noteDate: '7 Aug 2026' },
+      SECB: { name: 'Security Bank Corporation', sector: 'Financials', logoBg: '#2A5A3A', price: 74.60, change: -0.32, state: 'Needs review', score: 68,
+        m: { pe: 9.6, pb: 0.88, yield: 3.20, roe: 9.4, nim: 4.86, cir: 62.4, npl: 2.94, car: 15.8, growth: 4.2, cap: 112.4 },
+        note: 'Highest margin in the set, but credit cost and cost-to-income both rising.', noteDate: '5 Aug 2026' },
+    };
+
+    const tickers = Object.keys(universe);
+    const picked = s.picked.filter(t => universe[t]);
+    const peso = v => '\u20B1' + v.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const stateColor = st => st === 'Strengthening' ? '#1A7F37' : (st === 'Stable' ? '#6B6B66' : (st === 'Needs review' ? '#B26B00' : '#D93025'));
+
+    const cols = picked.map((t, i) => {
+      const u = universe[t];
+      return {
+        ticker: t, name: u.name, sector: u.sector, logoBg: u.logoBg,
+        price: peso(u.price),
+        change: (u.change >= 0 ? '+' : '') + u.change.toFixed(2) + '%',
+        changeColor: u.change >= 0 ? '#1A7F37' : '#D93025',
+        state: u.state, stateColor: stateColor(u.state),
+        headBg: i === 0 ? '#FBFAF4' : '#FFFFFF',
+        note: u.note, noteDate: u.noteDate,
+      };
+    });
+
+    // rows: key, label, format, higherIsBetter (null = no winner marked)
+    const defs = [
+      { title: 'Research', rows: [
+        { key: 'score', label: 'StockEX score', fmt: v => String(v), hib: true, root: true },
+      ] },
+      { title: 'Valuation', rows: [
+        { key: 'pe', label: 'Price / earnings', fmt: v => v.toFixed(1) + 'x', hib: false },
+        { key: 'pb', label: 'Price / book', fmt: v => v.toFixed(2) + 'x', hib: false },
+        { key: 'yield', label: 'Dividend yield', fmt: v => v.toFixed(2) + '%', hib: true },
+        { key: 'cap', label: 'Market cap', fmt: v => '\u20B1' + v.toFixed(1) + 'B', hib: null },
+      ] },
+      { title: 'Profitability', rows: [
+        { key: 'roe', label: 'Return on equity', fmt: v => v.toFixed(1) + '%', hib: true },
+        { key: 'nim', label: 'Net interest margin', fmt: v => v.toFixed(2) + '%', hib: true },
+        { key: 'cir', label: 'Cost-to-income', fmt: v => v.toFixed(1) + '%', hib: false },
+        { key: 'growth', label: 'Revenue growth', fmt: v => v.toFixed(1) + '%', hib: true },
+      ] },
+      { title: 'Risk', rows: [
+        { key: 'npl', label: 'Non-performing loans', fmt: v => v.toFixed(2) + '%', hib: false },
+        { key: 'car', label: 'Capital adequacy', fmt: v => v.toFixed(1) + '%', hib: true },
+      ] },
+    ];
+
+    const sections = defs.map(sec => ({
+      title: sec.title,
+      rows: sec.rows.map(r => {
+        const vals = picked.map(t => r.root ? universe[t][r.key] : universe[t].m[r.key]);
+        let bestVal = null;
+        if (r.hib === true) bestVal = Math.max.apply(null, vals);
+        if (r.hib === false) bestVal = Math.min.apply(null, vals);
+        return {
+          label: r.label,
+          cells: vals.map(v => {
+            const best = bestVal !== null && v === bestVal && picked.length > 1;
+            return {
+              value: r.fmt(v),
+              best,
+              weight: best ? 600 : 500,
+              color: best ? '#166B2E' : '#0A0A0A',
+              bg: best ? '#FBFCFB' : 'transparent',
+            };
+          }),
+        };
+      }),
+    }));
+
+    const available = tickers.filter(t => picked.indexOf(t) === -1)
+      .map(t => ({ ticker: t, label: t + ' \u2014 ' + universe[t].name }));
+
+    const labelCol = w < 700 ? '130px' : '196px';
+    const colWidth = w < 700 ? '150px' : (picked.length >= 4 ? '178px' : 'minmax(178px,1fr)');
+
+    return {
+      rangeDisplay: w < 400 ? 'none' : 'flex',
+      searchLabelShow: w >= 1240 ? 'inline' : 'none',
+      searchKbdShow: w >= 1240 ? 'inline' : 'none',
+      showBottomNav: w < 1080,
+      pageBottomPad: w < 1080 ? 'calc(66px + env(safe-area-inset-bottom))' : '0px',
+      bottomItems: [
+        { label: 'Home', href: 'StockStory Shell.dc.html', icon: 'M4.4 19.6 V9.8 L12 4.2 L19.6 9.8 V19.6 Z M9.4 19.6 V13.6 H14.6 V19.6' },
+        { label: 'Scanner', href: 'StockStory Scanner.dc.html', icon: 'M10.8 4.2 A6.6 6.6 0 1 1 10.79 4.2 Z M15.6 15.6 L20.4 20.4' },
+        { label: 'Watchlist', href: 'StockStory Watchlist.dc.html', icon: 'M12 3.8 L14.5 9.1 L20.3 9.9 L16.1 14 L17.2 19.8 L12 17 L6.8 19.8 L7.9 14 L3.7 9.9 L9.5 9.1 Z' },
+        { label: 'Portfolio', href: 'StockStory Portfolio.dc.html', icon: 'M3.8 19.6 H20.2 M6.8 19.6 V12.8 M11.2 19.6 V7.8 M15.6 19.6 V10.6 M20 19.6 V5.2' },
+        { label: 'Alerts', href: 'StockStory Alerts.dc.html', icon: 'M7.2 10.2 A4.8 4.8 0 0 1 16.8 10.2 C16.8 15 18.4 17 18.4 17 H5.6 C5.6 17 7.2 15 7.2 10.2 Z M10.2 19.6 A2.2 2.2 0 0 0 13.8 19.6' },
+      ].map(b => ({
+        ...b,
+        color: b.label === 'Scanner' ? '#0A0A0A' : '#9A9A94',
+        weight: b.label === 'Scanner' ? 600 : 500,
+        stroke: b.label === 'Scanner' ? 1.9 : 1.6,
+      })),
+      showNav: w >= 1080,
+      topNav: navItems.map(n => ({ ...n, weight: n.active ? 600 : 500, color: n.active ? '#0A0A0A' : '#3A3A36', rule: n.active ? '#1A7F37' : 'transparent' })),
+      tapeGrid: w < 940 ? 'repeat(2, minmax(0,1fr))' : (w < 1180 ? 'repeat(4, minmax(0,1fr))' : 'repeat(4, minmax(0,1fr)) auto'),
+      statusSpan: w < 1180 ? '1 / -1' : 'auto',
+      statusTopRule: w < 1180 ? '1px solid #E8E8E3' : '0',
+      indices: [
+        { name: 'PSE Index', value: '6,842.15', change: '+0.84%', color: '#1A7F37', low: '6,801', high: '6,858', pos: '72%' },
+        { name: 'All Shares', value: '3,614.20', change: '+0.62%', color: '#1A7F37', low: '3,592', high: '3,621', pos: '77%' },
+        { name: 'Financials', value: '2,188.44', change: '+1.12%', color: '#1A7F37', low: '2,166', high: '2,194', pos: '80%' },
+        { name: 'Property', value: '2,470.06', change: '-0.31%', color: '#D93025', low: '2,462', high: '2,498', pos: '22%' },
+      ].map((ix, i) => ({ ...ix, topRule: (w < 940 && i > 1) ? '1px solid #E8E8E3' : '0' })),
+
+      chips: picked.map(t => ({
+        ticker: t, logoBg: universe[t].logoBg,
+        remove: () => this.setState(st => ({ picked: st.picked.filter(x => x !== t) })),
+      })),
+      canAdd: picked.length < 4 && available.length > 0,
+      available,
+      pickValue: '',
+      onPick: e => {
+        const v = e.target.value;
+        if (v) this.setState(st => ({ picked: st.picked.concat([v]).slice(0, 4) }));
+      },
+
+      grid: labelCol + ' repeat(' + picked.length + ', ' + colWidth + ')',
+      tableMinWidth: w < 700 ? (130 + picked.length * 150) + 'px' : 'auto',
+      cols,
+      sections,
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -4,6 +4,7 @@ import App from "./App";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import "./index.css";
 import "./styles/tailwind.css";
+import "./styles/stockex-theme.css";
 
 const root = document.getElementById("root");
 

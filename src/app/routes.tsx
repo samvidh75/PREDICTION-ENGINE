@@ -52,9 +52,9 @@ function RouteFallback() {
         minHeight: "100vh",
         display: "grid",
         placeItems: "center",
-        color: "#ffffff",
-        fontFamily: "-apple-system, BlinkMacSystemFont, 'Inter', sans-serif",
-        backgroundColor: "#000000",
+        color: "var(--sx-ink)",
+        fontFamily: "var(--sx-font)",
+        backgroundColor: "var(--sx-bg)",
       }}
     >
       <div style={{ textAlign: "center" }}>
@@ -62,10 +62,10 @@ function RouteFallback() {
           <span className="stockex-loader-ring" />
           <span className="stockex-loader-core" />
         </div>
-        <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.55)", marginTop: "18px", letterSpacing: "0.01em" }}>
+        <p style={{ fontSize: "13px", color: "var(--sx-ink-3)", marginTop: "18px", letterSpacing: "0.01em" }}>
           Loading research…
         </p>
-        <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)", marginTop: "6px" }}>
+        <p style={{ fontSize: "11px", color: "var(--sx-ink-5)", marginTop: "6px" }}>
           If this takes too long, please reload the page.
         </p>
       </div>
@@ -73,14 +73,14 @@ function RouteFallback() {
         .stockex-loader { position: relative; width: 40px; height: 40px; margin: 0 auto; }
         .stockex-loader-ring {
           position: absolute; inset: 0; border-radius: 50%;
-          border: 2px solid rgba(255,107,74,0.16);
-          border-top-color: #FF6B4A;
+          border: 2px solid rgba(26,127,55,0.16);
+          border-top-color: var(--sx-up);
           animation: stockex-loader-spin 0.9s cubic-bezier(0.4,0,0.2,1) infinite;
         }
         .stockex-loader-core {
           position: absolute; left: 50%; top: 50%; width: 6px; height: 6px;
           transform: translate(-50%, -50%); border-radius: 50%;
-          background: #FF6B4A; box-shadow: 0 0 12px 2px rgba(255,107,74,0.6);
+          background: var(--sx-up); box-shadow: 0 0 12px 2px rgba(26,127,55,0.5);
           animation: stockex-loader-pulse 1.6s ease-in-out infinite;
         }
         @keyframes stockex-loader-spin { to { transform: rotate(360deg); } }
@@ -121,7 +121,7 @@ export function AppRoutes() {
       <Routes>
         <Route path="/" element={<Navigate to={publicFallback} replace />} />
         {SHOW_ABOUT_PAGE ? (
-          <Route path="/about" element={<AboutPage />} />
+          <Route path="/about" element={<Suspense fallback={<RouteFallback />}><PublicLayout><AboutPage /></PublicLayout></Suspense>} />
         ) : (
           <Route path="/about" element={<Navigate to="/dashboard" replace />} />
         )}

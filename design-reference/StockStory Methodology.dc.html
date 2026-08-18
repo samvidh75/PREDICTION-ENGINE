@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    body { margin:0; background:#FAFAF7; font-family:"Instrument Sans", -apple-system, BlinkMacSystemFont, sans-serif; -webkit-font-smoothing:antialiased; color:#0A0A0A; }
+    * { box-sizing:border-box; }
+    .n { font-family:"IBM Plex Mono", ui-monospace, monospace; font-variant-numeric:tabular-nums; letter-spacing:-0.02em; }
+    .lb { font-size:12.5px; color:#6B6B66; }
+    a { color:#0A0A0A; text-decoration:none; }
+    a:hover { color:#1A7F37; }
+    ::selection { background:#D8EEDF; }
+    .cd { background:#FFFFFF; border:1px solid #E8E8E3; border-radius:12px; }
+    ::-webkit-scrollbar { width:9px; height:9px; }
+    ::-webkit-scrollbar-thumb { background:#DEDED7; border-radius:8px; }
+    @media (prefers-reduced-motion: reduce) { * { animation:none !important; transition:none !important; } }
+  </style>
+</helmet>
+
+<div style="min-height:100dvh; background:#FAFAF7; padding-bottom:{{ pageBottomPad }};">
+
+  <sc-if value="{{ showBottomNav }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed; left:0; right:0; bottom:0; z-index:60; background:#FFFFFFF2; backdrop-filter:saturate(180%) blur(12px); border-top:1px solid #E4E4DE; padding-bottom:env(safe-area-inset-bottom);">
+      <div style="display:grid; grid-template-columns:repeat(5, minmax(0,1fr));">
+        <sc-for list="{{ bottomItems }}" as="bi" hint-placeholder-count="5">
+          <a href="{{ bi.href }}" style="display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; min-height:56px; padding:8px 2px; color:{{ bi.color }};">
+            <svg width="21" height="21" viewBox="0 0 24 24" fill="none"><path d="{{ bi.icon }}" stroke="{{ bi.color }}" stroke-width="{{ bi.stroke }}" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+            <span style="font-size:10px; font-weight:{{ bi.weight }}; letter-spacing:0.01em;">{{ bi.label }}</span>
+          </a>
+        </sc-for>
+      </div>
+    </div>
+  </sc-if>
+
+  <div style="position:sticky; top:0; z-index:30; background:#FAFAF7; border-bottom:1px solid #E8E8E3;">
+    <div style="width:100%; max-width:1480px; margin:0 auto; padding:0 clamp(14px,2vw,26px); height:64px; display:flex; align-items:center; gap:clamp(14px,2.4vw,34px);">
+      <a href="StockStory Shell.dc.html" style="display:flex; align-items:center; gap:10px; flex-shrink:0;">
+        <svg width="30" height="30" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="9" fill="#0A0A0A"></rect><path d="M21 11.4 C21 8.6 11.6 8.8 11.6 13 C11.6 17.2 21 15.6 21 19.8 C21 24 11.6 23.6 11.6 20.8" stroke="#FFFFFF" stroke-width="2.1" stroke-linecap="round" fill="none"></path></svg>
+        <span style="line-height:1.1;"><span style="display:block; font-size:17px; font-weight:600; letter-spacing:-0.02em;">StockEX<span style="font-size:8.5px; font-weight:500; vertical-align:super; letter-spacing:0; margin-left:1px; color:#9A9A94;">&#8482;</span></span><span style="display:block; font-size:11.5px; color:#6B6B66;">Philippines</span></span>
+      </a>
+      <sc-if value="{{ showNav }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex; align-items:center; gap:clamp(12px,1.6vw,26px); margin-left:clamp(8px,2vw,28px);">
+          <sc-for list="{{ topNav }}" as="t" hint-placeholder-count="5">
+            <a href="{{ t.href }}" style="display:flex; align-items:center; gap:5px; font-size:14px; font-weight:{{ t.weight }}; color:{{ t.color }}; padding:20px 0; border-bottom:2px solid {{ t.rule }}; white-space:nowrap;" style-hover="color:#1A7F37;">{{ t.label }}</a>
+          </sc-for>
+        </div>
+      </sc-if>
+      <div style="flex:1;"></div>
+      <sc-if value="{{ showNav }}" hint-placeholder-val="{{ true }}">
+        <a href="StockStory Sign In.dc.html" style="font-size:14px; font-weight:500; white-space:nowrap;">Sign in</a>
+      </sc-if>
+      <a href="StockStory Pricing.dc.html" style="display:inline-flex; align-items:center; gap:7px; height:42px; padding:0 18px; border-radius:9px; background:#0A0A0A; color:#FFFFFF; font-size:14px; font-weight:500; white-space:nowrap;" style-hover="background:#1A1A1A; color:#FFFFFF;">Start Free Trial <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M3 9 L9 3 M9 3 H4.6 M9 3 V7.4" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round"></path></svg></a>
+    </div>
+  </div>
+
+  <div style="width:100%; max-width:1480px; margin:0 auto; padding:clamp(24px,3vw,44px) clamp(14px,2vw,26px) clamp(28px,3.4vw,52px); display:grid; grid-template-columns:{{ bodyGrid }}; gap:clamp(16px,2.4vw,36px); align-items:start;">
+
+    <div style="min-width:0; display:{{ railDisplay }}; flex-direction:column; gap:2px; position:sticky; top:80px;">
+      <div class="lb" style="font-size:10.5px; font-weight:600; text-transform:uppercase; letter-spacing:0.09em; padding:0 11px 9px;">On this page</div>
+      <sc-for list="{{ sectionNav }}" as="sn" hint-placeholder-count="6">
+        <a href="{{ sn.href }}" style="display:flex; align-items:center; gap:9px; padding:9px 11px; border-radius:8px; border-left:2px solid {{ sn.rail }}; background:{{ sn.bg }}; font-size:13px; font-weight:{{ sn.weight }}; color:{{ sn.color }};" style-hover="background:#F2F2ED; color:#0A0A0A;">
+          <span class="n" style="font-size:10.5px; color:#B0B0A9;">{{ sn.num }}</span>{{ sn.label }}
+        </a>
+      </sc-for>
+    </div>
+
+    <div style="min-width:0; width:100%; max-width:{{ contentMax }}; display:flex; flex-direction:column; gap:clamp(12px,1.4vw,18px);">
+
+      <div>
+        <div class="lb" style="font-size:10.5px; font-weight:600; text-transform:uppercase; letter-spacing:0.09em; margin-bottom:12px;">Methodology</div>
+        <h1 style="margin:0 0 14px; font-size:clamp(26px,1.8vw + 16px,38px); font-weight:600; letter-spacing:-0.032em; line-height:1.1; max-width:24ch;">How a score is built, and what it cannot tell you.</h1>
+        <p style="margin:0; font-size:clamp(14.5px,0.3vw + 13.5px,16.5px); line-height:1.68; color:#6B6B66; max-width:56ch;">Every figure in StockEX traces to a document filed with the exchange. This page explains the path from that document to the number on a company page — including where the method is weakest.</p>
+        <div style="display:flex; gap:0; flex-wrap:wrap; margin-top:22px; padding-top:20px; border-top:1px solid #E8E8E3;">
+          <sc-for list="{{ facts }}" as="f" hint-placeholder-count="4">
+            <div style="padding-right:clamp(16px,2vw,28px); margin-right:clamp(16px,2vw,28px); border-right:1px solid #E4E4DE;">
+              <div class="n" style="font-size:19px; font-weight:600; letter-spacing:-0.025em; margin-bottom:3px;">{{ f.value }}</div>
+              <div class="lb" style="font-size:11.5px; line-height:1.45; max-width:16ch;">{{ f.label }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div class="cd" id="sources" style="padding:clamp(16px,1.8vw,24px);">
+        <div style="display:flex; align-items:baseline; gap:10px; margin-bottom:6px;">
+          <span class="n" style="font-size:11px; color:#B0B0A9;">01</span>
+          <span style="font-size:15px; font-weight:600; letter-spacing:-0.015em;">Where the data comes from</span>
+        </div>
+        <p class="lb" style="margin:0 0 18px; font-size:13.5px; line-height:1.68; max-width:64ch;">Four sources, in order of authority. When two disagree, the higher one wins and the conflict is flagged on the company page rather than quietly averaged.</p>
+        <sc-for list="{{ sources }}" as="sc" hint-placeholder-count="4">
+          <div style="display:grid; grid-template-columns:{{ sourceGrid }}; gap:12px; align-items:baseline; padding:13px 0; border-top:1px solid #F0F0EB;">
+            <span style="display:flex; align-items:center; gap:9px; min-width:0;">
+              <span style="width:26px; height:26px; border-radius:7px; background:#F2F5F3; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="{{ sc.icon }}" stroke="#1A7F37" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+              </span>
+              <span style="font-size:13px; font-weight:500; min-width:0; overflow-wrap:break-word;">{{ sc.name }}</span>
+            </span>
+            <span class="lb" style="font-size:12.5px; line-height:1.6; min-width:0; overflow-wrap:break-word;">{{ sc.detail }}</span>
+            <span class="lb" style="font-size:11.5px; text-align:right; white-space:nowrap; display:{{ cadenceDisplay }};">{{ sc.cadence }}</span>
+          </div>
+        </sc-for>
+      </div>
+
+      <div class="cd" id="factors" style="padding:clamp(16px,1.8vw,24px);">
+        <div style="display:flex; align-items:baseline; gap:10px; margin-bottom:6px;">
+          <span class="n" style="font-size:11px; color:#B0B0A9;">02</span>
+          <span style="font-size:15px; font-weight:600; letter-spacing:-0.015em;">The five factors</span>
+        </div>
+        <p class="lb" style="margin:0 0 18px; font-size:13.5px; line-height:1.68; max-width:64ch;">A StockEX score is the weighted mean of five factor scores. Each factor is a percentile against the PSE universe, not an absolute grade — a 90 means top decile on the exchange, nothing more.</p>
+        <sc-for list="{{ factors }}" as="fa" hint-placeholder-count="5">
+          <div style="padding:15px 0; border-top:1px solid #F0F0EB;">
+            <div style="display:grid; grid-template-columns:{{ factorGrid }}; gap:12px; align-items:center; margin-bottom:9px;">
+              <span style="font-size:13.5px; font-weight:600; min-width:0;">{{ fa.name }}</span>
+              <span style="display:flex; align-items:center; gap:9px; min-width:0;">
+                <span style="flex:1; min-width:40px; height:5px; border-radius:3px; background:#EDEDE8;"><span style="display:block; height:5px; width:{{ fa.weightWidth }}; border-radius:3px; background:#1A7F37;"></span></span>
+                <span class="n" style="font-size:12px; font-weight:600; white-space:nowrap;">{{ fa.weight }}</span>
+              </span>
+            </div>
+            <div class="lb" style="font-size:12.5px; line-height:1.65; max-width:62ch; margin-bottom:9px;">{{ fa.what }}</div>
+            <div style="display:flex; gap:6px; flex-wrap:wrap;">
+              <sc-for list="{{ fa.inputs }}" as="inp" hint-placeholder-count="3">
+                <span class="n" style="padding:3px 9px; border-radius:6px; background:#F4F4EF; font-size:10.5px; color:#5A5A55; white-space:nowrap;">{{ inp.label }}</span>
+              </sc-for>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+
+      <div class="cd" id="states" style="padding:clamp(16px,1.8vw,24px);">
+        <div style="display:flex; align-items:baseline; gap:10px; margin-bottom:6px;">
+          <span class="n" style="font-size:11px; color:#B0B0A9;">03</span>
+          <span style="font-size:15px; font-weight:600; letter-spacing:-0.015em;">What the states mean</span>
+        </div>
+        <p class="lb" style="margin:0 0 18px; font-size:13.5px; line-height:1.68; max-width:64ch;">A state describes the direction of the evidence since we last reviewed the company. It is deliberately not a recommendation, and it says nothing about whether the price already reflects it.</p>
+        <sc-for list="{{ states }}" as="st" hint-placeholder-count="4">
+          <div style="display:grid; grid-template-columns:{{ stateGrid }}; gap:12px; align-items:baseline; padding:13px 0; border-top:1px solid #F0F0EB;">
+            <span style="display:flex; align-items:center; gap:8px; white-space:nowrap;">
+              <span style="width:7px; height:7px; border-radius:50%; background:{{ st.color }}; flex-shrink:0;"></span>
+              <span style="font-size:13px; font-weight:600; color:{{ st.color }};">{{ st.label }}</span>
+            </span>
+            <span class="lb" style="font-size:12.5px; line-height:1.65; min-width:0; overflow-wrap:break-word;">{{ st.meaning }}</span>
+          </div>
+        </sc-for>
+      </div>
+
+      <div class="cd" id="coverage" style="padding:clamp(16px,1.8vw,24px);">
+        <div style="display:flex; align-items:baseline; gap:10px; margin-bottom:6px;">
+          <span class="n" style="font-size:11px; color:#B0B0A9;">04</span>
+          <span style="font-size:15px; font-weight:600; letter-spacing:-0.015em;">Coverage, not confidence</span>
+        </div>
+        <p class="lb" style="margin:0 0 18px; font-size:13.5px; line-height:1.68; max-width:64ch;">Each company shows a coverage figure. It measures how much of the required input set we actually found in primary filings — it is a completeness measure, never a verdict on quality.</p>
+        <div style="display:grid; grid-template-columns:{{ coverGrid }}; gap:clamp(12px,1.6vw,20px); align-items:center;">
+          <div style="display:flex; justify-content:center;">
+            <div style="position:relative; width:132px; height:132px;">
+              <svg viewBox="0 0 140 140" width="132" height="132" style="transform:rotate(-90deg);">
+                <circle cx="70" cy="70" r="58" stroke="#EDEDE8" stroke-width="11" fill="none"></circle>
+                <circle cx="70" cy="70" r="58" stroke="#1A7F37" stroke-width="11" fill="none" stroke-linecap="round" stroke-dasharray="{{ coverDash }}"></circle>
+              </svg>
+              <div style="position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+                <span class="n" style="font-size:30px; font-weight:600; line-height:1;">88</span>
+                <span class="lb" style="font-size:10px; margin-top:3px;">of 142 inputs</span>
+              </div>
+            </div>
+          </div>
+          <div style="min-width:0;">
+            <sc-for list="{{ coverageBands }}" as="cb" hint-placeholder-count="4">
+              <div style="display:grid; grid-template-columns:66px minmax(0,1fr); gap:11px; align-items:baseline; padding:8px 0; border-top:1px solid #F0F0EB;">
+                <span class="n" style="font-size:12px; font-weight:600; color:{{ cb.color }}; white-space:nowrap;">{{ cb.range }}</span>
+                <span class="lb" style="font-size:12.5px; line-height:1.58; min-width:0; overflow-wrap:break-word;">{{ cb.meaning }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+
+      <div class="cd" id="limits" style="padding:clamp(16px,1.8vw,24px);">
+        <div style="display:flex; align-items:baseline; gap:10px; margin-bottom:6px;">
+          <span class="n" style="font-size:11px; color:#B0B0A9;">05</span>
+          <span style="font-size:15px; font-weight:600; letter-spacing:-0.015em;">Where this method is weak</span>
+        </div>
+        <p class="lb" style="margin:0 0 18px; font-size:13.5px; line-height:1.68; max-width:64ch;">Any method that produces a number invites more trust than it has earned. These are the failure modes we know about.</p>
+        <sc-for list="{{ limits }}" as="lm" hint-placeholder-count="5">
+          <div style="display:grid; grid-template-columns:19px minmax(0,1fr); gap:11px; padding:12px 0; border-top:1px solid #F0F0EB;">
+            <svg width="17" height="17" viewBox="0 0 18 18" fill="none" style="margin-top:2px;"><circle cx="9" cy="9" r="7.4" stroke="#B26B00" stroke-width="1.4"></circle><path d="M9 5.4 V9.6 M9 12 V12.2" stroke="#B26B00" stroke-width="1.5" stroke-linecap="round"></path></svg>
+            <span style="min-width:0;">
+              <span style="display:block; font-size:13px; font-weight:500; margin-bottom:4px;">{{ lm.label }}</span>
+              <span class="lb" style="display:block; font-size:12.5px; line-height:1.65; max-width:62ch; overflow-wrap:break-word;">{{ lm.body }}</span>
+            </span>
+          </div>
+        </sc-for>
+      </div>
+
+      <div class="cd" id="revisions" style="padding:clamp(16px,1.8vw,24px);">
+        <div style="display:flex; align-items:baseline; gap:10px; margin-bottom:6px;">
+          <span class="n" style="font-size:11px; color:#B0B0A9;">06</span>
+          <span style="font-size:15px; font-weight:600; letter-spacing:-0.015em;">When we change our mind</span>
+        </div>
+        <p class="lb" style="margin:0 0 18px; font-size:13.5px; line-height:1.68; max-width:64ch;">Revisions are logged and kept. You can see what we thought before, when it changed, and what filing caused it — so the record cannot be quietly tidied up after the fact.</p>
+        <sc-for list="{{ revisions }}" as="rv" hint-placeholder-count="3">
+          <div style="display:grid; grid-template-columns:{{ revGrid }}; gap:12px; align-items:baseline; padding:13px 0; border-top:1px solid #F0F0EB;">
+            <span class="lb" style="font-size:11.5px; white-space:nowrap;">{{ rv.date }}</span>
+            <span style="min-width:0;">
+              <span style="display:flex; align-items:center; gap:8px; margin-bottom:4px; flex-wrap:wrap;">
+                <span style="font-size:12.5px; font-weight:600;">{{ rv.ticker }}</span>
+                <span class="lb" style="font-size:11.5px;">{{ rv.from }}</span>
+                <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6 H10 M7 3 L10 6 L7 9" stroke="#B0B0A9" stroke-width="1.4" stroke-linecap="round"></path></svg>
+                <span style="font-size:11.5px; font-weight:600; color:{{ rv.toColor }};">{{ rv.to }}</span>
+              </span>
+              <span class="lb" style="display:block; font-size:12.5px; line-height:1.6; overflow-wrap:break-word;">{{ rv.because }}</span>
+            </span>
+          </div>
+        </sc-for>
+      </div>
+
+      <div class="cd" style="padding:clamp(16px,1.8vw,24px); display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;">
+        <div style="min-width:0;">
+          <div style="font-size:14px; font-weight:600; margin-bottom:4px;">Found something wrong?</div>
+          <div class="lb" style="font-size:12.5px; line-height:1.6; max-width:44ch;">Corrections on a specific figure are read by a person, not a form queue.</div>
+        </div>
+        <a href="StockStory Settings.dc.html" style="display:inline-flex; align-items:center; gap:8px; height:42px; padding:0 17px; border-radius:9px; border:1px solid #DCDCD5; font-size:13.5px; font-weight:500; white-space:nowrap;" style-hover="border-color:#0A0A0A; color:#0A0A0A;">Report a correction</a>
+      </div>
+    </div>
+  </div>
+
+  <div style="border-top:1px solid #E8E8E3; padding:22px clamp(14px,2vw,26px); display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;">
+    <span class="lb" style="font-size:12px;">StockEX&#8482; Research · Makati City, Philippines</span>
+    <span class="lb" style="font-size:12px;">Research only. Not investment advice. Not a broker-dealer.</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{}">
+class Component extends DCLogic {
+  state = { width: typeof window !== 'undefined' ? window.innerWidth : 1480 };
+
+  componentDidMount() { this._r = () => this.setState({ width: window.innerWidth }); window.addEventListener('resize', this._r); }
+  componentWillUnmount() { window.removeEventListener('resize', this._r); }
+
+  renderVals() {
+    const w = this.state.width;
+    const C = 2 * Math.PI * 58;
+
+    return {
+      showNav: w >= 1080,
+      showBottomNav: w < 1080,
+      pageBottomPad: w < 1080 ? 'calc(66px + env(safe-area-inset-bottom))' : '0px',
+      bottomItems: [
+        { label: 'Home', href: 'StockStory Shell.dc.html', icon: 'M4.4 19.6 V9.8 L12 4.2 L19.6 9.8 V19.6 Z M9.4 19.6 V13.6 H14.6 V19.6' },
+        { label: 'Scanner', href: 'StockStory Scanner.dc.html', icon: 'M10.8 4.2 A6.6 6.6 0 1 1 10.79 4.2 Z M15.6 15.6 L20.4 20.4' },
+        { label: 'Watchlist', href: 'StockStory Watchlist.dc.html', icon: 'M12 3.8 L14.5 9.1 L20.3 9.9 L16.1 14 L17.2 19.8 L12 17 L6.8 19.8 L7.9 14 L3.7 9.9 L9.5 9.1 Z' },
+        { label: 'Portfolio', href: 'StockStory Portfolio.dc.html', icon: 'M3.8 19.6 H20.2 M6.8 19.6 V12.8 M11.2 19.6 V7.8 M15.6 19.6 V10.6 M20 19.6 V5.2' },
+        { label: 'Alerts', href: 'StockStory Alerts.dc.html', icon: 'M7.2 10.2 A4.8 4.8 0 0 1 16.8 10.2 C16.8 15 18.4 17 18.4 17 H5.6 C5.6 17 7.2 15 7.2 10.2 Z M10.2 19.6 A2.2 2.2 0 0 0 13.8 19.6' },
+      ].map(b => ({ ...b, color: '#9A9A94', weight: 500, stroke: 1.6 })),
+      topNav: [
+        { label: 'Research', href: 'StockStory Stock Detail.dc.html' },
+        { label: 'Scanner', href: 'StockStory Scanner.dc.html' },
+        { label: 'Rankings', href: 'StockStory Rankings.dc.html' },
+        { label: 'Pricing', href: 'StockStory Pricing.dc.html' },
+        { label: 'Methodology', href: 'StockStory Methodology.dc.html', active: true },
+      ].map(n => ({ ...n, weight: n.active ? 600 : 500, color: n.active ? '#0A0A0A' : '#3A3A36', rule: n.active ? '#1A7F37' : 'transparent' })),
+
+      bodyGrid: w >= 1080 ? '224px minmax(0,1fr)' : '1fr',
+      railDisplay: w >= 1080 ? 'flex' : 'none',
+      contentMax: w >= 1080 ? '830px' : '100%',
+      sourceGrid: w < 760 ? 'minmax(0,1fr)' : (w < 1000 ? 'minmax(150px,0.7fr) minmax(0,1fr)' : 'minmax(150px,0.62fr) minmax(0,1fr) 92px'),
+      cadenceDisplay: w < 1000 ? 'none' : 'block',
+      factorGrid: w < 560 ? 'minmax(0,1fr)' : 'minmax(0,1fr) minmax(120px,0.6fr)',
+      stateGrid: w < 620 ? 'minmax(0,1fr)' : '132px minmax(0,1fr)',
+      coverGrid: w < 700 ? '1fr' : 'auto minmax(0,1fr)',
+      revGrid: w < 620 ? 'minmax(0,1fr)' : '88px minmax(0,1fr)',
+
+      sectionNav: [
+        { num: '01', label: 'Data sources', href: '#sources', active: true },
+        { num: '02', label: 'The five factors', href: '#factors' },
+        { num: '03', label: 'What states mean', href: '#states' },
+        { num: '04', label: 'Coverage', href: '#coverage' },
+        { num: '05', label: 'Known weaknesses', href: '#limits' },
+        { num: '06', label: 'Revisions', href: '#revisions' },
+      ].map(s => ({
+        ...s,
+        bg: s.active ? '#F2F2ED' : 'transparent',
+        rail: s.active ? '#1A7F37' : 'transparent',
+        color: s.active ? '#0A0A0A' : '#6B6B66',
+        weight: s.active ? 600 : 500,
+      })),
+
+      facts: [
+        { value: '~280', label: 'PSE-listed companies' },
+        { value: '142', label: 'Inputs per company' },
+        { value: '5', label: 'Factors per score' },
+        { value: 'Daily', label: 'Rebuilt after the close' },
+      ],
+
+      sources: [
+        { name: 'Annual reports', cadence: 'Yearly', icon: 'M6.4 3.6 H14 L17.6 7.2 V20.4 H6.4 Z M14 3.6 V7.2 H17.6 M9.2 12.4 H14.8 M9.2 15.8 H14.8', detail: 'Audited statements as filed. The only source we treat as authoritative for balance-sheet and cash-flow figures.' },
+        { name: 'Quarterly disclosures', cadence: 'Quarterly', icon: 'M3.6 6.4 H20.4 V20.4 H3.6 Z M3.6 6.4 V4 M8 3 V6.4 M16 3 V6.4', detail: 'Unaudited, so trends are read from them but levels are reconciled against the last audited year.' },
+        { name: 'Exchange announcements', cadence: 'As filed', icon: 'M4.6 9.4 H8.4 L14.6 5.4 V18.6 L8.4 14.6 H4.6 Z M17.4 9.8 A3.4 3.4 0 0 1 17.4 14.2', detail: 'Dividends, board changes, material events. Drives the what-changed feed and event calendar.' },
+        { name: 'PSE market data', cadence: 'Intraday', icon: 'M3.6 19.4 H20.4 M6.6 19.4 V13 M11 19.4 V8.6 M15.4 19.4 V11 M19.8 19.4 V5.4', detail: 'Price, volume, and index levels. Used for momentum and valuation multiples only, never for fundamentals.' },
+      ],
+
+      factors: [
+        { name: 'Quality', weight: '30%', weightWidth: '100%', what: 'Return on capital, balance-sheet strength, and how reliably reported profit converts into cash. Weighted highest because it is the hardest thing for a company to fake over several years.', inputs: [{ label: 'ROE' }, { label: 'ROA' }, { label: 'Cash conversion' }, { label: 'Interest cover' }] },
+        { name: 'Growth', weight: '22%', weightWidth: '73%', what: 'Durability of revenue and earnings expansion over five years, discounted where growth came from acquisitions rather than the existing business.', inputs: [{ label: 'Revenue CAGR' }, { label: 'EPS CAGR' }, { label: 'Organic share' }] },
+        { name: 'Valuation', weight: '20%', weightWidth: '67%', what: 'Price against earnings, book, and cash flow — measured twice: against the sector median and against the company\u2019s own five-year range.', inputs: [{ label: 'P/E' }, { label: 'P/B' }, { label: 'EV/EBITDA' }, { label: 'FCF yield' }] },
+        { name: 'Risk', weight: '18%', weightWidth: '60%', what: 'Inverted, so a high score means low measured risk. Reads leverage, interest cover, revenue concentration, and earnings variability.', inputs: [{ label: 'Debt/equity' }, { label: 'Concentration' }, { label: 'Earnings variance' }] },
+        { name: 'Momentum', weight: '10%', weightWidth: '33%', what: 'Relative strength against the PSE Index over three, six, and twelve months, volatility-adjusted. Weighted lowest because it decays fastest.', inputs: [{ label: '3M relative' }, { label: '6M relative' }, { label: '12M relative' }] },
+      ],
+
+      states: [
+        { label: 'Strengthening', color: '#1A7F37', meaning: 'The evidence has improved on at least two factors since the last review, with nothing material deteriorating. It does not mean the stock is cheap.' },
+        { label: 'Stable', color: '#6B6B66', meaning: 'Nothing in the filings has moved the thesis either way. Most companies sit here most of the time, which is the honest answer.' },
+        { label: 'Needs review', color: '#B26B00', meaning: 'Something load-bearing in the thesis has weakened and warrants your attention before you act on the old view.' },
+        { label: 'Risk rising', color: '#D93025', meaning: 'A measured risk input — leverage, cash cover, or credit quality — has deteriorated for two or more consecutive periods.' },
+      ],
+
+      coverDash: (C * 0.88).toFixed(1) + ' ' + C.toFixed(1),
+      coverageBands: [
+        { range: '90 – 100', color: '#166B2E', meaning: 'Full audited set, cross-checked. Scores can be read at face value.' },
+        { range: '75 – 89', color: '#1A7F37', meaning: 'Complete on the essentials, with some secondary inputs estimated from prior periods.' },
+        { range: '50 – 74', color: '#B26B00', meaning: 'Material gaps. Factor scores are shown but the thesis language is hedged.' },
+        { range: 'Below 50', color: '#D93025', meaning: 'Not enough filed material to score. We show the gap instead of publishing a number.' },
+      ],
+
+      limits: [
+        { label: 'Percentiles are relative to a small exchange', body: 'A 90 on quality means top decile among roughly 280 PSE companies, not top decile globally. A strong Philippine bank is not automatically a strong bank.' },
+        { label: 'Quarterly figures are unaudited', body: 'Trends read from quarterlies can reverse when the annual audit lands. We reconcile levels to the last audited year, but the direction can still be wrong for a quarter.' },
+        { label: 'Momentum is backward-looking by construction', body: 'It describes what has already happened to the price. It carries the lowest weight for exactly this reason and should never be read as a forecast.' },
+        { label: 'Thin coverage penalises small caps', body: 'Companies that file less end up with lower coverage, which is a statement about disclosure, not about the business. Read the coverage figure alongside the score.' },
+        { label: 'A fair value estimate is a model, not a price target', body: 'Change the discount rate or the terminal growth assumption and the number moves materially. That is why we publish bear and bull cases beside it rather than a single figure.' },
+      ],
+
+      revisions: [
+        { date: '12 Aug 2026', ticker: 'BDO', from: 'Stable', to: 'Strengthening', toColor: '#1A7F37', because: 'Third consecutive quarter of above-sector loan growth with net interest margin held through the August rate cut.' },
+        { date: '11 Aug 2026', ticker: 'JFC', from: 'Stable', to: 'Needs review', toColor: '#B26B00', because: 'North America same-store sales decelerated against a soft base, weakening the growth leg the thesis rested on.' },
+        { date: '30 Jul 2026', ticker: 'TEL', from: 'Needs review', to: 'Risk rising', toColor: '#D93025', because: 'Capex intensity rose a third straight quarter while free cash cover fell below 1.4x.' },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>

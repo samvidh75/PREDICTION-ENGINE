@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    body { margin:0; background:#FAFAF7; font-family:"Instrument Sans", -apple-system, BlinkMacSystemFont, sans-serif; -webkit-font-smoothing:antialiased; color:#0A0A0A; }
+    * { box-sizing:border-box; }
+    .n { font-family:"IBM Plex Mono", ui-monospace, monospace; font-variant-numeric:tabular-nums; letter-spacing:-0.02em; }
+    .lb { font-size:12.5px; color:#6B6B66; }
+    a { color:#0A0A0A; text-decoration:none; }
+    a:hover { color:#1A7F37; }
+    ::selection { background:#D8EEDF; }
+    .cd { background:#FFFFFF; border:1px solid #E8E8E3; border-radius:12px; }
+    ::-webkit-scrollbar { width:9px; height:9px; }
+    ::-webkit-scrollbar-thumb { background:#DEDED7; border-radius:8px; }
+    @media (prefers-reduced-motion: reduce) { * { animation:none !important; transition:none !important; } }
+  </style>
+</helmet>
+
+<div style="min-height:100dvh; background:#FAFAF7; padding-bottom:{{ pageBottomPad }};">
+
+  <sc-if value="{{ showBottomNav }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed; left:0; right:0; bottom:0; z-index:60; background:#FFFFFFF2; backdrop-filter:saturate(180%) blur(12px); border-top:1px solid #E4E4DE; padding-bottom:env(safe-area-inset-bottom);">
+      <div style="display:grid; grid-template-columns:repeat(5, minmax(0,1fr));">
+        <sc-for list="{{ bottomItems }}" as="bi" hint-placeholder-count="5">
+          <a href="{{ bi.href }}" style="display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; min-height:56px; padding:8px 2px; color:{{ bi.color }};">
+            <svg width="21" height="21" viewBox="0 0 24 24" fill="none"><path d="{{ bi.icon }}" stroke="{{ bi.color }}" stroke-width="{{ bi.stroke }}" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+            <span style="font-size:10px; font-weight:{{ bi.weight }}; letter-spacing:0.01em;">{{ bi.label }}</span>
+          </a>
+        </sc-for>
+      </div>
+    </div>
+  </sc-if>
+
+  <div style="position:sticky; top:0; z-index:30; background:#FAFAF7; border-bottom:1px solid #E8E8E3;">
+    <div style="width:100%; max-width:1480px; margin:0 auto; padding:0 clamp(14px,2vw,26px); height:64px; display:flex; align-items:center; gap:clamp(14px,2.4vw,34px);">
+      <a href="StockStory Shell.dc.html" style="display:flex; align-items:center; gap:10px; flex-shrink:0;">
+        <svg width="30" height="30" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="9" fill="#0A0A0A"></rect><path d="M21 11.4 C21 8.6 11.6 8.8 11.6 13 C11.6 17.2 21 15.6 21 19.8 C21 24 11.6 23.6 11.6 20.8" stroke="#FFFFFF" stroke-width="2.1" stroke-linecap="round" fill="none"></path></svg>
+        <span style="line-height:1.1;"><span style="display:block; font-size:17px; font-weight:600; letter-spacing:-0.02em;">StockEX<span style="font-size:8.5px; font-weight:500; vertical-align:super; letter-spacing:0; margin-left:1px; color:#9A9A94;">&#8482;</span></span><span style="display:block; font-size:11.5px; color:#6B6B66;">Philippines</span></span>
+      </a>
+      <sc-if value="{{ showNav }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex; align-items:center; gap:clamp(12px,1.6vw,26px); margin-left:clamp(8px,2vw,28px);">
+          <sc-for list="{{ topNav }}" as="t" hint-placeholder-count="6">
+            <a href="{{ t.href }}" style="display:flex; align-items:center; gap:5px; font-size:14px; font-weight:{{ t.weight }}; color:{{ t.color }}; padding:20px 0; border-bottom:2px solid {{ t.rule }}; white-space:nowrap;" style-hover="color:#1A7F37;">{{ t.label }}</a>
+          </sc-for>
+        </div>
+      </sc-if>
+      <div style="flex:1;"></div>
+      <sc-if value="{{ showNav }}" hint-placeholder-val="{{ true }}">
+        <a href="StockStory Sign In.dc.html" style="font-size:14px; font-weight:500; white-space:nowrap;">Sign in</a>
+      </sc-if>
+      <a href="StockStory Sign In.dc.html" style="display:inline-flex; align-items:center; gap:7px; height:42px; padding:0 18px; border-radius:9px; background:#0A0A0A; color:#FFFFFF; font-size:14px; font-weight:500; white-space:nowrap;" style-hover="background:#1A1A1A; color:#FFFFFF;">Start Free Trial <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M3 9 L9 3 M9 3 H4.6 M9 3 V7.4" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round"></path></svg></a>
+    </div>
+  </div>
+
+  <div style="width:100%; max-width:1480px; margin:0 auto; padding:clamp(30px,4vw,60px) clamp(14px,2vw,26px) clamp(18px,2vw,26px); text-align:center;">
+    <h1 style="margin:0 0 14px; font-size:clamp(28px,2.4vw + 16px,46px); font-weight:700; line-height:1.06; letter-spacing:-0.035em;">One price. Every company on the exchange.</h1>
+    <p class="lb" style="margin:0 auto 26px; font-size:clamp(14px,0.3vw + 13px,16px); line-height:1.65; max-width:52ch;">Around 280 PSE-listed companies, read and scored from primary filings. No tiers that hide the good research behind the expensive plan.</p>
+    <div style="display:inline-flex; align-items:center; gap:3px; padding:3px; background:#F2F2ED; border-radius:9px;">
+      <sc-for list="{{ cycles }}" as="cy" hint-placeholder-count="2">
+        <span onClick="{{ cy.select }}" style="display:inline-flex; align-items:center; gap:7px; padding:8px 16px; border-radius:7px; background:{{ cy.bg }}; font-size:13px; font-weight:{{ cy.weight }}; color:{{ cy.color }}; cursor:pointer; white-space:nowrap;">
+          {{ cy.label }}<sc-if value="{{ cy.badge }}" hint-placeholder-val="{{ false }}"><span style="padding:2px 7px; border-radius:5px; background:#EDF6F0; font-size:10.5px; font-weight:600; color:#166B2E;">Save 20%</span></sc-if>
+        </span>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="width:100%; max-width:1180px; margin:0 auto; padding:0 clamp(14px,2vw,26px) clamp(14px,1.6vw,20px); display:grid; grid-template-columns:{{ planGrid }}; gap:clamp(12px,1.4vw,18px); align-items:stretch;">
+    <sc-for list="{{ plans }}" as="p" hint-placeholder-count="3">
+      <div class="cd" style="padding:clamp(18px,2vw,26px); border-color:{{ p.border }}; box-shadow:{{ p.shadow }}; display:flex; flex-direction:column; min-width:0;">
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:6px;">
+          <span style="font-size:15px; font-weight:600; letter-spacing:-0.015em;">{{ p.name }}</span>
+          <sc-if value="{{ p.tag }}" hint-placeholder-val="{{ false }}">
+            <span style="padding:3px 9px; border-radius:6px; background:#0A0A0A; font-size:10.5px; font-weight:600; color:#FFFFFF; letter-spacing:0.03em;">{{ p.tagLabel }}</span>
+          </sc-if>
+        </div>
+        <div class="lb" style="font-size:12.5px; line-height:1.55; margin-bottom:18px; min-height:2.6em;">{{ p.who }}</div>
+        <div style="display:flex; align-items:baseline; gap:6px; flex-wrap:wrap;">
+          <span class="n" style="font-size:clamp(28px,1.6vw + 18px,38px); font-weight:600; letter-spacing:-0.035em;">{{ p.price }}</span>
+          <span class="lb" style="font-size:12.5px;">{{ p.per }}</span>
+        </div>
+        <div class="lb" style="font-size:11.5px; margin-top:5px;">{{ p.billNote }}</div>
+        <a href="StockStory Sign In.dc.html" style="display:flex; align-items:center; justify-content:center; gap:8px; height:46px; margin-top:20px; border-radius:9px; background:{{ p.ctaBg }}; border:1px solid {{ p.ctaBorder }}; color:{{ p.ctaColor }}; font-size:14px; font-weight:600;" style-hover="{{ p.ctaHover }}">{{ p.cta }}</a>
+        <div style="margin-top:20px; padding-top:17px; border-top:1px solid #F0F0EB;">
+          <div class="lb" style="font-size:10.5px; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:12px;">{{ p.listTitle }}</div>
+          <sc-for list="{{ p.features }}" as="ft" hint-placeholder-count="5">
+            <div style="display:grid; grid-template-columns:17px minmax(0,1fr); gap:9px; padding:6px 0;">
+              <svg width="15" height="15" viewBox="0 0 18 18" fill="none" style="margin-top:2px;"><path d="M4.4 9.4 L7.2 12.2 L13.6 5.8" stroke="{{ ft.color }}" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+              <span style="font-size:12.5px; line-height:1.58; color:#3A3A36; overflow-wrap:break-word;">{{ ft.text }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+
+  <div style="width:100%; max-width:1180px; margin:0 auto; padding:0 clamp(14px,2vw,26px) clamp(14px,1.6vw,20px);">
+    <div class="cd" style="overflow:hidden;">
+      <div style="padding:15px 17px; border-bottom:1px solid #E8E8E3;">
+        <div style="font-size:14.5px; font-weight:600;">What you get on each plan</div>
+        <div class="lb" style="font-size:11.5px; margin-top:3px;">Research depth is the same on every paid plan. Only breadth and history differ.</div>
+      </div>
+      <div style="overflow-x:auto;">
+        <div style="min-width:{{ tableMinWidth }};">
+          <div style="display:grid; grid-template-columns:{{ matrixGrid }}; gap:12px; padding:10px 17px; border-bottom:1px solid #E8E8E3; background:#FBFBF8;">
+            <span class="lb" style="font-size:11px; font-weight:600;">Capability</span>
+            <span class="lb" style="font-size:11px; font-weight:600; text-align:center;">Free</span>
+            <span class="lb" style="font-size:11px; font-weight:600; text-align:center;">Research</span>
+            <span class="lb" style="font-size:11px; font-weight:600; text-align:center;">Professional</span>
+          </div>
+          <sc-for list="{{ matrix }}" as="m" hint-placeholder-count="9">
+            <div style="display:grid; grid-template-columns:{{ matrixGrid }}; gap:12px; align-items:center; padding:11px 17px; border-bottom:1px solid #F0F0EB;" style-hover="background:#FAFAF7;">
+              <span style="font-size:12.5px; min-width:0; overflow-wrap:break-word;">{{ m.label }}</span>
+              <sc-for list="{{ m.cells }}" as="c" hint-placeholder-count="3">
+                <span style="display:flex; align-items:center; justify-content:center;">
+                  <sc-if value="{{ c.isText }}" hint-placeholder-val="{{ false }}">
+                    <span class="n" style="font-size:12px; font-weight:500; color:{{ c.color }}; white-space:nowrap;">{{ c.text }}</span>
+                  </sc-if>
+                  <sc-if value="{{ c.isYes }}" hint-placeholder-val="{{ false }}">
+                    <svg width="16" height="16" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7.6" fill="#EDF6F0"></circle><path d="M5.4 9.2 L7.6 11.4 L12.6 6.4" stroke="#1A7F37" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                  </sc-if>
+                  <sc-if value="{{ c.isNo }}" hint-placeholder-val="{{ false }}">
+                    <span style="width:10px; height:1.5px; border-radius:1px; background:#D4D4CD;"></span>
+                  </sc-if>
+                </span>
+              </sc-for>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="width:100%; max-width:1180px; margin:0 auto; padding:0 clamp(14px,2vw,26px) clamp(14px,1.6vw,20px);">
+    <div class="cd" style="padding:clamp(18px,2vw,26px);">
+      <div style="font-size:14.5px; font-weight:600; margin-bottom:4px;">Questions people actually ask</div>
+      <div class="lb" style="font-size:11.5px; margin-bottom:8px;">Straight answers, including the unflattering ones.</div>
+      <sc-for list="{{ faq }}" as="q" hint-placeholder-count="5">
+        <div style="border-top:1px solid #F0F0EB;">
+          <div onClick="{{ q.toggle }}" style="display:grid; grid-template-columns:minmax(0,1fr) 20px; gap:12px; align-items:center; padding:15px 0; cursor:pointer;">
+            <span style="font-size:13.5px; font-weight:500; min-width:0; overflow-wrap:break-word;">{{ q.question }}</span>
+            <span style="display:flex; align-items:center; justify-content:center; width:20px; height:20px;">
+              <svg width="13" height="13" viewBox="0 0 14 14" fill="none" style="transform:{{ q.caret }}; transition:transform 180ms cubic-bezier(0.16,1,0.3,1);"><path d="M3.4 5.4 L7 9 L10.6 5.4" stroke="#8A8A84" stroke-width="1.6" stroke-linecap="round"></path></svg>
+            </span>
+          </div>
+          <sc-if value="{{ q.open }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:0 0 16px; max-width:76ch;">
+              <span class="lb" style="font-size:13px; line-height:1.7; overflow-wrap:break-word;">{{ q.answer }}</span>
+            </div>
+          </sc-if>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="width:100%; max-width:1180px; margin:0 auto; padding:0 clamp(14px,2vw,26px) clamp(34px,4vw,58px);">
+    <div class="cd" style="padding:clamp(24px,3vw,44px); text-align:center;">
+      <h2 style="margin:0 0 12px; font-size:clamp(20px,1.6vw + 13px,30px); font-weight:600; line-height:1.16; letter-spacing:-0.03em;">Try it on a company you already own.</h2>
+      <p class="lb" style="margin:0 auto 22px; font-size:14px; line-height:1.65; max-width:44ch;">Fourteen days, no card. If the first thesis you read tells you nothing new, walk away.</p>
+      <div style="display:flex; align-items:center; justify-content:center; gap:11px; flex-wrap:wrap;">
+        <a href="StockStory Sign In.dc.html" style="display:inline-flex; align-items:center; gap:9px; height:48px; padding:0 24px; border-radius:10px; background:#0A0A0A; color:#FFFFFF; font-size:15px; font-weight:600;" style-hover="background:#1A1A1A; color:#FFFFFF;">Start Free Trial</a>
+        <a href="StockStory Methodology.dc.html" style="display:inline-flex; align-items:center; gap:8px; height:48px; padding:0 22px; border-radius:10px; border:1px solid #DCDCD5; background:#FFFFFF; font-size:15px; font-weight:500;" style-hover="border-color:#0A0A0A; color:#0A0A0A;">Read the methodology</a>
+      </div>
+    </div>
+  </div>
+
+  <div style="border-top:1px solid #E8E8E3; padding:22px clamp(14px,2vw,26px); display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;">
+    <span class="lb" style="font-size:12px;">StockEX&#8482; Research · Makati City, Philippines</span>
+    <span class="lb" style="font-size:12px;">Research only. Not investment advice. Not a broker-dealer.</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{}">
+class Component extends DCLogic {
+  state = {
+    width: typeof window !== 'undefined' ? window.innerWidth : 1480,
+    cycle: 'Annual',
+    open: { 0: true },
+  };
+
+  componentDidMount() { this._r = () => this.setState({ width: window.innerWidth }); window.addEventListener('resize', this._r); }
+  componentWillUnmount() { window.removeEventListener('resize', this._r); }
+
+  renderVals() {
+    const w = this.state.width, s = this.state;
+    const annual = s.cycle === 'Annual';
+
+    const plans = [
+      {
+        name: 'Free', who: 'For seeing whether any of this is useful to you.',
+        price: '\u20B10', per: 'forever', billNote: 'No card, no trial clock.',
+        cta: 'Create account', ctaBg: '#FFFFFF', ctaBorder: '#DCDCD5', ctaColor: '#0A0A0A',
+        ctaHover: 'border-color:#0A0A0A; color:#0A0A0A;',
+        border: '#E8E8E3', shadow: 'none', tag: false, tagLabel: '',
+        listTitle: 'Includes',
+        features: [
+          { text: 'Full research on 10 companies of your choosing', color: '#1A7F37' },
+          { text: 'Scores, thesis, and key metrics on those 10', color: '#1A7F37' },
+          { text: 'Scanner and rankings, read-only', color: '#1A7F37' },
+          { text: 'Weekly digest email', color: '#1A7F37' },
+        ],
+      },
+      {
+        name: 'Research', who: 'For someone running their own portfolio of PSE names.',
+        price: annual ? '\u20B1390' : '\u20B1490', per: '/ month', billNote: annual ? 'Billed \u20B14,680 yearly. Cancel any time.' : 'Billed monthly. Cancel any time.',
+        cta: 'Start 14-day trial', ctaBg: '#0A0A0A', ctaBorder: '#0A0A0A', ctaColor: '#FFFFFF',
+        ctaHover: 'background:#1A1A1A; color:#FFFFFF;',
+        border: '#CDE5D6', shadow: '0 10px 30px -18px rgba(26,127,55,0.35)', tag: true, tagLabel: 'MOST CHOSEN',
+        listTitle: 'Everything in Free, plus',
+        features: [
+          { text: 'All ~280 PSE-listed companies', color: '#1A7F37' },
+          { text: 'Track up to 50 companies with thesis alerts', color: '#1A7F37' },
+          { text: 'Fair value estimates with bear and bull cases', color: '#1A7F37' },
+          { text: 'Compare up to four companies side by side', color: '#1A7F37' },
+          { text: 'Five years of filing history and revisions', color: '#1A7F37' },
+        ],
+      },
+      {
+        name: 'Professional', who: 'For advisers and analysts who answer to someone else.',
+        price: annual ? '\u20B11,490' : '\u20B11,850', per: '/ month', billNote: annual ? 'Billed \u20B117,880 yearly. Cancel any time.' : 'Billed monthly. Cancel any time.',
+        cta: 'Start 14-day trial', ctaBg: '#FFFFFF', ctaBorder: '#DCDCD5', ctaColor: '#0A0A0A',
+        ctaHover: 'border-color:#0A0A0A; color:#0A0A0A;',
+        border: '#E8E8E3', shadow: 'none', tag: false, tagLabel: '',
+        listTitle: 'Everything in Research, plus',
+        features: [
+          { text: 'Unlimited tracked companies', color: '#1A7F37' },
+          { text: 'Ten years of history and full revision trail', color: '#1A7F37' },
+          { text: 'Export to CSV and Excel', color: '#1A7F37' },
+          { text: 'Same-day filing reads instead of next-day', color: '#1A7F37' },
+          { text: 'Three seats included', color: '#1A7F37' },
+        ],
+      },
+    ];
+
+    const T = (text, color) => ({ isText: true, text, color: color || '#0A0A0A', isYes: false, isNo: false });
+    const Y = () => ({ isYes: true, isText: false, isNo: false, text: '', color: '' });
+    const N = () => ({ isNo: true, isText: false, isYes: false, text: '', color: '' });
+
+    const matrix = [
+      { label: 'Companies covered', cells: [T('10'), T('~280', '#166B2E'), T('~280', '#166B2E')] },
+      { label: 'Companies you can track', cells: [T('10'), T('50'), T('Unlimited', '#166B2E')] },
+      { label: 'Thesis and what-changed reads', cells: [Y(), Y(), Y()] },
+      { label: 'Fair value estimate', cells: [N(), Y(), Y()] },
+      { label: 'Side-by-side compare', cells: [T('2'), T('4'), T('4')] },
+      { label: 'Filing history', cells: [T('1 yr'), T('5 yrs'), T('10 yrs')] },
+      { label: 'Thesis-change alerts', cells: [N(), Y(), Y()] },
+      { label: 'Filing read latency', cells: [T('Next day'), T('Next day'), T('Same day', '#166B2E')] },
+      { label: 'CSV and Excel export', cells: [N(), N(), Y()] },
+      { label: 'Seats', cells: [T('1'), T('1'), T('3')] },
+    ];
+
+    const faqDefs = [
+      {
+        question: 'Do you tell me what to buy?',
+        answer: 'No. There is no buy, sell, or hold anywhere in the product, and there never will be. You get states \u2014 strengthening, stable, needs review, risk rising \u2014 and the evidence behind them. The decision stays yours, and so does the responsibility.',
+      },
+      {
+        question: 'Is this a broker? Can I trade through it?',
+        answer: 'No. We hold no funds, place no orders, and earn no commission on anything you do. When you have decided, you go to whichever broker you already use. That also means we have no incentive for you to trade more often, which is the point.',
+      },
+      {
+        question: 'Where does the data come from?',
+        answer: 'Audited annual reports, quarterly disclosures, and briefings as filed with the exchange, plus PSE price and volume data. Every company page shows a coverage figure so you can see how complete the underlying filings actually are rather than assuming.',
+      },
+      {
+        question: 'What happens when the trial ends?',
+        answer: 'Nothing is charged and nothing is deducted \u2014 we never took a card. Your account drops to Free, keeping full research on ten companies of your choosing. Your notes and tracked list stay where they are.',
+      },
+      {
+        question: 'Why only the Philippines?',
+        answer: 'Because reading roughly 280 companies properly is a real job, and skimming four markets badly is not a product. If we cover another exchange it will be because we can do it to the same standard, not to widen a feature list.',
+      },
+      {
+        question: 'Can I cancel whenever I want?',
+        answer: 'Yes, from Settings, in one click, with no retention call and no exit survey. Annual plans are refunded pro rata for the unused months.',
+      },
+    ];
+
+    return {
+      showNav: w >= 1080,
+      showBottomNav: w < 1080,
+      pageBottomPad: w < 1080 ? 'calc(66px + env(safe-area-inset-bottom))' : '0px',
+      bottomItems: [
+        { label: 'Home', href: 'StockStory Shell.dc.html', icon: 'M4.4 19.6 V9.8 L12 4.2 L19.6 9.8 V19.6 Z M9.4 19.6 V13.6 H14.6 V19.6' },
+        { label: 'Scanner', href: 'StockStory Scanner.dc.html', icon: 'M10.8 4.2 A6.6 6.6 0 1 1 10.79 4.2 Z M15.6 15.6 L20.4 20.4' },
+        { label: 'Watchlist', href: 'StockStory Watchlist.dc.html', icon: 'M12 3.8 L14.5 9.1 L20.3 9.9 L16.1 14 L17.2 19.8 L12 17 L6.8 19.8 L7.9 14 L3.7 9.9 L9.5 9.1 Z' },
+        { label: 'Portfolio', href: 'StockStory Portfolio.dc.html', icon: 'M3.8 19.6 H20.2 M6.8 19.6 V12.8 M11.2 19.6 V7.8 M15.6 19.6 V10.6 M20 19.6 V5.2' },
+        { label: 'Alerts', href: 'StockStory Alerts.dc.html', icon: 'M7.2 10.2 A4.8 4.8 0 0 1 16.8 10.2 C16.8 15 18.4 17 18.4 17 H5.6 C5.6 17 7.2 15 7.2 10.2 Z M10.2 19.6 A2.2 2.2 0 0 0 13.8 19.6' },
+      ].map(b => ({ ...b, color: '#9A9A94', weight: 500, stroke: 1.6 })),
+      topNav: [
+        { label: 'Research', href: 'StockStory Stock Detail.dc.html' },
+        { label: 'Scanner', href: 'StockStory Scanner.dc.html' },
+        { label: 'Rankings', href: 'StockStory Rankings.dc.html' },
+        { label: 'Pricing', href: 'StockStory Pricing.dc.html', active: true },
+        { label: 'Methodology', href: 'StockStory Methodology.dc.html' },
+      ].map(n => ({ ...n, weight: n.active ? 600 : 500, color: n.active ? '#0A0A0A' : '#3A3A36', rule: n.active ? '#1A7F37' : 'transparent' })),
+
+      cycles: ['Monthly', 'Annual'].map(l => ({
+        label: l, select: () => this.setState({ cycle: l }),
+        bg: l === s.cycle ? '#FFFFFF' : 'transparent',
+        color: l === s.cycle ? '#0A0A0A' : '#6B6B66',
+        weight: l === s.cycle ? 600 : 500,
+        badge: l === 'Annual',
+      })),
+
+      planGrid: w < 720 ? '1fr' : (w < 1000 ? 'repeat(2, minmax(0,1fr))' : 'repeat(3, minmax(0,1fr))'),
+      plans,
+
+      matrixGrid: w < 700 ? 'minmax(150px,1.4fr) 74px 84px 96px' : 'minmax(0,1.6fr) minmax(74px,0.6fr) minmax(84px,0.6fr) minmax(96px,0.6fr)',
+      tableMinWidth: w < 700 ? '470px' : 'auto',
+      matrix,
+
+      faq: faqDefs.map((q, i) => ({
+        question: q.question, answer: q.answer,
+        open: !!s.open[i],
+        caret: s.open[i] ? 'rotate(180deg)' : 'none',
+        toggle: () => this.setState(st => ({ open: { ...st.open, [i]: !st.open[i] } })),
+      })),
+    };
+  }
+}
+</script>
+</body>
+</html>

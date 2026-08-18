@@ -1,0 +1,214 @@
+/* StockEX Philippines — design tokens and primitives
+   Values lifted verbatim from the StockStory *.dc.html designs.
+   Import once, at the app entry: import "./handoff/stockex-theme.css";
+   Everything below is the exact vocabulary the 16 designs use. Do not add colors. */
+
+@import url("https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap");
+
+:root {
+  /* surfaces */
+  --sx-bg: #FAFAF7;
+  --sx-surface: #FFFFFF;
+  --sx-surface-sunken: #F4F4EF;
+  --sx-surface-quiet: #F2F2ED;
+  --sx-surface-tint: #F2F5F3;
+
+  /* rules */
+  --sx-rule: #E8E8E3;
+  --sx-rule-strong: #E4E4DE;
+  --sx-rule-input: #DCDCD5;
+  --sx-rule-soft: #F0F0EB;
+  --sx-rule-chart: #EDEDE8;
+
+  /* ink */
+  --sx-ink: #0A0A0A;
+  --sx-ink-2: #3A3A36;
+  --sx-ink-3: #6B6B66;
+  --sx-ink-4: #8A8A84;
+  --sx-ink-5: #9A9A94;
+  --sx-ink-6: #B0B0A9;
+  --sx-ink-7: #C4C4BD;
+
+  /* semantic */
+  --sx-up: #1A7F37;
+  --sx-up-bg: #E9F5ED;
+  --sx-up-bg-soft: #F1F8F3;
+  --sx-up-fill: #CFE6D8;
+  --sx-up-border: #C9D8CE;
+  --sx-down: #D93025;
+  --sx-down-bg: #FDF2F1;
+  --sx-down-fill: #F0CFCB;
+  --sx-select: #D8EEDF;
+  --sx-gold: #C9A15D;
+  --sx-navy: #0A2C5C;
+
+  /* type */
+  --sx-font: "Instrument Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+  --sx-mono: "IBM Plex Mono", ui-monospace, monospace;
+
+  /* geometry */
+  --sx-radius-card: 12px;
+  --sx-radius-tile: 11px;
+  --sx-radius-btn: 10px;
+  --sx-radius-btn-sm: 9px;
+  --sx-radius-field: 8px;
+  --sx-radius-pill: 999px;
+  --sx-max: 1400px;
+  --sx-gutter: clamp(14px, 2vw, 26px);
+  --sx-header-h: 64px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--sx-bg);
+  font-family: var(--sx-font);
+  -webkit-font-smoothing: antialiased;
+  color: var(--sx-ink);
+}
+
+a { color: var(--sx-ink); text-decoration: none; }
+a:hover { color: var(--sx-up); }
+::selection { background: var(--sx-select); }
+
+/* numerals — every price, score, percentage and count in the design */
+.n {
+  font-family: var(--sx-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+/* quiet label */
+.lb { font-size: 12.5px; color: var(--sx-ink-3); }
+
+/* card — the single container primitive */
+.cd {
+  background: var(--sx-surface);
+  border: 1px solid var(--sx-rule);
+  border-radius: var(--sx-radius-card);
+}
+
+/* eyebrow / section kicker */
+.sx-eyebrow {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--sx-ink-3);
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+/* page width */
+.sx-shell {
+  width: 100%;
+  max-width: var(--sx-max);
+  margin: 0 auto;
+  padding-left: var(--sx-gutter);
+  padding-right: var(--sx-gutter);
+}
+
+/* buttons */
+.sx-btn,
+.sx-btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  height: 52px;
+  padding: 0 26px;
+  border-radius: var(--sx-radius-btn);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 0;
+  font-family: inherit;
+}
+.sx-btn { background: var(--sx-ink); color: var(--sx-surface); }
+.sx-btn:hover { background: #1A1A1A; color: var(--sx-surface); }
+.sx-btn-ghost {
+  background: var(--sx-surface);
+  border: 1px solid var(--sx-rule-input);
+  color: var(--sx-ink);
+  font-weight: 500;
+  padding: 0 24px;
+}
+.sx-btn-ghost:hover { border-color: var(--sx-ink); color: var(--sx-ink); }
+
+.sx-btn-sm {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 42px;
+  padding: 0 18px;
+  border-radius: var(--sx-radius-btn-sm);
+  background: var(--sx-ink);
+  color: var(--sx-surface);
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.sx-btn-sm:hover { background: #1A1A1A; color: var(--sx-surface); }
+
+/* status pill (Strengthening / PSE EQUITY RESEARCH) */
+.sx-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  border-radius: var(--sx-radius-pill);
+  background: var(--sx-up-bg);
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--sx-up);
+  letter-spacing: 0.07em;
+}
+.sx-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--sx-up);
+  flex-shrink: 0;
+}
+
+/* segmented range control (1D / 1W / 1M / 1Y / YTD) */
+.sx-seg {
+  display: flex;
+  gap: 2px;
+  padding: 2px;
+  background: var(--sx-surface-quiet);
+  border-radius: 7px;
+}
+.sx-seg > button {
+  padding: 4px 9px;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--sx-ink-3);
+  font: 500 11px var(--sx-font);
+  cursor: pointer;
+}
+.sx-seg > button[aria-pressed="true"] { background: var(--sx-surface); color: var(--sx-ink); }
+
+/* headings */
+.sx-h1 {
+  margin: 0 0 20px;
+  font-size: clamp(34px, 3.4vw + 18px, 62px);
+  font-weight: 700;
+  line-height: 1.03;
+  letter-spacing: -0.035em;
+  text-wrap: pretty;
+}
+.sx-h2 {
+  margin: 0 0 7px;
+  font-size: clamp(20px, 1.4vw + 14px, 28px);
+  font-weight: 600;
+  letter-spacing: -0.025em;
+}
+.sx-lede {
+  margin: 0 0 30px;
+  font-size: clamp(15px, 0.4vw + 14px, 17px);
+  line-height: 1.6;
+  color: var(--sx-ink-3);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}

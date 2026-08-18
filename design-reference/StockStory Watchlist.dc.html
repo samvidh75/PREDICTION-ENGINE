@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <script src="_ds/raycast-command-ui-917818a8-4c87-4b33-aa1f-77e2df663ec5/_ds_bundle.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    body { margin:0; background:#FAFAF7; font-family:"Instrument Sans", -apple-system, BlinkMacSystemFont, sans-serif; -webkit-font-smoothing:antialiased; color:#0A0A0A; }
+    * { box-sizing:border-box; }
+    .n { font-family:"IBM Plex Mono", ui-monospace, monospace; font-variant-numeric:tabular-nums; letter-spacing:-0.02em; }
+    .lb { font-size:12.5px; color:#6B6B66; }
+    a { color:#0A0A0A; text-decoration:none; }
+    a:hover { color:#1A7F37; }
+    ::selection { background:#D8EEDF; }
+    .cd { background:#FFFFFF; border:1px solid #E8E8E3; border-radius:12px; }
+    ::-webkit-scrollbar { width:9px; height:9px; }
+    ::-webkit-scrollbar-thumb { background:#DEDED7; border-radius:8px; }
+    @media (prefers-reduced-motion: reduce) { * { animation:none !important; transition:none !important; } }
+  </style>
+</helmet>
+
+<div style="min-height:100dvh; background:#FAFAF7; padding-bottom:{{ pageBottomPad }};">
+
+  <sc-if value="{{ showBottomNav }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed; left:0; right:0; bottom:0; z-index:60; background:#FFFFFFF2; backdrop-filter:saturate(180%) blur(12px); border-top:1px solid #E4E4DE; padding-bottom:env(safe-area-inset-bottom);">
+      <div style="display:grid; grid-template-columns:repeat(5, minmax(0,1fr));">
+        <sc-for list="{{ bottomItems }}" as="bi" hint-placeholder-count="5">
+          <a href="{{ bi.href }}" style="display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; min-height:56px; padding:8px 2px; color:{{ bi.color }};">
+            <svg width="21" height="21" viewBox="0 0 24 24" fill="none"><path d="{{ bi.icon }}" stroke="{{ bi.color }}" stroke-width="{{ bi.stroke }}" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+            <span style="font-size:10px; font-weight:{{ bi.weight }}; letter-spacing:0.01em;">{{ bi.label }}</span>
+          </a>
+        </sc-for>
+      </div>
+    </div>
+  </sc-if>
+  <div style="position:sticky; top:0; z-index:30; background:#FAFAF7; border-bottom:1px solid #E8E8E3;">
+    <div style="width:100%; max-width:1480px; margin:0 auto; padding:0 clamp(14px,2vw,26px); height:64px; display:flex; align-items:center; gap:clamp(14px,2.4vw,34px);">
+      <a href="StockStory Shell.dc.html" style="display:flex; align-items:center; gap:10px; flex-shrink:0;">
+        <svg width="30" height="30" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="9" fill="#0A0A0A"></rect><path d="M21 11.4 C21 8.6 11.6 8.8 11.6 13 C11.6 17.2 21 15.6 21 19.8 C21 24 11.6 23.6 11.6 20.8" stroke="#FFFFFF" stroke-width="2.1" stroke-linecap="round" fill="none"></path></svg>
+        <span style="line-height:1.1;"><span style="display:block; font-size:17px; font-weight:600; letter-spacing:-0.02em;">StockEX<span style="font-size:8.5px; font-weight:500; vertical-align:super; letter-spacing:0; margin-left:1px; color:#9A9A94;">&#8482;</span></span><span style="display:block; font-size:11.5px; color:#6B6B66;">Philippines</span></span>
+      </a>
+      <sc-if value="{{ showNav }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex; align-items:center; gap:clamp(12px,1.6vw,26px); margin-left:clamp(8px,2vw,28px);">
+          <sc-for list="{{ topNav }}" as="t" hint-placeholder-count="6">
+            <a href="{{ t.href }}" style="display:flex; align-items:center; gap:5px; font-size:14px; font-weight:{{ t.weight }}; color:{{ t.color }}; padding:20px 0; border-bottom:2px solid {{ t.rule }}; white-space:nowrap;" style-hover="color:#1A7F37;">{{ t.label }}<sc-if value="{{ t.caret }}" hint-placeholder-val="{{ false }}"><svg width="9" height="9" viewBox="0 0 12 12" fill="none"><path d="M2.5 4.5 L6 8 L9.5 4.5" stroke="#6B6B66" stroke-width="1.5" stroke-linecap="round"></path></svg></sc-if></a>
+          </sc-for>
+        </div>
+      </sc-if>
+      <div style="flex:1;"></div>
+      <a href="StockStory Search.dc.html" style="display:flex; align-items:center; gap:8px; height:34px; padding:0 11px; border-radius:8px; border:1px solid #E4E4DE; background:#FFFFFF; color:#8A8A84;" style-hover="border-color:#0A0A0A; color:#0A0A0A;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="10.8" cy="10.8" r="6.6" stroke="currentColor" stroke-width="1.8"></circle><path d="M15.6 15.6 L20.4 20.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path></svg>
+        <span style="font-size:12.5px; display:{{ searchLabelShow }};">Search</span>
+        <span class="n" style="padding:2px 6px; border-radius:5px; background:#F4F4EF; font-size:10px; color:#9A9A94; display:{{ searchKbdShow }};">⌘K</span>
+      </a>
+      <sc-if value="{{ showNav }}" hint-placeholder-val="{{ true }}">
+        <a href="StockStory Sign In.dc.html" style="font-size:14px; font-weight:500; white-space:nowrap;">Sign in</a>
+      </sc-if>
+      <a href="StockStory Pricing.dc.html" style="display:inline-flex; align-items:center; gap:7px; height:42px; padding:0 18px; border-radius:9px; background:#0A0A0A; color:#FFFFFF; font-size:14px; font-weight:500; white-space:nowrap;" style-hover="background:#1A1A1A; color:#FFFFFF;">Start Free Trial <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M3 9 L9 3 M9 3 H4.6 M9 3 V7.4" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round"></path></svg></a>
+    </div>
+  </div>
+
+  <div style="width:100%; max-width:1480px; margin:0 auto; padding:clamp(12px,1.6vw,18px) clamp(14px,2vw,26px) 0;">
+    <div class="cd" style="display:grid; grid-template-columns:{{ tapeGrid }}; overflow:hidden;">
+      <sc-for list="{{ indices }}" as="ix" hint-placeholder-count="4">
+        <div style="padding:13px 17px; border-right:1px solid #E8E8E3; border-top:{{ ix.topRule }}; display:flex; flex-direction:column; gap:9px; min-width:0;">
+          <div style="min-width:0;">
+            <div style="font-size:10.5px; font-weight:600; color:#6B6B66; letter-spacing:0.09em; text-transform:uppercase; margin-bottom:5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ ix.name }}</div>
+            <div style="display:flex; align-items:baseline; gap:7px; flex-shrink:0; white-space:nowrap;">
+              <span class="n" style="font-size:17.5px; font-weight:600; letter-spacing:-0.025em;">{{ ix.value }}</span>
+              <span class="n" style="font-size:12.5px; font-weight:500; color:{{ ix.color }};">{{ ix.change }}</span>
+            </div>
+          </div>
+          <div style="width:100%; min-width:0; display:{{ rangeDisplay }}; flex-direction:column; gap:4px;">
+            <div style="position:relative; height:4px; border-radius:2px; background:#EDEDE8;">
+              <span style="position:absolute; left:0; width:{{ ix.pos }}; height:4px; border-radius:2px; background:{{ ix.color }}; opacity:0.26;"></span>
+              <span style="position:absolute; left:{{ ix.pos }}; top:-2px; width:2px; height:8px; border-radius:1px; background:{{ ix.color }}; transform:translateX(-1px);"></span>
+            </div>
+            <div style="display:flex; align-items:baseline; justify-content:space-between; gap:6px;">
+              <span class="n" style="font-size:11px; color:#6B6B66; white-space:nowrap;">{{ ix.low }}</span>
+              <span class="lb" style="font-size:10px; letter-spacing:0.06em; color:#6B6B66;">DAY</span>
+              <span class="n" style="font-size:11px; color:#6B6B66; white-space:nowrap;">{{ ix.high }}</span>
+            </div>
+          </div>
+        </div>
+      </sc-for>
+      <div style="padding:13px 17px; display:flex; flex-direction:column; justify-content:center; gap:3px; grid-column:{{ statusSpan }}; border-top:{{ statusTopRule }};">
+        <div style="display:flex; align-items:center; gap:6px; font-size:13px; font-weight:500; color:#1A7F37; white-space:nowrap;"><span style="width:6px; height:6px; border-radius:50%; background:#1A7F37;"></span>Market is Open</div>
+        <div class="lb" style="font-size:11.5px; white-space:nowrap;">Closes 3:30 PM PHT</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="width:100%; max-width:1480px; margin:0 auto; padding:clamp(14px,1.8vw,22px) clamp(14px,2vw,26px) clamp(28px,3.4vw,52px); display:grid; grid-template-columns:{{ bodyGrid }}; gap:clamp(12px,1.4vw,18px); align-items:start;">
+
+    <div style="min-width:0; display:flex; flex-direction:column; gap:clamp(12px,1.4vw,18px);">
+
+      <div class="cd" style="padding:clamp(16px,1.8vw,24px); min-width:0;">
+        <div style="display:flex; align-items:flex-end; justify-content:space-between; gap:16px; flex-wrap:wrap;">
+          <div style="min-width:0;">
+            <h1 style="margin:0 0 10px; font-size:clamp(22px,1.4vw + 14px,30px); font-weight:600; letter-spacing:-0.03em;">Your watchlist</h1>
+            <div style="display:flex; align-items:baseline; gap:16px; flex-wrap:wrap;">
+              <sc-for list="{{ pulse }}" as="p" hint-placeholder-count="4">
+                <span style="display:flex; align-items:center; gap:6px; font-size:13px;"><span style="width:6px; height:6px; border-radius:50%; background:{{ p.color }};"></span><span class="n" style="font-weight:600;">{{ p.count }}</span><span class="lb" style="font-size:12.5px;">{{ p.label }}</span></span>
+              </sc-for>
+            </div>
+          </div>
+          <a href="StockStory Scanner.dc.html" style="display:inline-flex; align-items:center; gap:7px; height:40px; padding:0 16px; border-radius:9px; background:#0A0A0A; color:#FFFFFF; font-size:13.5px; font-weight:500;" style-hover="background:#1A1A1A; color:#FFFFFF;">
+            <svg width="14" height="14" viewBox="0 0 20 20" fill="none"><path d="M10 4.4 V15.6 M4.4 10 H15.6" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round"></path></svg>Add company
+          </a>
+        </div>
+      </div>
+
+      <div class="cd" style="min-width:0; overflow:hidden;">
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; padding:13px 16px; border-bottom:1px solid #E8E8E3; flex-wrap:wrap;">
+          <span class="lb" style="font-size:12px;">{{ countLabel }}</span>
+          <select value="{{ sortKey }}" onChange="{{ onSortChange }}" style="height:36px; padding:0 10px; border:1px solid #DCDCD5; border-radius:8px; background:#FFFFFF; font-family:inherit; font-size:12.5px; cursor:pointer;">
+            <option value="since">Sort by return since added</option>
+            <option value="change">Sort by day change</option>
+            <option value="state">Sort by research state</option>
+            <option value="added">Sort by date added</option>
+            <option value="name">Sort by name</option>
+          </select>
+        </div>
+        <div style="padding:10px 16px; border-bottom:1px solid #F0F0EB; background:#FBFBF8;">
+          <span class="lb" style="font-size:11.5px; line-height:1.55;">Since added compares today's quote with the price when you started tracking. It is not a position or a trade.</span>
+        </div>
+        <div style="overflow-x:auto;">
+          <div style="min-width:{{ tableMinWidth }};">
+            <div style="display:grid; grid-template-columns:{{ rowGrid }}; gap:10px; align-items:center; padding:10px 16px; border-bottom:1px solid #E8E8E3; background:#FBFBF8;">
+              <span class="lb" style="font-size:11px; font-weight:600;">Company</span>
+              <span class="lb" style="font-size:11px; font-weight:600; display:{{ stateDisplay }};">Research state</span>
+              <span class="lb" style="font-size:11px; font-weight:600; text-align:right; display:{{ addedPriceDisplay }};">Added at</span>
+              <span class="lb" style="font-size:11px; font-weight:600; text-align:right;">Price</span>
+              <span class="lb" style="font-size:11px; font-weight:600; text-align:right; display:{{ dayDisplay }};">Today</span>
+              <span class="lb" style="font-size:11px; font-weight:600; text-align:right;">Since added</span>
+              <span class="lb" style="font-size:11px; font-weight:600; display:{{ addedDateDisplay }};">Added</span>
+              <span class="lb" style="font-size:11px; font-weight:600; text-align:right;">&nbsp;</span>
+            </div>
+            <sc-for list="{{ rows }}" as="r" hint-placeholder-count="8">
+              <div style="display:grid; grid-template-columns:{{ rowGrid }}; gap:10px; align-items:center; padding:12px 16px; border-bottom:1px solid #F0F0EB;" style-hover="background:#FAFAF7;">
+                <a href="StockStory Stock Detail.dc.html" style="display:flex; align-items:center; gap:10px; min-width:0; color:#0A0A0A;">
+                  <span style="width:30px; height:30px; border-radius:7px; background:{{ r.logoBg }}; color:#FFFFFF; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; flex-shrink:0;">{{ r.ticker }}</span>
+                  <span style="min-width:0;">
+                    <span style="display:block; font-size:13px; font-weight:600;">{{ r.ticker }}</span>
+                    <span class="lb" style="display:block; font-size:11.5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ r.name }}</span>
+                  </span>
+                </a>
+                <span style="display:{{ stateDisplay }}; align-items:center; gap:6px; font-size:11.5px; font-weight:500; color:{{ r.stateColor }}; white-space:nowrap;"><span style="width:6px; height:6px; border-radius:50%; background:{{ r.stateColor }}; flex-shrink:0;"></span>{{ r.state }}</span>
+                <span class="n" style="font-size:12.5px; text-align:right; color:#6B6B66; display:{{ addedPriceDisplay }};">{{ r.addedPrice }}</span>
+                <span class="n" style="font-size:13px; font-weight:500; text-align:right;">{{ r.price }}</span>
+                <span class="n" style="font-size:12.5px; text-align:right; color:{{ r.dayColor }}; display:{{ dayDisplay }};">{{ r.day }}</span>
+                <span style="text-align:right; min-width:0;">
+                  <span class="n" style="display:block; font-size:12.5px; font-weight:500; color:{{ r.sinceColor }};">{{ r.sincePct }}</span>
+                  <span class="n" style="display:block; font-size:11px; color:{{ r.sinceColor }}; opacity:0.78;">{{ r.sinceAbs }}</span>
+                </span>
+                <span class="lb" style="font-size:11.5px; display:{{ addedDateDisplay }}; white-space:nowrap;">{{ r.added }}</span>
+                <span onClick="{{ r.remove }}" style="font-size:11.5px; color:#9A9A94; cursor:pointer; text-align:right; white-space:nowrap;" style-hover="color:#D93025;">Remove</span>
+              </div>
+            </sc-for>
+            <sc-if value="{{ isEmpty }}" hint-placeholder-val="{{ false }}">
+              <div style="padding:52px 16px; text-align:center;">
+                <div style="font-size:14.5px; font-weight:600; margin-bottom:7px;">You are not tracking any companies yet</div>
+                <div class="lb" style="font-size:13px; margin-bottom:16px;">Start from the scanner and add the names you want to follow.</div>
+                <a href="StockStory Scanner.dc.html" style="display:inline-flex; align-items:center; gap:7px; height:40px; padding:0 18px; border-radius:9px; background:#0A0A0A; color:#FFFFFF; font-size:13.5px; font-weight:500;" style-hover="background:#1A1A1A; color:#FFFFFF;">Go to scanner <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6 H10 M7 3 L10 6 L7 9" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round"></path></svg></a>
+              </div>
+            </sc-if>
+          </div>
+        </div>
+        <div style="padding:12px 16px; border-top:1px solid #E8E8E3;">
+          <span class="lb" style="font-size:11.5px;">{{ limitNote }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="min-width:0; display:flex; flex-direction:column; gap:clamp(12px,1.4vw,18px);">
+      <div class="cd" style="padding:16px;">
+        <div style="font-size:13.5px; font-weight:600; margin-bottom:3px;">Needs your attention</div>
+        <div class="lb" style="font-size:11px; margin-bottom:12px;">Theses that moved this week</div>
+        <sc-for list="{{ attention }}" as="at" hint-placeholder-count="3">
+          <a href="StockStory Stock Detail.dc.html" style="display:block; padding:11px 0; border-top:1px solid #F0F0EB; color:#0A0A0A;">
+            <div style="display:flex; align-items:center; gap:7px; margin-bottom:5px;">
+              <span style="width:6px; height:6px; border-radius:50%; background:{{ at.color }}; flex-shrink:0;"></span>
+              <span style="font-size:12.5px; font-weight:600;">{{ at.ticker }}</span>
+              <span style="font-size:11.5px; color:{{ at.color }};">{{ at.state }}</span>
+              <span class="lb" style="font-size:10.5px; margin-left:auto; white-space:nowrap;">{{ at.date }}</span>
+            </div>
+            <div style="font-size:12px; line-height:1.58; color:#6B6B66; overflow-wrap:break-word;">{{ at.text }}</div>
+          </a>
+        </sc-for>
+      </div>
+
+      <div class="cd" style="padding:16px;">
+        <div style="font-size:13.5px; font-weight:600; margin-bottom:12px;">By sector</div>
+        <sc-for list="{{ bySector }}" as="bs" hint-placeholder-count="5">
+          <div style="display:grid; grid-template-columns:minmax(0,1fr) 46px 24px; gap:9px; align-items:center; padding:6px 0; border-top:1px solid #F0F0EB;">
+            <span style="font-size:12px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ bs.name }}</span>
+            <span style="height:5px; background:#EDEDE8; border-radius:3px; overflow:hidden;"><span style="display:block; height:5px; width:{{ bs.width }}; background:#1A7F37; border-radius:3px;"></span></span>
+            <span class="n" style="font-size:11.5px; text-align:right;">{{ bs.count }}</span>
+          </div>
+        </sc-for>
+      </div>
+
+      <div class="cd" style="padding:16px;">
+        <div style="font-size:13.5px; font-weight:600; margin-bottom:6px;">Alert on this list</div>
+        <div class="lb" style="font-size:12px; line-height:1.55; margin-bottom:13px;">Be told when a thesis changes on any company you track.</div>
+        <a href="StockStory Alerts.dc.html" style="display:flex; align-items:center; justify-content:center; gap:8px; height:42px; border-radius:9px; border:1px solid #DCDCD5; font-size:13px; font-weight:500;" style-hover="border-color:#0A0A0A; color:#0A0A0A;">
+          <svg width="15" height="15" viewBox="0 0 20 20" fill="none"><path d="M6 8.4 A4 4 0 0 1 14 8.4 C14 12.4 15.4 14 15.4 14 H4.6 C4.6 14 6 12.4 6 8.4 Z M8.4 16.2 A1.8 1.8 0 0 0 11.6 16.2" stroke="#0A0A0A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>Manage alerts
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{}">
+class Component extends DCLogic {
+  state = {
+    width: typeof window !== 'undefined' ? window.innerWidth : 1480,
+    sortKey: 'since',
+    removed: {},
+  };
+
+  componentDidMount() { this._r = () => this.setState({ width: window.innerWidth }); window.addEventListener('resize', this._r); }
+  componentWillUnmount() { window.removeEventListener('resize', this._r); }
+
+  spark(vals, w, h, pad) {
+    const p = pad == null ? 3 : pad;
+    const lo = Math.min.apply(null, vals), hi = Math.max.apply(null, vals), span = (hi - lo) || 1;
+    return vals.map((v, i) => {
+      const x = p + (i / (vals.length - 1)) * (w - p * 2);
+      const y = h - p - ((v - lo) / span) * (h - p * 2);
+      return (i ? 'L' : 'M') + x.toFixed(1) + ' ' + y.toFixed(1);
+    }).join(' ');
+  }
+
+  // seeded random walk — irregular like real tape, stable across renders
+  walk(seed, n, drift, vol) {
+    let s = seed * 7919 + 13, v = 100, out = [];
+    const rnd = () => { s = (s * 1103515245 + 12345) & 0x7fffffff; return s / 0x7fffffff; };
+    for (let i = 0; i < n; i++) {
+      const shock = (rnd() < 0.08) ? (rnd() - 0.5) * vol * 3.4 : 0;
+      v += (rnd() - 0.5) * vol + drift + shock;
+      out.push(v);
+    }
+    return out;
+  }
+
+  renderVals() {
+    const w = this.state.width, s = this.state;
+    const wide = w >= 1340, mid = w >= 1080;
+    const navItems = [
+      { label: 'Research', href: 'StockStory Stock Detail.dc.html', caret: true },
+      { label: 'Scanner', href: 'StockStory Scanner.dc.html', caret: false },
+      { label: 'Compare', href: 'StockStory Compare.dc.html', caret: false },
+      { label: 'Watchlist', href: 'StockStory Watchlist.dc.html', caret: false, active: true },
+      { label: 'Portfolio', href: 'StockStory Portfolio.dc.html', caret: false },
+      { label: 'Pricing', href: 'StockStory Pricing.dc.html', caret: false },
+        { label: 'Methodology', href: 'StockStory Methodology.dc.html', caret: false },
+    ];
+
+    const raw = [
+      { ticker: 'ICT', name: 'Int\u2019l Container Terminal Services', logoBg: '#1F4E3D', sector: 'Industrials', addedPrice: 232.60, price: 312.00, day: 3.48, state: 'Strengthening', added: '4 months ago', addedIdx: 4 },
+      { ticker: 'SM', name: 'SM Investments Corporation', logoBg: '#8A1A12', sector: 'Holding Firms', addedPrice: 812.00, price: 945.00, day: 2.31, state: 'Strengthening', added: '7 months ago', addedIdx: 7 },
+      { ticker: 'BDO', name: 'BDO Unibank, Inc.', logoBg: '#0A2C5C', sector: 'Financials', addedPrice: 120.90, price: 142.50, day: 1.82, state: 'Strengthening', added: '11 months ago', addedIdx: 11 },
+      { ticker: 'BPI', name: 'Bank of the Philippine Islands', logoBg: '#B8860B', sector: 'Financials', addedPrice: 118.40, price: 128.90, day: 1.21, state: 'Stable', added: '3 months ago', addedIdx: 3 },
+      { ticker: 'AC', name: 'Ayala Corporation', logoBg: '#2C3E6B', sector: 'Holding Firms', addedPrice: 586.00, price: 612.00, day: 0.94, state: 'Stable', added: '9 months ago', addedIdx: 9 },
+      { ticker: 'MER', name: 'Manila Electric Company', logoBg: '#C8571B', sector: 'Utilities', addedPrice: 396.20, price: 408.60, day: 0.42, state: 'Stable', added: '6 weeks ago', addedIdx: 1.5 },
+      { ticker: 'URC', name: 'Universal Robina Corporation', logoBg: '#6B3E8A', sector: 'Consumer', addedPrice: 98.20, price: 96.40, day: 0.68, state: 'Stable', added: '2 months ago', addedIdx: 2 },
+      { ticker: 'JFC', name: 'Jollibee Foods Corporation', logoBg: '#C1272D', sector: 'Consumer', addedPrice: 246.00, price: 228.40, day: -0.61, state: 'Needs review', added: '5 months ago', addedIdx: 5 },
+      { ticker: 'ALI', name: 'Ayala Land, Inc.', logoBg: '#3B6E4F', sector: 'Property', addedPrice: 28.60, price: 27.15, day: -0.22, state: 'Needs review', added: '8 months ago', addedIdx: 8 },
+      { ticker: 'TEL', name: 'PLDT Inc.', logoBg: '#1B3A6B', sector: 'Services', addedPrice: 1462.00, price: 1285.00, day: -1.14, state: 'Risk rising', added: '10 months ago', addedIdx: 10 },
+    ];
+
+    const live = raw.filter(r => !s.removed[r.ticker]);
+    const stateRank = { 'Risk rising': 0, 'Needs review': 1, 'Stable': 2, 'Strengthening': 3 };
+    const sincePct = r => (r.price - r.addedPrice) / r.addedPrice * 100;
+    const sorters = {
+      since: (a, b) => sincePct(b) - sincePct(a),
+      change: (a, b) => b.day - a.day,
+      state: (a, b) => stateRank[a.state] - stateRank[b.state],
+      added: (a, b) => a.addedIdx - b.addedIdx,
+      name: (a, b) => a.name.localeCompare(b.name),
+    };
+    const sorted = live.slice().sort(sorters[s.sortKey]);
+
+    const peso = v => '\u20B1' + v.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const stateColor = st => st === 'Strengthening' ? '#1A7F37' : (st === 'Stable' ? '#6B6B66' : (st === 'Needs review' ? '#B26B00' : '#D93025'));
+    const pct = v => (v >= 0 ? '+' : '') + v.toFixed(2) + '%';
+
+    const counts = { Strengthening: 0, Stable: 0, 'Needs review': 0, 'Risk rising': 0 };
+    live.forEach(r => { counts[r.state] += 1; });
+
+    const sectors = {};
+    live.forEach(r => { sectors[r.sector] = (sectors[r.sector] || 0) + 1; });
+    const sectorList = Object.keys(sectors).map(k => ({ name: k, count: sectors[k] }))
+      .sort((a, b) => b.count - a.count);
+    const maxSector = sectorList.length ? sectorList[0].count : 1;
+
+    return {
+      rangeDisplay: w < 400 ? 'none' : 'flex',
+      searchLabelShow: w >= 1240 ? 'inline' : 'none',
+      searchKbdShow: w >= 1240 ? 'inline' : 'none',
+      showBottomNav: w < 1080,
+      pageBottomPad: w < 1080 ? 'calc(66px + env(safe-area-inset-bottom))' : '0px',
+      bottomItems: [
+        { label: 'Home', href: 'StockStory Shell.dc.html', icon: 'M4.4 19.6 V9.8 L12 4.2 L19.6 9.8 V19.6 Z M9.4 19.6 V13.6 H14.6 V19.6' },
+        { label: 'Scanner', href: 'StockStory Scanner.dc.html', icon: 'M10.8 4.2 A6.6 6.6 0 1 1 10.79 4.2 Z M15.6 15.6 L20.4 20.4' },
+        { label: 'Watchlist', href: 'StockStory Watchlist.dc.html', icon: 'M12 3.8 L14.5 9.1 L20.3 9.9 L16.1 14 L17.2 19.8 L12 17 L6.8 19.8 L7.9 14 L3.7 9.9 L9.5 9.1 Z' },
+        { label: 'Portfolio', href: 'StockStory Portfolio.dc.html', icon: 'M3.8 19.6 H20.2 M6.8 19.6 V12.8 M11.2 19.6 V7.8 M15.6 19.6 V10.6 M20 19.6 V5.2' },
+        { label: 'Alerts', href: 'StockStory Alerts.dc.html', icon: 'M7.2 10.2 A4.8 4.8 0 0 1 16.8 10.2 C16.8 15 18.4 17 18.4 17 H5.6 C5.6 17 7.2 15 7.2 10.2 Z M10.2 19.6 A2.2 2.2 0 0 0 13.8 19.6' },
+      ].map(b => ({
+        ...b,
+        color: b.label === 'Watchlist' ? '#0A0A0A' : '#9A9A94',
+        weight: b.label === 'Watchlist' ? 600 : 500,
+        stroke: b.label === 'Watchlist' ? 1.9 : 1.6,
+      })),
+      showNav: w >= 1080,
+      topNav: navItems.map(n => ({ ...n, weight: n.active ? 600 : 500, color: n.active ? '#0A0A0A' : '#3A3A36', rule: n.active ? '#1A7F37' : 'transparent' })),
+      tapeGrid: w < 940 ? 'repeat(2, minmax(0,1fr))' : (w < 1180 ? 'repeat(4, minmax(0,1fr))' : 'repeat(4, minmax(0,1fr)) auto'),
+      statusSpan: w < 1180 ? '1 / -1' : 'auto',
+      statusTopRule: w < 1180 ? '1px solid #E8E8E3' : '0',
+      indices: [
+        { name: 'PSE Index', value: '6,842.15', change: '+0.84%', color: '#1A7F37', low: '6,801', high: '6,858', pos: '72%' },
+        { name: 'All Shares', value: '3,614.20', change: '+0.62%', color: '#1A7F37', low: '3,592', high: '3,621', pos: '77%' },
+        { name: 'Financials', value: '2,188.44', change: '+1.12%', color: '#1A7F37', low: '2,166', high: '2,194', pos: '80%' },
+        { name: 'Property', value: '2,470.06', change: '-0.31%', color: '#D93025', low: '2,462', high: '2,498', pos: '22%' },
+      ].map((ix, i) => ({ ...ix, topRule: (w < 940 && i > 1) ? '1px solid #E8E8E3' : '0' })),
+
+      bodyGrid: wide ? 'minmax(0,1fr) 300px' : '1fr',
+      pulse: [
+        { count: counts.Strengthening, label: 'strengthening', color: '#1A7F37' },
+        { count: counts.Stable, label: 'stable', color: '#6B6B66' },
+        { count: counts['Needs review'], label: 'need review', color: '#B26B00' },
+        { count: counts['Risk rising'], label: 'risk rising', color: '#D93025' },
+      ],
+      countLabel: live.length === 1 ? '1 company tracked' : (live.length + ' companies tracked'),
+      limitNote: 'You can track up to 50 companies. ' + (50 - live.length) + ' slots remaining.',
+      sortKey: s.sortKey,
+      onSortChange: e => this.setState({ sortKey: e.target.value }),
+
+      rowGrid: wide
+        ? 'minmax(160px,1.6fr) 126px 88px 92px 72px 104px 116px 68px'
+        : (mid ? 'minmax(150px,1.6fr) 122px 88px 88px 70px 100px 68px' : 'minmax(120px,1fr) 84px 92px 62px'),
+      tableMinWidth: wide ? '940px' : (mid ? '800px' : '370px'),
+      stateDisplay: mid ? 'flex' : 'none',
+      addedPriceDisplay: mid ? 'block' : 'none',
+      dayDisplay: mid ? 'block' : 'none',
+      addedDateDisplay: wide ? 'block' : 'none',
+
+      rows: sorted.map(r => {
+        const p = sincePct(r), abs = r.price - r.addedPrice;
+        return {
+          ticker: r.ticker, name: r.name, logoBg: r.logoBg,
+          state: r.state, stateColor: stateColor(r.state),
+          addedPrice: peso(r.addedPrice),
+          price: peso(r.price),
+          day: pct(r.day), dayColor: r.day >= 0 ? '#1A7F37' : '#D93025',
+          sincePct: pct(p),
+          sinceAbs: (abs >= 0 ? '+' : '-') + '\u20B1' + Math.abs(abs).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+          sinceColor: p >= 0 ? '#1A7F37' : '#D93025',
+          added: r.added,
+          remove: () => this.setState(st => ({ removed: { ...st.removed, [r.ticker]: true } })),
+        };
+      }),
+      isEmpty: live.length === 0,
+
+      attention: [
+        { ticker: 'TEL', state: 'Risk rising', color: '#D93025', date: '13 Aug', text: 'Capex intensity rose a third straight quarter while free cash cover thinned. Down 12.1% since you added it.' },
+        { ticker: 'JFC', state: 'Needs review', color: '#B26B00', date: '11 Aug', text: 'North America same-store sales decelerating against a soft base. The growth leg of the thesis is weakening.' },
+        { ticker: 'ALI', state: 'Needs review', color: '#B26B00', date: '6 Aug', text: 'Residential take-up slowed for a second quarter as mortgage rates held above 7%.' },
+      ],
+      bySector: sectorList.map(sc => ({
+        name: sc.name, count: sc.count, width: Math.round(sc.count / maxSector * 100) + '%',
+      })),
+    };
+  }
+}
+</script>
+</body>
+</html>

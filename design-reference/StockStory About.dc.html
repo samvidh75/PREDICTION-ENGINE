@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <script src="_ds/raycast-command-ui-917818a8-4c87-4b33-aa1f-77e2df663ec5/_ds_bundle.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    body { margin:0; background:#FAFAF7; font-family:"Instrument Sans", -apple-system, BlinkMacSystemFont, sans-serif; -webkit-font-smoothing:antialiased; color:#0A0A0A; }
+    * { box-sizing:border-box; }
+    .n { font-family:"IBM Plex Mono", ui-monospace, monospace; font-variant-numeric:tabular-nums; letter-spacing:-0.02em; }
+    .lb { font-size:12.5px; color:#6B6B66; }
+    a { color:#0A0A0A; text-decoration:none; }
+    a:hover { color:#1A7F37; }
+    ::selection { background:#D8EEDF; }
+    .cd { background:#FFFFFF; border:1px solid #E8E8E3; border-radius:12px; }
+    .scr { position:absolute; inset:0; transition:opacity 560ms cubic-bezier(0.16,1,0.3,1), transform 560ms cubic-bezier(0.16,1,0.3,1); }
+    ::-webkit-scrollbar { width:9px; height:9px; }
+    ::-webkit-scrollbar-thumb { background:#DEDED7; border-radius:8px; }
+    @media (prefers-reduced-motion: reduce) { *, .scr { animation:none !important; transition:none !important; } }
+  </style>
+</helmet>
+
+<div style="min-height:100dvh; background:#FAFAF7; padding-bottom:{{ pageBottomPad }};">
+
+  <sc-if value="{{ showBottomNav }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed; left:0; right:0; bottom:0; z-index:60; background:#FFFFFFF2; backdrop-filter:saturate(180%) blur(12px); border-top:1px solid #E4E4DE; padding-bottom:env(safe-area-inset-bottom);">
+      <div style="display:grid; grid-template-columns:repeat(5, minmax(0,1fr));">
+        <sc-for list="{{ bottomItems }}" as="bi" hint-placeholder-count="5">
+          <a href="{{ bi.href }}" style="display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; min-height:56px; padding:8px 2px; color:{{ bi.color }};">
+            <svg width="21" height="21" viewBox="0 0 24 24" fill="none"><path d="{{ bi.icon }}" stroke="{{ bi.color }}" stroke-width="{{ bi.stroke }}" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+            <span style="font-size:10px; font-weight:{{ bi.weight }}; letter-spacing:0.01em;">{{ bi.label }}</span>
+          </a>
+        </sc-for>
+      </div>
+    </div>
+  </sc-if>
+  <div style="position:sticky; top:0; z-index:30; background:#FAFAF7; border-bottom:1px solid #E8E8E3;">
+    <div style="width:100%; max-width:1480px; margin:0 auto; padding:0 clamp(14px,2vw,26px); height:64px; display:flex; align-items:center; gap:clamp(14px,2.4vw,34px);">
+      <a href="StockStory Shell.dc.html" style="display:flex; align-items:center; gap:10px; flex-shrink:0;">
+        <svg width="30" height="30" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="9" fill="#0A0A0A"></rect><path d="M21 11.4 C21 8.6 11.6 8.8 11.6 13 C11.6 17.2 21 15.6 21 19.8 C21 24 11.6 23.6 11.6 20.8" stroke="#FFFFFF" stroke-width="2.1" stroke-linecap="round" fill="none"></path></svg>
+        <span style="line-height:1.1;"><span style="display:block; font-size:17px; font-weight:600; letter-spacing:-0.02em;">StockEX<span style="font-size:8.5px; font-weight:500; vertical-align:super; letter-spacing:0; margin-left:1px; color:#9A9A94;">&#8482;</span></span><span style="display:block; font-size:11.5px; color:#6B6B66;">Philippines</span></span>
+      </a>
+      <sc-if value="{{ showNav }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex; align-items:center; gap:clamp(12px,1.6vw,26px); margin-left:clamp(8px,2vw,28px);">
+          <sc-for list="{{ topNav }}" as="t" hint-placeholder-count="6">
+            <a href="{{ t.href }}" style="display:flex; align-items:center; gap:5px; font-size:14px; font-weight:{{ t.weight }}; color:{{ t.color }}; padding:20px 0; border-bottom:2px solid {{ t.rule }}; white-space:nowrap;" style-hover="color:#1A7F37;">{{ t.label }}<sc-if value="{{ t.caret }}" hint-placeholder-val="{{ false }}"><svg width="9" height="9" viewBox="0 0 12 12" fill="none"><path d="M2.5 4.5 L6 8 L9.5 4.5" stroke="#6B6B66" stroke-width="1.5" stroke-linecap="round"></path></svg></sc-if></a>
+          </sc-for>
+        </div>
+      </sc-if>
+      <div style="flex:1;"></div>
+      <a href="StockStory Sign In.dc.html" style="font-size:14px; font-weight:500; white-space:nowrap; display:{{ signInDisplay }};">Sign in</a>
+      <a href="StockStory Shell.dc.html" style="display:inline-flex; align-items:center; gap:7px; height:42px; padding:0 18px; border-radius:9px; background:#0A0A0A; color:#FFFFFF; font-size:14px; font-weight:500; white-space:nowrap;" style-hover="background:#1A1A1A; color:#FFFFFF;">Open StockEX <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M3 9 L9 3 M9 3 H4.6 M9 3 V7.4" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round"></path></svg></a>
+    </div>
+  </div>
+
+  <div style="width:100%; max-width:1480px; margin:0 auto; padding:clamp(28px,4vw,64px) clamp(14px,2vw,26px) clamp(20px,2.4vw,32px); display:grid; grid-template-columns:{{ heroGrid }}; gap:clamp(28px,4vw,60px); align-items:center;">
+    <div style="min-width:0;">
+      <div style="display:inline-flex; align-items:center; gap:8px; padding:7px 13px; border-radius:999px; background:#E9F5ED; margin-bottom:24px;">
+        <span style="width:6px; height:6px; border-radius:50%; background:#1A7F37;"></span>
+        <span style="font-size:11.5px; font-weight:600; color:#166B2E; letter-spacing:0.06em;">PHILIPPINE EQUITY RESEARCH</span>
+      </div>
+      <h1 style="margin:0 0 18px; font-size:clamp(32px,3.4vw + 16px,58px); font-weight:700; line-height:1.04; letter-spacing:-0.035em; max-width:{{ heroTitleMeasure }};">You already know the names. You don't know what changed.</h1>
+      <p style="margin:0 0 26px; font-size:clamp(15px,0.4vw + 14px,17.5px); line-height:1.66; color:#6B6B66; max-width:{{ heroBodyMeasure }};">There are around 280 companies on the PSE. StockEX reads their filings the week they land, tells you which theses moved, and gets out of your way.</p>
+      <div style="display:flex; align-items:center; gap:13px; flex-wrap:wrap; margin-bottom:28px;">
+        <a href="StockStory Shell.dc.html" style="display:inline-flex; align-items:center; gap:9px; height:50px; padding:0 24px; border-radius:10px; background:#0A0A0A; color:#FFFFFF; font-size:15px; font-weight:600;" style-hover="background:#1A1A1A; color:#FFFFFF;">Open StockEX <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M3 9 L9 3 M9 3 H4.6 M9 3 V7.4" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round"></path></svg></a>
+        <span class="lb" style="font-size:12.5px;">Free while we are in beta. No card.</span>
+      </div>
+      <div style="display:flex; gap:{{ factsGap }}; flex-wrap:wrap;">
+        <sc-for list="{{ heroFacts }}" as="hf" hint-placeholder-count="3">
+          <div style="padding-right:{{ hf.pad }}; border-right:{{ hf.rule }};">
+            <div class="n" style="font-size:20px; font-weight:600; letter-spacing:-0.02em; margin-bottom:2px;">{{ hf.value }}</div>
+            <div class="lb" style="font-size:11.5px; line-height:1.4; max-width:15ch;">{{ hf.label }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="display:flex; flex-direction:column; align-items:center; gap:16px; min-width:0;">
+      <div style="position:relative; width:min(304px,84vw); aspect-ratio:304/624; border-radius:44px; background:#E4E4DE; border:1px solid #D2D2CB; padding:10px; box-shadow:0 26px 60px -26px rgba(0,0,0,0.28);">
+        <div style="position:relative; width:100%; height:100%; border-radius:35px; background:#FFFFFF; overflow:hidden;">
+          <div style="position:absolute; top:0; left:0; right:0; height:30px; display:flex; align-items:center; justify-content:space-between; padding:0 18px; z-index:4;">
+            <span class="n" style="font-size:10.5px; font-weight:600;">9:41</span>
+            <span style="display:flex; gap:3px; align-items:flex-end;">
+              <span style="width:3px; height:5px; background:#B0B0A9; border-radius:1px;"></span>
+              <span style="width:3px; height:7px; background:#B0B0A9; border-radius:1px;"></span>
+              <span style="width:3px; height:9px; background:#0A0A0A; border-radius:1px;"></span>
+              <span style="width:15px; height:8px; border:1px solid #B0B0A9; border-radius:2px; margin-left:3px;"></span>
+            </span>
+          </div>
+          <div style="position:absolute; top:6px; left:50%; transform:translateX(-50%); width:84px; height:20px; border-radius:12px; background:#E4E4DE; z-index:5;"></div>
+
+          <div class="scr" style="padding:36px 13px 0; opacity:{{ op0 }}; transform:{{ tf0 }};">
+            <div style="font-size:17px; font-weight:600; letter-spacing:-0.02em;">Watchlist</div>
+            <div class="lb" style="font-size:10.5px; margin-bottom:11px;">3 strengthening · 1 needs review</div>
+            <sc-for list="{{ phoneWatch }}" as="p" hint-placeholder-count="5">
+              <div style="display:grid; grid-template-columns:34px minmax(0,1fr) auto; align-items:center; gap:8px; padding:8px 0; border-top:1px solid #F0F0EB;">
+                <span style="width:26px; height:26px; border-radius:6px; background:{{ p.logoBg }}; color:#FFFFFF; display:flex; align-items:center; justify-content:center; font-size:8px; font-weight:700;">{{ p.ticker }}</span>
+                <span style="min-width:0;">
+                  <span style="display:block; font-size:11.5px; font-weight:600;">{{ p.ticker }}</span>
+                  <span style="display:flex; align-items:center; gap:5px; font-size:9.5px; color:{{ p.statusColor }}; margin-top:1px;"><span style="width:5px; height:5px; border-radius:50%; background:{{ p.statusColor }};"></span>{{ p.status }}</span>
+                </span>
+                <span style="text-align:right;">
+                  <span class="n" style="display:block; font-size:11.5px; font-weight:500;">{{ p.price }}</span>
+                  <span class="n" style="display:block; font-size:10px; color:{{ p.changeColor }};">{{ p.change }}</span>
+                </span>
+              </div>
+            </sc-for>
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; margin-top:9px; padding-top:9px; border-top:1px solid #E8E8E3;">
+              <span class="lb" style="font-size:9.5px;">10 of 50 tracked</span>
+              <span class="lb" style="font-size:9.5px;">Sorted by day change</span>
+            </div>
+          </div>
+
+          <div class="scr" style="padding:36px 13px 0; opacity:{{ op1 }}; transform:{{ tf1 }};">
+            <div class="lb" style="font-size:9.5px; margin-bottom:2px;">BDO · Financials</div>
+            <div style="font-size:15px; font-weight:600; letter-spacing:-0.02em; margin-bottom:7px;">BDO Unibank</div>
+            <div style="display:flex; align-items:baseline; gap:8px; margin-bottom:11px;">
+              <span class="n" style="font-size:25px; font-weight:600; letter-spacing:-0.03em;">₱142.50</span>
+              <span class="n" style="font-size:11px; color:#1A7F37;">+1.82%</span>
+            </div>
+            <svg viewBox="0 0 252 62" width="100%" height="62" fill="none" preserveAspectRatio="none" style="display:block; margin-bottom:12px;">
+              <path d="M2 52 L26 47 L50 50 L74 39 L98 43 L122 32 L146 35 L170 23 L194 27 L218 14 L250 8 L250 60 L2 60 Z" fill="#1A7F37" opacity="0.07"></path>
+              <path d="M2 52 L26 47 L50 50 L74 39 L98 43 L122 32 L146 35 L170 23 L194 27 L218 14 L250 8" stroke="#1A7F37" stroke-width="1.7" stroke-linecap="round"></path>
+            </svg>
+            <div style="display:grid; grid-template-columns:auto minmax(0,1fr); gap:11px; align-items:center; padding:9px 0; border-top:1px solid #F0F0EB; border-bottom:1px solid #F0F0EB; margin-bottom:10px;">
+              <div style="position:relative; width:52px; height:52px;">
+                <svg viewBox="0 0 56 56" width="52" height="52" style="transform:rotate(-90deg);">
+                  <circle cx="28" cy="28" r="23" stroke="#EDEDE8" stroke-width="5" fill="none"></circle>
+                  <circle cx="28" cy="28" r="23" stroke="#1A7F37" stroke-width="5" fill="none" stroke-linecap="round" stroke-dasharray="{{ phoneGauge }}"></circle>
+                </svg>
+                <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center;">
+                  <span class="n" style="font-size:15px; font-weight:600;">88</span>
+                </div>
+              </div>
+              <div style="min-width:0;">
+                <sc-for list="{{ phoneFactors }}" as="pf" hint-placeholder-count="3">
+                  <div style="display:flex; align-items:baseline; justify-content:space-between; gap:8px; padding:2px 0;">
+                    <span style="font-size:10px; color:#6B6B66;">{{ pf.name }}</span>
+                    <span class="n" style="font-size:10px; font-weight:600; color:#1A7F37;">{{ pf.score }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+            <div class="lb" style="font-size:9.5px; font-weight:600; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:5px;">What changed</div>
+            <div style="font-size:11px; line-height:1.6; color:#3A3A36; margin-bottom:11px;">Loan growth beat for a third quarter. Margin held through the rate cut, and provisioning stayed conservative against peers.</div>
+            <sc-for list="{{ phoneMetrics }}" as="pm" hint-placeholder-count="4">
+              <div style="display:flex; align-items:baseline; justify-content:space-between; gap:10px; padding:6px 0; border-top:1px solid #F0F0EB;">
+                <span class="lb" style="font-size:10px;">{{ pm.label }}</span>
+                <span class="n" style="font-size:10.5px; font-weight:500;">{{ pm.value }}</span>
+              </div>
+            </sc-for>
+            <div style="display:flex; gap:6px; margin-top:12px;">
+              <span style="flex:1; display:flex; align-items:center; justify-content:center; height:32px; border-radius:8px; background:#0A0A0A; color:#FFFFFF; font-size:10.5px; font-weight:600;">Track</span>
+              <span style="flex:1; display:flex; align-items:center; justify-content:center; height:32px; border-radius:8px; border:1px solid #DCDCD5; font-size:10.5px; font-weight:500;">Compare</span>
+              <span style="width:32px; display:flex; align-items:center; justify-content:center; height:32px; border-radius:8px; border:1px solid #DCDCD5; flex-shrink:0;">
+                <svg width="13" height="13" viewBox="0 0 20 20" fill="none"><path d="M6 8.4 A4 4 0 0 1 14 8.4 C14 12.4 15.4 14 15.4 14 H4.6 C4.6 14 6 12.4 6 8.4 Z M8.4 16.2 A1.8 1.8 0 0 0 11.6 16.2" stroke="#0A0A0A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+              </span>
+            </div>
+          </div>
+
+          <div class="scr" style="padding:36px 13px 0; opacity:{{ op2 }}; transform:{{ tf2 }};">
+            <div style="font-size:17px; font-weight:600; letter-spacing:-0.02em;">Alerts</div>
+            <div class="lb" style="font-size:10.5px; margin-bottom:12px;">Thursday, 13 August</div>
+            <sc-for list="{{ phoneAlerts }}" as="pa" hint-placeholder-count="3">
+              <div style="padding:11px; border-radius:9px; border:1px solid #E8E8E3; background:{{ pa.bg }}; margin-bottom:8px;">
+                <div style="display:flex; align-items:center; gap:6px; margin-bottom:6px;">
+                  <span style="width:5px; height:5px; border-radius:50%; background:{{ pa.color }};"></span>
+                  <span style="font-size:9.5px; font-weight:600; color:{{ pa.color }};">{{ pa.kind }}</span>
+                  <span class="n" style="font-size:9.5px; font-weight:600; margin-left:auto;">{{ pa.ticker }}</span>
+                </div>
+                <div style="font-size:11px; line-height:1.58; color:#3A3A36;">{{ pa.text }}</div>
+                <div class="lb" style="font-size:9.5px; margin-top:6px;">{{ pa.time }}</div>
+              </div>
+            </sc-for>
+          </div>
+
+          <div class="scr" style="padding:36px 13px 0; opacity:{{ op3 }}; transform:{{ tf3 }};">
+            <div style="font-size:17px; font-weight:600; letter-spacing:-0.02em;">Scanner</div>
+            <div class="lb" style="font-size:10.5px; margin-bottom:11px;">Score ≥ 80 · 128 companies</div>
+            <div style="display:flex; gap:5px; margin-bottom:10px; flex-wrap:wrap;">
+              <sc-for list="{{ phonePresets }}" as="pp" hint-placeholder-count="3">
+                <span style="padding:4px 9px; border-radius:6px; background:{{ pp.bg }}; border:1px solid {{ pp.border }}; font-size:9.5px; font-weight:{{ pp.weight }}; color:{{ pp.color }};">{{ pp.label }}</span>
+              </sc-for>
+            </div>
+            <sc-for list="{{ phoneScan }}" as="ps" hint-placeholder-count="6">
+              <div style="display:grid; grid-template-columns:minmax(0,1fr) 40px; gap:9px; align-items:center; padding:9px 0; border-top:1px solid #F0F0EB;">
+                <span style="min-width:0;">
+                  <span style="display:block; font-size:11.5px; font-weight:600;">{{ ps.ticker }}</span>
+                  <span class="lb" style="display:block; font-size:9.5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ ps.reason }}</span>
+                </span>
+                <span style="padding:4px 0; border-radius:6px; background:#EDF6F0; border:1px solid #D3E8DA; text-align:center;">
+                  <span class="n" style="display:block; font-size:12px; font-weight:600; color:#166B2E; line-height:1;">{{ ps.score }}</span>
+                </span>
+              </div>
+            </sc-for>
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; margin-top:9px; padding-top:9px; border-top:1px solid #E8E8E3;">
+              <span class="lb" style="font-size:9.5px;">128 of 280 companies</span>
+              <span class="lb" style="font-size:9.5px; color:#166B2E; font-weight:600;">Save this scan</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; gap:7px;">
+        <sc-for list="{{ dots }}" as="d" hint-placeholder-count="4">
+          <span onClick="{{ d.go }}" style="width:{{ d.w }}; height:4px; border-radius:2px; background:{{ d.bg }}; cursor:pointer; transition:width 300ms ease, background-color 300ms ease;"></span>
+        </sc-for>
+      </div>
+      <div class="lb" style="text-align:center; font-size:12.5px; min-height:1.5em; max-width:32ch;">{{ caption }}</div>
+    </div>
+  </div>
+
+  <div style="width:100%; max-width:1480px; margin:0 auto; padding:clamp(20px,2.4vw,32px) clamp(14px,2vw,26px) 0;">
+    <div class="cd" style="padding:clamp(20px,2.6vw,34px); display:grid; grid-template-columns:{{ noteGrid }}; gap:clamp(24px,4vw,56px);">
+      <div>
+        <div class="lb" style="font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:12px;">Why we built it</div>
+        <div style="display:flex; align-items:center; gap:11px; padding-top:14px; border-top:1px solid #F0F0EB;">
+          <div style="width:36px; height:36px; border-radius:50%; background:#0A2C5C; color:#FFFFFF; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:600; flex-shrink:0;">MR</div>
+          <div style="min-width:0;">
+            <div style="font-size:13px; font-weight:500;">Miguel Reyes</div>
+            <div class="lb" style="font-size:11.5px;">Co-founder · Makati City</div>
+          </div>
+        </div>
+      </div>
+      <div style="min-width:0;">
+        <p style="margin:0 0 16px; font-size:clamp(17px,0.8vw + 15px,22px); font-weight:500; line-height:1.5; letter-spacing:-0.02em;">I spent four years reading PSE disclosures on a Sunday night because nobody else was going to do it for me.</p>
+        <p style="margin:0 0 14px; font-size:14.5px; line-height:1.72; color:#6B6B66;">The filings are all public. They are also PDFs, posted at odd hours, written for regulators. If you hold eight or ten names, keeping up is a weekend job — and the week you skip is usually the week something moves.</p>
+        <p style="margin:0 0 14px; font-size:14.5px; line-height:1.72; color:#6B6B66;">So we built the thing we wanted: something that reads every filing as it lands, remembers what we thought last quarter, and says plainly when the two no longer agree. Not a score out of ten pretending to be certain. A sentence a person can argue with.</p>
+        <p style="margin:0; font-size:14.5px; line-height:1.72; color:#6B6B66;">We do not take orders, hold your money, or tell you what to buy. We are not a broker and have no interest in becoming one. When you have made up your mind, you go to the broker you already use.</p>
+      </div>
+    </div>
+  </div>
+
+  <div style="width:100%; max-width:1480px; margin:0 auto; padding:clamp(14px,1.6vw,20px) clamp(14px,2vw,26px) 0;">
+    <div class="cd" style="padding:clamp(20px,2.6vw,34px);">
+      <div style="text-align:center; margin-bottom:clamp(20px,2.4vw,30px);">
+        <h2 style="margin:0 0 7px; font-size:clamp(20px,1.4vw + 14px,28px); font-weight:600; letter-spacing:-0.025em;">What it actually does</h2>
+        <p class="lb" style="margin:0; font-size:13.5px;">Four things, done properly. Nothing else.</p>
+      </div>
+      <div style="display:grid; grid-template-columns:{{ featureGrid }}; gap:clamp(11px,1.2vw,16px);">
+        <sc-for list="{{ features }}" as="f" hint-placeholder-count="4">
+          <div style="padding:18px; border:1px solid #E8E8E3; border-radius:11px;" style-hover="border-color:#C9D8CE;">
+            <div style="width:32px; height:32px; border-radius:8px; background:#F2F5F3; display:flex; align-items:center; justify-content:center; margin-bottom:13px;">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="{{ f.icon }}" stroke="#1A7F37" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+            </div>
+            <div class="n" style="font-size:11px; color:#8A8A84; margin-bottom:7px;">{{ f.num }}</div>
+            <div style="font-size:14.5px; font-weight:600; margin-bottom:8px; letter-spacing:-0.015em;">{{ f.title }}</div>
+            <div style="font-size:13px; line-height:1.66; color:#6B6B66;">{{ f.body }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+
+  <div style="width:100%; max-width:1480px; margin:0 auto; padding:clamp(14px,1.6vw,20px) clamp(14px,2vw,26px) 0;">
+    <div class="cd" style="padding:clamp(20px,2.6vw,34px);">
+      <h2 style="margin:0 0 6px; font-size:clamp(20px,1.4vw + 14px,28px); font-weight:600; letter-spacing:-0.025em;">What it is not</h2>
+      <p class="lb" style="margin:0 0 22px; font-size:13.5px;">Saying this plainly matters more than another feature.</p>
+      <sc-for list="{{ limits }}" as="l" hint-placeholder-count="4">
+        <div style="display:grid; grid-template-columns:{{ limitGrid }}; gap:clamp(12px,2vw,32px); padding:16px 0; border-top:1px solid #F0F0EB;">
+          <div style="display:flex; align-items:flex-start; gap:9px; min-width:0;">
+            <svg width="16" height="16" viewBox="0 0 18 18" fill="none" style="flex-shrink:0; margin-top:2px;"><circle cx="9" cy="9" r="7.4" stroke="#B0B0A9" stroke-width="1.4"></circle><path d="M6.2 6.2 L11.8 11.8 M11.8 6.2 L6.2 11.8" stroke="#B0B0A9" stroke-width="1.4" stroke-linecap="round"></path></svg>
+            <span style="font-size:14px; font-weight:500;">{{ l.label }}</span>
+          </div>
+          <div style="font-size:13.5px; line-height:1.68; color:#6B6B66; min-width:0; overflow-wrap:break-word;">{{ l.body }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="width:100%; max-width:1480px; margin:0 auto; padding:clamp(14px,1.6vw,20px) clamp(14px,2vw,26px) clamp(34px,4vw,60px);">
+    <div class="cd" style="padding:clamp(28px,4vw,56px) clamp(20px,2.6vw,34px); text-align:center;">
+      <h2 style="margin:0 0 13px; font-size:clamp(23px,2vw + 14px,36px); font-weight:600; line-height:1.14; letter-spacing:-0.03em;">Start with one company you already own.</h2>
+      <p class="lb" style="margin:0 auto 24px; font-size:14.5px; line-height:1.68; max-width:44ch;">Read what changed last quarter. If it tells you something you did not know, keep going.</p>
+      <a href="StockStory Shell.dc.html" style="display:inline-flex; align-items:center; gap:9px; height:48px; padding:0 26px; border-radius:10px; background:#0A0A0A; color:#FFFFFF; font-size:15px; font-weight:600;" style-hover="background:#1A1A1A; color:#FFFFFF;">Open StockEX <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M3 9 L9 3 M9 3 H4.6 M9 3 V7.4" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round"></path></svg></a>
+    </div>
+  </div>
+
+  <div style="border-top:1px solid #E8E8E3; padding:22px clamp(14px,2vw,26px); display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;">
+    <span class="lb" style="font-size:12px;">StockEX&#8482; Research · Makati City, Philippines</span>
+    <span class="lb" style="font-size:12px;">Research only. Not investment advice. Not a broker-dealer.</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{}">
+class Component extends DCLogic {
+  state = { width: typeof window !== 'undefined' ? window.innerWidth : 1480, step: 0 };
+
+  componentDidMount() {
+    this._r = () => this.setState({ width: window.innerWidth });
+    window.addEventListener('resize', this._r);
+    const reduce = typeof window !== 'undefined' && window.matchMedia
+      && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!reduce) this._t = setInterval(() => this.setState(st => ({ step: (st.step + 1) % 4 })), 3600);
+  }
+  componentWillUnmount() {
+    window.removeEventListener('resize', this._r);
+    if (this._t) clearInterval(this._t);
+  }
+
+  renderVals() {
+    const w = this.state.width, step = this.state.step, total = 4;
+    const shift = i => {
+      if (i === step) return 'none';
+      const next = (step + 1) % total;
+      return i === next ? 'translateY(12px)' : 'translateY(-12px)';
+    };
+    const captions = [
+      'Everything you track, and what moved.',
+      'One company. What changed, in a sentence.',
+      'Told the week it happens, not the quarter after.',
+      'Find the next name worth the reading.',
+    ];
+    const navItems = [
+      { label: 'Research', href: 'StockStory Stock Detail.dc.html', caret: true },
+      { label: 'Scanner', href: 'StockStory Scanner.dc.html', caret: false },
+      { label: 'Rankings', href: 'StockStory Rankings.dc.html', caret: false },
+      { label: 'Sectors', href: 'StockStory Sectors.dc.html', caret: false },
+      { label: 'Pricing', href: 'StockStory Pricing.dc.html', caret: false },
+      { label: 'Methodology', href: 'StockStory Methodology.dc.html', caret: false },
+    ];
+    const C = 2 * Math.PI * 23;
+
+    return {
+      showBottomNav: w < 1080,
+      pageBottomPad: w < 1080 ? 'calc(66px + env(safe-area-inset-bottom))' : '0px',
+      bottomItems: [
+        { label: 'Home', href: 'StockStory Shell.dc.html', icon: 'M4.4 19.6 V9.8 L12 4.2 L19.6 9.8 V19.6 Z M9.4 19.6 V13.6 H14.6 V19.6' },
+        { label: 'Scanner', href: 'StockStory Scanner.dc.html', icon: 'M10.8 4.2 A6.6 6.6 0 1 1 10.79 4.2 Z M15.6 15.6 L20.4 20.4' },
+        { label: 'Watchlist', href: 'StockStory Watchlist.dc.html', icon: 'M12 3.8 L14.5 9.1 L20.3 9.9 L16.1 14 L17.2 19.8 L12 17 L6.8 19.8 L7.9 14 L3.7 9.9 L9.5 9.1 Z' },
+        { label: 'Portfolio', href: 'StockStory Portfolio.dc.html', icon: 'M3.8 19.6 H20.2 M6.8 19.6 V12.8 M11.2 19.6 V7.8 M15.6 19.6 V10.6 M20 19.6 V5.2' },
+        { label: 'Alerts', href: 'StockStory Alerts.dc.html', icon: 'M7.2 10.2 A4.8 4.8 0 0 1 16.8 10.2 C16.8 15 18.4 17 18.4 17 H5.6 C5.6 17 7.2 15 7.2 10.2 Z M10.2 19.6 A2.2 2.2 0 0 0 13.8 19.6' },
+      ].map(b => ({ ...b, color: '#9A9A94', weight: 500, stroke: 1.6 })),
+      showNav: w >= 1080,
+      signInDisplay: w >= 1080 ? 'inline' : 'none',
+      topNav: navItems.map(n => ({ ...n, weight: n.active ? 600 : 500, color: n.active ? '#0A0A0A' : '#3A3A36', rule: n.active ? '#1A7F37' : 'transparent' })),
+      heroGrid: w < 880 ? '1fr' : 'minmax(0,1.06fr) minmax(0,0.94fr)',
+      heroTitleMeasure: w < 880 ? '22ch' : '17ch',
+      heroBodyMeasure: w < 880 ? '60ch' : '47ch',
+      noteGrid: w < 820 ? '1fr' : 'minmax(0,0.32fr) minmax(0,1fr)',
+      limitGrid: w < 700 ? '1fr' : 'minmax(0,0.34fr) minmax(0,1fr)',
+      // column count driven by the item count so the last row never leaves empty tracks
+      featureGrid: w < 620 ? '1fr' : (w < 1120 ? 'repeat(2, minmax(0,1fr))' : 'repeat(4, minmax(0,1fr))'),
+
+      factsGap: w < 640 ? '14px 22px' : 'clamp(16px,2vw,26px)',
+      heroFacts: [
+        { value: '280', label: 'PSE companies covered' },
+        { value: '1,000+', label: 'Data points per company' },
+        { value: 'Daily', label: 'Filings read and scored' },
+      ].map((hf, i, arr) => {
+        // no rule on the final item, and none at all once the row wraps
+        const ruled = w >= 640 && i < arr.length - 1;
+        return { ...hf, rule: ruled ? '1px solid #E0E0DA' : '0', pad: ruled ? 'clamp(16px,2vw,26px)' : '0' };
+      }),
+
+      op0: step === 0 ? 1 : 0, op1: step === 1 ? 1 : 0, op2: step === 2 ? 1 : 0, op3: step === 3 ? 1 : 0,
+      tf0: shift(0), tf1: shift(1), tf2: shift(2), tf3: shift(3),
+      caption: captions[step],
+      dots: [0, 1, 2, 3].map(i => ({
+        w: i === step ? '22px' : '5px',
+        bg: i === step ? '#1A7F37' : '#DCDCD5',
+        go: () => this.setState({ step: i }),
+      })),
+
+      phoneWatch: [
+        { ticker: 'ICT', logoBg: '#1F4E3D', status: 'Strengthening', statusColor: '#1A7F37', price: '₱312.00', change: '+3.5%', changeColor: '#1A7F37' },
+        { ticker: 'SM', logoBg: '#8A1A12', status: 'Strengthening', statusColor: '#1A7F37', price: '₱945.00', change: '+2.3%', changeColor: '#1A7F37' },
+        { ticker: 'BDO', logoBg: '#0A2C5C', status: 'Strengthening', statusColor: '#1A7F37', price: '₱142.50', change: '+1.8%', changeColor: '#1A7F37' },
+        { ticker: 'BPI', logoBg: '#B8860B', status: 'Stable', statusColor: '#6B6B66', price: '₱128.90', change: '+1.2%', changeColor: '#1A7F37' },
+        { ticker: 'AC', logoBg: '#2C3E6B', status: 'Stable', statusColor: '#6B6B66', price: '₱612.00', change: '+0.9%', changeColor: '#1A7F37' },
+        { ticker: 'MER', logoBg: '#C8571B', status: 'Stable', statusColor: '#6B6B66', price: '₱408.60', change: '+0.4%', changeColor: '#1A7F37' },
+        { ticker: 'URC', logoBg: '#6B3E8A', status: 'Stable', statusColor: '#6B6B66', price: '₱96.40', change: '+0.7%', changeColor: '#1A7F37' },
+        { ticker: 'JFC', logoBg: '#C1272D', status: 'Needs review', statusColor: '#B26B00', price: '₱228.40', change: '-0.6%', changeColor: '#D93025' },
+        { ticker: 'ALI', logoBg: '#3B6E4F', status: 'Needs review', statusColor: '#B26B00', price: '₱27.15', change: '-0.2%', changeColor: '#D93025' },
+        { ticker: 'TEL', logoBg: '#1B3A6B', status: 'Risk rising', statusColor: '#D93025', price: '₱1,285.00', change: '-1.1%', changeColor: '#D93025' },
+      ],
+      phoneGauge: (C * 0.88).toFixed(1) + ' ' + C.toFixed(1),
+      phoneFactors: [
+        { name: 'Quality', score: 92 },
+        { name: 'Growth', score: 85 },
+        { name: 'Valuation', score: 78 },
+        { name: 'Risk', score: 82 },
+      ],
+      phoneMetrics: [
+        { label: 'Market cap', value: '₱758.4B' },
+        { label: 'P/E trailing', value: '10.4x' },
+        { label: 'Dividend yield', value: '4.20%' },
+        { label: '52-week range', value: '₱118.00 – ₱148.90' },
+      ],
+      phoneAlerts: [
+        { ticker: 'TEL', kind: 'Risk rising', color: '#D93025', bg: '#FDFAFA', time: '9:42 AM', text: 'Capex intensity up a third straight quarter. Free cash cover thinning.' },
+        { ticker: 'ICT', kind: 'Filing read', color: '#1A7F37', bg: '#FBFDFB', time: '8:30 AM', text: 'Volume guidance raised. Yard utilisation at a five-year high.' },
+        { ticker: 'JFC', kind: 'Needs review', color: '#B26B00', bg: '#FDFCF9', time: 'Yesterday', text: 'North America same-store sales decelerating against a soft base.' },
+        { ticker: 'BPI', kind: 'Thesis improving', color: '#1A7F37', bg: '#FBFDFB', time: 'Yesterday', text: 'Cost-to-income improved to 52.6%, strongest of the large banks.' },
+        { ticker: 'ALI', kind: 'Needs review', color: '#B26B00', bg: '#FDFCF9', time: 'Wed', text: 'Residential take-up slowed a second quarter as rates held above 7%.' },
+      ],
+      phonePresets: [
+        { label: 'Quality', bg: '#EDF6F0', border: '#D3E8DA', color: '#166B2E', weight: 600 },
+        { label: 'Value', bg: '#FFFFFF', border: '#DCDCD5', color: '#6B6B66', weight: 500 },
+        { label: 'Dividends', bg: '#FFFFFF', border: '#DCDCD5', color: '#6B6B66', weight: 500 },
+      ],
+      phoneScan: [
+        { ticker: 'BDO', reason: 'Margin held through the cut', score: 92 },
+        { ticker: 'ICT', reason: 'Volume guidance raised', score: 89 },
+        { ticker: 'SM', reason: 'Retail footfall recovering', score: 87 },
+        { ticker: 'BPI', reason: 'Best cost-to-income in class', score: 84 },
+        { ticker: 'AC', reason: 'Holdco discount narrowing', score: 81 },
+        { ticker: 'MER', reason: 'Rate reset confirmed', score: 79 },
+        { ticker: 'MBT', reason: 'Strongest capital buffer', score: 78 },
+        { ticker: 'URC', reason: 'Input costs easing', score: 76 },
+        { ticker: 'AEV', reason: 'Power margins recovering', score: 75 },
+        { ticker: 'CBC', reason: 'Cheapest on earnings', score: 74 },
+      ],
+
+      features: [
+        { num: '01', title: 'Reads the filings', icon: 'M6.4 3.6 H14 L17.6 7.2 V20.4 H6.4 Z M14 3.6 V7.2 H17.6 M9.2 12.4 H14.8 M9.2 15.8 H14.8', body: 'Every disclosure, annual report, and briefing the week it is posted to the exchange. You do not open a PDF unless you want to.' },
+        { num: '02', title: 'Remembers the thesis', icon: 'M12 3.6 A8.4 8.4 0 1 1 11.99 3.6 Z M12 7.6 V12 L15.4 14.2', body: 'What you believed about a company last quarter, held next to what the numbers now say. When those diverge, you hear about it.' },
+        { num: '03', title: 'Compares honestly', icon: 'M3.6 19.4 H20.4 M6.6 19.4 V13 M11 19.4 V8.6 M15.4 19.4 V11 M19.8 19.4 V5.4', body: 'A multiple means nothing alone. Every figure sits against the sector median and the company\u2019s own five-year history.' },
+        { num: '04', title: 'Says what it does not know', icon: 'M4.4 14.6 A7.6 7.6 0 0 1 19.6 14.6 M12 14.6 L16.4 9.4', body: 'Coverage is shown as a number. Where a filing is thin or late, the page says so instead of filling the gap.' },
+      ],
+      limits: [
+        { label: 'Not a broker', body: 'We hold no funds, place no orders, and take no commission. When you decide, you go to the broker you already use.' },
+        { label: 'No recommendations', body: 'You will not find buy, sell, or hold anywhere in the product. Strengthening, stable, needs review \u2014 states, not instructions.' },
+        { label: 'No certainty theatre', body: 'No conviction score pretending to be precise. Where the evidence is thin, the language is hedged and the coverage number says so.' },
+        { label: 'Philippines only', body: 'Around 280 PSE-listed companies. We would rather read those properly than skim four markets badly.' },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>

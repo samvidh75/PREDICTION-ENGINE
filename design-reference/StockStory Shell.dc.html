@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <script src="_ds/raycast-command-ui-917818a8-4c87-4b33-aa1f-77e2df663ec5/_ds_bundle.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    body { margin:0; background:#FAFAF7; font-family:"Instrument Sans", -apple-system, BlinkMacSystemFont, sans-serif; -webkit-font-smoothing:antialiased; color:#0A0A0A; }
+    * { box-sizing:border-box; }
+    .n { font-family:"IBM Plex Mono", ui-monospace, monospace; font-variant-numeric:tabular-nums; letter-spacing:-0.02em; }
+    .lb { font-size:12.5px; color:#6B6B66; }
+    a { color:#0A0A0A; text-decoration:none; }
+    a:hover { color:#1A7F37; }
+    ::selection { background:#D8EEDF; }
+    .cd { background:#FFFFFF; border:1px solid #E8E8E3; border-radius:12px; }
+    @media (prefers-reduced-motion: reduce) { * { animation:none !important; transition:none !important; } }
+  </style>
+</helmet>
+
+<div style="min-height:100dvh; background:#FAFAF7; padding-bottom:{{ pageBottomPad }};">
+
+  <sc-if value="{{ showBottomNav }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed; left:0; right:0; bottom:0; z-index:60; background:#FFFFFFF2; backdrop-filter:saturate(180%) blur(12px); border-top:1px solid #E4E4DE; padding-bottom:env(safe-area-inset-bottom);">
+      <div style="display:grid; grid-template-columns:repeat(5, minmax(0,1fr));">
+        <sc-for list="{{ bottomItems }}" as="bi" hint-placeholder-count="5">
+          <a href="{{ bi.href }}" style="display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; min-height:56px; padding:8px 2px; color:{{ bi.color }};">
+            <svg width="21" height="21" viewBox="0 0 24 24" fill="none"><path d="{{ bi.icon }}" stroke="{{ bi.color }}" stroke-width="{{ bi.stroke }}" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+            <span style="font-size:10px; font-weight:{{ bi.weight }}; letter-spacing:0.01em;">{{ bi.label }}</span>
+          </a>
+        </sc-for>
+      </div>
+    </div>
+  </sc-if>
+  <div style="position:sticky; top:0; z-index:30; background:#FAFAF7; border-bottom:1px solid #E8E8E3;">
+    <div style="width:100%; max-width:1400px; margin:0 auto; padding:0 clamp(14px,2vw,26px); height:64px; display:flex; align-items:center; gap:clamp(14px,2.4vw,34px);">
+      <a href="StockStory Shell.dc.html" style="display:flex; align-items:center; gap:10px; flex-shrink:0;">
+        <svg width="30" height="30" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="9" fill="#0A0A0A"></rect><path d="M21 11.4 C21 8.6 11.6 8.8 11.6 13 C11.6 17.2 21 15.6 21 19.8 C21 24 11.6 23.6 11.6 20.8" stroke="#FFFFFF" stroke-width="2.1" stroke-linecap="round" fill="none"></path></svg>
+        <span style="line-height:1.1;"><span style="display:block; font-size:17px; font-weight:600; letter-spacing:-0.02em;">StockEX<span style="font-size:8.5px; font-weight:500; vertical-align:super; letter-spacing:0; margin-left:1px; color:#9A9A94;">&#8482;</span></span><span style="display:block; font-size:11.5px; color:#6B6B66;">Philippines</span></span>
+      </a>
+      <sc-if value="{{ showNav }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex; align-items:center; gap:clamp(12px,1.6vw,26px); margin-left:clamp(8px,2vw,28px);">
+          <sc-for list="{{ topNav }}" as="t" hint-placeholder-count="6">
+            <a href="{{ t.href }}" style="display:flex; align-items:center; gap:5px; font-size:14px; font-weight:{{ t.weight }}; color:{{ t.color }}; padding:20px 0; border-bottom:2px solid {{ t.rule }}; white-space:nowrap;" style-hover="color:#1A7F37;">{{ t.label }}<sc-if value="{{ t.caret }}" hint-placeholder-val="{{ false }}"><svg width="9" height="9" viewBox="0 0 12 12" fill="none"><path d="M2.5 4.5 L6 8 L9.5 4.5" stroke="#6B6B66" stroke-width="1.5" stroke-linecap="round"></path></svg></sc-if></a>
+          </sc-for>
+        </div>
+      </sc-if>
+      <div style="flex:1;"></div>
+      <a href="StockStory Search.dc.html" style="display:flex; align-items:center; gap:8px; height:34px; padding:0 11px; border-radius:8px; border:1px solid #E4E4DE; background:#FFFFFF; color:#8A8A84;" style-hover="border-color:#0A0A0A; color:#0A0A0A;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="10.8" cy="10.8" r="6.6" stroke="currentColor" stroke-width="1.8"></circle><path d="M15.6 15.6 L20.4 20.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path></svg>
+        <span style="font-size:12.5px; display:{{ searchLabelShow }};">Search</span>
+        <span class="n" style="padding:2px 6px; border-radius:5px; background:#F4F4EF; font-size:10px; color:#6B6B66; display:{{ searchKbdShow }};">⌘K</span>
+      </a>
+      <sc-if value="{{ showNav }}" hint-placeholder-val="{{ true }}">
+        <a href="StockStory Sign In.dc.html" style="font-size:14px; font-weight:500; white-space:nowrap;">Sign in</a>
+      </sc-if>
+      <a href="StockStory Pricing.dc.html" style="display:inline-flex; align-items:center; gap:7px; height:42px; padding:0 18px; border-radius:9px; background:#0A0A0A; color:#FFFFFF; font-size:14px; font-weight:500; white-space:nowrap;" style-hover="background:#1A1A1A; color:#FFFFFF;">Start Free Trial <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M3 9 L9 3 M9 3 H4.6 M9 3 V7.4" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round"></path></svg></a>
+    </div>
+  </div>
+
+  <div style="width:100%; max-width:1400px; margin:0 auto; padding:clamp(14px,2vw,22px) clamp(14px,2vw,26px) 0;">
+    <div class="cd" style="display:grid; grid-template-columns:{{ tapeGrid }}; overflow:hidden;">
+      <sc-for list="{{ indices }}" as="ix" hint-placeholder-count="4">
+        <div style="padding:13px 17px; border-right:1px solid #E8E8E3; display:flex; flex-direction:column; gap:9px; min-width:0; border-top:{{ ix.topRule }};">
+          <div style="min-width:0;">
+            <div style="font-size:10.5px; font-weight:600; color:#6B6B66; letter-spacing:0.09em; text-transform:uppercase; margin-bottom:5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ ix.name }}</div>
+            <div style="display:flex; align-items:baseline; gap:7px; flex-shrink:0; white-space:nowrap;">
+              <span class="n" style="font-size:17.5px; font-weight:600; letter-spacing:-0.025em;">{{ ix.value }}</span>
+              <span class="n" style="font-size:12.5px; font-weight:500; color:{{ ix.color }};">{{ ix.change }}</span>
+            </div>
+          </div>
+          <div style="width:100%; min-width:0; display:{{ rangeDisplay }}; flex-direction:column; gap:4px;">
+            <div style="position:relative; height:4px; border-radius:2px; background:#EDEDE8;">
+              <span style="position:absolute; left:0; width:{{ ix.pos }}; height:4px; border-radius:2px; background:{{ ix.color }}; opacity:0.26;"></span>
+              <span style="position:absolute; left:{{ ix.pos }}; top:-2px; width:2px; height:8px; border-radius:1px; background:{{ ix.color }}; transform:translateX(-1px);"></span>
+            </div>
+            <div style="display:flex; align-items:baseline; justify-content:space-between; gap:6px;">
+              <span class="n" style="font-size:11px; color:#6B6B66; white-space:nowrap;">{{ ix.low }}</span>
+              <span class="lb" style="font-size:10px; letter-spacing:0.06em; color:#6B6B66;">DAY</span>
+              <span class="n" style="font-size:11px; color:#6B6B66; white-space:nowrap;">{{ ix.high }}</span>
+            </div>
+          </div>
+        </div>
+      </sc-for>
+      <div style="padding:14px 18px; display:flex; flex-direction:column; justify-content:center; gap:3px; grid-column:{{ statusSpan }}; border-top:{{ statusTopRule }};">
+        <div style="display:flex; align-items:center; gap:6px; font-size:13px; font-weight:500; color:#1A7F37; white-space:nowrap;"><span style="width:6px; height:6px; border-radius:50%; background:#1A7F37;"></span>Market is Open</div>
+        <div class="lb" style="font-size:11.5px; white-space:nowrap;">Closes 3:30 PM PHT</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="width:100%; max-width:1400px; margin:0 auto; padding:clamp(24px,3.4vw,44px) clamp(14px,2vw,26px) 0; display:grid; grid-template-columns:{{ heroGrid }}; gap:clamp(22px,2.6vw,36px); align-items:start;">
+    <div style="padding-top:clamp(0px,1vw,14px);">
+      <div style="display:inline-flex; align-items:center; gap:8px; padding:7px 14px; border-radius:999px; background:#E9F5ED; margin-bottom:26px;">
+        <span style="width:6px; height:6px; border-radius:50%; background:#1A7F37;"></span>
+        <span style="font-size:11.5px; font-weight:600; color:#1A7F37; letter-spacing:0.07em;">PSE EQUITY RESEARCH</span>
+      </div>
+      <h1 style="margin:0 0 20px; font-size:clamp(34px,3.4vw + 18px,62px); font-weight:700; line-height:1.03; letter-spacing:-0.035em; max-width:{{ heroTitleMeasure }};">Understand businesses. Invest better.</h1>
+      <p style="margin:0 0 30px; font-size:clamp(15px,0.4vw + 14px,17px); line-height:1.6; color:#6B6B66; max-width:{{ heroBodyMeasure }};">StockEX Philippines reads every PSE filing and financial statement so you understand a business before you buy the stock.</p>
+      <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:32px;">
+        <a href="StockStory Pricing.dc.html" style="display:inline-flex; align-items:center; gap:9px; height:52px; padding:0 26px; border-radius:10px; background:#0A0A0A; color:#FFFFFF; font-size:15px; font-weight:600;" style-hover="background:#1A1A1A; color:#FFFFFF;">Start Free Trial <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M3 9 L9 3 M9 3 H4.6 M9 3 V7.4" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round"></path></svg></a>
+        <a href="StockStory Scanner.dc.html" style="display:inline-flex; align-items:center; gap:9px; height:52px; padding:0 24px; border-radius:10px; background:#FFFFFF; border:1px solid #DCDCD5; font-size:15px; font-weight:500;" style-hover="border-color:#0A0A0A; color:#0A0A0A;">Explore Scanner <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="#0A0A0A" stroke-width="1.9"></circle><path d="M21 21 L16.5 16.5" stroke="#0A0A0A" stroke-width="1.9" stroke-linecap="round"></path></svg></a>
+      </div>
+    </div>
+
+    <div style="display:grid; grid-template-columns:{{ panelGrid }}; gap:clamp(14px,1.4vw,18px); min-width:0;">
+      <div class="cd" style="padding:18px; min-width:0; display:flex; flex-direction:column;">
+        <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:10px; margin-bottom:16px;">
+          <div style="display:flex; align-items:center; gap:11px; min-width:0;">
+            <div style="width:34px; height:34px; border-radius:8px; background:#0A2C5C; color:#FFFFFF; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; flex-shrink:0;">BDO</div>
+            <div style="min-width:0;">
+              <div style="font-size:14.5px; font-weight:600; letter-spacing:-0.01em;">BDO</div>
+              <div class="lb" style="font-size:12px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">BDO Unibank, Inc.</div>
+            </div>
+          </div>
+          <svg width="16" height="16" viewBox="0 0 20 20" fill="none" style="flex-shrink:0;"><path d="M5 3.4 H15 V17 L10 13.2 L5 17 Z" stroke="#9A9A94" stroke-width="1.5" stroke-linejoin="round"></path></svg>
+        </div>
+        <div style="display:grid; grid-template-columns:auto minmax(0,1fr); gap:18px; align-items:center;">
+          <div style="position:relative; width:112px; height:112px; flex-shrink:0;">
+            <svg viewBox="0 0 120 120" width="112" height="112" style="transform:rotate(-90deg);">
+              <circle cx="60" cy="60" r="50" stroke="#EDEDE8" stroke-width="11" fill="none"></circle>
+              <circle cx="60" cy="60" r="50" stroke="#1A7F37" stroke-width="11" fill="none" stroke-linecap="round" stroke-dasharray="{{ gaugeDash }}"></circle>
+            </svg>
+            <div style="position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+              <span class="n" style="font-size:30px; font-weight:600; line-height:1;">88</span>
+              <span style="font-size:9.5px; color:#6B6B66; margin-top:3px;">StockEX Score</span>
+              <span style="font-size:10px; font-weight:600; color:#1A7F37;">Excellent</span>
+            </div>
+          </div>
+          <div style="min-width:0;">
+            <sc-for list="{{ factors }}" as="f" hint-placeholder-count="5">
+              <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; padding:6px 0; border-bottom:1px solid #F0F0EB;">
+                <span style="font-size:13px; color:#3A3A36;">{{ f.name }}</span>
+                <span style="display:flex; align-items:center; gap:6px;"><span class="n" style="font-size:13px; font-weight:600; color:#1A7F37;">{{ f.score }}</span><svg width="9" height="9" viewBox="0 0 12 12" fill="none"><path d="M4 2.5 L7.5 6 L4 9.5" stroke="#B0B0A9" stroke-width="1.5" stroke-linecap="round"></path></svg></span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+        <div style="display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin-top:16px; padding-top:14px; border-top:1px solid #F0F0EB;">
+          <span style="min-width:0;">
+            <span class="lb" style="display:block; font-size:11px; margin-bottom:3px;">Last close</span>
+            <span style="display:flex; align-items:baseline; gap:8px;">
+              <span class="n" style="font-size:19px; font-weight:600; letter-spacing:-0.025em;">₱142.50</span>
+              <span class="n" style="font-size:12.5px; font-weight:500; color:#1A7F37;">+1.82%</span>
+            </span>
+          </span>
+          <span style="text-align:right; min-width:0;">
+            <span class="lb" style="display:block; font-size:11px; margin-bottom:3px;">Fair value</span>
+            <span class="n" style="font-size:15px; font-weight:600;">₱158.40</span>
+          </span>
+        </div>
+        <div style="margin-top:14px; padding-top:13px; border-top:1px solid #F0F0EB; flex:1;">
+          <div class="lb" style="font-size:10.5px; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:6px;">What changed</div>
+          <div style="font-size:12.5px; line-height:1.62; color:#3A3A36;">Loan growth beat for a third straight quarter. Net interest margin held at 4.62% through the August rate cut.</div>
+        </div>
+        <a href="StockStory Stock Detail.dc.html" style="display:flex; align-items:center; justify-content:center; gap:7px; margin-top:14px; padding-top:13px; border-top:1px solid #E8E8E3; font-size:13px; font-weight:500; color:#0A0A0A;" style-hover="color:#1A7F37;">View Full Research <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6 H10 M7 3 L10 6 L7 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg></a>
+      </div>
+
+      <div class="cd" style="padding:18px; min-width:0;">
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:14px; flex-wrap:wrap;">
+          <div style="display:flex; align-items:center; gap:9px;">
+            <span style="font-size:14.5px; font-weight:600;">Market Overview</span>
+            <span style="display:flex; align-items:center; gap:5px; font-size:11.5px; font-weight:500; color:#1A7F37;"><span style="width:5px; height:5px; border-radius:50%; background:#1A7F37;"></span>Live</span>
+          </div>
+          <div style="display:flex; gap:2px; padding:2px; background:#F2F2ED; border-radius:7px;">
+            <sc-for list="{{ ranges }}" as="rg" hint-placeholder-count="5">
+              <span style="padding:4px 9px; border-radius:5px; font-size:11px; font-weight:500; background:{{ rg.bg }}; color:{{ rg.color }}; cursor:pointer;">{{ rg.label }}</span>
+            </sc-for>
+          </div>
+        </div>
+        <div style="display:flex; align-items:baseline; gap:10px; margin-bottom:10px; flex-wrap:wrap;">
+          <span class="n" style="font-size:clamp(22px, 1.2vw + 16px, 28px); font-weight:600; letter-spacing:-0.03em;">6,842.15</span>
+          <span class="n" style="font-size:13px; font-weight:500; color:#1A7F37;">+57.02 (+0.84%)</span>
+          <span class="lb" style="font-size:11px; margin-left:auto;">PSE Index · 11:15 AM PHT</span>
+        </div>
+        <div style="display:grid; grid-template-columns:minmax(0,1fr) 46px; gap:7px;">
+          <div style="min-width:0;">
+            <svg viewBox="0 0 400 132" width="100%" height="132" fill="none" preserveAspectRatio="none" style="display:block;">
+              <sc-for list="{{ mktGrid }}" as="g" hint-placeholder-count="5">
+                <line x1="0" y1="{{ g.y }}" x2="400" y2="{{ g.y }}" stroke="#F2F2ED" stroke-width="1"></line>
+              </sc-for>
+              <line x1="0" y1="{{ mktOpenY }}" x2="400" y2="{{ mktOpenY }}" stroke="#DCDCD5" stroke-width="1" stroke-dasharray="3 3"></line>
+              <path d="{{ marketArea }}" fill="#1A7F37" opacity="0.07"></path>
+              <path d="{{ marketLine }}" stroke="#1A7F37" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"></path>
+              <circle cx="{{ mktLastX }}" cy="{{ mktLastY }}" r="7" fill="#1A7F37" opacity="0.16"></circle>
+              <circle cx="{{ mktLastX }}" cy="{{ mktLastY }}" r="3" fill="#1A7F37"></circle>
+            </svg>
+            <svg viewBox="0 0 400 26" width="100%" height="26" fill="none" preserveAspectRatio="none" style="display:block; margin-top:3px;">
+              <sc-for list="{{ mktVol }}" as="v" hint-placeholder-count="26">
+                <rect x="{{ v.x }}" y="{{ v.y }}" width="{{ v.w }}" height="{{ v.h }}" fill="{{ v.fill }}"></rect>
+              </sc-for>
+            </svg>
+          </div>
+          <div style="display:flex; flex-direction:column; justify-content:space-between; align-items:flex-end; padding-bottom:29px;">
+            <sc-for list="{{ mktAxis }}" as="ax" hint-placeholder-count="5">
+              <span class="lb" style="font-size:9.5px; white-space:nowrap;">{{ ax.label }}</span>
+            </sc-for>
+          </div>
+        </div>
+        <div style="display:flex; justify-content:space-between; padding:6px 52px 13px 0; border-bottom:1px solid #E8E8E3; margin-bottom:14px;">
+          <sc-for list="{{ times }}" as="tm" hint-placeholder-count="5">
+            <span class="lb" style="font-size:10.5px;">{{ tm.label }}</span>
+          </sc-for>
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(min(80px,100%),1fr));">
+          <sc-for list="{{ breadth }}" as="b" hint-placeholder-count="4">
+            <div style="padding:0 13px; border-left:1px solid #EDEDE8; margin-left:-1px; min-width:0;">
+              <div class="lb" style="font-size:10.5px; margin-bottom:5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ b.label }}</div>
+              <div class="n" style="font-size:18px; font-weight:600; letter-spacing:-0.025em; color:{{ b.color }};">{{ b.value }}</div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display:flex; align-items:center; gap:0; margin-top:14px; height:5px; border-radius:3px; overflow:hidden; background:#F2F2ED;">
+          <span style="height:5px; width:51.5%; background:#1A7F37;"></span>
+          <span style="height:5px; width:35.7%; background:#D93025;"></span>
+        </div>
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:7px;">
+          <span class="lb" style="font-size:10.5px;">124 advancing</span>
+          <span class="lb" style="font-size:10.5px;">31 unchanged</span>
+          <span class="lb" style="font-size:10.5px;">86 declining</span>
+        </div>
+      </div>
+
+      <div class="cd" style="padding:18px; min-width:0;">
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:12px; flex-wrap:wrap;">
+          <span style="font-size:14px; font-weight:600;">Research note</span>
+          <span class="lb" style="font-size:11px;">Updated today · 9:30 AM</span>
+        </div>
+        <div style="font-size:15px; font-weight:600; line-height:1.4; letter-spacing:-0.015em; margin-bottom:9px;">BDO: deposit franchise still compounding</div>
+        <div style="font-size:13px; line-height:1.62; color:#6B6B66; margin-bottom:14px;">Loan growth beat for a third straight quarter. Net interest margin held through the August rate cut, and provisioning stayed conservative against sector peers.</div>
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; padding-top:13px; border-top:1px solid #E8E8E3; flex-wrap:wrap;">
+          <span style="display:flex; align-items:center; gap:6px; padding:5px 11px; border-radius:999px; background:#E9F5ED; font-size:11.5px; font-weight:600; color:#1A7F37;"><span style="width:5px; height:5px; border-radius:50%; background:#1A7F37;"></span>Strengthening</span>
+          <a href="StockStory Stock Detail.dc.html" style="display:flex; align-items:center; gap:6px; font-size:13px; font-weight:500;" style-hover="color:#1A7F37;">Read full thesis <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M2 6 H10 M7 3 L10 6 L7 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg></a>
+        </div>
+      </div>
+
+      <div class="cd" style="padding:18px; min-width:0;">
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:12px; flex-wrap:wrap;">
+          <span style="font-size:14px; font-weight:600;">5Y Performance</span>
+          <span class="lb" style="font-size:11px;">vs PSE Index</span>
+        </div>
+        <div style="display:flex; gap:16px; margin-bottom:10px; flex-wrap:wrap;">
+          <span style="display:flex; align-items:center; gap:6px; font-size:11.5px;"><span style="width:14px; height:2px; background:#1A7F37;"></span>BDO <span class="n" style="font-weight:600;">+142.6%</span></span>
+          <span style="display:flex; align-items:center; gap:6px; font-size:11.5px; color:#6B6B66;"><span style="width:14px; height:2px; background:#C4C4BD;"></span>PSE Index <span class="n" style="font-weight:600;">+38.4%</span></span>
+        </div>
+        <div style="display:grid; grid-template-columns:minmax(0,1fr) 44px; gap:7px;">
+          <svg viewBox="0 0 400 140" width="100%" height="140" fill="none" preserveAspectRatio="none" style="display:block;">
+            <sc-for list="{{ perfGrid }}" as="g" hint-placeholder-count="5">
+              <line x1="0" y1="{{ g.y }}" x2="400" y2="{{ g.y }}" stroke="#F2F2ED" stroke-width="1"></line>
+            </sc-for>
+            <path d="{{ perfArea }}" fill="#1A7F37" opacity="0.05"></path>
+            <path d="{{ perfBench }}" stroke="#C4C4BD" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="4 3"></path>
+            <path d="{{ perfLine }}" stroke="#1A7F37" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round"></path>
+            <circle cx="{{ perfLastX }}" cy="{{ perfLastY }}" r="3" fill="#1A7F37"></circle>
+            <circle cx="{{ benchLastX }}" cy="{{ benchLastY }}" r="2.6" fill="#C4C4BD"></circle>
+          </svg>
+          <div style="display:flex; flex-direction:column; justify-content:space-between; align-items:flex-end;">
+            <sc-for list="{{ perfAxis }}" as="ax" hint-placeholder-count="5">
+              <span class="lb" style="font-size:9.5px; white-space:nowrap;">{{ ax.label }}</span>
+            </sc-for>
+          </div>
+        </div>
+        <div style="display:flex; justify-content:space-between; padding:8px 50px 0 0; border-top:1px solid #E8E8E3; margin-top:8px;">
+          <sc-for list="{{ years }}" as="yr" hint-placeholder-count="6">
+            <span class="lb" style="font-size:10.5px;">{{ yr.label }}</span>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="width:100%; max-width:1400px; margin:0 auto; padding:clamp(26px,3vw,44px) clamp(14px,2vw,26px) 0;">
+    <div class="cd" style="padding:clamp(22px,2.6vw,34px);">
+      <div style="text-align:center; margin-bottom:clamp(20px,2.4vw,30px);">
+        <h2 style="margin:0 0 7px; font-size:clamp(20px,1.4vw + 14px,28px); font-weight:600; letter-spacing:-0.025em;">Research every PSE-listed company</h2>
+        <p class="lb" style="margin:0; font-size:13.5px;">Five proprietary scores. Over 1,000 data points. Rebuilt every trading day.</p>
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(min(215px,100%),1fr)); gap:clamp(11px,1.2vw,16px);">
+        <sc-for list="{{ factorCards }}" as="fc" hint-placeholder-count="5">
+          <div style="padding:16px; border:1px solid #E8E8E3; border-radius:11px; background:#FFFFFF;" style-hover="border-color:#C9D8CE;">
+            <div style="display:flex; align-items:center; gap:9px; margin-bottom:11px;">
+              <svg width="19" height="19" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;"><path d="{{ fc.icon }}" stroke="#1A7F37" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+              <span style="font-size:13.5px; font-weight:600;">{{ fc.name }}</span>
+            </div>
+            <div style="display:flex; align-items:baseline; gap:4px; margin-bottom:9px;">
+              <span class="n" style="font-size:26px; font-weight:600; color:#1A7F37;">{{ fc.score }}</span>
+              <span class="lb" style="font-size:12px;">/100</span>
+            </div>
+            <div style="display:grid; grid-template-columns:minmax(0,1fr); gap:10px; align-items:flex-end;">
+              <span style="font-size:12px; line-height:1.5; color:#6B6B66;">{{ fc.body }}</span>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+
+  <div style="width:100%; max-width:1400px; margin:0 auto; padding:clamp(14px,1.6vw,20px) clamp(14px,2vw,26px) 0; display:grid; grid-template-columns:{{ socialGrid }}; gap:clamp(14px,1.4vw,20px);">
+    <div class="cd" style="padding:clamp(18px,2vw,26px); display:flex; align-items:center; gap:18px; flex-wrap:wrap;">
+      <div style="width:62px; height:62px; border-radius:50%; background:#1A7F37; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8" r="3.1" stroke="#FFFFFF" stroke-width="1.6"></circle><circle cx="16.4" cy="9.2" r="2.4" stroke="#FFFFFF" stroke-width="1.6"></circle><path d="M3.4 18.4 C3.4 14.9 6 13.2 9 13.2 C12 13.2 14.6 14.9 14.6 18.4" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round"></path><path d="M16 13.6 C18.6 13.9 20.6 15.4 20.6 18.4" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round"></path></svg>
+      </div>
+      <div style="min-width:0;">
+        <div style="font-size:14px; font-weight:600; margin-bottom:12px;">Trusted by investors across the Philippines</div>
+        <div style="display:flex; gap:clamp(16px,2vw,30px); flex-wrap:wrap;">
+          <sc-for list="{{ stats }}" as="st" hint-placeholder-count="3">
+            <div>
+              <div class="n" style="font-size:clamp(20px,1.2vw + 14px,26px); font-weight:600; letter-spacing:-0.02em;">{{ st.value }}</div>
+              <div class="lb" style="font-size:11.5px; line-height:1.4; max-width:14ch;">{{ st.label }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+    <div class="cd" style="padding:clamp(18px,2vw,26px); display:flex; gap:14px;">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;"><path d="M9.4 6.4 C6.4 7.6 4.6 10.2 4.6 13.4 C4.6 15.6 5.9 17 7.8 17 C9.4 17 10.6 15.9 10.6 14.3 C10.6 12.8 9.6 11.7 8.1 11.7 C7.8 11.7 7.5 11.75 7.3 11.85 C7.6 10.2 8.7 8.9 10.3 8.1 Z M18.2 6.4 C15.2 7.6 13.4 10.2 13.4 13.4 C13.4 15.6 14.7 17 16.6 17 C18.2 17 19.4 15.9 19.4 14.3 C19.4 12.8 18.4 11.7 16.9 11.7 C16.6 11.7 16.3 11.75 16.1 11.85 C16.4 10.2 17.5 8.9 19.1 8.1 Z" fill="#C9C9C2"></path></svg>
+      <div style="min-width:0;">
+        <div style="font-size:15px; line-height:1.55; font-weight:500; letter-spacing:-0.01em; margin-bottom:16px;">StockEX changed how I research PSE companies. The work is deeper, faster, and I stopped reading disclosures on Sunday nights.</div>
+        <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+          <span style="display:flex; align-items:center; gap:6px; font-size:12.5px; color:#6B6B66;">Verified subscriber <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" fill="#1A7F37"></circle><path d="M5 8.2 L7 10.2 L11 6.2" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>
+          <span style="display:flex; align-items:center;">
+            <sc-for list="{{ avatars }}" as="av" hint-placeholder-count="5">
+              <span style="width:26px; height:26px; border-radius:50%; background:{{ av.bg }}; border:2px solid #FFFFFF; margin-left:-7px; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:600; color:#FFFFFF;">{{ av.initials }}</span>
+            </sc-for>
+          </span>
+        </div>
+      </div>
+    </div>
+    <div class="cd" style="padding:clamp(18px,2vw,26px); display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:9px;">
+      <div style="font-size:14.5px; font-weight:600; line-height:1.4;">Built for the Philippine market</div>
+      <div style="display:flex; gap:3px;">
+        <sc-for list="{{ starList }}" as="sr" hint-placeholder-count="5">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M8 1.4 L10 5.7 L14.6 6.3 L11.2 9.5 L12.1 14.1 L8 11.8 L3.9 14.1 L4.8 9.5 L1.4 6.3 L6 5.7 Z" fill="#C9A15D"></path></svg>
+        </sc-for>
+      </div>
+      <div class="lb" style="font-size:12px;">4.8 / 5 from early subscribers</div>
+    </div>
+  </div>
+
+  <div style="width:100%; max-width:1400px; margin:0 auto; padding:clamp(14px,1.6vw,20px) clamp(14px,2vw,26px) clamp(34px,4vw,60px);">
+    <div class="cd" style="padding:clamp(20px,2.2vw,28px);">
+      <div style="text-align:center; font-size:14.5px; font-weight:600; margin-bottom:20px;">Built on primary Philippine market data</div>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(min(196px,100%),1fr)); gap:clamp(14px,1.6vw,22px);">
+        <sc-for list="{{ infra }}" as="inf" hint-placeholder-count="5">
+          <div style="display:flex; gap:11px; align-items:flex-start;">
+            <div style="width:32px; height:32px; border-radius:8px; background:#F2F5F3; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="{{ inf.icon }}" stroke="#1A7F37" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+            </div>
+            <div style="min-width:0;">
+              <div style="font-size:13px; font-weight:600; margin-bottom:3px;">{{ inf.title }}</div>
+              <div class="lb" style="font-size:12px; line-height:1.5;">{{ inf.body }}</div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{}">
+class Component extends DCLogic {
+  state = { width: typeof window !== 'undefined' ? window.innerWidth : 1400, paletteOpen: false, query: '', range: '1D' };
+
+  componentDidMount() {
+    this._r = () => this.setState({ width: window.innerWidth });
+    window.addEventListener('resize', this._r);
+    // Cmd/Ctrl+K belongs to Search app-wide (the labelled header control on every page);
+    // Ask owns Cmd/Ctrl+J. No page-level palette here — it duplicated the Search page.
+    this._k = e => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        window.location.href = 'StockStory Search.dc.html';
+      }
+    };
+    window.addEventListener('keydown', this._k);
+  }
+  componentWillUnmount() { window.removeEventListener('resize', this._r); window.removeEventListener('keydown', this._k); }
+
+  path(vals, w, h, pad) {
+    const p = pad == null ? 2 : pad;
+    const lo = Math.min.apply(null, vals), hi = Math.max.apply(null, vals);
+    const span = (hi - lo) || 1;
+    return vals.map((v, i) => {
+      const x = p + (i / (vals.length - 1)) * (w - p * 2);
+      const y = h - p - ((v - lo) / span) * (h - p * 2);
+      return (i ? 'L' : 'M') + x.toFixed(1) + ' ' + y.toFixed(1);
+    }).join(' ');
+  }
+
+  // seeded random walk — irregular like real tape, stable across renders
+  walk(seed, n, drift, vol) {
+    let s = seed * 7919 + 13, v = 100, out = [];
+    const rnd = () => { s = (s * 1103515245 + 12345) & 0x7fffffff; return s / 0x7fffffff; };
+    for (let i = 0; i < n; i++) {
+      const shock = (rnd() < 0.08) ? (rnd() - 0.5) * vol * 3.4 : 0;
+      v += (rnd() - 0.5) * vol + drift + shock;
+      out.push(v);
+    }
+    return out;
+  }
+
+  renderVals() {
+    const w = this.state.width, q = this.state.query.trim().toLowerCase();
+    const sp = a => this.path(a, 96, 30, 3);
+
+    const pages = [
+      { title: 'BDO Unibank, Inc.', sub: 'BDO · Financials', tag: 'BDO', href: 'StockStory Stock Detail.dc.html' },
+      { title: 'Scanner', sub: 'Filter the PSE by factor scores', tag: 'SC', href: 'StockStory Scanner.dc.html' },
+      { title: 'Rankings', sub: 'Leaderboard by dimension', tag: 'RK', href: 'StockStory Rankings.dc.html' },
+      { title: 'Watchlist', sub: 'Companies you track', tag: 'WL', href: 'StockStory Watchlist.dc.html' },
+      { title: 'Portfolio', sub: 'Holdings and thesis monitor', tag: 'PF', href: 'StockStory Portfolio.dc.html' },
+      { title: 'Compare', sub: 'Two to four companies side by side', tag: 'CM', href: 'StockStory Compare.dc.html' },
+      { title: 'Sectors', sub: 'Sector performance across the PSE', tag: 'SE', href: 'StockStory Sectors.dc.html' },
+      { title: 'Alerts', sub: 'Thesis changes and filings', tag: 'AL', href: 'StockStory Alerts.dc.html' },
+      { title: 'About StockEX', sub: 'How the research works', tag: 'AB', href: 'StockStory About.dc.html' },
+    ];
+    const results = q ? pages.filter(p => (p.title + ' ' + p.sub).toLowerCase().indexOf(q) > -1) : pages;
+
+    const navItems = [
+      { label: 'Research', href: 'StockStory Stock Detail.dc.html', caret: true },
+      { label: 'Scanner', href: 'StockStory Scanner.dc.html', caret: false },
+      { label: 'Compare', href: 'StockStory Compare.dc.html', caret: false },
+      { label: 'Watchlist', href: 'StockStory Watchlist.dc.html', caret: false },
+      { label: 'Portfolio', href: 'StockStory Portfolio.dc.html', caret: false },
+      { label: 'Pricing', href: 'StockStory Pricing.dc.html', caret: false },
+        { label: 'Methodology', href: 'StockStory Methodology.dc.html', caret: false },
+    ];
+
+    // chart geometry derived from the same walks the paths use
+    const mkt = this.walk(5, 78, 0.34, 4.2);
+    const mLo = Math.min.apply(null, mkt), mHi = Math.max.apply(null, mkt), mSpan = (mHi - mLo) || 1;
+    const mktLastY = +(132 - 8 - ((mkt[mkt.length - 1] - mLo) / mSpan) * (132 - 16)).toFixed(1);
+    const mktVol = [];
+    for (let i = 0; i < 26; i++) {
+      const seed = (Math.sin(i * 2.7) + Math.cos(i * 1.3)) * 0.5 + 0.5;
+      const h = 6 + seed * 18;
+      mktVol.push({
+        x: (i * 15.4).toFixed(1), w: '10', y: (26 - h).toFixed(1), h: h.toFixed(1),
+        fill: (i > 0 && mkt[Math.floor(i * 3)] < mkt[Math.floor((i - 1) * 3)]) ? '#F0CFCB' : '#CFE6D8',
+      });
+    }
+    const pf = this.walk(17, 120, 0.62, 5.4);
+    const pLo = Math.min.apply(null, pf), pHi = Math.max.apply(null, pf), pSpan = (pHi - pLo) || 1;
+    const perfLastY = +(140 - 8 - ((pf[pf.length - 1] - pLo) / pSpan) * (140 - 16)).toFixed(1);
+    const bch = this.walk(23, 120, 0.19, 3.8);
+    const bLo = Math.min.apply(null, bch), bHi = Math.max.apply(null, bch), bSpan = (bHi - bLo) || 1;
+    const benchLastY = +(140 - 8 - ((bch[bch.length - 1] - bLo) / bSpan) * (140 - 16)).toFixed(1);
+    const perfArea = this.path(pf, 400, 140, 8) + ' L392 132 L8 132 Z';
+
+    return {
+      searchLabelShow: w >= 1240 ? 'inline' : 'none',
+      searchKbdShow: w >= 1240 ? 'inline' : 'none',
+      rangeDisplay: w < 400 ? 'none' : 'flex',
+      showBottomNav: w < 1080,
+      pageBottomPad: w < 1080 ? 'calc(66px + env(safe-area-inset-bottom))' : '0px',
+      bottomItems: [
+        { label: 'Home', href: 'StockStory Shell.dc.html', icon: 'M4.4 19.6 V9.8 L12 4.2 L19.6 9.8 V19.6 Z M9.4 19.6 V13.6 H14.6 V19.6' },
+        { label: 'Scanner', href: 'StockStory Scanner.dc.html', icon: 'M10.8 4.2 A6.6 6.6 0 1 1 10.79 4.2 Z M15.6 15.6 L20.4 20.4' },
+        { label: 'Watchlist', href: 'StockStory Watchlist.dc.html', icon: 'M12 3.8 L14.5 9.1 L20.3 9.9 L16.1 14 L17.2 19.8 L12 17 L6.8 19.8 L7.9 14 L3.7 9.9 L9.5 9.1 Z' },
+        { label: 'Portfolio', href: 'StockStory Portfolio.dc.html', icon: 'M3.8 19.6 H20.2 M6.8 19.6 V12.8 M11.2 19.6 V7.8 M15.6 19.6 V10.6 M20 19.6 V5.2' },
+        { label: 'Alerts', href: 'StockStory Alerts.dc.html', icon: 'M7.2 10.2 A4.8 4.8 0 0 1 16.8 10.2 C16.8 15 18.4 17 18.4 17 H5.6 C5.6 17 7.2 15 7.2 10.2 Z M10.2 19.6 A2.2 2.2 0 0 0 13.8 19.6' },
+      ].map(b => ({
+        ...b,
+        color: b.label === 'Home' ? '#0A0A0A' : '#9A9A94',
+        weight: b.label === 'Home' ? 600 : 500,
+        stroke: b.label === 'Home' ? 1.9 : 1.6,
+      })),
+      showNav: w >= 1080,
+      topNav: navItems.map(n => ({ ...n, weight: 500, color: '#3A3A36', rule: 'transparent' })),
+      tapeGrid: w < 940 ? 'repeat(2, minmax(0,1fr))' : (w < 1180 ? 'repeat(4, minmax(0,1fr))' : 'repeat(4, minmax(0,1fr)) auto'),
+      statusSpan: w < 1180 ? '1 / -1' : 'auto',
+      statusTopRule: w < 1180 ? '1px solid #E8E8E3' : '0',
+      heroGrid: w < 880 ? '1fr' : 'minmax(0,0.86fr) minmax(0,1.14fr)',
+      heroTitleMeasure: w < 880 ? '19ch' : '13ch',
+      heroBodyMeasure: w < 880 ? '58ch' : '44ch',
+      panelGrid: w < 620 ? '1fr' : 'repeat(2, minmax(0,1fr))',
+      socialGrid: w < 900 ? '1fr' : (w < 1200 ? 'repeat(2, minmax(0,1fr))' : 'minmax(0,1.05fr) minmax(0,1.15fr) minmax(0,0.8fr)'),
+      paletteOpen: this.state.paletteOpen,
+      openPalette: () => this.setState({ paletteOpen: true }),
+      closePalette: () => this.setState({ paletteOpen: false, query: '' }),
+      stop: e => e.stopPropagation(),
+      query: this.state.query,
+      onQueryChange: e => this.setState({ query: e.target.value }),
+      paletteResults: results,
+      noResults: results.length === 0,
+
+      mktGrid: [10, 40, 70, 100, 126].map(y => ({ y })),
+      mktAxis: ['6,880', '6,860', '6,840', '6,820', '6,800'].map(label => ({ label })),
+      mktOpenY: 86,
+      mktLastX: 394,
+      mktLastY: mktLastY,
+      mktVol: mktVol,
+      perfGrid: [10, 42, 74, 106, 134].map(y => ({ y })),
+      perfAxis: ['+150%', '+110%', '+70%', '+30%', '-10%'].map(label => ({ label })),
+      perfLastX: 392,
+      perfLastY: perfLastY,
+      benchLastX: 392,
+      benchLastY: benchLastY,
+      perfArea: perfArea,
+      indices: [
+        { name: 'PSE Index', value: '6,842.15', change: '+0.84%', color: '#1A7F37', low: '6,801', high: '6,858', pos: '72%' },
+        { name: 'All Shares', value: '3,614.20', change: '+0.62%', color: '#1A7F37', low: '3,592', high: '3,621', pos: '77%' },
+        { name: 'Financials', value: '2,188.44', change: '+1.12%', color: '#1A7F37', low: '2,166', high: '2,194', pos: '80%' },
+        { name: 'Property', value: '2,470.06', change: '-0.31%', color: '#D93025', low: '2,462', high: '2,498', pos: '22%' },
+      ].map((ix, i) => ({ ...ix, topRule: (w < 940 && i > 1) ? '1px solid #E8E8E3' : '0' })),
+      gaugeDash: (2 * Math.PI * 50 * 0.88).toFixed(1) + ' ' + (2 * Math.PI * 50).toFixed(1),
+      factors: [
+        { name: 'Quality', score: 92 }, { name: 'Growth', score: 85 },
+        { name: 'Valuation', score: 78 }, { name: 'Risk', score: 82 }, { name: 'Momentum', score: 87 },
+      ],
+      ranges: ['1D', '1W', '1M', '1Y', 'YTD'].map(l => ({
+        label: l, bg: l === this.state.range ? '#FFFFFF' : 'transparent', color: l === this.state.range ? '#0A0A0A' : '#6B6B66'
+      })),
+      marketLine: this.path(mkt, 400, 132, 8),
+      marketArea: this.path(mkt, 400, 132, 8) + ' L392 124 L8 124 Z',
+      times: ['9:30 AM', '11:00 AM', '12:30 PM', '2:00 PM', '3:30 PM'].map(l => ({ label: l })),
+      breadth: [
+        { label: 'Advances', value: '124', color: '#1A7F37', bg: '#F1F8F3' },
+        { label: 'Declines', value: '86', color: '#D93025', bg: '#FDF2F1' },
+        { label: 'Unchanged', value: '31', color: '#0A0A0A', bg: '#F5F5F0' },
+        { label: 'Breadth', value: '+38', color: '#1A7F37', bg: '#F1F8F3' },
+      ],
+      perfLine: this.path(pf, 400, 140, 8),
+      perfBench: this.path(bch, 400, 140, 8),
+      years: ['2021', '2023', '2026'].map(l => ({ label: l })),
+
+      factorCards: [
+        { name: 'Quality', score: 92, body: 'High returns, strong balance sheet, efficient operations', icon: 'M12 3.4 L20 8 V16 L12 20.6 L4 16 V8 Z', spark: this.path(this.walk(101, 26, 0.30, 2.2), 62, 24, 3) },
+        { name: 'Growth', score: 85, body: 'Sustainable earnings growth and forward outlook', icon: 'M4 18 L9 12 L13 15 L20 6 M20 6 H15.4 M20 6 V10.6', spark: this.path(this.walk(107, 26, 0.34, 2.4), 62, 24, 3) },
+        { name: 'Valuation', score: 78, body: 'Attractive relative to sector and own history', icon: 'M12 4.4 A7.6 7.6 0 1 1 11.99 4.4 Z M12 8.4 V15.6 M9.6 10.4 H14.4 M9.6 13.6 H14.4', spark: this.path(this.walk(113, 26, 0.14, 2.6), 62, 24, 3) },
+        { name: 'Risk', score: 82, body: 'Low financial leverage, stable business model', icon: 'M12 3.6 L19.4 6.4 V12 C19.4 16.4 16.2 19.4 12 20.4 C7.8 19.4 4.6 16.4 4.6 12 V6.4 Z', spark: this.path(this.walk(127, 26, 0.22, 2.0), 62, 24, 3) },
+        { name: 'Momentum', score: 87, body: 'Strong relative strength against the index', icon: 'M13.4 3.4 L6 13.4 H11 L10 20.6 L18 10.4 H12.6 Z', spark: this.path(this.walk(131, 26, 0.40, 2.8), 62, 24, 3) },
+      ],
+      stats: [
+        { value: '280', label: 'PSE-listed companies covered' },
+        { value: '1,000+', label: 'Data points per company' },
+        { value: 'Daily', label: 'Filings read and scored' },
+      ],
+      avatars: [
+        { initials: 'MR', bg: '#1A7F37' }, { initials: 'AC', bg: '#0A2C5C' }, { initials: 'JL', bg: '#6B6B66' },
+        { initials: 'TS', bg: '#8A5A12' }, { initials: 'RD', bg: '#3A3A36' },
+      ],
+      starList: [1, 2, 3, 4, 5].map(n => ({ n })),
+      infra: [
+        { title: 'PSE primary filings', icon: 'M6 3.6 H14 L18 7.6 V20.4 H6 Z M14 3.6 V7.6 H18 M9 12 H15 M9 15.4 H15', body: 'Disclosures, annuals, briefings' },
+        { title: 'Factor engine', icon: 'M4 20 V10 M9.4 20 V5 M14.8 20 V13 M20.2 20 V8', body: 'Five scores, rebuilt daily' },
+        { title: 'Analyst review', icon: 'M12 4.6 A3.4 3.4 0 1 1 11.99 4.6 Z M5 20 C5 15.8 8.2 13.6 12 13.6 C15.8 13.6 19 15.8 19 20', body: 'Every thesis read by a person' },
+        { title: 'No order handling', icon: 'M12 3.6 L19.4 6.4 V12 C19.4 16.4 16.2 19.4 12 20.4 C7.8 19.4 4.6 16.4 4.6 12 V6.4 Z M9.4 12 L11.6 14.2 L15 10.4', body: 'We never touch your funds' },
+        { title: 'Philippines only', icon: 'M12 3.6 A8.4 8.4 0 1 1 11.99 3.6 Z M3.6 12 H20.4 M12 3.6 C14.6 6.4 14.6 17.6 12 20.4 C9.4 17.6 9.4 6.4 12 3.6', body: 'One market, read properly' },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>
