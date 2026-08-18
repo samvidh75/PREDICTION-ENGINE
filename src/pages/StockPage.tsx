@@ -11,6 +11,7 @@ import StockChart from "../components/StockChart";
 import { BrokerHandoffModal } from "../components/BrokerHandoffModal";
 import { ChartErrorBoundary } from "../components/ChartErrorBoundary";
 import { RSIGauge } from "../components/animations/TechnicalIndicatorCanvas";
+import { GaugeFill } from "../components/animations/MotionPrimitives";
 import { listAvailableBrokers } from "../commercial/BrokerHandoffService";
 import { fallbackAnalysis, generateStockAnalysis } from "../services/llm/AIAnalysisService";
 import type { AIAnalysis } from "../services/llm/AIAnalysisService";
@@ -971,24 +972,44 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
                   <div style={{ fontSize: "11px", fontWeight: 700, textTransform: "uppercase", color: TERMINAL_COLORS.secondaryText, letterSpacing: "0.05em" }}>
                     Scores
                   </div>
-                  <div style={{ display: "grid", gap: "8px" }}>
-                    {[
+                  {(() => {
+                    const factors = [
                       { label: "Quality", value: stock.scores.quality },
                       { label: "Valuation", value: stock.scores.valuation },
                       { label: "Growth", value: stock.scores.growth },
                       { label: "Momentum", value: stock.scores.momentum },
-                    ].map((item, idx) => {
-                      const color = !item.value ? TERMINAL_COLORS.secondaryText : item.value >= 70 ? TERMINAL_COLORS.gainGreen : item.value >= 50 ? TERMINAL_COLORS.accent : TERMINAL_COLORS.lossRed;
-                      return (
-                        <div key={idx} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "11px" }}>
-                          <span style={{ color: TERMINAL_COLORS.secondaryText }}>{item.label}</span>
-                          <span style={{ color, fontWeight: 600, fontFamily: "'SF Mono', 'IBM Plex Mono', 'Roboto Mono', monospace" }}>
-                            {item.value != null ? `${item.value}/100` : "—"}
-                          </span>
+                    ];
+                    const known = factors.filter((f) => f.value != null).map((f) => f.value as number);
+                    const composite = known.length > 0 ? Math.round(known.reduce((a, b) => a + b, 0) / known.length) : null;
+                    return (
+                      <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+                        {composite != null && (
+                          <div style={{ flexShrink: 0 }}>
+                            <GaugeFill
+                              percent={composite}
+                              size={68}
+                              strokeWidth={6}
+                              color={composite >= 70 ? TERMINAL_COLORS.gainGreen : composite >= 50 ? TERMINAL_COLORS.accent : TERMINAL_COLORS.lossRed}
+                              label={String(composite)}
+                            />
+                          </div>
+                        )}
+                        <div style={{ display: "grid", gap: "8px", flex: 1, minWidth: 0 }}>
+                          {factors.map((item, idx) => {
+                            const color = !item.value ? TERMINAL_COLORS.secondaryText : item.value >= 70 ? TERMINAL_COLORS.gainGreen : item.value >= 50 ? TERMINAL_COLORS.accent : TERMINAL_COLORS.lossRed;
+                            return (
+                              <div key={idx} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "11px" }}>
+                                <span style={{ color: TERMINAL_COLORS.secondaryText }}>{item.label}</span>
+                                <span style={{ color, fontWeight: 600, fontFamily: "'SF Mono', 'IBM Plex Mono', 'Roboto Mono', monospace" }}>
+                                  {item.value != null ? `${item.value}/100` : "—"}
+                                </span>
+                              </div>
+                            );
+                          })}
                         </div>
-                      );
-                    })}
-                  </div>
+                      </div>
+                    );
+                  })()}
                 </div>
               </div>
             </motion.div>
