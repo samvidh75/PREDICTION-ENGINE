@@ -6,15 +6,15 @@ import { alertEngine, type AlertDefinition, type AlertConditionType, type AlertR
 import { MetricsSkeleton } from "../components/SkeletonLoader";
 
 const PALETTE = {
-  primary: "#0B5FA5",    // Signature rust/amber
-  success: "#0F9D58",    // Green
-  danger: "#DC2626",     // Red
-  bg: "#F5F6F8",         // Page background (warm paper)
+  primary: "#1A7F37",    // Signature rust/amber
+  success: "#1A7F37",    // Green
+  danger: "#D93025",     // Red
+  bg: "#FAFAF7",         // Page background (warm paper)
   surface: "#FFFFFF",
-  border: "#E2E5EA",
-  text: "#0B0D12",
-  textSecondary: "#374151",
-  textTertiary: "#64748B",
+  border: "#E8E8E3",
+  text: "#0A0A0A",
+  textSecondary: "#3A3A36",
+  textTertiary: "#6B6B66",
 };
 
 const CONDITION_OPTIONS: { value: AlertConditionType; label: string; icon: any }[] = [

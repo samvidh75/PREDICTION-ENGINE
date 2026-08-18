@@ -1,5 +1,7 @@
 import { useResponsiveValue } from "../ui/responsive";
 import { colors, typography, layout } from "../design/tokens";
+import { BananaBanner } from "../components/nano/BananaBanner";
+import { NANOBANANA_ASSETS } from "../lib/nanoAssets";
 const SECTIONS = [
   {
     id: "what-we-are",
@@ -44,13 +46,23 @@ export default function Trust() {
   return (
     <main className="raycast-slideUp" style={{ maxWidth: contentWidth, margin: "0 auto", padding: layout.pagePaddingDesktop, color: colors.textPrimary }}>
 
-      <section className="raycast-stagger-1" style={{ marginBottom: "48px" }}>
-        <h1 style={{ fontSize: typography.h2.desktop.size, fontWeight: 700, marginBottom: "12px" }}>
-          Trust and Disclosures
-        </h1>
-        <p style={{ fontSize: typography.body.desktop.size, color: colors.textSecondary, lineHeight: 1.6 }}>
-          What StockEX is, what it is not, and what you can expect from our research. Transparency is a design principle.
-        </p>
+      <section style={{ marginBottom: "48px" }}>
+        <BananaBanner
+          src={NANOBANANA_ASSETS.trustHero}
+          minHeight={280}
+          overlay={0.5}
+          className="raycast-stagger-1"
+        >
+          <div style={{ maxWidth: 640 }}>
+            <h1 style={{ fontSize: 30, fontWeight: 700, margin: "0 0 10px", color: "#FFFFFF" }}>
+              Trust and Disclosures
+            </h1>
+            <p style={{ fontSize: 16, lineHeight: 1.6, color: "rgba(247,248,250,0.84)", margin: 0 }}>
+              What StockEX is, what it is not, and what you can expect from our research.
+              Transparency is a design principle.
+            </p>
+          </div>
+        </BananaBanner>
       </section>
 
       <div className="raycast-stagger-3" style={{ animationDelay: "0.2s" }}>

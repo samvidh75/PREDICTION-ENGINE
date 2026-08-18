@@ -438,7 +438,7 @@ export default function PortfolioPage() {
                 fontSize: "18px",
                 fontWeight: 700,
                 color: colors.textPrimary,
-                fontFamily: `"JetBrains Mono", monospace`,
+                fontFamily: `"IBM Plex Mono", monospace`,
               }}>
                 {formatPHP(perf.currentValue, true)}
               </div>
@@ -450,7 +450,7 @@ export default function PortfolioPage() {
             <div style={{ fontSize: "11px", color: colors.textSecondary, textTransform: "uppercase", letterSpacing: "0.4px", marginBottom: 2 }}>
               Today's P&L
             </div>
-            <div style={{ fontSize: "13px", fontWeight: 600, fontFamily: `"JetBrains Mono", monospace`, color: colors.textPrimary }}>
+            <div style={{ fontSize: "13px", fontWeight: 600, fontFamily: `"IBM Plex Mono", monospace`, color: colors.textPrimary }}>
               <span style={{ color: colors.textSecondary }}>—</span>
             </div>
           </div>
@@ -460,7 +460,7 @@ export default function PortfolioPage() {
             <div style={{ fontSize: "11px", color: colors.textSecondary, textTransform: "uppercase", letterSpacing: "0.4px", marginBottom: 2 }}>
               Month's P&L
             </div>
-            <div style={{ fontSize: "13px", fontWeight: 600, fontFamily: `"JetBrains Mono", monospace`, color: colors.textPrimary }}>
+            <div style={{ fontSize: "13px", fontWeight: 600, fontFamily: `"IBM Plex Mono", monospace`, color: colors.textPrimary }}>
               <span style={{ color: colors.textSecondary }}>—</span>
             </div>
           </div>
@@ -474,7 +474,7 @@ export default function PortfolioPage() {
               <div style={{
                 fontSize: "13px",
                 fontWeight: 600,
-                fontFamily: `"JetBrains Mono", monospace`,
+                fontFamily: `"IBM Plex Mono", monospace`,
                 color: perf.totalGainAmount >= 0 ? colors.marketGreen : colors.marketRed,
               }}>
                 {perf.totalGainAmount >= 0 ? "+" : ""}{formatPHP(perf.totalGainAmount, true)} ({formatPercent(perf.totalGainPct)})
@@ -595,29 +595,29 @@ export default function PortfolioPage() {
                           onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
                         >
                           <td style={{ padding: "8px 12px" }}>
-                            <span style={{ fontWeight: 700, color: colors.textPrimary, fontSize: "13px", fontFamily: `"JetBrains Mono", monospace` }}>
+                            <span style={{ fontWeight: 700, color: colors.textPrimary, fontSize: "13px", fontFamily: `"IBM Plex Mono", monospace` }}>
                               {h.symbol}
                             </span>
                           </td>
                           <td style={{ padding: "8px 12px", color: colors.textSecondary, fontSize: "12px" }}>
                             {h.sector}
                           </td>
-                          <td style={{ padding: "8px 12px", color: colors.textPrimary, fontSize: "12px", textAlign: "right", fontFamily: `"JetBrains Mono", monospace` }}>
+                          <td style={{ padding: "8px 12px", color: colors.textPrimary, fontSize: "12px", textAlign: "right", fontFamily: `"IBM Plex Mono", monospace` }}>
                             {h.shares.toLocaleString()}
                           </td>
-                          <td style={{ padding: "8px 12px", color: colors.textPrimary, fontSize: "12px", textAlign: "right", fontFamily: `"JetBrains Mono", monospace` }}>
+                          <td style={{ padding: "8px 12px", color: colors.textPrimary, fontSize: "12px", textAlign: "right", fontFamily: `"IBM Plex Mono", monospace` }}>
                             {formatPHP(h.avgBuyPrice)}
                           </td>
                           <td style={{ padding: "8px 12px", textAlign: "right" }}>
                             <PriceFlash value={h.currentPrice ?? 0}>
-                              <span style={{ color: colors.textPrimary, fontSize: "12px", fontWeight: 500, fontFamily: `"JetBrains Mono", monospace` }}>
+                              <span style={{ color: colors.textPrimary, fontSize: "12px", fontWeight: 500, fontFamily: `"IBM Plex Mono", monospace` }}>
                                 {h.currentPrice ? formatPHP(h.currentPrice) : "—"}
                               </span>
                             </PriceFlash>
                           </td>
                           <td style={{ padding: "8px 12px", textAlign: "right" }}>
                             <PriceFlash value={h.totalValue ?? 0}>
-                              <span style={{ color: colors.textPrimary, fontSize: "12px", fontWeight: 500, fontFamily: `"JetBrains Mono", monospace` }}>
+                              <span style={{ color: colors.textPrimary, fontSize: "12px", fontWeight: 500, fontFamily: `"IBM Plex Mono", monospace` }}>
                                 {formatPHP(h.totalValue ?? 0)}
                               </span>
                             </PriceFlash>
@@ -628,7 +628,7 @@ export default function PortfolioPage() {
                                 color: (h.unrealizedPnL ?? 0) >= 0 ? colors.marketGreen : colors.marketRed,
                                 fontSize: "12px",
                                 fontWeight: 600,
-                                fontFamily: `"JetBrains Mono", monospace`,
+                                fontFamily: `"IBM Plex Mono", monospace`,
                               }}>
                                 {(h.unrealizedPnL ?? 0) >= 0 ? "+" : ""}{formatPHP(h.unrealizedPnL ?? 0)}
                               </span>
@@ -639,7 +639,7 @@ export default function PortfolioPage() {
                               color: (h.unrealizedPnLPct ?? 0) >= 0 ? colors.marketGreen : colors.marketRed,
                               fontSize: "12px",
                               fontWeight: 600,
-                              fontFamily: `"JetBrains Mono", monospace`,
+                              fontFamily: `"IBM Plex Mono", monospace`,
                             }}>
                               {(h.unrealizedPnLPct ?? 0) >= 0 ? "+" : ""}{(h.unrealizedPnLPct ?? 0).toFixed(2)}%
                             </span>
@@ -710,7 +710,7 @@ export default function PortfolioPage() {
                         <span style={{ color: colors.textSecondary, fontSize: "11px", fontWeight: 500, maxWidth: "160px", overflow: "hidden", textOverflow: "ellipsis" }}>
                           {sw.sector}
                         </span>
-                        <span style={{ color: colors.textPrimary, fontSize: "11px", fontWeight: 700, fontFamily: `"JetBrains Mono", monospace` }}>
+                        <span style={{ color: colors.textPrimary, fontSize: "11px", fontWeight: 700, fontFamily: `"IBM Plex Mono", monospace` }}>
                           {sw.weightPct}%
                         </span>
                       </div>
@@ -750,7 +750,7 @@ export default function PortfolioPage() {
                   fontSize: "24px",
                   fontWeight: 700,
                   color: holdings.length >= 5 ? colors.marketGreen : holdings.length >= 3 ? colors.accentYellow : colors.marketRed,
-                  fontFamily: `"JetBrains Mono", monospace`,
+                  fontFamily: `"IBM Plex Mono", monospace`,
                 }}>
                   {holdings.length}
                 </div>
@@ -830,10 +830,10 @@ export default function PortfolioPage() {
                         onMouseEnter={(e) => e.currentTarget.style.backgroundColor = colors.surfaceElevated}
                         onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
                       >
-                        <td style={{ padding: "8px 12px", color: colors.textSecondary, fontSize: "12px", fontFamily: `"JetBrains Mono", monospace` }}>
+                        <td style={{ padding: "8px 12px", color: colors.textSecondary, fontSize: "12px", fontFamily: `"IBM Plex Mono", monospace` }}>
                           {act.time}
                         </td>
-                        <td style={{ padding: "8px 12px", fontWeight: 600, color: colors.textPrimary, fontSize: "12px", fontFamily: `"JetBrains Mono", monospace` }}>
+                        <td style={{ padding: "8px 12px", fontWeight: 600, color: colors.textPrimary, fontSize: "12px", fontFamily: `"IBM Plex Mono", monospace` }}>
                           {act.symbol}
                         </td>
                         <td style={{ padding: "8px 12px", color: colors.textSecondary, fontSize: "12px" }}>
@@ -849,13 +849,13 @@ export default function PortfolioPage() {
                             {act.action}
                           </span>
                         </td>
-                        <td style={{ padding: "8px 12px", textAlign: "right", color: colors.textPrimary, fontSize: "12px", fontFamily: `"JetBrains Mono", monospace` }}>
+                        <td style={{ padding: "8px 12px", textAlign: "right", color: colors.textPrimary, fontSize: "12px", fontFamily: `"IBM Plex Mono", monospace` }}>
                           {act.quantity.toLocaleString()}
                         </td>
-                        <td style={{ padding: "8px 12px", textAlign: "right", color: colors.textPrimary, fontSize: "12px", fontFamily: `"JetBrains Mono", monospace` }}>
+                        <td style={{ padding: "8px 12px", textAlign: "right", color: colors.textPrimary, fontSize: "12px", fontFamily: `"IBM Plex Mono", monospace` }}>
                           {formatPHP(act.price)}
                         </td>
-                        <td style={{ padding: "8px 12px", textAlign: "right", color: colors.textPrimary, fontSize: "12px", fontFamily: `"JetBrains Mono", monospace`, fontWeight: 600 }}>
+                        <td style={{ padding: "8px 12px", textAlign: "right", color: colors.textPrimary, fontSize: "12px", fontFamily: `"IBM Plex Mono", monospace`, fontWeight: 600 }}>
                           {formatPHP(act.total)}
                         </td>
                       </tr>
@@ -919,7 +919,7 @@ export default function PortfolioPage() {
                 Performance
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 6, alignItems: "center", justifyContent: "center", minHeight: "120px" }}>
-                <div style={{ fontSize: "24px", fontWeight: 700, color: perf.totalGainPct >= 0 ? colors.marketGreen : colors.marketRed, fontFamily: `"JetBrains Mono", monospace` }}>
+                <div style={{ fontSize: "24px", fontWeight: 700, color: perf.totalGainPct >= 0 ? colors.marketGreen : colors.marketRed, fontFamily: `"IBM Plex Mono", monospace` }}>
                   {perf.totalGainPct >= 0 ? "+" : ""}{perf.totalGainPct.toFixed(2)}%
                 </div>
                 <div style={{ fontSize: "12px", color: colors.textSecondary }}>
@@ -937,7 +937,7 @@ export default function PortfolioPage() {
                 Win Rate
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 6, alignItems: "center", justifyContent: "center", minHeight: "120px" }}>
-                <div style={{ fontSize: "24px", fontWeight: 700, color: colors.primary, fontFamily: `"JetBrains Mono", monospace` }}>
+                <div style={{ fontSize: "24px", fontWeight: 700, color: colors.primary, fontFamily: `"IBM Plex Mono", monospace` }}>
                   {holdings.filter(h => (currentPrices[h.symbol] ?? 0) > h.avgBuyPrice).length}/{holdings.length}
                 </div>
                 <div style={{ fontSize: "12px", color: colors.textSecondary }}>
@@ -960,10 +960,10 @@ export default function PortfolioPage() {
                   .slice(0, 3)
                   .map((h) => (
                     <div key={h.symbol} style={{ display: "flex", justifyContent: "space-between", paddingBottom: 6, borderBottom: `1px solid ${colors.hairline}` }}>
-                      <span style={{ fontSize: "12px", fontWeight: 600, color: colors.textPrimary, fontFamily: `"JetBrains Mono", monospace` }}>
+                      <span style={{ fontSize: "12px", fontWeight: 600, color: colors.textPrimary, fontFamily: `"IBM Plex Mono", monospace` }}>
                         {h.symbol}
                       </span>
-                      <span style={{ fontSize: "12px", fontWeight: 600, color: colors.marketGreen, fontFamily: `"JetBrains Mono", monospace` }}>
+                      <span style={{ fontSize: "12px", fontWeight: 600, color: colors.marketGreen, fontFamily: `"IBM Plex Mono", monospace` }}>
                         +{(h.unrealizedPnLPct ?? 0).toFixed(2)}%
                       </span>
                     </div>
@@ -982,10 +982,10 @@ export default function PortfolioPage() {
                   .slice(0, 3)
                   .map((h) => (
                     <div key={h.symbol} style={{ display: "flex", justifyContent: "space-between", paddingBottom: 6, borderBottom: `1px solid ${colors.hairline}` }}>
-                      <span style={{ fontSize: "12px", fontWeight: 600, color: colors.textPrimary, fontFamily: `"JetBrains Mono", monospace` }}>
+                      <span style={{ fontSize: "12px", fontWeight: 600, color: colors.textPrimary, fontFamily: `"IBM Plex Mono", monospace` }}>
                         {h.symbol}
                       </span>
-                      <span style={{ fontSize: "12px", fontWeight: 600, color: colors.marketRed, fontFamily: `"JetBrains Mono", monospace` }}>
+                      <span style={{ fontSize: "12px", fontWeight: 600, color: colors.marketRed, fontFamily: `"IBM Plex Mono", monospace` }}>
                         {(h.unrealizedPnLPct ?? 0).toFixed(2)}%
                       </span>
                     </div>

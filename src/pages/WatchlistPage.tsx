@@ -13,10 +13,10 @@ import { recordAction } from "../services/personalization/UserActionMemory";
 import { getWatchlists, createWatchlist, addTickerToWatchlist, subscribeWatchlist } from "../services/portfolio/watchlistStore";
 
 const TERMINAL_COLORS = {
-  cyan: "#0B5FA5",
-  green: "#0F9D58",
-  red: "#DC2626",
-  bg: "#F5F6F8",
+  cyan: "#1A7F37",
+  green: "#1A7F37",
+  red: "#D93025",
+  bg: "#FAFAF7",
 };
 
 const STATUS_COLORS: Record<string, string> = {
@@ -24,8 +24,8 @@ const STATUS_COLORS: Record<string, string> = {
   Stable: TERMINAL_COLORS.cyan,
   "Needs review": TERMINAL_COLORS.red,
   Weakening: TERMINAL_COLORS.red,
-  "Research signals pending": "#64748B",
-  "Tracking begins now": "#64748B",
+  "Research signals pending": "#6B6B66",
+  "Tracking begins now": "#6B6B66",
 };
 
 const STATUS_PRIORITY: Record<string, number> = {
@@ -216,9 +216,9 @@ export default function WatchlistPage() {
               padding: "6px 10px",
               fontSize: 12,
               fontWeight: 600,
-              color: loading ? "#64748B" : TERMINAL_COLORS.green,
+              color: loading ? "#6B6B66" : TERMINAL_COLORS.green,
               background: "transparent",
-              border: `1px solid ${loading ? "#64748B" : TERMINAL_COLORS.green}`,
+              border: `1px solid ${loading ? "#6B6B66" : TERMINAL_COLORS.green}`,
               borderRadius: 4,
               cursor: loading ? "not-allowed" : "pointer",
               fontFamily: "monospace",
@@ -353,7 +353,7 @@ export default function WatchlistPage() {
               {alertCount} ALERT{alertCount === 1 ? "" : "S"}
             </span>
           )}
-          <span style={{ color: "#64748B" }}>
+          <span style={{ color: "#6B6B66" }}>
             {new Date(intel.generatedAt).toLocaleTimeString()}
           </span>
         </div>
@@ -396,7 +396,7 @@ export default function WatchlistPage() {
                 ERROR
               </span>
             </div>
-            <p style={{ color: "#94A3B8", fontSize: 11, margin: 0, fontFamily: "monospace" }}>
+            <p style={{ color: "#9A9A94", fontSize: 11, margin: 0, fontFamily: "monospace" }}>
               {error}
             </p>
             <button
@@ -442,7 +442,7 @@ export default function WatchlistPage() {
             <h2 style={{ color: TERMINAL_COLORS.cyan, margin: 0, fontSize: 13, fontFamily: "monospace", fontWeight: 600 }}>
               WATCHLIST EMPTY
             </h2>
-            <p style={{ color: "#94A3B8", margin: 0, fontSize: 11, fontFamily: "monospace" }}>
+            <p style={{ color: "#9A9A94", margin: 0, fontSize: 11, fontFamily: "monospace" }}>
               Add stocks to monitor fundamentals and track thesis changes.
             </p>
             <div style={{ display: "flex", gap: "8px", justifyContent: "center", marginTop: "8px" }}>
@@ -539,7 +539,7 @@ export default function WatchlistPage() {
 
                 {/* Status */}
                 <div style={{
-                  color: STATUS_COLORS[item.currentStatus] || "#64748B",
+                  color: STATUS_COLORS[item.currentStatus] || "#6B6B66",
                   fontWeight: 500,
                 }}>
                   {item.currentStatus}
@@ -563,7 +563,7 @@ export default function WatchlistPage() {
                   gap: "3px",
                   color: item.scoreDirection === "improving" ? TERMINAL_COLORS.green :
                           item.scoreDirection === "declining" ? TERMINAL_COLORS.red :
-                          "#64748B",
+                          "#6B6B66",
                 }}>
                   {item.scoreDirection === "improving" ? (
                     <TrendingUp size={10} />
@@ -602,9 +602,9 @@ export default function WatchlistPage() {
                       padding: "3px 6px",
                       fontSize: 9,
                       fontWeight: 600,
-                      color: "#94A3B8",
+                      color: "#9A9A94",
                       background: "transparent",
-                      border: "1px solid #94A3B8",
+                      border: "1px solid #9A9A94",
                       borderRadius: 2,
                       cursor: "pointer",
                       fontFamily: "monospace",

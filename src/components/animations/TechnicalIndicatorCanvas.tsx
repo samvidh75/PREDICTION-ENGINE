@@ -9,13 +9,13 @@
 
 import { useEffect, useRef } from "react";
 
-const INK = "#0B0D12";
-const MUTED = "#64748B";
-const FAINT = "rgba(11,13,18,0.06)";
-const GREEN = "#0F9D58";
-const RED = "#DC2626";
-const AMBER = "#B45309";
-const RUST = "#0B5FA5";
+const INK = "#0A0A0A";
+const MUTED = "#6B6B66";
+const FAINT = "rgba(10,10,10,0.06)";
+const GREEN = "#1A7F37";
+const RED = "#D93025";
+const AMBER = "#8A5A12";
+const RUST = "#1A7F37";
 
 function useDevicePixelCanvas(width: number, height: number) {
   const ref = useRef<HTMLCanvasElement | null>(null);
@@ -115,12 +115,12 @@ export function RSIGauge({ value, width = 220, height = 140 }: RSIGaugeProps) {
       ctx.fill();
 
       // Center readout
-      ctx.font = "600 22px 'JetBrains Mono', monospace";
+      ctx.font = "600 22px 'IBM Plex Mono', monospace";
       ctx.fillStyle = INK;
       ctx.textAlign = "center";
       ctx.fillText((t * 100).toFixed(1), cx, cy - radius * 0.35);
 
-      ctx.font = "500 10px 'JetBrains Mono', monospace";
+      ctx.font = "500 10px 'IBM Plex Mono', monospace";
       ctx.fillStyle = MUTED;
       ctx.fillText("RSI (14)", cx, cy - radius * 0.35 + 16);
 
@@ -286,7 +286,7 @@ export function VolumeProfile({ buckets, width = 140, height = 320, currentPrice
         const y = i * rowH;
         const barW = (b.volume / maxVol) * maxBarW * progress;
         const isPoc = b === poc;
-        ctx.fillStyle = isPoc ? RUST : "rgba(11,95,165,0.28)";
+        ctx.fillStyle = isPoc ? RUST : "rgba(26,127,55,0.28)";
         ctx.fillRect(0, y + rowH * 0.15, barW, rowH * 0.7);
       });
 

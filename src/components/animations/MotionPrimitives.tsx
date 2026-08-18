@@ -80,9 +80,9 @@ export function TickerNumber({
   decimals = 2,
   prefix = "",
   suffix = "",
-  positiveColor = "#0F9D58",
-  negativeColor = "#DC2626",
-  neutralColor = "#0B0D12",
+  positiveColor = "#1A7F37",
+  negativeColor = "#D93025",
+  neutralColor = "#0A0A0A",
   style,
 }: TickerNumberProps) {
   const prevValue = useRef(value);
@@ -106,11 +106,11 @@ export function TickerNumber({
   return (
     <motion.span
       key={value}
-      initial={{ backgroundColor: flash ? (flash === "up" ? "rgba(15,157,88,0.14)" : "rgba(220,38,38,0.14)") : "transparent" }}
+      initial={{ backgroundColor: flash ? (flash === "up" ? "rgba(26,127,55,0.14)" : "rgba(217,48,37,0.14)") : "transparent" }}
       animate={{ backgroundColor: "rgba(0,0,0,0)" }}
       transition={{ duration: 0.6, ease: "easeOut" }}
       style={{
-        fontFamily: "'JetBrains Mono', monospace",
+        fontFamily: "'IBM Plex Mono', monospace",
         color,
         transition: "color 0.3s ease",
         borderRadius: 2,
@@ -162,14 +162,14 @@ export function TickerTape({ items, speed = 40 }: TickerTapeProps) {
             display: "flex",
             alignItems: "center",
             gap: 6,
-            fontFamily: "'JetBrains Mono', monospace",
+            fontFamily: "'IBM Plex Mono', monospace",
             fontSize: 12,
             whiteSpace: "nowrap",
           }}
         >
-          <span style={{ color: "#0B0D12", fontWeight: 600 }}>{item.symbol}</span>
-          <span style={{ color: "#374151" }}>{item.price.toFixed(2)}</span>
-          <span style={{ color: item.changePct >= 0 ? "#0F9D58" : "#DC2626" }}>
+          <span style={{ color: "#0A0A0A", fontWeight: 600 }}>{item.symbol}</span>
+          <span style={{ color: "#3A3A36" }}>{item.price.toFixed(2)}</span>
+          <span style={{ color: item.changePct >= 0 ? "#1A7F37" : "#D93025" }}>
             {item.changePct >= 0 ? "+" : ""}
             {item.changePct.toFixed(2)}%
           </span>
@@ -179,7 +179,7 @@ export function TickerTape({ items, speed = 40 }: TickerTapeProps) {
   );
 
   return (
-    <div style={{ overflow: "hidden", width: "100%", background: "#EEF1F4", borderBottom: "1px solid #E2E5EA" }}>
+    <div style={{ overflow: "hidden", width: "100%", background: "#F4F4EF", borderBottom: "1px solid #E8E8E3" }}>
       <div ref={trackRef} style={{ display: "flex", padding: "6px 0" }}>
         {renderRow("a")}
         {renderRow("b")}
@@ -203,8 +203,8 @@ export function GaugeFill({
   percent,
   size = 64,
   strokeWidth = 5,
-  color = "#0B5FA5",
-  trackColor = "rgba(11,13,18,0.08)",
+  color = "#1A7F37",
+  trackColor = "rgba(10,10,10,0.08)",
   label,
 }: GaugeFillProps) {
   const radius = (size - strokeWidth) / 2;
@@ -237,10 +237,10 @@ export function GaugeFill({
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            fontFamily: "'JetBrains Mono', monospace",
+            fontFamily: "'IBM Plex Mono', monospace",
             fontSize: size * 0.22,
             fontWeight: 600,
-            color: "#0B0D12",
+            color: "#0A0A0A",
           }}
         >
           {label}

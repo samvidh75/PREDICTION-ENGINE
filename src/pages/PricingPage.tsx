@@ -15,6 +15,8 @@ import { getAllPlans } from "../commercial/plans";
 import type { Plan, PlanTier } from "../commercial/plans";
 import { createCheckout, getUserId, redirectToCheckout } from "../commercial/checkoutClient";
 import { colors, space, radius, layout } from "../design/tokens";
+import { BananaBanner } from "../components/nano/BananaBanner";
+import { NANOBANANA_ASSETS } from "../lib/nanoAssets";
 
 const ANNUAL_DISCOUNT_MULTIPLIER = 10; // 2 months free on annual
 
@@ -159,12 +161,24 @@ export default function PricingPage() {
 
   return (
     <div className="raycast-slideUp" style={{ maxWidth: layout.contentMaxWidth, margin: "0 auto", padding: space[6] }}>
-      <div className="raycast-stagger-1" style={{ textAlign: "center", marginBottom: space[4] }}>
-        <h1 style={{ fontSize: 28, fontWeight: 700, margin: "0 0 8px" }}>Research Plans</h1>
-        <p style={{ color: colors.textSecondary, fontSize: 16, maxWidth: 560, margin: "0 auto" }}>
-          Choose a plan that fits your research needs. All plans provide access 
-          to stock health scores, factor analysis, and research narratives.
-        </p>
+      <div style={{ marginBottom: space[4] }}>
+        <BananaBanner
+          src={NANOBANANA_ASSETS.pricingHero}
+          minHeight={320}
+          overlay={0.5}
+          className="raycast-stagger-1"
+        >
+          <div style={{ maxWidth: 600 }}>
+            <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.14em", textTransform: "uppercase", color: "#F5A97F", marginBottom: 14 }}>
+              Free · Research Plus · Research Pro
+            </div>
+            <h1 style={{ fontSize: 34, fontWeight: 700, margin: "0 0 10px", color: "#FFFFFF" }}>Research Plans</h1>
+            <p style={{ color: "rgba(247,248,250,0.84)", fontSize: 16, lineHeight: 1.55, margin: 0 }}>
+              Choose a plan that fits your research needs. All plans provide access
+              to stock health scores, factor analysis, and research narratives.
+            </p>
+          </div>
+        </BananaBanner>
       </div>
 
       {/* Annual/Monthly Toggle */}

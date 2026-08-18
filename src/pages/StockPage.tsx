@@ -26,13 +26,13 @@ import { PriceSkeleton, ChartSkeleton, MetricsSkeleton } from "../components/Ske
 
 // ── Professional Trading Terminal Palette ──
 const TERMINAL_COLORS = {
-  canvas: "#F5F6F8",
+  canvas: "#FAFAF7",
   panel: "#FFFFFF",
-  accent: "#0B5FA5",
-  gainGreen: "#0F9D58",
-  lossRed: "#DC2626",
-  monoText: "#0B0D12",
-  secondaryText: "#64748B",
+  accent: "#1A7F37",
+  gainGreen: "#1A7F37",
+  lossRed: "#D93025",
+  monoText: "#0A0A0A",
+  secondaryText: "#6B6B66",
 };
 
 // ── Motion presets (minimal) ──
@@ -249,7 +249,7 @@ function StockHeader({ stock }: { stock: StockResearchDetail }) {
           fontSize: "20px",
           fontWeight: 700,
           color: TERMINAL_COLORS.monoText,
-          fontFamily: "'SF Mono', 'JetBrains Mono', 'Roboto Mono', monospace",
+          fontFamily: "'SF Mono', 'IBM Plex Mono', 'Roboto Mono', monospace",
           letterSpacing: "-0.02em",
         }}>
           {stock.symbol}
@@ -270,7 +270,7 @@ function StockHeader({ stock }: { stock: StockResearchDetail }) {
           fontSize: "42px",
           fontWeight: 700,
           color: TERMINAL_COLORS.monoText,
-          fontFamily: "'SF Mono', 'JetBrains Mono', 'Roboto Mono', monospace",
+          fontFamily: "'SF Mono', 'IBM Plex Mono', 'Roboto Mono', monospace",
           fontVariantNumeric: "tabular-nums",
           letterSpacing: "-0.02em",
           lineHeight: 1,
@@ -287,7 +287,7 @@ function StockHeader({ stock }: { stock: StockResearchDetail }) {
         color: priceColor,
         fontSize: "14px",
         fontWeight: 700,
-        fontFamily: "'SF Mono', 'JetBrains Mono', 'Roboto Mono', monospace",
+        fontFamily: "'SF Mono', 'IBM Plex Mono', 'Roboto Mono', monospace",
         fontVariantNumeric: "tabular-nums",
       }}>
         {isUp ? <ArrowUpRight size={16} /> : <ArrowDownRight size={16} />}
@@ -300,7 +300,7 @@ function StockHeader({ stock }: { stock: StockResearchDetail }) {
         display: "flex",
         gap: "16px",
         fontSize: "11px",
-        fontFamily: "'SF Mono', 'JetBrains Mono', 'Roboto Mono', monospace",
+        fontFamily: "'SF Mono', 'IBM Plex Mono', 'Roboto Mono', monospace",
       }}>
         <div style={{ textAlign: "right" }}>
           <div style={{ color: TERMINAL_COLORS.secondaryText, fontSize: "9px", textTransform: "uppercase", fontWeight: 600 }}>H</div>
@@ -387,7 +387,7 @@ function OrderTicket({ stock }: { stock: StockResearchDetail }) {
             border: `1px solid rgba(0,0,0,0.1)`,
             background: TERMINAL_COLORS.canvas,
             color: TERMINAL_COLORS.monoText,
-            fontFamily: "'SF Mono', 'JetBrains Mono', 'Roboto Mono', monospace",
+            fontFamily: "'SF Mono', 'IBM Plex Mono', 'Roboto Mono', monospace",
             fontSize: "13px",
             fontWeight: 600,
             borderRadius: "0",
@@ -421,7 +421,7 @@ function OrderTicket({ stock }: { stock: StockResearchDetail }) {
             border: `1px solid rgba(0,0,0,0.1)`,
             background: isMarketOrder ? "rgba(0,0,0,0.02)" : TERMINAL_COLORS.canvas,
             color: TERMINAL_COLORS.monoText,
-            fontFamily: "'SF Mono', 'JetBrains Mono', 'Roboto Mono', monospace",
+            fontFamily: "'SF Mono', 'IBM Plex Mono', 'Roboto Mono', monospace",
             fontSize: "13px",
             fontWeight: 600,
             borderRadius: "0",
@@ -443,7 +443,7 @@ function OrderTicket({ stock }: { stock: StockResearchDetail }) {
           fontSize: "18px",
           fontWeight: 700,
           color: TERMINAL_COLORS.monoText,
-          fontFamily: "'SF Mono', 'JetBrains Mono', 'Roboto Mono', monospace",
+          fontFamily: "'SF Mono', 'IBM Plex Mono', 'Roboto Mono', monospace",
           fontVariantNumeric: "tabular-nums",
         }}>
           ₱{formatNumber(Math.round(totalAmount))}
@@ -533,7 +533,7 @@ function StockInfoGrid({ stock }: { stock: StockResearchDetail }) {
             <span style={{
               color: metric.value != null ? getValueColor(metric.value, metric.label.includes("%")) : TERMINAL_COLORS.secondaryText,
               fontWeight: 600,
-              fontFamily: "'SF Mono', 'JetBrains Mono', 'Roboto Mono', monospace",
+              fontFamily: "'SF Mono', 'IBM Plex Mono', 'Roboto Mono', monospace",
               fontVariantNumeric: "tabular-nums",
             }}>
               {metric.value != null ? metric.format(metric.value) : "—"}
@@ -577,7 +577,7 @@ function StockInfoGrid({ stock }: { stock: StockResearchDetail }) {
               <span style={{
                 color: metric.value != null ? getValueColor(metric.value, metric.label.includes("%")) : TERMINAL_COLORS.secondaryText,
                 fontWeight: 600,
-                fontFamily: "'SF Mono', 'JetBrains Mono', 'Roboto Mono', monospace",
+                fontFamily: "'SF Mono', 'IBM Plex Mono', 'Roboto Mono', monospace",
                 fontVariantNumeric: "tabular-nums",
               }}>
                 {metric.value != null ? metric.format(metric.value) : "—"}
@@ -685,7 +685,7 @@ function StockError({ symbol, onRetry }: { symbol: string; onRetry?: () => void 
         alignItems: "center",
         justifyContent: "center",
       }}>
-        <AlertCircle size={20} color="#DC2626" />
+        <AlertCircle size={20} color="#D93025" />
       </div>
       <div style={{ color: TERMINAL_COLORS.monoText, fontSize: "13px", fontWeight: 600 }}>
         Failed to load {symbol}
@@ -982,7 +982,7 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
                       return (
                         <div key={idx} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "11px" }}>
                           <span style={{ color: TERMINAL_COLORS.secondaryText }}>{item.label}</span>
-                          <span style={{ color, fontWeight: 600, fontFamily: "'SF Mono', 'JetBrains Mono', 'Roboto Mono', monospace" }}>
+                          <span style={{ color, fontWeight: 600, fontFamily: "'SF Mono', 'IBM Plex Mono', 'Roboto Mono', monospace" }}>
                             {item.value != null ? `${item.value}/100` : "—"}
                           </span>
                         </div>
@@ -1028,7 +1028,7 @@ function StockView({ stock, financialChartData, shareholding, shareholdingSeries
                       minWidth: "50px",
                       fontWeight: 600,
                       fontSize: "10px",
-                      fontFamily: "'SF Mono', 'JetBrains Mono', 'Roboto Mono', monospace",
+                      fontFamily: "'SF Mono', 'IBM Plex Mono', 'Roboto Mono', monospace",
                     }}>
                       {formatNewsTime(item.publishedAt) || item.time}
                     </span>

@@ -22,14 +22,14 @@ function liveClock(): string {
 }
 
 const QUICK_LINKS = [
-  { icon: TrendingUp,  label: "Top Gainers",   route: "/scanner?mode=gainers", color: "#0F9D58" },
-  { icon: TrendingDown, label: "Top Losers",   route: "/scanner?mode=losers",  color: "#DC2626" },
-  { icon: Activity,    label: "Most Active",   route: "/scanner?mode=active",  color: "#0B5FA5" },
-  { icon: Compass,     label: "Sectors",       route: "/sectors",              color: "#0B5FA5" },
-  { icon: BarChart2,   label: "Portfolio",     route: "/portfolio",            color: "#0B5FA5" },
-  { icon: Bell,        label: "Alerts",        route: "/alerts",               color: "#DC2626" },
-  { icon: BookOpen,    label: "AI Research",   route: "/chat",                 color: "#0B5FA5" },
-  { icon: Zap,         label: "Full Scanner",  route: "/scanner?mode=all",     color: "#0F9D58" },
+  { icon: TrendingUp,  label: "Top Gainers",   route: "/scanner?mode=gainers", color: "#1A7F37" },
+  { icon: TrendingDown, label: "Top Losers",   route: "/scanner?mode=losers",  color: "#D93025" },
+  { icon: Activity,    label: "Most Active",   route: "/scanner?mode=active",  color: "#1A7F37" },
+  { icon: Compass,     label: "Sectors",       route: "/sectors",              color: "#1A7F37" },
+  { icon: BarChart2,   label: "Portfolio",     route: "/portfolio",            color: "#1A7F37" },
+  { icon: Bell,        label: "Alerts",        route: "/alerts",               color: "#D93025" },
+  { icon: BookOpen,    label: "AI Research",   route: "/chat",                 color: "#1A7F37" },
+  { icon: Zap,         label: "Full Scanner",  route: "/scanner?mode=all",     color: "#1A7F37" },
 ];
 
 export default function HomePage() {
@@ -102,30 +102,30 @@ export default function HomePage() {
       <div style={{
         display: "flex", alignItems: "center", justifyContent: "space-between",
         padding: "9px 14px", minHeight: 36,
-        background: "#EEF1F4",
+        background: "#F4F4EF",
         border: "1px solid rgba(0,0,0,0.10)",
         borderRadius: 4,
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <span style={{
             display: "inline-block", width: 6, height: 6, borderRadius: "50%",
-            background: marketStatus.isOpen ? "#0F9D58" : "#94A3B8",
+            background: marketStatus.isOpen ? "#1A7F37" : "#9A9A94",
           }} />
           <span style={{
-            fontSize: 11, fontWeight: 600, color: marketStatus.isOpen ? "#0F9D58" : "#94A3B8",
-            fontFamily: '"SF Mono", "JetBrains Mono", "Roboto Mono", monospace',
+            fontSize: 11, fontWeight: 600, color: marketStatus.isOpen ? "#1A7F37" : "#9A9A94",
+            fontFamily: '"SF Mono", "IBM Plex Mono", "Roboto Mono", monospace',
           }}>
             {marketStatus.label}
           </span>
           <span style={{
             fontSize: 11, color: "#9CA3AF",
-            fontFamily: '"SF Mono", "JetBrains Mono", "Roboto Mono", monospace',
+            fontFamily: '"SF Mono", "IBM Plex Mono", "Roboto Mono", monospace',
           }}>
             PSE
           </span>
         </div>
         <span style={{
-          fontFamily: '"SF Mono", "JetBrains Mono", "Roboto Mono", monospace',
+          fontFamily: '"SF Mono", "IBM Plex Mono", "Roboto Mono", monospace',
           fontSize: 11, color: "#9CA3AF", letterSpacing: "0.05em",
         }}>
           {clock}
@@ -154,7 +154,7 @@ export default function HomePage() {
               border: "1px solid rgba(0,0,0,0.14)", background: "#FFFFFF",
               borderRadius: 4, padding: "0 36px 0 32px",
               fontSize: 12, color: "#1A1A1A", outline: "none",
-              fontFamily: '"SF Mono", "JetBrains Mono", "Roboto Mono", monospace',
+              fontFamily: '"SF Mono", "IBM Plex Mono", "Roboto Mono", monospace',
               transition: "border-color 120ms ease",
             }}
             onFocus={(e) => { e.currentTarget.style.borderColor = "rgba(181, 80, 46, 0.4)"; }}
@@ -163,7 +163,7 @@ export default function HomePage() {
           <kbd style={{
             position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)",
             padding: "1px 4px", border: "1px solid rgba(0,0,0,0.10)", borderRadius: 2,
-            color: "#9CA3AF", fontSize: 9, fontFamily: '"SF Mono", "JetBrains Mono", "Roboto Mono", monospace',
+            color: "#9CA3AF", fontSize: 9, fontFamily: '"SF Mono", "IBM Plex Mono", "Roboto Mono", monospace',
             background: "transparent",
           }}>⌘K</kbd>
 
@@ -188,7 +188,7 @@ export default function HomePage() {
                   onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
                 >
                   <span style={{
-                    fontFamily: '"SF Mono", "JetBrains Mono", "Roboto Mono", monospace',
+                    fontFamily: '"SF Mono", "IBM Plex Mono", "Roboto Mono", monospace',
                     fontWeight: 700, fontSize: 11, color: "#1A1A1A",
                   }}>
                     {r.symbol}
@@ -203,19 +203,19 @@ export default function HomePage() {
           onClick={() => { const t = resolveTarget(); if (t) navigate(`/stock/${t}`); }}
           style={{
             padding: "0 16px", height: 38, borderRadius: 4,
-            background: "#0B5FA5", color: "#F0F2F5", border: "1px solid #0B5FA5",
+            background: "#1A7F37", color: "#F0F2F5", border: "1px solid #1A7F37",
             fontSize: 11, fontWeight: 600, cursor: "pointer",
             display: "flex", alignItems: "center", gap: 5,
             transition: "background 120ms ease, border-color 120ms ease",
-            fontFamily: '"SF Mono", "JetBrains Mono", "Roboto Mono", monospace',
+            fontFamily: '"SF Mono", "IBM Plex Mono", "Roboto Mono", monospace',
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.background = "#084A80";
-            e.currentTarget.style.borderColor = "#084A80";
+            e.currentTarget.style.background = "#145F29";
+            e.currentTarget.style.borderColor = "#145F29";
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.background = "#0B5FA5";
-            e.currentTarget.style.borderColor = "#0B5FA5";
+            e.currentTarget.style.background = "#1A7F37";
+            e.currentTarget.style.borderColor = "#1A7F37";
           }}
         >
           <Eye size={12} /> View
@@ -250,7 +250,7 @@ export default function HomePage() {
             <l.icon size={12} style={{ color: l.color, flexShrink: 0 }} strokeWidth={2.5} />
             <span style={{
               fontSize: 10.5, fontWeight: 600, color: "#1A1A1A", lineHeight: 1.2,
-              fontFamily: '"Plus Jakarta Sans", "SF Pro Display", sans-serif',
+              fontFamily: '"Instrument Sans", "SF Pro Display", sans-serif',
               overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
             }}>
               {l.label}
@@ -273,11 +273,11 @@ export default function HomePage() {
         fontSize: 10, color: "#9CA3AF", display: "flex", gap: 12, flexWrap: "wrap",
         padding: "4px 0", borderTop: "1px solid rgba(0,0,0,0.06)",
         marginTop: 6, paddingTop: 12,
-        fontFamily: '"SF Mono", "JetBrains Mono", "Roboto Mono", monospace',
+        fontFamily: '"SF Mono", "IBM Plex Mono", "Roboto Mono", monospace',
       }}>
         <span>PHISIX · PSE Edge</span>
         <Link to="/trust" style={{
-          color: "#0B5FA5", textDecoration: "none",
+          color: "#1A7F37", textDecoration: "none",
           borderBottom: "1px solid rgba(181, 80, 46, 0.3)",
         }}>
           Data sources

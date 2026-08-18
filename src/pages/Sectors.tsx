@@ -48,13 +48,13 @@ const SECTOR_COLORS: Record<string, { primary: string; light: string }> = {
   "Healthcare": { primary: "#0D7377", light: "rgba(13,115,119,0.15)" },
   "Retail": { primary: "#C73866", light: "rgba(199,56,102,0.15)" },
   "Utilities": { primary: "#6A4C93", light: "rgba(106,76,147,0.15)" },
-  "Technology": { primary: "#0B5FA5", light: "rgba(181, 80, 46,0.15)" },
+  "Technology": { primary: "#1A7F37", light: "rgba(181, 80, 46,0.15)" },
   "Telecom": { primary: "#14B8A6", light: "rgba(20,184,166,0.15)" },
   "Construction": { primary: "#F59E0B", light: "rgba(245,158,11,0.15)" },
 };
 
 function getSectorColor(sector: string): { primary: string; light: string } {
-  return SECTOR_COLORS[sector] || { primary: "#64748B", light: "rgba(100,116,139,0.15)" };
+  return SECTOR_COLORS[sector] || { primary: "#6B6B66", light: "rgba(100,116,139,0.15)" };
 }
 
 export default function Sectors() {

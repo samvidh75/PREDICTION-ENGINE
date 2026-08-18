@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 import { BrandMark } from "../components/BrandMark";
 import { MarketStatusBadge } from "../components/MarketStatusBadge";
+import { TickerBar } from "../components/TickerBar";
 
 /* ============================================================================
    PublicLayout — Editorial chrome for the open site (home, scanner, stock, etc.)
@@ -189,13 +190,13 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            padding: "14px 28px",
-            borderBottom: "1px solid var(--glass-border)",
-            boxShadow: "inset 0 1px 0 var(--glass-border-top)",
+            padding: "0 28px",
+            height: 64,
+            borderBottom: "1px solid var(--border)",
             position: "sticky",
             top: 0,
             zIndex: 80,
-            background: "var(--glass-bg)",
+            background: "var(--bg-page)",
             gap: 16,
           }}
         >
@@ -214,7 +215,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
                 display: "inline-flex",
                 alignItems: "center",
                 gap: 8,
-                borderRadius: 4,
+                borderRadius: 8,
                 fontSize: 13,
                 fontWeight: 500,
                 fontFamily: "var(--font-sans)",
@@ -238,22 +239,27 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
                 color: "var(--text-primary)",
               }}
             >
-              <BrandMark size={32} />
-              <span
-                style={{
-                  fontFamily: "var(--font-display)",
-                  fontWeight: 500,
-                  fontStyle: "italic",
-                  fontSize: 19,
-                  letterSpacing: "-0.015em",
-                }}
-              >
-                StockEx
+              <BrandMark size={30} />
+              <span style={{ lineHeight: 1.1, textAlign: "left" }}>
+                <span
+                  style={{
+                    display: "block",
+                    fontFamily: "var(--font-display)",
+                    fontWeight: 600,
+                    fontSize: 17,
+                    letterSpacing: "-0.02em",
+                  }}
+                >
+                  StockEx
+                  <span style={{ fontSize: 8.5, fontWeight: 500, verticalAlign: "super", marginLeft: 1, color: "var(--text-muted)" }}>
+                    ™
+                  </span>
+                </span>
+                <span style={{ display: "block", fontSize: 11.5, color: "var(--text-secondary)" }}>
+                  Philippines
+                </span>
               </span>
             </button>
-
-            {/* Live PSE session indicator — reads at a glance in the masthead */}
-            <MarketStatusBadge />
           </div>
 
           <nav
@@ -286,38 +292,90 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
             ))}
           </nav>
 
+          <div style={{ flex: 1 }} />
+
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <MarketStatusBadge />
+
+            <button
+              type="button"
+              onClick={() => navigate("/scanner")}
+              className="public-search-btn"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 8,
+                height: 34,
+                padding: "0 11px",
+                borderRadius: 8,
+                border: "1px solid var(--border)",
+                background: "var(--bg-card)",
+                color: "var(--text-muted)",
+                fontFamily: "var(--font-sans)",
+                fontSize: 12.5,
+                cursor: "pointer",
+                transition: "all 180ms var(--ease-soft)",
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.borderColor = "var(--text-primary)"; e.currentTarget.style.color = "var(--text-primary)"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.color = "var(--text-muted)"; }}
+            >
+              <Search size={15} />
+              <span className="public-search-label">Search</span>
+              <span
+                className="public-search-kbd"
+                style={{
+                  fontFamily: "var(--font-mono)",
+                  padding: "2px 6px",
+                  borderRadius: 5,
+                  background: "var(--bg-chip)",
+                  fontSize: 10,
+                  color: "var(--text-muted)",
+                }}
+              >
+                ⌘K
+              </span>
+            </button>
+
             <button
               type="button"
               onClick={() => navigate("/scanner")}
               style={{
-                background: "var(--brand)", color: "var(--text-inverse)",
-                border: "1px solid var(--brand)",
-                borderRadius: 4,
-                padding: "0 14px",
-                height: 34,
+                background: "var(--text-primary)", color: "var(--text-inverse)",
+                border: "1px solid var(--text-primary)",
+                borderRadius: 9,
+                padding: "0 16px",
+                height: 42,
                 fontFamily: "var(--font-sans)",
-                fontSize: 12.5,
+                fontSize: 13.5,
                 fontWeight: 500,
                 letterSpacing: "0.01em",
                 cursor: "pointer",
                 display: "inline-flex",
                 alignItems: "center",
                 gap: 6,
+                whiteSpace: "nowrap",
                 transition: "background 180ms var(--ease-soft)",
               }}
-              onMouseEnter={(e) => { e.currentTarget.style.background = "var(--brand-light)"; }}
-              onMouseLeave={(e) => { e.currentTarget.style.background = "var(--brand)"; }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = "var(--brand-dark)"; e.currentTarget.style.borderColor = "var(--brand-dark)"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = "var(--text-primary)"; e.currentTarget.style.borderColor = "var(--text-primary)"; }}
             >
               Open scanner <ArrowRight size={13} />
             </button>
           </div>
         </header>
 
+        <div className="public-index-tape" style={{ padding: "14px 28px 0" }}>
+          <TickerBar />
+        </div>
+
         <style>{`
           .public-top-nav { display: none; }
           @media (min-width: 980px) {
             .public-top-nav { display: flex !important; }
+          }
+          .public-search-label, .public-search-kbd { display: none; }
+          @media (min-width: 620px) {
+            .public-search-label, .public-search-kbd { display: inline; }
           }
           @media (max-width: 640px) {
             header[role="masthead"], header { padding-left: 16px !important; padding-right: 16px !important; }

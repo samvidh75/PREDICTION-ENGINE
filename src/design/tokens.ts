@@ -15,30 +15,30 @@
 // market data legibility. Borders: 1px only, no rounded corners for data sections.
 export const colors = {
   // Brand — signature rust/amber "ledger stamp" (not fintech blue)
-  primary:        '#0B5FA5',
-  primaryPressed: '#084A80',
-  onPrimary:      '#FAFBFC',
+  primary:        '#1A7F37',
+  primaryPressed: '#145F29',
+  onPrimary:      '#FDFDFB',
 
   // Gold — kept as a distinct secondary accent for premium features only
-  gold:           '#B45309',
+  gold:           '#8A5A12',
   goldLight:      'rgba(156, 107, 20, 0.12)',
   goldStrong:     'rgba(156, 107, 20, 0.24)',
 
   // Text hierarchy — deep ink on warm paper
-  ink:            '#0B0D12',    // Primary headlines / body (deep ink)
-  body:           '#374151',    // Default paragraph / secondary,
+  ink:            '#0A0A0A',    // Primary headlines / body (deep ink)
+  body:           '#3A3A36',    // Default paragraph / secondary,
   charcoal:       '#332F28',    // Stronger body emphasis,
-  mute:           '#64748B',    // Metadata, secondary captions,
-  ash:            '#94A3B8',    // Disabled text, lowest emphasis,
+  mute:           '#6B6B66',    // Metadata, secondary captions,
+  ash:            '#9A9A94',    // Disabled text, lowest emphasis,
   stone:          '#D3CBB8',    // Least-emphasis caption / disabled icon,
-  onDark:         '#FAFBFC',    // Interactive-state primary text (on colored/dark chips),
+  onDark:         '#FDFDFB',    // Interactive-state primary text (on colored/dark chips),
   onDarkMute:     'rgba(253,251,248,0.72)',
 
   // Surface ladder — warm paper, not stark white
-  canvas:           '#F5F6F8', // Page background (warm paper)
+  canvas:           '#FAFAF7', // Page background (warm paper)
   surface:          '#FFFFFF', // Card / panel background
-  surfaceElevated:  '#EEF1F4', // Hover states, lifted interiors
-  surfaceCard:      '#EDF0F4', // Active/pressed cards, tile fills
+  surfaceElevated:  '#F4F4EF', // Hover states, lifted interiors
+  surfaceCard:      '#F2F2ED', // Active/pressed cards, tile fills
   buttonFg:         '#FFFFFF', // Light surface variant for button focus
 
   // Glass — minimal use (modals/overlays only, NO blur)
@@ -50,36 +50,36 @@ export const colors = {
 
   // Backdrop / overlay tokens
   backdropClear:       'rgba(0,0,0,0)',
-  backdropModal:       'rgba(11,13,18,0.4)',
-  backdropHeavy:       'rgba(11,13,18,0.6)',
+  backdropModal:       'rgba(10,10,10,0.4)',
+  backdropHeavy:       'rgba(10,10,10,0.6)',
   backdropGlassmorphic:'rgba(255,255,255,0.85)',
   backdropFooter:      'rgba(255,255,255,0.90)',
-  backdropMuted:       'rgba(11,13,18,0.03)',
+  backdropMuted:       'rgba(10,10,10,0.03)',
 
   // Borders — thin ink-tinted hairlines (1px only, no rounded cards)
-  hairline:       'rgba(11,13,18,0.08)',      // 1px dividers
-  hairlineSoft:   'rgba(11,13,18,0.05)',      // Minimal emphasis
-  hairlineStrong: 'rgba(11,13,18,0.16)',      // Stronger dividers
+  hairline:       'rgba(10,10,10,0.08)',      // 1px dividers
+  hairlineSoft:   'rgba(10,10,10,0.05)',      // Minimal emphasis
+  hairlineStrong: 'rgba(10,10,10,0.16)',      // Stronger dividers
 
   // Brand accent — signature rust/amber
-  accentRed:        '#0B5FA5',
-  accentRedSoft:    'rgba(11,95,165,0.12)',
-  accentRedStrong:  'rgba(11,95,165,0.24)',
-  accentBlue:       '#0B5FA5',  // Alias retained for callers; same rust accent
-  accentBlueSoft:   'rgba(11,95,165,0.12)',
-  accentYellow:     '#B45309',
-  accentYellowSoft: 'rgba(180,83,9,0.14)',
+  accentRed:        '#1A7F37',
+  accentRedSoft:    'rgba(26,127,55,0.12)',
+  accentRedStrong:  'rgba(26,127,55,0.24)',
+  accentBlue:       '#1A7F37',  // Alias retained for callers; same rust accent
+  accentBlueSoft:   'rgba(26,127,55,0.12)',
+  accentYellow:     '#8A5A12',
+  accentYellowSoft: 'rgba(138,90,18,0.14)',
 
   // Market semantic colors — sharp, institutional greens/reds for instant legibility
-  marketGreen:       '#0F9D58', // Bullish (positive) - darkened for paper-bg contrast
-  marketGreenSoft:   'rgba(15,157,88,0.10)',
-  marketRed:         '#DC2626', // Bearish (negative) - darkened for paper-bg contrast
-  marketRedSoft:     'rgba(220,38,38,0.10)',
-  marketOrange:      '#B45309', // Neutral, caution - darkened for paper-bg contrast
-  marketOrangeSoft:  'rgba(180,83,9,0.10)',
+  marketGreen:       '#1A7F37', // Bullish (positive) - darkened for paper-bg contrast
+  marketGreenSoft:   'rgba(26,127,55,0.10)',
+  marketRed:         '#D93025', // Bearish (negative) - darkened for paper-bg contrast
+  marketRedSoft:     'rgba(217,48,37,0.10)',
+  marketOrange:      '#8A5A12', // Neutral, caution - darkened for paper-bg contrast
+  marketOrangeSoft:  'rgba(138,90,18,0.10)',
 
-  accentGreen:       '#0F9D58',
-  accentGreenSoft:   'rgba(15,157,88,0.10)',
+  accentGreen:       '#1A7F37',
+  accentGreenSoft:   'rgba(26,127,55,0.10)',
 
   // PSE sector taxonomy colors
   sectorFinancials:  '#1E5FAD',
@@ -96,28 +96,28 @@ export const colors = {
   keyBgEnd:        '#0A0E27',
 
   // Semantic aliases (ledger theme)
-  success:         '#0F9D58',
-  danger:          '#DC2626',
-  warning:         '#B45309',
-  page:            '#F5F6F8',
+  success:         '#1A7F37',
+  danger:          '#D93025',
+  warning:         '#8A5A12',
+  page:            '#FAFAF7',
   card:            '#FFFFFF',
-  textPrimary:     '#0B0D12',
-  textSecondary:   '#64748B',
-  textTertiary:    '#94A3B8',
-  border:          'rgba(11,13,18,0.08)',
-  separator:       'rgba(11,13,18,0.08)',
-  fill:            '#EDF0F4',
-  bgSecondary:     '#EEF1F4',
+  textPrimary:     '#0A0A0A',
+  textSecondary:   '#6B6B66',
+  textTertiary:    '#9A9A94',
+  border:          'rgba(10,10,10,0.08)',
+  separator:       'rgba(10,10,10,0.08)',
+  fill:            '#F2F2ED',
+  bgSecondary:     '#F4F4EF',
 } as const;
 
 // ── TYPOGRAPHY ─────────────────────────────────────────────────────────
 // One typeface, three weights of intent: Inter carries everything (display,
-// body, UI); JetBrains Mono keeps figures aligned in tables and tickers.
+// body, UI); IBM Plex Mono keeps figures aligned in tables and tickers.
 export const typography = {
   fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
   displayFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", sans-serif',
   serifFamily:   '"Fraunces", "Iowan Old Style", Georgia, serif',
-  monoFamily:    '"JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
+  monoFamily:    '"IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
   fontFeature:   '"calt", "kern", "liga", "ss03"',
 
   displayXl: { size: '64px', weight: 600, line: '1.05', track: '-0.02em' },

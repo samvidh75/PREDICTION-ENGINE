@@ -20,6 +20,8 @@ import {
 } from "lucide-react";
 import { colors, layout, typography, animation } from "../design/tokens";
 import { TickerBar } from "../components/TickerBar";
+import { BananaBanner } from "../components/nano/BananaBanner";
+import { NANOBANANA_ASSETS } from "../lib/nanoAssets";
 
 function FadeInSection({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
   const [visible, setVisible] = useState(false);
@@ -353,6 +355,32 @@ export default function AboutPage() {
                 </div>
               ))}
             </div>
+          </div>
+        </section>
+
+        {/* ─── NANO BANANA SHOWCASE ─────────────────────── */}
+        <section style={{ padding: "16px 0 88px" }}>
+          <div className="shell">
+            <FadeInSection>
+              <BananaBanner
+                src={NANOBANANA_ASSETS.landingHero}
+                minHeight={460}
+                overlay={0.5}
+              >
+                <div style={{ maxWidth: 560 }}>
+                  <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.14em", textTransform: "uppercase", color: "#F5A97F", marginBottom: 14 }}>
+                    The research desk, reimagined
+                  </div>
+                  <div style={{ fontSize: 30, fontWeight: 700, lineHeight: 1.12, letterSpacing: "-0.02em", marginBottom: 10 }}>
+                    Real PSE data, in one focused frame.
+                  </div>
+                  <p style={{ margin: 0, maxWidth: 480, color: "rgba(247,248,250,0.78)", fontSize: 15, lineHeight: 1.6 }}>
+                    Live quotes, fundamentals, ownership and disclosures from PSE Edge — the
+                    full picture of any listed company without leaving the page.
+                  </p>
+                </div>
+              </BananaBanner>
+            </FadeInSection>
           </div>
         </section>
 
