@@ -6,4 +6,4 @@ Disallow: /share/
 Disallow: /waitlist
 
 # Sitemaps
-Sitemap: https://stockstory-ph.com/sitemap.xml
+Sitemap: https://stockstory-india.com/sitemap.xml

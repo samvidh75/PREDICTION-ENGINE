@@ -25,6 +25,8 @@ import { registerLiveQuotesWs } from "../backend/routes/liveQuotesWs.js";
 import { registerFeatureRoutes, registerHealthRoutes } from "../backend/web/routes/index.js";
 import { registerAIRoutes } from "./aiRoutes.js";
 import { registerModelInferenceRoutes } from "../services/ai/ModelInferenceServer.js";
+import { resolveRouteMeta } from "../frontend/seo/routeMeta.js";
+import { injectSeoMeta } from "./seoInjection.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -32,6 +34,7 @@ const __dirname = dirname(__filename);
 const PORT = parseInt(process.env.PORT ?? "10000", 10);
 const HOST = process.env.HOST ?? "0.0.0.0";
 const SELF_ORIGIN = process.env.SELF_ORIGIN ?? "https://api.stockstory-india.com";
+const SEO_BASE_URL = process.env.VITE_APP_ORIGIN ?? "https://stockstory-india.com";
 const BUILD_TIME = __filename.includes("node_modules") ? "" : __filename;
 
 // ── Capture deploy commit & build timestamp at import time ─────────────
@@ -515,6 +518,29 @@ async function bootstrap() {
     });
   }
 
+  const STOCK_PATH_PREFIXES = ["/stock/", "/stocks/", "/research/", "/company/"];
+
+  /** Best-effort company name/sector lookup for /stock/:symbol SEO context. */
+  async function resolveSeoContext(
+    pathname: string,
+  ): Promise<{ symbol?: string; companyName?: string; sector?: string } | undefined> {
+    const prefix = STOCK_PATH_PREFIXES.find((p) => pathname.startsWith(p));
+    if (!prefix) return undefined;
+
+    const symbol = pathname.slice(prefix.length).split("/")[0];
+    if (!symbol) return undefined;
+
+    try {
+      const result = await StockUniverseAdapter.getInstance().getCompanyMaster(symbol);
+      if (result.ok) {
+        return { symbol, companyName: result.data.companyName, sector: result.data.sector ?? undefined };
+      }
+    } catch {
+      // Fall through — SEO meta will just use the symbol as the name.
+    }
+    return { symbol };
+  }
+
   // ── Catch-all: serve static files or fall back to SPA index.html ─
   server.setNotFoundHandler(async (_req, reply) => {
     const url = new URL(_req.url, "http://localhost");
@@ -543,10 +569,21 @@ async function bootstrap() {
       }
     }
 
-    // SPA fallback: serve index.html
+    // SPA fallback: serve index.html, with route-specific SEO tags injected
+    // server-side so crawlers that don't execute JS (AI search crawlers,
+    // social-preview bots) see per-route title/description/canonical/JSON-LD
+    // instead of one generic <head> for every page.
     const indexContent = await tryReadFile(indexPath);
     if (indexContent) {
-      return reply.type("text/html").send(indexContent);
+      let html = indexContent.toString("utf-8");
+      try {
+        const context = await resolveSeoContext(url.pathname);
+        const meta = resolveRouteMeta(url.pathname, context);
+        html = injectSeoMeta(html, meta, SEO_BASE_URL, "STOCKEX");
+      } catch (err) {
+        server.log.warn(`SEO injection failed for ${url.pathname}: ${(err as Error)?.message ?? err}`);
+      }
+      return reply.type("text/html").send(html);
     }
 
     return reply.status(404).send({ error: "not found" });

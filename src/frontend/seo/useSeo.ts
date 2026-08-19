@@ -20,7 +20,7 @@ export function useSeo(meta: SeoMeta | null) {
       return;
     }
 
-    document.title = `${meta.title} | ${SITE_NAME}`;
+    document.title = meta.title.endsWith(`| ${SITE_NAME}`) ? meta.title : `${meta.title} | ${SITE_NAME}`;
 
     updateMeta("description", meta.description);
     updateMeta("og:title", meta.title);

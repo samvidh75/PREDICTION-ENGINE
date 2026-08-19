@@ -1,1 +1,5 @@
+# lint-staged's eslint step is a no-op ("true", in package.json's "lint-staged")
+# because @typescript-eslint doesn't yet support typescript@7 (see package.json's
+# "typescript": "^7.0.2"). Re-enable "*.{ts,tsx}": "eslint --quiet --fix" once
+# @typescript-eslint ships TS7 support.
 npx lint-staged && npm run typecheck

@@ -3,292 +3,292 @@
 
   <!-- Core pages -->
   <url>
-    <loc>https://stockstory-ph.com/</loc>
+    <loc>https://stockstory-india.com/</loc>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
 
   <url>
-    <loc>https://stockstory-ph.com/scanner</loc>
+    <loc>https://stockstory-india.com/scanner</loc>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
-    <loc>https://stockstory-ph.com/pricing</loc>
+    <loc>https://stockstory-india.com/pricing</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://stockstory-ph.com/methodology</loc>
+    <loc>https://stockstory-india.com/methodology</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
 
   <url>
-    <loc>https://stockstory-ph.com/trust</loc>
+    <loc>https://stockstory-india.com/trust</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
 
   <url>
-    <loc>https://stockstory-ph.com/sectors</loc>
+    <loc>https://stockstory-india.com/sectors</loc>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
 
   <!-- Scanner landing pages -->
   <url>
-    <loc>https://stockstory-ph.com/scanner/quality-compounders</loc>
+    <loc>https://stockstory-india.com/scanner/quality-compounders</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
 
   <url>
-    <loc>https://stockstory-ph.com/scanner/undervalued-quality</loc>
+    <loc>https://stockstory-india.com/scanner/undervalued-quality</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
 
   <url>
-    <loc>https://stockstory-ph.com/scanner/improving-momentum</loc>
+    <loc>https://stockstory-india.com/scanner/improving-momentum</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
 
   <url>
-    <loc>https://stockstory-ph.com/scanner/low-debt-leaders</loc>
+    <loc>https://stockstory-india.com/scanner/low-debt-leaders</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
 
   <url>
-    <loc>https://stockstory-ph.com/scanner/earnings-acceleration</loc>
+    <loc>https://stockstory-india.com/scanner/earnings-acceleration</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
 
   <url>
-    <loc>https://stockstory-ph.com/scanner/dividend-stability</loc>
+    <loc>https://stockstory-india.com/scanner/dividend-stability</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
 
   <url>
-    <loc>https://stockstory-ph.com/scanner/risk-rising</loc>
+    <loc>https://stockstory-india.com/scanner/risk-rising</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
 
   <url>
-    <loc>https://stockstory-ph.com/scanner/good-businesses-out-of-favour</loc>
+    <loc>https://stockstory-india.com/scanner/good-businesses-out-of-favour</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
 
   <!-- Sector hubs -->
   <url>
-    <loc>https://stockstory-ph.com/sectors/it</loc>
+    <loc>https://stockstory-india.com/sectors/it</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://stockstory-ph.com/sectors/banking</loc>
+    <loc>https://stockstory-india.com/sectors/banking</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://stockstory-ph.com/sectors/pharma</loc>
+    <loc>https://stockstory-india.com/sectors/pharma</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://stockstory-ph.com/sectors/fmcg</loc>
+    <loc>https://stockstory-india.com/sectors/fmcg</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://stockstory-ph.com/sectors/auto</loc>
+    <loc>https://stockstory-india.com/sectors/auto</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://stockstory-ph.com/sectors/energy</loc>
+    <loc>https://stockstory-india.com/sectors/energy</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://stockstory-ph.com/sectors/telecom</loc>
+    <loc>https://stockstory-india.com/sectors/telecom</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
 
   <url>
-    <loc>https://stockstory-ph.com/sectors/metal</loc>
+    <loc>https://stockstory-india.com/sectors/metal</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
 
   <url>
-    <loc>https://stockstory-ph.com/sectors/cement</loc>
+    <loc>https://stockstory-india.com/sectors/cement</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
 
   <url>
-    <loc>https://stockstory-ph.com/sectors/power</loc>
+    <loc>https://stockstory-india.com/sectors/power</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
 
   <url>
-    <loc>https://stockstory-ph.com/sectors/realestate</loc>
+    <loc>https://stockstory-india.com/sectors/realestate</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
 
   <url>
-    <loc>https://stockstory-ph.com/sectors/consumer-durables</loc>
+    <loc>https://stockstory-india.com/sectors/consumer-durables</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
 
   <url>
-    <loc>https://stockstory-ph.com/sectors/engineering</loc>
+    <loc>https://stockstory-india.com/sectors/engineering</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
 
   <url>
-    <loc>https://stockstory-ph.com/sectors/logistics</loc>
+    <loc>https://stockstory-india.com/sectors/logistics</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
 
   <url>
-    <loc>https://stockstory-ph.com/sectors/media</loc>
+    <loc>https://stockstory-india.com/sectors/media</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
 
   <!-- Major company research pages -->
   <url>
-    <loc>https://stockstory-ph.com/stock/SM</loc>
+    <loc>https://stockstory-india.com/stock/SM</loc>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://stockstory-ph.com/stock/BDO</loc>
+    <loc>https://stockstory-india.com/stock/BDO</loc>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://stockstory-ph.com/stock/BPI</loc>
+    <loc>https://stockstory-india.com/stock/BPI</loc>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://stockstory-ph.com/stock/JFC</loc>
+    <loc>https://stockstory-india.com/stock/JFC</loc>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://stockstory-ph.com/stock/MBT</loc>
+    <loc>https://stockstory-india.com/stock/MBT</loc>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://stockstory-ph.com/stock/URC</loc>
+    <loc>https://stockstory-india.com/stock/URC</loc>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://stockstory-ph.com/stock/SECB</loc>
+    <loc>https://stockstory-india.com/stock/SECB</loc>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://stockstory-ph.com/stock/GLO</loc>
+    <loc>https://stockstory-india.com/stock/GLO</loc>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://stockstory-ph.com/stock/AEV</loc>
+    <loc>https://stockstory-india.com/stock/AEV</loc>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://stockstory-ph.com/stock/AC</loc>
+    <loc>https://stockstory-india.com/stock/AC</loc>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://stockstory-ph.com/stock/DD</loc>
+    <loc>https://stockstory-india.com/stock/DD</loc>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://stockstory-ph.com/stock/CEB</loc>
+    <loc>https://stockstory-india.com/stock/CEB</loc>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://stockstory-ph.com/stock/EMI</loc>
+    <loc>https://stockstory-india.com/stock/EMI</loc>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://stockstory-ph.com/stock/IMI</loc>
+    <loc>https://stockstory-india.com/stock/IMI</loc>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://stockstory-ph.com/stock/ACEN</loc>
+    <loc>https://stockstory-india.com/stock/ACEN</loc>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://stockstory-ph.com/stock/CHP</loc>
+    <loc>https://stockstory-india.com/stock/CHP</loc>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://stockstory-ph.com/stock/MONDE</loc>
+    <loc>https://stockstory-india.com/stock/MONDE</loc>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://stockstory-ph.com/stock/WLCON</loc>
+    <loc>https://stockstory-india.com/stock/WLCON</loc>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://stockstory-ph.com/stock/ANI</loc>
+    <loc>https://stockstory-india.com/stock/ANI</loc>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Settings, X } from "lucide-react";
 import type { UserResearchProfile, ResearchExperienceLevel, ResearchTimeHorizon, RiskLevel } from "../research/contracts/productContracts";
 import { getProfile, saveProfile, updateExperienceLevel, updateTimeHorizon, updateMaxRiskLevel, updateResearchTopics, updateDisplayName } from "../services/personalization/researchProfileStore";
@@ -17,6 +18,7 @@ const TOPIC_OPTIONS = [
 ];
 
 export function ResearchProfileModal() {
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [profile, setProfile] = useState<UserResearchProfile | null>(null);
 
@@ -109,6 +111,12 @@ export function ResearchProfileModal() {
               >
                 <X size={20} />
               </button>
+            </div>
+
+            <div style={{ display: "flex", gap: space[2], flexWrap: "wrap" }}>
+              <Button size="sm" variant="secondary" onClick={() => { setOpen(false); navigate("/settings"); }}>
+                Open full settings
+              </Button>
             </div>
 
             {/* Display Name */}

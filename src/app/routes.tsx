@@ -1,4 +1,4 @@
-import { Suspense, lazy, useEffect, type ReactNode } from "react";
+import { Suspense, lazy, type ReactNode } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { AppShell } from "./AppShell";
 import { PublicLayout } from "./PublicLayout";
@@ -38,6 +38,7 @@ const PortfolioAnalyticsPage = lazy(() => import("../pages/PortfolioAnalyticsPag
 const LiveMarketPage = lazy(() => import("../pages/LiveMarketPage"));
 const PortfolioDetailPage = lazy(() => import("../pages/PortfolioDetailPage"));
 const StockStoryPage = lazy(() => import("../pages/StockStoryPage"));
+const SettingsPage = lazy(() => import("../pages/SettingsPage"));
 const AITestPage = lazy(() => import("../pages/AITestPage"));
 const BrowserAITestPage = lazy(() => import("../pages/BrowserAITestPage"));
 const ComponentTestPage = lazy(() => import("../pages/ComponentTestPage"));
@@ -111,19 +112,6 @@ function WorkspaceRoute({ children }: { children: ReactNode }) {
   return <AppShell>{children}</AppShell>;
 }
 
-/**
- * The StockStory design frontend is served as static HTML under /design/
- * (all 16 design pages, fully navigable). The app lands on it so opening the
- * site shows the design pages exactly as designed. This is a hard page
- * navigation because /design/ is a static path, not a React route.
- */
-function DesignLanding() {
-  useEffect(() => {
-    window.location.replace("/design/");
-  }, []);
-  return null;
-}
-
 export function AppRoutes() {
   const { enableWaitlistPage } = getBetaConfig();
   const changelogEnabled = isFeatureEnabled("changelog");
@@ -131,7 +119,7 @@ export function AppRoutes() {
   return (
     <Suspense fallback={<RouteFallback />}>
       <Routes>
-        <Route path="/" element={<DesignLanding />} />
+        <Route path="/" element={<Navigate to="/dashboard" replace />} />
         {SHOW_ABOUT_PAGE ? (
           <Route path="/about" element={<Suspense fallback={<RouteFallback />}><PublicLayout><AboutPage /></PublicLayout></Suspense>} />
         ) : (
@@ -168,6 +156,7 @@ export function AppRoutes() {
         <Route path="/portfolio" element={<WorkspaceRoute><PortfolioPage /></WorkspaceRoute>} />
         <Route path="/portfolio-analytics" element={<WorkspaceRoute><PortfolioAnalyticsPage /></WorkspaceRoute>} />
         <Route path="/watchlist" element={<WorkspaceRoute><WatchlistPage /></WorkspaceRoute>} />
+        <Route path="/settings" element={<WorkspaceRoute><SettingsPage /></WorkspaceRoute>} />
         <Route path="/analyst" element={<WorkspaceRoute><AnalystWorkspace /></WorkspaceRoute>} />
         <Route path="/billing/success" element={<WorkspaceRoute><BillingSuccessPage /></WorkspaceRoute>} />
         <Route path="/billing/cancel" element={<WorkspaceRoute><BillingCancelPage /></WorkspaceRoute>} />
