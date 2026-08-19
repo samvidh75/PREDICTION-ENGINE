@@ -521,9 +521,16 @@ async function bootstrap() {
   const STOCK_PATH_PREFIXES = ["/stock/", "/stocks/", "/research/", "/company/"];
 
   /** Best-effort company name/sector lookup for /stock/:symbol SEO context. */
-  async function resolveSeoContext(
-    pathname: string,
-  ): Promise<{ symbol?: string; companyName?: string; sector?: string } | undefined> {
+  async function resolveSeoContext(pathname: string): Promise<
+    | {
+        symbol?: string;
+        companyName?: string;
+        sector?: string;
+        industry?: string;
+        marketCapCategory?: string;
+      }
+    | undefined
+  > {
     const prefix = STOCK_PATH_PREFIXES.find((p) => pathname.startsWith(p));
     if (!prefix) return undefined;
 
@@ -533,7 +540,13 @@ async function bootstrap() {
     try {
       const result = await StockUniverseAdapter.getInstance().getCompanyMaster(symbol);
       if (result.ok) {
-        return { symbol, companyName: result.data.companyName, sector: result.data.sector ?? undefined };
+        return {
+          symbol,
+          companyName: result.data.companyName,
+          sector: result.data.sector ?? undefined,
+          industry: result.data.industry ?? undefined,
+          marketCapCategory: result.data.marketCapCategory ?? undefined,
+        };
       }
     } catch {
       // Fall through — SEO meta will just use the symbol as the name.

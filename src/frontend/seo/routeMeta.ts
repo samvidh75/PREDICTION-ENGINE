@@ -7,7 +7,13 @@ import { buildCompanySeo } from "./companySeo";
  */
 export function resolveRouteMeta(
   pathname: string,
-  context?: { symbol?: string; companyName?: string; sector?: string },
+  context?: {
+    symbol?: string;
+    companyName?: string;
+    sector?: string;
+    industry?: string;
+    marketCapCategory?: string;
+  },
 ): SeoMeta | null {
   // Strip trailing slash
   const p = pathname.replace(/\/$/, "");
@@ -52,7 +58,10 @@ export function resolveRouteMeta(
   // Stock / Company research pages
   if (p.startsWith("/stock/") || p.startsWith("/stocks/") || p.startsWith("/research/") || p.startsWith("/company/")) {
     const symbol = context?.symbol || p.split("/").pop() || "";
-    return buildCompanySeo(symbol.toUpperCase(), context?.companyName, context?.sector);
+    return buildCompanySeo(symbol.toUpperCase(), context?.companyName, context?.sector, {
+      industry: context?.industry,
+      marketCapCategory: context?.marketCapCategory,
+    });
   }
 
   // Watchlist
