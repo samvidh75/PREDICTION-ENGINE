@@ -1,0 +1,1319 @@
+{
+  "generatedAt": "2026-08-20T10:32:39.162Z",
+  "source": "stockanalysis.com",
+  "totalSymbols": 282,
+  "resolved": 262,
+  "units": "millions PHP",
+  "results": {
+    "ABG": {
+      "marketCap": 15990,
+      "raw": "15.99B",
+      "scrapedAt": "2026-08-20T10:29:12.484Z"
+    },
+    "ABA": {
+      "marketCap": 1490,
+      "raw": "1.49B",
+      "scrapedAt": "2026-08-20T10:29:12.699Z"
+    },
+    "AB": {
+      "marketCap": 5120,
+      "raw": "5.12B",
+      "scrapedAt": "2026-08-20T10:29:12.702Z"
+    },
+    "ACE": {
+      "marketCap": 417.14,
+      "raw": "417.14M",
+      "scrapedAt": "2026-08-20T10:29:14.407Z"
+    },
+    "ABSP": {
+      "marketCap": 318.38,
+      "raw": "318.38M",
+      "scrapedAt": "2026-08-20T10:29:14.478Z"
+    },
+    "ABS": {
+      "marketCap": 3340,
+      "raw": "3.34B",
+      "scrapedAt": "2026-08-20T10:29:14.611Z"
+    },
+    "AC": {
+      "marketCap": 311140,
+      "raw": "311.14B",
+      "scrapedAt": "2026-08-20T10:29:14.612Z"
+    },
+    "ACR": {
+      "marketCap": 5030,
+      "raw": "5.03B",
+      "scrapedAt": "2026-08-20T10:29:16.294Z"
+    },
+    "AGI": {
+      "marketCap": 81040,
+      "raw": "81.04B",
+      "scrapedAt": "2026-08-20T10:29:16.324Z"
+    },
+    "ACEN": {
+      "marketCap": 119850,
+      "raw": "119.85B",
+      "scrapedAt": "2026-08-20T10:29:16.382Z"
+    },
+    "AEV": {
+      "marketCap": 205450,
+      "raw": "205.45B",
+      "scrapedAt": "2026-08-20T10:29:16.440Z"
+    },
+    "ALCO": {
+      "marketCap": 2290,
+      "raw": "2.29B",
+      "scrapedAt": "2026-08-20T10:29:18.277Z"
+    },
+    "ALHI": {
+      "marketCap": 4160,
+      "raw": "4.16B",
+      "scrapedAt": "2026-08-20T10:29:18.289Z"
+    },
+    "ALLDY": {
+      "marketCap": 800,
+      "raw": "800.00M",
+      "scrapedAt": "2026-08-20T10:29:18.418Z"
+    },
+    "ALI": {
+      "marketCap": 216090,
+      "raw": "216.09B",
+      "scrapedAt": "2026-08-20T10:29:18.462Z"
+    },
+    "ALTER": {
+      "marketCap": 3030,
+      "raw": "3.03B",
+      "scrapedAt": "2026-08-20T10:29:20.115Z"
+    },
+    "ANS": {
+      "marketCap": 20990,
+      "raw": "20.99B",
+      "scrapedAt": "2026-08-20T10:29:20.500Z"
+    },
+    "ANI": {
+      "marketCap": 486.61,
+      "raw": "486.61M",
+      "scrapedAt": "2026-08-20T10:29:20.653Z"
+    },
+    "ALLHC": {
+      "marketCap": 7380,
+      "raw": "7.38B",
+      "scrapedAt": "2026-08-20T10:29:20.653Z"
+    },
+    "APC": {
+      "marketCap": 847.98,
+      "raw": "847.98M",
+      "scrapedAt": "2026-08-20T10:29:22.496Z"
+    },
+    "APO": {
+      "marketCap": 3240,
+      "raw": "3.24B",
+      "scrapedAt": "2026-08-20T10:29:22.515Z"
+    },
+    "APL": {
+      "marketCap": 1900,
+      "raw": "1.90B",
+      "scrapedAt": "2026-08-20T10:29:22.620Z"
+    },
+    "AP": {
+      "marketCap": 324260,
+      "raw": "324.26B",
+      "scrapedAt": "2026-08-20T10:29:22.631Z"
+    },
+    "APX": {
+      "marketCap": 80890,
+      "raw": "80.89B",
+      "scrapedAt": "2026-08-20T10:29:24.518Z"
+    },
+    "APVI": {
+      "marketCap": 1190,
+      "raw": "1.19B",
+      "scrapedAt": "2026-08-20T10:29:24.539Z"
+    },
+    "ARA": {
+      "marketCap": 556.15,
+      "raw": "556.15M",
+      "scrapedAt": "2026-08-20T10:29:24.540Z"
+    },
+    "AT": {
+      "marketCap": 61900,
+      "raw": "61.90B",
+      "scrapedAt": "2026-08-20T10:29:26.467Z"
+    },
+    "ATN": {
+      "marketCap": 2830,
+      "raw": "2.83B",
+      "scrapedAt": "2026-08-20T10:29:26.471Z"
+    },
+    "AREIT": {
+      "marketCap": 156300,
+      "raw": "156.30B",
+      "scrapedAt": "2026-08-20T10:29:26.481Z"
+    },
+    "ASLAG": {
+      "marketCap": 1680,
+      "raw": "1.68B",
+      "scrapedAt": "2026-08-20T10:29:26.605Z"
+    },
+    "AUB": {
+      "marketCap": 71630,
+      "raw": "71.63B",
+      "scrapedAt": "2026-08-20T10:29:28.236Z"
+    },
+    "BC": {
+      "marketCap": 5040,
+      "raw": "5.04B",
+      "scrapedAt": "2026-08-20T10:29:28.445Z"
+    },
+    "BALAI": {
+      "marketCap": 470.93,
+      "raw": "470.93M",
+      "scrapedAt": "2026-08-20T10:29:28.508Z"
+    },
+    "AXLM": {
+      "marketCap": 11130,
+      "raw": "11.13B",
+      "scrapedAt": "2026-08-20T10:29:28.578Z"
+    },
+    "BCOR": {
+      "marketCap": 41240,
+      "raw": "41.24B",
+      "scrapedAt": "2026-08-20T10:29:30.324Z"
+    },
+    "BH": {
+      "marketCap": 339.99,
+      "raw": "339.99M",
+      "scrapedAt": "2026-08-20T10:29:30.332Z"
+    },
+    "BEL": {
+      "marketCap": 11680,
+      "raw": "11.68B",
+      "scrapedAt": "2026-08-20T10:29:30.372Z"
+    },
+    "BDO": {
+      "marketCap": 651450,
+      "raw": "651.45B",
+      "scrapedAt": "2026-08-20T10:29:30.412Z"
+    },
+    "BKR": {
+      "marketCap": 764.24,
+      "raw": "764.24M",
+      "scrapedAt": "2026-08-20T10:29:32.510Z"
+    },
+    "BHI": {
+      "marketCap": 432,
+      "raw": "432.00M",
+      "scrapedAt": "2026-08-20T10:29:32.597Z"
+    },
+    "BLOOM": {
+      "marketCap": 29850,
+      "raw": "29.85B",
+      "scrapedAt": "2026-08-20T10:29:32.962Z"
+    },
+    "BNCOM": {
+      "marketCap": 14450,
+      "raw": "14.45B",
+      "scrapedAt": "2026-08-20T10:29:34.916Z"
+    },
+    "BPI": {
+      "marketCap": 568830,
+      "raw": "568.83B",
+      "scrapedAt": "2026-08-20T10:29:34.931Z"
+    },
+    "BSC": {
+      "marketCap": 1640,
+      "raw": "1.64B",
+      "scrapedAt": "2026-08-20T10:29:35.026Z"
+    },
+    "BRN": {
+      "marketCap": 1690,
+      "raw": "1.69B",
+      "scrapedAt": "2026-08-20T10:29:35.381Z"
+    },
+    "C": {
+      "marketCap": 2070,
+      "raw": "2.07B",
+      "scrapedAt": "2026-08-20T10:29:37.233Z"
+    },
+    "CA": {
+      "marketCap": 1570,
+      "raw": "1.57B",
+      "scrapedAt": "2026-08-20T10:29:37.532Z"
+    },
+    "CBC": {
+      "marketCap": 143990,
+      "raw": "143.99B",
+      "scrapedAt": "2026-08-20T10:29:37.610Z"
+    },
+    "CAT": {
+      "marketCap": 2340,
+      "raw": "2.34B",
+      "scrapedAt": "2026-08-20T10:29:38.095Z"
+    },
+    "CDC": {
+      "marketCap": 3040,
+      "raw": "3.04B",
+      "scrapedAt": "2026-08-20T10:29:39.728Z"
+    },
+    "CEB": {
+      "marketCap": 17490,
+      "raw": "17.49B",
+      "scrapedAt": "2026-08-20T10:29:39.863Z"
+    },
+    "CEU": {
+      "marketCap": 6630,
+      "raw": "6.63B",
+      "scrapedAt": "2026-08-20T10:29:39.863Z"
+    },
+    "CEI": {
+      "marketCap": 1320,
+      "raw": "1.32B",
+      "scrapedAt": "2026-08-20T10:29:40.409Z"
+    },
+    "CIC": {
+      "marketCap": 4210,
+      "raw": "4.21B",
+      "scrapedAt": "2026-08-20T10:29:42.589Z"
+    },
+    "CLI": {
+      "marketCap": 7550,
+      "raw": "7.55B",
+      "scrapedAt": "2026-08-20T10:29:43.156Z"
+    },
+    "CHP": {
+      "marketCap": 16190,
+      "raw": "16.19B",
+      "scrapedAt": "2026-08-20T10:29:44.001Z"
+    },
+    "CNPF": {
+      "marketCap": 114060,
+      "raw": "114.06B",
+      "scrapedAt": "2026-08-20T10:29:44.143Z"
+    },
+    "COL": {
+      "marketCap": 8630,
+      "raw": "8.63B",
+      "scrapedAt": "2026-08-20T10:29:46.022Z"
+    },
+    "CPG": {
+      "marketCap": 8700,
+      "raw": "8.70B",
+      "scrapedAt": "2026-08-20T10:29:46.022Z"
+    },
+    "CNVRG": {
+      "marketCap": 70240,
+      "raw": "70.24B",
+      "scrapedAt": "2026-08-20T10:29:46.109Z"
+    },
+    "COSCO": {
+      "marketCap": 57640,
+      "raw": "57.64B",
+      "scrapedAt": "2026-08-20T10:29:46.629Z"
+    },
+    "CREC": {
+      "marketCap": 51230,
+      "raw": "51.23B",
+      "scrapedAt": "2026-08-20T10:29:48.685Z"
+    },
+    "CPM": {
+      "marketCap": 6460,
+      "raw": "6.46B",
+      "scrapedAt": "2026-08-20T10:29:48.765Z"
+    },
+    "CROWN": {
+      "marketCap": 1120,
+      "raw": "1.12B",
+      "scrapedAt": "2026-08-20T10:29:48.929Z"
+    },
+    "CREIT": {
+      "marketCap": 21600,
+      "raw": "21.60B",
+      "scrapedAt": "2026-08-20T10:29:50.583Z"
+    },
+    "DD": {
+      "marketCap": 28560,
+      "raw": "28.56B",
+      "scrapedAt": "2026-08-20T10:29:52.655Z"
+    },
+    "CSB": {
+      "marketCap": 2430,
+      "raw": "2.43B",
+      "scrapedAt": "2026-08-20T10:29:52.870Z"
+    },
+    "CTS": {
+      "marketCap": 2410,
+      "raw": "2.41B",
+      "scrapedAt": "2026-08-20T10:29:52.931Z"
+    },
+    "DHI": {
+      "marketCap": 33730,
+      "raw": "33.73B",
+      "scrapedAt": "2026-08-20T10:29:54.650Z"
+    },
+    "DDMPR": {
+      "marketCap": 18540,
+      "raw": "18.54B",
+      "scrapedAt": "2026-08-20T10:29:55.014Z"
+    },
+    "DFNN": {
+      "marketCap": 278.58,
+      "raw": "278.58M",
+      "scrapedAt": "2026-08-20T10:29:55.156Z"
+    },
+    "DMW": {
+      "marketCap": 16640,
+      "raw": "16.64B",
+      "scrapedAt": "2026-08-20T10:29:56.807Z"
+    },
+    "DIZ": {
+      "marketCap": 320.3,
+      "raw": "320.30M",
+      "scrapedAt": "2026-08-20T10:29:56.939Z"
+    },
+    "DITO": {
+      "marketCap": 15900,
+      "raw": "15.90B",
+      "scrapedAt": "2026-08-20T10:29:57.118Z"
+    },
+    "DMC": {
+      "marketCap": 105560,
+      "raw": "105.56B",
+      "scrapedAt": "2026-08-20T10:29:57.202Z"
+    },
+    "DWC": {
+      "marketCap": 802.76,
+      "raw": "802.76M",
+      "scrapedAt": "2026-08-20T10:29:59.109Z"
+    },
+    "ECVC": {
+      "marketCap": 1860,
+      "raw": "1.86B",
+      "scrapedAt": "2026-08-20T10:29:59.128Z"
+    },
+    "DNL": {
+      "marketCap": 25070,
+      "raw": "25.07B",
+      "scrapedAt": "2026-08-20T10:29:59.409Z"
+    },
+    "ECP": {
+      "marketCap": 345,
+      "raw": "345.00M",
+      "scrapedAt": "2026-08-20T10:29:59.457Z"
+    },
+    "ELI": {
+      "marketCap": 1510,
+      "raw": "1.51B",
+      "scrapedAt": "2026-08-20T10:30:01.444Z"
+    },
+    "EEI": {
+      "marketCap": 2030,
+      "raw": "2.03B",
+      "scrapedAt": "2026-08-20T10:30:01.632Z"
+    },
+    "EGRN": {
+      "marketCap": 725,
+      "raw": "725.00M",
+      "scrapedAt": "2026-08-20T10:30:01.644Z"
+    },
+    "ENEX": {
+      "marketCap": 925,
+      "raw": "925.00M",
+      "scrapedAt": "2026-08-20T10:30:03.492Z"
+    },
+    "EURO": {
+      "marketCap": 4520,
+      "raw": "4.52B",
+      "scrapedAt": "2026-08-20T10:30:03.715Z"
+    },
+    "EMI": {
+      "marketCap": 236250,
+      "raw": "236.25B",
+      "scrapedAt": "2026-08-20T10:30:03.720Z"
+    },
+    "EW": {
+      "marketCap": 24880,
+      "raw": "24.88B",
+      "scrapedAt": "2026-08-20T10:30:03.724Z"
+    },
+    "FDC": {
+      "marketCap": 31480,
+      "raw": "31.48B",
+      "scrapedAt": "2026-08-20T10:30:05.651Z"
+    },
+    "FB": {
+      "marketCap": 280690,
+      "raw": "280.69B",
+      "scrapedAt": "2026-08-20T10:30:05.699Z"
+    },
+    "FCG": {
+      "marketCap": 3550,
+      "raw": "3.55B",
+      "scrapedAt": "2026-08-20T10:30:06.417Z"
+    },
+    "FAF": {
+      "marketCap": 561.98,
+      "raw": "561.98M",
+      "scrapedAt": "2026-08-20T10:30:06.653Z"
+    },
+    "FEU": {
+      "marketCap": 19240,
+      "raw": "19.24B",
+      "scrapedAt": "2026-08-20T10:30:08.394Z"
+    },
+    "FERRO": {
+      "marketCap": 1300,
+      "raw": "1.30B",
+      "scrapedAt": "2026-08-20T10:30:08.606Z"
+    },
+    "FGEN": {
+      "marketCap": 104660,
+      "raw": "104.66B",
+      "scrapedAt": "2026-08-20T10:30:08.642Z"
+    },
+    "FJP": {
+      "marketCap": 1110,
+      "raw": "1.11B",
+      "scrapedAt": "2026-08-20T10:30:10.420Z"
+    },
+    "FILRT": {
+      "marketCap": 18970,
+      "raw": "18.97B",
+      "scrapedAt": "2026-08-20T10:30:10.576Z"
+    },
+    "FLI": {
+      "marketCap": 15440,
+      "raw": "15.44B",
+      "scrapedAt": "2026-08-20T10:30:10.721Z"
+    },
+    "FNI": {
+      "marketCap": 10730,
+      "raw": "10.73B",
+      "scrapedAt": "2026-08-20T10:30:14.444Z"
+    },
+    "FOOD": {
+      "marketCap": 774.91,
+      "raw": "774.91M",
+      "scrapedAt": "2026-08-20T10:30:14.583Z"
+    },
+    "FPH": {
+      "marketCap": 45120,
+      "raw": "45.12B",
+      "scrapedAt": "2026-08-20T10:30:14.844Z"
+    },
+    "FPI": {
+      "marketCap": 304.73,
+      "raw": "304.73M",
+      "scrapedAt": "2026-08-20T10:30:15.202Z"
+    },
+    "GERI": {
+      "marketCap": 6810,
+      "raw": "6.81B",
+      "scrapedAt": "2026-08-20T10:30:18.423Z"
+    },
+    "FRUIT": {
+      "marketCap": 1340,
+      "raw": "1.34B",
+      "scrapedAt": "2026-08-20T10:30:19.328Z"
+    },
+    "FYN": {
+      "marketCap": 604.23,
+      "raw": "604.23M",
+      "scrapedAt": "2026-08-20T10:30:19.361Z"
+    },
+    "GEO": {
+      "marketCap": 315,
+      "raw": "315.00M",
+      "scrapedAt": "2026-08-20T10:30:20.132Z"
+    },
+    "GPH": {
+      "marketCap": 270.2,
+      "raw": "270.20M",
+      "scrapedAt": "2026-08-20T10:30:22.287Z"
+    },
+    "GMAP": {
+      "marketCap": 1480,
+      "raw": "1.48B",
+      "scrapedAt": "2026-08-20T10:30:22.989Z"
+    },
+    "GLO": {
+      "marketCap": 250940,
+      "raw": "250.94B",
+      "scrapedAt": "2026-08-20T10:30:23.263Z"
+    },
+    "GMA7": {
+      "marketCap": 14600,
+      "raw": "14.60B",
+      "scrapedAt": "2026-08-20T10:30:23.893Z"
+    },
+    "HI": {
+      "marketCap": 7570,
+      "raw": "7.57B",
+      "scrapedAt": "2026-08-20T10:30:29.155Z"
+    },
+    "GSMI": {
+      "marketCap": 65860,
+      "raw": "65.86B",
+      "scrapedAt": "2026-08-20T10:30:29.196Z"
+    },
+    "GREEN": {
+      "marketCap": 684.88,
+      "raw": "684.88M",
+      "scrapedAt": "2026-08-20T10:30:30.123Z"
+    },
+    "GTCAP": {
+      "marketCap": 108070,
+      "raw": "108.07B",
+      "scrapedAt": "2026-08-20T10:30:30.484Z"
+    },
+    "HOME": {
+      "marketCap": 900,
+      "raw": "900.00M",
+      "scrapedAt": "2026-08-20T10:30:33.299Z"
+    },
+    "HTI": {
+      "marketCap": 3400,
+      "raw": "3.40B",
+      "scrapedAt": "2026-08-20T10:30:33.655Z"
+    },
+    "I": {
+      "marketCap": 121.72,
+      "raw": "121.72M",
+      "scrapedAt": "2026-08-20T10:30:34.186Z"
+    },
+    "ICT": {
+      "marketCap": 1880000,
+      "raw": "1.88T",
+      "scrapedAt": "2026-08-20T10:30:34.472Z"
+    },
+    "INFRA": {
+      "marketCap": 1940,
+      "raw": "1.94B",
+      "scrapedAt": "2026-08-20T10:30:37.328Z"
+    },
+    "IDC": {
+      "marketCap": 506.8,
+      "raw": "506.80M",
+      "scrapedAt": "2026-08-20T10:30:37.376Z"
+    },
+    "IMP": {
+      "marketCap": 567.68,
+      "raw": "567.68M",
+      "scrapedAt": "2026-08-20T10:30:37.819Z"
+    },
+    "IMI": {
+      "marketCap": 16730,
+      "raw": "16.73B",
+      "scrapedAt": "2026-08-20T10:30:38.310Z"
+    },
+    "IS": {
+      "marketCap": 591.18,
+      "raw": "591.18M",
+      "scrapedAt": "2026-08-20T10:30:39.973Z"
+    },
+    "ION": {
+      "marketCap": 1830,
+      "raw": "1.83B",
+      "scrapedAt": "2026-08-20T10:30:40.728Z"
+    },
+    "IPO": {
+      "marketCap": 7210,
+      "raw": "7.21B",
+      "scrapedAt": "2026-08-20T10:30:41.188Z"
+    },
+    "IPM": {
+      "marketCap": 1130,
+      "raw": "1.13B",
+      "scrapedAt": "2026-08-20T10:30:41.441Z"
+    },
+    "JOH": {
+      "marketCap": 1110,
+      "raw": "1.11B",
+      "scrapedAt": "2026-08-20T10:30:43.622Z"
+    },
+    "JGS": {
+      "marketCap": 162830,
+      "raw": "162.83B",
+      "scrapedAt": "2026-08-20T10:30:44.796Z"
+    },
+    "JFC": {
+      "marketCap": 173480,
+      "raw": "173.48B",
+      "scrapedAt": "2026-08-20T10:30:45.911Z"
+    },
+    "JAS": {
+      "marketCap": 437.6,
+      "raw": "437.60M",
+      "scrapedAt": "2026-08-20T10:30:46.760Z"
+    },
+    "KEEPR": {
+      "marketCap": 28580,
+      "raw": "28.58B",
+      "scrapedAt": "2026-08-20T10:30:50.636Z"
+    },
+    "KPPI": {
+      "marketCap": 273.44,
+      "raw": "273.44M",
+      "scrapedAt": "2026-08-20T10:30:50.938Z"
+    },
+    "LBC": {
+      "marketCap": 9340,
+      "raw": "9.34B",
+      "scrapedAt": "2026-08-20T10:30:51.616Z"
+    },
+    "KEP": {
+      "marketCap": 734.57,
+      "raw": "734.57M",
+      "scrapedAt": "2026-08-20T10:30:52.074Z"
+    },
+    "LODE": {
+      "marketCap": 1100,
+      "raw": "1.10B",
+      "scrapedAt": "2026-08-20T10:30:56.514Z"
+    },
+    "LMG": {
+      "marketCap": 541.92,
+      "raw": "541.92M",
+      "scrapedAt": "2026-08-20T10:30:56.677Z"
+    },
+    "LFM": {
+      "marketCap": 3090,
+      "raw": "3.09B",
+      "scrapedAt": "2026-08-20T10:30:56.835Z"
+    },
+    "LSC": {
+      "marketCap": 653.51,
+      "raw": "653.51M",
+      "scrapedAt": "2026-08-20T10:30:58.943Z"
+    },
+    "LPZ": {
+      "marketCap": 22920,
+      "raw": "22.92B",
+      "scrapedAt": "2026-08-20T10:31:00.036Z"
+    },
+    "LOTO": {
+      "marketCap": 1440,
+      "raw": "1.44B",
+      "scrapedAt": "2026-08-20T10:31:00.037Z"
+    },
+    "LPC": {
+      "marketCap": 525,
+      "raw": "525.00M",
+      "scrapedAt": "2026-08-20T10:31:00.064Z"
+    },
+    "MACAY": {
+      "marketCap": 7890,
+      "raw": "7.89B",
+      "scrapedAt": "2026-08-20T10:31:02.270Z"
+    },
+    "LTG": {
+      "marketCap": 161380,
+      "raw": "161.38B",
+      "scrapedAt": "2026-08-20T10:31:02.941Z"
+    },
+    "MA": {
+      "marketCap": 2370,
+      "raw": "2.37B",
+      "scrapedAt": "2026-08-20T10:31:03.022Z"
+    },
+    "MAC": {
+      "marketCap": 7220,
+      "raw": "7.22B",
+      "scrapedAt": "2026-08-20T10:31:03.145Z"
+    },
+    "MB": {
+      "marketCap": 610.04,
+      "raw": "610.04M",
+      "scrapedAt": "2026-08-20T10:31:05.189Z"
+    },
+    "MAH": {
+      "marketCap": 186.73,
+      "raw": "186.73M",
+      "scrapedAt": "2026-08-20T10:31:05.688Z"
+    },
+    "MAXS": {
+      "marketCap": 1650,
+      "raw": "1.65B",
+      "scrapedAt": "2026-08-20T10:31:06.126Z"
+    },
+    "MARC": {
+      "marketCap": 2200,
+      "raw": "2.20B",
+      "scrapedAt": "2026-08-20T10:31:06.252Z"
+    },
+    "MEDIC": {
+      "marketCap": 617.98,
+      "raw": "617.98M",
+      "scrapedAt": "2026-08-20T10:31:08.454Z"
+    },
+    "MBC": {
+      "marketCap": 2090,
+      "raw": "2.09B",
+      "scrapedAt": "2026-08-20T10:31:08.752Z"
+    },
+    "MED": {
+      "marketCap": 334.88,
+      "raw": "334.88M",
+      "scrapedAt": "2026-08-20T10:31:08.862Z"
+    },
+    "MBT": {
+      "marketCap": 304480,
+      "raw": "304.48B",
+      "scrapedAt": "2026-08-20T10:31:09.086Z"
+    },
+    "MFIN": {
+      "marketCap": 659.81,
+      "raw": "659.81M",
+      "scrapedAt": "2026-08-20T10:31:11.045Z"
+    },
+    "MEG": {
+      "marketCap": 75890,
+      "raw": "75.89B",
+      "scrapedAt": "2026-08-20T10:31:11.395Z"
+    },
+    "MER": {
+      "marketCap": 543260,
+      "raw": "543.26B",
+      "scrapedAt": "2026-08-20T10:31:11.646Z"
+    },
+    "MHC": {
+      "marketCap": 78.85,
+      "raw": "78.85M",
+      "scrapedAt": "2026-08-20T10:31:14.807Z"
+    },
+    "MG": {
+      "marketCap": 163.51,
+      "raw": "163.51M",
+      "scrapedAt": "2026-08-20T10:31:14.843Z"
+    },
+    "MONDE": {
+      "marketCap": 128300,
+      "raw": "128.30B",
+      "scrapedAt": "2026-08-20T10:31:18.761Z"
+    },
+    "MM": {
+      "marketCap": 3300,
+      "raw": "3.30B",
+      "scrapedAt": "2026-08-20T10:31:21.928Z"
+    },
+    "MRC": {
+      "marketCap": 1050,
+      "raw": "1.05B",
+      "scrapedAt": "2026-08-20T10:31:22.036Z"
+    },
+    "MWC": {
+      "marketCap": 106580,
+      "raw": "106.58B",
+      "scrapedAt": "2026-08-20T10:31:24.242Z"
+    },
+    "MREIT": {
+      "marketCap": 65690,
+      "raw": "65.69B",
+      "scrapedAt": "2026-08-20T10:31:24.605Z"
+    },
+    "MRSGI": {
+      "marketCap": 3430,
+      "raw": "3.43B",
+      "scrapedAt": "2026-08-20T10:31:24.739Z"
+    },
+    "MVC": {
+      "marketCap": 3480,
+      "raw": "3.48B",
+      "scrapedAt": "2026-08-20T10:31:25.640Z"
+    },
+    "NI": {
+      "marketCap": 429.25,
+      "raw": "429.25M",
+      "scrapedAt": "2026-08-20T10:31:28.269Z"
+    },
+    "MWIDE": {
+      "marketCap": 9160,
+      "raw": "9.16B",
+      "scrapedAt": "2026-08-20T10:31:28.733Z"
+    },
+    "MYNLD": {
+      "marketCap": 136650,
+      "raw": "136.65B",
+      "scrapedAt": "2026-08-20T10:31:29.321Z"
+    },
+    "NIKL": {
+      "marketCap": 57120,
+      "raw": "57.12B",
+      "scrapedAt": "2026-08-20T10:31:29.568Z"
+    },
+    "NOW": {
+      "marketCap": 858.19,
+      "raw": "858.19M",
+      "scrapedAt": "2026-08-20T10:31:31.700Z"
+    },
+    "OGP": {
+      "marketCap": 80480,
+      "raw": "80.48B",
+      "scrapedAt": "2026-08-20T10:31:31.804Z"
+    },
+    "NRCP": {
+      "marketCap": 2290,
+      "raw": "2.29B",
+      "scrapedAt": "2026-08-20T10:31:32.114Z"
+    },
+    "ORE": {
+      "marketCap": 1400,
+      "raw": "1.40B",
+      "scrapedAt": "2026-08-20T10:31:33.935Z"
+    },
+    "OV": {
+      "marketCap": 1550,
+      "raw": "1.55B",
+      "scrapedAt": "2026-08-20T10:31:34.256Z"
+    },
+    "OM": {
+      "marketCap": 108.2,
+      "raw": "108.20M",
+      "scrapedAt": "2026-08-20T10:31:34.353Z"
+    },
+    "PAX": {
+      "marketCap": 2890,
+      "raw": "2.89B",
+      "scrapedAt": "2026-08-20T10:31:36.320Z"
+    },
+    "PAL": {
+      "marketCap": 56390,
+      "raw": "56.39B",
+      "scrapedAt": "2026-08-20T10:31:36.841Z"
+    },
+    "PBB": {
+      "marketCap": 5790,
+      "raw": "5.79B",
+      "scrapedAt": "2026-08-20T10:31:36.863Z"
+    },
+    "PA": {
+      "marketCap": 260,
+      "raw": "260.00M",
+      "scrapedAt": "2026-08-20T10:31:36.975Z"
+    },
+    "PERC": {
+      "marketCap": 2270,
+      "raw": "2.27B",
+      "scrapedAt": "2026-08-20T10:31:38.851Z"
+    },
+    "PGOLD": {
+      "marketCap": 115780,
+      "raw": "115.78B",
+      "scrapedAt": "2026-08-20T10:31:38.976Z"
+    },
+    "PBC": {
+      "marketCap": 7110,
+      "raw": "7.11B",
+      "scrapedAt": "2026-08-20T10:31:39.121Z"
+    },
+    "PCOR": {
+      "marketCap": 20670,
+      "raw": "20.67B",
+      "scrapedAt": "2026-08-20T10:31:39.215Z"
+    },
+    "PHES": {
+      "marketCap": 1210,
+      "raw": "1.21B",
+      "scrapedAt": "2026-08-20T10:31:41.003Z"
+    },
+    "PHN": {
+      "marketCap": 4710,
+      "raw": "4.71B",
+      "scrapedAt": "2026-08-20T10:31:41.235Z"
+    },
+    "PHA": {
+      "marketCap": 930.46,
+      "raw": "930.46M",
+      "scrapedAt": "2026-08-20T10:31:41.271Z"
+    },
+    "PHC": {
+      "marketCap": 1610,
+      "raw": "1.61B",
+      "scrapedAt": "2026-08-20T10:31:41.424Z"
+    },
+    "PLUS": {
+      "marketCap": 43810,
+      "raw": "43.81B",
+      "scrapedAt": "2026-08-20T10:31:43.116Z"
+    },
+    "PMPC": {
+      "marketCap": 3120,
+      "raw": "3.12B",
+      "scrapedAt": "2026-08-20T10:31:43.498Z"
+    },
+    "PIZZA": {
+      "marketCap": 9730,
+      "raw": "9.73B",
+      "scrapedAt": "2026-08-20T10:31:43.507Z"
+    },
+    "PHR": {
+      "marketCap": 1360,
+      "raw": "1.36B",
+      "scrapedAt": "2026-08-20T10:31:43.543Z"
+    },
+    "PNX": {
+      "marketCap": 6010,
+      "raw": "6.01B",
+      "scrapedAt": "2026-08-20T10:31:45.391Z"
+    },
+    "PNB": {
+      "marketCap": 101010,
+      "raw": "101.01B",
+      "scrapedAt": "2026-08-20T10:31:45.537Z"
+    },
+    "PREIT": {
+      "marketCap": 3490,
+      "raw": "3.49B",
+      "scrapedAt": "2026-08-20T10:31:47.324Z"
+    },
+    "PPC": {
+      "marketCap": 28580,
+      "raw": "28.58B",
+      "scrapedAt": "2026-08-20T10:31:47.423Z"
+    },
+    "PRIM": {
+      "marketCap": 1030,
+      "raw": "1.03B",
+      "scrapedAt": "2026-08-20T10:31:47.577Z"
+    },
+    "PRC": {
+      "marketCap": 2740,
+      "raw": "2.74B",
+      "scrapedAt": "2026-08-20T10:31:47.600Z"
+    },
+    "PSE": {
+      "marketCap": 16970,
+      "raw": "16.97B",
+      "scrapedAt": "2026-08-20T10:31:49.308Z"
+    },
+    "PRMX": {
+      "marketCap": 2280,
+      "raw": "2.28B",
+      "scrapedAt": "2026-08-20T10:31:49.469Z"
+    },
+    "PTC": {
+      "marketCap": 90000,
+      "raw": "90.00B",
+      "scrapedAt": "2026-08-20T10:31:49.577Z"
+    },
+    "PSB": {
+      "marketCap": 22470,
+      "raw": "22.47B",
+      "scrapedAt": "2026-08-20T10:31:49.668Z"
+    },
+    "PX": {
+      "marketCap": 61870,
+      "raw": "61.87B",
+      "scrapedAt": "2026-08-20T10:31:52.314Z"
+    },
+    "RCB": {
+      "marketCap": 55290,
+      "raw": "55.29B",
+      "scrapedAt": "2026-08-20T10:31:52.709Z"
+    },
+    "PXP": {
+      "marketCap": 7000,
+      "raw": "7.00B",
+      "scrapedAt": "2026-08-20T10:31:52.719Z"
+    },
+    "REDC": {
+      "marketCap": 6370,
+      "raw": "6.37B",
+      "scrapedAt": "2026-08-20T10:31:54.836Z"
+    },
+    "RCI": {
+      "marketCap": 6950,
+      "raw": "6.95B",
+      "scrapedAt": "2026-08-20T10:31:54.984Z"
+    },
+    "REG": {
+      "marketCap": 2140,
+      "raw": "2.14B",
+      "scrapedAt": "2026-08-20T10:31:54.994Z"
+    },
+    "RCR": {
+      "marketCap": 141530,
+      "raw": "141.53B",
+      "scrapedAt": "2026-08-20T10:31:55.002Z"
+    },
+    "RLT": {
+      "marketCap": 910.01,
+      "raw": "910.01M",
+      "scrapedAt": "2026-08-20T10:31:57.028Z"
+    },
+    "RLC": {
+      "marketCap": 84470,
+      "raw": "84.47B",
+      "scrapedAt": "2026-08-20T10:31:57.992Z"
+    },
+    "ROCK": {
+      "marketCap": 18350,
+      "raw": "18.35B",
+      "scrapedAt": "2026-08-20T10:31:58.280Z"
+    },
+    "RFM": {
+      "marketCap": 17890,
+      "raw": "17.89B",
+      "scrapedAt": "2026-08-20T10:31:58.651Z"
+    },
+    "RRHI": {
+      "marketCap": 40490,
+      "raw": "40.49B",
+      "scrapedAt": "2026-08-20T10:32:00.607Z"
+    },
+    "SBS": {
+      "marketCap": 6110,
+      "raw": "6.11B",
+      "scrapedAt": "2026-08-20T10:32:00.618Z"
+    },
+    "SCC": {
+      "marketCap": 77100,
+      "raw": "77.10B",
+      "scrapedAt": "2026-08-20T10:32:00.624Z"
+    },
+    "ROX": {
+      "marketCap": 2240,
+      "raw": "2.24B",
+      "scrapedAt": "2026-08-20T10:32:00.780Z"
+    },
+    "SECB": {
+      "marketCap": 50490,
+      "raw": "50.49B",
+      "scrapedAt": "2026-08-20T10:32:03.061Z"
+    },
+    "SEVN": {
+      "marketCap": 52040,
+      "raw": "52.04B",
+      "scrapedAt": "2026-08-20T10:32:03.062Z"
+    },
+    "SFI": {
+      "marketCap": 101.83,
+      "raw": "101.83M",
+      "scrapedAt": "2026-08-20T10:32:03.062Z"
+    },
+    "SGI": {
+      "marketCap": 2170,
+      "raw": "2.17B",
+      "scrapedAt": "2026-08-20T10:32:03.063Z"
+    },
+    "SHNG": {
+      "marketCap": 15480,
+      "raw": "15.48B",
+      "scrapedAt": "2026-08-20T10:32:05.047Z"
+    },
+    "SGP": {
+      "marketCap": 152180,
+      "raw": "152.18B",
+      "scrapedAt": "2026-08-20T10:32:05.066Z"
+    },
+    "SHLPH": {
+      "marketCap": 13590,
+      "raw": "13.59B",
+      "scrapedAt": "2026-08-20T10:32:06.788Z"
+    },
+    "SLI": {
+      "marketCap": 15600,
+      "raw": "15.60B",
+      "scrapedAt": "2026-08-20T10:32:08.755Z"
+    },
+    "SMPH": {
+      "marketCap": 524120,
+      "raw": "524.12B",
+      "scrapedAt": "2026-08-20T10:32:08.758Z"
+    },
+    "SM": {
+      "marketCap": 690100,
+      "raw": "690.10B",
+      "scrapedAt": "2026-08-20T10:32:08.810Z"
+    },
+    "SMC": {
+      "marketCap": 156860,
+      "raw": "156.86B",
+      "scrapedAt": "2026-08-20T10:32:08.811Z"
+    },
+    "SPNEC": {
+      "marketCap": 59090,
+      "raw": "59.09B",
+      "scrapedAt": "2026-08-20T10:32:12.095Z"
+    },
+    "SOC": {
+      "marketCap": 188.5,
+      "raw": "188.50M",
+      "scrapedAt": "2026-08-20T10:32:12.095Z"
+    },
+    "SPC": {
+      "marketCap": 14440,
+      "raw": "14.44B",
+      "scrapedAt": "2026-08-20T10:32:12.202Z"
+    },
+    "SPM": {
+      "marketCap": 266.15,
+      "raw": "266.15M",
+      "scrapedAt": "2026-08-20T10:32:12.558Z"
+    },
+    "SRDC": {
+      "marketCap": 880,
+      "raw": "880.00M",
+      "scrapedAt": "2026-08-20T10:32:14.879Z"
+    },
+    "SSI": {
+      "marketCap": 6700,
+      "raw": "6.70B",
+      "scrapedAt": "2026-08-20T10:32:14.952Z"
+    },
+    "STI": {
+      "marketCap": 12590,
+      "raw": "12.59B",
+      "scrapedAt": "2026-08-20T10:32:15.028Z"
+    },
+    "STN": {
+      "marketCap": 3150,
+      "raw": "3.15B",
+      "scrapedAt": "2026-08-20T10:32:15.052Z"
+    },
+    "T": {
+      "marketCap": 507,
+      "raw": "507.00M",
+      "scrapedAt": "2026-08-20T10:32:17.087Z"
+    },
+    "TBGI": {
+      "marketCap": 455.47,
+      "raw": "455.47M",
+      "scrapedAt": "2026-08-20T10:32:17.089Z"
+    },
+    "STR": {
+      "marketCap": 8590,
+      "raw": "8.59B",
+      "scrapedAt": "2026-08-20T10:32:17.093Z"
+    },
+    "SUN": {
+      "marketCap": 2940,
+      "raw": "2.94B",
+      "scrapedAt": "2026-08-20T10:32:17.159Z"
+    },
+    "TFC": {
+      "marketCap": 1750,
+      "raw": "1.75B",
+      "scrapedAt": "2026-08-20T10:32:19.207Z"
+    },
+    "TECH": {
+      "marketCap": 976.02,
+      "raw": "976.02M",
+      "scrapedAt": "2026-08-20T10:32:19.225Z"
+    },
+    "TFHI": {
+      "marketCap": 20410,
+      "raw": "20.41B",
+      "scrapedAt": "2026-08-20T10:32:19.226Z"
+    },
+    "TEL": {
+      "marketCap": 258830,
+      "raw": "258.83B",
+      "scrapedAt": "2026-08-20T10:32:19.238Z"
+    },
+    "TUGS": {
+      "marketCap": 1280,
+      "raw": "1.28B",
+      "scrapedAt": "2026-08-20T10:32:21.631Z"
+    },
+    "UBP": {
+      "marketCap": 81580,
+      "raw": "81.58B",
+      "scrapedAt": "2026-08-20T10:32:22.089Z"
+    },
+    "TOP": {
+      "marketCap": 19340,
+      "raw": "19.34B",
+      "scrapedAt": "2026-08-20T10:32:24.037Z"
+    },
+    "UPM": {
+      "marketCap": 1940,
+      "raw": "1.94B",
+      "scrapedAt": "2026-08-20T10:32:26.281Z"
+    },
+    "UPSON": {
+      "marketCap": 2440,
+      "raw": "2.44B",
+      "scrapedAt": "2026-08-20T10:32:26.282Z"
+    },
+    "UNH": {
+      "marketCap": 8340,
+      "raw": "8.34B",
+      "scrapedAt": "2026-08-20T10:32:26.282Z"
+    },
+    "URC": {
+      "marketCap": 135020,
+      "raw": "135.02B",
+      "scrapedAt": "2026-08-20T10:32:26.282Z"
+    },
+    "V": {
+      "marketCap": 3360,
+      "raw": "3.36B",
+      "scrapedAt": "2026-08-20T10:32:28.837Z"
+    },
+    "VITA": {
+      "marketCap": 1560,
+      "raw": "1.56B",
+      "scrapedAt": "2026-08-20T10:32:28.977Z"
+    },
+    "VLL": {
+      "marketCap": 12190,
+      "raw": "12.19B",
+      "scrapedAt": "2026-08-20T10:32:31.344Z"
+    },
+    "VLC": {
+      "marketCap": 288560,
+      "raw": "288.56B",
+      "scrapedAt": "2026-08-20T10:32:31.692Z"
+    },
+    "VREIT": {
+      "marketCap": 9830,
+      "raw": "9.83B",
+      "scrapedAt": "2026-08-20T10:32:33.582Z"
+    },
+    "WEB": {
+      "marketCap": 18030,
+      "raw": "18.03B",
+      "scrapedAt": "2026-08-20T10:32:33.740Z"
+    },
+    "VVT": {
+      "marketCap": 21130,
+      "raw": "21.13B",
+      "scrapedAt": "2026-08-20T10:32:33.743Z"
+    },
+    "VMC": {
+      "marketCap": 10580,
+      "raw": "10.58B",
+      "scrapedAt": "2026-08-20T10:32:34.020Z"
+    },
+    "WIN": {
+      "marketCap": 933.67,
+      "raw": "933.67M",
+      "scrapedAt": "2026-08-20T10:32:35.757Z"
+    },
+    "WLCON": {
+      "marketCap": 24600,
+      "raw": "24.60B",
+      "scrapedAt": "2026-08-20T10:32:35.914Z"
+    },
+    "WPI": {
+      "marketCap": 987.1,
+      "raw": "987.10M",
+      "scrapedAt": "2026-08-20T10:32:35.920Z"
+    },
+    "X": {
+      "marketCap": 507.75,
+      "raw": "507.75M",
+      "scrapedAt": "2026-08-20T10:32:35.945Z"
+    },
+    "ZHI": {
+      "marketCap": 197.07,
+      "raw": "197.07M",
+      "scrapedAt": "2026-08-20T10:32:38.649Z"
+    },
+    "XG": {
+      "marketCap": 4020,
+      "raw": "4.02B",
+      "scrapedAt": "2026-08-20T10:32:39.159Z"
+    }
+  }
+}

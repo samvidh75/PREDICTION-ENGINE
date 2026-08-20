@@ -82,7 +82,7 @@ export interface IngestionReport {
   }>;
 }
 
-type DbLike = {
+export type DbLike = {
   kind: "postgres" | "sqlite" | "unavailable";
   initialize(): Promise<void>;
   query(text: string, params?: unknown[]): Promise<{ rows: Record<string, unknown>[]; rowCount: number }>;
@@ -267,7 +267,7 @@ function statusFor(snapshot: NormalizedFundamentalSnapshot): "accepted" | "parti
   return snapshot.completenessScore >= 70 ? "accepted" : "partial";
 }
 
-async function tableColumns(db: DbLike, table: string): Promise<Set<string>> {
+export async function tableColumns(db: DbLike, table: string): Promise<Set<string>> {
   if (db.kind === "sqlite") {
     const result = await db.query(`PRAGMA table_info(${table})`);
     return new Set(result.rows.map((row) => String(row.name)));

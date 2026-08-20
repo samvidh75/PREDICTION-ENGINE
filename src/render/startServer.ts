@@ -141,7 +141,13 @@ async function bootstrap() {
       (req.headers["x-real-ip"] as string) ||
       (req.headers["x-forwarded-for"] as string) ||
       req.ip,
+    // `statusCode` must be on this object. The plugin hands the built response
+    // to setErrorHandler below, which reads `err.statusCode` — without it the
+    // handler fell through to its 500 default, so callers saw "Internal server
+    // error" for what is a throttle, logged it as an unhandled 5xx, and had no
+    // 429 to back off on.
     errorResponseBuilder: (_req, context) => ({
+      statusCode: 429,
       success: false,
       error: "Rate Limit Exceeded",
       message: `StockEX rate limit hit (60 req/min). Resets in ${context.after}.`,
@@ -199,8 +205,12 @@ async function bootstrap() {
 
   // ── Global error handler: sanitize all errors ─────────────────────
   server.setErrorHandler((error: unknown, _request, reply) => {
-    const err = error as { statusCode?: number; message?: string };
-    const statusCode = err.statusCode ?? 500;
+    const err = error as { statusCode?: number; message?: string; code?: string };
+    // Fastify signals a throttle with FST_ERR_RATE_LIMIT; honour it even if a
+    // future errorResponseBuilder forgets to carry an explicit statusCode, so a
+    // rate limit can never regress into a logged 500 again.
+    const statusCode =
+      err.statusCode ?? (err.code === "FST_ERR_RATE_LIMIT" ? 429 : 500);
     if (statusCode >= 500) {
       server.log.error({ err: error }, `Unhandled error: ${err.message ?? String(error)}`);
     }

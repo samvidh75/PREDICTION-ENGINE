@@ -5,8 +5,37 @@
  */
 
 import { PseDataProvider } from './PseDataProvider';
-import { PhisixProvider } from './PhisixProvider';
+import { PhisixProvider, type PhisixStock } from './PhisixProvider';
 import axios from 'axios';
+
+/**
+ * Absolute price move for a Phisix stock.
+ *
+ * Phisix publishes `percentChange` but no `previous_close`. Four call sites in
+ * this file computed `price - s.previous_close`, which was `price - undefined`
+ * (NaN), and the gainers/losers filters tested `s.percent_change > 0` against
+ * an always-undefined field — so those endpoints returned empty lists. Derive
+ * the move from the percentage instead.
+ */
+function absoluteChange(stock: PhisixStock): number {
+  const price = stock.price.amount;
+  const changePercent = stock.percentChange ?? 0;
+  const previousClose = changePercent === -100 ? price : price / (1 + changePercent / 100);
+  return Math.round((price - previousClose) * 10000) / 10000;
+}
+
+/** Map a Phisix stock to the pipeline's result shape. */
+function toResult(stock: PhisixStock, sector: string): PseDataResult {
+  return {
+    symbol: stock.symbol,
+    name: stock.name,
+    price: stock.price.amount,
+    change: absoluteChange(stock),
+    changePercent: stock.percentChange ?? 0,
+    volume: stock.volume,
+    sector,
+  };
+}
 
 export interface PseMarketSummary {
   index: { psei: number; pseiChange: number; pseiChangePercent: number };
@@ -43,8 +72,9 @@ export class PseDataPipeline {
     let totalVolume = 0;
 
     for (const s of stocks) {
-      if (s.percent_change > 0) advancers++;
-      else if (s.percent_change < 0) decliners++;
+      const pct = s.percentChange ?? 0;
+      if (pct > 0) advancers++;
+      else if (pct < 0) decliners++;
       else unchanged++;
       totalVolume += s.volume;
     }
@@ -54,7 +84,7 @@ export class PseDataPipeline {
     // weighted PSEi value (PHISIX doesn't expose per-stock market cap, so
     // true cap-weighting isn't possible from this feed).
     const pseiChangePercent = stocks.length
-      ? Number((stocks.reduce((sum, s) => sum + s.percent_change, 0) / stocks.length).toFixed(2))
+      ? Number((stocks.reduce((sum, s) => sum + (s.percentChange ?? 0), 0) / stocks.length).toFixed(2))
       : 0;
     const avgPrice = stocks.length
       ? stocks.reduce((sum, s) => sum + s.price.amount, 0) / stocks.length
@@ -75,35 +105,19 @@ export class PseDataPipeline {
   async getTopGainers(limit = 10): Promise<PseDataResult[]> {
     const stocks = await this.phisix.getStocks();
     return stocks
-      .filter(s => s.percent_change > 0)
-      .sort((a, b) => b.percent_change - a.percent_change)
+      .filter(s => (s.percentChange ?? 0) > 0)
+      .sort((a, b) => (b.percentChange ?? 0) - (a.percentChange ?? 0))
       .slice(0, limit)
-      .map(s => ({
-        symbol: s.symbol,
-        name: s.name,
-        price: s.price.amount,
-        change: s.price.amount - s.previous_close,
-        changePercent: s.percent_change,
-        volume: s.volume,
-        sector: 'N/A',
-      }));
+      .map(s => toResult(s, 'N/A'));
   }
 
   async getTopLosers(limit = 10): Promise<PseDataResult[]> {
     const stocks = await this.phisix.getStocks();
     return stocks
-      .filter(s => s.percent_change < 0)
-      .sort((a, b) => a.percent_change - b.percent_change)
+      .filter(s => (s.percentChange ?? 0) < 0)
+      .sort((a, b) => (a.percentChange ?? 0) - (b.percentChange ?? 0))
       .slice(0, limit)
-      .map(s => ({
-        symbol: s.symbol,
-        name: s.name,
-        price: s.price.amount,
-        change: s.price.amount - s.previous_close,
-        changePercent: s.percent_change,
-        volume: s.volume,
-        sector: 'N/A',
-      }));
+      .map(s => toResult(s, 'N/A'));
   }
 
   async getMostActive(limit = 10): Promise<PseDataResult[]> {
@@ -111,15 +125,7 @@ export class PseDataPipeline {
     return stocks
       .sort((a, b) => b.volume - a.volume)
       .slice(0, limit)
-      .map(s => ({
-        symbol: s.symbol,
-        name: s.name,
-        price: s.price.amount,
-        change: s.price.amount - s.previous_close,
-        changePercent: s.percent_change,
-        volume: s.volume,
-        sector: 'N/A',
-      }));
+      .map(s => toResult(s, 'N/A'));
   }
 
   async getAllSectors(): Promise<Record<string, PseDataResult[]>> {
@@ -128,15 +134,7 @@ export class PseDataPipeline {
     for (const s of stocks) {
       const sector = 'All';
       if (!sectors[sector]) sectors[sector] = [];
-      sectors[sector].push({
-        symbol: s.symbol,
-        name: s.name,
-        price: s.price.amount,
-        change: s.price.amount - s.previous_close,
-        changePercent: s.percent_change,
-        volume: s.volume,
-        sector,
-      });
+      sectors[sector].push(toResult(s, sector));
     }
     return sectors;
   }

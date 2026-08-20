@@ -10,7 +10,7 @@ import { PhisixProvider } from './PhisixProvider';
 
 import { ProviderHealthMonitor } from './ProviderHealthMonitor';
 import { DataFlowTracer } from '../audit/DataFlowTracer';
-import ProviderCircuitBreaker from './ProviderCircuitBreaker';
+import ProviderCircuitBreaker, { CircuitOpenError } from './ProviderCircuitBreaker';
 import { ProviderQuotaMonitor } from '../scheduler/ProviderQuotaMonitor';
 
 const REQUIRED_SCORING_FIELDS = new Set([
@@ -120,7 +120,15 @@ export class ProviderCoordinator {
         return result;
       } catch (err: any) {
         errors.push(`${providerName}: ${this.sanitizeProviderError(err)}`);
-        this.healthMonitor.recordFailure(provider);
+        // A CircuitOpenError means the breaker refused the call outright — no
+        // request was made, so it is not a new provider failure. Recording it
+        // as one let a single 30s-open window (from as few as 3 real errors)
+        // rack up dozens of synthetic failures and push the health monitor
+        // past its own threshold, sidelining the provider far longer than the
+        // circuit breaker itself intended.
+        if (!(err instanceof CircuitOpenError)) {
+          this.healthMonitor.recordFailure(provider);
+        }
         this.tracer.recordUsage(symbol, category, providerName, true);
         ProviderQuotaMonitor.recordCall(providerName, category, false).catch(() => {});
       }
@@ -161,7 +169,11 @@ export class ProviderCoordinator {
         this.mergeFinancialFields(merged, result as Record<string, any>, providerName, sourceMap);
       } catch (err: any) {
         errors.push(`${providerName}: ${this.sanitizeProviderError(err)}`);
-        this.healthMonitor.recordFailure(provider);
+        // See the matching guard in invokeChain(): a refused (not attempted)
+        // call must not compound as a fresh provider failure.
+        if (!(err instanceof CircuitOpenError)) {
+          this.healthMonitor.recordFailure(provider);
+        }
         this.tracer.recordUsage(symbol, 'financials', providerName, true);
       }
     }

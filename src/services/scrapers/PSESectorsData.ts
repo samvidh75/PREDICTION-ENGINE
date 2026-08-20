@@ -22,6 +22,8 @@ export interface RealPseSectorRecord {
   sector: string;
   subsector: string;
   cmpyId: number | null;
+  /** PSE Edge listing date, e.g. "Mar 22, 1973". Absent in older scrapes. */
+  listingDate?: string | null;
   sourceUrl: string;
 }
 

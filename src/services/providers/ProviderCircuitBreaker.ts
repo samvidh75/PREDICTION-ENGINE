@@ -24,6 +24,23 @@ export interface CircuitBreakerOptions {
   openTimeoutMs: number;
 }
 
+/**
+ * Thrown when the circuit is open and `execute()` refuses to even attempt the
+ * call. Distinct from a real provider error so callers (ProviderCoordinator)
+ * can tell "the provider failed" from "we didn't try the provider" — treating
+ * the latter as a real failure double-counts a single outage: three genuine
+ * errors open the circuit, and every fast-fail during the 30s-60s open window
+ * was then also recorded against ProviderHealthMonitor, which pushed it past
+ * its own unavailable threshold from just a handful of real failures.
+ */
+export class CircuitOpenError extends Error {
+  readonly circuitOpen = true;
+  constructor() {
+    super('CircuitBreaker: Open');
+    this.name = 'CircuitOpenError';
+  }
+}
+
 export class ProviderCircuitBreaker {
   private state: CircuitState = CircuitState.CLOSED;
   private failureCount = 0;
@@ -37,7 +54,7 @@ export class ProviderCircuitBreaker {
   async execute<T>(fn: () => Promise<T>): Promise<T> {
     const now = Date.now();
     if (this.state === CircuitState.OPEN && now < this.nextAttempt) {
-      throw new Error('CircuitBreaker: Open');
+      throw new CircuitOpenError();
     }
     if (this.state === CircuitState.OPEN && now >= this.nextAttempt) {
       this.state = CircuitState.HALF_OPEN;

@@ -49,6 +49,7 @@ import { dbAdapter } from "../db/DatabaseAdapter.js";
 import { AsymmetricDataGateway } from "../db/AsymmetricDataGateway.js";
 import { loadRealPseOwnership } from "../services/scrapers/PSEOwnershipData.js";
 import { getSectorBySymbol, getSubsectorBySymbol, loadPseSector } from "../services/scrapers/PSESectorsData.js";
+import { getMarketCapBySymbol } from "../services/data/providers/PseMarketCapAdapter.js";
 import { loadPseDisclosures } from "../services/scrapers/PSEDisclosuresData.js";
 import { loadPseInsiderFilings } from "../services/scrapers/PSEInsiderFilingsData.js";
 import { computeMomentumFeatures } from "../research/features/momentumFeatures.js";
@@ -777,6 +778,21 @@ export default async function registerApiRoutes(server: FastifyInstance) {
   // Register intelligence quality gate (sanitizes all /api/intelligence/* responses)
   await server.register(intelligenceQualityGate);
   // Shared stock detail handler — supports both ?symbol=AC and /api/stock/AC
+  /**
+   * Best real company name for a PSE symbol.
+   *
+   * The metadata providers commonly return the ticker itself as `companyName`
+   * for PSE listings, which passed a plain `||` chain and surfaced "BDO"
+   * instead of "BDO Unibank, Inc.". A provider name matching the symbol is
+   * therefore treated as no name at all, falling through to PSE Edge's
+   * company directory.
+   */
+  function resolveCompanyName(symbol: string, meta: { companyName?: string; name?: string } | null): string {
+    const fromProvider = (meta?.companyName || meta?.name || "").trim();
+    if (fromProvider && fromProvider.toUpperCase() !== symbol.toUpperCase()) return fromProvider;
+    return loadPseSector(symbol)?.companyName || symbol;
+  }
+
   async function stockHandler(req: FastifyRequest, reply: FastifyReply) {
     const symbol = String(
       (req.query as any)?.symbol ?? (req.params as any)?.symbol ?? ""
@@ -852,7 +868,16 @@ export default async function registerApiRoutes(server: FastifyInstance) {
     const price = quote.price;
     const change = quote.change || 0;
     const changePercent = quote.changePercent || 0;
-    const marketCapCr = Math.round(((meta?.marketCap ?? (cachedFinancials?.marketCap ?? 0)) / 1e7) * 100) / 100;
+    // Market cap in raw PHP. Providers rarely return one for PSE names, so fall
+    // back to the scraped universe bundle (millions PHP → pesos) before giving
+    // up. Without this the value was 0 for effectively every symbol.
+    const universeMarketCapM = getMarketCapBySymbol(cleanSymbol);
+    const marketCapPhp =
+      meta?.marketCap ??
+      cachedFinancials?.marketCap ??
+      (universeMarketCapM !== null ? universeMarketCapM * 1e6 : 0);
+    // Internal working unit for the derivations below (1 unit = 1e7 PHP).
+    const marketCapCr = Math.round((marketCapPhp / 1e7) * 100) / 100;
     // Real PSE Edge company-directory sector when available (full universe);
     // falls back to the provider's sector string. The estimation tables below
     // (SECTOR_PS / SECTOR_PE_MEDIAN / SECTOR_NET_MARGIN) are keyed by their
@@ -940,11 +965,16 @@ export default async function registerApiRoutes(server: FastifyInstance) {
 
     const payload = {
       symbol,
-      companyName: gatewayMeta?.companyName || gatewayMeta?.name || symbol,
+      // Providers frequently echo the ticker back as the company name for PSE
+      // listings, so a provider value equal to the symbol is treated as absent.
+      // PSE Edge's directory carries the registered name for all 282 companies.
+      companyName: resolveCompanyName(cleanSymbol, gatewayMeta),
       exchange: "PSE" as "PSE" | "PSE",
       sector: displaySector,
       industry: realSubsector ?? displaySector,
-      price: { current: price, changeAbs: change, changePercent, marketCap: marketCapCr },
+      // Raw PHP — StockPage renders this as `marketCap / 1e9` + "B". Sending
+      // the 1e7-scaled working value here would under-report it 100-fold.
+      price: { current: price, changeAbs: change, changePercent, marketCap: marketCapPhp || null },
       fundamentals: {
         pe, industryPe, pb, dividendYield: divYld, eps,
         netMargin: n(fundData.net_margin) ?? null,

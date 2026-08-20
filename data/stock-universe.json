@@ -1,1 +1,2549 @@
-{"totalUniverse": 294, "entries": [{"symbol": "AAA", "name": "Asia Amalgamated Holdings Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "AB", "name": "Atok-Big Wedge Co., Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "ABA", "name": "AbaCore Capital Holdings, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "ABG", "name": "Asiabest Group International Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "ABS", "name": "ABS-CBN Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "ABSP", "name": "ABS-CBN Holdings Corporation - Philippine Deposit Receipts", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "AC", "name": "Ayala Corporation", "exchange": "PSE", "sector": "Holding Firms", "industry": "Holding Firms", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "ACE", "name": "Acesite (Phils.) Hotel Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "ACEN", "name": "ACEN CORPORATION", "exchange": "PSE", "sector": "Industrial", "industry": "Industrial", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "ACR", "name": "Alsons Consolidated Resources, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "AEV", "name": "Aboitiz Equity Ventures, Inc.", "exchange": "PSE", "sector": "Industrial", "industry": "Industrial", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "AGI", "name": "Alliance Global Group, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "ALCO", "name": "Arthaland Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "ALHI", "name": "Anchor Land Holdings, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "ALI", "name": "Ayala Land, Inc.", "exchange": "PSE", "sector": "Property", "industry": "Property", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "ALLDY", "name": "AllDay Marts, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "ALLHC", "name": "AyalaLand Logistics Holdings Corp.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "ALTER", "name": "Alternergy Holdings Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "ANI", "name": "AgriNurture, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "ANS", "name": "A. Soriano Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "AP", "name": "Aboitiz Power Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "APC", "name": "APC Group, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "APL", "name": "Apollo Global Capital, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "APO", "name": "Anglo Philippine Holdings Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "APVI", "name": "Altus Property Ventures, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "APX", "name": "Apex Mining Co., Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "AR", "name": "Abra Mining & Industrial Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "ARA", "name": "Araneta Properties, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "AREIT", "name": "AREIT, Inc.", "exchange": "PSE", "sector": "Property", "industry": "Property", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "ASLAG", "name": "Raslag Corp.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "AT", "name": "Atlas Consolidated Mining and Development Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "ATN", "name": "ATN Holdings, Inc. ``A``", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "ATNB", "name": "ATN Holdings, Inc. ``B``", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "AUB", "name": "Asia United Bank Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "AXLM", "name": "Axelum Resources Corp.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "BALAI", "name": "Balai Ni Fruitas Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "BC", "name": "Benguet Corporation ``A``", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "BCB", "name": "Benguet Corporation ``B``", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "BCOR", "name": "Berjaya Philippines, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "BDO", "name": "BDO Unibank, Inc.", "exchange": "PSE", "sector": "Financials", "industry": "Financials", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "BEL", "name": "Belle Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "BH", "name": "BHI Holdings, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "BHI", "name": "Boulevard Holdings, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "BLOOM", "name": "Bloomberry Resorts Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "BMM", "name": "Bogo-Medellin Milling Co., Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "BNCOM", "name": "Bank of Commerce", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "BPI", "name": "Bank of the Philippine Islands", "exchange": "PSE", "sector": "Financials", "industry": "Financials", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "BRN", "name": "A Brown Company, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "BSC", "name": "Basic Energy Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "C", "name": "Chelsea Logistics and Infrastructure Holdings Corp.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "CA", "name": "Concrete Aggregates Corp. ``A``", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "CAB", "name": "Concrete Aggregates Corp. ``B``", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "CAT", "name": "Central Azucarera de Tarlac, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "CBC", "name": "China Banking Corporation", "exchange": "PSE", "sector": "Financials", "industry": "Financials", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "CDC", "name": "Cityland Development Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "CEB", "name": "Cebu Air, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "CEI", "name": "Crown Equities, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "CEU", "name": "Centro Escolar University", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "CHP", "name": "Concreat Holdings Philippines, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "CIC", "name": "Concepcion Industrial Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "CLI", "name": "Cebu Landmasters, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "CNPF", "name": "Century Pacific Food, Inc.", "exchange": "PSE", "sector": "Industrial", "industry": "Industrial", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "CNVRG", "name": "Converge Information and Communications Technology Solutions, Inc.", "exchange": "PSE", "sector": "Services", "industry": "Services", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "COAL", "name": "Coal Asia Holdings Incorporated", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "COL", "name": "COL Financial Group, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "COSCO", "name": "Cosco Capital, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "CPG", "name": "Century Properties Group Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "CPM", "name": "Century Peak Holdings Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "CREC", "name": "Citicore Renewable Energy Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "CREIT", "name": "Citicore Energy REIT Corp.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "CROWN", "name": "Crown Asia Chemicals Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "CSB", "name": "Citystate Savings Bank, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "CTS", "name": "CTS Global Equity Group, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "CYBR", "name": "Cyber Bay Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "DD", "name": "DoubleDragon Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "DDMPR", "name": "DDMP REIT, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "DELM", "name": "Del Monte Pacific Limited", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "DFNN", "name": "DFNN, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "DHI", "name": "Dominion Holdings, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "DITO", "name": "DITO CME Holdings Corp.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "DIZ", "name": "Dizon Copper-Silver Mines, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "DMC", "name": "DMCI Holdings, Inc.", "exchange": "PSE", "sector": "Holding Firms", "industry": "Holding Firms", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "DMPA1", "name": "Del Monte Pacific Limited U.S. Dollar-Denominated Series A-1 Preference Shares", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "DMPA2", "name": "Del Monte Pacific Limited U.S. Dollar-Denominated Series A-2 Preference Shares", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "DMPI", "name": "DEL MONTE PHILIPPINES, INC.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "DMW", "name": "D.M. Wenceslao & Associates, Incorporated", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "DNL", "name": "D&L Industries, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "DTEL", "name": "PLDT INC. -USD", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "DWC", "name": "Discovery World Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "ECP", "name": "Easycall Communications Philippines, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "ECVC", "name": "East Coast Vulcan Mining Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "EEI", "name": "EEI Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "EG", "name": "IP E-Game Ventures, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "EGRN", "name": "Everwoods Green Resources and Holdings, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "ELI", "name": "Empire East Land Holdings, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "EMI", "name": "Emperador Inc.", "exchange": "PSE", "sector": "Industrial", "industry": "Industrial", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "ENEX", "name": "ENEX Energy Corp.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "EURO", "name": "Euro-Med Laboratories Phil., Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "EW", "name": "East West Banking Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "FAF", "name": "First Abacus Financial Holdings Corp.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "FB", "name": "San Miguel Food and Beverage, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "FCG", "name": "Figaro Culinary Group, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "FDC", "name": "Filinvest Development Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "FERRO", "name": "Ferronoux Holdings, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "FEU", "name": "Far Eastern University, Incorporated", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "FFI", "name": "Filipino Fund, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "FGEN", "name": "First Gen Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "FILRT", "name": "Filinvest REIT Corp.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "FJP", "name": "F&J Prince Holdings Corporation ``A``", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "FJPB", "name": "F&J Prince Holdings Corporation ``B``", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "FLI", "name": "Filinvest Land, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "FMETF", "name": "First Metro Philippine Equity Exchange Traded Fund, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "FNI", "name": "Global Ferronickel Holdings, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "FOOD", "name": "Alliance Select Foods International, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "FPH", "name": "First Philippine Holdings Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "FPI", "name": "Forum Pacific, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "FRUIT", "name": "Fruitas Holdings, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "FYN", "name": "Filsyn Corporation ``A``", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "FYNB", "name": "Filsyn Corporation ``B``", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "GEO", "name": "GEOGRACE Resources Philippines, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "GERI", "name": "Global-Estate Resorts, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "GLO", "name": "Globe Telecom, Inc.", "exchange": "PSE", "sector": "Services", "industry": "Services", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "GMA7", "name": "GMA Network, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "GMAP", "name": "GMA Holdings, Inc. - Philippine Deposit Receipts", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "GPH", "name": "Grand Plaza Hotel Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "GREEN", "name": "Greenergy Holdings Incorporated", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "GSMI", "name": "Ginebra San Miguel, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "GTCAP", "name": "GT Capital Holdings, Inc.", "exchange": "PSE", "sector": "Holding Firms", "industry": "Holding Firms", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "HI", "name": "House of Investments, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "HOME", "name": "AllHome Corp.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "HTI", "name": "Haus Talk, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "I", "name": "I-Remit, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "ICT", "name": "International Container Terminal Services, Inc.", "exchange": "PSE", "sector": "Services", "industry": "Services", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "IDC", "name": "Italpinas Development Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "IMI", "name": "Integrated Micro-Electronics, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "IMP", "name": "Imperial Resources, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "INFRA", "name": "Philippine Infradev Holdings Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "ION", "name": "Ionics, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "IPM", "name": "IPM Holdings, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "IPO", "name": "iPeople, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "IS", "name": "Island Information & Technology, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "JAS", "name": "Jackstones, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "JFC", "name": "Jollibee Foods Corporation", "exchange": "PSE", "sector": "Services", "industry": "Services", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "JGS", "name": "JG Summit Holdings, Inc.", "exchange": "PSE", "sector": "Holding Firms", "industry": "Holding Firms", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "JOH", "name": "Jolliville Holdings Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "KEEPR", "name": "The Keepers Holdings, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "KEP", "name": "Keppel Philippines Properties, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "KPPI", "name": "Kepwealth Property Phils., Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "LBC", "name": "LBC Express Holdings, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "LC", "name": "Lepanto Consolidated Mining Company ``A``", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "LCB", "name": "Lepanto Consolidated Mining Company ``B``", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "LFM", "name": "Liberty Flour Mills, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "LMG", "name": "LMG Corp.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "LODE", "name": "Lodestar Investment Holdings Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "LOTO", "name": "Pacific Online Systems Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "LPC", "name": "LFM Properties Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "LPZ", "name": "Lopez Holdings Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "LSC", "name": "Lorenzo Shipping Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "LTG", "name": "LT Group, Inc.", "exchange": "PSE", "sector": "Holding Firms", "industry": "Holding Firms", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "MA", "name": "Manila Mining Corporation ``A``", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "MAB", "name": "Manila Mining Corporation ``B``", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "MAC", "name": "MacroAsia Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "MACAY", "name": "Macay Holdings, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "MAH", "name": "Metro Alliance Holdings & Equities Corp. ``A``", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "MAHB", "name": "Metro Alliance Holdings & Equities Corp. ``B``", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "MARC", "name": "Marcventures Holdings, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "MAXS", "name": "Max`s Group, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "MB", "name": "Manila Bulletin Publishing Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "MBC", "name": "Manila Broadcasting Company", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "MBT", "name": "Metropolitan Bank & Trust Company", "exchange": "PSE", "sector": "Financials", "industry": "Financials", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "MED", "name": "Medco Holdings, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "MEDIC", "name": "Medilines Distributors Incorporated", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "MEG", "name": "Megaworld Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "MER", "name": "Manila Electric Company", "exchange": "PSE", "sector": "Industrial", "industry": "Industrial", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "MFC", "name": "Manulife Financial Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "MFIN", "name": "Makati Finance Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "MG", "name": "Millennium Global Holdings, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "MGH", "name": "Metro Global Holdings Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "MHC", "name": "Mabuhay Holdings Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "MJC", "name": "Manila Jockey Club, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "MJIC", "name": "MJC Investments Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "MM", "name": "MerryMart Consumer Corp.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "MONDE", "name": "Monde Nissin Corporation", "exchange": "PSE", "sector": "Industrial", "industry": "Industrial", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "MRC", "name": "MRC Allied, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "MREIT", "name": "MREIT, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "MRSGI", "name": "Metro Retail Stores Group, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "MVC", "name": "Mabuhay Vinyl Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "MWC", "name": "Manila Water Company, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "MWIDE", "name": "Megawide Construction Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "MYNLD", "name": "Maynilad Water Services, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "NI", "name": "NiHAO Mineral Resources International, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "NIKL", "name": "Nickel Asia Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "NOW", "name": "Now Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "NRCP", "name": "National Reinsurance Corporation of the Philippines", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "NXGEN", "name": "NextGenesis Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "OGP", "name": "OceanaGold (Philippines), Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "OM", "name": "Omico Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "OPM", "name": "Oriental Petroleum and Minerals Corporation ``A``", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "OPMB", "name": "Oriental Petroleum and Minerals Corporation ``B``", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "ORE", "name": "Oriental Peninsula Resources Group, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "OV", "name": "The Philodrill Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "PA", "name": "Pacifica Holdings, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "PAL", "name": "PAL Holdings, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "PAX", "name": "Paxys, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "PBB", "name": "Philippine Business Bank, Inc., A Savings Bank", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "PBC", "name": "Philippine Bank of Communications", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "PCOR", "name": "Petron Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "PERC", "name": "PetroEnergy Resources Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "PGOLD", "name": "Puregold Price Club, Inc.", "exchange": "PSE", "sector": "Services", "industry": "Services", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "PHA", "name": "Premiere Horizon Alliance Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "PHC", "name": "Philcomsat Holdings Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "PHES", "name": "Philippine Estates Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "PHN", "name": "Phinma Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "PHR", "name": "PH Resorts Group Holdings, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "PIZZA", "name": "Shakey`s Pizza Asia Ventures Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "PLUS", "name": "DigiPlus Interactive Corp.", "exchange": "PSE", "sector": "Services", "industry": "Services", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "PMPC", "name": "Panasonic Manufacturing Philippines Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "PNB", "name": "Philippine National Bank", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "PNC", "name": "Philippine National Construction Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "PNX", "name": "P-H-O-E-N-I-X PETROLEUM PHILIPPINES, INC.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "PORT", "name": "Globalport 900, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "PPC", "name": "Pryce Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "PRC", "name": "Philippine Racing Club, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "PREIT", "name": "Premiere Island Power REIT Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "PRIM", "name": "Prime Media Holdings, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "PRMX", "name": "Primex Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "PSB", "name": "Philippine Savings Bank", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "PSE", "name": "The Philippine Stock Exchange, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "PTC", "name": "Philippine Trust Company", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "PTT", "name": "PT&T Corp.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "PX", "name": "Philex Mining Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "PXP", "name": "PXP Energy Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "RCB", "name": "Rizal Commercial Banking Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "RCI", "name": "Roxas and Company, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "RCR", "name": "RL Commercial REIT, Inc.", "exchange": "PSE", "sector": "Property", "industry": "Property", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "REDC", "name": "Repower Energy Development Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "REG", "name": "Republic Glass Holdings Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "RFM", "name": "RFM Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "RLC", "name": "Robinsons Land Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "RLT", "name": "Philippine Realty and Holdings Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "ROCK", "name": "Rockwell Land Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "ROX", "name": "Roxas Holdings, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "RRHI", "name": "Robinsons Retail Holdings, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "SBS", "name": "SBS Philippines Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "SCC", "name": "Semirara Mining and Power Corporation", "exchange": "PSE", "sector": "Mining and Oil", "industry": "Mining and Oil", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "SECB", "name": "Security Bank Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "SEVN", "name": "Philippine Seven Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "SFI", "name": "Swift Foods, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "SGI", "name": "Solid Group, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "SGP", "name": "Synergy Grid & Development Phils., Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "SHLPH", "name": "Shell Pilipinas Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "SHNG", "name": "Shang Properties, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "SLF", "name": "Sun Life Financial Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "SLI", "name": "Sta. Lucia Land, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "SM", "name": "SM Investments Corporation", "exchange": "PSE", "sector": "Holding Firms", "industry": "Holding Firms", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "SMC", "name": "San Miguel Corporation", "exchange": "PSE", "sector": "Industrial", "industry": "Industrial", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "SMPH", "name": "SM Prime Holdings, Inc.", "exchange": "PSE", "sector": "Property", "industry": "Property", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "SOC", "name": "SOCResources, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "SPC", "name": "SPC Power Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "SPM", "name": "Seafront Resources Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "SPNEC", "name": "SP New Energy Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "SRDC", "name": "Supercity Realty Development Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "SSI", "name": "SSI Group, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "STI", "name": "STI Education Systems Holdings, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "STN", "name": "Steniel Manufacturing Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "STR", "name": "Vistamalls, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "SUN", "name": "Suntrust Resort Holdings, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "T", "name": "TKC Metals Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "TBGI", "name": "Transpacific Broadband Group Int`l. Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "TECH", "name": "Cirtek Holdings Philippines Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "TEL", "name": "PLDT Inc.", "exchange": "PSE", "sector": "Services", "industry": "Services", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "TFC", "name": "PTFC Redevelopment Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "TFHI", "name": "Top Frontier Investment Holdings, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "TOP", "name": "Top Line Business Development Corp.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "TUGS", "name": "Harbor Star Shipping Services, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "UBP", "name": "Union Bank of the Philippines", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "UNH", "name": "Uniholdings Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "UPM", "name": "United Paragon Mining Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "UPSON", "name": "Upson International Corp.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "URC", "name": "Universal Robina Corporation", "exchange": "PSE", "sector": "Industrial", "industry": "Industrial", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "V", "name": "Vantage Equities, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "VITA", "name": "Vitarich Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "VLC", "name": "Villar Land Holdings Corp.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "VLL", "name": "Vista Land & Lifescapes, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "VMC", "name": "Victorias Milling Company, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "VREIT", "name": "VistaREIT, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "VVT", "name": "Vivant Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "WEB", "name": "Philweb Corporation", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "WIN", "name": "Wellex Industries, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "WLCON", "name": "Wilcon Depot, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "WPI", "name": "Waterfront Philippines, Incorporated", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "X", "name": "Xurpas Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "XG", "name": "NexGen Energy Corp.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}, {"symbol": "ZHI", "name": "Zeus Holdings, Inc.", "exchange": "PSE", "sector": "PSE Listed", "industry": "PSE Listed", "marketCap": 0, "scores": {"quality": 50, "valuation": 50, "growth": 50, "momentum": 50, "risk": 50, "health": 50, "riskAdjusted": 50}}]}
+{
+  "generatedAt": "2026-08-20T10:32:55.312Z",
+  "totalUniverse": 282,
+  "sources": [
+    "data/pse-sectors.json (edge.pse.com.ph company directory)",
+    "data/pse-market-cap.json (stockanalysis.com)"
+  ],
+  "marketCapUnits": "millions PHP",
+  "entries": [
+    {
+      "symbol": "AAA",
+      "name": "Asia Amalgamated Holdings Corporation",
+      "exchange": "PSE",
+      "sector": "Holding Firms",
+      "industry": "Holding Firms",
+      "marketCap": null,
+      "listingDate": "Mar 22, 1973"
+    },
+    {
+      "symbol": "AB",
+      "name": "Atok-Big Wedge Co., Inc.",
+      "exchange": "PSE",
+      "sector": "Mining and Oil",
+      "industry": "Mining",
+      "marketCap": 5120,
+      "listingDate": "Jan 08, 1948"
+    },
+    {
+      "symbol": "ABA",
+      "name": "AbaCore Capital Holdings, Inc.",
+      "exchange": "PSE",
+      "sector": "Holding Firms",
+      "industry": "Holding Firms",
+      "marketCap": 1490,
+      "listingDate": "Oct 28, 1987"
+    },
+    {
+      "symbol": "ABG",
+      "name": "Asiabest Group International Inc.",
+      "exchange": "PSE",
+      "sector": "Holding Firms",
+      "industry": "Holding Firms",
+      "marketCap": 15990,
+      "listingDate": "Jul 10, 1979"
+    },
+    {
+      "symbol": "ABS",
+      "name": "ABS-CBN Corporation",
+      "exchange": "PSE",
+      "sector": "Services",
+      "industry": "Media",
+      "marketCap": 3340,
+      "listingDate": "Jul 08, 1992"
+    },
+    {
+      "symbol": "ABSP",
+      "name": "ABS-CBN Holdings Corporation",
+      "exchange": "PSE",
+      "sector": "Services",
+      "industry": "Media",
+      "marketCap": 318.38,
+      "listingDate": "Oct 07, 1999"
+    },
+    {
+      "symbol": "AC",
+      "name": "Ayala Corporation",
+      "exchange": "PSE",
+      "sector": "Holding Firms",
+      "industry": "Holding Firms",
+      "marketCap": 311140,
+      "listingDate": "Nov 08, 1976"
+    },
+    {
+      "symbol": "ACE",
+      "name": "Acesite (Phils.) Hotel Corporation",
+      "exchange": "PSE",
+      "sector": "Services",
+      "industry": "Hotel & Leisure",
+      "marketCap": 417.14,
+      "listingDate": "Dec 05, 1986"
+    },
+    {
+      "symbol": "ACEN",
+      "name": "ACEN CORPORATION",
+      "exchange": "PSE",
+      "sector": "Industrial",
+      "industry": "Electricity, Energy, Power & Water",
+      "marketCap": 119850,
+      "listingDate": "Jan 05, 1970"
+    },
+    {
+      "symbol": "ACR",
+      "name": "Alsons Consolidated Resources, Inc.",
+      "exchange": "PSE",
+      "sector": "Industrial",
+      "industry": "Electricity, Energy, Power & Water",
+      "marketCap": 5030,
+      "listingDate": "Apr 12, 1993"
+    },
+    {
+      "symbol": "AEV",
+      "name": "Aboitiz Equity Ventures, Inc.",
+      "exchange": "PSE",
+      "sector": "Holding Firms",
+      "industry": "Holding Firms",
+      "marketCap": 205450,
+      "listingDate": "Nov 16, 1994"
+    },
+    {
+      "symbol": "AGI",
+      "name": "Alliance Global Group, Inc.",
+      "exchange": "PSE",
+      "sector": "Holding Firms",
+      "industry": "Holding Firms",
+      "marketCap": 81040,
+      "listingDate": "Apr 19, 1999"
+    },
+    {
+      "symbol": "ALCO",
+      "name": "Arthaland Corporation",
+      "exchange": "PSE",
+      "sector": "Property",
+      "industry": "Property",
+      "marketCap": 2290,
+      "listingDate": "Mar 19, 1996"
+    },
+    {
+      "symbol": "ALHI",
+      "name": "Anchor Land Holdings, Inc.",
+      "exchange": "PSE",
+      "sector": "Property",
+      "industry": "Property",
+      "marketCap": 4160,
+      "listingDate": "Aug 08, 2007"
+    },
+    {
+      "symbol": "ALI",
+      "name": "Ayala Land, Inc.",
+      "exchange": "PSE",
+      "sector": "Property",
+      "industry": "Property",
+      "marketCap": 216090,
+      "listingDate": "Jul 05, 1991"
+    },
+    {
+      "symbol": "ALLDY",
+      "name": "AllDay Marts, Inc.",
+      "exchange": "PSE",
+      "sector": "Services",
+      "industry": "Retail",
+      "marketCap": 800,
+      "listingDate": "Nov 03, 2021"
+    },
+    {
+      "symbol": "ALLHC",
+      "name": "AyalaLand Logistics Holdings Corp.",
+      "exchange": "PSE",
+      "sector": "Property",
+      "industry": "Property",
+      "marketCap": 7380,
+      "listingDate": "Feb 28, 1990"
+    },
+    {
+      "symbol": "ALTER",
+      "name": "Alternergy Holdings Corporation",
+      "exchange": "PSE",
+      "sector": "Industrial",
+      "industry": "Electricity, Energy, Power, & Water",
+      "marketCap": 3030,
+      "listingDate": "Mar 24, 2023"
+    },
+    {
+      "symbol": "ANI",
+      "name": "AgriNurture, Inc.",
+      "exchange": "PSE",
+      "sector": "Industrial",
+      "industry": "Food, Beverage & Tobacco",
+      "marketCap": 486.61,
+      "listingDate": "May 25, 2009"
+    },
+    {
+      "symbol": "ANS",
+      "name": "A. Soriano Corporation",
+      "exchange": "PSE",
+      "sector": "Holding Firms",
+      "industry": "Holding Firms",
+      "marketCap": 20990,
+      "listingDate": "Oct 25, 1973"
+    },
+    {
+      "symbol": "AP",
+      "name": "Aboitiz Power Corporation",
+      "exchange": "PSE",
+      "sector": "Industrial",
+      "industry": "Electricity, Energy, Power & Water",
+      "marketCap": 324260,
+      "listingDate": "Jul 16, 2007"
+    },
+    {
+      "symbol": "APC",
+      "name": "APC Group, Inc.",
+      "exchange": "PSE",
+      "sector": "Services",
+      "industry": "Other Services",
+      "marketCap": 847.98,
+      "listingDate": "Mar 08, 1994"
+    },
+    {
+      "symbol": "APL",
+      "name": "Apollo Global Capital, Inc.",
+      "exchange": "PSE",
+      "sector": "Services",
+      "industry": "Information Technology",
+      "marketCap": 1900,
+      "listingDate": "Oct 18, 2012"
+    },
+    {
+      "symbol": "APO",
+      "name": "Anglo Philippine Holdings Corporation",
+      "exchange": "PSE",
+      "sector": "Holding Firms",
+      "industry": "Holding Firms",
+      "marketCap": 3240,
+      "listingDate": "Jul 31, 1959"
+    },
+    {
+      "symbol": "APVI",
+      "name": "Altus Property Ventures, Inc.",
+      "exchange": "PSE",
+      "sector": "Property",
+      "industry": "Property",
+      "marketCap": 1190,
+      "listingDate": "Jun 26, 2020"
+    },
+    {
+      "symbol": "APX",
+      "name": "Apex Mining Co., Inc.",
+      "exchange": "PSE",
+      "sector": "Mining and Oil",
+      "industry": "Mining",
+      "marketCap": 80890,
+      "listingDate": "Mar 07, 1974"
+    },
+    {
+      "symbol": "AR",
+      "name": "Abra Mining and Industrial Corporation",
+      "exchange": "PSE",
+      "sector": "Mining and Oil",
+      "industry": "Mining",
+      "marketCap": null,
+      "listingDate": "Dec 24, 1969"
+    },
+    {
+      "symbol": "ARA",
+      "name": "Araneta Properties, Inc.",
+      "exchange": "PSE",
+      "sector": "Property",
+      "industry": "Property",
+      "marketCap": 556.15,
+      "listingDate": "Nov 14, 1989"
+    },
+    {
+      "symbol": "AREIT",
+      "name": "AREIT, Inc.",
+      "exchange": "PSE",
+      "sector": "Property",
+      "industry": "Property",
+      "marketCap": 156300,
+      "listingDate": "Aug 13, 2020"
+    },
+    {
+      "symbol": "ASLAG",
+      "name": "Raslag Corp.",
+      "exchange": "PSE",
+      "sector": "Industrial",
+      "industry": "Electricity, Energy, Power & Water",
+      "marketCap": 1680,
+      "listingDate": "Jun 06, 2022"
+    },
+    {
+      "symbol": "AT",
+      "name": "Atlas Consolidated Mining and Development Corporation",
+      "exchange": "PSE",
+      "sector": "Mining and Oil",
+      "industry": "Mining",
+      "marketCap": 61900,
+      "listingDate": "Nov 17, 1970"
+    },
+    {
+      "symbol": "ATN",
+      "name": "ATN Holdings, Inc.",
+      "exchange": "PSE",
+      "sector": "Industrial",
+      "industry": "Construction, Infrastructure & Allied Services",
+      "marketCap": 2830,
+      "listingDate": "Sep 24, 1970"
+    },
+    {
+      "symbol": "AUB",
+      "name": "Asia United Bank Corporation",
+      "exchange": "PSE",
+      "sector": "Financials",
+      "industry": "Banks",
+      "marketCap": 71630,
+      "listingDate": "May 17, 2013"
+    },
+    {
+      "symbol": "AXLM",
+      "name": "Axelum Resources Corp.",
+      "exchange": "PSE",
+      "sector": "Industrial",
+      "industry": "Food, Beverage & Tobacco",
+      "marketCap": 11130,
+      "listingDate": "Oct 07, 2019"
+    },
+    {
+      "symbol": "BALAI",
+      "name": "Balai Ni Fruitas Inc.",
+      "exchange": "PSE",
+      "sector": "Industrial",
+      "industry": "Food, Beverage, & Tobacco",
+      "marketCap": 470.93,
+      "listingDate": "Jun 30, 2022"
+    },
+    {
+      "symbol": "BC",
+      "name": "Benguet Corporation",
+      "exchange": "PSE",
+      "sector": "Mining and Oil",
+      "industry": "Mining",
+      "marketCap": 5040,
+      "listingDate": "Jan 04, 1950"
+    },
+    {
+      "symbol": "BCOR",
+      "name": "Berjaya Philippines Inc.",
+      "exchange": "PSE",
+      "sector": "Services",
+      "industry": "Retail",
+      "marketCap": 41240,
+      "listingDate": "Nov 29, 1948"
+    },
+    {
+      "symbol": "BDO",
+      "name": "BDO Unibank, Inc.",
+      "exchange": "PSE",
+      "sector": "Financials",
+      "industry": "Banks",
+      "marketCap": 651450,
+      "listingDate": "May 21, 2002"
+    },
+    {
+      "symbol": "BEL",
+      "name": "Belle Corporation",
+      "exchange": "PSE",
+      "sector": "Services",
+      "industry": "Casinos & Gaming",
+      "marketCap": 11680,
+      "listingDate": "Feb 02, 1977"
+    },
+    {
+      "symbol": "BH",
+      "name": "BHI Holdings, Inc.",
+      "exchange": "PSE",
+      "sector": "Holding Firms",
+      "industry": "Holding Firms",
+      "marketCap": 339.99,
+      "listingDate": "Nov 02, 1966"
+    },
+    {
+      "symbol": "BHI",
+      "name": "Boulevard Holdings, Inc.",
+      "exchange": "PSE",
+      "sector": "Services",
+      "industry": "Hotel & Leisure",
+      "marketCap": 432,
+      "listingDate": "Apr 28, 1997"
+    },
+    {
+      "symbol": "BKR",
+      "name": "Bright Kindle Resources & Investments Inc.",
+      "exchange": "PSE",
+      "sector": "Financials",
+      "industry": "Other Financial Institutions",
+      "marketCap": 764.24,
+      "listingDate": "Mar 21, 1995"
+    },
+    {
+      "symbol": "BLOOM",
+      "name": "Bloomberry Resorts Corporation",
+      "exchange": "PSE",
+      "sector": "Services",
+      "industry": "Casinos & Gaming",
+      "marketCap": 29850,
+      "listingDate": "Oct 17, 2000"
+    },
+    {
+      "symbol": "BMM",
+      "name": "Bogo-Medellin Milling Company, Inc.",
+      "exchange": "PSE",
+      "sector": "Industrial",
+      "industry": "Food, Beverage & Tobacco",
+      "marketCap": null,
+      "listingDate": "Nov 16, 1950"
+    },
+    {
+      "symbol": "BNCOM",
+      "name": "Bank of Commerce",
+      "exchange": "PSE",
+      "sector": "Financials",
+      "industry": "Banks",
+      "marketCap": 14450,
+      "listingDate": "Mar 31, 2022"
+    },
+    {
+      "symbol": "BPI",
+      "name": "Bank of the Philippine Islands",
+      "exchange": "PSE",
+      "sector": "Financials",
+      "industry": "Banks",
+      "marketCap": 568830,
+      "listingDate": "Oct 12, 1971"
+    },
+    {
+      "symbol": "BRN",
+      "name": "A Brown Company, Inc.",
+      "exchange": "PSE",
+      "sector": "Property",
+      "industry": "Property",
+      "marketCap": 1690,
+      "listingDate": "Feb 08, 1994"
+    },
+    {
+      "symbol": "BSC",
+      "name": "Basic Energy Corporation",
+      "exchange": "PSE",
+      "sector": "Industrial",
+      "industry": "Electricity, Energy, Power & Water",
+      "marketCap": 1640,
+      "listingDate": "Oct 16, 1973"
+    },
+    {
+      "symbol": "C",
+      "name": "Chelsea Logistics and Infrastructure Holdings Corp.",
+      "exchange": "PSE",
+      "sector": "Services",
+      "industry": "Transportation Services",
+      "marketCap": 2070,
+      "listingDate": "Aug 08, 2017"
+    },
+    {
+      "symbol": "CA",
+      "name": "Concrete Aggregates Corporation",
+      "exchange": "PSE",
+      "sector": "Industrial",
+      "industry": "Construction, Infra. & Allied Services",
+      "marketCap": 1570,
+      "listingDate": "Oct 20, 1972"
+    },
+    {
+      "symbol": "CAT",
+      "name": "Central Azucarera de Tarlac, Inc.",
+      "exchange": "PSE",
+      "sector": "Industrial",
+      "industry": "Food, Beverage & Tobacco",
+      "marketCap": 2340,
+      "listingDate": "Apr 12, 1977"
+    },
+    {
+      "symbol": "CBC",
+      "name": "China Banking Corporation",
+      "exchange": "PSE",
+      "sector": "Financials",
+      "industry": "Banks",
+      "marketCap": 143990,
+      "listingDate": "Sep 01, 1927"
+    },
+    {
+      "symbol": "CDC",
+      "name": "Cityland Development Corporation",
+      "exchange": "PSE",
+      "sector": "Property",
+      "industry": "Property",
+      "marketCap": 3040,
+      "listingDate": "Aug 02, 1983"
+    },
+    {
+      "symbol": "CEB",
+      "name": "Cebu Air, Inc.",
+      "exchange": "PSE",
+      "sector": "Services",
+      "industry": "Transportation Services",
+      "marketCap": 17490,
+      "listingDate": "Oct 26, 2010"
+    },
+    {
+      "symbol": "CEI",
+      "name": "Crown Equities, Inc.",
+      "exchange": "PSE",
+      "sector": "Property",
+      "industry": "Property",
+      "marketCap": 1320,
+      "listingDate": "Aug 16, 1994"
+    },
+    {
+      "symbol": "CEU",
+      "name": "Centro Escolar University",
+      "exchange": "PSE",
+      "sector": "Services",
+      "industry": "Education",
+      "marketCap": 6630,
+      "listingDate": "Nov 10, 1986"
+    },
+    {
+      "symbol": "CHP",
+      "name": "Concreat Holdings Philippines, Inc.",
+      "exchange": "PSE",
+      "sector": "Industrial",
+      "industry": "Construction, Infra. & Allied Services",
+      "marketCap": 16190,
+      "listingDate": "Jul 18, 2016"
+    },
+    {
+      "symbol": "CIC",
+      "name": "Concepcion Industrial Corporation",
+      "exchange": "PSE",
+      "sector": "Industrial",
+      "industry": "Electrical Components & Equipment",
+      "marketCap": 4210,
+      "listingDate": "Nov 27, 2013"
+    },
+    {
+      "symbol": "CLI",
+      "name": "Cebu Landmasters, Inc.",
+      "exchange": "PSE",
+      "sector": "Property",
+      "industry": "Property",
+      "marketCap": 7550,
+      "listingDate": "Jun 02, 2017"
+    },
+    {
+      "symbol": "CNPF",
+      "name": "Century Pacific Food, Inc.",
+      "exchange": "PSE",
+      "sector": "Industrial",
+      "industry": "Food, Beverage & Tobacco",
+      "marketCap": 114060,
+      "listingDate": "May 06, 2014"
+    },
+    {
+      "symbol": "CNVRG",
+      "name": "Converge Information and Communications Technology Solutions, Inc.",
+      "exchange": "PSE",
+      "sector": "Services",
+      "industry": "Information Technology",
+      "marketCap": 70240,
+      "listingDate": "Oct 26, 2020"
+    },
+    {
+      "symbol": "COL",
+      "name": "COL Financial Group, Inc.",
+      "exchange": "PSE",
+      "sector": "Financials",
+      "industry": "Other Financial Institutions",
+      "marketCap": 8630,
+      "listingDate": "Jul 12, 2006"
+    },
+    {
+      "symbol": "COSCO",
+      "name": "Cosco Capital, Inc.",
+      "exchange": "PSE",
+      "sector": "Holding Firms",
+      "industry": "Holding Firms",
+      "marketCap": 57640,
+      "listingDate": "Sep 26, 1988"
+    },
+    {
+      "symbol": "CPG",
+      "name": "Century Properties Group, Inc.",
+      "exchange": "PSE",
+      "sector": "Property",
+      "industry": "Property",
+      "marketCap": 8700,
+      "listingDate": "Jun 16, 1976"
+    },
+    {
+      "symbol": "CPM",
+      "name": "Century Peak Holdings Corporation",
+      "exchange": "PSE",
+      "sector": "Mining and Oil",
+      "industry": "Mining",
+      "marketCap": 6460,
+      "listingDate": "Oct 06, 2009"
+    },
+    {
+      "symbol": "CREC",
+      "name": "Citicore Renewable Energy Corporation",
+      "exchange": "PSE",
+      "sector": "Industrial",
+      "industry": "Electricity, Energy, Power and Water",
+      "marketCap": 51230,
+      "listingDate": "Jun 07, 2024"
+    },
+    {
+      "symbol": "CREIT",
+      "name": "Citicore Energy REIT Corp.",
+      "exchange": "PSE",
+      "sector": "Property",
+      "industry": "Property",
+      "marketCap": 21600,
+      "listingDate": "Feb 22, 2022"
+    },
+    {
+      "symbol": "CROWN",
+      "name": "Crown Asia Chemicals Corporation",
+      "exchange": "PSE",
+      "sector": "Industrial",
+      "industry": "Chemicals",
+      "marketCap": 1120,
+      "listingDate": "Apr 27, 2015"
+    },
+    {
+      "symbol": "CSB",
+      "name": "Citystate Savings Bank, Inc.",
+      "exchange": "PSE",
+      "sector": "Financials",
+      "industry": "Banks",
+      "marketCap": 2430,
+      "listingDate": "Jan 03, 2002"
+    },
+    {
+      "symbol": "CTS",
+      "name": "CTS Global Equity Group, Inc.",
+      "exchange": "PSE",
+      "sector": "Small, Medium & Emerging Board",
+      "industry": "Small, Medium & Emerging Board",
+      "marketCap": 2410,
+      "listingDate": "Apr 13, 2022"
+    },
+    {
+      "symbol": "CYBR",
+      "name": "Cyber Bay Corporation",
+      "exchange": "PSE",
+      "sector": "Property",
+      "industry": "Property",
+      "marketCap": null,
+      "listingDate": "Mar 19, 1991"
+    },
+    {
+      "symbol": "DD",
+      "name": "DoubleDragon Corporation",
+      "exchange": "PSE",
+      "sector": "Property",
+      "industry": "Property",
+      "marketCap": 28560,
+      "listingDate": "Apr 07, 2014"
+    },
+    {
+      "symbol": "DDMPR",
+      "name": "DDMP REIT, Inc.",
+      "exchange": "PSE",
+      "sector": "Property",
+      "industry": "Property",
+      "marketCap": 18540,
+      "listingDate": "Mar 24, 2021"
+    },
+    {
+      "symbol": "DELM",
+      "name": "Del Monte Pacific Limited",
+      "exchange": "PSE",
+      "sector": "Industrial",
+      "industry": "Food, Beverage & Tobacco",
+      "marketCap": null,
+      "listingDate": "Jun 10, 2013"
+    },
+    {
+      "symbol": "DFNN",
+      "name": "DFNN, Inc.",
+      "exchange": "PSE",
+      "sector": "Services",
+      "industry": "Information Technology",
+      "marketCap": 278.58,
+      "listingDate": "Oct 30, 2000"
+    },
+    {
+      "symbol": "DHI",
+      "name": "Dominion Holdings, Inc.",
+      "exchange": "PSE",
+      "sector": "Financials",
+      "industry": "Other Financial Institutions",
+      "marketCap": 33730,
+      "listingDate": "Jan 06, 1997"
+    },
+    {
+      "symbol": "DITO",
+      "name": "DITO CME Holdings Corp.",
+      "exchange": "PSE",
+      "sector": "Services",
+      "industry": "Telecommunications",
+      "marketCap": 15900,
+      "listingDate": "Oct 01, 1975"
+    },
+    {
+      "symbol": "DIZ",
+      "name": "Dizon Copper-Silver Mines, Inc.",
+      "exchange": "PSE",
+      "sector": "Mining and Oil",
+      "industry": "Mining",
+      "marketCap": 320.3,
+      "listingDate": "Feb 10, 1988"
+    },
+    {
+      "symbol": "DMC",
+      "name": "DMCI Holdings, Inc.",
+      "exchange": "PSE",
+      "sector": "Holding Firms",
+      "industry": "Holding Firms",
+      "marketCap": 105560,
+      "listingDate": "Dec 18, 1995"
+    },
+    {
+      "symbol": "DMW",
+      "name": "D.M. Wenceslao & Associates, Incorporated",
+      "exchange": "PSE",
+      "sector": "Property",
+      "industry": "Property",
+      "marketCap": 16640,
+      "listingDate": "Jun 29, 2018"
+    },
+    {
+      "symbol": "DNL",
+      "name": "D&L Industries, Inc.",
+      "exchange": "PSE",
+      "sector": "Industrial",
+      "industry": "Food, Beverage & Tobacco",
+      "marketCap": 25070,
+      "listingDate": "Dec 12, 2012"
+    },
+    {
+      "symbol": "DWC",
+      "name": "Discovery World Corporation",
+      "exchange": "PSE",
+      "sector": "Services",
+      "industry": "Hotel & Leisure",
+      "marketCap": 802.76,
+      "listingDate": "Nov 21, 2013"
+    },
+    {
+      "symbol": "ECP",
+      "name": "EasyCall Communications Philippines, Inc.",
+      "exchange": "PSE",
+      "sector": "Services",
+      "industry": "Information Technology",
+      "marketCap": 345,
+      "listingDate": "May 05, 1992"
+    },
+    {
+      "symbol": "ECVC",
+      "name": "East Coast Vulcan Mining Corporation",
+      "exchange": "PSE",
+      "sector": "Mining and Oil",
+      "industry": "Mining",
+      "marketCap": 1860,
+      "listingDate": "Aug 31, 1970"
+    },
+    {
+      "symbol": "EEI",
+      "name": "EEI Corporation",
+      "exchange": "PSE",
+      "sector": "Industrial",
+      "industry": "Construction, Infra. & Allied Services",
+      "marketCap": 2030,
+      "listingDate": "Jul 21, 1975"
+    },
+    {
+      "symbol": "EG",
+      "name": "IP E-Game Ventures, Inc.",
+      "exchange": "PSE",
+      "sector": "Services",
+      "industry": "Casinos & Gaming",
+      "marketCap": null,
+      "listingDate": "Feb 17, 2010"
+    },
+    {
+      "symbol": "EGRN",
+      "name": "Everwoods Green Resources and Holdings, Inc.",
+      "exchange": "PSE",
+      "sector": "Property",
+      "industry": "Property",
+      "marketCap": 725,
+      "listingDate": "Sep 16, 1996"
+    },
+    {
+      "symbol": "ELI",
+      "name": "Empire East Land Holdings, Inc.",
+      "exchange": "PSE",
+      "sector": "Property",
+      "industry": "Property",
+      "marketCap": 1510,
+      "listingDate": "Jun 28, 1996"
+    },
+    {
+      "symbol": "EMI",
+      "name": "Emperador Inc.",
+      "exchange": "PSE",
+      "sector": "Industrial",
+      "industry": "Food, Beverage & Tobacco",
+      "marketCap": 236250,
+      "listingDate": "Dec 19, 2011"
+    },
+    {
+      "symbol": "ENEX",
+      "name": "ENEX Energy Corp.",
+      "exchange": "PSE",
+      "sector": "Mining and Oil",
+      "industry": "Oil",
+      "marketCap": 925,
+      "listingDate": "Aug 28, 2014"
+    },
+    {
+      "symbol": "EURO",
+      "name": "Euro-Med Laboratories Phil., Inc.",
+      "exchange": "PSE",
+      "sector": "Industrial",
+      "industry": "Chemicals",
+      "marketCap": 4520,
+      "listingDate": "Jul 02, 1998"
+    },
+    {
+      "symbol": "EW",
+      "name": "East West Banking Corporation",
+      "exchange": "PSE",
+      "sector": "Financials",
+      "industry": "Banks",
+      "marketCap": 24880,
+      "listingDate": "May 07, 2012"
+    },
+    {
+      "symbol": "FAF",
+      "name": "First Abacus Financial Holdings Corporation",
+      "exchange": "PSE",
+      "sector": "Financials",
+      "industry": "Other Financial Institutions",
+      "marketCap": 561.98,
+      "listingDate": "Nov 17, 1994"
+    },
+    {
+      "symbol": "FB",
+      "name": "San Miguel Food and Beverage, Inc.",
+      "exchange": "PSE",
+      "sector": "Industrial",
+      "industry": "Food, Beverage & Tobacco",
+      "marketCap": 280690,
+      "listingDate": "Oct 28, 1971"
+    },
+    {
+      "symbol": "FCG",
+      "name": "Figaro Culinary Group, Inc.",
+      "exchange": "PSE",
+      "sector": "Industrial",
+      "industry": "Food, Beverage & Tobacco",
+      "marketCap": 3550,
+      "listingDate": "Jan 24, 2022"
+    },
+    {
+      "symbol": "FDC",
+      "name": "Filinvest Development Corporation",
+      "exchange": "PSE",
+      "sector": "Holding Firms",
+      "industry": "Holding Firms",
+      "marketCap": 31480,
+      "listingDate": "Dec 22, 1982"
+    },
+    {
+      "symbol": "FERRO",
+      "name": "Ferronoux Holdings, Inc.",
+      "exchange": "PSE",
+      "sector": "Financials",
+      "industry": "Other Financial Institutions",
+      "marketCap": 1300,
+      "listingDate": "Aug 13, 2013"
+    },
+    {
+      "symbol": "FEU",
+      "name": "Far Eastern University, Incorporated",
+      "exchange": "PSE",
+      "sector": "Services",
+      "industry": "Education",
+      "marketCap": 19240,
+      "listingDate": "Jul 11, 1986"
+    },
+    {
+      "symbol": "FFI",
+      "name": "Filipino Fund, Inc.",
+      "exchange": "PSE",
+      "sector": "Financials",
+      "industry": "Other Financial Institutions",
+      "marketCap": null,
+      "listingDate": "Sep 27, 1995"
+    },
+    {
+      "symbol": "FGEN",
+      "name": "First Gen Corporation",
+      "exchange": "PSE",
+      "sector": "Industrial",
+      "industry": "Electricity, Energy, Power & Water",
+      "marketCap": 104660,
+      "listingDate": "Feb 10, 2006"
+    },
+    {
+      "symbol": "FILRT",
+      "name": "Filinvest REIT Corp.",
+      "exchange": "PSE",
+      "sector": "Property",
+      "industry": "Property",
+      "marketCap": 18970,
+      "listingDate": "Aug 12, 2021"
+    },
+    {
+      "symbol": "FJP",
+      "name": "F & J Prince Holdings Corporation",
+      "exchange": "PSE",
+      "sector": "Holding Firms",
+      "industry": "Holding Firms",
+      "marketCap": 1110,
+      "listingDate": "Dec 08, 1982"
+    },
+    {
+      "symbol": "FLI",
+      "name": "Filinvest Land, Inc.",
+      "exchange": "PSE",
+      "sector": "Property",
+      "industry": "Property",
+      "marketCap": 15440,
+      "listingDate": "Oct 25, 1993"
+    },
+    {
+      "symbol": "FMETF",
+      "name": "First Metro Philippine Equity Exchange Traded Fund, Inc.",
+      "exchange": "PSE",
+      "sector": "ETF",
+      "industry": "ETF-Equity",
+      "marketCap": null,
+      "listingDate": "Dec 02, 2013"
+    },
+    {
+      "symbol": "FNI",
+      "name": "Global Ferronickel Holdings, Inc.",
+      "exchange": "PSE",
+      "sector": "Mining and Oil",
+      "industry": "Mining",
+      "marketCap": 10730,
+      "listingDate": "Dec 14, 1994"
+    },
+    {
+      "symbol": "FOOD",
+      "name": "Alliance Select Foods International, Inc.",
+      "exchange": "PSE",
+      "sector": "Industrial",
+      "industry": "Food, Beverage & Tobacco",
+      "marketCap": 774.91,
+      "listingDate": "Nov 08, 2006"
+    },
+    {
+      "symbol": "FPH",
+      "name": "First Philippine Holdings Corporation",
+      "exchange": "PSE",
+      "sector": "Industrial",
+      "industry": "Electricity, Energy, Power & Water",
+      "marketCap": 45120,
+      "listingDate": "May 23, 1963"
+    },
+    {
+      "symbol": "FPI",
+      "name": "Forum Pacific, Inc.",
+      "exchange": "PSE",
+      "sector": "Holding Firms",
+      "industry": "Holding Firms",
+      "marketCap": 304.73,
+      "listingDate": "Dec 19, 1994"
+    },
+    {
+      "symbol": "FRUIT",
+      "name": "Fruitas Holdings, Inc.",
+      "exchange": "PSE",
+      "sector": "Industrial",
+      "industry": "Food, Beverage & Tobacco",
+      "marketCap": 1340,
+      "listingDate": "Nov 29, 2019"
+    },
+    {
+      "symbol": "FYN",
+      "name": "Filsyn Corporation",
+      "exchange": "PSE",
+      "sector": "Industrial",
+      "industry": "Chemicals",
+      "marketCap": 604.23,
+      "listingDate": "Jun 03, 1975"
+    },
+    {
+      "symbol": "GEO",
+      "name": "GEOGRACE Resources Philippines, Inc.",
+      "exchange": "PSE",
+      "sector": "Mining and Oil",
+      "industry": "Mining",
+      "marketCap": 315,
+      "listingDate": "Feb 07, 1972"
+    },
+    {
+      "symbol": "GERI",
+      "name": "Global-Estate Resorts, Inc.",
+      "exchange": "PSE",
+      "sector": "Property",
+      "industry": "Property",
+      "marketCap": 6810,
+      "listingDate": "Nov 23, 1995"
+    },
+    {
+      "symbol": "GLO",
+      "name": "Globe Telecom, Inc.",
+      "exchange": "PSE",
+      "sector": "Services",
+      "industry": "Telecommunications",
+      "marketCap": 250940,
+      "listingDate": "Aug 11, 1975"
+    },
+    {
+      "symbol": "GMA7",
+      "name": "GMA Network, Inc.",
+      "exchange": "PSE",
+      "sector": "Services",
+      "industry": "Media",
+      "marketCap": 14600,
+      "listingDate": "Jul 30, 2007"
+    },
+    {
+      "symbol": "GMAP",
+      "name": "GMA Holdings, Inc.",
+      "exchange": "PSE",
+      "sector": "Services",
+      "industry": "Media",
+      "marketCap": 1480,
+      "listingDate": "Jul 30, 2007"
+    },
+    {
+      "symbol": "GPH",
+      "name": "Grand Plaza Hotel Corporation",
+      "exchange": "PSE",
+      "sector": "Services",
+      "industry": "Hotel & Leisure",
+      "marketCap": 270.2,
+      "listingDate": "Dec 10, 1992"
+    },
+    {
+      "symbol": "GREEN",
+      "name": "Greenergy Holdings Incorporated",
+      "exchange": "PSE",
+      "sector": "Industrial",
+      "industry": "Electrical Components & Equipment",
+      "marketCap": 684.88,
+      "listingDate": "Sep 26, 1996"
+    },
+    {
+      "symbol": "GSMI",
+      "name": "Ginebra San Miguel,  Inc.",
+      "exchange": "PSE",
+      "sector": "Industrial",
+      "industry": "Food, Beverage & Tobacco",
+      "marketCap": 65860,
+      "listingDate": "Apr 18, 1995"
+    },
+    {
+      "symbol": "GTCAP",
+      "name": "GT Capital Holdings, Inc.",
+      "exchange": "PSE",
+      "sector": "Holding Firms",
+      "industry": "Holding Firms",
+      "marketCap": 108070,
+      "listingDate": "Apr 20, 2012"
+    },
+    {
+      "symbol": "HI",
+      "name": "House of Investments, Inc.",
+      "exchange": "PSE",
+      "sector": "Holding Firms",
+      "industry": "Holding Firms",
+      "marketCap": 7570,
+      "listingDate": "Jul 02, 1962"
+    },
+    {
+      "symbol": "HOME",
+      "name": "AllHome Corp.",
+      "exchange": "PSE",
+      "sector": "Services",
+      "industry": "Retail",
+      "marketCap": 900,
+      "listingDate": "Oct 10, 2019"
+    },
+    {
+      "symbol": "HTI",
+      "name": "Haus Talk, Inc.",
+      "exchange": "PSE",
+      "sector": "Small, Medium & Emerging Board",
+      "industry": "Small, Medium & Emerging Board",
+      "marketCap": 3400,
+      "listingDate": "Jan 17, 2022"
+    },
+    {
+      "symbol": "I",
+      "name": "I-Remit, Inc.",
+      "exchange": "PSE",
+      "sector": "Financials",
+      "industry": "Other Financial Institutions",
+      "marketCap": 121.72,
+      "listingDate": "Oct 17, 2007"
+    },
+    {
+      "symbol": "ICT",
+      "name": "International Container Terminal Services, Inc.",
+      "exchange": "PSE",
+      "sector": "Services",
+      "industry": "Transportation Services",
+      "marketCap": 1880000,
+      "listingDate": "Mar 23, 1992"
+    },
+    {
+      "symbol": "IDC",
+      "name": "Italpinas Development Corporation",
+      "exchange": "PSE",
+      "sector": "Small, Medium & Emerging Board",
+      "industry": "Small, Medium & Emerging Board",
+      "marketCap": 506.8,
+      "listingDate": "Dec 07, 2015"
+    },
+    {
+      "symbol": "IMI",
+      "name": "Integrated Micro-Electronics, Inc.",
+      "exchange": "PSE",
+      "sector": "Industrial",
+      "industry": "Electrical Components & Equipment",
+      "marketCap": 16730,
+      "listingDate": "Jan 21, 2010"
+    },
+    {
+      "symbol": "IMP",
+      "name": "Imperial Resources, Inc.",
+      "exchange": "PSE",
+      "sector": "Services",
+      "industry": "Information Technology",
+      "marketCap": 567.68,
+      "listingDate": "Aug 31, 1970"
+    },
+    {
+      "symbol": "INFRA",
+      "name": "Philippine Infradev Holdings, Inc.",
+      "exchange": "PSE",
+      "sector": "Property",
+      "industry": "Property",
+      "marketCap": 1940,
+      "listingDate": "Feb 27, 1978"
+    },
+    {
+      "symbol": "ION",
+      "name": "Ionics, Inc.",
+      "exchange": "PSE",
+      "sector": "Industrial",
+      "industry": "Electrical Components & Equipment",
+      "marketCap": 1830,
+      "listingDate": "Jul 18, 1995"
+    },
+    {
+      "symbol": "IPM",
+      "name": "IPM Holdings, Inc.",
+      "exchange": "PSE",
+      "sector": "Services",
+      "industry": "Other Services",
+      "marketCap": 1130,
+      "listingDate": "Jun 17, 1998"
+    },
+    {
+      "symbol": "IPO",
+      "name": "iPeople, inc.",
+      "exchange": "PSE",
+      "sector": "Services",
+      "industry": "Education",
+      "marketCap": 7210,
+      "listingDate": "Jan 24, 1990"
+    },
+    {
+      "symbol": "IS",
+      "name": "Island Information & Technology, Inc.",
+      "exchange": "PSE",
+      "sector": "Services",
+      "industry": "Information Technology",
+      "marketCap": 591.18,
+      "listingDate": "Dec 06, 1988"
+    },
+    {
+      "symbol": "JAS",
+      "name": "Jackstones, Inc.",
+      "exchange": "PSE",
+      "sector": "Property",
+      "industry": "Property",
+      "marketCap": 437.6,
+      "listingDate": "Oct 27, 1967"
+    },
+    {
+      "symbol": "JFC",
+      "name": "Jollibee Foods Corporation",
+      "exchange": "PSE",
+      "sector": "Industrial",
+      "industry": "Food, Beverage & Tobacco",
+      "marketCap": 173480,
+      "listingDate": "Jul 14, 1993"
+    },
+    {
+      "symbol": "JGS",
+      "name": "JG Summit Holdings, Inc.",
+      "exchange": "PSE",
+      "sector": "Holding Firms",
+      "industry": "Holding Firms",
+      "marketCap": 162830,
+      "listingDate": "Aug 09, 1993"
+    },
+    {
+      "symbol": "JOH",
+      "name": "Jolliville Holdings Corporation",
+      "exchange": "PSE",
+      "sector": "Industrial",
+      "industry": "Electricity, Energy, Power & Water",
+      "marketCap": 1110,
+      "listingDate": "Jun 17, 2002"
+    },
+    {
+      "symbol": "KEEPR",
+      "name": "The Keepers Holdings, Inc.",
+      "exchange": "PSE",
+      "sector": "Industrial",
+      "industry": "Food, Beverage & Tobacco",
+      "marketCap": 28580,
+      "listingDate": "Sep 03, 1991"
+    },
+    {
+      "symbol": "KEP",
+      "name": "Keppel Philippines Properties, Inc.",
+      "exchange": "PSE",
+      "sector": "Property",
+      "industry": "Property",
+      "marketCap": 734.57,
+      "listingDate": "Sep 11, 1989"
+    },
+    {
+      "symbol": "KPPI",
+      "name": "Kepwealth Property Phils., Inc.",
+      "exchange": "PSE",
+      "sector": "Small, Medium & Emerging Board",
+      "industry": "Small, Medium & Emerging Board",
+      "marketCap": 273.44,
+      "listingDate": "Aug 19, 2019"
+    },
+    {
+      "symbol": "LBC",
+      "name": "LBC Express Holdings, Inc.",
+      "exchange": "PSE",
+      "sector": "Services",
+      "industry": "Transportation Services",
+      "marketCap": 9340,
+      "listingDate": "Dec 21, 2001"
+    },
+    {
+      "symbol": "LC",
+      "name": "Lepanto Consolidated Mining Company",
+      "exchange": "PSE",
+      "sector": "Mining and Oil",
+      "industry": "Mining",
+      "marketCap": null,
+      "listingDate": "Apr 30, 1947"
+    },
+    {
+      "symbol": "LFM",
+      "name": "Liberty Flour Mills, Inc.",
+      "exchange": "PSE",
+      "sector": "Industrial",
+      "industry": "Food, Beverage & Tobacco",
+      "marketCap": 3090,
+      "listingDate": "Apr 25, 1985"
+    },
+    {
+      "symbol": "LMG",
+      "name": "LMG Corp.",
+      "exchange": "PSE",
+      "sector": "Financials",
+      "industry": "Other Financial Institutions",
+      "marketCap": 541.92,
+      "listingDate": "Jan 07, 1986"
+    },
+    {
+      "symbol": "LODE",
+      "name": "Lodestar Investment Holdings Corporation",
+      "exchange": "PSE",
+      "sector": "Holding Firms",
+      "industry": "Holding Firms",
+      "marketCap": 1100,
+      "listingDate": "May 26, 1989"
+    },
+    {
+      "symbol": "LOTO",
+      "name": "Pacific Online Systems Corporation",
+      "exchange": "PSE",
+      "sector": "Services",
+      "industry": "Casinos & Gaming",
+      "marketCap": 1440,
+      "listingDate": "Apr 12, 2007"
+    },
+    {
+      "symbol": "LPC",
+      "name": "LFM Properties Corporation",
+      "exchange": "PSE",
+      "sector": "Small, Medium & Emerging Board",
+      "industry": "Small, Medium & Emerging Board",
+      "marketCap": 525,
+      "listingDate": "Nov 09, 2022"
+    },
+    {
+      "symbol": "LPZ",
+      "name": "Lopez Holdings Corporation",
+      "exchange": "PSE",
+      "sector": "Holding Firms",
+      "industry": "Holding Firms",
+      "marketCap": 22920,
+      "listingDate": "Nov 25, 1993"
+    },
+    {
+      "symbol": "LSC",
+      "name": "Lorenzo Shipping Corporation",
+      "exchange": "PSE",
+      "sector": "Services",
+      "industry": "Transportation Services",
+      "marketCap": 653.51,
+      "listingDate": "Jul 22, 1996"
+    },
+    {
+      "symbol": "LTG",
+      "name": "LT Group, Inc.",
+      "exchange": "PSE",
+      "sector": "Holding Firms",
+      "industry": "Holding Firms",
+      "marketCap": 161380,
+      "listingDate": "Nov 07, 1947"
+    },
+    {
+      "symbol": "MA",
+      "name": "Manila Mining Corporation",
+      "exchange": "PSE",
+      "sector": "Mining and Oil",
+      "industry": "Mining",
+      "marketCap": 2370,
+      "listingDate": "Dec 17, 1959"
+    },
+    {
+      "symbol": "MAC",
+      "name": "MacroAsia Corporation",
+      "exchange": "PSE",
+      "sector": "Services",
+      "industry": "Transportation Services",
+      "marketCap": 7220,
+      "listingDate": "May 21, 1970"
+    },
+    {
+      "symbol": "MACAY",
+      "name": "Macay Holdings, Inc.",
+      "exchange": "PSE",
+      "sector": "Industrial",
+      "industry": "Food, Beverage & Tobacco",
+      "marketCap": 7890,
+      "listingDate": "Jan 28, 1987"
+    },
+    {
+      "symbol": "MAH",
+      "name": "Metro Alliance Holdings & Equities Corp.",
+      "exchange": "PSE",
+      "sector": "Services",
+      "industry": "Transportation Services",
+      "marketCap": 186.73,
+      "listingDate": "Dec 08, 1947"
+    },
+    {
+      "symbol": "MARC",
+      "name": "Marcventures Holdings, Inc.",
+      "exchange": "PSE",
+      "sector": "Mining and Oil",
+      "industry": "Mining",
+      "marketCap": 2200,
+      "listingDate": "Jan 10, 1958"
+    },
+    {
+      "symbol": "MAXS",
+      "name": "Max's Group, Inc.",
+      "exchange": "PSE",
+      "sector": "Industrial",
+      "industry": "Food, Beverage & Tobacco",
+      "marketCap": 1650,
+      "listingDate": "Dec 15, 2000"
+    },
+    {
+      "symbol": "MB",
+      "name": "Manila Bulletin Publishing Corporation",
+      "exchange": "PSE",
+      "sector": "Services",
+      "industry": "Media",
+      "marketCap": 610.04,
+      "listingDate": "Apr 18, 1990"
+    },
+    {
+      "symbol": "MBC",
+      "name": "Manila Broadcasting Company",
+      "exchange": "PSE",
+      "sector": "Services",
+      "industry": "Media",
+      "marketCap": 2090,
+      "listingDate": "Oct 08, 1949"
+    },
+    {
+      "symbol": "MBT",
+      "name": "Metropolitan Bank & Trust Company",
+      "exchange": "PSE",
+      "sector": "Financials",
+      "industry": "Banks",
+      "marketCap": 304480,
+      "listingDate": "Feb 26, 1981"
+    },
+    {
+      "symbol": "MED",
+      "name": "MEDCO Holdings, Inc.",
+      "exchange": "PSE",
+      "sector": "Financials",
+      "industry": "Other Financial Institutions",
+      "marketCap": 334.88,
+      "listingDate": "Nov 18, 1975"
+    },
+    {
+      "symbol": "MEDIC",
+      "name": "Medilines Distributors Incorporated",
+      "exchange": "PSE",
+      "sector": "Services",
+      "industry": "Other Services",
+      "marketCap": 617.98,
+      "listingDate": "Dec 07, 2021"
+    },
+    {
+      "symbol": "MEG",
+      "name": "Megaworld Corporation",
+      "exchange": "PSE",
+      "sector": "Property",
+      "industry": "Property",
+      "marketCap": 75890,
+      "listingDate": "Jun 15, 1994"
+    },
+    {
+      "symbol": "MER",
+      "name": "Manila Electric Company",
+      "exchange": "PSE",
+      "sector": "Industrial",
+      "industry": "Electricity, Energy, Power & Water",
+      "marketCap": 543260,
+      "listingDate": "Jan 08, 1992"
+    },
+    {
+      "symbol": "MFC",
+      "name": "Manulife Financial Corporation",
+      "exchange": "PSE",
+      "sector": "Financials",
+      "industry": "Other Financial Institutions",
+      "marketCap": null,
+      "listingDate": "Sep 27, 1999"
+    },
+    {
+      "symbol": "MFIN",
+      "name": "Makati Finance Corporation",
+      "exchange": "PSE",
+      "sector": "Small, Medium & Emerging Board",
+      "industry": "Small, Medium & Emerging Board",
+      "marketCap": 659.81,
+      "listingDate": "Jan 06, 2003"
+    },
+    {
+      "symbol": "MG",
+      "name": "Millennium Global Holdings, Inc.",
+      "exchange": "PSE",
+      "sector": "Industrial",
+      "industry": "Food, Beverage & Tobacco",
+      "marketCap": 163.51,
+      "listingDate": "Mar 01, 1976"
+    },
+    {
+      "symbol": "MGH",
+      "name": "Metro Global Holdings Corporation",
+      "exchange": "PSE",
+      "sector": "Holding Firms",
+      "industry": "Holding Firms",
+      "marketCap": null,
+      "listingDate": "May 04, 1964"
+    },
+    {
+      "symbol": "MHC",
+      "name": "Mabuhay Holdings Corporation",
+      "exchange": "PSE",
+      "sector": "Holding Firms",
+      "industry": "Holding Firms",
+      "marketCap": 78.85,
+      "listingDate": "Oct 22, 1990"
+    },
+    {
+      "symbol": "MJC",
+      "name": "Manila Jockey Club, Inc.",
+      "exchange": "PSE",
+      "sector": "Services",
+      "industry": "Casinos & Gaming",
+      "marketCap": null,
+      "listingDate": "Oct 11, 1963"
+    },
+    {
+      "symbol": "MJIC",
+      "name": "MJC Investments Corporation",
+      "exchange": "PSE",
+      "sector": "Services",
+      "industry": "Casinos & Gaming",
+      "marketCap": null,
+      "listingDate": "Nov 11, 1955"
+    },
+    {
+      "symbol": "MM",
+      "name": "MerryMart Consumer Corp.",
+      "exchange": "PSE",
+      "sector": "Small, Medium & Emerging Board",
+      "industry": "Small, Medium & Emerging Board",
+      "marketCap": 3300,
+      "listingDate": "Jun 15, 2020"
+    },
+    {
+      "symbol": "MONDE",
+      "name": "Monde Nissin Corporation",
+      "exchange": "PSE",
+      "sector": "Industrial",
+      "industry": "Food, Beverage & Tobacco",
+      "marketCap": 128300,
+      "listingDate": "Jun 01, 2021"
+    },
+    {
+      "symbol": "MRC",
+      "name": "MRC Allied, Inc.",
+      "exchange": "PSE",
+      "sector": "Property",
+      "industry": "Property",
+      "marketCap": 1050,
+      "listingDate": "May 18, 1995"
+    },
+    {
+      "symbol": "MREIT",
+      "name": "MREIT, Inc.",
+      "exchange": "PSE",
+      "sector": "Property",
+      "industry": "Property",
+      "marketCap": 65690,
+      "listingDate": "Oct 01, 2021"
+    },
+    {
+      "symbol": "MRSGI",
+      "name": "Metro Retail Stores Group, Inc.",
+      "exchange": "PSE",
+      "sector": "Services",
+      "industry": "Retail",
+      "marketCap": 3430,
+      "listingDate": "Nov 24, 2015"
+    },
+    {
+      "symbol": "MVC",
+      "name": "Mabuhay Vinyl Corporation",
+      "exchange": "PSE",
+      "sector": "Industrial",
+      "industry": "Chemicals",
+      "marketCap": 3480,
+      "listingDate": "Feb 05, 1997"
+    },
+    {
+      "symbol": "MWC",
+      "name": "Manila Water Company, Inc.",
+      "exchange": "PSE",
+      "sector": "Industrial",
+      "industry": "Electricity, Energy, Power & Water",
+      "marketCap": 106580,
+      "listingDate": "Mar 18, 2005"
+    },
+    {
+      "symbol": "MWIDE",
+      "name": "Megawide Construction Corporation",
+      "exchange": "PSE",
+      "sector": "Industrial",
+      "industry": "Construction, Infra. & Allied Services",
+      "marketCap": 9160,
+      "listingDate": "Feb 18, 2011"
+    },
+    {
+      "symbol": "MYNLD",
+      "name": "Maynilad Water Services, Inc.",
+      "exchange": "PSE",
+      "sector": "Industrial",
+      "industry": "Electricity, Energy, Power & Water",
+      "marketCap": 136650,
+      "listingDate": "Nov 07, 2025"
+    },
+    {
+      "symbol": "NI",
+      "name": "NiHAO Mineral Resources International, Inc.",
+      "exchange": "PSE",
+      "sector": "Mining and Oil",
+      "industry": "Mining",
+      "marketCap": 429.25,
+      "listingDate": "Oct 03, 1990"
+    },
+    {
+      "symbol": "NIKL",
+      "name": "Nickel Asia Corporation",
+      "exchange": "PSE",
+      "sector": "Mining and Oil",
+      "industry": "Mining",
+      "marketCap": 57120,
+      "listingDate": "Nov 22, 2010"
+    },
+    {
+      "symbol": "NOW",
+      "name": "Now Corporation",
+      "exchange": "PSE",
+      "sector": "Services",
+      "industry": "Information Technology",
+      "marketCap": 858.19,
+      "listingDate": "Jul 23, 2003"
+    },
+    {
+      "symbol": "NRCP",
+      "name": "National Reinsurance Corporation of the Philippines",
+      "exchange": "PSE",
+      "sector": "Financials",
+      "industry": "Other Financial Institutions",
+      "marketCap": 2290,
+      "listingDate": "Apr 27, 2007"
+    },
+    {
+      "symbol": "NXGEN",
+      "name": "NextGenesis Corporation",
+      "exchange": "PSE",
+      "sector": "Financials",
+      "industry": "Banks",
+      "marketCap": null,
+      "listingDate": "Oct 08, 1996"
+    },
+    {
+      "symbol": "OGP",
+      "name": "OceanaGold (Philippines), Inc.",
+      "exchange": "PSE",
+      "sector": "Mining and Oil",
+      "industry": "Mining",
+      "marketCap": 80480,
+      "listingDate": "May 13, 2024"
+    },
+    {
+      "symbol": "OM",
+      "name": "Omico Corporation",
+      "exchange": "PSE",
+      "sector": "Property",
+      "industry": "Property",
+      "marketCap": 108.2,
+      "listingDate": "May 02, 1969"
+    },
+    {
+      "symbol": "OPM",
+      "name": "Oriental Petroleum and Minerals Corporation",
+      "exchange": "PSE",
+      "sector": "Mining and Oil",
+      "industry": "Oil",
+      "marketCap": null,
+      "listingDate": "Oct 14, 1970"
+    },
+    {
+      "symbol": "ORE",
+      "name": "Oriental Peninsula Resources Group, Inc.",
+      "exchange": "PSE",
+      "sector": "Mining and Oil",
+      "industry": "Mining",
+      "marketCap": 1400,
+      "listingDate": "Dec 19, 2007"
+    },
+    {
+      "symbol": "OV",
+      "name": "The Philodrill Corporation",
+      "exchange": "PSE",
+      "sector": "Mining and Oil",
+      "industry": "Oil",
+      "marketCap": 1550,
+      "listingDate": "Sep 25, 1969"
+    },
+    {
+      "symbol": "PA",
+      "name": "Pacifica Holdings, Inc.",
+      "exchange": "PSE",
+      "sector": "Holding Firms",
+      "industry": "Holding Firms",
+      "marketCap": 260,
+      "listingDate": "Nov 23, 1959"
+    },
+    {
+      "symbol": "PAL",
+      "name": "PAL Holdings, Inc.",
+      "exchange": "PSE",
+      "sector": "Services",
+      "industry": "Transportation Services",
+      "marketCap": 56390,
+      "listingDate": "Jan 04, 1954"
+    },
+    {
+      "symbol": "PAX",
+      "name": "Paxys, Inc.",
+      "exchange": "PSE",
+      "sector": "Services",
+      "industry": "Other Services",
+      "marketCap": 2890,
+      "listingDate": "Oct 05, 1972"
+    },
+    {
+      "symbol": "PBB",
+      "name": "Philippine Business Bank",
+      "exchange": "PSE",
+      "sector": "Financials",
+      "industry": "Banks",
+      "marketCap": 5790,
+      "listingDate": "Feb 19, 2013"
+    },
+    {
+      "symbol": "PBC",
+      "name": "Philippine Bank of Communications",
+      "exchange": "PSE",
+      "sector": "Financials",
+      "industry": "Banks",
+      "marketCap": 7110,
+      "listingDate": "May 12, 1988"
+    },
+    {
+      "symbol": "PCOR",
+      "name": "Petron Corporation",
+      "exchange": "PSE",
+      "sector": "Industrial",
+      "industry": "Electricity, Energy, Power & Water",
+      "marketCap": 20670,
+      "listingDate": "Sep 07, 1994"
+    },
+    {
+      "symbol": "PERC",
+      "name": "PetroEnergy Resources Corporation",
+      "exchange": "PSE",
+      "sector": "Industrial",
+      "industry": "Electricity, Energy, Power & Water",
+      "marketCap": 2270,
+      "listingDate": "Aug 11, 2004"
+    },
+    {
+      "symbol": "PGOLD",
+      "name": "Puregold Price Club, Inc.",
+      "exchange": "PSE",
+      "sector": "Services",
+      "industry": "Retail",
+      "marketCap": 115780,
+      "listingDate": "Oct 05, 2011"
+    },
+    {
+      "symbol": "PHA",
+      "name": "Premiere Horizon Alliance Corporation",
+      "exchange": "PSE",
+      "sector": "Property",
+      "industry": "Property",
+      "marketCap": 930.46,
+      "listingDate": "May 05, 1997"
+    },
+    {
+      "symbol": "PHC",
+      "name": "Philcomsat Holdings Corporation",
+      "exchange": "PSE",
+      "sector": "Services",
+      "industry": "Other Services",
+      "marketCap": 1610,
+      "listingDate": "Nov 28, 1958"
+    },
+    {
+      "symbol": "PHES",
+      "name": "Philippine Estates Corporation",
+      "exchange": "PSE",
+      "sector": "Property",
+      "industry": "Property",
+      "marketCap": 1210,
+      "listingDate": "Jan 21, 1985"
+    },
+    {
+      "symbol": "PHN",
+      "name": "Phinma Corporation",
+      "exchange": "PSE",
+      "sector": "Industrial",
+      "industry": "Construction, Infra. & Allied Services",
+      "marketCap": 4710,
+      "listingDate": "Aug 18, 1958"
+    },
+    {
+      "symbol": "PHR",
+      "name": "PH Resorts Group Holdings, Inc.",
+      "exchange": "PSE",
+      "sector": "Services",
+      "industry": "Hotel & Leisure",
+      "marketCap": 1360,
+      "listingDate": "Nov 24, 2011"
+    },
+    {
+      "symbol": "PIZZA",
+      "name": "Shakey's Pizza Asia Ventures, Inc.",
+      "exchange": "PSE",
+      "sector": "Industrial",
+      "industry": "Food, Beverage & Tobacco",
+      "marketCap": 9730,
+      "listingDate": "Dec 15, 2016"
+    },
+    {
+      "symbol": "PLUS",
+      "name": "DigiPlus Interactive Corp.",
+      "exchange": "PSE",
+      "sector": "Services",
+      "industry": "Casinos & Gaming",
+      "marketCap": 43810,
+      "listingDate": "Apr 17, 1958"
+    },
+    {
+      "symbol": "PMPC",
+      "name": "Panasonic Manufacturing Philippines Corporation",
+      "exchange": "PSE",
+      "sector": "Industrial",
+      "industry": "Electrical Components & Equipment",
+      "marketCap": 3120,
+      "listingDate": "Jan 21, 1983"
+    },
+    {
+      "symbol": "PNB",
+      "name": "Philippine National Bank",
+      "exchange": "PSE",
+      "sector": "Financials",
+      "industry": "Banks",
+      "marketCap": 101010,
+      "listingDate": "Jun 21, 1989"
+    },
+    {
+      "symbol": "PNC",
+      "name": "Philippine National Construction Corporation",
+      "exchange": "PSE",
+      "sector": "Industrial",
+      "industry": "Construction, Infra. & Allied Services",
+      "marketCap": null,
+      "listingDate": "Mar 13, 1974"
+    },
+    {
+      "symbol": "PNX",
+      "name": "Phoenix Petroleum Philippines, Inc.",
+      "exchange": "PSE",
+      "sector": "Industrial",
+      "industry": "Electricity, Energy, Power & Water",
+      "marketCap": 6010,
+      "listingDate": "Jul 11, 2007"
+    },
+    {
+      "symbol": "PORT",
+      "name": "Globalport 900, Inc.",
+      "exchange": "PSE",
+      "sector": "Services",
+      "industry": "Transportation Services",
+      "marketCap": null,
+      "listingDate": "Jun 09, 1948"
+    },
+    {
+      "symbol": "PPC",
+      "name": "Pryce Corporation",
+      "exchange": "PSE",
+      "sector": "Industrial",
+      "industry": "Electricity, Energy, Power & Water",
+      "marketCap": 28580,
+      "listingDate": "Oct 29, 1991"
+    },
+    {
+      "symbol": "PRC",
+      "name": "Philippine Racing Club, Inc.",
+      "exchange": "PSE",
+      "sector": "Property",
+      "industry": "Property",
+      "marketCap": 2740,
+      "listingDate": "Mar 02, 1952"
+    },
+    {
+      "symbol": "PREIT",
+      "name": "Premiere Island Power REIT Corporation",
+      "exchange": "PSE",
+      "sector": "Property",
+      "industry": "Property",
+      "marketCap": 3490,
+      "listingDate": "Dec 15, 2022"
+    },
+    {
+      "symbol": "PRIM",
+      "name": "Prime Media Holdings, Inc.",
+      "exchange": "PSE",
+      "sector": "Holding Firms",
+      "industry": "Holding Firms",
+      "marketCap": 1030,
+      "listingDate": "Jul 29, 1964"
+    },
+    {
+      "symbol": "PRMX",
+      "name": "Primex Corporation",
+      "exchange": "PSE",
+      "sector": "Property",
+      "industry": "Property",
+      "marketCap": 2280,
+      "listingDate": "Aug 10, 2001"
+    },
+    {
+      "symbol": "PSB",
+      "name": "Philippine Savings Bank",
+      "exchange": "PSE",
+      "sector": "Financials",
+      "industry": "Banks",
+      "marketCap": 22470,
+      "listingDate": "Oct 10, 1994"
+    },
+    {
+      "symbol": "PSE",
+      "name": "The Philippine Stock Exchange, Inc.",
+      "exchange": "PSE",
+      "sector": "Financials",
+      "industry": "Other Financial Institutions",
+      "marketCap": 16970,
+      "listingDate": "Dec 15, 2003"
+    },
+    {
+      "symbol": "PTC",
+      "name": "Philippine Trust Company",
+      "exchange": "PSE",
+      "sector": "Financials",
+      "industry": "Banks",
+      "marketCap": 90000,
+      "listingDate": "Feb 17, 1988"
+    },
+    {
+      "symbol": "PTT",
+      "name": "PT&T Corp.",
+      "exchange": "PSE",
+      "sector": "Services",
+      "industry": "Telecommunications",
+      "marketCap": null,
+      "listingDate": "Jan 10, 1990"
+    },
+    {
+      "symbol": "PX",
+      "name": "Philex Mining Corporation",
+      "exchange": "PSE",
+      "sector": "Mining and Oil",
+      "industry": "Mining",
+      "marketCap": 61870,
+      "listingDate": "Nov 23, 1956"
+    },
+    {
+      "symbol": "PXP",
+      "name": "PXP Energy Corporation",
+      "exchange": "PSE",
+      "sector": "Mining and Oil",
+      "industry": "Oil",
+      "marketCap": 7000,
+      "listingDate": "Sep 12, 2011"
+    },
+    {
+      "symbol": "RCB",
+      "name": "Rizal Commercial Banking Corporation",
+      "exchange": "PSE",
+      "sector": "Financials",
+      "industry": "Banks",
+      "marketCap": 55290,
+      "listingDate": "Nov 06, 1986"
+    },
+    {
+      "symbol": "RCI",
+      "name": "Roxas and Company, Inc.",
+      "exchange": "PSE",
+      "sector": "Industrial",
+      "industry": "Food, Beverage & Tobacco",
+      "marketCap": 6950,
+      "listingDate": "Nov 29, 1948"
+    },
+    {
+      "symbol": "RCR",
+      "name": "RL Commercial REIT, Inc.",
+      "exchange": "PSE",
+      "sector": "Property",
+      "industry": "Property",
+      "marketCap": 141530,
+      "listingDate": "Sep 14, 2021"
+    },
+    {
+      "symbol": "REDC",
+      "name": "Repower Energy Development Corporation",
+      "exchange": "PSE",
+      "sector": "Industrial",
+      "industry": "Electricity, Energy, Power & Water",
+      "marketCap": 6370,
+      "listingDate": "Jul 24, 2023"
+    },
+    {
+      "symbol": "REG",
+      "name": "Republic Glass Holdings Corporation",
+      "exchange": "PSE",
+      "sector": "Holding Firms",
+      "industry": "Holding Firms",
+      "marketCap": 2140,
+      "listingDate": "Jul 17, 1959"
+    },
+    {
+      "symbol": "RFM",
+      "name": "RFM Corporation",
+      "exchange": "PSE",
+      "sector": "Industrial",
+      "industry": "Food, Beverage & Tobacco",
+      "marketCap": 17890,
+      "listingDate": "Feb 21, 1966"
+    },
+    {
+      "symbol": "RLC",
+      "name": "Robinsons Land Corporation",
+      "exchange": "PSE",
+      "sector": "Property",
+      "industry": "Property",
+      "marketCap": 84470,
+      "listingDate": "Oct 16, 1989"
+    },
+    {
+      "symbol": "RLT",
+      "name": "Philippine Realty and Holdings Corporation",
+      "exchange": "PSE",
+      "sector": "Property",
+      "industry": "Property",
+      "marketCap": 910.01,
+      "listingDate": "Sep 07, 1987"
+    },
+    {
+      "symbol": "ROCK",
+      "name": "Rockwell Land Corporation",
+      "exchange": "PSE",
+      "sector": "Property",
+      "industry": "Property",
+      "marketCap": 18350,
+      "listingDate": "May 11, 2012"
+    },
+    {
+      "symbol": "ROX",
+      "name": "Roxas Holdings,  Inc.",
+      "exchange": "PSE",
+      "sector": "Industrial",
+      "industry": "Food, Beverage & Tobacco",
+      "marketCap": 2240,
+      "listingDate": "Aug 08, 1996"
+    },
+    {
+      "symbol": "RRHI",
+      "name": "Robinsons Retail Holdings, Inc.",
+      "exchange": "PSE",
+      "sector": "Services",
+      "industry": "Retail",
+      "marketCap": 40490,
+      "listingDate": "Nov 11, 2013"
+    },
+    {
+      "symbol": "SBS",
+      "name": "SBS Philippines Corporation",
+      "exchange": "PSE",
+      "sector": "Services",
+      "industry": "Other Services",
+      "marketCap": 6110,
+      "listingDate": "Aug 10, 2015"
+    },
+    {
+      "symbol": "SCC",
+      "name": "Semirara Mining and Power Corporation",
+      "exchange": "PSE",
+      "sector": "Industrial",
+      "industry": "Electricity, Energy, Power and Water",
+      "marketCap": 77100,
+      "listingDate": "Nov 28, 1983"
+    },
+    {
+      "symbol": "SECB",
+      "name": "Security Bank Corporation",
+      "exchange": "PSE",
+      "sector": "Financials",
+      "industry": "Banks",
+      "marketCap": 50490,
+      "listingDate": "Jun 08, 1995"
+    },
+    {
+      "symbol": "SEVN",
+      "name": "Philippine Seven Corporation",
+      "exchange": "PSE",
+      "sector": "Services",
+      "industry": "Retail",
+      "marketCap": 52040,
+      "listingDate": "Feb 04, 1998"
+    },
+    {
+      "symbol": "SFI",
+      "name": "Swift Foods, Inc.",
+      "exchange": "PSE",
+      "sector": "Industrial",
+      "industry": "Food, Beverage & Tobacco",
+      "marketCap": 101.83,
+      "listingDate": "Nov 15, 1994"
+    },
+    {
+      "symbol": "SGI",
+      "name": "Solid Group, Inc.",
+      "exchange": "PSE",
+      "sector": "Holding Firms",
+      "industry": "Holding Firms",
+      "marketCap": 2170,
+      "listingDate": "Apr 26, 1948"
+    },
+    {
+      "symbol": "SGP",
+      "name": "Synergy Grid & Development Phils., Inc.",
+      "exchange": "PSE",
+      "sector": "Industrial",
+      "industry": "Electricity, Energy, Power & Water",
+      "marketCap": 152180,
+      "listingDate": "May 10, 1972"
+    },
+    {
+      "symbol": "SHLPH",
+      "name": "Shell Pilipinas Corporation",
+      "exchange": "PSE",
+      "sector": "Industrial",
+      "industry": "Electricity, Energy, Power & Water",
+      "marketCap": 13590,
+      "listingDate": "Nov 03, 2016"
+    },
+    {
+      "symbol": "SHNG",
+      "name": "Shang Properties, Inc.",
+      "exchange": "PSE",
+      "sector": "Property",
+      "industry": "Property",
+      "marketCap": 15480,
+      "listingDate": "Jun 13, 1991"
+    },
+    {
+      "symbol": "SLF",
+      "name": "Sun Life Financial Inc.",
+      "exchange": "PSE",
+      "sector": "Financials",
+      "industry": "Other Financial Institutions",
+      "marketCap": null,
+      "listingDate": "Mar 24, 2000"
+    },
+    {
+      "symbol": "SLI",
+      "name": "Sta. Lucia Land, Inc.",
+      "exchange": "PSE",
+      "sector": "Property",
+      "industry": "Property",
+      "marketCap": 15600,
+      "listingDate": "Sep 14, 1987"
+    },
+    {
+      "symbol": "SM",
+      "name": "SM Investments Corporation",
+      "exchange": "PSE",
+      "sector": "Holding Firms",
+      "industry": "Holding Firms",
+      "marketCap": 690100,
+      "listingDate": "Mar 22, 2005"
+    },
+    {
+      "symbol": "SMC",
+      "name": "San Miguel Corporation",
+      "exchange": "PSE",
+      "sector": "Holding Firms",
+      "industry": "Holding Firms",
+      "marketCap": 156860,
+      "listingDate": "Nov 05, 1948"
+    },
+    {
+      "symbol": "SMPH",
+      "name": "SM Prime Holdings, Inc.",
+      "exchange": "PSE",
+      "sector": "Property",
+      "industry": "Property",
+      "marketCap": 524120,
+      "listingDate": "Jul 05, 1994"
+    },
+    {
+      "symbol": "SOC",
+      "name": "SOCResources, Inc.",
+      "exchange": "PSE",
+      "sector": "Property",
+      "industry": "Property",
+      "marketCap": 188.5,
+      "listingDate": "Jan 05, 1994"
+    },
+    {
+      "symbol": "SPC",
+      "name": "SPC Power Corporation",
+      "exchange": "PSE",
+      "sector": "Industrial",
+      "industry": "Electricity, Energy, Power & Water",
+      "marketCap": 14440,
+      "listingDate": "Apr 02, 2002"
+    },
+    {
+      "symbol": "SPM",
+      "name": "Seafront Resources Corporation",
+      "exchange": "PSE",
+      "sector": "Holding Firms",
+      "industry": "Holding Firms",
+      "marketCap": 266.15,
+      "listingDate": "May 07, 1974"
+    },
+    {
+      "symbol": "SPNEC",
+      "name": "SP New Energy Corporation",
+      "exchange": "PSE",
+      "sector": "Industrial",
+      "industry": "Electricity, Energy, Power & Water",
+      "marketCap": 59090,
+      "listingDate": "Dec 17, 2021"
+    },
+    {
+      "symbol": "SRDC",
+      "name": "Supercity Realty Development Corporation",
+      "exchange": "PSE",
+      "sector": "Industrial",
+      "industry": "Construction, Infra. & Allied Services",
+      "marketCap": 880,
+      "listingDate": "Dec 19, 2003"
+    },
+    {
+      "symbol": "SSI",
+      "name": "SSI Group, Inc.",
+      "exchange": "PSE",
+      "sector": "Services",
+      "industry": "Retail",
+      "marketCap": 6700,
+      "listingDate": "Nov 07, 2014"
+    },
+    {
+      "symbol": "STI",
+      "name": "STI Education Systems Holdings, Inc.",
+      "exchange": "PSE",
+      "sector": "Services",
+      "industry": "Education",
+      "marketCap": 12590,
+      "listingDate": "Oct 12, 1976"
+    },
+    {
+      "symbol": "STN",
+      "name": "Steniel Manufacturing Corporation",
+      "exchange": "PSE",
+      "sector": "Industrial",
+      "industry": "Other Industrials",
+      "marketCap": 3150,
+      "listingDate": "Nov 22, 1993"
+    },
+    {
+      "symbol": "STR",
+      "name": "Vistamalls, Inc.",
+      "exchange": "PSE",
+      "sector": "Property",
+      "industry": "Property",
+      "marketCap": 8590,
+      "listingDate": "Nov 17, 1970"
+    },
+    {
+      "symbol": "SUN",
+      "name": "Suntrust Resort Holdings, Inc.",
+      "exchange": "PSE",
+      "sector": "Property",
+      "industry": "Property",
+      "marketCap": 2940,
+      "listingDate": "Feb 11, 1959"
+    },
+    {
+      "symbol": "T",
+      "name": "TKC Metals Corporation",
+      "exchange": "PSE",
+      "sector": "Industrial",
+      "industry": "Construction, Infra. & Allied Services",
+      "marketCap": 507,
+      "listingDate": "Jul 20, 2001"
+    },
+    {
+      "symbol": "TBGI",
+      "name": "Transpacific Broadband Group Int`l. Inc.",
+      "exchange": "PSE",
+      "sector": "Services",
+      "industry": "Information Technology",
+      "marketCap": 455.47,
+      "listingDate": "Dec 12, 2003"
+    },
+    {
+      "symbol": "TECH",
+      "name": "Cirtek Holdings Philippines Corporation",
+      "exchange": "PSE",
+      "sector": "Industrial",
+      "industry": "Electrical Components & Equipment",
+      "marketCap": 976.02,
+      "listingDate": "Nov 18, 2011"
+    },
+    {
+      "symbol": "TEL",
+      "name": "PLDT Inc.",
+      "exchange": "PSE",
+      "sector": "Services",
+      "industry": "Telecommunications",
+      "marketCap": 258830,
+      "listingDate": "Sep 17, 1953"
+    },
+    {
+      "symbol": "TFC",
+      "name": "PTFC Redevelopment Corporation",
+      "exchange": "PSE",
+      "sector": "Property",
+      "industry": "Property",
+      "marketCap": 1750,
+      "listingDate": "Dec 19, 1955"
+    },
+    {
+      "symbol": "TFHI",
+      "name": "Top Frontier Investment Holdings, Inc.",
+      "exchange": "PSE",
+      "sector": "Holding Firms",
+      "industry": "Holding Firms",
+      "marketCap": 20410,
+      "listingDate": "Jan 13, 2014"
+    },
+    {
+      "symbol": "TOP",
+      "name": "Top Line Business Development Corp.",
+      "exchange": "PSE",
+      "sector": "Industrial",
+      "industry": "Electricity, Energy, Power and Water",
+      "marketCap": 19340,
+      "listingDate": "Apr 08, 2025"
+    },
+    {
+      "symbol": "TUBIG",
+      "name": "Tubig Pilipinas Holdings Inc.",
+      "exchange": "PSE",
+      "sector": "Mining and Oil",
+      "industry": "Mining",
+      "marketCap": null,
+      "listingDate": "Oct 23, 2012"
+    },
+    {
+      "symbol": "TUGS",
+      "name": "Harbor Star Shipping Services, Inc.",
+      "exchange": "PSE",
+      "sector": "Services",
+      "industry": "Transportation Services",
+      "marketCap": 1280,
+      "listingDate": "Oct 30, 2013"
+    },
+    {
+      "symbol": "UBP",
+      "name": "Union Bank of the Philippines",
+      "exchange": "PSE",
+      "sector": "Financials",
+      "industry": "Banks",
+      "marketCap": 81580,
+      "listingDate": "Jun 29, 1992"
+    },
+    {
+      "symbol": "UNH",
+      "name": "Uniholdings Inc.",
+      "exchange": "PSE",
+      "sector": "Property",
+      "industry": "Property",
+      "marketCap": 8340,
+      "listingDate": "Nov 21, 1985"
+    },
+    {
+      "symbol": "UPM",
+      "name": "United Paragon Mining Corporation",
+      "exchange": "PSE",
+      "sector": "Mining and Oil",
+      "industry": "Mining",
+      "marketCap": 1940,
+      "listingDate": "Aug 31, 1972"
+    },
+    {
+      "symbol": "UPSON",
+      "name": "Upson International Corp.",
+      "exchange": "PSE",
+      "sector": "Services",
+      "industry": "Retail",
+      "marketCap": 2440,
+      "listingDate": "Apr 03, 2023"
+    },
+    {
+      "symbol": "URC",
+      "name": "Universal Robina Corporation",
+      "exchange": "PSE",
+      "sector": "Industrial",
+      "industry": "Food, Beverage & Tobacco",
+      "marketCap": 135020,
+      "listingDate": "Mar 25, 1994"
+    },
+    {
+      "symbol": "V",
+      "name": "Vantage Equities, Inc.",
+      "exchange": "PSE",
+      "sector": "Financials",
+      "industry": "Other Financial Institutions",
+      "marketCap": 3360,
+      "listingDate": "Mar 30, 1993"
+    },
+    {
+      "symbol": "VITA",
+      "name": "Vitarich Corporation",
+      "exchange": "PSE",
+      "sector": "Industrial",
+      "industry": "Food, Beverage & Tobacco",
+      "marketCap": 1560,
+      "listingDate": "Feb 08, 1995"
+    },
+    {
+      "symbol": "VLC",
+      "name": "Villar Land Holdings Corp.",
+      "exchange": "PSE",
+      "sector": "Property",
+      "industry": "Property",
+      "marketCap": 288560,
+      "listingDate": "Jun 29, 2016"
+    },
+    {
+      "symbol": "VLL",
+      "name": "Vista Land & Lifescapes, Inc.",
+      "exchange": "PSE",
+      "sector": "Property",
+      "industry": "Property",
+      "marketCap": 12190,
+      "listingDate": "Jun 25, 2007"
+    },
+    {
+      "symbol": "VMC",
+      "name": "Victorias Milling Company, Inc.",
+      "exchange": "PSE",
+      "sector": "Industrial",
+      "industry": "Food, Beverage & Tobacco",
+      "marketCap": 10580,
+      "listingDate": "Nov 15, 1993"
+    },
+    {
+      "symbol": "VREIT",
+      "name": "VistaREIT, Inc.",
+      "exchange": "PSE",
+      "sector": "Property",
+      "industry": "Property",
+      "marketCap": 9830,
+      "listingDate": "Jun 15, 2022"
+    },
+    {
+      "symbol": "VVT",
+      "name": "Vivant Corporation",
+      "exchange": "PSE",
+      "sector": "Industrial",
+      "industry": "Electricity, Energy, Power & Water",
+      "marketCap": 21130,
+      "listingDate": "Jun 23, 1994"
+    },
+    {
+      "symbol": "WEB",
+      "name": "PhilWeb Corporation",
+      "exchange": "PSE",
+      "sector": "Services",
+      "industry": "Casinos & Gaming",
+      "marketCap": 18030,
+      "listingDate": "Dec 08, 1969"
+    },
+    {
+      "symbol": "WIN",
+      "name": "Wellex Industries, Incorporated",
+      "exchange": "PSE",
+      "sector": "Property",
+      "industry": "Property",
+      "marketCap": 933.67,
+      "listingDate": "Jan 09, 1958"
+    },
+    {
+      "symbol": "WLCON",
+      "name": "Wilcon Depot, Inc.",
+      "exchange": "PSE",
+      "sector": "Services",
+      "industry": "Retail",
+      "marketCap": 24600,
+      "listingDate": "Mar 31, 2017"
+    },
+    {
+      "symbol": "WPI",
+      "name": "Waterfront Philippines, Incorporated",
+      "exchange": "PSE",
+      "sector": "Services",
+      "industry": "Hotel & Leisure",
+      "marketCap": 987.1,
+      "listingDate": "Mar 17, 1995"
+    },
+    {
+      "symbol": "X",
+      "name": "Xurpas Inc.",
+      "exchange": "PSE",
+      "sector": "Small, Medium & Emerging Board",
+      "industry": "Small, Medium & Emerging Board",
+      "marketCap": 507.75,
+      "listingDate": "Dec 02, 2014"
+    },
+    {
+      "symbol": "XG",
+      "name": "NexGen Energy Corp.",
+      "exchange": "PSE",
+      "sector": "Small, Medium & Emerging Board",
+      "industry": "Small, Medium & Emerging Board",
+      "marketCap": 4020,
+      "listingDate": "Jul 16, 2024"
+    },
+    {
+      "symbol": "ZHI",
+      "name": "Zeus Holdings, Inc.",
+      "exchange": "PSE",
+      "sector": "Holding Firms",
+      "industry": "Holding Firms",
+      "marketCap": 197.07,
+      "listingDate": "Jul 15, 1991"
+    }
+  ]
+}

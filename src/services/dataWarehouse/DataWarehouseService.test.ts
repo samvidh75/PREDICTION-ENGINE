@@ -31,16 +31,37 @@ describe('DataWarehouseService', () => {
     expect((result.rows[0][0] as Record<string, unknown>).symbol).toBe('BDO');
   });
 
-  it('screener filters on real factor scores within their documented 0-100 range', () => {
+  // This previously asserted the screener returned rows for `quality_score >= 50`
+  // and called them "real factor scores". They were not real: every entry in the
+  // bundled universe carried a hardcoded 50, so the filter matched the entire
+  // universe and every result ranked identically. The generator now omits the
+  // scores object entirely rather than emit a placeholder, so the honest
+  // contract is that factor filters match nothing until a real scoring pipeline
+  // exists — and, crucially, never match on a fabricated value.
+  it('screener never returns a fabricated factor score', () => {
     const result = service.runScreener([
-      { dimension: 'quality_score', operator: 'gte', value: 50 },
+      { dimension: 'quality_score', operator: 'gte', value: 0 },
     ], 'quality_score', 10);
-    expect(result.rows.length).toBeGreaterThan(0);
+
     for (const row of result.rows) {
-      const qualityScore = (row[0] as Record<string, unknown>).quality_score as number;
-      expect(qualityScore).toBeGreaterThanOrEqual(50);
-      expect(qualityScore).toBeLessThanOrEqual(100);
+      const qualityScore = (row[0] as Record<string, unknown>).quality_score;
+      // Any row that does come back must carry a genuine 0-100 score.
+      expect(typeof qualityScore).toBe('number');
+      expect(qualityScore as number).toBeGreaterThanOrEqual(0);
+      expect(qualityScore as number).toBeLessThanOrEqual(100);
     }
+  });
+
+  it('exposes market cap and sector as real, populated values', () => {
+    const result = service.runScreener([
+      { dimension: 'symbol', operator: 'eq', value: 'BDO' },
+    ], 'market_cap', 1);
+    expect(result.rows.length).toBe(1);
+
+    const row = result.rows[0][0] as Record<string, unknown>;
+    expect(row.sector).toBe('Financials');
+    // Real market cap in millions PHP — not the 0 the universe used to carry.
+    expect(row.market_cap as number).toBeGreaterThan(0);
   });
 
   it('only advertises metrics/dimensions that are actually real (no fabricated P/E or ROE)', () => {

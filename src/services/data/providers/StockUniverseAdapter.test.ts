@@ -45,10 +45,25 @@ describe('StockUniverseAdapter', () => {
     }
   });
 
-  it('maps zero marketCap to Micro Cap', async () => {
+  // This previously asserted BDO was a "Micro Cap" — true only because every
+  // entry in the bundled universe carried marketCap: 0. The universe now
+  // carries real figures (BDO ≈ ₱651bn, from data/pse-market-cap.json), so the
+  // largest bank in the Philippines categorises as Large Cap.
+  it('derives a market cap category from the real market cap', async () => {
     const result = await adapter.getCompanyMaster('BDO');
     expect(result.ok).toBe(true);
-    if (result.ok) expect(result.data.marketCapCategory).toBe('Micro Cap');
+    if (result.ok) expect(result.data.marketCapCategory).toBe('Large Cap');
+  });
+
+  it('leaves the category null when no market cap could be sourced', async () => {
+    const entry = adapter.getAllEntries().find((e) => e.marketCap === null);
+    // Not every scrape resolves all 282 names; if one is missing, it must
+    // degrade to null rather than being bucketed as a real micro cap.
+    if (entry) {
+      const result = await adapter.getCompanyMaster(entry.symbol);
+      expect(result.ok).toBe(true);
+      if (result.ok) expect(result.data.marketCapCategory).toBeNull();
+    }
   });
 
   // ── Normalization ──────────────────────────────────────────────────────────

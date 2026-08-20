@@ -5,7 +5,19 @@
  */
 
 import axios, { AxiosInstance } from 'axios';
+import type { StockQuote } from '../data/types';
 
+/**
+ * A single stock as phisix-api3 actually returns it. Verified live against
+ * https://phisix-api3.appspot.com/stocks/BDO.json (2026-08-20):
+ *
+ *   {"stocks":[{"name":"BDO Unibank, Inc.","price":{"currency":"PHP","amount":122.70},
+ *     "percentChange":0.49,"volume":2701960,"symbol":"BDO"}],
+ *    "as_of":"2026-08-20T00:00:00+08:00"}
+ *
+ * The previous shape declared here (`percent_change`, plus high/low/open/
+ * previous_close) did not match the endpoint — those fields are not returned.
+ */
 export interface PhisixStock {
   symbol: string;
   name: string;
@@ -13,16 +25,13 @@ export interface PhisixStock {
     amount: number;
     currency: string;
   };
-  percent_change: number;
+  percentChange: number;
   volume: number;
-  high: number;
-  low: number;
-  open: number;
-  previous_close: number;
 }
 
 export interface PhisixResponse {
-  stock: PhisixStock[];
+  /** The API returns `stocks` (plural). Reading `stock` yields undefined. */
+  stocks: PhisixStock[];
   as_of: string;
 }
 
@@ -39,12 +48,63 @@ export class PhisixProvider {
 
   async getStocks(): Promise<PhisixStock[]> {
     const { data } = await this.client.get<PhisixResponse>('/stocks.json');
-    return data.stock;
+    return data.stocks ?? [];
   }
 
   async getStock(symbol: string): Promise<PhisixStock | null> {
-    const { data } = await this.client.get<PhisixResponse>(`/stocks/${symbol}.json`);
-    return data.stock[0] || null;
+    const { data } = await this.client.get<PhisixResponse>(
+      `/stocks/${encodeURIComponent(symbol.toUpperCase())}.json`,
+    );
+    return data.stocks?.[0] ?? null;
+  }
+
+  /**
+   * Quote for a single PSE symbol.
+   *
+   * ProviderCoordinator.getQuote() invokes `provider.getQuote(symbol)` on every
+   * registered price provider, and Phisix is the first one in that chain. This
+   * method did not exist, so the call threw "p.getQuote is not a function" for
+   * every symbol; the chain then fell through to Yahoo, whose `.PS` suffix
+   * resolves PSE tickers to dead mutual-fund records with a null price, and
+   * finally to data/pse-live-prices.json, which is empty. The result was a 503
+   * from stockHandler for every stock detail page.
+   *
+   * PriceProvider is a bare stub class with no instance members, so structural
+   * typing accepted a provider missing this method and the compiler never
+   * flagged it.
+   */
+  async getQuote(symbol: string): Promise<StockQuote> {
+    // Fetched inline rather than via getStock() so the response's `as_of`
+    // market timestamp is available for the freshness fields below.
+    const { data } = await this.client.get<PhisixResponse>(
+      `/stocks/${encodeURIComponent(symbol.toUpperCase())}.json`,
+    );
+    const stock = data.stocks?.[0];
+    if (!stock || typeof stock.price?.amount !== 'number') {
+      throw new Error(`Phisix has no quote for ${symbol}`);
+    }
+
+    const price = stock.price.amount;
+    const changePercent = stock.percentChange ?? 0;
+    // Phisix exposes only the percentage, so derive the absolute move from it.
+    const previousClose = changePercent === -100 ? price : price / (1 + changePercent / 100);
+    const change = Math.round((price - previousClose) * 10000) / 10000;
+
+    return {
+      symbol: stock.symbol,
+      exchange: 'PSE',
+      price,
+      change,
+      changePercent,
+      volume: stock.volume,
+      updatedAt: data.as_of,
+      asOf: data.as_of ?? null,
+      retrievedAt: new Date().toISOString(),
+      source: 'provider',
+      // Phisix publishes an end-of-day snapshot, not a live intraday tick.
+      freshness: 'delayed',
+      delayed: true,
+    };
   }
 
   async getAllPrices(): Promise<Map<string, number>> {

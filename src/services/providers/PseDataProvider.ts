@@ -4,7 +4,7 @@
  */
 
 import axios from 'axios';
-import { PhisixProvider } from './PhisixProvider';
+import { PhisixProvider, type PhisixStock } from './PhisixProvider';
 
 export interface PseQuote {
   symbol: string;
@@ -91,42 +91,43 @@ export class PseDataProvider {
     };
   }
 
-  private async getPhisixQuote(symbol: string): Promise<PseQuote> {
-    const stock = await this.phisix.getStock(symbol);
-    if (!stock) throw new Error(`${symbol} not found in PHISIX`);
+  /**
+   * Map a Phisix stock to a PseQuote.
+   *
+   * Phisix returns only symbol/name/price/percentChange/volume. This mapping
+   * previously read `previous_close`, `high`, `low` and `open` off the response
+   * — fields the endpoint has never returned — so `change` evaluated to
+   * `price - undefined` (NaN) and the OHLC fields were all undefined. The
+   * absolute change is now derived from the percentage, and the fields Phisix
+   * does not publish are left off rather than emitted as undefined/NaN.
+   */
+  private toPseQuote(stock: PhisixStock): PseQuote {
+    const price = stock.price.amount;
+    const changePercent = stock.percentChange ?? 0;
+    const previousClose = changePercent === -100 ? price : price / (1 + changePercent / 100);
 
     return {
       symbol: stock.symbol,
       name: stock.name,
-      price: stock.price.amount,
-      change: stock.price.amount - stock.previous_close,
-      changePercent: stock.percent_change,
+      price,
+      change: Math.round((price - previousClose) * 10000) / 10000,
+      changePercent,
       volume: stock.volume,
-      high: stock.high,
-      low: stock.low,
-      open: stock.open,
-      previousClose: stock.previous_close,
+      previousClose: Math.round(previousClose * 10000) / 10000,
       timestamp: new Date().toISOString(),
       source: 'phisix',
     };
   }
 
+  private async getPhisixQuote(symbol: string): Promise<PseQuote> {
+    const stock = await this.phisix.getStock(symbol);
+    if (!stock) throw new Error(`${symbol} not found in PHISIX`);
+    return this.toPseQuote(stock);
+  }
+
   async getPseStocks(): Promise<PseQuote[]> {
     const stocks = await this.phisix.getStocks();
-    return stocks.map(s => ({
-      symbol: s.symbol,
-      name: s.name,
-      price: s.price.amount,
-      change: s.price.amount - s.previous_close,
-      changePercent: s.percent_change,
-      volume: s.volume,
-      high: s.high,
-      low: s.low,
-      open: s.open,
-      previousClose: s.previous_close,
-      timestamp: new Date().toISOString(),
-      source: 'phisix',
-    }));
+    return stocks.map(s => this.toPseQuote(s));
   }
 
   get name(): string {
