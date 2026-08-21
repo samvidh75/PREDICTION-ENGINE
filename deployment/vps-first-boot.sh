@@ -20,6 +20,9 @@ if [ "$(id -u)" -ne 0 ]; then
   exit 1
 fi
 
+# Note: this tees the freshly generated passwords into a local log file on
+# the VPS itself. That's a much smaller exposure than the git-committed
+# password this replaces, but delete/rotate after use if this box is shared.
 exec > >(tee -a /var/log/stockex-first-boot.log) 2>&1
 echo "[$(date)] Starting StockEX first-boot setup..."
 
@@ -36,18 +39,26 @@ systemctl enable sshd 2>/dev/null || systemctl enable ssh 2>/dev/null || true
 systemctl restart sshd 2>/dev/null || systemctl restart ssh 2>/dev/null || true
 echo "✅ SSH enabled on port 22"
 
-# ── 2. Fix root password (set known one) ─────────────────────────────
+# ── 2. Fix root password ──────────────────────────────────────────────
+# A hardcoded password lived here previously and was committed to this
+# repo's public git history for 19 days — treat that value as permanently
+# compromised, never reintroduce it. This script now generates a fresh
+# random password per run (or takes one via VPS_ROOT_PASSWORD) and prints
+# it once, so re-running this script can never silently reset the server
+# back to a known/leaked value.
 echo ""
 echo "━━━ [2/10] Setting root password ━━━"
-echo "root:H0uPCooqdObR705" | chpasswd
-echo "✅ Root password set"
+ROOT_PASSWORD="${VPS_ROOT_PASSWORD:-$(openssl rand -base64 24)}"
+echo "root:${ROOT_PASSWORD}" | chpasswd
+echo "✅ Root password set (generated fresh this run — see summary below)"
 
 # ── 3. Create ubuntu user ────────────────────────────────────────────
 echo ""
 echo "━━━ [3/10] Creating ubuntu user ━━━"
 if ! id "ubuntu" &>/dev/null; then
   useradd -m -s /bin/bash -G sudo ubuntu 2>/dev/null || true
-  echo "ubuntu:H0uPCooqdObR705" | chpasswd
+  UBUNTU_PASSWORD="${VPS_UBUNTU_PASSWORD:-$(openssl rand -base64 24)}"
+  echo "ubuntu:${UBUNTU_PASSWORD}" | chpasswd
   echo "ubuntu ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/ubuntu
   echo "✅ ubuntu user created"
 else
@@ -165,7 +176,10 @@ echo "╠═══════════════════════�
 echo "║  SSH:   ssh root@${IP}                                      "
 echo "║  Host:  ${IP}                                               "
 echo "║  User:  root / ubuntu                                       "
-echo "║  Pass:  H0uPCooqdObR705                                     "
+echo "║  Pass:  ${ROOT_PASSWORD}                                    "
+echo "║         (generated this run — copy it now, it is not stored "
+echo "║          anywhere; rotate again if this console session is  "
+echo "║          shared or logged)                                  "
 echo "║                                                              "
 echo "║  NEXT STEPS (from your terminal):                           "
 echo "║                                                              "

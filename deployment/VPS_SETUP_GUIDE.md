@@ -2,7 +2,11 @@
 
 > **VPS:** Webyne Gold Linux VPS 2 (4 CPU, 8GB RAM, 100GB SSD)
 > **IP:** 103.211.56.127
-> **Credentials:** root / H0uPCooqdObR705
+> **Credentials:** get these from the Webyne client area (client.webyne.com)
+> or your password manager — never hardcode them here. A previous version of
+> this file had the root password in plaintext; that value was committed to
+> this repo's public git history for 19 days and must be treated as
+> permanently compromised. If you haven't rotated it since, do that first.
 
 ---
 
@@ -15,8 +19,11 @@ If `ssh root@103.211.56.127` doesn't work, the VPS needs initial provisioning:
 1. **Log into** [Webyne Client Area](https://client.webyne.com)
 2. Navigate to **Services → Your VPS**
 3. Click **Console** (or VNC/NoVNC) to open the browser-based terminal
-4. Log in with: `root` / `H0uPCooqdObR705`
-5. **Run the first-boot script:**
+4. Log in with the current root credentials from the Webyne client area
+5. **Run the first-boot script** — it now generates a fresh root/ubuntu
+   password on each run and prints it once at the end (see
+   `deployment/vps-first-boot.sh`); copy it from the console output, it is
+   not stored anywhere:
 
 ```bash
 # Option A: If the deployment files exist
