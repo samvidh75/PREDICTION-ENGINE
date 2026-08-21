@@ -89,7 +89,11 @@ export async function fetchMarketCap(symbol: string): Promise<MarketCapRecord | 
   }
 
   const html = await response.text();
-  const match = /Market Cap<\/a>.*?class="[^"]*">([^<]+)/s.exec(html);
+  // Two markup variants exist for the label cell: linked ("Market Cap</a>…")
+  // on most quotes, and unlinked ("Market Cap<!--]--></td>…") on others such
+  // as SLF. Anchoring on the *next table cell* after the label handles both;
+  // the earlier `Market Cap<\/a>` form silently missed the unlinked variant.
+  const match = /Market Cap.*?<td[^>]*>\s*([^<\s][^<]*)/s.exec(html);
   if (!match) return null;
 
   const raw = match[1].trim();

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-20T10:32:55.312Z",
+  "generatedAt": "2026-08-21T08:59:32.884Z",
   "totalUniverse": 282,
   "sources": [
     "data/pse-sectors.json (edge.pse.com.ph company directory)",
@@ -22,7 +22,7 @@
       "exchange": "PSE",
       "sector": "Mining and Oil",
       "industry": "Mining",
-      "marketCap": 5120,
+      "marketCap": 5060,
       "listingDate": "Jan 08, 1948"
     },
     {
@@ -31,7 +31,7 @@
       "exchange": "PSE",
       "sector": "Holding Firms",
       "industry": "Holding Firms",
-      "marketCap": 1490,
+      "marketCap": 1530,
       "listingDate": "Oct 28, 1987"
     },
     {
@@ -40,7 +40,7 @@
       "exchange": "PSE",
       "sector": "Holding Firms",
       "industry": "Holding Firms",
-      "marketCap": 15990,
+      "marketCap": 16020,
       "listingDate": "Jul 10, 1979"
     },
     {
@@ -49,7 +49,7 @@
       "exchange": "PSE",
       "sector": "Services",
       "industry": "Media",
-      "marketCap": 3340,
+      "marketCap": 3480,
       "listingDate": "Jul 08, 1992"
     },
     {
@@ -58,7 +58,7 @@
       "exchange": "PSE",
       "sector": "Services",
       "industry": "Media",
-      "marketCap": 318.38,
+      "marketCap": 323.91,
       "listingDate": "Oct 07, 1999"
     },
     {
@@ -67,7 +67,7 @@
       "exchange": "PSE",
       "sector": "Holding Firms",
       "industry": "Holding Firms",
-      "marketCap": 311140,
+      "marketCap": 315790,
       "listingDate": "Nov 08, 1976"
     },
     {
@@ -85,7 +85,7 @@
       "exchange": "PSE",
       "sector": "Industrial",
       "industry": "Electricity, Energy, Power & Water",
-      "marketCap": 119850,
+      "marketCap": 117860,
       "listingDate": "Jan 05, 1970"
     },
     {
@@ -94,7 +94,7 @@
       "exchange": "PSE",
       "sector": "Industrial",
       "industry": "Electricity, Energy, Power & Water",
-      "marketCap": 5030,
+      "marketCap": 6540,
       "listingDate": "Apr 12, 1993"
     },
     {
@@ -103,7 +103,7 @@
       "exchange": "PSE",
       "sector": "Holding Firms",
       "industry": "Holding Firms",
-      "marketCap": 205450,
+      "marketCap": 210170,
       "listingDate": "Nov 16, 1994"
     },
     {
@@ -112,7 +112,7 @@
       "exchange": "PSE",
       "sector": "Holding Firms",
       "industry": "Holding Firms",
-      "marketCap": 81040,
+      "marketCap": 81650,
       "listingDate": "Apr 19, 1999"
     },
     {
@@ -121,7 +121,7 @@
       "exchange": "PSE",
       "sector": "Property",
       "industry": "Property",
-      "marketCap": 2290,
+      "marketCap": 2420,
       "listingDate": "Mar 19, 1996"
     },
     {
@@ -157,7 +157,7 @@
       "exchange": "PSE",
       "sector": "Property",
       "industry": "Property",
-      "marketCap": 7380,
+      "marketCap": 7630,
       "listingDate": "Feb 28, 1990"
     },
     {
@@ -184,7 +184,7 @@
       "exchange": "PSE",
       "sector": "Holding Firms",
       "industry": "Holding Firms",
-      "marketCap": 20990,
+      "marketCap": 20890,
       "listingDate": "Oct 25, 1973"
     },
     {
@@ -193,7 +193,7 @@
       "exchange": "PSE",
       "sector": "Industrial",
       "industry": "Electricity, Energy, Power & Water",
-      "marketCap": 324260,
+      "marketCap": 327870,
       "listingDate": "Jul 16, 2007"
     },
     {
@@ -211,7 +211,7 @@
       "exchange": "PSE",
       "sector": "Services",
       "industry": "Information Technology",
-      "marketCap": 1900,
+      "marketCap": 1870,
       "listingDate": "Oct 18, 2012"
     },
     {
@@ -220,7 +220,7 @@
       "exchange": "PSE",
       "sector": "Holding Firms",
       "industry": "Holding Firms",
-      "marketCap": 3240,
+      "marketCap": 3150,
       "listingDate": "Jul 31, 1959"
     },
     {
@@ -229,7 +229,7 @@
       "exchange": "PSE",
       "sector": "Property",
       "industry": "Property",
-      "marketCap": 1190,
+      "marketCap": 1160,
       "listingDate": "Jun 26, 2020"
     },
     {
@@ -238,7 +238,7 @@
       "exchange": "PSE",
       "sector": "Mining and Oil",
       "industry": "Mining",
-      "marketCap": 80890,
+      "marketCap": 88380,
       "listingDate": "Mar 07, 1974"
     },
     {
@@ -265,7 +265,7 @@
       "exchange": "PSE",
       "sector": "Property",
       "industry": "Property",
-      "marketCap": 156300,
+      "marketCap": 157960,
       "listingDate": "Aug 13, 2020"
     },
     {
@@ -274,7 +274,7 @@
       "exchange": "PSE",
       "sector": "Industrial",
       "industry": "Electricity, Energy, Power & Water",
-      "marketCap": 1680,
+      "marketCap": 1700,
       "listingDate": "Jun 06, 2022"
     },
     {
@@ -283,7 +283,7 @@
       "exchange": "PSE",
       "sector": "Mining and Oil",
       "industry": "Mining",
-      "marketCap": 61900,
+      "marketCap": 63610,
       "listingDate": "Nov 17, 1970"
     },
     {
@@ -310,7 +310,7 @@
       "exchange": "PSE",
       "sector": "Industrial",
       "industry": "Food, Beverage & Tobacco",
-      "marketCap": 11130,
+      "marketCap": 10940,
       "listingDate": "Oct 07, 2019"
     },
     {
@@ -328,7 +328,7 @@
       "exchange": "PSE",
       "sector": "Mining and Oil",
       "industry": "Mining",
-      "marketCap": 5040,
+      "marketCap": 4980,
       "listingDate": "Jan 04, 1950"
     },
     {
@@ -346,7 +346,7 @@
       "exchange": "PSE",
       "sector": "Financials",
       "industry": "Banks",
-      "marketCap": 651450,
+      "marketCap": 654650,
       "listingDate": "May 21, 2002"
     },
     {
@@ -355,7 +355,7 @@
       "exchange": "PSE",
       "sector": "Services",
       "industry": "Casinos & Gaming",
-      "marketCap": 11680,
+      "marketCap": 11480,
       "listingDate": "Feb 02, 1977"
     },
     {
@@ -373,7 +373,7 @@
       "exchange": "PSE",
       "sector": "Services",
       "industry": "Hotel & Leisure",
-      "marketCap": 432,
+      "marketCap": 446.4,
       "listingDate": "Apr 28, 1997"
     },
     {
@@ -391,7 +391,7 @@
       "exchange": "PSE",
       "sector": "Services",
       "industry": "Casinos & Gaming",
-      "marketCap": 29850,
+      "marketCap": 29270,
       "listingDate": "Oct 17, 2000"
     },
     {
@@ -409,7 +409,7 @@
       "exchange": "PSE",
       "sector": "Financials",
       "industry": "Banks",
-      "marketCap": 14450,
+      "marketCap": 14590,
       "listingDate": "Mar 31, 2022"
     },
     {
@@ -418,7 +418,7 @@
       "exchange": "PSE",
       "sector": "Financials",
       "industry": "Banks",
-      "marketCap": 568830,
+      "marketCap": 568300,
       "listingDate": "Oct 12, 1971"
     },
     {
@@ -445,7 +445,7 @@
       "exchange": "PSE",
       "sector": "Services",
       "industry": "Transportation Services",
-      "marketCap": 2070,
+      "marketCap": 2050,
       "listingDate": "Aug 08, 2017"
     },
     {
@@ -454,7 +454,7 @@
       "exchange": "PSE",
       "sector": "Industrial",
       "industry": "Construction, Infra. & Allied Services",
-      "marketCap": 1570,
+      "marketCap": 1600,
       "listingDate": "Oct 20, 1972"
     },
     {
@@ -490,7 +490,7 @@
       "exchange": "PSE",
       "sector": "Services",
       "industry": "Transportation Services",
-      "marketCap": 17490,
+      "marketCap": 17460,
       "listingDate": "Oct 26, 2010"
     },
     {
@@ -517,7 +517,7 @@
       "exchange": "PSE",
       "sector": "Industrial",
       "industry": "Construction, Infra. & Allied Services",
-      "marketCap": 16190,
+      "marketCap": 17540,
       "listingDate": "Jul 18, 2016"
     },
     {
@@ -526,7 +526,7 @@
       "exchange": "PSE",
       "sector": "Industrial",
       "industry": "Electrical Components & Equipment",
-      "marketCap": 4210,
+      "marketCap": 4250,
       "listingDate": "Nov 27, 2013"
     },
     {
@@ -544,7 +544,7 @@
       "exchange": "PSE",
       "sector": "Industrial",
       "industry": "Food, Beverage & Tobacco",
-      "marketCap": 114060,
+      "marketCap": 115480,
       "listingDate": "May 06, 2014"
     },
     {
@@ -562,7 +562,7 @@
       "exchange": "PSE",
       "sector": "Financials",
       "industry": "Other Financial Institutions",
-      "marketCap": 8630,
+      "marketCap": 8570,
       "listingDate": "Jul 12, 2006"
     },
     {
@@ -571,7 +571,7 @@
       "exchange": "PSE",
       "sector": "Holding Firms",
       "industry": "Holding Firms",
-      "marketCap": 57640,
+      "marketCap": 57500,
       "listingDate": "Sep 26, 1988"
     },
     {
@@ -598,7 +598,7 @@
       "exchange": "PSE",
       "sector": "Industrial",
       "industry": "Electricity, Energy, Power and Water",
-      "marketCap": 51230,
+      "marketCap": 51790,
       "listingDate": "Jun 07, 2024"
     },
     {
@@ -616,7 +616,7 @@
       "exchange": "PSE",
       "sector": "Industrial",
       "industry": "Chemicals",
-      "marketCap": 1120,
+      "marketCap": 1150,
       "listingDate": "Apr 27, 2015"
     },
     {
@@ -670,7 +670,7 @@
       "exchange": "PSE",
       "sector": "Industrial",
       "industry": "Food, Beverage & Tobacco",
-      "marketCap": null,
+      "marketCap": 6230,
       "listingDate": "Jun 10, 2013"
     },
     {
@@ -679,7 +679,7 @@
       "exchange": "PSE",
       "sector": "Services",
       "industry": "Information Technology",
-      "marketCap": 278.58,
+      "marketCap": 258.97,
       "listingDate": "Oct 30, 2000"
     },
     {
@@ -715,7 +715,7 @@
       "exchange": "PSE",
       "sector": "Holding Firms",
       "industry": "Holding Firms",
-      "marketCap": 105560,
+      "marketCap": 104890,
       "listingDate": "Dec 18, 1995"
     },
     {
@@ -724,7 +724,7 @@
       "exchange": "PSE",
       "sector": "Property",
       "industry": "Property",
-      "marketCap": 16640,
+      "marketCap": 16980,
       "listingDate": "Jun 29, 2018"
     },
     {
@@ -751,7 +751,7 @@
       "exchange": "PSE",
       "sector": "Services",
       "industry": "Information Technology",
-      "marketCap": 345,
+      "marketCap": 342,
       "listingDate": "May 05, 1992"
     },
     {
@@ -760,7 +760,7 @@
       "exchange": "PSE",
       "sector": "Mining and Oil",
       "industry": "Mining",
-      "marketCap": 1860,
+      "marketCap": 2290,
       "listingDate": "Aug 31, 1970"
     },
     {
@@ -769,7 +769,7 @@
       "exchange": "PSE",
       "sector": "Industrial",
       "industry": "Construction, Infra. & Allied Services",
-      "marketCap": 2030,
+      "marketCap": 1970,
       "listingDate": "Jul 21, 1975"
     },
     {
@@ -805,7 +805,7 @@
       "exchange": "PSE",
       "sector": "Industrial",
       "industry": "Food, Beverage & Tobacco",
-      "marketCap": 236250,
+      "marketCap": 236560,
       "listingDate": "Dec 19, 2011"
     },
     {
@@ -814,7 +814,7 @@
       "exchange": "PSE",
       "sector": "Mining and Oil",
       "industry": "Oil",
-      "marketCap": 925,
+      "marketCap": 912.5,
       "listingDate": "Aug 28, 2014"
     },
     {
@@ -823,7 +823,7 @@
       "exchange": "PSE",
       "sector": "Industrial",
       "industry": "Chemicals",
-      "marketCap": 4520,
+      "marketCap": 4560,
       "listingDate": "Jul 02, 1998"
     },
     {
@@ -832,7 +832,7 @@
       "exchange": "PSE",
       "sector": "Financials",
       "industry": "Banks",
-      "marketCap": 24880,
+      "marketCap": 24930,
       "listingDate": "May 07, 2012"
     },
     {
@@ -850,7 +850,7 @@
       "exchange": "PSE",
       "sector": "Industrial",
       "industry": "Food, Beverage & Tobacco",
-      "marketCap": 280690,
+      "marketCap": 279510,
       "listingDate": "Oct 28, 1971"
     },
     {
@@ -859,7 +859,7 @@
       "exchange": "PSE",
       "sector": "Industrial",
       "industry": "Food, Beverage & Tobacco",
-      "marketCap": 3550,
+      "marketCap": 3500,
       "listingDate": "Jan 24, 2022"
     },
     {
@@ -868,7 +868,7 @@
       "exchange": "PSE",
       "sector": "Holding Firms",
       "industry": "Holding Firms",
-      "marketCap": 31480,
+      "marketCap": 33470,
       "listingDate": "Dec 22, 1982"
     },
     {
@@ -904,7 +904,7 @@
       "exchange": "PSE",
       "sector": "Industrial",
       "industry": "Electricity, Energy, Power & Water",
-      "marketCap": 104660,
+      "marketCap": 107720,
       "listingDate": "Feb 10, 2006"
     },
     {
@@ -913,7 +913,7 @@
       "exchange": "PSE",
       "sector": "Property",
       "industry": "Property",
-      "marketCap": 18970,
+      "marketCap": 19030,
       "listingDate": "Aug 12, 2021"
     },
     {
@@ -949,7 +949,7 @@
       "exchange": "PSE",
       "sector": "Mining and Oil",
       "industry": "Mining",
-      "marketCap": 10730,
+      "marketCap": 11650,
       "listingDate": "Dec 14, 1994"
     },
     {
@@ -967,7 +967,7 @@
       "exchange": "PSE",
       "sector": "Industrial",
       "industry": "Electricity, Energy, Power & Water",
-      "marketCap": 45120,
+      "marketCap": 45510,
       "listingDate": "May 23, 1963"
     },
     {
@@ -985,7 +985,7 @@
       "exchange": "PSE",
       "sector": "Industrial",
       "industry": "Food, Beverage & Tobacco",
-      "marketCap": 1340,
+      "marketCap": 1360,
       "listingDate": "Nov 29, 2019"
     },
     {
@@ -1003,7 +1003,7 @@
       "exchange": "PSE",
       "sector": "Mining and Oil",
       "industry": "Mining",
-      "marketCap": 315,
+      "marketCap": 346.5,
       "listingDate": "Feb 07, 1972"
     },
     {
@@ -1021,7 +1021,7 @@
       "exchange": "PSE",
       "sector": "Services",
       "industry": "Telecommunications",
-      "marketCap": 250940,
+      "marketCap": 252820,
       "listingDate": "Aug 11, 1975"
     },
     {
@@ -1057,7 +1057,7 @@
       "exchange": "PSE",
       "sector": "Industrial",
       "industry": "Electrical Components & Equipment",
-      "marketCap": 684.88,
+      "marketCap": 718.08,
       "listingDate": "Sep 26, 1996"
     },
     {
@@ -1066,7 +1066,7 @@
       "exchange": "PSE",
       "sector": "Industrial",
       "industry": "Food, Beverage & Tobacco",
-      "marketCap": 65860,
+      "marketCap": 66710,
       "listingDate": "Apr 18, 1995"
     },
     {
@@ -1075,7 +1075,7 @@
       "exchange": "PSE",
       "sector": "Holding Firms",
       "industry": "Holding Firms",
-      "marketCap": 108070,
+      "marketCap": 105920,
       "listingDate": "Apr 20, 2012"
     },
     {
@@ -1084,7 +1084,7 @@
       "exchange": "PSE",
       "sector": "Holding Firms",
       "industry": "Holding Firms",
-      "marketCap": 7570,
+      "marketCap": 7640,
       "listingDate": "Jul 02, 1962"
     },
     {
@@ -1120,7 +1120,7 @@
       "exchange": "PSE",
       "sector": "Services",
       "industry": "Transportation Services",
-      "marketCap": 1880000,
+      "marketCap": 1940000,
       "listingDate": "Mar 23, 1992"
     },
     {
@@ -1138,7 +1138,7 @@
       "exchange": "PSE",
       "sector": "Industrial",
       "industry": "Electrical Components & Equipment",
-      "marketCap": 16730,
+      "marketCap": 16460,
       "listingDate": "Jan 21, 2010"
     },
     {
@@ -1165,7 +1165,7 @@
       "exchange": "PSE",
       "sector": "Industrial",
       "industry": "Electrical Components & Equipment",
-      "marketCap": 1830,
+      "marketCap": 1760,
       "listingDate": "Jul 18, 1995"
     },
     {
@@ -1192,7 +1192,7 @@
       "exchange": "PSE",
       "sector": "Services",
       "industry": "Information Technology",
-      "marketCap": 591.18,
+      "marketCap": 596.06,
       "listingDate": "Dec 06, 1988"
     },
     {
@@ -1201,7 +1201,7 @@
       "exchange": "PSE",
       "sector": "Property",
       "industry": "Property",
-      "marketCap": 437.6,
+      "marketCap": 515.12,
       "listingDate": "Oct 27, 1967"
     },
     {
@@ -1210,7 +1210,7 @@
       "exchange": "PSE",
       "sector": "Industrial",
       "industry": "Food, Beverage & Tobacco",
-      "marketCap": 173480,
+      "marketCap": 177070,
       "listingDate": "Jul 14, 1993"
     },
     {
@@ -1219,7 +1219,7 @@
       "exchange": "PSE",
       "sector": "Holding Firms",
       "industry": "Holding Firms",
-      "marketCap": 162830,
+      "marketCap": 163580,
       "listingDate": "Aug 09, 1993"
     },
     {
@@ -1246,7 +1246,7 @@
       "exchange": "PSE",
       "sector": "Property",
       "industry": "Property",
-      "marketCap": 734.57,
+      "marketCap": 769.83,
       "listingDate": "Sep 11, 1989"
     },
     {
@@ -1273,7 +1273,7 @@
       "exchange": "PSE",
       "sector": "Mining and Oil",
       "industry": "Mining",
-      "marketCap": null,
+      "marketCap": 15480,
       "listingDate": "Apr 30, 1947"
     },
     {
@@ -1282,7 +1282,7 @@
       "exchange": "PSE",
       "sector": "Industrial",
       "industry": "Food, Beverage & Tobacco",
-      "marketCap": 3090,
+      "marketCap": 3230,
       "listingDate": "Apr 25, 1985"
     },
     {
@@ -1300,7 +1300,7 @@
       "exchange": "PSE",
       "sector": "Holding Firms",
       "industry": "Holding Firms",
-      "marketCap": 1100,
+      "marketCap": 1080,
       "listingDate": "May 26, 1989"
     },
     {
@@ -1327,7 +1327,7 @@
       "exchange": "PSE",
       "sector": "Holding Firms",
       "industry": "Holding Firms",
-      "marketCap": 22920,
+      "marketCap": 22960,
       "listingDate": "Nov 25, 1993"
     },
     {
@@ -1345,7 +1345,7 @@
       "exchange": "PSE",
       "sector": "Holding Firms",
       "industry": "Holding Firms",
-      "marketCap": 161380,
+      "marketCap": 163980,
       "listingDate": "Nov 07, 1947"
     },
     {
@@ -1354,7 +1354,7 @@
       "exchange": "PSE",
       "sector": "Mining and Oil",
       "industry": "Mining",
-      "marketCap": 2370,
+      "marketCap": 2400,
       "listingDate": "Dec 17, 1959"
     },
     {
@@ -1363,7 +1363,7 @@
       "exchange": "PSE",
       "sector": "Services",
       "industry": "Transportation Services",
-      "marketCap": 7220,
+      "marketCap": 7090,
       "listingDate": "May 21, 1970"
     },
     {
@@ -1390,7 +1390,7 @@
       "exchange": "PSE",
       "sector": "Mining and Oil",
       "industry": "Mining",
-      "marketCap": 2200,
+      "marketCap": 2320,
       "listingDate": "Jan 10, 1958"
     },
     {
@@ -1399,7 +1399,7 @@
       "exchange": "PSE",
       "sector": "Industrial",
       "industry": "Food, Beverage & Tobacco",
-      "marketCap": 1650,
+      "marketCap": 1630,
       "listingDate": "Dec 15, 2000"
     },
     {
@@ -1408,7 +1408,7 @@
       "exchange": "PSE",
       "sector": "Services",
       "industry": "Media",
-      "marketCap": 610.04,
+      "marketCap": 648.17,
       "listingDate": "Apr 18, 1990"
     },
     {
@@ -1444,7 +1444,7 @@
       "exchange": "PSE",
       "sector": "Services",
       "industry": "Other Services",
-      "marketCap": 617.98,
+      "marketCap": 637.21,
       "listingDate": "Dec 07, 2021"
     },
     {
@@ -1453,7 +1453,7 @@
       "exchange": "PSE",
       "sector": "Property",
       "industry": "Property",
-      "marketCap": 75890,
+      "marketCap": 76860,
       "listingDate": "Jun 15, 1994"
     },
     {
@@ -1471,7 +1471,7 @@
       "exchange": "PSE",
       "sector": "Financials",
       "industry": "Other Financial Institutions",
-      "marketCap": null,
+      "marketCap": 4360000,
       "listingDate": "Sep 27, 1999"
     },
     {
@@ -1507,7 +1507,7 @@
       "exchange": "PSE",
       "sector": "Holding Firms",
       "industry": "Holding Firms",
-      "marketCap": 78.85,
+      "marketCap": 77.94,
       "listingDate": "Oct 22, 1990"
     },
     {
@@ -1543,7 +1543,7 @@
       "exchange": "PSE",
       "sector": "Industrial",
       "industry": "Food, Beverage & Tobacco",
-      "marketCap": 128300,
+      "marketCap": 127760,
       "listingDate": "Jun 01, 2021"
     },
     {
@@ -1579,7 +1579,7 @@
       "exchange": "PSE",
       "sector": "Industrial",
       "industry": "Chemicals",
-      "marketCap": 3480,
+      "marketCap": 3490,
       "listingDate": "Feb 05, 1997"
     },
     {
@@ -1615,7 +1615,7 @@
       "exchange": "PSE",
       "sector": "Mining and Oil",
       "industry": "Mining",
-      "marketCap": 429.25,
+      "marketCap": 439.35,
       "listingDate": "Oct 03, 1990"
     },
     {
@@ -1624,7 +1624,7 @@
       "exchange": "PSE",
       "sector": "Mining and Oil",
       "industry": "Mining",
-      "marketCap": 57120,
+      "marketCap": 58090,
       "listingDate": "Nov 22, 2010"
     },
     {
@@ -1633,7 +1633,7 @@
       "exchange": "PSE",
       "sector": "Services",
       "industry": "Information Technology",
-      "marketCap": 858.19,
+      "marketCap": 849.16,
       "listingDate": "Jul 23, 2003"
     },
     {
@@ -1642,7 +1642,7 @@
       "exchange": "PSE",
       "sector": "Financials",
       "industry": "Other Financial Institutions",
-      "marketCap": 2290,
+      "marketCap": 2460,
       "listingDate": "Apr 27, 2007"
     },
     {
@@ -1660,7 +1660,7 @@
       "exchange": "PSE",
       "sector": "Mining and Oil",
       "industry": "Mining",
-      "marketCap": 80480,
+      "marketCap": 82650,
       "listingDate": "May 13, 2024"
     },
     {
@@ -1678,7 +1678,7 @@
       "exchange": "PSE",
       "sector": "Mining and Oil",
       "industry": "Oil",
-      "marketCap": null,
+      "marketCap": 2720,
       "listingDate": "Oct 14, 1970"
     },
     {
@@ -1687,7 +1687,7 @@
       "exchange": "PSE",
       "sector": "Mining and Oil",
       "industry": "Mining",
-      "marketCap": 1400,
+      "marketCap": 1500,
       "listingDate": "Dec 19, 2007"
     },
     {
@@ -1696,7 +1696,7 @@
       "exchange": "PSE",
       "sector": "Mining and Oil",
       "industry": "Oil",
-      "marketCap": 1550,
+      "marketCap": 1570,
       "listingDate": "Sep 25, 1969"
     },
     {
@@ -1705,7 +1705,7 @@
       "exchange": "PSE",
       "sector": "Holding Firms",
       "industry": "Holding Firms",
-      "marketCap": 260,
+      "marketCap": 276.25,
       "listingDate": "Nov 23, 1959"
     },
     {
@@ -1723,7 +1723,7 @@
       "exchange": "PSE",
       "sector": "Services",
       "industry": "Other Services",
-      "marketCap": 2890,
+      "marketCap": 2850,
       "listingDate": "Oct 05, 1972"
     },
     {
@@ -1732,7 +1732,7 @@
       "exchange": "PSE",
       "sector": "Financials",
       "industry": "Banks",
-      "marketCap": 5790,
+      "marketCap": 5800,
       "listingDate": "Feb 19, 2013"
     },
     {
@@ -1750,7 +1750,7 @@
       "exchange": "PSE",
       "sector": "Industrial",
       "industry": "Electricity, Energy, Power & Water",
-      "marketCap": 20670,
+      "marketCap": 20320,
       "listingDate": "Sep 07, 1994"
     },
     {
@@ -1768,7 +1768,7 @@
       "exchange": "PSE",
       "sector": "Services",
       "industry": "Retail",
-      "marketCap": 115780,
+      "marketCap": 115490,
       "listingDate": "Oct 05, 2011"
     },
     {
@@ -1795,7 +1795,7 @@
       "exchange": "PSE",
       "sector": "Property",
       "industry": "Property",
-      "marketCap": 1210,
+      "marketCap": 1110,
       "listingDate": "Jan 21, 1985"
     },
     {
@@ -1804,7 +1804,7 @@
       "exchange": "PSE",
       "sector": "Industrial",
       "industry": "Construction, Infra. & Allied Services",
-      "marketCap": 4710,
+      "marketCap": 5030,
       "listingDate": "Aug 18, 1958"
     },
     {
@@ -1831,7 +1831,7 @@
       "exchange": "PSE",
       "sector": "Services",
       "industry": "Casinos & Gaming",
-      "marketCap": 43810,
+      "marketCap": 45130,
       "listingDate": "Apr 17, 1958"
     },
     {
@@ -1840,7 +1840,7 @@
       "exchange": "PSE",
       "sector": "Industrial",
       "industry": "Electrical Components & Equipment",
-      "marketCap": 3120,
+      "marketCap": 3130,
       "listingDate": "Jan 21, 1983"
     },
     {
@@ -1903,7 +1903,7 @@
       "exchange": "PSE",
       "sector": "Property",
       "industry": "Property",
-      "marketCap": 3490,
+      "marketCap": 3420,
       "listingDate": "Dec 15, 2022"
     },
     {
@@ -1921,7 +1921,7 @@
       "exchange": "PSE",
       "sector": "Property",
       "industry": "Property",
-      "marketCap": 2280,
+      "marketCap": 2300,
       "listingDate": "Aug 10, 2001"
     },
     {
@@ -1930,7 +1930,7 @@
       "exchange": "PSE",
       "sector": "Financials",
       "industry": "Banks",
-      "marketCap": 22470,
+      "marketCap": 22410,
       "listingDate": "Oct 10, 1994"
     },
     {
@@ -1939,7 +1939,7 @@
       "exchange": "PSE",
       "sector": "Financials",
       "industry": "Other Financial Institutions",
-      "marketCap": 16970,
+      "marketCap": 17460,
       "listingDate": "Dec 15, 2003"
     },
     {
@@ -1975,7 +1975,7 @@
       "exchange": "PSE",
       "sector": "Mining and Oil",
       "industry": "Oil",
-      "marketCap": 7000,
+      "marketCap": 7360,
       "listingDate": "Sep 12, 2011"
     },
     {
@@ -1984,7 +1984,7 @@
       "exchange": "PSE",
       "sector": "Financials",
       "industry": "Banks",
-      "marketCap": 55290,
+      "marketCap": 55410,
       "listingDate": "Nov 06, 1986"
     },
     {
@@ -1993,7 +1993,7 @@
       "exchange": "PSE",
       "sector": "Industrial",
       "industry": "Food, Beverage & Tobacco",
-      "marketCap": 6950,
+      "marketCap": 7260,
       "listingDate": "Nov 29, 1948"
     },
     {
@@ -2002,7 +2002,7 @@
       "exchange": "PSE",
       "sector": "Property",
       "industry": "Property",
-      "marketCap": 141530,
+      "marketCap": 146030,
       "listingDate": "Sep 14, 2021"
     },
     {
@@ -2047,7 +2047,7 @@
       "exchange": "PSE",
       "sector": "Property",
       "industry": "Property",
-      "marketCap": 910.01,
+      "marketCap": 973.71,
       "listingDate": "Sep 07, 1987"
     },
     {
@@ -2056,7 +2056,7 @@
       "exchange": "PSE",
       "sector": "Property",
       "industry": "Property",
-      "marketCap": 18350,
+      "marketCap": 19570,
       "listingDate": "May 11, 2012"
     },
     {
@@ -2092,7 +2092,7 @@
       "exchange": "PSE",
       "sector": "Industrial",
       "industry": "Electricity, Energy, Power and Water",
-      "marketCap": 77100,
+      "marketCap": 79490,
       "listingDate": "Nov 28, 1983"
     },
     {
@@ -2128,7 +2128,7 @@
       "exchange": "PSE",
       "sector": "Holding Firms",
       "industry": "Holding Firms",
-      "marketCap": 2170,
+      "marketCap": 2090,
       "listingDate": "Apr 26, 1948"
     },
     {
@@ -2137,7 +2137,7 @@
       "exchange": "PSE",
       "sector": "Industrial",
       "industry": "Electricity, Energy, Power & Water",
-      "marketCap": 152180,
+      "marketCap": 159820,
       "listingDate": "May 10, 1972"
     },
     {
@@ -2164,7 +2164,7 @@
       "exchange": "PSE",
       "sector": "Financials",
       "industry": "Other Financial Institutions",
-      "marketCap": null,
+      "marketCap": 2690000,
       "listingDate": "Mar 24, 2000"
     },
     {
@@ -2182,7 +2182,7 @@
       "exchange": "PSE",
       "sector": "Holding Firms",
       "industry": "Holding Firms",
-      "marketCap": 690100,
+      "marketCap": 703470,
       "listingDate": "Mar 22, 2005"
     },
     {
@@ -2200,7 +2200,7 @@
       "exchange": "PSE",
       "sector": "Property",
       "industry": "Property",
-      "marketCap": 524120,
+      "marketCap": 522400,
       "listingDate": "Jul 05, 1994"
     },
     {
@@ -2218,7 +2218,7 @@
       "exchange": "PSE",
       "sector": "Industrial",
       "industry": "Electricity, Energy, Power & Water",
-      "marketCap": 14440,
+      "marketCap": 14820,
       "listingDate": "Apr 02, 2002"
     },
     {
@@ -2236,7 +2236,7 @@
       "exchange": "PSE",
       "sector": "Industrial",
       "industry": "Electricity, Energy, Power & Water",
-      "marketCap": 59090,
+      "marketCap": 64090,
       "listingDate": "Dec 17, 2021"
     },
     {
@@ -2254,7 +2254,7 @@
       "exchange": "PSE",
       "sector": "Services",
       "industry": "Retail",
-      "marketCap": 6700,
+      "marketCap": 6610,
       "listingDate": "Nov 07, 2014"
     },
     {
@@ -2317,7 +2317,7 @@
       "exchange": "PSE",
       "sector": "Industrial",
       "industry": "Electrical Components & Equipment",
-      "marketCap": 976.02,
+      "marketCap": 808.89,
       "listingDate": "Nov 18, 2011"
     },
     {
@@ -2344,7 +2344,7 @@
       "exchange": "PSE",
       "sector": "Holding Firms",
       "industry": "Holding Firms",
-      "marketCap": 20410,
+      "marketCap": 20030,
       "listingDate": "Jan 13, 2014"
     },
     {
@@ -2353,7 +2353,7 @@
       "exchange": "PSE",
       "sector": "Industrial",
       "industry": "Electricity, Energy, Power and Water",
-      "marketCap": 19340,
+      "marketCap": 19770,
       "listingDate": "Apr 08, 2025"
     },
     {
@@ -2398,7 +2398,7 @@
       "exchange": "PSE",
       "sector": "Mining and Oil",
       "industry": "Mining",
-      "marketCap": 1940,
+      "marketCap": 2050,
       "listingDate": "Aug 31, 1972"
     },
     {
@@ -2434,7 +2434,7 @@
       "exchange": "PSE",
       "sector": "Industrial",
       "industry": "Food, Beverage & Tobacco",
-      "marketCap": 1560,
+      "marketCap": 1620,
       "listingDate": "Feb 08, 1995"
     },
     {
@@ -2488,7 +2488,7 @@
       "exchange": "PSE",
       "sector": "Services",
       "industry": "Casinos & Gaming",
-      "marketCap": 18030,
+      "marketCap": 17930,
       "listingDate": "Dec 08, 1969"
     },
     {
@@ -2524,7 +2524,7 @@
       "exchange": "PSE",
       "sector": "Small, Medium & Emerging Board",
       "industry": "Small, Medium & Emerging Board",
-      "marketCap": 507.75,
+      "marketCap": 527.86,
       "listingDate": "Dec 02, 2014"
     },
     {
@@ -2542,7 +2542,7 @@
       "exchange": "PSE",
       "sector": "Holding Firms",
       "industry": "Holding Firms",
-      "marketCap": 197.07,
+      "marketCap": 216.23,
       "listingDate": "Jul 15, 1991"
     }
   ]

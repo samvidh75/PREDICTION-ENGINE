@@ -1,1340 +1,1270 @@
 {
-  "generatedAt": "2026-08-20T12:15:19.717Z",
-  "baseUrl": "http://localhost:10085",
+  "generatedAt": "2026-08-20T17:17:19.939Z",
+  "baseUrl": "https://api.stockstory-india.com",
   "totals": {
     "total": 282,
     "clean": 0,
-    "warnings": 246,
-    "failed": 36
+    "warnings": 0,
+    "failed": 282
   },
   "results": [
     {
       "symbol": "AAA",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 3058,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 4355,
+      "checkedAt": "2026-08-20T17:05:26.402Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "no_market_cap",
-          "detail": "price.marketCap = null"
-        },
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "financials is synthetic"
-        },
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:00:30.114Z"
+      ]
     },
     {
       "symbol": "AB",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 2641,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 3030,
+      "checkedAt": "2026-08-20T17:05:26.428Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:00:30.135Z"
+      ]
     },
     {
       "symbol": "ABA",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 2883,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1879,
+      "checkedAt": "2026-08-20T17:05:33.258Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:00:35.673Z"
+      ]
     },
     {
       "symbol": "ABG",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 2887,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1600,
+      "checkedAt": "2026-08-20T17:05:33.260Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:00:35.675Z"
+      ]
     },
     {
       "symbol": "ABS",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 4031,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 2565,
+      "checkedAt": "2026-08-20T17:05:37.639Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:00:41.063Z"
+      ]
     },
     {
       "symbol": "ABSP",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 4229,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 2361,
+      "checkedAt": "2026-08-20T17:05:37.641Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:00:41.064Z"
+      ]
     },
     {
       "symbol": "AC",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1411,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1361,
+      "checkedAt": "2026-08-20T17:05:42.704Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:00:47.794Z"
+      ]
     },
     {
       "symbol": "ACE",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1831,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1210,
+      "checkedAt": "2026-08-20T17:05:42.705Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:00:47.795Z"
+      ]
     },
     {
       "symbol": "ACEN",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1782,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:00:52.127Z"
-    },
-    {
-      "symbol": "ACR",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 2144,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:00:52.130Z"
-    },
-    {
-      "symbol": "AEV",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1731,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:00:56.776Z"
-    },
-    {
-      "symbol": "AGI",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1476,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:00:56.776Z"
-    },
-    {
-      "symbol": "ALCO",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1315,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:01:01.008Z"
-    },
-    {
-      "symbol": "ALHI",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1315,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:01:01.009Z"
-    },
-    {
-      "symbol": "ALI",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1540,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:01:04.826Z"
-    },
-    {
-      "symbol": "ALLDY",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 932,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:01:04.827Z"
-    },
-    {
-      "symbol": "ALLHC",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 958,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:01:08.867Z"
-    },
-    {
-      "symbol": "ALTER",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1464,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:01:08.868Z"
-    },
-    {
-      "symbol": "ANI",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1156,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:01:12.833Z"
-    },
-    {
-      "symbol": "ANS",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1701,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:01:12.834Z"
-    },
-    {
-      "symbol": "AP",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1178,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:01:17.037Z"
-    },
-    {
-      "symbol": "APC",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1804,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:01:17.037Z"
-    },
-    {
-      "symbol": "APL",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1187,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:01:21.343Z"
-    },
-    {
-      "symbol": "APO",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1771,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:01:21.343Z"
-    },
-    {
-      "symbol": "APVI",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 848,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:01:25.616Z"
-    },
-    {
-      "symbol": "APX",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1624,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:01:25.617Z"
-    },
-    {
-      "symbol": "AR",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1078,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "no_market_cap",
-          "detail": "price.marketCap = null"
-        },
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "financials is synthetic"
-        },
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "shareholding is synthetic"
-        },
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:01:29.742Z"
-    },
-    {
-      "symbol": "ARA",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1689,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:01:29.743Z"
-    },
-    {
-      "symbol": "AREIT",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1221,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:01:33.934Z"
-    },
-    {
-      "symbol": "ASLAG",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1301,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:01:33.934Z"
-    },
-    {
-      "symbol": "AT",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 3047,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:01:37.736Z"
-    },
-    {
-      "symbol": "ATN",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 3032,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:01:37.737Z"
-    },
-    {
-      "symbol": "AUB",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1842,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:01:43.284Z"
-    },
-    {
-      "symbol": "AXLM",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1786,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:01:43.285Z"
-    },
-    {
-      "symbol": "BALAI",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1382,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:01:47.627Z"
-    },
-    {
-      "symbol": "BC",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1671,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:01:47.628Z"
-    },
-    {
-      "symbol": "BCOR",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1440,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:01:51.800Z"
-    },
-    {
-      "symbol": "BDO",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 5,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:01:51.801Z"
-    },
-    {
-      "symbol": "BEL",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1898,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:01:55.741Z"
-    },
-    {
-      "symbol": "BH",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1438,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:01:55.742Z"
-    },
-    {
-      "symbol": "BHI",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1321,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:02:00.141Z"
-    },
-    {
-      "symbol": "BKR",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1927,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "financials is synthetic"
-        },
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "shareholding is synthetic"
-        },
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:02:00.141Z"
-    },
-    {
-      "symbol": "BLOOM",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1299,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:02:04.569Z"
-    },
-    {
-      "symbol": "BMM",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1165,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "no_market_cap",
-          "detail": "price.marketCap = null"
-        },
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "financials is synthetic"
-        },
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:02:04.570Z"
-    },
-    {
-      "symbol": "BNCOM",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1213,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:02:08.368Z"
-    },
-    {
-      "symbol": "BPI",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1376,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:02:08.369Z"
-    },
-    {
-      "symbol": "BRN",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1374,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:02:12.246Z"
-    },
-    {
-      "symbol": "BSC",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1240,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:02:12.247Z"
-    },
-    {
-      "symbol": "C",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1048,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:02:16.121Z"
-    },
-    {
-      "symbol": "CA",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1159,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:02:16.122Z"
-    },
-    {
-      "symbol": "CAT",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1309,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:02:19.782Z"
-    },
-    {
-      "symbol": "CBC",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1018,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:02:19.782Z"
-    },
-    {
-      "symbol": "CDC",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1668,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:02:23.592Z"
-    },
-    {
-      "symbol": "CEB",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1166,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:02:23.593Z"
-    },
-    {
-      "symbol": "CEI",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1097,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:02:27.762Z"
-    },
-    {
-      "symbol": "CEU",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1626,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:02:27.763Z"
-    },
-    {
-      "symbol": "CHP",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1308,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:02:31.890Z"
-    },
-    {
-      "symbol": "CIC",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1238,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:02:31.891Z"
-    },
-    {
-      "symbol": "CLI",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1856,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:02:35.699Z"
-    },
-    {
-      "symbol": "CNPF",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1259,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:02:35.699Z"
-    },
-    {
-      "symbol": "CNVRG",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 2232,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:02:40.057Z"
-    },
-    {
-      "symbol": "COL",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 3947,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:02:40.058Z"
-    },
-    {
-      "symbol": "COSCO",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 2263,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:02:46.506Z"
-    },
-    {
-      "symbol": "CPG",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 2942,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:02:46.507Z"
-    },
-    {
-      "symbol": "CPM",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 2424,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:02:51.951Z"
-    },
-    {
-      "symbol": "CREC",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1082,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:02:51.952Z"
-    },
-    {
-      "symbol": "CREIT",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 2096,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:02:56.875Z"
-    },
-    {
-      "symbol": "CROWN",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 2406,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:02:56.876Z"
-    },
-    {
-      "symbol": "CSB",
       "ok": false,
       "httpStatus": null,
-      "latencyMs": 30004,
-      "checkedAt": "2026-08-20T12:03:01.784Z",
+      "latencyMs": 30022,
+      "checkedAt": "2026-08-20T17:05:46.567Z",
       "issues": [
         {
           "severity": "error",
           "code": "request_failed",
           "detail": "The operation was aborted due to timeout"
+        }
+      ]
+    },
+    {
+      "symbol": "ACR",
+      "ok": false,
+      "httpStatus": null,
+      "latencyMs": 30022,
+      "checkedAt": "2026-08-20T17:05:46.569Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "request_failed",
+          "detail": "The operation was aborted due to timeout"
+        }
+      ]
+    },
+    {
+      "symbol": "AEV",
+      "ok": false,
+      "httpStatus": null,
+      "latencyMs": 10501,
+      "checkedAt": "2026-08-20T17:06:19.092Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "request_failed",
+          "detail": "fetch failed"
+        }
+      ]
+    },
+    {
+      "symbol": "AGI",
+      "ok": false,
+      "httpStatus": null,
+      "latencyMs": 10498,
+      "checkedAt": "2026-08-20T17:06:19.095Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "request_failed",
+          "detail": "fetch failed"
+        }
+      ]
+    },
+    {
+      "symbol": "ALCO",
+      "ok": false,
+      "httpStatus": null,
+      "latencyMs": 10506,
+      "checkedAt": "2026-08-20T17:06:32.094Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "request_failed",
+          "detail": "fetch failed"
+        }
+      ]
+    },
+    {
+      "symbol": "ALHI",
+      "ok": false,
+      "httpStatus": null,
+      "latencyMs": 10505,
+      "checkedAt": "2026-08-20T17:06:32.096Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "request_failed",
+          "detail": "fetch failed"
+        }
+      ]
+    },
+    {
+      "symbol": "ALI",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 2475,
+      "checkedAt": "2026-08-20T17:06:45.101Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "ALLDY",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 2623,
+      "checkedAt": "2026-08-20T17:06:45.105Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "ALLHC",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 714,
+      "checkedAt": "2026-08-20T17:06:50.228Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "ALTER",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1368,
+      "checkedAt": "2026-08-20T17:06:50.229Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "ANI",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1103,
+      "checkedAt": "2026-08-20T17:06:54.098Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "ANS",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1276,
+      "checkedAt": "2026-08-20T17:06:54.098Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "AP",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1080,
+      "checkedAt": "2026-08-20T17:06:57.875Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "APC",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1377,
+      "checkedAt": "2026-08-20T17:06:57.876Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "APL",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1052,
+      "checkedAt": "2026-08-20T17:07:01.755Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "APO",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1275,
+      "checkedAt": "2026-08-20T17:07:01.755Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "APVI",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1013,
+      "checkedAt": "2026-08-20T17:07:05.532Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "APX",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1021,
+      "checkedAt": "2026-08-20T17:07:05.532Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "AR",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 2080,
+      "checkedAt": "2026-08-20T17:07:09.055Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "ARA",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1734,
+      "checkedAt": "2026-08-20T17:07:09.056Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "AREIT",
+      "ok": false,
+      "httpStatus": null,
+      "latencyMs": 30002,
+      "checkedAt": "2026-08-20T17:07:13.639Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "request_failed",
+          "detail": "The operation was aborted due to timeout"
+        }
+      ]
+    },
+    {
+      "symbol": "ASLAG",
+      "ok": false,
+      "httpStatus": null,
+      "latencyMs": 30001,
+      "checkedAt": "2026-08-20T17:07:13.640Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "request_failed",
+          "detail": "The operation was aborted due to timeout"
+        }
+      ]
+    },
+    {
+      "symbol": "AT",
+      "ok": false,
+      "httpStatus": null,
+      "latencyMs": 10048,
+      "checkedAt": "2026-08-20T17:07:46.143Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "request_failed",
+          "detail": "fetch failed"
+        }
+      ]
+    },
+    {
+      "symbol": "ATN",
+      "ok": false,
+      "httpStatus": null,
+      "latencyMs": 10047,
+      "checkedAt": "2026-08-20T17:07:46.144Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "request_failed",
+          "detail": "fetch failed"
+        }
+      ]
+    },
+    {
+      "symbol": "AUB",
+      "ok": false,
+      "httpStatus": null,
+      "latencyMs": 10501,
+      "checkedAt": "2026-08-20T17:07:58.692Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "request_failed",
+          "detail": "fetch failed"
+        }
+      ]
+    },
+    {
+      "symbol": "AXLM",
+      "ok": false,
+      "httpStatus": null,
+      "latencyMs": 10501,
+      "checkedAt": "2026-08-20T17:07:58.693Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "request_failed",
+          "detail": "fetch failed"
+        }
+      ]
+    },
+    {
+      "symbol": "BALAI",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 2018,
+      "checkedAt": "2026-08-20T17:08:11.695Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "BC",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 29285,
+      "checkedAt": "2026-08-20T17:08:11.697Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "BCOR",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 2293,
+      "checkedAt": "2026-08-20T17:08:43.483Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "BDO",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1456,
+      "checkedAt": "2026-08-20T17:08:43.485Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "BEL",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1417,
+      "checkedAt": "2026-08-20T17:08:48.278Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "BH",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1379,
+      "checkedAt": "2026-08-20T17:08:48.278Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "BHI",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1048,
+      "checkedAt": "2026-08-20T17:08:52.196Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "BKR",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1365,
+      "checkedAt": "2026-08-20T17:08:52.197Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "BLOOM",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1105,
+      "checkedAt": "2026-08-20T17:08:56.063Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "BMM",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 855,
+      "checkedAt": "2026-08-20T17:08:56.064Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "BNCOM",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 753,
+      "checkedAt": "2026-08-20T17:08:59.669Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "BPI",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1030,
+      "checkedAt": "2026-08-20T17:08:59.670Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "BRN",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1660,
+      "checkedAt": "2026-08-20T17:09:03.201Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "BSC",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 948,
+      "checkedAt": "2026-08-20T17:09:03.201Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "C",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1244,
+      "checkedAt": "2026-08-20T17:09:07.361Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "CA",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1174,
+      "checkedAt": "2026-08-20T17:09:07.361Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "CAT",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1096,
+      "checkedAt": "2026-08-20T17:09:11.108Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "CBC",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 987,
+      "checkedAt": "2026-08-20T17:09:11.108Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "CDC",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 977,
+      "checkedAt": "2026-08-20T17:09:14.705Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "CEB",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1016,
+      "checkedAt": "2026-08-20T17:09:14.706Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "CEI",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1162,
+      "checkedAt": "2026-08-20T17:09:18.223Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "CEU",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1124,
+      "checkedAt": "2026-08-20T17:09:18.223Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "CHP",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1326,
+      "checkedAt": "2026-08-20T17:09:21.888Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "CIC",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 955,
+      "checkedAt": "2026-08-20T17:09:21.888Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "CLI",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1167,
+      "checkedAt": "2026-08-20T17:09:25.716Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "CNPF",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 872,
+      "checkedAt": "2026-08-20T17:09:25.717Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "CNVRG",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 751,
+      "checkedAt": "2026-08-20T17:09:29.388Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "COL",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1323,
+      "checkedAt": "2026-08-20T17:09:29.389Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "COSCO",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1371,
+      "checkedAt": "2026-08-20T17:09:33.214Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "CPG",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1369,
+      "checkedAt": "2026-08-20T17:09:33.215Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "CPM",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 954,
+      "checkedAt": "2026-08-20T17:09:37.086Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "CREC",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 896,
+      "checkedAt": "2026-08-20T17:09:37.086Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "CREIT",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1127,
+      "checkedAt": "2026-08-20T17:09:40.544Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "CROWN",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1127,
+      "checkedAt": "2026-08-20T17:09:40.544Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "CSB",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 972,
+      "checkedAt": "2026-08-20T17:09:44.173Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
       ]
     },
     {
       "symbol": "CTS",
       "ok": false,
-      "httpStatus": null,
-      "latencyMs": 30003,
-      "checkedAt": "2026-08-20T12:03:01.785Z",
+      "httpStatus": 503,
+      "latencyMs": 1063,
+      "checkedAt": "2026-08-20T17:09:44.173Z",
       "issues": [
         {
           "severity": "error",
-          "code": "request_failed",
-          "detail": "The operation was aborted due to timeout"
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
       ]
     },
     {
       "symbol": "CYBR",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1373,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 808,
+      "checkedAt": "2026-08-20T17:09:47.739Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "no_market_cap",
-          "detail": "price.marketCap = null"
-        },
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:03:34.289Z"
+      ]
     },
     {
       "symbol": "DD",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 2237,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 980,
+      "checkedAt": "2026-08-20T17:09:47.740Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:03:34.290Z"
+      ]
     },
     {
       "symbol": "DDMPR",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1900,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 740,
+      "checkedAt": "2026-08-20T17:09:51.221Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:03:39.027Z"
+      ]
     },
     {
       "symbol": "DELM",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 2774,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 834,
+      "checkedAt": "2026-08-20T17:09:51.222Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "no_market_cap",
-          "detail": "price.marketCap = null"
-        },
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:03:39.028Z"
+      ]
     },
     {
       "symbol": "DFNN",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1371,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 832,
+      "checkedAt": "2026-08-20T17:09:54.558Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:03:44.304Z"
+      ]
     },
     {
       "symbol": "DHI",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1150,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 958,
+      "checkedAt": "2026-08-20T17:09:54.559Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:03:44.304Z"
+      ]
     },
     {
       "symbol": "DITO",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1660,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 904,
+      "checkedAt": "2026-08-20T17:09:58.019Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:03:48.176Z"
+      ]
     },
     {
       "symbol": "DIZ",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1144,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1159,
+      "checkedAt": "2026-08-20T17:09:58.020Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:03:48.177Z"
+      ]
     },
     {
       "symbol": "DMC",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1149,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 2468,
+      "checkedAt": "2026-08-20T17:10:01.684Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:03:52.338Z"
+      ]
     },
     {
       "symbol": "DMW",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1625,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 2310,
+      "checkedAt": "2026-08-20T17:10:01.685Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:03:52.339Z"
+      ]
     },
     {
       "symbol": "DNL",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 7755,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1146,
+      "checkedAt": "2026-08-20T17:10:06.653Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:03:56.465Z"
+      ]
     },
     {
       "symbol": "DWC",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 8409,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1146,
+      "checkedAt": "2026-08-20T17:10:06.653Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:03:56.466Z"
+      ]
     },
     {
       "symbol": "ECP",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1898,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1473,
+      "checkedAt": "2026-08-20T17:10:10.301Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:04:07.377Z"
+      ]
     },
     {
       "symbol": "ECVC",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1233,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1500,
+      "checkedAt": "2026-08-20T17:10:10.302Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:04:07.377Z"
+      ]
     },
     {
       "symbol": "EEI",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 23168,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 890,
+      "checkedAt": "2026-08-20T17:10:14.303Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:04:11.777Z"
+      ]
     },
     {
       "symbol": "EG",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 23536,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1208,
+      "checkedAt": "2026-08-20T17:10:14.304Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "no_market_cap",
-          "detail": "price.marketCap = null"
-        },
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "financials is synthetic"
-        },
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "shareholding is synthetic"
-        },
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:04:11.778Z"
+      ]
     },
     {
       "symbol": "EGRN",
       "ok": false,
-      "httpStatus": null,
-      "latencyMs": 30000,
-      "checkedAt": "2026-08-20T12:04:37.815Z",
+      "httpStatus": 503,
+      "latencyMs": 1296,
+      "checkedAt": "2026-08-20T17:10:18.015Z",
       "issues": [
         {
           "severity": "error",
-          "code": "request_failed",
-          "detail": "The operation was aborted due to timeout"
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
       ]
     },
     {
       "symbol": "ELI",
       "ok": false,
-      "httpStatus": null,
-      "latencyMs": 30000,
-      "checkedAt": "2026-08-20T12:04:37.816Z",
+      "httpStatus": 503,
+      "latencyMs": 1058,
+      "checkedAt": "2026-08-20T17:10:18.016Z",
       "issues": [
         {
           "severity": "error",
-          "code": "request_failed",
-          "detail": "The operation was aborted due to timeout"
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
       ]
     },
     {
       "symbol": "EMI",
       "ok": false,
-      "httpStatus": null,
-      "latencyMs": 29999,
-      "checkedAt": "2026-08-20T12:05:10.317Z",
+      "httpStatus": 503,
+      "latencyMs": 1017,
+      "checkedAt": "2026-08-20T17:10:21.813Z",
       "issues": [
         {
           "severity": "error",
-          "code": "request_failed",
-          "detail": "The operation was aborted due to timeout"
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
       ]
     },
     {
       "symbol": "ENEX",
       "ok": false,
-      "httpStatus": null,
-      "latencyMs": 30000,
-      "checkedAt": "2026-08-20T12:05:10.318Z",
+      "httpStatus": 503,
+      "latencyMs": 812,
+      "checkedAt": "2026-08-20T17:10:21.813Z",
       "issues": [
         {
           "severity": "error",
-          "code": "request_failed",
-          "detail": "The operation was aborted due to timeout"
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
       ]
     },
@@ -1342,8 +1272,8 @@
       "symbol": "EURO",
       "ok": false,
       "httpStatus": 503,
-      "latencyMs": 10010,
-      "checkedAt": "2026-08-20T12:05:42.820Z",
+      "latencyMs": 1322,
+      "checkedAt": "2026-08-20T17:10:25.331Z",
       "issues": [
         {
           "severity": "error",
@@ -1356,8 +1286,8 @@
       "symbol": "EW",
       "ok": false,
       "httpStatus": 503,
-      "latencyMs": 10011,
-      "checkedAt": "2026-08-20T12:05:42.821Z",
+      "latencyMs": 1103,
+      "checkedAt": "2026-08-20T17:10:25.332Z",
       "issues": [
         {
           "severity": "error",
@@ -1370,8 +1300,8 @@
       "symbol": "FAF",
       "ok": false,
       "httpStatus": 503,
-      "latencyMs": 7,
-      "checkedAt": "2026-08-20T12:05:55.333Z",
+      "latencyMs": 990,
+      "checkedAt": "2026-08-20T17:10:29.155Z",
       "issues": [
         {
           "severity": "error",
@@ -1384,8 +1314,8 @@
       "symbol": "FB",
       "ok": false,
       "httpStatus": 503,
-      "latencyMs": 7,
-      "checkedAt": "2026-08-20T12:05:55.334Z",
+      "latencyMs": 1391,
+      "checkedAt": "2026-08-20T17:10:29.156Z",
       "issues": [
         {
           "severity": "error",
@@ -1398,8 +1328,8 @@
       "symbol": "FCG",
       "ok": false,
       "httpStatus": 503,
-      "latencyMs": 5,
-      "checkedAt": "2026-08-20T12:05:57.843Z",
+      "latencyMs": 1261,
+      "checkedAt": "2026-08-20T17:10:33.047Z",
       "issues": [
         {
           "severity": "error",
@@ -1412,8 +1342,8 @@
       "symbol": "FDC",
       "ok": false,
       "httpStatus": 503,
-      "latencyMs": 7,
-      "checkedAt": "2026-08-20T12:05:57.844Z",
+      "latencyMs": 1101,
+      "checkedAt": "2026-08-20T17:10:33.048Z",
       "issues": [
         {
           "severity": "error",
@@ -1426,8 +1356,8 @@
       "symbol": "FERRO",
       "ok": false,
       "httpStatus": 503,
-      "latencyMs": 4,
-      "checkedAt": "2026-08-20T12:06:00.352Z",
+      "latencyMs": 1178,
+      "checkedAt": "2026-08-20T17:10:36.810Z",
       "issues": [
         {
           "severity": "error",
@@ -1440,8 +1370,8 @@
       "symbol": "FEU",
       "ok": false,
       "httpStatus": 503,
-      "latencyMs": 5,
-      "checkedAt": "2026-08-20T12:06:00.353Z",
+      "latencyMs": 917,
+      "checkedAt": "2026-08-20T17:10:36.810Z",
       "issues": [
         {
           "severity": "error",
@@ -1454,8 +1384,8 @@
       "symbol": "FFI",
       "ok": false,
       "httpStatus": 503,
-      "latencyMs": 4,
-      "checkedAt": "2026-08-20T12:06:02.859Z",
+      "latencyMs": 886,
+      "checkedAt": "2026-08-20T17:10:40.490Z",
       "issues": [
         {
           "severity": "error",
@@ -1468,8 +1398,8 @@
       "symbol": "FGEN",
       "ok": false,
       "httpStatus": 503,
-      "latencyMs": 5,
-      "checkedAt": "2026-08-20T12:06:02.860Z",
+      "latencyMs": 1154,
+      "checkedAt": "2026-08-20T17:10:40.491Z",
       "issues": [
         {
           "severity": "error",
@@ -1482,8 +1412,8 @@
       "symbol": "FILRT",
       "ok": false,
       "httpStatus": 503,
-      "latencyMs": 4,
-      "checkedAt": "2026-08-20T12:06:05.367Z",
+      "latencyMs": 862,
+      "checkedAt": "2026-08-20T17:10:44.148Z",
       "issues": [
         {
           "severity": "error",
@@ -1496,8 +1426,8 @@
       "symbol": "FJP",
       "ok": false,
       "httpStatus": 503,
-      "latencyMs": 6,
-      "checkedAt": "2026-08-20T12:06:05.367Z",
+      "latencyMs": 1034,
+      "checkedAt": "2026-08-20T17:10:44.149Z",
       "issues": [
         {
           "severity": "error",
@@ -1510,8 +1440,8 @@
       "symbol": "FLI",
       "ok": false,
       "httpStatus": 503,
-      "latencyMs": 5,
-      "checkedAt": "2026-08-20T12:06:07.874Z",
+      "latencyMs": 1111,
+      "checkedAt": "2026-08-20T17:10:47.686Z",
       "issues": [
         {
           "severity": "error",
@@ -1524,8 +1454,8 @@
       "symbol": "FMETF",
       "ok": false,
       "httpStatus": 503,
-      "latencyMs": 7,
-      "checkedAt": "2026-08-20T12:06:07.875Z",
+      "latencyMs": 991,
+      "checkedAt": "2026-08-20T17:10:47.687Z",
       "issues": [
         {
           "severity": "error",
@@ -1538,8 +1468,8 @@
       "symbol": "FNI",
       "ok": false,
       "httpStatus": 503,
-      "latencyMs": 4,
-      "checkedAt": "2026-08-20T12:06:10.383Z",
+      "latencyMs": 917,
+      "checkedAt": "2026-08-20T17:10:51.299Z",
       "issues": [
         {
           "severity": "error",
@@ -1552,8 +1482,8 @@
       "symbol": "FOOD",
       "ok": false,
       "httpStatus": 503,
-      "latencyMs": 6,
-      "checkedAt": "2026-08-20T12:06:10.383Z",
+      "latencyMs": 1182,
+      "checkedAt": "2026-08-20T17:10:51.301Z",
       "issues": [
         {
           "severity": "error",
@@ -1566,8 +1496,8 @@
       "symbol": "FPH",
       "ok": false,
       "httpStatus": 503,
-      "latencyMs": 3,
-      "checkedAt": "2026-08-20T12:06:12.890Z",
+      "latencyMs": 919,
+      "checkedAt": "2026-08-20T17:10:54.985Z",
       "issues": [
         {
           "severity": "error",
@@ -1580,8 +1510,8 @@
       "symbol": "FPI",
       "ok": false,
       "httpStatus": 503,
-      "latencyMs": 5,
-      "checkedAt": "2026-08-20T12:06:12.891Z",
+      "latencyMs": 1035,
+      "checkedAt": "2026-08-20T17:10:54.986Z",
       "issues": [
         {
           "severity": "error",
@@ -1594,8 +1524,8 @@
       "symbol": "FRUIT",
       "ok": false,
       "httpStatus": 503,
-      "latencyMs": 4,
-      "checkedAt": "2026-08-20T12:06:15.398Z",
+      "latencyMs": 1088,
+      "checkedAt": "2026-08-20T17:10:58.523Z",
       "issues": [
         {
           "severity": "error",
@@ -1608,8 +1538,8 @@
       "symbol": "FYN",
       "ok": false,
       "httpStatus": 503,
-      "latencyMs": 6,
-      "checkedAt": "2026-08-20T12:06:15.398Z",
+      "latencyMs": 895,
+      "checkedAt": "2026-08-20T17:10:58.524Z",
       "issues": [
         {
           "severity": "error",
@@ -1622,8 +1552,8 @@
       "symbol": "GEO",
       "ok": false,
       "httpStatus": 503,
-      "latencyMs": 5,
-      "checkedAt": "2026-08-20T12:06:17.906Z",
+      "latencyMs": 1071,
+      "checkedAt": "2026-08-20T17:11:02.113Z",
       "issues": [
         {
           "severity": "error",
@@ -1636,8 +1566,8 @@
       "symbol": "GERI",
       "ok": false,
       "httpStatus": 503,
-      "latencyMs": 6,
-      "checkedAt": "2026-08-20T12:06:17.907Z",
+      "latencyMs": 1087,
+      "checkedAt": "2026-08-20T17:11:02.114Z",
       "issues": [
         {
           "severity": "error",
@@ -1650,8 +1580,8 @@
       "symbol": "GLO",
       "ok": false,
       "httpStatus": 503,
-      "latencyMs": 4,
-      "checkedAt": "2026-08-20T12:06:20.415Z",
+      "latencyMs": 1098,
+      "checkedAt": "2026-08-20T17:11:05.703Z",
       "issues": [
         {
           "severity": "error",
@@ -1664,8 +1594,8 @@
       "symbol": "GMA7",
       "ok": false,
       "httpStatus": 503,
-      "latencyMs": 5,
-      "checkedAt": "2026-08-20T12:06:20.415Z",
+      "latencyMs": 916,
+      "checkedAt": "2026-08-20T17:11:05.703Z",
       "issues": [
         {
           "severity": "error",
@@ -1676,1555 +1606,2334 @@
     },
     {
       "symbol": "GMAP",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 951,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1016,
+      "checkedAt": "2026-08-20T17:11:09.303Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "shareholding is synthetic"
-        },
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:06:22.921Z"
+      ]
     },
     {
       "symbol": "GPH",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1299,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 876,
+      "checkedAt": "2026-08-20T17:11:09.304Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:06:22.921Z"
+      ]
     },
     {
       "symbol": "GREEN",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 286,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1225,
+      "checkedAt": "2026-08-20T17:11:12.821Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:06:26.721Z"
+      ]
     },
     {
       "symbol": "GSMI",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 299,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 916,
+      "checkedAt": "2026-08-20T17:11:12.822Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:06:26.722Z"
+      ]
     },
     {
       "symbol": "GTCAP",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 331,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 727,
+      "checkedAt": "2026-08-20T17:11:16.549Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:06:29.522Z"
+      ]
     },
     {
       "symbol": "HI",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 331,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 960,
+      "checkedAt": "2026-08-20T17:11:16.549Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:06:29.523Z"
+      ]
     },
     {
       "symbol": "HOME",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 385,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1293,
+      "checkedAt": "2026-08-20T17:11:20.011Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:06:32.356Z"
+      ]
     },
     {
       "symbol": "HTI",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 387,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 913,
+      "checkedAt": "2026-08-20T17:11:20.012Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:06:32.356Z"
+      ]
     },
     {
       "symbol": "I",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 290,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1285,
+      "checkedAt": "2026-08-20T17:11:23.807Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:06:35.245Z"
+      ]
     },
     {
       "symbol": "ICT",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 292,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1089,
+      "checkedAt": "2026-08-20T17:11:23.808Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:06:35.245Z"
+      ]
     },
     {
       "symbol": "IDC",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 320,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1052,
+      "checkedAt": "2026-08-20T17:11:27.591Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:06:38.038Z"
+      ]
     },
     {
       "symbol": "IMI",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 319,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1001,
+      "checkedAt": "2026-08-20T17:11:27.592Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:06:38.038Z"
+      ]
     },
     {
       "symbol": "IMP",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 885,
+      "ok": false,
+      "httpStatus": 502,
+      "latencyMs": 631,
+      "checkedAt": "2026-08-20T17:11:31.144Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_502",
+          "detail": "HTTP 502"
         }
-      ],
-      "checkedAt": "2026-08-20T12:06:40.860Z"
+      ]
     },
     {
       "symbol": "INFRA",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 883,
+      "ok": false,
+      "httpStatus": 502,
+      "latencyMs": 635,
+      "checkedAt": "2026-08-20T17:11:31.144Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_502",
+          "detail": "HTTP 502"
         }
-      ],
-      "checkedAt": "2026-08-20T12:06:40.861Z"
+      ]
     },
     {
       "symbol": "ION",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 2263,
+      "ok": false,
+      "httpStatus": 502,
+      "latencyMs": 532,
+      "checkedAt": "2026-08-20T17:11:34.280Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_502",
+          "detail": "HTTP 502"
         }
-      ],
-      "checkedAt": "2026-08-20T12:06:44.246Z"
+      ]
     },
     {
       "symbol": "IPM",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1810,
+      "ok": false,
+      "httpStatus": 502,
+      "latencyMs": 532,
+      "checkedAt": "2026-08-20T17:11:34.281Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_502",
+          "detail": "HTTP 502"
         }
-      ],
-      "checkedAt": "2026-08-20T12:06:44.247Z"
+      ]
     },
     {
       "symbol": "IPO",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 3806,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1702,
+      "checkedAt": "2026-08-20T17:11:37.314Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:06:49.010Z"
+      ]
     },
     {
       "symbol": "IS",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 3498,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1601,
+      "checkedAt": "2026-08-20T17:11:37.314Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:06:49.011Z"
+      ]
     },
     {
       "symbol": "JAS",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 2861,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1075,
+      "checkedAt": "2026-08-20T17:11:41.519Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:06:55.317Z"
+      ]
     },
     {
       "symbol": "JFC",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 2453,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1318,
+      "checkedAt": "2026-08-20T17:11:41.519Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:06:55.317Z"
+      ]
     },
     {
       "symbol": "JGS",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1489,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1266,
+      "checkedAt": "2026-08-20T17:11:45.339Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:07:00.679Z"
+      ]
     },
     {
       "symbol": "JOH",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 2419,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1534,
+      "checkedAt": "2026-08-20T17:11:45.340Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:07:00.680Z"
+      ]
     },
     {
       "symbol": "KEEPR",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1954,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1215,
+      "checkedAt": "2026-08-20T17:11:49.376Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:07:05.601Z"
+      ]
     },
     {
       "symbol": "KEP",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1609,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1216,
+      "checkedAt": "2026-08-20T17:11:49.377Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:07:05.602Z"
+      ]
     },
     {
       "symbol": "KPPI",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1326,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 965,
+      "checkedAt": "2026-08-20T17:11:53.094Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:07:10.057Z"
+      ]
     },
     {
       "symbol": "LBC",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1716,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1640,
+      "checkedAt": "2026-08-20T17:11:53.095Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:07:10.057Z"
+      ]
     },
     {
       "symbol": "LC",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1154,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1448,
+      "checkedAt": "2026-08-20T17:11:57.236Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "no_market_cap",
-          "detail": "price.marketCap = null"
-        },
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:07:14.275Z"
+      ]
     },
     {
       "symbol": "LFM",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1406,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1045,
+      "checkedAt": "2026-08-20T17:11:57.237Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:07:14.275Z"
+      ]
     },
     {
       "symbol": "LMG",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1083,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1126,
+      "checkedAt": "2026-08-20T17:12:01.186Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:07:18.182Z"
+      ]
     },
     {
       "symbol": "LODE",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1270,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1084,
+      "checkedAt": "2026-08-20T17:12:01.187Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:07:18.183Z"
+      ]
     },
     {
       "symbol": "LOTO",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1122,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1037,
+      "checkedAt": "2026-08-20T17:12:04.815Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:07:21.955Z"
+      ]
     },
     {
       "symbol": "LPC",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1093,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1282,
+      "checkedAt": "2026-08-20T17:12:04.816Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:07:21.955Z"
+      ]
     },
     {
       "symbol": "LPZ",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 859,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1076,
+      "checkedAt": "2026-08-20T17:12:08.600Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:07:25.578Z"
+      ]
     },
     {
       "symbol": "LSC",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1305,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 946,
+      "checkedAt": "2026-08-20T17:12:08.600Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:07:25.579Z"
+      ]
     },
     {
       "symbol": "LTG",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1157,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 913,
+      "checkedAt": "2026-08-20T17:12:12.179Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:07:29.385Z"
+      ]
     },
     {
       "symbol": "MA",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1502,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1265,
+      "checkedAt": "2026-08-20T17:12:12.180Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:07:29.386Z"
+      ]
     },
     {
       "symbol": "MAC",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1212,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1331,
+      "checkedAt": "2026-08-20T17:12:15.948Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:07:33.389Z"
+      ]
     },
     {
       "symbol": "MACAY",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1118,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 841,
+      "checkedAt": "2026-08-20T17:12:15.948Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:07:33.390Z"
+      ]
     },
     {
       "symbol": "MAH",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 3423,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1169,
+      "checkedAt": "2026-08-20T17:12:19.781Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:07:37.102Z"
+      ]
     },
     {
       "symbol": "MARC",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 2460,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1582,
+      "checkedAt": "2026-08-20T17:12:19.781Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:07:37.102Z"
+      ]
     },
     {
       "symbol": "MAXS",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 2480,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1282,
+      "checkedAt": "2026-08-20T17:12:23.864Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:07:43.025Z"
+      ]
     },
     {
       "symbol": "MB",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 2778,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1282,
+      "checkedAt": "2026-08-20T17:12:23.864Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:07:43.026Z"
+      ]
     },
     {
       "symbol": "MBC",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1781,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1189,
+      "checkedAt": "2026-08-20T17:12:27.647Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:07:48.305Z"
+      ]
     },
     {
       "symbol": "MBT",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 2189,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 830,
+      "checkedAt": "2026-08-20T17:12:27.648Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:07:48.306Z"
+      ]
     },
     {
       "symbol": "MED",
       "ok": false,
-      "httpStatus": null,
-      "latencyMs": 30001,
-      "checkedAt": "2026-08-20T12:07:52.995Z",
+      "httpStatus": 503,
+      "latencyMs": 1268,
+      "checkedAt": "2026-08-20T17:12:31.338Z",
       "issues": [
         {
           "severity": "error",
-          "code": "request_failed",
-          "detail": "The operation was aborted due to timeout"
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
       ]
     },
     {
       "symbol": "MEDIC",
       "ok": false,
-      "httpStatus": null,
-      "latencyMs": 30001,
-      "checkedAt": "2026-08-20T12:07:52.996Z",
+      "httpStatus": 503,
+      "latencyMs": 1044,
+      "checkedAt": "2026-08-20T17:12:31.338Z",
       "issues": [
         {
           "severity": "error",
-          "code": "request_failed",
-          "detail": "The operation was aborted due to timeout"
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
       ]
     },
     {
       "symbol": "MEG",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 26873,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1154,
+      "checkedAt": "2026-08-20T17:12:35.110Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:08:25.499Z"
+      ]
     },
     {
       "symbol": "MER",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 26544,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1153,
+      "checkedAt": "2026-08-20T17:12:35.111Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:08:25.499Z"
+      ]
     },
     {
       "symbol": "MFC",
       "ok": false,
-      "httpStatus": null,
-      "latencyMs": 30002,
-      "checkedAt": "2026-08-20T12:08:54.875Z",
+      "httpStatus": 503,
+      "latencyMs": 1058,
+      "checkedAt": "2026-08-20T17:12:38.767Z",
       "issues": [
         {
           "severity": "error",
-          "code": "request_failed",
-          "detail": "The operation was aborted due to timeout"
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
       ]
     },
     {
       "symbol": "MFIN",
       "ok": false,
-      "httpStatus": null,
-      "latencyMs": 30002,
-      "checkedAt": "2026-08-20T12:08:54.876Z",
+      "httpStatus": 503,
+      "latencyMs": 1058,
+      "checkedAt": "2026-08-20T17:12:38.767Z",
       "issues": [
         {
           "severity": "error",
-          "code": "request_failed",
-          "detail": "The operation was aborted due to timeout"
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
       ]
     },
     {
       "symbol": "MG",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 25098,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1208,
+      "checkedAt": "2026-08-20T17:12:42.326Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:09:27.380Z"
+      ]
     },
     {
       "symbol": "MGH",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 25337,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1206,
+      "checkedAt": "2026-08-20T17:12:42.327Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "no_market_cap",
-          "detail": "price.marketCap = null"
-        },
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:09:27.381Z"
+      ]
     },
     {
       "symbol": "MHC",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 25977,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 982,
+      "checkedAt": "2026-08-20T17:12:46.036Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:09:55.218Z"
+      ]
     },
     {
       "symbol": "MJC",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 26354,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 980,
+      "checkedAt": "2026-08-20T17:12:46.037Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "no_market_cap",
-          "detail": "price.marketCap = null"
-        },
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "financials is synthetic"
-        },
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:09:55.219Z"
+      ]
     },
     {
       "symbol": "MJIC",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 2162,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 852,
+      "checkedAt": "2026-08-20T17:12:49.519Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "no_market_cap",
-          "detail": "price.marketCap = null"
-        },
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "financials is synthetic"
-        },
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:10:24.075Z"
+      ]
     },
     {
       "symbol": "MM",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 2945,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 877,
+      "checkedAt": "2026-08-20T17:12:49.520Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:10:24.076Z"
+      ]
     },
     {
       "symbol": "MONDE",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 2887,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1186,
+      "checkedAt": "2026-08-20T17:12:52.899Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:10:29.523Z"
+      ]
     },
     {
       "symbol": "MRC",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 2133,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1138,
+      "checkedAt": "2026-08-20T17:12:52.900Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:10:29.524Z"
+      ]
     },
     {
       "symbol": "MREIT",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1459,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1236,
+      "checkedAt": "2026-08-20T17:12:56.586Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:10:34.914Z"
+      ]
     },
     {
       "symbol": "MRSGI",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1099,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 975,
+      "checkedAt": "2026-08-20T17:12:56.587Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:10:34.914Z"
+      ]
     },
     {
       "symbol": "MVC",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1052,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1028,
+      "checkedAt": "2026-08-20T17:13:00.324Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:10:38.875Z"
+      ]
     },
     {
       "symbol": "MWC",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1011,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 915,
+      "checkedAt": "2026-08-20T17:13:00.324Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:10:38.876Z"
+      ]
     },
     {
       "symbol": "MWIDE",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1041,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 716,
+      "checkedAt": "2026-08-20T17:13:03.855Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:10:42.429Z"
+      ]
     },
     {
       "symbol": "MYNLD",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 898,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 777,
+      "checkedAt": "2026-08-20T17:13:03.855Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:10:42.430Z"
+      ]
     },
     {
       "symbol": "NI",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1305,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1021,
+      "checkedAt": "2026-08-20T17:13:07.134Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:10:45.973Z"
+      ]
     },
     {
       "symbol": "NIKL",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 931,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 843,
+      "checkedAt": "2026-08-20T17:13:07.136Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:10:45.974Z"
+      ]
     },
     {
       "symbol": "NOW",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1272,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1052,
+      "checkedAt": "2026-08-20T17:13:10.658Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:10:49.779Z"
+      ]
     },
     {
       "symbol": "NRCP",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 941,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 732,
+      "checkedAt": "2026-08-20T17:13:10.659Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:10:49.780Z"
+      ]
     },
     {
       "symbol": "NXGEN",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 926,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 768,
+      "checkedAt": "2026-08-20T17:13:14.210Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "no_market_cap",
-          "detail": "price.marketCap = null"
-        },
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:10:53.553Z"
+      ]
     },
     {
       "symbol": "OGP",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1365,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 883,
+      "checkedAt": "2026-08-20T17:13:14.211Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:10:53.554Z"
+      ]
     },
     {
       "symbol": "OM",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 2346,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1098,
+      "checkedAt": "2026-08-20T17:13:17.595Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:10:57.420Z"
+      ]
     },
     {
       "symbol": "OPM",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 2547,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1061,
+      "checkedAt": "2026-08-20T17:13:17.596Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "no_market_cap",
-          "detail": "price.marketCap = null"
-        },
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:10:57.421Z"
+      ]
     },
     {
       "symbol": "ORE",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1730,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1023,
+      "checkedAt": "2026-08-20T17:13:21.195Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:11:02.470Z"
+      ]
     },
     {
       "symbol": "OV",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 2216,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1096,
+      "checkedAt": "2026-08-20T17:13:21.196Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:11:02.470Z"
+      ]
     },
     {
       "symbol": "PA",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1780,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 2822,
+      "checkedAt": "2026-08-20T17:13:24.793Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:11:07.188Z"
+      ]
     },
     {
       "symbol": "PAL",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1354,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 2609,
+      "checkedAt": "2026-08-20T17:13:24.794Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:11:07.189Z"
+      ]
     },
     {
       "symbol": "PAX",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1602,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1224,
+      "checkedAt": "2026-08-20T17:13:30.116Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:11:11.469Z"
+      ]
     },
     {
       "symbol": "PBB",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1081,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 878,
+      "checkedAt": "2026-08-20T17:13:30.117Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:11:11.470Z"
+      ]
     },
     {
       "symbol": "PBC",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1280,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1060,
+      "checkedAt": "2026-08-20T17:13:33.842Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:11:15.574Z"
+      ]
     },
     {
       "symbol": "PCOR",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1452,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1350,
+      "checkedAt": "2026-08-20T17:13:33.843Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:11:15.575Z"
+      ]
     },
     {
       "symbol": "PERC",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1047,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1177,
+      "checkedAt": "2026-08-20T17:13:37.695Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:11:19.529Z"
+      ]
     },
     {
       "symbol": "PGOLD",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1048,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1039,
+      "checkedAt": "2026-08-20T17:13:37.696Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:11:19.529Z"
+      ]
     },
     {
       "symbol": "PHA",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1121,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1410,
+      "checkedAt": "2026-08-20T17:13:41.374Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:11:23.080Z"
+      ]
     },
     {
       "symbol": "PHC",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1290,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1106,
+      "checkedAt": "2026-08-20T17:13:41.375Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:11:23.080Z"
+      ]
     },
     {
       "symbol": "PHES",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1622,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1299,
+      "checkedAt": "2026-08-20T17:13:45.286Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:11:26.872Z"
+      ]
     },
     {
       "symbol": "PHN",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1605,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1038,
+      "checkedAt": "2026-08-20T17:13:45.287Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:11:26.873Z"
+      ]
     },
     {
       "symbol": "PHR",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 988,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1423,
+      "checkedAt": "2026-08-20T17:13:49.087Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:11:30.996Z"
+      ]
     },
     {
       "symbol": "PIZZA",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1232,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1214,
+      "checkedAt": "2026-08-20T17:13:49.087Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:11:30.997Z"
+      ]
     },
     {
       "symbol": "PLUS",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1177,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1268,
+      "checkedAt": "2026-08-20T17:13:53.012Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:11:34.731Z"
+      ]
     },
     {
       "symbol": "PMPC",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 887,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 871,
+      "checkedAt": "2026-08-20T17:13:53.013Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:11:34.732Z"
+      ]
     },
     {
       "symbol": "PNB",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1153,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1847,
+      "checkedAt": "2026-08-20T17:13:56.781Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:11:38.410Z"
+      ]
     },
     {
       "symbol": "PNC",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1479,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1431,
+      "checkedAt": "2026-08-20T17:13:56.782Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "no_market_cap",
-          "detail": "price.marketCap = null"
-        },
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "financials is synthetic"
-        },
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:11:38.411Z"
+      ]
     },
     {
       "symbol": "PNX",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1153,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 2175,
+      "checkedAt": "2026-08-20T17:14:01.131Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "financials is synthetic"
-        },
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:11:42.390Z"
+      ]
     },
     {
       "symbol": "PORT",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1093,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 2174,
+      "checkedAt": "2026-08-20T17:14:01.132Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "no_market_cap",
-          "detail": "price.marketCap = null"
-        },
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "financials is synthetic"
-        },
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:11:42.391Z"
+      ]
     },
     {
       "symbol": "PPC",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1294,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1080,
+      "checkedAt": "2026-08-20T17:14:05.808Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:11:46.046Z"
+      ]
     },
     {
       "symbol": "PRC",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1175,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1080,
+      "checkedAt": "2026-08-20T17:14:05.809Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:11:46.047Z"
+      ]
     },
     {
       "symbol": "PREIT",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1023,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 788,
+      "checkedAt": "2026-08-20T17:14:09.390Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:11:49.843Z"
+      ]
     },
     {
       "symbol": "PRIM",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1260,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1556,
+      "checkedAt": "2026-08-20T17:14:09.390Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:11:49.844Z"
+      ]
     },
     {
       "symbol": "PRMX",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 890,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1118,
+      "checkedAt": "2026-08-20T17:14:13.448Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:11:53.606Z"
+      ]
     },
     {
       "symbol": "PSB",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1175,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1029,
+      "checkedAt": "2026-08-20T17:14:13.449Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:11:53.606Z"
+      ]
     },
     {
       "symbol": "PSE",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1532,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1085,
+      "checkedAt": "2026-08-20T17:14:17.068Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:11:57.282Z"
+      ]
     },
     {
       "symbol": "PTC",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1045,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1085,
+      "checkedAt": "2026-08-20T17:14:17.068Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:11:57.282Z"
+      ]
     },
     {
       "symbol": "PTT",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 2096,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 979,
+      "checkedAt": "2026-08-20T17:14:20.656Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "no_market_cap",
-          "detail": "price.marketCap = null"
-        },
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:12:01.315Z"
+      ]
     },
     {
       "symbol": "PX",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1130,
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1537,
+      "checkedAt": "2026-08-20T17:14:20.657Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
-      ],
-      "checkedAt": "2026-08-20T12:12:01.315Z"
+      ]
     },
     {
       "symbol": "PXP",
       "ok": false,
-      "httpStatus": null,
-      "latencyMs": 30000,
-      "checkedAt": "2026-08-20T12:12:05.912Z",
+      "httpStatus": 503,
+      "latencyMs": 1041,
+      "checkedAt": "2026-08-20T17:14:24.695Z",
       "issues": [
         {
           "severity": "error",
-          "code": "request_failed",
-          "detail": "The operation was aborted due to timeout"
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
         }
       ]
     },
     {
       "symbol": "RCB",
       "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 952,
+      "checkedAt": "2026-08-20T17:14:24.695Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "RCI",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 2215,
+      "checkedAt": "2026-08-20T17:14:28.237Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "RCR",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1689,
+      "checkedAt": "2026-08-20T17:14:28.238Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "REDC",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 4837,
+      "checkedAt": "2026-08-20T17:14:32.954Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "REG",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 4985,
+      "checkedAt": "2026-08-20T17:14:32.955Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "RFM",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1123,
+      "checkedAt": "2026-08-20T17:14:40.440Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "RLC",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1021,
+      "checkedAt": "2026-08-20T17:14:40.441Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "RLT",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 821,
+      "checkedAt": "2026-08-20T17:14:44.066Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "ROCK",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1343,
+      "checkedAt": "2026-08-20T17:14:44.067Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "ROX",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1475,
+      "checkedAt": "2026-08-20T17:14:47.912Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "RRHI",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 924,
+      "checkedAt": "2026-08-20T17:14:47.913Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "SBS",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1299,
+      "checkedAt": "2026-08-20T17:14:51.889Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "SCC",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1011,
+      "checkedAt": "2026-08-20T17:14:51.890Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "SECB",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 2026,
+      "checkedAt": "2026-08-20T17:14:55.688Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "SEVN",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 2203,
+      "checkedAt": "2026-08-20T17:14:55.689Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "SFI",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1587,
+      "checkedAt": "2026-08-20T17:15:00.394Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "SGI",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1588,
+      "checkedAt": "2026-08-20T17:15:00.395Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "SGP",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 975,
+      "checkedAt": "2026-08-20T17:15:04.484Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "SHLPH",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1002,
+      "checkedAt": "2026-08-20T17:15:04.485Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "SHNG",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1298,
+      "checkedAt": "2026-08-20T17:15:07.989Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "SLF",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1556,
+      "checkedAt": "2026-08-20T17:15:07.989Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "SLI",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1000,
+      "checkedAt": "2026-08-20T17:15:12.048Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "SM",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1293,
+      "checkedAt": "2026-08-20T17:15:12.049Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "SMC",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 3509,
+      "checkedAt": "2026-08-20T17:15:15.843Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "SMPH",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 3211,
+      "checkedAt": "2026-08-20T17:15:15.844Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "SOC",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1325,
+      "checkedAt": "2026-08-20T17:15:21.854Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "SPC",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1326,
+      "checkedAt": "2026-08-20T17:15:21.855Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "SPM",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1243,
+      "checkedAt": "2026-08-20T17:15:25.683Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "SPNEC",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 908,
+      "checkedAt": "2026-08-20T17:15:25.684Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "SRDC",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1319,
+      "checkedAt": "2026-08-20T17:15:29.427Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "SSI",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1677,
+      "checkedAt": "2026-08-20T17:15:29.428Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "STI",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1140,
+      "checkedAt": "2026-08-20T17:15:33.605Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "STN",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1545,
+      "checkedAt": "2026-08-20T17:15:33.606Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "STR",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 3053,
+      "checkedAt": "2026-08-20T17:15:37.654Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "SUN",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 3156,
+      "checkedAt": "2026-08-20T17:15:37.655Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "T",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1063,
+      "checkedAt": "2026-08-20T17:15:43.314Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "TBGI",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1075,
+      "checkedAt": "2026-08-20T17:15:43.315Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "TECH",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1748,
+      "checkedAt": "2026-08-20T17:15:46.891Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "TEL",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1414,
+      "checkedAt": "2026-08-20T17:15:46.891Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "TFC",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 7257,
+      "checkedAt": "2026-08-20T17:15:51.141Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "TFHI",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 7083,
+      "checkedAt": "2026-08-20T17:15:51.141Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "TOP",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1359,
+      "checkedAt": "2026-08-20T17:16:00.901Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "TUBIG",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 881,
+      "checkedAt": "2026-08-20T17:16:00.902Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "TUGS",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 2783,
+      "checkedAt": "2026-08-20T17:16:04.761Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "UBP",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 2581,
+      "checkedAt": "2026-08-20T17:16:04.762Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "UNH",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 2001,
+      "checkedAt": "2026-08-20T17:16:10.045Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "UPM",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 2048,
+      "checkedAt": "2026-08-20T17:16:10.046Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "UPSON",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1134,
+      "checkedAt": "2026-08-20T17:16:14.596Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "URC",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1132,
+      "checkedAt": "2026-08-20T17:16:14.596Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "V",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1043,
+      "checkedAt": "2026-08-20T17:16:18.232Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "VITA",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1100,
+      "checkedAt": "2026-08-20T17:16:18.232Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "VLC",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1199,
+      "checkedAt": "2026-08-20T17:16:21.834Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "VLL",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1046,
+      "checkedAt": "2026-08-20T17:16:21.835Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "VMC",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1311,
+      "checkedAt": "2026-08-20T17:16:25.534Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "VREIT",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 982,
+      "checkedAt": "2026-08-20T17:16:25.535Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "VVT",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1032,
+      "checkedAt": "2026-08-20T17:16:29.347Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "WEB",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1373,
+      "checkedAt": "2026-08-20T17:16:29.348Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "WIN",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1132,
+      "checkedAt": "2026-08-20T17:16:33.223Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "WLCON",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 1134,
+      "checkedAt": "2026-08-20T17:16:33.224Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "WPI",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 10104,
+      "checkedAt": "2026-08-20T17:16:36.860Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "X",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 10565,
+      "checkedAt": "2026-08-20T17:16:36.862Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "XG",
+      "ok": false,
       "httpStatus": null,
-      "latencyMs": 30000,
-      "checkedAt": "2026-08-20T12:12:05.913Z",
+      "latencyMs": 30004,
+      "checkedAt": "2026-08-20T17:16:49.929Z",
       "issues": [
         {
           "severity": "error",
@@ -3234,897 +3943,18 @@
       ]
     },
     {
-      "symbol": "RCI",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 27906,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:12:38.414Z"
-    },
-    {
-      "symbol": "RCR",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 26999,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:12:38.415Z"
-    },
-    {
-      "symbol": "REDC",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 2091,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:13:08.822Z"
-    },
-    {
-      "symbol": "REG",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 2273,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:13:08.823Z"
-    },
-    {
-      "symbol": "RFM",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 971,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:13:13.597Z"
-    },
-    {
-      "symbol": "RLC",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1708,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:13:13.598Z"
-    },
-    {
-      "symbol": "RLT",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 4255,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:13:17.807Z"
-    },
-    {
-      "symbol": "ROCK",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 3829,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:13:17.808Z"
-    },
-    {
-      "symbol": "ROX",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1151,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:13:24.563Z"
-    },
-    {
-      "symbol": "RRHI",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1596,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:13:24.564Z"
-    },
-    {
-      "symbol": "SBS",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1777,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:13:28.661Z"
-    },
-    {
-      "symbol": "SCC",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1294,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:13:28.662Z"
-    },
-    {
-      "symbol": "SECB",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1461,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:13:32.939Z"
-    },
-    {
-      "symbol": "SEVN",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1975,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:13:32.939Z"
-    },
-    {
-      "symbol": "SFI",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1167,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:13:37.415Z"
-    },
-    {
-      "symbol": "SGI",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1164,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:13:37.417Z"
-    },
-    {
-      "symbol": "SGP",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 2356,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:13:41.083Z"
-    },
-    {
-      "symbol": "SHLPH",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1942,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:13:41.083Z"
-    },
-    {
-      "symbol": "SHNG",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1172,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:13:45.939Z"
-    },
-    {
-      "symbol": "SLF",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1660,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "no_market_cap",
-          "detail": "price.marketCap = null"
-        },
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "shareholding is synthetic"
-        },
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:13:45.940Z"
-    },
-    {
-      "symbol": "SLI",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1963,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:13:50.103Z"
-    },
-    {
-      "symbol": "SM",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1614,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:13:50.103Z"
-    },
-    {
-      "symbol": "SMC",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1269,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:13:54.566Z"
-    },
-    {
-      "symbol": "SMPH",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1316,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:13:54.567Z"
-    },
-    {
-      "symbol": "SOC",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1406,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:13:58.385Z"
-    },
-    {
-      "symbol": "SPC",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1472,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:13:58.385Z"
-    },
-    {
-      "symbol": "SPM",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1135,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:14:02.359Z"
-    },
-    {
-      "symbol": "SPNEC",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1147,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:14:02.360Z"
-    },
-    {
-      "symbol": "SRDC",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1047,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:14:06.009Z"
-    },
-    {
-      "symbol": "SSI",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1146,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:14:06.010Z"
-    },
-    {
-      "symbol": "STI",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 3101,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:14:09.656Z"
-    },
-    {
-      "symbol": "STN",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1058,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:14:09.657Z"
-    },
-    {
-      "symbol": "STR",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 2359,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:14:15.259Z"
-    },
-    {
-      "symbol": "SUN",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 2644,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:14:15.259Z"
-    },
-    {
-      "symbol": "T",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1705,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:14:20.405Z"
-    },
-    {
-      "symbol": "TBGI",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 948,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:14:20.405Z"
-    },
-    {
-      "symbol": "TECH",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1711,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:14:24.610Z"
-    },
-    {
-      "symbol": "TEL",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1158,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:14:24.611Z"
-    },
-    {
-      "symbol": "TFC",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1431,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:14:28.822Z"
-    },
-    {
-      "symbol": "TFHI",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1108,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:14:28.823Z"
-    },
-    {
-      "symbol": "TOP",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1432,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:14:32.754Z"
-    },
-    {
-      "symbol": "TUBIG",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 962,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "no_market_cap",
-          "detail": "price.marketCap = null"
-        },
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "financials is synthetic"
-        },
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "shareholding is synthetic"
-        },
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:14:32.755Z"
-    },
-    {
-      "symbol": "TUGS",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1702,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:14:36.686Z"
-    },
-    {
-      "symbol": "UBP",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1222,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:14:36.687Z"
-    },
-    {
-      "symbol": "UNH",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1176,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:14:40.890Z"
-    },
-    {
-      "symbol": "UPM",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1745,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:14:40.890Z"
-    },
-    {
-      "symbol": "UPSON",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1346,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:14:45.136Z"
-    },
-    {
-      "symbol": "URC",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1746,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:14:45.137Z"
-    },
-    {
-      "symbol": "V",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1132,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:14:49.383Z"
-    },
-    {
-      "symbol": "VITA",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1590,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:14:49.384Z"
-    },
-    {
-      "symbol": "VLC",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1784,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:14:53.475Z"
-    },
-    {
-      "symbol": "VLL",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1715,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:14:53.476Z"
-    },
-    {
-      "symbol": "VMC",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 2072,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:14:57.760Z"
-    },
-    {
-      "symbol": "VREIT",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1052,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:14:57.762Z"
-    },
-    {
-      "symbol": "VVT",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 2768,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:15:02.333Z"
-    },
-    {
-      "symbol": "WEB",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1665,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:15:02.334Z"
-    },
-    {
-      "symbol": "WIN",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 2767,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:15:07.603Z"
-    },
-    {
-      "symbol": "WLCON",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1452,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:15:07.603Z"
-    },
-    {
-      "symbol": "WPI",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1663,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:15:12.871Z"
-    },
-    {
-      "symbol": "X",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 2039,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:15:12.872Z"
-    },
-    {
-      "symbol": "XG",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 1708,
-      "issues": [
-        {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
-        }
-      ],
-      "checkedAt": "2026-08-20T12:15:17.413Z"
-    },
-    {
       "symbol": "ZHI",
-      "ok": true,
-      "httpStatus": 200,
-      "latencyMs": 2301,
+      "ok": false,
+      "httpStatus": null,
+      "latencyMs": 30004,
+      "checkedAt": "2026-08-20T17:16:49.930Z",
       "issues": [
         {
-          "severity": "warn",
-          "code": "synthetic_section",
-          "detail": "thesis is synthetic"
+          "severity": "error",
+          "code": "request_failed",
+          "detail": "The operation was aborted due to timeout"
         }
-      ],
-      "checkedAt": "2026-08-20T12:15:17.414Z"
+      ]
     }
   ]
 }

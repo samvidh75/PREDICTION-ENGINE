@@ -1698,41 +1698,12 @@ export default async function registerApiRoutes(server: FastifyInstance) {
     return payload;
   });
 
-  // GET /api/market-universe — live snapshot of the full ~294-ticker PSE
-  // common-share universe (gainers + losers + all), same PHISIX feed.
+  // GET /api/market-universe — live snapshot of the full PSE common-share
+  // universe (gainers + losers + all) from the PHISIX feed, joined against the
+  // bundled stock-universe.json for real PSE Edge sectors and company names.
   // Previously only existed as api/market-universe.ts (Vercel), so it 404'd
   // in production. Now registered here so the Scanner page works on the VPS.
   let universeCache: { data: unknown; expiresAt: number } | null = null;
-
-  async function fetchUniverseQuote(symbol: string, name: string, sector: string | null): Promise<{
-    symbol: string; name: string; price: number; change: number;
-    changePercent: number; volume: number; sector: string | null;
-  } | null> {
-    try {
-      const r = await fetch(`https://phisix-api3.appspot.com/stocks/${symbol.toLowerCase()}.json`, {
-        signal: AbortSignal.timeout(8000),
-      });
-      if (!r.ok) return null;
-      const data = (await r.json()) as any;
-      const stock = data?.stocks?.[0];
-      if (!stock) return null;
-      const price = Number(stock.price?.amount ?? 0);
-      if (!price) return null;
-      const changePercent = Number(stock.percentChange ?? 0);
-      const prevClose = changePercent !== 0 ? price / (1 + changePercent / 100) : price;
-      return {
-        symbol,
-        name: String(stock.name || name),
-        price: Number(price.toFixed(2)),
-        change: Number((price - prevClose).toFixed(2)),
-        changePercent: Number(changePercent.toFixed(2)),
-        volume: Number(stock.volume ?? 0),
-        sector,
-      };
-    } catch {
-      return null;
-    }
-  }
 
   server.get("/api/market-universe", async (_req: FastifyRequest, reply: FastifyReply) => {
     const now = Date.now();
@@ -1740,20 +1711,56 @@ export default async function registerApiRoutes(server: FastifyInstance) {
       setCache(reply, 240);
       return universeCache.data;
     }
-    // Batch PHISIX requests to stay within rate limits
-    const symbols = Object.values(PSE_COMMON_STOCKS);
-    const BATCH = 10;
-    const results: Array<{ symbol: string; name: string; price: number; change: number; changePercent: number; volume: number; sector: string | null }> = [];
-    for (let i = 0; i < symbols.length; i += BATCH) {
-      const batch = symbols.slice(i, i + BATCH);
-      const settled = await Promise.allSettled(
-        batch.map((s) => fetchUniverseQuote(s.symbol, s.name, s.sector ?? null)),
-      );
-      for (const r of settled) {
-        if (r.status === "fulfilled" && r.value) results.push(r.value);
+    // Full PSE universe from the bundled stock-universe.json (282 names with
+    // real PSE Edge sectors), falling back to the hand-curated blue-chip map
+    // if that file is unavailable. This endpoint backs the Scanner, which was
+    // previously limited to the 42 entries in PSE_COMMON_STOCKS — 240 listed
+    // companies were simply invisible to it, and the "N/294" reporting ratio
+    // it rendered was measured against that 42-name list.
+    const universeEntries = StockUniverseAdapter.getInstance().getAllEntries();
+    const symbols: Array<{ symbol: string; name: string; sector: string | null }> =
+      universeEntries.length > 0
+        ? universeEntries.map((e) => ({ symbol: e.symbol, name: e.companyName, sector: e.sector ?? null }))
+        : Object.values(PSE_COMMON_STOCKS).map((s) => ({ symbol: s.symbol, name: s.name, sector: s.sector ?? null }));
+
+    // One bulk call for the whole market rather than one request per symbol.
+    // Per-symbol fetching cost 282 requests per cache refresh (~70/min
+    // sustained) against a free community API — enough to trip the provider
+    // circuit breaker on its own. PHISIX publishes the entire board at
+    // /stocks.json, so the universe is joined against a single response.
+    const priceBySymbol = new Map<string, { name: string; price: number; changePercent: number; volume: number }>();
+    try {
+      const { phisixProvider } = await import("../services/providers/PhisixProvider.js");
+      for (const stock of await phisixProvider.getStocks()) {
+        const price = Number(stock.price?.amount ?? 0);
+        if (!price) continue;
+        priceBySymbol.set(stock.symbol.toUpperCase(), {
+          name: String(stock.name ?? stock.symbol),
+          price,
+          changePercent: Number(stock.percentChange ?? 0),
+          volume: Number(stock.volume ?? 0),
+        });
       }
-      if (i + BATCH < symbols.length) await new Promise((res) => setTimeout(res, 80));
+    } catch (err) {
+      server.log.warn(`market-universe: PHISIX bulk feed failed: ${(err as Error)?.message ?? err}`);
     }
+
+    const results: Array<{ symbol: string; name: string; price: number; change: number; changePercent: number; volume: number; sector: string | null }> = [];
+    for (const entry of symbols) {
+      const quote = priceBySymbol.get(entry.symbol.toUpperCase());
+      if (!quote) continue; // Not trading today / not on the board — omitted, never zero-filled.
+      const prevClose = quote.changePercent !== 0 ? quote.price / (1 + quote.changePercent / 100) : quote.price;
+      results.push({
+        symbol: entry.symbol,
+        name: entry.name || quote.name,
+        price: Number(quote.price.toFixed(2)),
+        change: Number((quote.price - prevClose).toFixed(2)),
+        changePercent: Number(quote.changePercent.toFixed(2)),
+        volume: quote.volume,
+        sector: entry.sector,
+      });
+    }
+
     const payload = {
       ok: true,
       quotes: results,

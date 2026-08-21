@@ -3,7 +3,8 @@
 export interface SeoMeta {
   title: string;
   description: string;
-  /** Canonical URL path (e.g. /stocks/BDO) */
+  /** Canonical URL path. Must match a real route in src/app/routes.tsx
+   *  (e.g. /stock/BDO — note the singular, matching `/stock/:symbol/*`). */
   canonical: string;
   /** og:image path relative to public/ */
   ogImage?: string;
