@@ -1,0 +1,4095 @@
+{
+  "generatedAt": "2026-08-21T10:14:10.465Z",
+  "baseUrl": "http://localhost:10105",
+  "totals": {
+    "total": 282,
+    "clean": 0,
+    "warnings": 251,
+    "failed": 31
+  },
+  "results": [
+    {
+      "symbol": "AAA",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 2844,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "no_market_cap",
+          "detail": "price.marketCap = null"
+        },
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "financials is synthetic"
+        },
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:02:57.909Z"
+    },
+    {
+      "symbol": "AB",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 2515,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:02:57.930Z"
+    },
+    {
+      "symbol": "ABA",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1408,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:03:03.255Z"
+    },
+    {
+      "symbol": "ABG",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1894,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:03:03.257Z"
+    },
+    {
+      "symbol": "ABS",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1491,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:03:07.652Z"
+    },
+    {
+      "symbol": "ABSP",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1399,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:03:07.654Z"
+    },
+    {
+      "symbol": "AC",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1231,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:03:11.644Z"
+    },
+    {
+      "symbol": "ACE",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1145,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:03:11.646Z"
+    },
+    {
+      "symbol": "ACEN",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1307,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:03:15.377Z"
+    },
+    {
+      "symbol": "ACR",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1142,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:03:15.378Z"
+    },
+    {
+      "symbol": "AEV",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 971,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:03:19.186Z"
+    },
+    {
+      "symbol": "AGI",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1067,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:03:19.187Z"
+    },
+    {
+      "symbol": "ALCO",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1267,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:03:22.755Z"
+    },
+    {
+      "symbol": "ALHI",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 935,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:03:22.755Z"
+    },
+    {
+      "symbol": "ALI",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 2746,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:03:26.524Z"
+    },
+    {
+      "symbol": "ALLDY",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 957,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:03:26.525Z"
+    },
+    {
+      "symbol": "ALLHC",
+      "ok": false,
+      "httpStatus": null,
+      "latencyMs": 30006,
+      "checkedAt": "2026-08-21T10:03:31.771Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "request_failed",
+          "detail": "The operation was aborted due to timeout"
+        }
+      ]
+    },
+    {
+      "symbol": "ALTER",
+      "ok": false,
+      "httpStatus": null,
+      "latencyMs": 30006,
+      "checkedAt": "2026-08-21T10:03:31.772Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "request_failed",
+          "detail": "The operation was aborted due to timeout"
+        }
+      ]
+    },
+    {
+      "symbol": "ANI",
+      "ok": false,
+      "httpStatus": null,
+      "latencyMs": 30000,
+      "checkedAt": "2026-08-21T10:04:04.279Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "request_failed",
+          "detail": "The operation was aborted due to timeout"
+        }
+      ]
+    },
+    {
+      "symbol": "ANS",
+      "ok": false,
+      "httpStatus": null,
+      "latencyMs": 30000,
+      "checkedAt": "2026-08-21T10:04:04.280Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "request_failed",
+          "detail": "The operation was aborted due to timeout"
+        }
+      ]
+    },
+    {
+      "symbol": "AP",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 389,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:04:36.780Z"
+    },
+    {
+      "symbol": "APC",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 387,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:04:36.781Z"
+    },
+    {
+      "symbol": "APL",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 10007,
+      "checkedAt": "2026-08-21T10:04:39.670Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "APO",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 10009,
+      "checkedAt": "2026-08-21T10:04:39.671Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "APVI",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 10010,
+      "checkedAt": "2026-08-21T10:04:52.181Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "APX",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 10011,
+      "checkedAt": "2026-08-21T10:04:52.182Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "AR",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 5,
+      "checkedAt": "2026-08-21T10:05:04.693Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "ARA",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 7,
+      "checkedAt": "2026-08-21T10:05:04.693Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "AREIT",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 4,
+      "checkedAt": "2026-08-21T10:05:07.201Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "ASLAG",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 6,
+      "checkedAt": "2026-08-21T10:05:07.202Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "AT",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 4,
+      "checkedAt": "2026-08-21T10:05:09.709Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "ATN",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 5,
+      "checkedAt": "2026-08-21T10:05:09.710Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "AUB",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 4,
+      "checkedAt": "2026-08-21T10:05:12.217Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "AXLM",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 5,
+      "checkedAt": "2026-08-21T10:05:12.218Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "BALAI",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 3,
+      "checkedAt": "2026-08-21T10:05:14.724Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "BC",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 6,
+      "checkedAt": "2026-08-21T10:05:14.724Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "BCOR",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 6,
+      "checkedAt": "2026-08-21T10:05:17.231Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "BDO",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 5,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:05:17.232Z"
+    },
+    {
+      "symbol": "BEL",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 5,
+      "checkedAt": "2026-08-21T10:05:19.739Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "BH",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 7,
+      "checkedAt": "2026-08-21T10:05:19.740Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "BHI",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 4,
+      "checkedAt": "2026-08-21T10:05:22.248Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "BKR",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 4,
+      "checkedAt": "2026-08-21T10:05:22.249Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "BLOOM",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 6,
+      "checkedAt": "2026-08-21T10:05:24.754Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "BMM",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 7,
+      "checkedAt": "2026-08-21T10:05:24.755Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "BNCOM",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 5,
+      "checkedAt": "2026-08-21T10:05:27.264Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "BPI",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 6,
+      "checkedAt": "2026-08-21T10:05:27.265Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "BRN",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 6,
+      "checkedAt": "2026-08-21T10:05:29.772Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "BSC",
+      "ok": false,
+      "httpStatus": 503,
+      "latencyMs": 8,
+      "checkedAt": "2026-08-21T10:05:29.773Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "http_503",
+          "detail": "503 — stockHandler reported market data providers not responding"
+        }
+      ]
+    },
+    {
+      "symbol": "C",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 849,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:05:32.282Z"
+    },
+    {
+      "symbol": "CA",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 851,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:05:32.283Z"
+    },
+    {
+      "symbol": "CAT",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 3129,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:05:35.635Z"
+    },
+    {
+      "symbol": "CBC",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 2913,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:05:35.636Z"
+    },
+    {
+      "symbol": "CDC",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 2515,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:05:41.266Z"
+    },
+    {
+      "symbol": "CEB",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1711,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:05:41.267Z"
+    },
+    {
+      "symbol": "CEI",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1246,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:05:46.282Z"
+    },
+    {
+      "symbol": "CEU",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1687,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:05:46.283Z"
+    },
+    {
+      "symbol": "CHP",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1183,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:05:50.470Z"
+    },
+    {
+      "symbol": "CIC",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1590,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:05:50.471Z"
+    },
+    {
+      "symbol": "CLI",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 2300,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:05:54.562Z"
+    },
+    {
+      "symbol": "CNPF",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 2191,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:05:54.563Z"
+    },
+    {
+      "symbol": "CNVRG",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 2020,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:05:59.365Z"
+    },
+    {
+      "symbol": "COL",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 2045,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:05:59.365Z"
+    },
+    {
+      "symbol": "COSCO",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1275,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:06:03.911Z"
+    },
+    {
+      "symbol": "CPG",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1262,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:06:03.912Z"
+    },
+    {
+      "symbol": "CPM",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1085,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:06:07.687Z"
+    },
+    {
+      "symbol": "CREC",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1039,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:06:07.688Z"
+    },
+    {
+      "symbol": "CREIT",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1346,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:06:11.342Z"
+    },
+    {
+      "symbol": "CROWN",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1344,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:06:11.342Z"
+    },
+    {
+      "symbol": "CSB",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1763,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:06:15.189Z"
+    },
+    {
+      "symbol": "CTS",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1176,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:06:15.190Z"
+    },
+    {
+      "symbol": "CYBR",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 2293,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "no_market_cap",
+          "detail": "price.marketCap = null"
+        },
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:06:19.454Z"
+    },
+    {
+      "symbol": "DD",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1884,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:06:19.455Z"
+    },
+    {
+      "symbol": "DDMPR",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1030,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:06:24.247Z"
+    },
+    {
+      "symbol": "DELM",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1025,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:06:24.248Z"
+    },
+    {
+      "symbol": "DFNN",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 931,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:06:27.779Z"
+    },
+    {
+      "symbol": "DHI",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1243,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:06:27.780Z"
+    },
+    {
+      "symbol": "DITO",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1145,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:06:31.525Z"
+    },
+    {
+      "symbol": "DIZ",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 899,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:06:31.526Z"
+    },
+    {
+      "symbol": "DMC",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1146,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:06:35.171Z"
+    },
+    {
+      "symbol": "DMW",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1109,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:06:35.172Z"
+    },
+    {
+      "symbol": "DNL",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1772,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:06:38.819Z"
+    },
+    {
+      "symbol": "DWC",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1214,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:06:38.819Z"
+    },
+    {
+      "symbol": "ECP",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1803,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:06:43.092Z"
+    },
+    {
+      "symbol": "ECVC",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 2367,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:06:43.093Z"
+    },
+    {
+      "symbol": "EEI",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1658,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:06:47.962Z"
+    },
+    {
+      "symbol": "EG",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1315,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "no_market_cap",
+          "detail": "price.marketCap = null"
+        },
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "financials is synthetic"
+        },
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "shareholding is synthetic"
+        },
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:06:47.963Z"
+    },
+    {
+      "symbol": "EGRN",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1209,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:06:52.122Z"
+    },
+    {
+      "symbol": "ELI",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1686,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:06:52.123Z"
+    },
+    {
+      "symbol": "EMI",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 2067,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:06:56.311Z"
+    },
+    {
+      "symbol": "ENEX",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 2759,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:06:56.312Z"
+    },
+    {
+      "symbol": "EURO",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1675,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:07:01.573Z"
+    },
+    {
+      "symbol": "EW",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1734,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:07:01.574Z"
+    },
+    {
+      "symbol": "FAF",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1397,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:07:05.809Z"
+    },
+    {
+      "symbol": "FB",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1416,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:07:05.810Z"
+    },
+    {
+      "symbol": "FCG",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1179,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:07:09.728Z"
+    },
+    {
+      "symbol": "FDC",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1178,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:07:09.728Z"
+    },
+    {
+      "symbol": "FERRO",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1681,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:07:13.408Z"
+    },
+    {
+      "symbol": "FEU",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1501,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:07:13.409Z"
+    },
+    {
+      "symbol": "FFI",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1202,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "no_market_cap",
+          "detail": "price.marketCap = null"
+        },
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:07:17.590Z"
+    },
+    {
+      "symbol": "FGEN",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1199,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:07:17.591Z"
+    },
+    {
+      "symbol": "FILRT",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 875,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:07:21.293Z"
+    },
+    {
+      "symbol": "FJP",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 864,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:07:21.293Z"
+    },
+    {
+      "symbol": "FLI",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1127,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:07:24.669Z"
+    },
+    {
+      "symbol": "FMETF",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1427,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "no_market_cap",
+          "detail": "price.marketCap = null"
+        },
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:07:24.670Z"
+    },
+    {
+      "symbol": "FNI",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 860,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:07:28.599Z"
+    },
+    {
+      "symbol": "FOOD",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1306,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:07:28.600Z"
+    },
+    {
+      "symbol": "FPH",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1848,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:07:32.407Z"
+    },
+    {
+      "symbol": "FPI",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1391,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:07:32.408Z"
+    },
+    {
+      "symbol": "FRUIT",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 2251,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:07:36.758Z"
+    },
+    {
+      "symbol": "FYN",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1334,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:07:36.758Z"
+    },
+    {
+      "symbol": "GEO",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1115,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:07:41.510Z"
+    },
+    {
+      "symbol": "GERI",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1582,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:07:41.511Z"
+    },
+    {
+      "symbol": "GLO",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1612,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:07:45.596Z"
+    },
+    {
+      "symbol": "GMA7",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1168,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "shareholding is synthetic"
+        },
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:07:45.597Z"
+    },
+    {
+      "symbol": "GMAP",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1805,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "shareholding is synthetic"
+        },
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:07:49.710Z"
+    },
+    {
+      "symbol": "GPH",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1803,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:07:49.711Z"
+    },
+    {
+      "symbol": "GREEN",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1433,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:07:54.018Z"
+    },
+    {
+      "symbol": "GSMI",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1941,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:07:54.019Z"
+    },
+    {
+      "symbol": "GTCAP",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 3165,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:07:58.461Z"
+    },
+    {
+      "symbol": "HI",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 3190,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:07:58.462Z"
+    },
+    {
+      "symbol": "HOME",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1787,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:08:04.153Z"
+    },
+    {
+      "symbol": "HTI",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1837,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:08:04.154Z"
+    },
+    {
+      "symbol": "I",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1440,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:08:08.494Z"
+    },
+    {
+      "symbol": "ICT",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1342,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:08:08.495Z"
+    },
+    {
+      "symbol": "IDC",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1160,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:08:12.436Z"
+    },
+    {
+      "symbol": "IMI",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1160,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:08:12.437Z"
+    },
+    {
+      "symbol": "IMP",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1093,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:08:16.097Z"
+    },
+    {
+      "symbol": "INFRA",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1386,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:08:16.098Z"
+    },
+    {
+      "symbol": "ION",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 2078,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:08:19.987Z"
+    },
+    {
+      "symbol": "IPM",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1490,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:08:19.987Z"
+    },
+    {
+      "symbol": "IPO",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 3092,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:08:24.566Z"
+    },
+    {
+      "symbol": "IS",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 2227,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:08:24.567Z"
+    },
+    {
+      "symbol": "JAS",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 2273,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:08:30.159Z"
+    },
+    {
+      "symbol": "JFC",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1608,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:08:30.160Z"
+    },
+    {
+      "symbol": "JGS",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1139,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:08:34.933Z"
+    },
+    {
+      "symbol": "JOH",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1388,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:08:34.934Z"
+    },
+    {
+      "symbol": "KEEPR",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 2243,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:08:38.823Z"
+    },
+    {
+      "symbol": "KEP",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 2779,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:08:38.823Z"
+    },
+    {
+      "symbol": "KPPI",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1670,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:08:44.105Z"
+    },
+    {
+      "symbol": "LBC",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1155,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:08:44.106Z"
+    },
+    {
+      "symbol": "LC",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1167,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:08:48.276Z"
+    },
+    {
+      "symbol": "LFM",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1006,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:08:48.277Z"
+    },
+    {
+      "symbol": "LMG",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 941,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:08:51.945Z"
+    },
+    {
+      "symbol": "LODE",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1165,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:08:51.946Z"
+    },
+    {
+      "symbol": "LOTO",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 929,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:08:55.613Z"
+    },
+    {
+      "symbol": "LPC",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 956,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:08:55.614Z"
+    },
+    {
+      "symbol": "LPZ",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 878,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:08:59.073Z"
+    },
+    {
+      "symbol": "LSC",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1170,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:08:59.074Z"
+    },
+    {
+      "symbol": "LTG",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 2139,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:09:02.746Z"
+    },
+    {
+      "symbol": "MA",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 2141,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:09:02.746Z"
+    },
+    {
+      "symbol": "MAC",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1689,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:09:07.390Z"
+    },
+    {
+      "symbol": "MACAY",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1592,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:09:07.390Z"
+    },
+    {
+      "symbol": "MAH",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1166,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:09:11.581Z"
+    },
+    {
+      "symbol": "MARC",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1953,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:09:11.581Z"
+    },
+    {
+      "symbol": "MAXS",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1775,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:09:16.035Z"
+    },
+    {
+      "symbol": "MB",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 972,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:09:16.036Z"
+    },
+    {
+      "symbol": "MBC",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1182,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:09:20.312Z"
+    },
+    {
+      "symbol": "MBT",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1750,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:09:20.313Z"
+    },
+    {
+      "symbol": "MED",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1966,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:09:24.564Z"
+    },
+    {
+      "symbol": "MEDIC",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1449,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:09:24.565Z"
+    },
+    {
+      "symbol": "MEG",
+      "ok": false,
+      "httpStatus": null,
+      "latencyMs": 30002,
+      "checkedAt": "2026-08-21T10:09:29.032Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "request_failed",
+          "detail": "The operation was aborted due to timeout"
+        }
+      ]
+    },
+    {
+      "symbol": "MER",
+      "ok": false,
+      "httpStatus": null,
+      "latencyMs": 30002,
+      "checkedAt": "2026-08-21T10:09:29.032Z",
+      "issues": [
+        {
+          "severity": "error",
+          "code": "request_failed",
+          "detail": "The operation was aborted due to timeout"
+        }
+      ]
+    },
+    {
+      "symbol": "MFC",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1943,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "shareholding is synthetic"
+        },
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:10:01.535Z"
+    },
+    {
+      "symbol": "MFIN",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1713,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:10:01.535Z"
+    },
+    {
+      "symbol": "MG",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1410,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:10:05.980Z"
+    },
+    {
+      "symbol": "MGH",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1591,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "no_market_cap",
+          "detail": "price.marketCap = null"
+        },
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:10:05.981Z"
+    },
+    {
+      "symbol": "MHC",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1673,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:10:10.073Z"
+    },
+    {
+      "symbol": "MJC",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1509,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "no_market_cap",
+          "detail": "price.marketCap = null"
+        },
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "financials is synthetic"
+        },
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:10:10.074Z"
+    },
+    {
+      "symbol": "MJIC",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 972,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "no_market_cap",
+          "detail": "price.marketCap = null"
+        },
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "financials is synthetic"
+        },
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:10:14.248Z"
+    },
+    {
+      "symbol": "MM",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1716,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:10:14.249Z"
+    },
+    {
+      "symbol": "MONDE",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1736,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:10:18.465Z"
+    },
+    {
+      "symbol": "MRC",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1295,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:10:18.466Z"
+    },
+    {
+      "symbol": "MREIT",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1478,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:10:22.703Z"
+    },
+    {
+      "symbol": "MRSGI",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1127,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:10:22.703Z"
+    },
+    {
+      "symbol": "MVC",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1594,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:10:26.682Z"
+    },
+    {
+      "symbol": "MWC",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1052,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:10:26.682Z"
+    },
+    {
+      "symbol": "MWIDE",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 793,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:10:30.777Z"
+    },
+    {
+      "symbol": "MYNLD",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 931,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:10:30.778Z"
+    },
+    {
+      "symbol": "NI",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1487,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:10:34.210Z"
+    },
+    {
+      "symbol": "NIKL",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1300,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:10:34.211Z"
+    },
+    {
+      "symbol": "NOW",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1406,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:10:38.198Z"
+    },
+    {
+      "symbol": "NRCP",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1109,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:10:38.199Z"
+    },
+    {
+      "symbol": "NXGEN",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1113,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "no_market_cap",
+          "detail": "price.marketCap = null"
+        },
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:10:42.106Z"
+    },
+    {
+      "symbol": "OGP",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1418,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:10:42.107Z"
+    },
+    {
+      "symbol": "OM",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1638,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:10:46.027Z"
+    },
+    {
+      "symbol": "OPM",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1448,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:10:46.028Z"
+    },
+    {
+      "symbol": "ORE",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1160,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:10:50.166Z"
+    },
+    {
+      "symbol": "OV",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1147,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:10:50.167Z"
+    },
+    {
+      "symbol": "PA",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1578,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:10:53.829Z"
+    },
+    {
+      "symbol": "PAL",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1576,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:10:53.829Z"
+    },
+    {
+      "symbol": "PAX",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 2187,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:10:57.908Z"
+    },
+    {
+      "symbol": "PBB",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1950,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:10:57.909Z"
+    },
+    {
+      "symbol": "PBC",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1383,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:11:02.597Z"
+    },
+    {
+      "symbol": "PCOR",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1633,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:11:02.597Z"
+    },
+    {
+      "symbol": "PERC",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 2460,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:11:06.732Z"
+    },
+    {
+      "symbol": "PGOLD",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 2664,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:11:06.733Z"
+    },
+    {
+      "symbol": "PHA",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1718,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:11:11.898Z"
+    },
+    {
+      "symbol": "PHC",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 2324,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:11:11.898Z"
+    },
+    {
+      "symbol": "PHES",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1626,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:11:16.723Z"
+    },
+    {
+      "symbol": "PHN",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1245,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:11:16.724Z"
+    },
+    {
+      "symbol": "PHR",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1653,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:11:20.851Z"
+    },
+    {
+      "symbol": "PIZZA",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1177,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:11:20.852Z"
+    },
+    {
+      "symbol": "PLUS",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1098,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:11:25.005Z"
+    },
+    {
+      "symbol": "PMPC",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1492,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:11:25.006Z"
+    },
+    {
+      "symbol": "PNB",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1243,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:11:28.999Z"
+    },
+    {
+      "symbol": "PNC",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1722,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "no_market_cap",
+          "detail": "price.marketCap = null"
+        },
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "financials is synthetic"
+        },
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:11:29.000Z"
+    },
+    {
+      "symbol": "PNX",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1089,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "financials is synthetic"
+        },
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:11:33.223Z"
+    },
+    {
+      "symbol": "PORT",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1396,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "no_market_cap",
+          "detail": "price.marketCap = null"
+        },
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "financials is synthetic"
+        },
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:11:33.224Z"
+    },
+    {
+      "symbol": "PPC",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1671,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:11:37.122Z"
+    },
+    {
+      "symbol": "PRC",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1228,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:11:37.123Z"
+    },
+    {
+      "symbol": "PREIT",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1489,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:11:41.295Z"
+    },
+    {
+      "symbol": "PRIM",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1491,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:11:41.296Z"
+    },
+    {
+      "symbol": "PRMX",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1102,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:11:45.288Z"
+    },
+    {
+      "symbol": "PSB",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1515,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:11:45.289Z"
+    },
+    {
+      "symbol": "PSE",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1965,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:11:49.305Z"
+    },
+    {
+      "symbol": "PTC",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1314,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:11:49.305Z"
+    },
+    {
+      "symbol": "PTT",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1072,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "no_market_cap",
+          "detail": "price.marketCap = null"
+        },
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:11:53.772Z"
+    },
+    {
+      "symbol": "PX",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1332,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:11:53.773Z"
+    },
+    {
+      "symbol": "PXP",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 940,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:11:57.607Z"
+    },
+    {
+      "symbol": "RCB",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1102,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:11:57.608Z"
+    },
+    {
+      "symbol": "RCI",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1432,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:12:01.212Z"
+    },
+    {
+      "symbol": "RCR",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1170,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:12:01.213Z"
+    },
+    {
+      "symbol": "REDC",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 931,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:12:05.146Z"
+    },
+    {
+      "symbol": "REG",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1492,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:12:05.146Z"
+    },
+    {
+      "symbol": "RFM",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 3332,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:12:09.140Z"
+    },
+    {
+      "symbol": "RLC",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 3333,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:12:09.140Z"
+    },
+    {
+      "symbol": "RLT",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 2485,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:12:14.975Z"
+    },
+    {
+      "symbol": "ROCK",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 4421,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:12:14.975Z"
+    },
+    {
+      "symbol": "ROX",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1987,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:12:21.897Z"
+    },
+    {
+      "symbol": "RRHI",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 2217,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:12:21.898Z"
+    },
+    {
+      "symbol": "SBS",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1513,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:12:26.616Z"
+    },
+    {
+      "symbol": "SCC",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1807,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:12:26.616Z"
+    },
+    {
+      "symbol": "SECB",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1626,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:12:30.923Z"
+    },
+    {
+      "symbol": "SEVN",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 2032,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:12:30.924Z"
+    },
+    {
+      "symbol": "SFI",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1331,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:12:35.457Z"
+    },
+    {
+      "symbol": "SGI",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1248,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:12:35.457Z"
+    },
+    {
+      "symbol": "SGP",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1162,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:12:39.290Z"
+    },
+    {
+      "symbol": "SHLPH",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1004,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:12:39.291Z"
+    },
+    {
+      "symbol": "SHNG",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1373,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:12:42.954Z"
+    },
+    {
+      "symbol": "SLF",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1606,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "shareholding is synthetic"
+        },
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:12:42.955Z"
+    },
+    {
+      "symbol": "SLI",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1378,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:12:47.063Z"
+    },
+    {
+      "symbol": "SM",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1378,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:12:47.064Z"
+    },
+    {
+      "symbol": "SMC",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1249,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:12:50.943Z"
+    },
+    {
+      "symbol": "SMPH",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1032,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:12:50.943Z"
+    },
+    {
+      "symbol": "SOC",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1447,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:12:54.693Z"
+    },
+    {
+      "symbol": "SPC",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1445,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:12:54.694Z"
+    },
+    {
+      "symbol": "SPM",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1739,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:12:58.641Z"
+    },
+    {
+      "symbol": "SPNEC",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1136,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:12:58.642Z"
+    },
+    {
+      "symbol": "SRDC",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1227,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:13:02.881Z"
+    },
+    {
+      "symbol": "SSI",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1723,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:13:02.882Z"
+    },
+    {
+      "symbol": "STI",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 966,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:13:07.108Z"
+    },
+    {
+      "symbol": "STN",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1606,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:13:07.108Z"
+    },
+    {
+      "symbol": "STR",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 2296,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:13:11.215Z"
+    },
+    {
+      "symbol": "SUN",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 2601,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:13:11.216Z"
+    },
+    {
+      "symbol": "T",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 2104,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:13:16.318Z"
+    },
+    {
+      "symbol": "TBGI",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1930,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:13:16.319Z"
+    },
+    {
+      "symbol": "TECH",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1300,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:13:20.923Z"
+    },
+    {
+      "symbol": "TEL",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1426,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:13:20.924Z"
+    },
+    {
+      "symbol": "TFC",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1466,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:13:24.851Z"
+    },
+    {
+      "symbol": "TFHI",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 973,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:13:24.852Z"
+    },
+    {
+      "symbol": "TOP",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 2095,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:13:28.818Z"
+    },
+    {
+      "symbol": "TUBIG",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1490,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "no_market_cap",
+          "detail": "price.marketCap = null"
+        },
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "financials is synthetic"
+        },
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "shareholding is synthetic"
+        },
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:13:28.819Z"
+    },
+    {
+      "symbol": "TUGS",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1288,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:13:33.415Z"
+    },
+    {
+      "symbol": "UBP",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1087,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:13:33.416Z"
+    },
+    {
+      "symbol": "UNH",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1360,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:13:37.205Z"
+    },
+    {
+      "symbol": "UPM",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1147,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:13:37.205Z"
+    },
+    {
+      "symbol": "UPSON",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1317,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:13:41.067Z"
+    },
+    {
+      "symbol": "URC",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1320,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:13:41.068Z"
+    },
+    {
+      "symbol": "V",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1126,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:13:44.890Z"
+    },
+    {
+      "symbol": "VITA",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1170,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:13:44.891Z"
+    },
+    {
+      "symbol": "VLC",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1455,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:13:48.562Z"
+    },
+    {
+      "symbol": "VLL",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1451,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:13:48.563Z"
+    },
+    {
+      "symbol": "VMC",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1022,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:13:52.518Z"
+    },
+    {
+      "symbol": "VREIT",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1094,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:13:52.519Z"
+    },
+    {
+      "symbol": "VVT",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 901,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:13:56.114Z"
+    },
+    {
+      "symbol": "WEB",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1088,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:13:56.115Z"
+    },
+    {
+      "symbol": "WIN",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1930,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:13:59.705Z"
+    },
+    {
+      "symbol": "WLCON",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1216,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:13:59.706Z"
+    },
+    {
+      "symbol": "WPI",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1169,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:14:04.137Z"
+    },
+    {
+      "symbol": "X",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1778,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:14:04.137Z"
+    },
+    {
+      "symbol": "XG",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 2047,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:14:08.416Z"
+    },
+    {
+      "symbol": "ZHI",
+      "ok": true,
+      "httpStatus": 200,
+      "latencyMs": 1382,
+      "issues": [
+        {
+          "severity": "warn",
+          "code": "synthetic_section",
+          "detail": "thesis is synthetic"
+        }
+      ],
+      "checkedAt": "2026-08-21T10:14:08.417Z"
+    }
+  ]
+}
