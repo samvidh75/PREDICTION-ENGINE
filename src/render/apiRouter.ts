@@ -1024,6 +1024,7 @@ export default async function registerApiRoutes(server: FastifyInstance) {
         riskAdjusted: realScores.riskAdjusted,
       },
       scoreConfidence: realScores.confidence,
+      scoreLabel: realScores.label,
       scoreMissingInputs: realScores.missingInputs,
       momentumBreakdown,
       confidenceMeter: realScores.confidence,

@@ -57,6 +57,8 @@ export interface StockScores {
   risk: number | null;
   health: number | null;
   riskAdjusted: number | null;
+  /** The engine's own verdict word for the composite, or the pending label. */
+  label: string;
   /** 0-100: how much of the scoring surface was backed by real inputs. */
   confidence: number;
   /** Named inputs that were unavailable, for display and debugging. */
@@ -158,6 +160,9 @@ export function computeStockScores(input: ScoringInputs): StockScores {
     // value fed the thesis generator, which is why that text never varied.
     health: conviction.overallScore,
     riskAdjusted: conviction.overallScore,
+    // researchEngine's own vocabulary ("Very Healthy" … "Research signals
+    // pending"), not a grade invented here for display.
+    label: conviction.conviction,
     confidence,
     missingInputs: [...new Set(missingInputs)],
   };

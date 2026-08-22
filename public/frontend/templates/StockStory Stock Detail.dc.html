@@ -167,9 +167,9 @@
             <circle cx="65" cy="65" r="54" stroke="#1A7F37" stroke-width="12" fill="none" stroke-linecap="round" stroke-dasharray="{{ gaugeDash }}"></circle>
           </svg>
           <div style="position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;">
-            <span class="n" style="font-size:34px; font-weight:600; line-height:1;">88</span>
+            <span class="n" style="font-size:34px; font-weight:600; line-height:1;">{{ scoreText }}</span>
             <span class="lb" style="font-size:10px; margin-top:2px;">/ 100</span>
-            <span style="font-size:10.5px; font-weight:600; color:#1A7F37; margin-top:2px;">Excellent</span>
+            <span style="font-size:10.5px; font-weight:600; color:{{ scoreLabelColor }}; margin-top:2px;">{{ scoreLabel }}</span>
           </div>
         </div>
         <div style="min-width:0;">
@@ -184,7 +184,7 @@
           </sc-for>
         </div>
       </div>
-      <div class="lb" style="font-size:11.5px; margin-top:14px; padding-top:12px; border-top:1px solid #F0F0EB;">Research coverage: <span style="color:#1A7F37; font-weight:600;">88% of key metrics</span> sourced from primary filings</div>
+      <div class="lb" style="font-size:11.5px; margin-top:14px; padding-top:12px; border-top:1px solid #F0F0EB;">Research coverage: <span style="color:#1A7F37; font-weight:600;">{{ coverageText }}</span> sourced from primary filings</div>
     </div>
   </div>
 
@@ -206,7 +206,7 @@
           <span style="font-size:14.5px; font-weight:600;">Investment thesis</span>
           <span class="lb" style="font-size:11px;">Reviewed 12 Aug · Updated daily</span>
         </div>
-        <div style="padding:14px; border-radius:9px; background:#FBFAF4; border:1px solid #EDE9D8; font-size:13.5px; line-height:1.62; margin-bottom:16px;">BDO is the country's largest bank by assets, with a low-cost deposit franchise, disciplined provisioning, and a lending book that has compounded through two rate cycles.</div>
+        <div style="padding:14px; border-radius:9px; background:#FBFAF4; border:1px solid #EDE9D8; font-size:13.5px; line-height:1.62; margin-bottom:16px;">{{ narrativeText }}</div>
         <sc-for list="{{ thesisPoints }}" as="tp" hint-placeholder-count="5">
           <div style="display:grid; grid-template-columns:19px minmax(0,1fr); gap:10px; padding:7px 0;">
             <svg width="17" height="17" viewBox="0 0 18 18" fill="none" style="margin-top:1px;"><circle cx="9" cy="9" r="7.4" stroke="#1A7F37" stroke-width="1.4"></circle><path d="M5.9 9.2 L7.9 11.2 L12.1 7" stroke="#1A7F37" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
@@ -225,7 +225,7 @@
         </div>
         <div style="display:flex; align-items:baseline; gap:11px; margin-bottom:16px; flex-wrap:wrap;">
           <span class="n" style="font-size:clamp(26px,1.6vw + 16px,36px); font-weight:600; letter-spacing:-0.03em;">{{ fairValueText }}</span>
-          <span style="padding:3px 9px; border-radius:6px; background:#EDF6F0; font-size:12px; font-weight:600; color:#166B2E;">+11.2% to estimate</span>
+          <span style="padding:3px 9px; border-radius:6px; background:#EDF6F0; font-size:12px; font-weight:600; color:#166B2E;">{{ upsideText }}</span>
         </div>
         <sc-for list="{{ valuationRows }}" as="vr" hint-placeholder-count="3">
           <div style="display:flex; align-items:baseline; justify-content:space-between; gap:12px; padding:8px 0; border-top:1px solid #F0F0EB;">
@@ -257,7 +257,7 @@
           <span style="font-size:14.5px; font-weight:600;">Performance</span>
           <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
             <span style="display:flex; align-items:center; gap:6px; font-size:11.5px;"><span style="width:14px; height:2px; background:#1A7F37;"></span>{{ tickerText }} <span class="n" style="font-weight:600;">{{ chartReturnText }}</span></span>
-            <span style="display:flex; align-items:center; gap:6px; font-size:11.5px; color:#6B6B66;"><span style="width:14px; height:2px; background:#C4C4BD;"></span>PSE Index <span class="n" style="font-weight:600;">+38.4%</span></span>
+            <span style="display:flex; align-items:center; gap:6px; font-size:11.5px; color:#6B6B66;"><span style="width:14px; height:2px; background:#C4C4BD;"></span>PSE Index <span class="n" style="font-weight:600;">{{ benchReturnText }}</span></span>
             <div style="display:flex; gap:2px; padding:2px; background:#F2F2ED; border-radius:7px;">
               <sc-for list="{{ ranges }}" as="rg" hint-placeholder-count="6">
                 <span onClick="{{ rg.select }}" style="padding:4px 10px; border-radius:5px; font-size:11.5px; font-weight:500; background:{{ rg.bg }}; color:{{ rg.color }}; cursor:pointer;">{{ rg.label }}</span>
@@ -457,7 +457,7 @@
         <div style="font-size:13.5px; font-weight:600; margin-bottom:12px;">Data confidence</div>
         <div style="display:flex; align-items:baseline; justify-content:space-between; gap:12px; padding-bottom:11px; border-bottom:1px solid #F0F0EB;">
           <span class="lb" style="font-size:12px;">Overall</span>
-          <span style="font-size:12.5px; font-weight:600; color:#1A7F37;">High</span>
+          <span style="font-size:12.5px; font-weight:600; color:{{ confidenceColor }};">{{ confidenceOverall }}</span>
         </div>
         <sc-for list="{{ confidence }}" as="cf" hint-placeholder-count="3">
           <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; padding:9px 0; border-bottom:1px solid #F0F0EB;">
@@ -501,6 +501,11 @@ class Component extends DCLogic {
   }
 
   renderVals() {
+    // Design values first, real injected data last — see prepareTemplates.ts.
+    return { ...this.__dcDesignVals(), ...(this.props || {}) };
+  }
+
+  __dcDesignVals() {
     const w = this.state.width, s = this.state;
     const wide = w >= 1340, mid = w >= 1080;
     const navItems = [
@@ -521,6 +526,7 @@ class Component extends DCLogic {
       // Defaults for bindings converted from hardcoded literals. Supplying
       // the same key via data-props overrides these with real data.
       changeColor: "#1A7F37",
+      scoreLabelColor: "#1A7F37",
       avatarText: "BDO",
       companyNameText: "BDO Unibank, Inc.",
       tickerText: "BDO",
@@ -531,6 +537,13 @@ class Component extends DCLogic {
       fairValueText: "₱158.40",
       chartReturnText: "+142.6%",
       marketStatusText: "Market is Open",
+      scoreText: "88",
+      scoreLabel: "Excellent",
+      coverageText: "88% of key metrics",
+      confidenceOverall: "High",
+      benchReturnText: "+38.4%",
+      upsideText: "+11.2% to estimate",
+      narrativeText: "BDO is the country's largest bank by assets, with a low-cost deposit franchise, disciplined provisioning, and a lending book that has compounded through two rate cycles.",
       rangeDisplay: w < 400 ? 'none' : 'flex',
       searchLabelShow: w >= 1240 ? 'inline' : 'none',
       searchKbdShow: w >= 1240 ? 'inline' : 'none',

@@ -90,11 +90,19 @@ export async function serveDirectory(
 
 /**
  * Replace the `data-props="{}"` attribute on the dc script tag with real data.
- * Uses the JSON-in-attribute form the runtime already parses (support.js
- * parseDataProps), so nothing about the load path changes.
+ *
+ * `data-props` is a props *schema*, not a value map: support.js:185-193 walks
+ * `propsMeta[key].default` to build the props it renders the root with, so a
+ * flat `{key: value}` object is silently ignored (every `.default` is
+ * undefined). Each value is therefore wrapped as `{default: value}`, which is
+ * the shape the runtime actually reads.
  */
 export function injectDataProps(html: string, props: unknown): string {
-  const encoded = JSON.stringify(props).replace(/&/g, "&amp;").replace(/"/g, "&quot;");
+  const schema: Record<string, { default: unknown }> = {};
+  for (const [key, value] of Object.entries((props ?? {}) as Record<string, unknown>)) {
+    schema[key] = { default: value };
+  }
+  const encoded = JSON.stringify(schema).replace(/&/g, "&amp;").replace(/"/g, "&quot;");
   return html.replace(
     /(<script[^>]*\bdata-dc-script\b[^>]*\bdata-props=")([^"]*)(")/,
     `$1${encoded}$3`,

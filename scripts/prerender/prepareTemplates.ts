@@ -101,11 +101,66 @@ const STOCK_DETAIL: Replacement[] = [
     defaultKey: "marketStatusText",
     defaultValue: "Market is Open",
   },
+  // The composite score, its verdict word, and the coverage figure are all
+  // hardcoded. Without binding these, every stock would advertise "88 /100
+  // Excellent" regardless of what its fundamentals actually say.
+  {
+    find: `<span class="n" style="font-size:34px; font-weight:600; line-height:1;">88</span>`,
+    replace: `<span class="n" style="font-size:34px; font-weight:600; line-height:1;">{{ scoreText }}</span>`,
+    defaultKey: "scoreText",
+    defaultValue: "88",
+  },
+  {
+    find: `<span style="font-size:10.5px; font-weight:600; color:#1A7F37; margin-top:2px;">Excellent</span>`,
+    replace: `<span style="font-size:10.5px; font-weight:600; color:{{ scoreLabelColor }}; margin-top:2px;">{{ scoreLabel }}</span>`,
+    defaultKey: "scoreLabel",
+    defaultValue: "Excellent",
+  },
+  {
+    find: `<span style="color:#1A7F37; font-weight:600;">88% of key metrics</span>`,
+    replace: `<span style="color:#1A7F37; font-weight:600;">{{ coverageText }}</span>`,
+    defaultKey: "coverageText",
+    defaultValue: "88% of key metrics",
+  },
+  // "Overall: High" is a trust claim about our own data quality, asserted
+  // unconditionally. It must reflect measured coverage, not be a constant.
+  {
+    find: `<span style="font-size:12.5px; font-weight:600; color:#1A7F37;">High</span>`,
+    replace: `<span style="font-size:12.5px; font-weight:600; color:{{ confidenceColor }};">{{ confidenceOverall }}</span>`,
+    defaultKey: "confidenceOverall",
+    defaultValue: "High",
+  },
+  // Benchmark return for the comparison line on the performance chart.
+  {
+    find: `background:#C4C4BD;"></span>PSE Index <span class="n" style="font-weight:600;">+38.4%</span>`,
+    replace: `background:#C4C4BD;"></span>PSE Index <span class="n" style="font-weight:600;">{{ benchReturnText }}</span>`,
+    defaultKey: "benchReturnText",
+    defaultValue: "+38.4%",
+  },
+  // The "to estimate" badge is derived from a fair value we do not compute
+  // here; hardcoded, it would claim an upside for every stock.
+  {
+    find: `color:#166B2E;">+11.2% to estimate</span>`,
+    replace: `color:#166B2E;">{{ upsideText }}</span>`,
+    defaultKey: "upsideText",
+    defaultValue: "+11.2% to estimate",
+  },
+  // A BDO-specific research summary sitting in the markup. Unbound, this
+  // paragraph would describe BDO on all 282 pages, including companies in
+  // unrelated sectors.
+  {
+    find: `BDO is the country's largest bank by assets, with a low-cost deposit franchise, disciplined provisioning, and a lending book that has compounded through two rate cycles.</div>`,
+    replace: `{{ narrativeText }}</div>`,
+    defaultKey: "narrativeText",
+    defaultValue:
+      "BDO is the country's largest bank by assets, with a low-cost deposit franchise, disciplined provisioning, and a lending book that has compounded through two rate cycles.",
+  },
 ];
 
 /** Colour default paired with changeText; green matches the original markup. */
 const EXTRA_DEFAULTS: Record<string, string> = {
   changeColor: "#1A7F37",
+  scoreLabelColor: "#1A7F37",
 };
 
 function applyReplacements(html: string, reps: Replacement[], file: string): string {
@@ -121,6 +176,33 @@ function applyReplacements(html: string, reps: Replacement[], file: string): str
     out = out.replace(rep.find, rep.replace);
   }
   return out;
+}
+
+/**
+ * Make injected props take precedence over the design's own values.
+ *
+ * support.js:1085 computes `vals = { ...userProps, ...renderVals() }` — the
+ * page's own values spread LAST, so anything passed via data-props is
+ * overwritten by the design defaults. Injection alone therefore has no effect.
+ *
+ * Rather than rewrite every key in the return object, the original method is
+ * renamed and a wrapper re-spreads props after it. Precedence flips for every
+ * key at once, and an unsupplied key still falls through to the design value.
+ * `this.props` here is already stripped of runtime internals (support.js:964).
+ */
+function addPropsPrecedence(html: string): string {
+  const marker = "  renderVals() {";
+  if (!html.includes(marker)) throw new Error("renderVals() declaration not found");
+
+  return html.replace(
+    marker,
+    `  renderVals() {
+    // Design values first, real injected data last — see prepareTemplates.ts.
+    return { ...this.__dcDesignVals(), ...(this.props || {}) };
+  }
+
+  __dcDesignVals() {`,
+  );
 }
 
 /** Seed renderVals()'s returned object with the defaults for the new bindings. */
@@ -169,6 +251,7 @@ async function main() {
         if (r.defaultKey && r.defaultValue !== undefined) defaults[r.defaultKey] = r.defaultValue;
       }
       out = injectDefaults(out, defaults);
+      out = addPropsPrecedence(out);
       converted++;
     }
 
