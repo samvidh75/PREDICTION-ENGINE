@@ -1,8 +1,10 @@
 name: Deploy to Oracle VM
 
+# Disabled: the Webyne VPS this targets cannot be reached (SSH blocked) and
+# ORACLE_SSH_KEY was never created, so it failed on every push. Deployment now
+# goes to Vercel via deploy-vercel.yml. Re-enable by restoring the push trigger
+# once VPS access is sorted.
 on:
-  push:
-    branches: [main]
     paths-ignore:
       - 'reports/**'
       - 'docs/**'

@@ -1,0 +1,135 @@
+# Build, prerender, and deploy the static site to Vercel.
+#
+# The stock pages are prerendered to static HTML, so nothing needs a Node
+# server at runtime — the API is only required during the build, to supply the
+# data each page is rendered with. That is why the API is started here, used,
+# and thrown away rather than deployed.
+#
+# Prerendering runs in CI rather than in Vercel's build step because it needs
+# headless Chromium; GitHub's runners already ship it, and installing it inside
+# Vercel's builder would add a ~150MB download to every deploy.
+#
+# Required secrets, all three from the Vercel dashboard:
+#   VERCEL_TOKEN       Account -> Settings -> Tokens
+#   VERCEL_ORG_ID      Project -> Settings -> General ("Team ID")
+#   VERCEL_PROJECT_ID  Project -> Settings -> General ("Project ID")
+# The IDs cannot be read from .vercel/project.json here: that directory is
+# gitignored by Vercel's own CLI and never reaches the runner.
+
+name: Deploy to Vercel
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      symbol_limit:
+        description: "Prerender only the first N symbols (blank = all 282)"
+        required: false
+        default: ""
+
+concurrency:
+  group: deploy-vercel
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci --include=dev
+
+      - name: Install Chromium for prerendering
+        run: npx playwright install --with-deps chromium
+
+      - name: Build frontend
+        run: npm run build:vercel
+
+      # SQLite fallback keeps the build self-contained: no external database is
+      # reachable from CI, and every figure the pages need is already in the
+      # committed data/*.json files.
+      - name: Start API for prerendering
+        env:
+          PORT: "10000"
+          ALLOW_SQLITE_FALLBACK: "true"
+          NODE_ENV: production
+        run: |
+          # nohup + setsid so the server outlives this step's shell; each
+          # GitHub Actions step runs its own shell, and a plain background job
+          # can be reaped when that shell exits.
+          nohup setsid npx tsx src/render/startServer.ts > /tmp/api.log 2>&1 &
+          disown || true
+          echo "Waiting for the API to accept requests..."
+          for i in $(seq 1 60); do
+            if curl -sf --max-time 5 http://localhost:10000/healthz >/dev/null; then
+              echo "API ready after ${i}s"
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "API failed to start:" && tail -40 /tmp/api.log && exit 1
+
+      - name: Prerender stock pages
+        run: |
+          LIMIT_ARG=""
+          if [ -n "${{ inputs.symbol_limit }}" ]; then
+            LIMIT_ARG="--limit=${{ inputs.symbol_limit }}"
+          fi
+          npx tsx scripts/prerender/prerenderStockPages.ts \
+            --api=http://localhost:10000 $LIMIT_ARG
+
+      - name: Regenerate sitemap
+        run: npx tsx scripts/generate-sitemap.ts
+
+      # A deploy that silently shipped the design's mock data would be worse
+      # than a failed one, so the build fails rather than publishing it.
+      - name: Verify prerendered output
+        run: |
+          PAGE=dist/public/stock/BDO/index.html
+          test -f "$PAGE" || { echo "BDO page missing"; exit 1; }
+
+          grep -q "BDO Unibank" "$PAGE" || { echo "real company name absent"; exit 1; }
+          grep -q "<title>" "$PAGE"     || { echo "SEO title not injected"; exit 1; }
+
+          if grep -q "₱142.50" "$PAGE"; then
+            echo "FAIL: the design's mock price reached the output"
+            exit 1
+          fi
+
+          echo "Prerendered pages: $(find dist/public/stock -name index.html | wc -l)"
+
+      - name: Deploy to Vercel
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          for v in VERCEL_TOKEN VERCEL_ORG_ID VERCEL_PROJECT_ID; do
+            if [ -z "${!v}" ]; then
+              echo "$v is not set — add it under Settings > Secrets and variables > Actions."
+              exit 1
+            fi
+          done
+          # Deploying the directory directly keeps dist/public as the single
+          # source of truth; --prebuilt would expect Vercel's own build layout.
+          npx vercel@latest deploy dist/public \
+            --token="$VERCEL_TOKEN" \
+            --prod \
+            --yes
+
+      - name: Upload API log on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-log
+          path: /tmp/api.log
+          if-no-files-found: ignore
