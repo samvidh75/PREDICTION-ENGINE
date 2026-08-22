@@ -51,7 +51,8 @@ import { loadRealPseOwnership } from "../services/scrapers/PSEOwnershipData.js";
 import { getSectorBySymbol, getSubsectorBySymbol, loadPseSector } from "../services/scrapers/PSESectorsData.js";
 import { getMarketCapBySymbol } from "../services/data/providers/PseMarketCapAdapter.js";
 import { computeStockScores } from "./stockScoring.js";
-import { getPseFundamentals, getPeRatio, getPbRatio, getNetMargin, getAnnualisedEps, getAnnualisedRoe } from "../services/data/providers/PseFundamentalsAdapter.js";
+import { getPseFundamentals, getNetMargin, getAnnualisedRoe } from "../services/data/providers/PseFundamentalsAdapter.js";
+import { getStockStats, computePbRatio } from "../services/data/providers/PseStockStatsAdapter.js";
 import { loadPseDisclosures } from "../services/scrapers/PSEDisclosuresData.js";
 import { loadPseInsiderFilings } from "../services/scrapers/PSEInsiderFilingsData.js";
 import { computeMomentumFeatures } from "../research/features/momentumFeatures.js";
@@ -895,14 +896,18 @@ export default async function registerApiRoutes(server: FastifyInstance) {
     // under src/ read it — so with the database unavailable every one of these
     // was null and no stock could be scored.
     const edgeFunds = getPseFundamentals(cleanSymbol);
-    // Annualised: filings are year-to-date, so the raw figure understates a
-    // full year and would distort every multiple derived from it.
-    const eps = n(fundData.eps) ?? getAnnualisedEps(cleanSymbol);
-    const pe = n(fundData.pe_ratio) ?? getPeRatio(cleanSymbol, price) ?? null;
-    const pb = n(fundData.pb_ratio) ?? getPbRatio(cleanSymbol, price) ?? null;
+    // Published trailing-twelve-month statistics, preferred over the EDGE
+    // filings: those are interim (mostly six-month) figures, and extrapolating
+    // them to a run rate put BDO's P/E at 15.89 against a real trailing 7.56.
+    const ttm = getStockStats(cleanSymbol);
+    const eps = n(fundData.eps) ?? ttm?.eps ?? null;
+    const pe = n(fundData.pe_ratio) ?? ttm?.peRatio ?? null;
+    const pb = n(fundData.pb_ratio) ?? computePbRatio(cleanSymbol, price, edgeFunds?.totalEquity ?? null);
+    // ROE is not published on the TTM source, so the annualised filing value
+    // remains the fallback here.
     const roe = n(fundData.roe ?? fundData.return_on_equity) ?? getAnnualisedRoe(cleanSymbol);
     const de = n(fundData.debt_to_equity) ?? edgeFunds?.debtToEquity ?? null;
-    const divYld = n(fundData.dividend_yield) ?? null;
+    const divYld = n(fundData.dividend_yield) ?? ttm?.dividendYield ?? null;
     const revGrowth = n(fundData.revenue_growth_3y ?? fundData.revenue_growth) ?? null;
     const profGrowth = n(fundData.profit_growth_3y ?? fundData.profit_growth) ?? null;
     const activeNews = newsSafe && newsSafe.length > 0 ? newsSafe : null;
@@ -951,7 +956,8 @@ export default async function registerApiRoutes(server: FastifyInstance) {
       profitGrowth: profGrowth,
       // EDGE reports netIncome in millions PHP; scale to pesos so the risk
       // engine's profitable/loss-making test sees a comparable magnitude.
-      netProfit: reportedNetProfit ?? (edgeFunds?.netIncome != null ? edgeFunds.netIncome * 1e6 : null),
+      netProfit: reportedNetProfit ?? ttm?.netIncomeTtm ?? (edgeFunds?.netIncome != null ? edgeFunds.netIncome * 1e6 : null),
+      beta: ttm?.beta ?? null,
       priceHistory: activePriceHistory ?? null,
     });
     const health = realScores.health;

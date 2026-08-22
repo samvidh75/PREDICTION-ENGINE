@@ -103,6 +103,41 @@ export async function fetchMarketCap(symbol: string): Promise<MarketCapRecord | 
   return { marketCap, raw, scrapedAt: new Date().toISOString() };
 }
 
+/**
+ * Fetch the whole exchange listing in a single request.
+ *
+ * stockanalysis.com publishes a PSE list page carrying symbol, company name,
+ * market cap and price for ~276 companies. Reading it once replaces 282
+ * individual quote-page fetches — roughly six minutes of polite batching for
+ * one request — so it is tried first and per-symbol scraping only covers
+ * whatever the listing omits.
+ */
+export async function fetchBulkMarketCaps(): Promise<Map<string, MarketCapRecord>> {
+  const out = new Map<string, MarketCapRecord>();
+  const scrapedAt = new Date().toISOString();
+
+  const response = await fetch(`https://${SOURCE}/list/philippine-stock-exchange/`, {
+    headers: { "User-Agent": USER_AGENT, Accept: "text/html" },
+    signal: AbortSignal.timeout(40_000),
+  });
+  if (!response.ok) throw new Error(`bulk listing HTTP ${response.status}`);
+  const html = await response.text();
+
+  // Each row links the symbol, then carries company name and market cap as the
+  // next two cells. Anchoring on the quote link keeps unrelated tables out.
+  const rowRe = /\/quote\/pse\/([A-Z0-9]+)\/"[^>]*>[^<]*<\/a>[\s\S]{0,240}?<td[^>]*>([^<]{1,80})<\/td>[\s\S]{0,120}?<td[^>]*>\s*([0-9][0-9.,]*[TBMK]?)\s*</g;
+
+  let m: RegExpExecArray | null;
+  while ((m = rowRe.exec(html)) !== null) {
+    const symbol = m[1].toUpperCase();
+    if (out.has(symbol)) continue;
+    const raw = m[3].trim();
+    const marketCap = parseMarketCap(raw);
+    if (marketCap !== null) out.set(symbol, { marketCap, raw, scrapedAt });
+  }
+  return out;
+}
+
 /** Scrape every symbol in polite batches, isolating per-symbol failures. */
 export async function scrapeAllMarketCaps(
   symbols: string[],
@@ -200,6 +235,7 @@ async function main() {
     return hit ? hit.slice(name.length + 3) : null;
   };
   const dryRun = args.includes("--dry-run");
+  const noBulk = args.includes("--no-bulk");
   const writeDb = args.includes("--write-db");
 
   const only = arg("symbol");
@@ -214,8 +250,31 @@ async function main() {
     throw new Error("No symbols to scrape — is data/pse-sectors.json present?");
   }
 
-  console.log(`[market-cap] scraping ${symbols.length} symbol(s) from ${SOURCE}`);
-  const results = await scrapeAllMarketCaps(symbols);
+  console.log(`[market-cap] resolving ${symbols.length} symbol(s) from ${SOURCE}`);
+
+  // One request for the whole exchange, then per-symbol only for the gaps.
+  const results = new Map<string, MarketCapRecord | null>();
+  const wanted = new Set(symbols);
+  if (!noBulk) {
+    try {
+      const bulk = await fetchBulkMarketCaps();
+      let used = 0;
+      for (const [symbol, record] of bulk) {
+        if (wanted.has(symbol)) { results.set(symbol, record); used++; }
+      }
+      console.log(`[market-cap] bulk listing covered ${used}/${symbols.length} in 1 request`);
+    } catch (err) {
+      console.warn(`[market-cap] bulk listing unavailable (${err instanceof Error ? err.message : String(err)}); falling back to per-symbol`);
+    }
+  }
+
+  const remaining = symbols.filter((s) => !results.has(s));
+  if (remaining.length > 0) {
+    console.log(`[market-cap] scraping ${remaining.length} remaining symbol(s) individually`);
+    for (const [symbol, record] of await scrapeAllMarketCaps(remaining)) {
+      results.set(symbol, record);
+    }
+  }
 
   const found = [...results.values()].filter(Boolean).length;
   console.log(`[market-cap] ${found}/${symbols.length} resolved`);

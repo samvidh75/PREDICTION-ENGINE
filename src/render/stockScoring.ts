@@ -46,6 +46,8 @@ export interface ScoringInputs {
    * revenue×margin estimate would manufacture an earnings-quality verdict.
    */
   netProfit: number | null;
+  /** Published beta. Enables riskFeatures' volatility sub-score. */
+  beta: number | null;
   priceHistory: HistoricalPoint[] | null;
 }
 
@@ -119,9 +121,7 @@ export function computeStockScores(input: ScoringInputs): StockScores {
   const quality = computeQualityFeatures(fundamentals);
   const valuation = computeValuationFeatures(fundamentals);
   const growth = computeGrowthFeatures(fundamentals);
-  // No beta source for PSE names yet; passed as null so the engine excludes it
-  // rather than assuming a market-average 1.0.
-  const risk = computeRiskFeatures(fundamentals, null);
+  const risk = computeRiskFeatures(fundamentals, input.beta);
   // Relative strength needs an index benchmark series we don't have here.
   const momentum = computeMomentumFeatures(candles, null);
 
