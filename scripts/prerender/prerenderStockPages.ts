@@ -129,10 +129,17 @@ async function main() {
   console.log(`[prerender] ${symbols.length} symbol(s), api=${apiBase}`);
 
   // Fetch everything first: the browser should never wait on the network.
+  //
+  // Paced under the API's own 60 requests/minute limiter. An earlier unpaced
+  // run at 8 concurrent got exactly 60 symbols through and 429 for the other
+  // 222 — the prerender was rate-limiting itself, and the missing pages looked
+  // like missing data. 4 per 4.5s is ~53/min, comfortably inside the window.
   const apiBySymbol = new Map<string, StockApiResponse>();
+  const FETCH_BATCH = 4;
+  const FETCH_GAP_MS = 4500;
   let fetched = 0;
-  for (let i = 0; i < symbols.length; i += 8) {
-    const batch = symbols.slice(i, i + 8);
+  for (let i = 0; i < symbols.length; i += FETCH_BATCH) {
+    const batch = symbols.slice(i, i + FETCH_BATCH);
     const results = await Promise.all(batch.map((s) => fetchStock(apiBase, s)));
     batch.forEach((s, j) => {
       const r = results[j];
@@ -142,8 +149,17 @@ async function main() {
     if (fetched % 40 === 0 || fetched >= symbols.length) {
       console.log(`[prerender] fetched ${Math.min(fetched, symbols.length)}/${symbols.length}`);
     }
+    if (i + FETCH_BATCH < symbols.length) {
+      await new Promise((r) => setTimeout(r, FETCH_GAP_MS));
+    }
   }
   console.log(`[prerender] API returned data for ${apiBySymbol.size}/${symbols.length}`);
+  if (apiBySymbol.size < symbols.length * 0.9) {
+    console.warn(
+      `[prerender] WARNING: ${symbols.length - apiBySymbol.size} symbol(s) returned no data. ` +
+      `If the API logged 429s, the fetch pacing is above its rate limit.`,
+    );
+  }
 
   if (apiBySymbol.size === 0) {
     throw new Error(`No data from ${apiBase} — is the API running? (--api=<url>)`);

@@ -840,6 +840,35 @@ export default async function registerApiRoutes(server: FastifyInstance) {
       }
     }
 
+    // Last resort: the backfilled daily history (data/pse-price-history.json).
+    // Its most recent candle is a real published close, so a transient provider
+    // failure should serve it rather than 503. That mattered concretely — a
+    // circuit-breaker window during a full prerender returned 503 for 75 of 282
+    // symbols in alphabetical clusters, losing pages for data we already held.
+    if (!gatewayQuote?.price) {
+      const history = getPriceHistory(cleanSymbol);
+      const latest = history[history.length - 1];
+      const previous = history[history.length - 2];
+      if (latest?.close) {
+        const changeAbs = previous?.close ? latest.close - previous.close : 0;
+        gatewayQuote = {
+          symbol: cleanSymbol,
+          exchange: "PSE",
+          price: latest.close,
+          change: Math.round(changeAbs * 10000) / 10000,
+          changePercent: previous?.close
+            ? Math.round((changeAbs / previous.close) * 10000) / 100
+            : 0,
+          updatedAt: latest.date,
+          asOf: latest.date,
+          source: "daily_prices",
+          // Explicitly not "current" — this close may be a session or more old.
+          freshness: "delayed",
+          delayed: true,
+        };
+      }
+    }
+
     const gatewayMeta = await providerCoordinator.getMetadata(cleanSymbol).catch(() => null);
 
     const quote = gatewayQuote;
