@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="./vendor/react.production.min.js"></script>
+  <script src="./vendor/react-dom.production.min.js"></script>
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    body { margin:0; background:#FAFAF7; font-family:"Instrument Sans", -apple-system, BlinkMacSystemFont, sans-serif; -webkit-font-smoothing:antialiased; color:#0A0A0A; }
+    * { box-sizing:border-box; }
+    .n { font-family:"IBM Plex Mono", ui-monospace, monospace; font-variant-numeric:tabular-nums; letter-spacing:-0.02em; }
+    .lb { font-size:12.5px; color:#6B6B66; }
+    a { color:#0A0A0A; text-decoration:none; }
+    a:hover { color:#1A7F37; }
+    ::selection { background:#D8EEDF; }
+    .cd { background:#FFFFFF; border:1px solid #E8E8E3; border-radius:12px; }
+    ::-webkit-scrollbar { width:9px; height:9px; }
+    ::-webkit-scrollbar-thumb { background:#DEDED7; border-radius:8px; }
+    @media (prefers-reduced-motion: reduce) { * { animation:none !important; transition:none !important; } }
+  </style>
+</helmet>
+
+<div style="min-height:100dvh; background:#FAFAF7; padding-bottom:{{ pageBottomPad }};">
+
+  <sc-if value="{{ showBottomNav }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed; left:0; right:0; bottom:0; z-index:60; background:#FFFFFFF2; backdrop-filter:saturate(180%) blur(12px); border-top:1px solid #E4E4DE; padding-bottom:env(safe-area-inset-bottom);">
+      <div style="display:grid; grid-template-columns:repeat(5, minmax(0,1fr));">
+        <sc-for list="{{ bottomItems }}" as="bi" hint-placeholder-count="5">
+          <a href="{{ bi.href }}" style="display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; min-height:56px; padding:8px 2px; color:{{ bi.color }};">
+            <svg width="21" height="21" viewBox="0 0 24 24" fill="none"><path d="{{ bi.icon }}" stroke="{{ bi.color }}" stroke-width="{{ bi.stroke }}" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+            <span style="font-size:10px; font-weight:{{ bi.weight }}; letter-spacing:0.01em;">{{ bi.label }}</span>
+          </a>
+        </sc-for>
+      </div>
+    </div>
+  </sc-if>
+
+  <div style="position:sticky; top:0; z-index:30; background:#FAFAF7; border-bottom:1px solid #E8E8E3;">
+    <div style="width:100%; max-width:1480px; margin:0 auto; padding:0 clamp(14px,2vw,26px); height:64px; display:flex; align-items:center; gap:clamp(14px,2.4vw,34px);">
+      <a href="StockStory Shell.dc.html" style="display:flex; align-items:center; gap:10px; flex-shrink:0;">
+        <svg width="30" height="30" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="9" fill="#0A0A0A"></rect><path d="M21 11.4 C21 8.6 11.6 8.8 11.6 13 C11.6 17.2 21 15.6 21 19.8 C21 24 11.6 23.6 11.6 20.8" stroke="#FFFFFF" stroke-width="2.1" stroke-linecap="round" fill="none"></path></svg>
+        <span style="line-height:1.1;"><span style="display:block; font-size:17px; font-weight:600; letter-spacing:-0.02em;">StockEX<span style="font-size:8.5px; font-weight:500; vertical-align:super; letter-spacing:0; margin-left:1px; color:#9A9A94;">&#8482;</span></span><span style="display:block; font-size:11.5px; color:#6B6B66;">Philippines</span></span>
+      </a>
+      <sc-if value="{{ showNav }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex; align-items:center; gap:clamp(12px,1.6vw,26px); margin-left:clamp(8px,2vw,28px);">
+          <sc-for list="{{ topNav }}" as="t" hint-placeholder-count="6">
+            <a href="{{ t.href }}" style="display:flex; align-items:center; gap:5px; font-size:14px; font-weight:{{ t.weight }}; color:{{ t.color }}; padding:20px 0; border-bottom:2px solid {{ t.rule }}; white-space:nowrap;" style-hover="color:#1A7F37;">{{ t.label }}</a>
+          </sc-for>
+        </div>
+      </sc-if>
+      <div style="flex:1;"></div>
+      <a href="StockStory Search.dc.html" style="display:flex; align-items:center; gap:8px; height:34px; padding:0 11px; border-radius:8px; border:1px solid #E4E4DE; background:#FFFFFF; color:#8A8A84;" style-hover="border-color:#0A0A0A; color:#0A0A0A;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="10.8" cy="10.8" r="6.6" stroke="currentColor" stroke-width="1.8"></circle><path d="M15.6 15.6 L20.4 20.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path></svg>
+        <span style="font-size:12.5px; display:{{ searchLabelShow }};">Search</span>
+        <span class="n" style="padding:2px 6px; border-radius:5px; background:#F4F4EF; font-size:10px; color:#9A9A94; display:{{ searchKbdShow }};">⌘K</span>
+      </a>
+      <sc-if value="{{ showNav }}" hint-placeholder-val="{{ true }}">
+        <a href="StockStory Sign In.dc.html" style="font-size:14px; font-weight:500; white-space:nowrap;">Sign in</a>
+      </sc-if>
+      <a href="StockStory Pricing.dc.html" style="display:inline-flex; align-items:center; gap:7px; height:42px; padding:0 18px; border-radius:9px; background:#0A0A0A; color:#FFFFFF; font-size:14px; font-weight:500; white-space:nowrap;" style-hover="background:#1A1A1A; color:#FFFFFF;">Start Free Trial <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M3 9 L9 3 M9 3 H4.6 M9 3 V7.4" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round"></path></svg></a>
+    </div>
+  </div>
+
+  <div style="width:100%; max-width:1480px; margin:0 auto; padding:14px clamp(14px,2vw,26px) 0; display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+    <a href="StockStory Shell.dc.html" style="font-size:12px; color:#6B6B66;" style-hover="color:#1A7F37;">Home</a>
+    <svg width="9" height="9" viewBox="0 0 12 12" fill="none"><path d="M4 2.5 L7.5 6 L4 9.5" stroke="#C0C0B9" stroke-width="1.4" stroke-linecap="round"></path></svg>
+    <a href="StockStory Sectors.dc.html" style="font-size:12px; color:#6B6B66;" style-hover="color:#1A7F37;">Sectors</a>
+    <svg width="9" height="9" viewBox="0 0 12 12" fill="none"><path d="M4 2.5 L7.5 6 L4 9.5" stroke="#C0C0B9" stroke-width="1.4" stroke-linecap="round"></path></svg>
+    <span style="font-size:12px; color:#0A0A0A;">{{ sectorName }}</span>
+  </div>
+
+  <div style="width:100%; max-width:1480px; margin:0 auto; padding:clamp(14px,1.8vw,22px) clamp(14px,2vw,26px) clamp(28px,3.4vw,52px); display:grid; grid-template-columns:{{ bodyGrid }}; gap:clamp(12px,1.4vw,18px); align-items:start;">
+
+    <div style="min-width:0; display:flex; flex-direction:column; gap:clamp(12px,1.4vw,18px);">
+
+      <div class="cd" style="padding:clamp(16px,1.8vw,24px);">
+        <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:18px;">
+          <sc-for list="{{ sectorTabs }}" as="sb" hint-placeholder-count="8">
+            <span onClick="{{ sb.select }}" style="display:inline-flex; align-items:center; height:32px; padding:0 12px; border-radius:8px; border:1px solid {{ sb.border }}; background:{{ sb.bg }}; font-size:12px; font-weight:{{ sb.weight }}; color:{{ sb.color }}; cursor:pointer; white-space:nowrap;" style-hover="border-color:#0A0A0A;">{{ sb.label }}</span>
+          </sc-for>
+        </div>
+
+        <div style="display:grid; grid-template-columns:{{ heroGrid }}; gap:clamp(16px,2.4vw,34px); align-items:end;">
+          <div style="min-width:0;">
+            <div style="display:flex; align-items:center; gap:11px; margin-bottom:12px;">
+              <span style="width:38px; height:38px; border-radius:9px; background:#F2F5F3; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="{{ sectorIcon }}" stroke="#1A7F37" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+              </span>
+              <div style="min-width:0;">
+                <h1 style="margin:0; font-size:clamp(21px,1.4vw + 13px,29px); font-weight:600; letter-spacing:-0.03em; line-height:1.12;">{{ sectorName }}</h1>
+                <div class="lb" style="font-size:12px; margin-top:2px;">{{ constituentLabel }}</div>
+              </div>
+            </div>
+            <div style="display:flex; align-items:baseline; gap:11px; flex-wrap:wrap;">
+              <span class="n" style="font-size:clamp(26px,1.8vw + 16px,38px); font-weight:600; letter-spacing:-0.035em; line-height:1;">{{ indexValue }}</span>
+              <span class="n" style="font-size:14px; font-weight:500; color:{{ changeColor }};">{{ changeLabel }}</span>
+            </div>
+            <div class="lb" style="font-size:11.5px; margin-top:8px;">Sector index · 11:15 AM PHT</div>
+          </div>
+
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(min(104px,100%),1fr)); gap:clamp(10px,1.4vw,18px); min-width:0;">
+            <sc-for list="{{ heroStats }}" as="hs" hint-placeholder-count="4">
+              <div style="min-width:0;">
+                <div class="lb" style="font-size:11px; margin-bottom:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ hs.label }}</div>
+                <div class="n" style="font-size:17px; font-weight:600; letter-spacing:-0.02em; color:{{ hs.color }};">{{ hs.value }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="display:flex; align-items:center; justify-content:flex-end; margin-top:20px;">
+          <div style="display:flex; gap:2px; padding:2px; background:#F2F2ED; border-radius:7px;">
+            <sc-for list="{{ ranges }}" as="rg" hint-placeholder-count="5">
+              <span onClick="{{ rg.select }}" style="padding:5px 11px; border-radius:5px; font-size:11.5px; font-weight:500; background:{{ rg.bg }}; color:{{ rg.color }}; cursor:pointer;">{{ rg.label }}</span>
+            </sc-for>
+          </div>
+        </div>
+        <div style="display:grid; grid-template-columns:minmax(0,1fr) 48px; gap:7px; margin-top:12px;">
+          <svg viewBox="0 0 800 190" width="100%" height="190" fill="none" preserveAspectRatio="none" style="display:block;">
+            <sc-for list="{{ gridLines }}" as="gl" hint-placeholder-count="5">
+              <line x1="0" y1="{{ gl.y }}" x2="800" y2="{{ gl.y }}" stroke="#F2F2ED" stroke-width="1"></line>
+            </sc-for>
+            <path d="{{ chartArea }}" fill="{{ lineColor }}" opacity="0.06"></path>
+            <path d="{{ chartBench }}" stroke="#C4C4BD" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="4 3"></path>
+            <path d="{{ chartLine }}" stroke="{{ lineColor }}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"></path>
+            <circle cx="{{ lastX }}" cy="{{ lastY }}" r="7.5" fill="{{ lineColor }}" opacity="0.14"></circle>
+            <circle cx="{{ lastX }}" cy="{{ lastY }}" r="3.2" fill="{{ lineColor }}"></circle>
+          </svg>
+          <div style="display:flex; flex-direction:column; justify-content:space-between; align-items:flex-end;">
+            <sc-for list="{{ yAxis }}" as="ya" hint-placeholder-count="5">
+              <span class="lb" style="font-size:9.5px; white-space:nowrap;">{{ ya.label }}</span>
+            </sc-for>
+          </div>
+        </div>
+        <div style="display:flex; justify-content:space-between; gap:8px; padding:7px 56px 0 8px;">
+          <sc-for list="{{ xAxis }}" as="xa" hint-placeholder-count="5">
+            <span class="lb" style="font-size:10px; white-space:nowrap;">{{ xa.label }}</span>
+          </sc-for>
+        </div>
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; padding:9px 56px 0 0; margin-top:4px; border-top:1px solid #F0F0EB; flex-wrap:wrap;">
+          <div style="display:flex; gap:14px; flex-wrap:wrap;">
+            <span style="display:flex; align-items:center; gap:6px; font-size:11.5px;"><span style="width:14px; height:2px; background:{{ lineColor }};"></span>{{ sectorName }}</span>
+            <span style="display:flex; align-items:center; gap:6px; font-size:11.5px; color:#6B6B66;"><span style="width:14px; height:2px; background:#C4C4BD;"></span>PSE Index</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="cd" style="min-width:0; overflow:hidden;">
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; padding:13px 16px; border-bottom:1px solid #E8E8E3; flex-wrap:wrap;">
+          <span style="font-size:14px; font-weight:600;">Constituents</span>
+          <select value="{{ sortKey }}" onChange="{{ onSort }}" style="height:34px; padding:0 10px; border:1px solid #DCDCD5; border-radius:8px; background:#FFFFFF; font-family:inherit; font-size:12.5px; cursor:pointer;">
+            <option value="score">Sort by score</option>
+            <option value="change">Sort by day change</option>
+            <option value="cap">Sort by market cap</option>
+            <option value="name">Sort by name</option>
+          </select>
+        </div>
+        <div style="overflow-x:auto;">
+          <div style="min-width:{{ tableMinWidth }};">
+            <div style="display:grid; grid-template-columns:{{ rowGrid }}; gap:10px; align-items:center; padding:10px 16px; border-bottom:1px solid #E8E8E3; background:#FBFBF8;">
+              <span class="lb" style="font-size:11px; font-weight:600;">Company</span>
+              <span class="lb" style="font-size:11px; font-weight:600; text-align:right; display:{{ capDisplay }};">Market cap</span>
+              <span class="lb" style="font-size:11px; font-weight:600; text-align:right;">Price</span>
+              <span class="lb" style="font-size:11px; font-weight:600; text-align:right;">1D</span>
+              <span class="lb" style="font-size:11px; font-weight:600; text-align:center;">Score</span>
+              <span class="lb" style="font-size:11px; font-weight:600; display:{{ stateDisplay }};">Research state</span>
+            </div>
+            <sc-for list="{{ rows }}" as="r" hint-placeholder-count="8">
+              <a href="StockStory Stock Detail.dc.html" style="display:grid; grid-template-columns:{{ rowGrid }}; gap:10px; align-items:center; padding:12px 16px; border-bottom:1px solid #F0F0EB; color:#0A0A0A;" style-hover="background:#FAFAF7;">
+                <span style="display:flex; align-items:center; gap:10px; min-width:0;">
+                  <span style="width:30px; height:30px; border-radius:7px; background:{{ r.logoBg }}; color:#FFFFFF; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; flex-shrink:0;">{{ r.ticker }}</span>
+                  <span style="min-width:0;">
+                    <span style="display:block; font-size:13px; font-weight:600;">{{ r.ticker }}</span>
+                    <span class="lb" style="display:block; font-size:11.5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ r.name }}</span>
+                  </span>
+                </span>
+                <span class="n" style="font-size:12.5px; text-align:right; color:#6B6B66; display:{{ capDisplay }};">{{ r.cap }}</span>
+                <span class="n" style="font-size:13px; font-weight:500; text-align:right;">{{ r.price }}</span>
+                <span class="n" style="font-size:12.5px; text-align:right; color:{{ r.changeColor }};">{{ r.change }}</span>
+                <span style="display:flex; flex-direction:column; align-items:center; gap:2px; padding:5px 0; border-radius:7px; background:{{ r.scoreBg }}; border:1px solid {{ r.scoreBorder }};">
+                  <span class="n" style="font-size:14px; font-weight:600; color:{{ r.scoreColor }}; line-height:1;">{{ r.score }}</span>
+                </span>
+                <span style="display:{{ stateDisplay }}; align-items:center; gap:6px; font-size:11.5px; font-weight:500; color:{{ r.stateColor }}; white-space:nowrap;"><span style="width:6px; height:6px; border-radius:50%; background:{{ r.stateColor }}; flex-shrink:0;"></span>{{ r.state }}</span>
+              </a>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="min-width:0; display:flex; flex-direction:column; gap:clamp(12px,1.4vw,18px);">
+      <div class="cd" style="padding:16px;">
+        <div style="font-size:13.5px; font-weight:600; margin-bottom:6px;">What is driving the sector</div>
+        <div class="lb" style="font-size:11px; margin-bottom:12px;">Read from this quarter's filings</div>
+        <div style="font-size:13px; line-height:1.65; color:#3A3A36; padding-bottom:13px; border-bottom:1px solid #F0F0EB;">{{ driverSummary }}</div>
+        <sc-for list="{{ drivers }}" as="dr" hint-placeholder-count="3">
+          <div style="display:grid; grid-template-columns:17px minmax(0,1fr); gap:10px; padding:10px 0; border-bottom:1px solid #F0F0EB;">
+            <svg width="15" height="15" viewBox="0 0 18 18" fill="none" style="margin-top:2px;"><circle cx="9" cy="9" r="7.4" stroke="{{ dr.color }}" stroke-width="1.4"></circle><path d="{{ dr.glyph }}" stroke="{{ dr.color }}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+            <span style="font-size:12.5px; line-height:1.58; color:#3A3A36; overflow-wrap:break-word;">{{ dr.text }}</span>
+          </div>
+        </sc-for>
+      </div>
+
+      <div class="cd" style="padding:16px;">
+        <div style="font-size:13.5px; font-weight:600; margin-bottom:3px;">Factor averages</div>
+        <div class="lb" style="font-size:11px; margin-bottom:13px;">Sector mean vs PSE mean</div>
+        <sc-for list="{{ factorAvg }}" as="fa" hint-placeholder-count="5">
+          <div style="padding:7px 0; border-top:1px solid #F0F0EB;">
+            <div style="display:flex; align-items:baseline; justify-content:space-between; gap:10px; margin-bottom:5px;">
+              <span style="font-size:12px; color:#3A3A36;">{{ fa.name }}</span>
+              <span style="display:flex; align-items:baseline; gap:7px;">
+                <span class="n" style="font-size:12px; font-weight:600;">{{ fa.value }}</span>
+                <span class="n" style="font-size:10.5px; color:{{ fa.deltaColor }};">{{ fa.delta }}</span>
+              </span>
+            </div>
+            <div style="position:relative; height:5px; border-radius:3px; background:#EDEDE8;">
+              <span style="display:block; height:5px; width:{{ fa.width }}; border-radius:3px; background:#1A7F37;"></span>
+              <span style="position:absolute; left:{{ fa.marketPos }}; top:-2px; width:1.5px; height:9px; border-radius:1px; background:#8A8A84;"></span>
+            </div>
+          </div>
+        </sc-for>
+        <div class="lb" style="font-size:10.5px; margin-top:11px; padding-top:10px; border-top:1px solid #F0F0EB;">The vertical tick marks the PSE-wide mean for that factor.</div>
+      </div>
+
+      <div class="cd" style="padding:16px;">
+        <div style="font-size:13.5px; font-weight:600; margin-bottom:12px;">Breadth</div>
+        <div style="display:flex; height:6px; border-radius:3px; overflow:hidden; background:#F2F2ED;">
+          <span style="height:6px; width:{{ advWidth }}; background:#1A7F37;"></span>
+          <span style="height:6px; width:{{ decWidth }}; background:#D93025;"></span>
+        </div>
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:9px;">
+          <span class="lb" style="font-size:11.5px;">{{ advLabel }}</span>
+          <span class="lb" style="font-size:11.5px;">{{ decLabel }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{}">
+class Component extends DCLogic {
+  state = {
+    width: typeof window !== 'undefined' ? window.innerWidth : 1480,
+    sector: 'Financials',
+    range: '1M',
+    sortKey: 'score',
+  };
+
+  componentDidMount() { this._r = () => this.setState({ width: window.innerWidth }); window.addEventListener('resize', this._r); }
+  componentWillUnmount() { window.removeEventListener('resize', this._r); }
+
+  walk(seed, n, drift, vol) {
+    let x = seed, v = 50, out = [];
+    for (let i = 0; i < n; i++) {
+      x = (x * 1103515245 + 12345) % 2147483648;
+      const r = (x / 2147483648) - 0.5;
+      v = v + drift + r * vol;
+      out.push(v);
+    }
+    return out;
+  }
+  path(vals, w, h, pad) {
+    const p = pad == null ? 8 : pad;
+    const lo = Math.min.apply(null, vals), hi = Math.max.apply(null, vals), span = (hi - lo) || 1;
+    return vals.map((v, i) => {
+      const x = p + (i / (vals.length - 1)) * (w - p * 2);
+      const y = h - p - ((v - lo) / span) * (h - p * 2);
+      return (i ? 'L' : 'M') + x.toFixed(1) + ' ' + y.toFixed(1);
+    }).join(' ');
+  }
+
+  renderVals() {
+    const w = this.state.width, s = this.state;
+    const wide = w >= 1340, mid = w >= 1080;
+
+    const ic = {
+      Financials: 'M4.6 19.4 H19.4 M6.4 19.4 V10 M11 19.4 V10 M15.6 19.4 V10 M3.6 10 L12 4.6 L20.4 10',
+      Industrials: 'M4.6 19.4 V11 L9.4 14 V11 L14.2 14 V11 L19.4 14 V19.4 Z',
+      Utilities: 'M13.4 3.4 L6 13.4 H11 L10 20.6 L18 10.4 H12.6 Z',
+      'Holding Firms': 'M4.6 19.4 V8.6 H11 V19.4 M11 19.4 V4.6 H19.4 V19.4 M4.6 19.4 H19.4',
+      'Mining & Oil': 'M12 3.6 L19.4 8.6 V16.4 L12 20.4 L4.6 16.4 V8.6 Z M4.6 8.6 L19.4 16.4',
+      Consumer: 'M5.4 7.6 H18.6 L17.4 19.4 H6.6 Z M9 7.6 V5.6 A3 3 0 0 1 15 5.6 V7.6',
+      Property: 'M4.6 19.4 V9.6 L12 4.6 L19.4 9.6 V19.4 Z M9.6 19.4 V13.6 H14.4 V19.4',
+      Services: 'M12 3.6 A8.4 8.4 0 1 1 11.99 3.6 Z M3.6 12 H20.4 M12 3.6 C14.6 6.4 14.6 17.6 12 20.4 C9.4 17.6 9.4 6.4 12 3.6',
+    };
+
+    const data = {
+      Financials: {
+        index: '2,188.44', change: 1.12, count: 24, cap: '\u20B12.84T', avgScore: 88, pe: '10.8x', yield: '3.8%', adv: 17, dec: 6, seed: 29, drift: 0.38,
+        summary: 'Margins held through the August policy cut better than the market expected, and loan growth stayed ahead of nominal GDP for a third quarter.',
+        factors: [{ n: 'Quality', v: 88, m: 74 }, { n: 'Growth', v: 79, m: 71 }, { n: 'Valuation', v: 82, m: 76 }, { n: 'Risk', v: 83, m: 72 }, { n: 'Momentum', v: 76, m: 68 }],
+        drivers: [
+          { text: 'Net interest margins compressed only 4 basis points against a sector-wide expectation of 15.', up: true },
+          { text: 'Non-performing loans fell to 2.1% across the large banks, a five-year low.', up: true },
+          { text: 'Cost-to-income is drifting up as digital and branch spending runs concurrently.', up: false },
+        ],
+        rows: [
+          { ticker: 'BDO', name: 'BDO Unibank, Inc.', logoBg: '#0A2C5C', cap: '\u20B1758.4B', price: 142.50, change: 1.82, score: 88, state: 'Strengthening' },
+          { ticker: 'BPI', name: 'Bank of the Philippine Islands', logoBg: '#B8860B', cap: '\u20B1612.8B', price: 128.90, change: 1.21, score: 84, state: 'Stable' },
+          { ticker: 'MBT', name: 'Metropolitan Bank & Trust', logoBg: '#1A4A7A', cap: '\u20B1352.6B', price: 78.40, change: 0.64, score: 79, state: 'Stable' },
+          { ticker: 'CBC', name: 'China Banking Corporation', logoBg: '#7A1A2A', cap: '\u20B1167.2B', price: 62.15, change: 0.42, score: 76, state: 'Stable' },
+          { ticker: 'SECB', name: 'Security Bank Corporation', logoBg: '#2A5A3A', cap: '\u20B1112.4B', price: 74.60, change: -0.32, score: 68, state: 'Needs review' },
+          { ticker: 'PNB', name: 'Philippine National Bank', logoBg: '#4A3A7A', cap: '\u20B168.9B', price: 42.80, change: -0.58, score: 64, state: 'Needs review' },
+        ],
+      },
+      Industrials: {
+        index: '1,942.60', change: 1.12, count: 32, cap: '\u20B11.42T', avgScore: 85, pe: '14.2x', yield: '2.1%', adv: 25, dec: 7, seed: 7, drift: 0.44,
+        summary: 'Terminal volume guidance was raised on the back of yard utilisation at a five-year high, with power generation margins recovering alongside.',
+        factors: [{ n: 'Quality', v: 85, m: 74 }, { n: 'Growth', v: 88, m: 71 }, { n: 'Valuation', v: 71, m: 76 }, { n: 'Risk', v: 76, m: 72 }, { n: 'Momentum', v: 91, m: 68 }],
+        drivers: [
+          { text: 'Container throughput up 11% year on year across Manila and Subic terminals.', up: true },
+          { text: 'Power generation spreads widened as coal input costs eased through the quarter.', up: true },
+          { text: 'Valuation is now the weakest factor in the sector after a strong twelve months.', up: false },
+        ],
+        rows: [
+          { ticker: 'ICT', name: 'Int\u2019l Container Terminal Services', logoBg: '#1F4E3D', cap: '\u20B1642.0B', price: 312.00, change: 3.48, score: 89, state: 'Strengthening' },
+          { ticker: 'AP', name: 'Aboitiz Power Corporation', logoBg: '#2A6B8A', cap: '\u20B1288.4B', price: 39.20, change: 1.84, score: 82, state: 'Strengthening' },
+          { ticker: 'MWC', name: 'Manila Water Company', logoBg: '#1A6B7A', cap: '\u20B196.2B', price: 24.60, change: 1.12, score: 78, state: 'Stable' },
+          { ticker: 'SCC', name: 'Semirara Mining & Power', logoBg: '#6B4A2A', cap: '\u20B1142.8B', price: 33.60, change: 0.62, score: 74, state: 'Stable' },
+          { ticker: 'DMC', name: 'DMCI Holdings, Inc.', logoBg: '#3A5A2A', cap: '\u20B1118.4B', price: 8.92, change: 0.22, score: 71, state: 'Stable' },
+        ],
+      },
+      Services: {
+        index: '1,486.20', change: -0.82, count: 27, cap: '\u20B11.08T', avgScore: 66, pe: '9.4x', yield: '6.2%', adv: 7, dec: 18, seed: 47, drift: -0.22,
+        summary: 'Telco capex intensity is still rising while free cash cover thins, and neither operator has shown data revenue growth that offsets it.',
+        factors: [{ n: 'Quality', v: 66, m: 74 }, { n: 'Growth', v: 58, m: 71 }, { n: 'Valuation', v: 81, m: 76 }, { n: 'Risk', v: 62, m: 72 }, { n: 'Momentum', v: 56, m: 68 }],
+        drivers: [
+          { text: 'Combined telco capex is running above 30% of revenue for a third consecutive year.', up: false },
+          { text: 'Free cash cover has fallen below 1.4x at the larger operator.', up: false },
+          { text: 'Dividend yields near 6% now reflect the market pricing that risk rather than generosity.', up: false },
+        ],
+        rows: [
+          { ticker: 'CNVRG', name: 'Converge ICT Solutions', logoBg: '#2A4A8A', cap: '\u20B1142.6B', price: 18.90, change: 0.42, score: 72, state: 'Stable' },
+          { ticker: 'TEL', name: 'PLDT Inc.', logoBg: '#1B3A6B', cap: '\u20B1277.4B', price: 1285.00, change: -1.14, score: 61, state: 'Risk rising' },
+          { ticker: 'GLO', name: 'Globe Telecom, Inc.', logoBg: '#1A5A8A', cap: '\u20B1246.8B', price: 1842.00, change: -1.22, score: 58, state: 'Risk rising' },
+          { ticker: 'DITO', name: 'DITO CME Holdings', logoBg: '#6B2A4A', cap: '\u20B142.2B', price: 1.86, change: -0.54, score: 48, state: 'Risk rising' },
+        ],
+      },
+    };
+
+    data.Utilities = {
+      index: '1,684.20', change: 0.91, count: 18, cap: '\u20B1642.8B', avgScore: 79, pe: '12.6x', yield: '4.6%', adv: 12, dec: 5, seed: 19, drift: 0.28,
+      summary: 'Regulated returns held steady through the rate reset while renewable capacity additions began contributing meaningfully to generation margins.',
+      factors: [{ n: 'Quality', v: 82, m: 74 }, { n: 'Growth', v: 74, m: 71 }, { n: 'Valuation', v: 79, m: 76 }, { n: 'Risk', v: 84, m: 72 }, { n: 'Momentum', v: 72, m: 68 }],
+      drivers: [
+        { text: 'Distribution charge held unchanged through the fourth quarter rate reset.', up: true },
+        { text: 'Renewable capacity additions now 14% of generation mix, up from 9% a year ago.', up: true },
+        { text: 'Capex programmes remain heavy, limiting near-term free cash generation.', up: false },
+      ],
+      rows: [
+        { ticker: 'MER', name: 'Manila Electric Company', logoBg: '#C8571B', cap: '\u20B1460.2B', price: 408.60, change: 0.42, score: 79, state: 'Stable' },
+        { ticker: 'ACEN', name: 'ACEN Corporation', logoBg: '#2A7A4A', cap: '\u20B1188.6B', price: 4.86, change: 1.62, score: 81, state: 'Strengthening' },
+        { ticker: 'FGEN', name: 'First Gen Corporation', logoBg: '#1A5A6B', cap: '\u20B168.4B', price: 18.90, change: 0.84, score: 76, state: 'Stable' },
+        { ticker: 'EDC', name: 'Energy Development Corp.', logoBg: '#3A6B4A', cap: '\u20B142.2B', price: 7.62, change: 0.26, score: 73, state: 'Stable' },
+      ],
+    };
+    data['Holding Firms'] = {
+      index: '6,428.60', change: 0.24, count: 29, cap: '\u20B13.16T', avgScore: 82, pe: '11.4x', yield: '2.4%', adv: 18, dec: 11, seed: 37, drift: 0.18,
+      summary: 'Conglomerate discounts narrowed modestly as retail and banking subsidiaries reported ahead of expectations, though property arms remained a drag.',
+      factors: [{ n: 'Quality', v: 84, m: 74 }, { n: 'Growth', v: 78, m: 71 }, { n: 'Valuation', v: 76, m: 76 }, { n: 'Risk', v: 79, m: 72 }, { n: 'Momentum', v: 77, m: 68 }],
+      drivers: [
+        { text: 'Retail and banking subsidiaries carried group earnings for a second quarter.', up: true },
+        { text: 'Holdco discounts to net asset value narrowed to 24% from 31% a year ago.', up: true },
+        { text: 'Property subsidiaries remain the weakest contributor across every major group.', up: false },
+      ],
+      rows: [
+        { ticker: 'SM', name: 'SM Investments Corporation', logoBg: '#8A1A12', cap: '\u20B11.14T', price: 945.00, change: 2.31, score: 87, state: 'Strengthening' },
+        { ticker: 'AC', name: 'Ayala Corporation', logoBg: '#2C3E6B', cap: '\u20B1382.4B', price: 612.00, change: 0.94, score: 81, state: 'Stable' },
+        { ticker: 'AEV', name: 'Aboitiz Equity Ventures', logoBg: '#3A6B8A', cap: '\u20B1212.6B', price: 37.80, change: 0.48, score: 77, state: 'Stable' },
+        { ticker: 'GTCAP', name: 'GT Capital Holdings', logoBg: '#6B3A2A', cap: '\u20B1128.4B', price: 588.00, change: -0.32, score: 72, state: 'Stable' },
+        { ticker: 'JGS', name: 'JG Summit Holdings', logoBg: '#4A4A7A', cap: '\u20B1146.8B', price: 20.50, change: -0.84, score: 68, state: 'Needs review' },
+      ],
+    };
+    data['Mining & Oil'] = {
+      index: '9,842.40', change: 0.44, count: 21, cap: '\u20B1428.6B', avgScore: 71, pe: '7.8x', yield: '5.4%', adv: 11, dec: 10, seed: 53, drift: 0.12,
+      summary: 'Nickel realisations improved on firmer Chinese demand, but the sector remains the most volatile on the exchange and the least consistent on disclosure.',
+      factors: [{ n: 'Quality', v: 68, m: 74 }, { n: 'Growth', v: 72, m: 71 }, { n: 'Valuation', v: 86, m: 76 }, { n: 'Risk', v: 58, m: 72 }, { n: 'Momentum', v: 74, m: 68 }],
+      drivers: [
+        { text: 'Nickel realisations up 8% on firmer demand from Chinese stainless producers.', up: true },
+        { text: 'The sector trades at the widest discount to book of any on the exchange.', up: true },
+        { text: 'Earnings variance is the highest of the eight sectors, and coverage is the thinnest.', up: false },
+      ],
+      rows: [
+        { ticker: 'NIKL', name: 'Nickel Asia Corporation', logoBg: '#4A5A2A', cap: '\u20B182.4B', price: 5.86, change: 1.42, score: 76, state: 'Stable' },
+        { ticker: 'SCC', name: 'Semirara Mining & Power', logoBg: '#6B4A2A', cap: '\u20B1142.8B', price: 33.60, change: 0.62, score: 74, state: 'Stable' },
+        { ticker: 'PX', name: 'Philex Mining Corporation', logoBg: '#5A3A4A', cap: '\u20B118.6B', price: 3.42, change: 0.22, score: 66, state: 'Needs review' },
+        { ticker: 'AT', name: 'Atlas Consolidated Mining', logoBg: '#3A4A5A', cap: '\u20B112.2B', price: 2.88, change: -0.62, score: 58, state: 'Risk rising' },
+      ],
+    };
+    data.Consumer = {
+      index: '3,246.80', change: -0.18, count: 26, cap: '\u20B1886.4B', avgScore: 74, pe: '16.8x', yield: '2.8%', adv: 11, dec: 14, seed: 41, drift: -0.08,
+      summary: 'Input cost pressure eased through the quarter, but volume growth stayed soft as household spending remained cautious outside the premium tiers.',
+      factors: [{ n: 'Quality', v: 78, m: 74 }, { n: 'Growth', v: 68, m: 71 }, { n: 'Valuation', v: 71, m: 76 }, { n: 'Risk', v: 79, m: 72 }, { n: 'Momentum', v: 66, m: 68 }],
+      drivers: [
+        { text: 'Wheat and packaging input costs eased for a second consecutive quarter.', up: true },
+        { text: 'Volume growth stayed below 2% as household spending remained cautious.', up: false },
+        { text: 'The sector still trades above its five-year average multiple despite slower growth.', up: false },
+      ],
+      rows: [
+        { ticker: 'URC', name: 'Universal Robina Corporation', logoBg: '#6B3E8A', cap: '\u20B1212.4B', price: 96.40, change: 0.68, score: 76, state: 'Stable' },
+        { ticker: 'CNPF', name: 'Century Pacific Food, Inc.', logoBg: '#2A5A6B', cap: '\u20B1128.6B', price: 36.20, change: 0.34, score: 78, state: 'Stable' },
+        { ticker: 'JFC', name: 'Jollibee Foods Corporation', logoBg: '#C1272D', cap: '\u20B1252.8B', price: 228.40, change: -0.61, score: 71, state: 'Needs review' },
+        { ticker: 'PIP', name: 'Pepsi-Cola Products Phils.', logoBg: '#2A4A7A', cap: '\u20B114.2B', price: 1.68, change: -0.24, score: 62, state: 'Needs review' },
+        { ticker: 'EMP', name: 'Emperador Inc.', logoBg: '#6B5A2A', cap: '\u20B1148.6B', price: 9.24, change: -1.42, score: 64, state: 'Risk rising' },
+      ],
+    };
+    data.Property = {
+      index: '2,470.06', change: -0.31, count: 34, cap: '\u20B11.24T', avgScore: 70, pe: '13.2x', yield: '2.2%', adv: 11, dec: 21, seed: 61, drift: -0.26,
+      summary: 'Residential take-up slowed for a second quarter with mortgage rates holding above 7%, and inventory months rose across every major developer.',
+      factors: [{ n: 'Quality', v: 72, m: 74 }, { n: 'Growth', v: 64, m: 71 }, { n: 'Valuation', v: 84, m: 76 }, { n: 'Risk', v: 68, m: 72 }, { n: 'Momentum', v: 62, m: 68 }],
+      drivers: [
+        { text: 'Mall and leasing revenue continues to recover toward pre-2020 footfall levels.', up: true },
+        { text: 'Residential take-up slowed a second quarter with mortgage rates above 7%.', up: false },
+        { text: 'Inventory months rose to 34 across the major developers, the highest since 2021.', up: false },
+      ],
+      rows: [
+        { ticker: 'SMPH', name: 'SM Prime Holdings, Inc.', logoBg: '#6A2A5A', cap: '\u20B1782.4B', price: 27.10, change: 0.22, score: 74, state: 'Stable' },
+        { ticker: 'ALI', name: 'Ayala Land, Inc.', logoBg: '#3B6E4F', cap: '\u20B1398.6B', price: 27.15, change: -0.22, score: 70, state: 'Needs review' },
+        { ticker: 'RLC', name: 'Robinsons Land Corporation', logoBg: '#5A3A6B', cap: '\u20B182.4B', price: 15.86, change: -0.58, score: 68, state: 'Needs review' },
+        { ticker: 'MEG', name: 'Megaworld Corporation', logoBg: '#2A6B5A', cap: '\u20B168.2B', price: 2.14, change: -1.08, score: 62, state: 'Needs review' },
+        { ticker: 'VLL', name: 'Vista Land & Lifescapes', logoBg: '#6B4A3A', cap: '\u20B128.6B', price: 2.06, change: -1.82, score: 54, state: 'Risk rising' },
+      ],
+    };
+
+    const names = ['Financials', 'Industrials', 'Utilities', 'Holding Firms', 'Mining & Oil', 'Consumer', 'Property', 'Services'];
+    const d = data[s.sector] || data.Financials;
+    const up = d.change >= 0;
+    const lineColor = up ? '#1A7F37' : '#D93025';
+
+    const sec = this.walk(d.seed, 60, d.drift, 3.4);
+    const bench = this.walk(13, 60, 0.14, 2.6);
+    const line = this.path(sec, 800, 190, 8);
+    const lo = Math.min.apply(null, sec), hi = Math.max.apply(null, sec), span = (hi - lo) || 1;
+
+    const peso = v => '\u20B1' + v.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const pct = v => (v >= 0 ? '+' : '') + v.toFixed(2) + '%';
+    const stateColor = st => st === 'Strengthening' ? '#1A7F37' : (st === 'Stable' ? '#6B6B66' : (st === 'Needs review' ? '#B26B00' : '#D93025'));
+    const band = v => v >= 85 ? { bg: '#EDF6F0', border: '#CDE5D6', color: '#166B2E' }
+      : (v >= 75 ? { bg: '#F1F7F3', border: '#D8E8DD', color: '#1A7F37' }
+      : (v >= 60 ? { bg: '#F7F6EE', border: '#E5E2CF', color: '#7A6A22' }
+      : { bg: '#FAF3F2', border: '#EDD9D6', color: '#A33227' }));
+
+    const sorters = {
+      score: (a, b) => b.score - a.score,
+      change: (a, b) => b.change - a.change,
+      cap: (a, b) => parseFloat(b.cap.replace(/[^0-9.]/g, '')) - parseFloat(a.cap.replace(/[^0-9.]/g, '')),
+      name: (a, b) => a.name.localeCompare(b.name),
+    };
+    const rows = d.rows.slice().sort(sorters[s.sortKey]);
+    const total = d.adv + d.dec;
+
+    return {
+      showNav: w >= 1080,
+      showBottomNav: w < 1080,
+      pageBottomPad: w < 1080 ? 'calc(66px + env(safe-area-inset-bottom))' : '0px',
+      searchLabelShow: w >= 1240 ? 'inline' : 'none',
+      searchKbdShow: w >= 1240 ? 'inline' : 'none',
+      bottomItems: [
+        { label: 'Home', href: 'StockStory Shell.dc.html', icon: 'M4.4 19.6 V9.8 L12 4.2 L19.6 9.8 V19.6 Z M9.4 19.6 V13.6 H14.6 V19.6' },
+        { label: 'Scanner', href: 'StockStory Scanner.dc.html', icon: 'M10.8 4.2 A6.6 6.6 0 1 1 10.79 4.2 Z M15.6 15.6 L20.4 20.4' },
+        { label: 'Watchlist', href: 'StockStory Watchlist.dc.html', icon: 'M12 3.8 L14.5 9.1 L20.3 9.9 L16.1 14 L17.2 19.8 L12 17 L6.8 19.8 L7.9 14 L3.7 9.9 L9.5 9.1 Z' },
+        { label: 'Portfolio', href: 'StockStory Portfolio.dc.html', icon: 'M3.8 19.6 H20.2 M6.8 19.6 V12.8 M11.2 19.6 V7.8 M15.6 19.6 V10.6 M20 19.6 V5.2' },
+        { label: 'Alerts', href: 'StockStory Alerts.dc.html', icon: 'M7.2 10.2 A4.8 4.8 0 0 1 16.8 10.2 C16.8 15 18.4 17 18.4 17 H5.6 C5.6 17 7.2 15 7.2 10.2 Z M10.2 19.6 A2.2 2.2 0 0 0 13.8 19.6' },
+      ].map(b => ({ ...b, color: '#9A9A94', weight: 500, stroke: 1.6 })),
+      topNav: [
+        { label: 'Research', href: 'StockStory Stock Detail.dc.html' },
+        { label: 'Scanner', href: 'StockStory Scanner.dc.html' },
+        { label: 'Sectors', href: 'StockStory Sectors.dc.html', active: true },
+        { label: 'Rankings', href: 'StockStory Rankings.dc.html' },
+        { label: 'Watchlist', href: 'StockStory Watchlist.dc.html' },
+        { label: 'Portfolio', href: 'StockStory Portfolio.dc.html' },
+      ].map(n => ({ ...n, weight: n.active ? 600 : 500, color: n.active ? '#0A0A0A' : '#3A3A36', rule: n.active ? '#1A7F37' : 'transparent' })),
+
+      bodyGrid: wide ? 'minmax(0,1fr) 300px' : '1fr',
+      heroGrid: w < 820 ? '1fr' : 'minmax(0,1.1fr) minmax(0,1fr)',
+      rowGrid: wide
+        ? 'minmax(160px,1.6fr) 100px 96px 68px 58px 122px'
+        : (mid ? 'minmax(150px,1.6fr) 96px 92px 66px 56px' : 'minmax(120px,1fr) 84px 60px 52px'),
+      tableMinWidth: wide ? '860px' : (mid ? '740px' : '340px'),
+      capDisplay: mid ? 'block' : 'none',
+      stateDisplay: wide ? 'flex' : 'none',
+
+      sectorTabs: names.map(nm => ({
+        label: nm,
+        select: () => this.setState({ sector: nm }),
+        bg: nm === s.sector ? '#EDF6F0' : '#FFFFFF',
+        border: nm === s.sector ? '#CDE5D6' : '#DCDCD5',
+        color: nm === s.sector ? '#166B2E' : '#3A3A36',
+        weight: nm === s.sector ? 600 : 500,
+      })),
+
+      sectorName: s.sector,
+      sectorIcon: ic[s.sector] || ic.Financials,
+      constituentLabel: d.count + ' listed companies · ' + d.cap + ' combined market cap',
+      indexValue: d.index,
+      changeLabel: pct(d.change) + ' today',
+      changeColor: lineColor,
+      lineColor,
+      heroStats: [
+        { label: 'Average score', value: String(d.avgScore), color: '#0A0A0A' },
+        { label: 'Median P/E', value: d.pe, color: '#0A0A0A' },
+        { label: 'Median yield', value: d.yield, color: '#0A0A0A' },
+        { label: 'Advancing', value: d.adv + ' of ' + total, color: d.adv > d.dec ? '#1A7F37' : '#D93025' },
+      ],
+
+      ranges: ['1D', '1W', '1M', '1Y', 'YTD'].map(l => ({
+        label: l, select: () => this.setState({ range: l }),
+        bg: l === s.range ? '#FFFFFF' : 'transparent', color: l === s.range ? '#0A0A0A' : '#6B6B66',
+      })),
+      gridLines: [10, 54, 98, 142, 182].map(y => ({ y })),
+      chartLine: line,
+      chartBench: this.path(bench, 800, 190, 8),
+      chartArea: line + ' L792 182 L8 182 Z',
+      lastX: 792,
+      lastY: +(190 - 8 - ((sec[sec.length - 1] - lo) / span) * (190 - 16)).toFixed(1),
+      yAxis: ['+8%', '+4%', '0%', '-4%', '-8%'].map(label => ({ label })),
+      xAxis: ({
+        '1D': ['9:30', '10:30', '11:30', '13:00', '14:00', '15:20'],
+        '1W': ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
+        '1M': ['18 Jul', '25 Jul', '1 Aug', '8 Aug', '15 Aug'],
+        '1Y': ['Aug 25', 'Nov 25', 'Feb 26', 'May 26', 'Aug 26'],
+        'YTD': ['Jan', 'Mar', 'Apr', 'Jun', 'Jul', 'Aug'],
+      }[s.range] || []).map(label => ({ label })),
+
+      sortKey: s.sortKey,
+      onSort: e => this.setState({ sortKey: e.target.value }),
+      rows: rows.map(r => {
+        const b = band(r.score);
+        return {
+          ticker: r.ticker, name: r.name, logoBg: r.logoBg, cap: r.cap,
+          price: peso(r.price),
+          change: pct(r.change), changeColor: r.change >= 0 ? '#1A7F37' : '#D93025',
+          score: r.score, scoreBg: b.bg, scoreBorder: b.border, scoreColor: b.color,
+          state: r.state, stateColor: stateColor(r.state),
+        };
+      }),
+
+      driverSummary: d.summary,
+      drivers: d.drivers.map(x => ({
+        text: x.text,
+        color: x.up ? '#1A7F37' : '#B26B00',
+        glyph: x.up ? 'M5.9 9.2 L7.9 11.2 L12.1 7' : 'M9 5.6 V9.8 M9 12.2 V12.4',
+      })),
+      factorAvg: d.factors.map(f => ({
+        name: f.n, value: String(f.v),
+        delta: (f.v - f.m >= 0 ? '+' : '') + (f.v - f.m),
+        deltaColor: f.v - f.m >= 0 ? '#1A7F37' : '#D93025',
+        width: f.v + '%',
+        marketPos: f.m + '%',
+      })),
+
+      advWidth: Math.round(d.adv / total * 100) + '%',
+      decWidth: Math.round(d.dec / total * 100) + '%',
+      advLabel: d.adv + ' advancing',
+      decLabel: d.dec + ' declining',
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -132,3 +132,6 @@ tokenizer.json
 tokenizer_config.json
 gemma_pse_model_final/
 *.safetensors
+
+# Playwright prerender proof artifacts (screenshots + captured HTML)
+tmp-prerender-proof/

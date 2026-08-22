@@ -50,6 +50,7 @@ import { AsymmetricDataGateway } from "../db/AsymmetricDataGateway.js";
 import { loadRealPseOwnership } from "../services/scrapers/PSEOwnershipData.js";
 import { getSectorBySymbol, getSubsectorBySymbol, loadPseSector } from "../services/scrapers/PSESectorsData.js";
 import { getMarketCapBySymbol } from "../services/data/providers/PseMarketCapAdapter.js";
+import { computeStockScores } from "./stockScoring.js";
 import { loadPseDisclosures } from "../services/scrapers/PSEDisclosuresData.js";
 import { loadPseInsiderFilings } from "../services/scrapers/PSEInsiderFilingsData.js";
 import { computeMomentumFeatures } from "../research/features/momentumFeatures.js";
@@ -914,10 +915,37 @@ export default async function registerApiRoutes(server: FastifyInstance) {
         overall: mf.overallMomentum,
       };
     }
-    const health = 50;
+    // Loaded ahead of scoring so the risk engine gets a real reported net
+    // profit; without it only leverage is measurable and overallRisk stays
+    // null for want of a second sub-score.
+    const realFinancialsData = await loadRealFinancialSeries(cleanSymbol);
+    const realAnnualProfit = realFinancialsData?.annual?.profit ?? [];
+    const reportedNetProfit = realAnnualProfit.length > 0
+      ? realAnnualProfit[realAnnualProfit.length - 1].value
+      : null;
+
+    // Real factor scores from this stock's own fundamentals. These were
+    // hardcoded to 50 for every symbol, so the "score" surfaced in the UI
+    // ranked all 282 listed companies identically while presenting itself as
+    // research. computeStockScores reuses the existing tested engines in
+    // src/research/features/* and returns null for any factor whose inputs are
+    // missing, rather than substituting a number.
+    const realScores = computeStockScores({
+      symbol: cleanSymbol,
+      pe, pb, eps,
+      dividendYield: divYld,
+      roe,
+      debtToEquity: de,
+      netMargin: n(fundData.net_margin) ?? null,
+      operatingMargin: n(fundData.operating_margin) ?? null,
+      revenueGrowth: revGrowth,
+      profitGrowth: profGrowth,
+      netProfit: reportedNetProfit,
+      priceHistory: activePriceHistory ?? null,
+    });
+    const health = realScores.health;
     const industryPe = SECTOR_PE_MEDIAN[sector] || 20;
     const known = KNOWN[cleanSymbol];
-    const realFinancialsData = await loadRealFinancialSeries(cleanSymbol);
     const financialsData = realFinancialsData ?? deriveFinancials(marketCapCr, pe, sector, revGrowth, profGrowth);
     const realShareholdingData = await loadRealShareholdingSeries(cleanSymbol);
     const realOwnership = loadRealPseOwnership(cleanSymbol);
@@ -983,18 +1011,27 @@ export default async function registerApiRoutes(server: FastifyInstance) {
       },
       roe, debtToEquity: de, revenueGrowth: revGrowth, profitGrowth: profGrowth,
       rsi: n(fundData.rsi) ?? 50,
+      // Real, per-symbol factor scores. A null factor means its inputs were
+      // unavailable for this stock — consumers must render that as "not rated"
+      // rather than substituting a number.
       scores: {
-        quality: 50, valuation: 50,
-        growth: 50, momentum: 50,
-        risk: 50, health,
-        riskAdjusted: 50,
+        quality: realScores.quality,
+        valuation: realScores.valuation,
+        growth: realScores.growth,
+        momentum: realScores.momentum,
+        risk: realScores.risk,
+        health,
+        riskAdjusted: realScores.riskAdjusted,
       },
+      scoreConfidence: realScores.confidence,
+      scoreMissingInputs: realScores.missingInputs,
       momentumBreakdown,
-      confidenceMeter: health,
-      timeline: Array.from({ length: 6 }, (_, i) => ({
-        day: ["Mon", "Tue", "Wed", "Thu", "Fri", "Today"][i],
-        health: Math.min(100, Math.max(20, health + Math.round(Math.sin(i * 1.5) * 8))),
-      })),
+      confidenceMeter: realScores.confidence,
+      // Was a six-point "Mon…Today" health history generated with Math.sin()
+      // off a constant 50 — a fabricated trend line, not a record of anything.
+      // No per-day score history is persisted, so the honest answer is an
+      // empty series; StockPage already renders `raw.timeline ?? []`.
+      timeline: [] as Array<{ day: string; health: number }>,
       whatChanged: [
         "Quality metrics need monitoring",
         `${revGrowth ? `Revenue growth at ${revGrowth}% — ${revGrowth >= 15 ? "above" : "near"} sector average` : "Revenue growth data pending"}`,

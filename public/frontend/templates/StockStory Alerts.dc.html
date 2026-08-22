@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="./vendor/react.production.min.js"></script>
+  <script src="./vendor/react-dom.production.min.js"></script>
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <script src="_ds/raycast-command-ui-917818a8-4c87-4b33-aa1f-77e2df663ec5/_ds_bundle.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    body { margin:0; background:#FAFAF7; font-family:"Instrument Sans", -apple-system, BlinkMacSystemFont, sans-serif; -webkit-font-smoothing:antialiased; color:#0A0A0A; }
+    * { box-sizing:border-box; }
+    .n { font-family:"IBM Plex Mono", ui-monospace, monospace; font-variant-numeric:tabular-nums; letter-spacing:-0.02em; }
+    .lb { font-size:12.5px; color:#6B6B66; }
+    a { color:#0A0A0A; text-decoration:none; }
+    a:hover { color:#1A7F37; }
+    ::selection { background:#D8EEDF; }
+    .cd { background:#FFFFFF; border:1px solid #E8E8E3; border-radius:12px; }
+    ::-webkit-scrollbar { width:9px; height:9px; }
+    ::-webkit-scrollbar-thumb { background:#DEDED7; border-radius:8px; }
+    @media (prefers-reduced-motion: reduce) { * { animation:none !important; transition:none !important; } }
+  </style>
+</helmet>
+
+<div style="min-height:100dvh; background:#FAFAF7; padding-bottom:{{ pageBottomPad }};">
+
+  <sc-if value="{{ showBottomNav }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed; left:0; right:0; bottom:0; z-index:60; background:#FFFFFFF2; backdrop-filter:saturate(180%) blur(12px); border-top:1px solid #E4E4DE; padding-bottom:env(safe-area-inset-bottom);">
+      <div style="display:grid; grid-template-columns:repeat(5, minmax(0,1fr));">
+        <sc-for list="{{ bottomItems }}" as="bi" hint-placeholder-count="5">
+          <a href="{{ bi.href }}" style="display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; min-height:56px; padding:8px 2px; color:{{ bi.color }};">
+            <svg width="21" height="21" viewBox="0 0 24 24" fill="none"><path d="{{ bi.icon }}" stroke="{{ bi.color }}" stroke-width="{{ bi.stroke }}" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+            <span style="font-size:10px; font-weight:{{ bi.weight }}; letter-spacing:0.01em;">{{ bi.label }}</span>
+          </a>
+        </sc-for>
+      </div>
+    </div>
+  </sc-if>
+  <div style="position:sticky; top:0; z-index:30; background:#FAFAF7; border-bottom:1px solid #E8E8E3;">
+    <div style="width:100%; max-width:1480px; margin:0 auto; padding:0 clamp(14px,2vw,26px); height:64px; display:flex; align-items:center; gap:clamp(14px,2.4vw,34px);">
+      <a href="StockStory Shell.dc.html" style="display:flex; align-items:center; gap:10px; flex-shrink:0;">
+        <svg width="30" height="30" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="9" fill="#0A0A0A"></rect><path d="M21 11.4 C21 8.6 11.6 8.8 11.6 13 C11.6 17.2 21 15.6 21 19.8 C21 24 11.6 23.6 11.6 20.8" stroke="#FFFFFF" stroke-width="2.1" stroke-linecap="round" fill="none"></path></svg>
+        <span style="line-height:1.1;"><span style="display:block; font-size:17px; font-weight:600; letter-spacing:-0.02em;">StockEX<span style="font-size:8.5px; font-weight:500; vertical-align:super; letter-spacing:0; margin-left:1px; color:#9A9A94;">&#8482;</span></span><span style="display:block; font-size:11.5px; color:#6B6B66;">Philippines</span></span>
+      </a>
+      <sc-if value="{{ showNav }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex; align-items:center; gap:clamp(12px,1.6vw,26px); margin-left:clamp(8px,2vw,28px);">
+          <sc-for list="{{ topNav }}" as="t" hint-placeholder-count="6">
+            <a href="{{ t.href }}" style="display:flex; align-items:center; gap:5px; font-size:14px; font-weight:{{ t.weight }}; color:{{ t.color }}; padding:20px 0; border-bottom:2px solid {{ t.rule }}; white-space:nowrap;" style-hover="color:#1A7F37;">{{ t.label }}<sc-if value="{{ t.caret }}" hint-placeholder-val="{{ false }}"><svg width="9" height="9" viewBox="0 0 12 12" fill="none"><path d="M2.5 4.5 L6 8 L9.5 4.5" stroke="#6B6B66" stroke-width="1.5" stroke-linecap="round"></path></svg></sc-if></a>
+          </sc-for>
+        </div>
+      </sc-if>
+      <div style="flex:1;"></div>
+      <a href="StockStory Search.dc.html" style="display:flex; align-items:center; gap:8px; height:34px; padding:0 11px; border-radius:8px; border:1px solid #E4E4DE; background:#FFFFFF; color:#8A8A84;" style-hover="border-color:#0A0A0A; color:#0A0A0A;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="10.8" cy="10.8" r="6.6" stroke="currentColor" stroke-width="1.8"></circle><path d="M15.6 15.6 L20.4 20.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path></svg>
+        <span style="font-size:12.5px; display:{{ searchLabelShow }};">Search</span>
+        <span class="n" style="padding:2px 6px; border-radius:5px; background:#F4F4EF; font-size:10px; color:#9A9A94; display:{{ searchKbdShow }};">⌘K</span>
+      </a>
+      <sc-if value="{{ showNav }}" hint-placeholder-val="{{ true }}">
+        <a href="StockStory Sign In.dc.html" style="font-size:14px; font-weight:500; white-space:nowrap;">Sign in</a>
+      </sc-if>
+      <a href="StockStory Pricing.dc.html" style="display:inline-flex; align-items:center; gap:7px; height:42px; padding:0 18px; border-radius:9px; background:#0A0A0A; color:#FFFFFF; font-size:14px; font-weight:500; white-space:nowrap;" style-hover="background:#1A1A1A; color:#FFFFFF;">Start Free Trial <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M3 9 L9 3 M9 3 H4.6 M9 3 V7.4" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round"></path></svg></a>
+    </div>
+  </div>
+
+  <div style="width:100%; max-width:1480px; margin:0 auto; padding:clamp(12px,1.6vw,18px) clamp(14px,2vw,26px) 0;">
+    <div class="cd" style="display:grid; grid-template-columns:{{ tapeGrid }}; overflow:hidden;">
+      <sc-for list="{{ indices }}" as="ix" hint-placeholder-count="4">
+        <div style="padding:13px 17px; border-right:1px solid #E8E8E3; border-top:{{ ix.topRule }}; display:flex; flex-direction:column; gap:9px; min-width:0;">
+          <div style="min-width:0;">
+            <div style="font-size:10.5px; font-weight:600; color:#6B6B66; letter-spacing:0.09em; text-transform:uppercase; margin-bottom:5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ ix.name }}</div>
+            <div style="display:flex; align-items:baseline; gap:7px; flex-shrink:0; white-space:nowrap;">
+              <span class="n" style="font-size:17.5px; font-weight:600; letter-spacing:-0.025em;">{{ ix.value }}</span>
+              <span class="n" style="font-size:12.5px; font-weight:500; color:{{ ix.color }};">{{ ix.change }}</span>
+            </div>
+          </div>
+          <div style="width:100%; min-width:0; display:{{ rangeDisplay }}; flex-direction:column; gap:4px;">
+            <div style="position:relative; height:4px; border-radius:2px; background:#EDEDE8;">
+              <span style="position:absolute; left:0; width:{{ ix.pos }}; height:4px; border-radius:2px; background:{{ ix.color }}; opacity:0.26;"></span>
+              <span style="position:absolute; left:{{ ix.pos }}; top:-2px; width:2px; height:8px; border-radius:1px; background:{{ ix.color }}; transform:translateX(-1px);"></span>
+            </div>
+            <div style="display:flex; align-items:baseline; justify-content:space-between; gap:6px;">
+              <span class="n" style="font-size:11px; color:#6B6B66; white-space:nowrap;">{{ ix.low }}</span>
+              <span class="lb" style="font-size:10px; letter-spacing:0.06em; color:#6B6B66;">DAY</span>
+              <span class="n" style="font-size:11px; color:#6B6B66; white-space:nowrap;">{{ ix.high }}</span>
+            </div>
+          </div>
+        </div>
+      </sc-for>
+      <div style="padding:13px 17px; display:flex; flex-direction:column; justify-content:center; gap:3px; grid-column:{{ statusSpan }}; border-top:{{ statusTopRule }};">
+        <div style="display:flex; align-items:center; gap:6px; font-size:13px; font-weight:500; color:#1A7F37; white-space:nowrap;"><span style="width:6px; height:6px; border-radius:50%; background:#1A7F37;"></span>Market is Open</div>
+        <div class="lb" style="font-size:11.5px; white-space:nowrap;">Closes 3:30 PM PHT</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="width:100%; max-width:1480px; margin:0 auto; padding:clamp(14px,1.8vw,22px) clamp(14px,2vw,26px) clamp(28px,3.4vw,52px); display:grid; grid-template-columns:{{ bodyGrid }}; gap:clamp(12px,1.4vw,18px); align-items:start;">
+
+    <div style="min-width:0; display:flex; flex-direction:column; gap:clamp(12px,1.4vw,18px);">
+
+      <div class="cd" style="padding:clamp(16px,1.8vw,24px); min-width:0;">
+        <div style="display:flex; align-items:flex-end; justify-content:space-between; gap:16px; flex-wrap:wrap;">
+          <div style="min-width:0;">
+            <h1 style="margin:0 0 8px; font-size:clamp(22px,1.4vw + 14px,30px); font-weight:600; letter-spacing:-0.03em;">Alerts</h1>
+            <p class="lb" style="margin:0; font-size:13.5px; line-height:1.6; max-width:52ch;">{{ unreadLabel }}</p>
+          </div>
+          <div style="display:flex; gap:9px; flex-wrap:wrap;">
+            <span onClick="{{ markAllRead }}" style="display:inline-flex; align-items:center; gap:7px; height:40px; padding:0 15px; border-radius:8px; border:1px solid #DCDCD5; font-size:13px; font-weight:500; cursor:pointer; white-space:nowrap;" style-hover="border-color:#0A0A0A;">
+              <svg width="14" height="14" viewBox="0 0 20 20" fill="none"><path d="M3.4 10.4 L6.6 13.6 L12 8.2 M8.4 13.6 L11.6 16.8 L17 11.4" stroke="#0A0A0A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>Mark all read
+            </span>
+          </div>
+        </div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:18px; padding-top:16px; border-top:1px solid #F0F0EB;">
+          <sc-for list="{{ filters }}" as="f" hint-placeholder-count="5">
+            <span onClick="{{ f.select }}" style="display:inline-flex; align-items:center; gap:7px; height:34px; padding:0 13px; border-radius:8px; border:1px solid {{ f.border }}; background:{{ f.bg }}; border-left:2px solid {{ f.rail }}; font-size:12.5px; font-weight:{{ f.weight }}; color:{{ f.color }}; cursor:pointer; white-space:nowrap;" style-hover="border-color:#0A0A0A;">
+              <sc-if value="{{ f.dot }}" hint-placeholder-val="{{ false }}"><span style="width:6px; height:6px; border-radius:50%; background:{{ f.dotColor }};"></span></sc-if>{{ f.label }}
+              <span class="n" style="font-size:11px; color:#8A8A84;">{{ f.count }}</span>
+            </span>
+          </sc-for>
+        </div>
+      </div>
+
+      <sc-for list="{{ groups }}" as="g" hint-placeholder-count="3">
+        <div class="cd" style="min-width:0; overflow:hidden;">
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 16px; border-bottom:1px solid #E8E8E3; background:#FBFBF8;">
+            <span style="font-size:13px; font-weight:600;">{{ g.label }}</span>
+            <span class="lb" style="font-size:11.5px;">{{ g.count }}</span>
+          </div>
+          <sc-for list="{{ g.items }}" as="it" hint-placeholder-count="4">
+            <div style="display:grid; grid-template-columns:{{ alertGrid }}; gap:12px; padding:14px 16px; border-bottom:1px solid #F0F0EB; background:{{ it.rowBg }};" style-hover="background:#FAFAF7;">
+              <span style="width:32px; height:32px; border-radius:8px; background:{{ it.iconBg }}; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="{{ it.icon }}" stroke="{{ it.iconColor }}" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+              </span>
+              <span style="min-width:0;">
+                <span style="display:flex; align-items:center; gap:9px; margin-bottom:5px; flex-wrap:wrap;">
+                  <a href="StockStory Stock Detail.dc.html" style="font-size:13.5px; font-weight:600; color:#0A0A0A;">{{ it.ticker }}</a>
+                  <span style="display:flex; align-items:center; gap:6px; font-size:11.5px; font-weight:500; color:{{ it.kindColor }};"><span style="width:6px; height:6px; border-radius:50%; background:{{ it.kindColor }};"></span>{{ it.kind }}</span>
+                  <sc-if value="{{ it.unread }}" hint-placeholder-val="{{ false }}">
+                    <span style="padding:2px 7px; border-radius:5px; background:#EDF6F0; font-size:10.5px; font-weight:600; color:#166B2E;">New</span>
+                  </sc-if>
+                </span>
+                <span style="display:block; font-size:13px; line-height:1.6; color:#3A3A36; overflow-wrap:break-word;">{{ it.text }}</span>
+                <span style="display:flex; align-items:center; gap:12px; margin-top:9px; flex-wrap:wrap;">
+                  <a href="StockStory Stock Detail.dc.html" style="display:flex; align-items:center; gap:6px; font-size:12px; font-weight:500;" style-hover="color:#1A7F37;">Open research <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6 H10 M7 3 L10 6 L7 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg></a>
+                  <span onClick="{{ it.dismiss }}" style="font-size:12px; color:#9A9A94; cursor:pointer;" style-hover="color:#D93025;">Dismiss</span>
+                </span>
+              </span>
+              <span class="lb" style="font-size:11.5px; text-align:right; white-space:nowrap; display:{{ timeDisplay }};">{{ it.time }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </sc-for>
+
+      <sc-if value="{{ isEmpty }}" hint-placeholder-val="{{ false }}">
+        <div class="cd" style="padding:56px 16px; text-align:center;">
+          <div style="font-size:14.5px; font-weight:600; margin-bottom:7px;">Nothing here right now</div>
+          <div class="lb" style="font-size:13px;">No alerts match this filter. Theses you track will appear here as they move.</div>
+        </div>
+      </sc-if>
+    </div>
+
+    <div style="min-width:0; display:flex; flex-direction:column; gap:clamp(12px,1.4vw,18px);">
+      <div class="cd" style="padding:16px;">
+        <div style="font-size:13.5px; font-weight:600; margin-bottom:3px;">What you are told about</div>
+        <div class="lb" style="font-size:11px; margin-bottom:12px;">Applies to all tracked companies</div>
+        <sc-for list="{{ rules }}" as="ru" hint-placeholder-count="5">
+          <div style="display:grid; grid-template-columns:minmax(0,1fr) 40px; gap:10px; align-items:center; padding:11px 0; border-top:1px solid #F0F0EB;">
+            <span style="min-width:0;">
+              <span style="display:block; font-size:12.5px; margin-bottom:2px; overflow-wrap:break-word;">{{ ru.label }}</span>
+              <span class="lb" style="display:block; font-size:11px; line-height:1.5;">{{ ru.sub }}</span>
+            </span>
+            <span onClick="{{ ru.toggle }}" style="width:38px; height:22px; border-radius:999px; background:{{ ru.trackBg }}; border:1px solid {{ ru.trackBorder }}; position:relative; cursor:pointer; flex-shrink:0; transition:background-color 200ms cubic-bezier(0.16,1,0.3,1);">
+              <span style="position:absolute; top:2px; left:{{ ru.knobLeft }}; width:16px; height:16px; border-radius:50%; background:{{ ru.knobBg }}; transition:left 200ms cubic-bezier(0.16,1,0.3,1);"></span>
+            </span>
+          </div>
+        </sc-for>
+      </div>
+
+      <div class="cd" style="padding:16px;">
+        <div style="font-size:13.5px; font-weight:600; margin-bottom:3px;">This week</div>
+        <div class="lb" style="font-size:11px; margin-bottom:12px;">Alert volume by kind</div>
+        <sc-for list="{{ stats }}" as="st" hint-placeholder-count="4">
+          <div style="display:grid; grid-template-columns:minmax(0,1fr) 52px 24px; gap:9px; align-items:center; padding:6px 0; border-top:1px solid #F0F0EB;">
+            <span style="display:flex; align-items:center; gap:7px; min-width:0;"><span style="width:6px; height:6px; border-radius:50%; background:{{ st.color }}; flex-shrink:0;"></span><span style="font-size:12px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ st.label }}</span></span>
+            <span style="height:5px; background:#F2F2ED; border-radius:3px; overflow:hidden;"><span style="display:block; height:5px; width:{{ st.width }}; background:{{ st.color }}; border-radius:3px;"></span></span>
+            <span class="n" style="font-size:11.5px; text-align:right;">{{ st.count }}</span>
+          </div>
+        </sc-for>
+      </div>
+
+      <div class="cd" style="padding:16px;">
+        <div style="font-size:13.5px; font-weight:600; margin-bottom:6px;">Delivery</div>
+        <div class="lb" style="font-size:12px; line-height:1.6; margin-bottom:13px;">Alerts arrive in the app. Email digests are sent once daily after the close, never intraday.</div>
+        <a href="StockStory Settings.dc.html" style="display:flex; align-items:center; justify-content:center; gap:8px; height:40px; border-radius:9px; border:1px solid #DCDCD5; font-size:13px; font-weight:500;" style-hover="border-color:#0A0A0A; color:#0A0A0A;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M14.4 12 A2.4 2.4 0 1 1 9.6 12 A2.4 2.4 0 1 1 14.4 12 Z M10.6 3.6 H13.4 L13.8 5.9 A6.4 6.4 0 0 1 15.6 6.9 L17.8 6.1 L19.2 8.5 L17.4 10.0 A6.4 6.4 0 0 1 17.4 14.0 L19.2 15.5 L17.8 17.9 L15.6 17.1 A6.4 6.4 0 0 1 13.8 18.1 L13.4 20.4 H10.6 L10.2 18.1 A6.4 6.4 0 0 1 8.4 17.1 L6.2 17.9 L4.8 15.5 L6.6 14.0 A6.4 6.4 0 0 1 6.6 10.0 L4.8 8.5 L6.2 6.1 L8.4 6.9 A6.4 6.4 0 0 1 10.2 5.9 Z" stroke="#0A0A0A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>Notification settings
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{}">
+class Component extends DCLogic {
+  state = {
+    width: typeof window !== 'undefined' ? window.innerWidth : 1480,
+    filter: 'All',
+    dismissed: {},
+    read: {},
+    rules: { thesis: true, filings: true, risk: true, price: false, digest: true },
+  };
+
+  componentDidMount() { this._r = () => this.setState({ width: window.innerWidth }); window.addEventListener('resize', this._r); }
+  componentWillUnmount() { window.removeEventListener('resize', this._r); }
+
+  spark(vals, w, h, pad) {
+    const p = pad == null ? 3 : pad;
+    const lo = Math.min.apply(null, vals), hi = Math.max.apply(null, vals), span = (hi - lo) || 1;
+    return vals.map((v, i) => {
+      const x = p + (i / (vals.length - 1)) * (w - p * 2);
+      const y = h - p - ((v - lo) / span) * (h - p * 2);
+      return (i ? 'L' : 'M') + x.toFixed(1) + ' ' + y.toFixed(1);
+    }).join(' ');
+  }
+
+  // seeded random walk — irregular like real tape, stable across renders
+  walk(seed, n, drift, vol) {
+    let s = seed * 7919 + 13, v = 100, out = [];
+    const rnd = () => { s = (s * 1103515245 + 12345) & 0x7fffffff; return s / 0x7fffffff; };
+    for (let i = 0; i < n; i++) {
+      const shock = (rnd() < 0.08) ? (rnd() - 0.5) * vol * 3.4 : 0;
+      v += (rnd() - 0.5) * vol + drift + shock;
+      out.push(v);
+    }
+    return out;
+  }
+
+  renderVals() {
+    const w = this.state.width, s = this.state;
+    const wide = w >= 1340;
+    const navItems = [
+      { label: 'Research', href: 'StockStory Stock Detail.dc.html', caret: true },
+      { label: 'Scanner', href: 'StockStory Scanner.dc.html', caret: false },
+      { label: 'Compare', href: 'StockStory Compare.dc.html', caret: false },
+      { label: 'Watchlist', href: 'StockStory Watchlist.dc.html', caret: false },
+      { label: 'Alerts', href: 'StockStory Alerts.dc.html', caret: false, active: true },
+      { label: 'Portfolio', href: 'StockStory Portfolio.dc.html', caret: false },
+    ];
+
+    const icons = {
+      thesis: 'M4 18 L9 12 L13 15 L20 6 M20 6 H15.4 M20 6 V10.6',
+      risk: 'M11.2 3.8 L3.4 18.4 H20.6 L12.8 3.8 Z M12 9.4 V13.4 M12 15.8 V16',
+      filing: 'M6.4 3.6 H14 L17.6 7.2 V20.4 H6.4 Z M14 3.6 V7.2 H17.6 M9.2 12.4 H14.8 M9.2 15.8 H14.8',
+      event: 'M3.6 6.4 H20.4 V20.4 H3.6 Z M3.6 6.4 V4 M8 3 V6.4 M16 3 V6.4 M20.4 6.4 V4',
+    };
+
+    const all = [
+      { id: 'a1', ticker: 'TEL', kind: 'Risk rising', day: 'Today', time: '9:42 AM', type: 'thesis', icon: icons.risk,
+        text: 'Capex intensity rose for a third straight quarter and free cash cover fell below 1.4x. The thesis assumed capex would peak this year.' },
+      { id: 'a2', ticker: 'BDO', kind: 'Thesis improving', day: 'Today', time: '9:15 AM', type: 'thesis', icon: icons.thesis,
+        text: 'Loan growth beat sector average for a third quarter. Net interest margin held at 4.62% through the August policy cut.' },
+      { id: 'a3', ticker: 'ICT', kind: 'Filing read', day: 'Today', time: '8:30 AM', type: 'filing', icon: icons.filing,
+        text: 'Q2 disclosure raises full-year volume guidance. Yard utilisation at a five-year high across Manila and Subic.' },
+      { id: 'a4', ticker: 'JFC', kind: 'Needs review', day: 'Yesterday', time: '3:02 PM', type: 'thesis', icon: icons.risk,
+        text: 'North America same-store sales decelerated to 1.2% against a soft base. Growth was the load-bearing leg of this thesis.' },
+      { id: 'a5', ticker: 'SM', kind: 'Event ahead', day: 'Yesterday', time: '11:20 AM', type: 'event', icon: icons.event,
+        text: 'Annual stockholders meeting set for 24 September. Dividend ex-date falls on 8 September.' },
+      { id: 'a6', ticker: 'ALI', kind: 'Needs review', day: 'This week', time: 'Wed', type: 'thesis', icon: icons.risk,
+        text: 'Residential take-up slowed a second quarter with mortgage rates holding above 7%. Inventory months rose to 34.' },
+      { id: 'a7', ticker: 'MER', kind: 'Filing read', day: 'This week', time: 'Tue', type: 'filing', icon: icons.filing,
+        text: 'Rate reset filing confirms distribution charge unchanged through the fourth quarter.' },
+      { id: 'a8', ticker: 'BPI', kind: 'Thesis improving', day: 'This week', time: 'Mon', type: 'thesis', icon: icons.thesis,
+        text: 'Cost-to-income improved to 52.6%, the strongest of the large banks. Fee income offset a softer margin.' },
+    ];
+
+    const kindColor = k => k === 'Thesis improving' ? '#1A7F37' : (k === 'Filing read' ? '#1A7F37' : (k === 'Needs review' ? '#B26B00' : (k === 'Event ahead' ? '#6B6B66' : '#D93025')));
+    const iconTint = k => k === 'Risk rising' ? { bg: '#FBF1F0', color: '#D93025' } : (k === 'Needs review' ? { bg: '#FBF6EC', color: '#B26B00' } : (k === 'Event ahead' ? { bg: '#F4F4EF', color: '#6B6B66' } : { bg: '#F2F5F3', color: '#1A7F37' }));
+
+    const live = all.filter(a => !s.dismissed[a.id]);
+    const matches = a => {
+      if (s.filter === 'All') return true;
+      if (s.filter === 'Unread') return !s.read[a.id];
+      if (s.filter === 'Thesis') return a.type === 'thesis';
+      if (s.filter === 'Filings') return a.type === 'filing';
+      if (s.filter === 'Events') return a.type === 'event';
+      return true;
+    };
+    const shown = live.filter(matches);
+
+    const dayOrder = ['Today', 'Yesterday', 'This week'];
+    const groups = dayOrder.map(d => {
+      const items = shown.filter(a => a.day === d);
+      return {
+        label: d,
+        count: items.length === 1 ? '1 alert' : items.length + ' alerts',
+        items: items.map(a => {
+          const tint = iconTint(a.kind);
+          const unread = !s.read[a.id];
+          return {
+            ticker: a.ticker, kind: a.kind, kindColor: kindColor(a.kind),
+            text: a.text, time: a.time,
+            icon: a.icon, iconBg: tint.bg, iconColor: tint.color,
+            unread, rowBg: unread ? '#FDFDFB' : '#FFFFFF',
+            dismiss: () => this.setState(st => ({ dismissed: { ...st.dismissed, [a.id]: true } })),
+          };
+        }),
+      };
+    }).filter(g => g.items.length > 0);
+
+    const unreadCount = live.filter(a => !s.read[a.id]).length;
+    const counts = {
+      All: live.length,
+      Unread: unreadCount,
+      Thesis: live.filter(a => a.type === 'thesis').length,
+      Filings: live.filter(a => a.type === 'filing').length,
+      Events: live.filter(a => a.type === 'event').length,
+    };
+
+    const ruleDefs = [
+      { key: 'thesis', label: 'Thesis changes', sub: 'When our read on a tracked company shifts' },
+      { key: 'filings', label: 'New filings', sub: 'Disclosures and reports as they are posted' },
+      { key: 'risk', label: 'Risk flags', sub: 'Leverage, cash cover, or credit quality deteriorating' },
+      { key: 'price', label: 'Large price moves', sub: 'Intraday moves beyond 5%' },
+      { key: 'digest', label: 'Weekly digest', sub: 'One summary after Friday\u2019s close' },
+    ];
+
+    const statCounts = [
+      { label: 'Thesis changes', count: counts.Thesis, color: '#1A7F37' },
+      { label: 'Filings read', count: counts.Filings, color: '#1A7F37' },
+      { label: 'Risk flags', count: live.filter(a => a.kind === 'Risk rising' || a.kind === 'Needs review').length, color: '#B26B00' },
+      { label: 'Events ahead', count: counts.Events, color: '#6B6B66' },
+    ];
+    const maxStat = Math.max.apply(null, statCounts.map(x => x.count)) || 1;
+
+    return {
+      rangeDisplay: w < 400 ? 'none' : 'flex',
+      searchLabelShow: w >= 1240 ? 'inline' : 'none',
+      searchKbdShow: w >= 1240 ? 'inline' : 'none',
+      showBottomNav: w < 1080,
+      pageBottomPad: w < 1080 ? 'calc(66px + env(safe-area-inset-bottom))' : '0px',
+      bottomItems: [
+        { label: 'Home', href: 'StockStory Shell.dc.html', icon: 'M4.4 19.6 V9.8 L12 4.2 L19.6 9.8 V19.6 Z M9.4 19.6 V13.6 H14.6 V19.6' },
+        { label: 'Scanner', href: 'StockStory Scanner.dc.html', icon: 'M10.8 4.2 A6.6 6.6 0 1 1 10.79 4.2 Z M15.6 15.6 L20.4 20.4' },
+        { label: 'Watchlist', href: 'StockStory Watchlist.dc.html', icon: 'M12 3.8 L14.5 9.1 L20.3 9.9 L16.1 14 L17.2 19.8 L12 17 L6.8 19.8 L7.9 14 L3.7 9.9 L9.5 9.1 Z' },
+        { label: 'Portfolio', href: 'StockStory Portfolio.dc.html', icon: 'M3.8 19.6 H20.2 M6.8 19.6 V12.8 M11.2 19.6 V7.8 M15.6 19.6 V10.6 M20 19.6 V5.2' },
+        { label: 'Alerts', href: 'StockStory Alerts.dc.html', icon: 'M7.2 10.2 A4.8 4.8 0 0 1 16.8 10.2 C16.8 15 18.4 17 18.4 17 H5.6 C5.6 17 7.2 15 7.2 10.2 Z M10.2 19.6 A2.2 2.2 0 0 0 13.8 19.6' },
+      ].map(b => ({
+        ...b,
+        color: b.label === 'Alerts' ? '#0A0A0A' : '#9A9A94',
+        weight: b.label === 'Alerts' ? 600 : 500,
+        stroke: b.label === 'Alerts' ? 1.9 : 1.6,
+      })),
+      showNav: w >= 1080,
+      topNav: navItems.map(n => ({ ...n, weight: n.active ? 600 : 500, color: n.active ? '#0A0A0A' : '#3A3A36', rule: n.active ? '#1A7F37' : 'transparent' })),
+      tapeGrid: w < 940 ? 'repeat(2, minmax(0,1fr))' : (w < 1180 ? 'repeat(4, minmax(0,1fr))' : 'repeat(4, minmax(0,1fr)) auto'),
+      statusSpan: w < 1180 ? '1 / -1' : 'auto',
+      statusTopRule: w < 1180 ? '1px solid #E8E8E3' : '0',
+      indices: [
+        { name: 'PSE Index', value: '6,842.15', change: '+0.84%', color: '#1A7F37', low: '6,801', high: '6,858', pos: '72%' },
+        { name: 'All Shares', value: '3,614.20', change: '+0.62%', color: '#1A7F37', low: '3,592', high: '3,621', pos: '77%' },
+        { name: 'Financials', value: '2,188.44', change: '+1.12%', color: '#1A7F37', low: '2,166', high: '2,194', pos: '80%' },
+        { name: 'Property', value: '2,470.06', change: '-0.31%', color: '#D93025', low: '2,462', high: '2,498', pos: '22%' },
+      ].map((ix, i) => ({ ...ix, topRule: (w < 940 && i > 1) ? '1px solid #E8E8E3' : '0' })),
+
+      bodyGrid: wide ? 'minmax(0,1fr) 300px' : '1fr',
+      alertGrid: w < 620 ? '32px minmax(0,1fr)' : '32px minmax(0,1fr) 62px',
+      timeDisplay: w < 620 ? 'none' : 'block',
+      unreadLabel: unreadCount === 0
+        ? 'Nothing unread. Alerts fire when a thesis moves, not when a price does.'
+        : (unreadCount + (unreadCount === 1 ? ' alert' : ' alerts') + ' unread across ' + live.length + ' this week.'),
+      markAllRead: () => {
+        const read = {};
+        all.forEach(a => { read[a.id] = true; });
+        this.setState({ read });
+      },
+
+      filters: ['All', 'Unread', 'Thesis', 'Filings', 'Events'].map(l => ({
+        label: l, count: counts[l],
+        select: () => this.setState({ filter: l }),
+        bg: l === s.filter ? '#EDF6F0' : '#FFFFFF',
+        border: l === s.filter ? '#CDE5D6' : '#DCDCD5',
+        rail: l === s.filter ? '#1A7F37' : 'transparent',
+        color: l === s.filter ? '#166B2E' : '#3A3A36',
+        weight: l === s.filter ? 600 : 500,
+        dot: l === 'Unread' && unreadCount > 0,
+        dotColor: '#1A7F37',
+      })),
+
+      groups,
+      isEmpty: shown.length === 0,
+
+      rules: ruleDefs.map(r => {
+        const on = s.rules[r.key];
+        return {
+          label: r.label, sub: r.sub,
+          toggle: () => this.setState(st => ({ rules: { ...st.rules, [r.key]: !st.rules[r.key] } })),
+          trackBg: on ? '#1A7F37' : '#F2F2ED',
+          trackBorder: on ? '#1A7F37' : '#DCDCD5',
+          knobLeft: on ? '18px' : '2px',
+          knobBg: '#FFFFFF',
+        };
+      }),
+      stats: statCounts.map(x => ({
+        label: x.label, count: x.count, color: x.color,
+        width: Math.round(x.count / maxStat * 100) + '%',
+      })),
+    };
+  }
+}
+</script>
+</body>
+</html>

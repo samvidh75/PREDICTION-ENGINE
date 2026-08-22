@@ -74,8 +74,8 @@
   <circle cx="314" cy="170" r="5" fill="#FFFFFF" opacity="0.96"/>
 
   <text x="458" y="208" font-family="Inter, system-ui, sans-serif" font-size="88" font-weight="600" letter-spacing="-3" fill="#FFFFFF">StockEx</text>
-  <text x="458" y="260" font-family="Inter, system-ui, sans-serif" font-size="22" font-weight="500" letter-spacing="6.5" fill="#AAB6C8">RESEARCH AND BROKER SYSTEM</text>
+  <text x="458" y="260" font-family="Inter, system-ui, sans-serif" font-size="22" font-weight="500" letter-spacing="6.5" fill="#AAB6C8">PSE STOCK RESEARCH</text>
   <text x="458" y="334" font-family="Inter, system-ui, sans-serif" font-size="54" font-weight="600" letter-spacing="-2" fill="#FFFFFF">Deep company research.</text>
-  <text x="458" y="398" font-family="Inter, system-ui, sans-serif" font-size="54" font-weight="600" letter-spacing="-2" fill="#FF6B6B">Connected execution path.</text>
-  <text x="458" y="468" font-family="Inter, system-ui, sans-serif" font-size="24" font-weight="400" fill="#94A3B8">Scanner, stock detail, tracking, portfolio context, and broker-ready follow-through in one product.</text>
+  <text x="458" y="398" font-family="Inter, system-ui, sans-serif" font-size="54" font-weight="600" letter-spacing="-2" fill="#FF6B6B">Plain-language scores.</text>
+  <text x="458" y="468" font-family="Inter, system-ui, sans-serif" font-size="24" font-weight="400" fill="#94A3B8">Scanner, stock detail, tracking, and portfolio context — research only, not investment advice.</text>
 </svg>
