@@ -573,8 +573,17 @@ async function bootstrap() {
       return reply.status(404).send({ error: "not found" });
     }
 
-    // Try to serve the requested file from dist
-    const filePath = join(distPath, url.pathname);
+    // Try to serve the requested file from dist.
+    //
+    // A directory is also tried as its index.html, which is how prerendered
+    // pages get served: scripts/prerender/prerenderStockPages.ts writes
+    // dist/public/stock/{SYMBOL}/index.html, and a request for /stock/BDO
+    // would otherwise fall through to the SPA shell — sending crawlers the
+    // empty client-rendered page these files exist to replace.
+    const requested = join(distPath, url.pathname);
+    const filePath = extname(url.pathname) === ""
+      ? join(requested, "index.html")
+      : requested;
     if (filePath.startsWith(distPath)) {
       const content = await tryReadFile(filePath);
       if (content) {

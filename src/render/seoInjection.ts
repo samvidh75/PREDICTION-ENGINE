@@ -19,8 +19,23 @@ function escapeHtml(value: string): string {
     .replace(/"/g, "&quot;");
 }
 
+/**
+ * Rewrite a head tag, inserting it when the document has none.
+ *
+ * This previously returned `html` untouched whenever the pattern did not match,
+ * which was fine for index.html — it already carries every tag. The prerendered
+ * design pages do not: their `<head>` has no `<title>`, description or
+ * canonical, so every replacement silently no-opped and the pages shipped with
+ * no metadata at all, losing exactly the crawler-facing tags prerendering
+ * exists to provide.
+ */
 function replaceTag(html: string, pattern: RegExp, replacement: string): string {
-  return pattern.test(html) ? html.replace(pattern, replacement) : html;
+  if (pattern.test(html)) return html.replace(pattern, replacement);
+  // Insert before </head> when present; otherwise leave the document alone
+  // rather than guessing at a structure that isn't there.
+  return html.includes("</head>")
+    ? html.replace("</head>", `  ${replacement}\n</head>`)
+    : html;
 }
 
 /**

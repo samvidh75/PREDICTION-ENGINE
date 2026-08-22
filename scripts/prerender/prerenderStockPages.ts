@@ -21,12 +21,15 @@ import { serveDirectory, stripRuntime } from "./dcRenderer";
 import { getCanonicalSymbols } from "../lib/canonical-symbols";
 import { buildStockDetailProps, type StockApiResponse } from "../../src/frontend/prerender/stockDetailProps";
 import { buildShellProps } from "../../src/frontend/prerender/shellProps";
+import { injectSeoMeta } from "../../src/render/seoInjection";
+import { resolveRouteMeta } from "../../src/frontend/seo/routeMeta";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, "..", "..");
 const TEMPLATE_DIR = path.join(root, "public", "frontend", "templates");
 const OUT_ROOT = path.join(root, "dist", "public", "stock");
 const PAGE = "StockStory Stock Detail.dc.html";
+const SEO_BASE_URL = process.env.VITE_APP_ORIGIN ?? "https://stockstory-india.com";
 
 /** Concurrent browser pages. Chromium is launched once and reused. */
 const CONCURRENCY = 6;
@@ -71,7 +74,22 @@ async function renderSymbol(
       { timeout: 45_000 },
     );
 
-    const html = stripRuntime(await page.content());
+    // Bake the head tags in here. injectSeoMeta runs on the SPA-fallback
+    // branch in startServer, which prerendered files never reach — without
+    // this they ship with an empty <title> and no canonical, losing exactly
+    // the crawler-facing metadata these pages exist to provide.
+    const meta = resolveRouteMeta(`/stock/${symbol.toUpperCase()}`, {
+      symbol: symbol.toUpperCase(),
+      companyName: api.companyName ?? undefined,
+      sector: api.sector ?? undefined,
+      industry: api.industry ?? undefined,
+    });
+    const html = injectSeoMeta(
+      stripRuntime(await page.content()),
+      meta,
+      SEO_BASE_URL,
+      "STOCKEX",
+    );
     const outDir = path.join(OUT_ROOT, symbol.toUpperCase());
     await mkdir(outDir, { recursive: true });
     await writeFile(path.join(outDir, "index.html"), html);
