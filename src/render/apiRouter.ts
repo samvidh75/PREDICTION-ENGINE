@@ -53,6 +53,7 @@ import { getMarketCapBySymbol } from "../services/data/providers/PseMarketCapAda
 import { computeStockScores } from "./stockScoring.js";
 import { getPseFundamentals, getNetMargin, getAnnualisedRoe } from "../services/data/providers/PseFundamentalsAdapter.js";
 import { getStockStats, computePbRatio } from "../services/data/providers/PseStockStatsAdapter.js";
+import { getPriceHistory } from "../services/data/providers/PsePriceHistoryAdapter.js";
 import { loadPseDisclosures } from "../services/scrapers/PSEDisclosuresData.js";
 import { loadPseInsiderFilings } from "../services/scrapers/PSEInsiderFilingsData.js";
 import { computeMomentumFeatures } from "../research/features/momentumFeatures.js";
@@ -958,7 +959,12 @@ export default async function registerApiRoutes(server: FastifyInstance) {
       // engine's profitable/loss-making test sees a comparable magnitude.
       netProfit: reportedNetProfit ?? ttm?.netIncomeTtm ?? (edgeFunds?.netIncome != null ? edgeFunds.netIncome * 1e6 : null),
       beta: ttm?.beta ?? null,
-      priceHistory: activePriceHistory ?? null,
+      // Backfilled PHISIX daily closes when the live provider returns nothing,
+      // which is what lets momentum score at all — no other free source covers
+      // the full universe (see scripts/backfill-price-history.ts).
+      priceHistory: (activePriceHistory && activePriceHistory.length > 0)
+        ? activePriceHistory
+        : getPriceHistory(cleanSymbol),
     });
     const health = realScores.health;
     const industryPe = SECTOR_PE_MEDIAN[sector] || 20;
