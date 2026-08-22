@@ -95,7 +95,7 @@
       </sc-for>
       <div style="padding:13px 17px; display:flex; flex-direction:column; justify-content:center; gap:3px; grid-column:{{ statusSpan }}; border-top:{{ statusTopRule }};">
         <div style="display:flex; align-items:center; gap:6px; font-size:13px; font-weight:500; color:#1A7F37; white-space:nowrap;"><span style="width:6px; height:6px; border-radius:50%; background:#1A7F37;"></span>{{ marketStatusText }}</div>
-        <div class="lb" style="font-size:11.5px; white-space:nowrap;">Closes 3:30 PM PHT</div>
+        <div class="lb" style="font-size:11.5px; white-space:nowrap;">{{ closesText }}</div>
       </div>
     </div>
   </div>
@@ -540,6 +540,7 @@ class Component extends DCLogic {
       scoreText: "88",
       scoreLabel: "Excellent",
       coverageText: "88% of key metrics",
+      closesText: "Closes 3:30 PM PHT",
       confidenceOverall: "High",
       benchReturnText: "+38.4%",
       upsideText: "+11.2% to estimate",

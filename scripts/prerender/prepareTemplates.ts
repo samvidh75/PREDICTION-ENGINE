@@ -122,6 +122,13 @@ const STOCK_DETAIL: Replacement[] = [
     defaultKey: "coverageText",
     defaultValue: "88% of key metrics",
   },
+  // Asserted closing time, shown even when the market state is unknown.
+  {
+    find: `<div class="lb" style="font-size:11.5px; white-space:nowrap;">Closes 3:30 PM PHT</div>`,
+    replace: `<div class="lb" style="font-size:11.5px; white-space:nowrap;">{{ closesText }}</div>`,
+    defaultKey: "closesText",
+    defaultValue: "Closes 3:30 PM PHT",
+  },
   // "Overall: High" is a trust claim about our own data quality, asserted
   // unconditionally. It must reflect measured coverage, not be a constant.
   {

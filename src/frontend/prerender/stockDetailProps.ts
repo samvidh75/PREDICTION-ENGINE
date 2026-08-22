@@ -214,14 +214,6 @@ export function buildStockDetailProps(api: StockApiResponse): StockDetailProps {
       : EMPTY,
     confidenceColor: isNum(api.scoreConfidence) && api.scoreConfidence >= 60 ? "#1A7F37" : "#B26B00",
 
-    // ── Breadcrumb ──────────────────────────────────────────────────────
-    crumbs: [
-      { label: "Home", href: "/" },
-      { label: "Research", href: "/scanner" },
-      ...(api.sector ? [{ label: api.sector, href: "/sectors" }] : []),
-      { label: api.symbol.toUpperCase() },
-    ],
-
     // ── Panels with no per-stock source ─────────────────────────────────
     // Each of these rendered BDO's own figures on every page: its revenue and
     // margin history, its quarterly commentary, its results calendar. None are

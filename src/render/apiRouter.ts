@@ -51,6 +51,7 @@ import { loadRealPseOwnership } from "../services/scrapers/PSEOwnershipData.js";
 import { getSectorBySymbol, getSubsectorBySymbol, loadPseSector } from "../services/scrapers/PSESectorsData.js";
 import { getMarketCapBySymbol } from "../services/data/providers/PseMarketCapAdapter.js";
 import { computeStockScores } from "./stockScoring.js";
+import { getPseFundamentals, getPeRatio, getPbRatio, getNetMargin, getAnnualisedEps, getAnnualisedRoe } from "../services/data/providers/PseFundamentalsAdapter.js";
 import { loadPseDisclosures } from "../services/scrapers/PSEDisclosuresData.js";
 import { loadPseInsiderFilings } from "../services/scrapers/PSEInsiderFilingsData.js";
 import { computeMomentumFeatures } from "../research/features/momentumFeatures.js";
@@ -888,11 +889,19 @@ export default async function registerApiRoutes(server: FastifyInstance) {
     const realSubsector = getSubsectorBySymbol(cleanSymbol);
     const sector: string = (fundData.sector as string) || "Diversified";
     const displaySector: string = realSector ?? sector;
-    const pe = n(fundData.pe_ratio) ?? null;
-    const pb = n(fundData.pb_ratio) ?? null;
-    const roe = n(fundData.roe ?? fundData.return_on_equity) ?? null;
-    const de = n(fundData.debt_to_equity) ?? null;
-    const eps = n(fundData.eps) ?? null;
+    // Real PSE EDGE disclosure fundamentals, used wherever the live providers
+    // and cache have nothing. data/pse-fundamentals.json covers 270 companies
+    // and each record cites the filing it was read from, but until now nothing
+    // under src/ read it — so with the database unavailable every one of these
+    // was null and no stock could be scored.
+    const edgeFunds = getPseFundamentals(cleanSymbol);
+    // Annualised: filings are year-to-date, so the raw figure understates a
+    // full year and would distort every multiple derived from it.
+    const eps = n(fundData.eps) ?? getAnnualisedEps(cleanSymbol);
+    const pe = n(fundData.pe_ratio) ?? getPeRatio(cleanSymbol, price) ?? null;
+    const pb = n(fundData.pb_ratio) ?? getPbRatio(cleanSymbol, price) ?? null;
+    const roe = n(fundData.roe ?? fundData.return_on_equity) ?? getAnnualisedRoe(cleanSymbol);
+    const de = n(fundData.debt_to_equity) ?? edgeFunds?.debtToEquity ?? null;
     const divYld = n(fundData.dividend_yield) ?? null;
     const revGrowth = n(fundData.revenue_growth_3y ?? fundData.revenue_growth) ?? null;
     const profGrowth = n(fundData.profit_growth_3y ?? fundData.profit_growth) ?? null;
@@ -936,11 +945,13 @@ export default async function registerApiRoutes(server: FastifyInstance) {
       dividendYield: divYld,
       roe,
       debtToEquity: de,
-      netMargin: n(fundData.net_margin) ?? null,
+      netMargin: n(fundData.net_margin) ?? getNetMargin(cleanSymbol),
       operatingMargin: n(fundData.operating_margin) ?? null,
       revenueGrowth: revGrowth,
       profitGrowth: profGrowth,
-      netProfit: reportedNetProfit,
+      // EDGE reports netIncome in millions PHP; scale to pesos so the risk
+      // engine's profitable/loss-making test sees a comparable magnitude.
+      netProfit: reportedNetProfit ?? (edgeFunds?.netIncome != null ? edgeFunds.netIncome * 1e6 : null),
       priceHistory: activePriceHistory ?? null,
     });
     const health = realScores.health;
