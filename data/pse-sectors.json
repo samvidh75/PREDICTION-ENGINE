@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-13T08:26:52.303Z",
+  "generatedAt": "2026-09-20T08:43:19.789Z",
   "source": "edge.pse.com.ph",
   "totalCompanies": 282,
   "sectorBreakdown": {
@@ -1045,7 +1045,7 @@
     },
     "FMETF": {
       "symbol": "FMETF",
-      "companyName": "First Metro Philippine Equity Exchange Traded Fund, Inc.",
+      "companyName": "ATR FAMI Philippine Equity Exchange Traded Fund, Inc.",
       "sector": "ETF",
       "subsector": "ETF-Equity",
       "cmpyId": 649,

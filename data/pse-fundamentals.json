@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-13T08:18:21.223Z",
+  "generatedAt": "2026-09-20T08:34:55.350Z",
   "source": "edge.pse.com.ph",
   "results": {
     "AAA": {
@@ -19,7 +19,7 @@
       "roe": null,
       "debtToEquity": 0,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=e3660731ff218cc264d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:12:25.036Z"
+      "scrapedAt": "2026-09-20T08:29:04.481Z"
     },
     "ABA": {
       "symbol": "ABA",
@@ -35,7 +35,7 @@
       "roe": null,
       "debtToEquity": 0.19,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=055f479ddd20749e64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:12:26.149Z"
+      "scrapedAt": "2026-09-20T08:29:04.516Z"
     },
     "ABG": {
       "symbol": "ABG",
@@ -51,7 +51,7 @@
       "roe": -0.68,
       "debtToEquity": 0.01,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=29a8a921e7110b5764d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:12:29.178Z"
+      "scrapedAt": "2026-09-20T08:29:08.309Z"
     },
     "ABS": {
       "symbol": "ABS",
@@ -67,7 +67,7 @@
       "roe": null,
       "debtToEquity": null,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=34b42f2e18d4a82d64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:12:31.512Z"
+      "scrapedAt": "2026-09-20T08:29:08.319Z"
     },
     "ABSP": {
       "symbol": "ABSP",
@@ -83,7 +83,7 @@
       "roe": null,
       "debtToEquity": null,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=d11346afc52a4a6a64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:12:29.169Z"
+      "scrapedAt": "2026-09-20T08:29:08.295Z"
     },
     "AC": {
       "symbol": "AC",
@@ -99,7 +99,7 @@
       "roe": 1.92,
       "debtToEquity": 1.36,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=5ec0721df0c8bd0464d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:12:35.698Z"
+      "scrapedAt": "2026-09-20T08:29:12.129Z"
     },
     "ACE": {
       "symbol": "ACE",
@@ -115,7 +115,7 @@
       "roe": null,
       "debtToEquity": 0.79,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=fcb1eec050b9597264d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:12:35.840Z"
+      "scrapedAt": "2026-09-20T08:29:12.145Z"
     },
     "ACEN": {
       "symbol": "ACEN",
@@ -131,7 +131,7 @@
       "roe": 0.62,
       "debtToEquity": 1.41,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=eec32f7d19cc24a564d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:12:34.590Z"
+      "scrapedAt": "2026-09-20T08:29:12.140Z"
     },
     "ACR": {
       "symbol": "ACR",
@@ -147,7 +147,7 @@
       "roe": 6.53,
       "debtToEquity": 1.85,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=970ccd2dadde9aba64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:12:38.856Z"
+      "scrapedAt": "2026-09-20T08:29:15.908Z"
     },
     "AEV": {
       "symbol": "AEV",
@@ -163,7 +163,7 @@
       "roe": 3.21,
       "debtToEquity": 1.45,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=a84b40b8c3dd51a564d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:12:38.876Z"
+      "scrapedAt": "2026-09-20T08:29:15.926Z"
     },
     "AGI": {
       "symbol": "AGI",
@@ -179,7 +179,7 @@
       "roe": 1.7,
       "debtToEquity": 0.85,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=14abe357a907871664d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:12:38.872Z"
+      "scrapedAt": "2026-09-20T08:29:15.900Z"
     },
     "ALCO": {
       "symbol": "ALCO",
@@ -195,7 +195,7 @@
       "roe": 1.59,
       "debtToEquity": 2.24,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=ca67ca65b799847e64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:12:41.901Z"
+      "scrapedAt": "2026-09-20T08:29:19.684Z"
     },
     "ALHI": {
       "symbol": "ALHI",
@@ -211,7 +211,7 @@
       "roe": null,
       "debtToEquity": 2.37,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=251833a60873c5c764d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:12:47.374Z"
+      "scrapedAt": "2026-09-20T08:29:19.712Z"
     },
     "ALI": {
       "symbol": "ALI",
@@ -227,7 +227,7 @@
       "roe": 1.98,
       "debtToEquity": 1.56,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=086c31d54ab98bf864d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:12:41.908Z"
+      "scrapedAt": "2026-09-20T08:29:19.675Z"
     },
     "ALLDY": {
       "symbol": "ALLDY",
@@ -243,7 +243,7 @@
       "roe": null,
       "debtToEquity": 0.46,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=5811f2c3709a76ebec6e1601ccee8f59",
-      "scrapedAt": "2026-09-13T08:12:50.407Z"
+      "scrapedAt": "2026-09-20T08:29:23.481Z"
     },
     "ALLHC": {
       "symbol": "ALLHC",
@@ -259,7 +259,7 @@
       "roe": 0.04,
       "debtToEquity": 1.12,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=a05ba1bef3c580e464d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:12:50.444Z"
+      "scrapedAt": "2026-09-20T08:29:23.461Z"
     },
     "ALTER": {
       "symbol": "ALTER",
@@ -275,7 +275,7 @@
       "roe": 0.68,
       "debtToEquity": 4.38,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=56310b1a7ec059be64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:12:50.426Z"
+      "scrapedAt": "2026-09-20T08:29:23.792Z"
     },
     "ANI": {
       "symbol": "ANI",
@@ -291,7 +291,7 @@
       "roe": null,
       "debtToEquity": 0.89,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=2411f8092d22588e64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:12:53.470Z"
+      "scrapedAt": "2026-09-20T08:29:27.609Z"
     },
     "ANS": {
       "symbol": "ANS",
@@ -307,7 +307,7 @@
       "roe": 11.13,
       "debtToEquity": 0.09,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=f0712c56f3c9b1ef64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:12:53.481Z"
+      "scrapedAt": "2026-09-20T08:29:27.537Z"
     },
     "AP": {
       "symbol": "AP",
@@ -323,7 +323,7 @@
       "roe": 5.21,
       "debtToEquity": 1.83,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=61f3da0d9c045fe964d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:12:54.474Z"
+      "scrapedAt": "2026-09-20T08:29:27.552Z"
     },
     "APC": {
       "symbol": "APC",
@@ -339,7 +339,7 @@
       "roe": null,
       "debtToEquity": 0.76,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=0d2b997f8d35247364d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:12:57.519Z"
+      "scrapedAt": "2026-09-20T08:29:31.389Z"
     },
     "APL": {
       "symbol": "APL",
@@ -355,7 +355,7 @@
       "roe": null,
       "debtToEquity": 0.13,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=e697e358c3ce184864d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:12:57.557Z"
+      "scrapedAt": "2026-09-20T08:29:31.356Z"
     },
     "APO": {
       "symbol": "APO",
@@ -371,7 +371,7 @@
       "roe": 12.35,
       "debtToEquity": 0.41,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=fcd3c5cdeef671cc64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:12:58.530Z"
+      "scrapedAt": "2026-09-20T08:29:31.353Z"
     },
     "APVI": {
       "symbol": "APVI",
@@ -387,7 +387,7 @@
       "roe": 2.71,
       "debtToEquity": 0.13,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=74cc16cc5329815164d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:13:01.567Z"
+      "scrapedAt": "2026-09-20T08:29:35.140Z"
     },
     "APX": {
       "symbol": "APX",
@@ -403,7 +403,7 @@
       "roe": 9.03,
       "debtToEquity": 0.39,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=29c5437123b2220964d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:13:01.580Z"
+      "scrapedAt": "2026-09-20T08:29:35.171Z"
     },
     "AR": {
       "error": "no_disclosure_found"
@@ -422,7 +422,7 @@
       "roe": -0.41,
       "debtToEquity": 0.11,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=c7ea3f393af8aa8464d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:13:04.638Z"
+      "scrapedAt": "2026-09-20T08:29:38.962Z"
     },
     "AREIT": {
       "symbol": "AREIT",
@@ -438,7 +438,7 @@
       "roe": 1.96,
       "debtToEquity": 0.08,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=20a9a1152937fc3764d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:13:06.792Z"
+      "scrapedAt": "2026-09-20T08:29:38.917Z"
     },
     "ASLAG": {
       "symbol": "ASLAG",
@@ -454,7 +454,7 @@
       "roe": 4.11,
       "debtToEquity": 0.69,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=b41e62cd7df846b464d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:13:04.623Z"
+      "scrapedAt": "2026-09-20T08:29:38.959Z"
     },
     "AT": {
       "symbol": "AT",
@@ -470,7 +470,7 @@
       "roe": 7.57,
       "debtToEquity": 0.41,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=95cf2b02321a502d64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:13:09.864Z"
+      "scrapedAt": "2026-09-20T08:29:42.710Z"
     },
     "ATN": {
       "symbol": "ATN",
@@ -486,7 +486,7 @@
       "roe": 0.09,
       "debtToEquity": 0.53,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=6228ef042b0afd7364d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:13:09.844Z"
+      "scrapedAt": "2026-09-20T08:29:42.723Z"
     },
     "AUB": {
       "symbol": "AUB",
@@ -502,7 +502,7 @@
       "roe": 4.24,
       "debtToEquity": 5.06,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=af1b98a6a002586b64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:13:09.857Z"
+      "scrapedAt": "2026-09-20T08:29:42.702Z"
     },
     "AXLM": {
       "symbol": "AXLM",
@@ -518,7 +518,7 @@
       "roe": 1.26,
       "debtToEquity": 0.18,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=87ad1311e91f87b064d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:13:12.930Z"
+      "scrapedAt": "2026-09-20T08:29:46.506Z"
     },
     "BALAI": {
       "symbol": "BALAI",
@@ -534,7 +534,7 @@
       "roe": 3.54,
       "debtToEquity": 0.1,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=dc0155d19ef3243d64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:13:12.893Z"
+      "scrapedAt": "2026-09-20T08:29:46.521Z"
     },
     "BC": {
       "symbol": "BC",
@@ -550,7 +550,7 @@
       "roe": 3.59,
       "debtToEquity": 0.16,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=925f2bf74a3e6a8564d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:13:13.040Z"
+      "scrapedAt": "2026-09-20T08:29:46.459Z"
     },
     "BCOR": {
       "symbol": "BCOR",
@@ -566,7 +566,7 @@
       "roe": 0.15,
       "debtToEquity": 1.63,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=784ec62ecbe4b4b564d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:13:16.083Z"
+      "scrapedAt": "2026-09-20T08:29:50.298Z"
     },
     "BDO": {
       "symbol": "BDO",
@@ -582,7 +582,7 @@
       "roe": 3.15,
       "debtToEquity": 8,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=87f6473bd063474a64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:13:16.099Z"
+      "scrapedAt": "2026-09-20T08:29:50.268Z"
     },
     "BEL": {
       "symbol": "BEL",
@@ -598,7 +598,7 @@
       "roe": 1.13,
       "debtToEquity": 0.33,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=1c150595c7408e4064d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:13:16.070Z"
+      "scrapedAt": "2026-09-20T08:29:50.312Z"
     },
     "BH": {
       "symbol": "BH",
@@ -614,7 +614,7 @@
       "roe": 0.03,
       "debtToEquity": 0.04,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=a497483e83d9abc664d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:13:19.114Z"
+      "scrapedAt": "2026-09-20T08:29:54.056Z"
     },
     "BHI": {
       "symbol": "BHI",
@@ -630,7 +630,7 @@
       "roe": null,
       "debtToEquity": 0.13,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=046cef2ce8041a9064d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:13:19.119Z"
+      "scrapedAt": "2026-09-20T08:29:54.048Z"
     },
     "BLOOM": {
       "symbol": "BLOOM",
@@ -646,7 +646,7 @@
       "roe": null,
       "debtToEquity": 2.27,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=b40c9b27f69041f564d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:13:19.288Z"
+      "scrapedAt": "2026-09-20T08:29:54.086Z"
     },
     "BMM": {
       "error": "no_disclosure_found"
@@ -665,7 +665,7 @@
       "roe": 3.11,
       "debtToEquity": 6.9,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=81b575c2afa4a5e964d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:13:22.317Z"
+      "scrapedAt": "2026-09-20T08:29:57.847Z"
     },
     "BPI": {
       "symbol": "BPI",
@@ -681,7 +681,7 @@
       "roe": 3.3,
       "debtToEquity": 6.69,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=0c53a753062c045264d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:13:22.321Z"
+      "scrapedAt": "2026-09-20T08:29:57.845Z"
     },
     "BRN": {
       "symbol": "BRN",
@@ -697,7 +697,7 @@
       "roe": 1.85,
       "debtToEquity": 0.82,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=93a828156eb5e10a64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:13:25.329Z"
+      "scrapedAt": "2026-09-20T08:30:01.596Z"
     },
     "BSC": {
       "symbol": "BSC",
@@ -713,7 +713,7 @@
       "roe": -0.41,
       "debtToEquity": 4.37,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=41579ec7bc9639b064d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:13:25.357Z"
+      "scrapedAt": "2026-09-20T08:30:01.603Z"
     },
     "C": {
       "symbol": "C",
@@ -729,7 +729,7 @@
       "roe": 4.25,
       "debtToEquity": 6.86,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=88561722d2dda37164d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:13:25.370Z"
+      "scrapedAt": "2026-09-20T08:30:01.629Z"
     },
     "CA": {
       "symbol": "CA",
@@ -745,7 +745,7 @@
       "roe": 6.99,
       "debtToEquity": 0.15,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=9d2134eeb33be25f64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:13:28.883Z"
+      "scrapedAt": "2026-09-20T08:30:05.357Z"
     },
     "CAT": {
       "symbol": "CAT",
@@ -761,7 +761,7 @@
       "roe": 6.22,
       "debtToEquity": 0.64,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=a62411425ba6a79364d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:13:28.881Z"
+      "scrapedAt": "2026-09-20T08:30:05.398Z"
     },
     "CBC": {
       "symbol": "CBC",
@@ -777,7 +777,7 @@
       "roe": 4,
       "debtToEquity": 8.81,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=e769cd419679c31f64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:13:28.412Z"
+      "scrapedAt": "2026-09-20T08:30:05.382Z"
     },
     "CDC": {
       "symbol": "CDC",
@@ -793,7 +793,7 @@
       "roe": 1.59,
       "debtToEquity": 0.14,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=9223fbe5e114c7be64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:13:32.529Z"
+      "scrapedAt": "2026-09-20T08:30:09.132Z"
     },
     "CEB": {
       "symbol": "CEB",
@@ -809,7 +809,7 @@
       "roe": null,
       "debtToEquity": 18.54,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=16fd1e87b0a163b064d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:13:32.927Z"
+      "scrapedAt": "2026-09-20T08:30:09.187Z"
     },
     "CEI": {
       "symbol": "CEI",
@@ -825,7 +825,7 @@
       "roe": 0.18,
       "debtToEquity": 0.09,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=b870a10b411f2b1764d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:13:31.914Z"
+      "scrapedAt": "2026-09-20T08:30:09.146Z"
     },
     "CEU": {
       "symbol": "CEU",
@@ -841,7 +841,7 @@
       "roe": 3.79,
       "debtToEquity": 0.45,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=e1213f23d9f1973c64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:13:37.119Z"
+      "scrapedAt": "2026-09-20T08:30:12.982Z"
     },
     "CHP": {
       "symbol": "CHP",
@@ -857,7 +857,7 @@
       "roe": -1.67,
       "debtToEquity": 2.7,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=429686b9c2f7f7fc64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:13:35.951Z"
+      "scrapedAt": "2026-09-20T08:30:12.974Z"
     },
     "CIC": {
       "symbol": "CIC",
@@ -873,7 +873,7 @@
       "roe": 1.68,
       "debtToEquity": 1.08,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=542ae7d1e3bba95764d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:13:36.095Z"
+      "scrapedAt": "2026-09-20T08:30:12.954Z"
     },
     "CLI": {
       "symbol": "CLI",
@@ -889,7 +889,7 @@
       "roe": 2.57,
       "debtToEquity": 2.75,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=ac5d14458d4e5a2364d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:13:41.143Z"
+      "scrapedAt": "2026-09-20T08:30:16.751Z"
     },
     "CNPF": {
       "symbol": "CNPF",
@@ -905,7 +905,7 @@
       "roe": 5.13,
       "debtToEquity": 0.88,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=01d7d7b889bbf88e64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:13:40.153Z"
+      "scrapedAt": "2026-09-20T08:30:16.850Z"
     },
     "CNVRG": {
       "symbol": "CNVRG",
@@ -921,7 +921,7 @@
       "roe": 3.77,
       "debtToEquity": 0.84,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=de6908d3233ba86c64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:13:40.145Z"
+      "scrapedAt": "2026-09-20T08:30:16.755Z"
     },
     "COL": {
       "symbol": "COL",
@@ -937,7 +937,7 @@
       "roe": 4.99,
       "debtToEquity": 4.29,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=ef4deb14c394efd764d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:13:44.146Z"
+      "scrapedAt": "2026-09-20T08:30:20.573Z"
     },
     "COSCO": {
       "symbol": "COSCO",
@@ -953,7 +953,7 @@
       "roe": 2.29,
       "debtToEquity": 0.56,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=0d3f1325996c6fd564d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:13:44.167Z"
+      "scrapedAt": "2026-09-20T08:30:20.646Z"
     },
     "CPG": {
       "symbol": "CPG",
@@ -969,7 +969,7 @@
       "roe": 2.89,
       "debtToEquity": 1.71,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=a5f0f18c081efa8464d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:13:45.591Z"
+      "scrapedAt": "2026-09-20T08:30:20.612Z"
     },
     "CPM": {
       "symbol": "CPM",
@@ -985,7 +985,7 @@
       "roe": null,
       "debtToEquity": 4.37,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=3d0af4f54efbf72464d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:13:48.623Z"
+      "scrapedAt": "2026-09-20T08:30:24.428Z"
     },
     "CREC": {
       "symbol": "CREC",
@@ -1001,7 +1001,7 @@
       "roe": 3.34,
       "debtToEquity": 2.49,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=0b43611a0daaf60564d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:13:49.762Z"
+      "scrapedAt": "2026-09-20T08:30:24.406Z"
     },
     "CREIT": {
       "symbol": "CREIT",
@@ -1017,7 +1017,7 @@
       "roe": 7.34,
       "debtToEquity": 1.13,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=0b1f3131b5b5911c64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:13:51.929Z"
+      "scrapedAt": "2026-09-20T08:30:24.420Z"
     },
     "CROWN": {
       "symbol": "CROWN",
@@ -1033,7 +1033,7 @@
       "roe": 2.87,
       "debtToEquity": 0.2,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=600f8980392f9b9564d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:13:54.926Z"
+      "scrapedAt": "2026-09-20T08:30:28.212Z"
     },
     "CSB": {
       "symbol": "CSB",
@@ -1049,7 +1049,7 @@
       "roe": 0.22,
       "debtToEquity": 4.18,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=662898fe2bf0858964d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:13:54.985Z"
+      "scrapedAt": "2026-09-20T08:30:28.164Z"
     },
     "CTS": {
       "symbol": "CTS",
@@ -1065,7 +1065,7 @@
       "roe": 0.18,
       "debtToEquity": 0.12,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=2ef43740ce0a6f6464d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:13:54.956Z"
+      "scrapedAt": "2026-09-20T08:30:28.195Z"
     },
     "CYBR": {
       "symbol": "CYBR",
@@ -1081,7 +1081,7 @@
       "roe": null,
       "debtToEquity": null,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=601e702a5b102bed64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:13:57.987Z"
+      "scrapedAt": "2026-09-20T08:30:31.978Z"
     },
     "DD": {
       "symbol": "DD",
@@ -1097,7 +1097,7 @@
       "roe": 0.15,
       "debtToEquity": 1.33,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=d1dbea9aa2eddcba64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:13:58.173Z"
+      "scrapedAt": "2026-09-20T08:30:31.942Z"
     },
     "DDMPR": {
       "symbol": "DDMPR",
@@ -1113,23 +1113,23 @@
       "roe": 0.68,
       "debtToEquity": 0.03,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=fdde4df7449c6c1c64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:13:58.012Z"
+      "scrapedAt": "2026-09-20T08:30:31.970Z"
     },
     "DELM": {
       "symbol": "DELM",
-      "asOfPeriod": "Jan 31, 2026",
-      "totalAssets": 779183,
-      "totalLiabilities": 1369082,
+      "asOfPeriod": "Jul 31, 2026",
+      "totalAssets": 760787,
+      "totalLiabilities": 1339328,
       "totalEquity": null,
-      "netIncome": 9964,
-      "revenue": 243775,
-      "eps": 0.51,
+      "netIncome": 16116,
+      "revenue": 222053,
+      "eps": 0.83,
       "sharesOutstanding": null,
-      "operatingIncome": 112,
+      "operatingIncome": 45,
       "roe": null,
       "debtToEquity": null,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=557742108ca62a2d64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:14:02.364Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=2c83700d072add6c64d70b69f0a3140b",
+      "scrapedAt": "2026-09-20T08:30:35.749Z"
     },
     "DFNN": {
       "symbol": "DFNN",
@@ -1145,7 +1145,7 @@
       "roe": null,
       "debtToEquity": null,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=866837d55ef0580e64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:14:01.195Z"
+      "scrapedAt": "2026-09-20T08:30:35.732Z"
     },
     "DHI": {
       "symbol": "DHI",
@@ -1161,7 +1161,7 @@
       "roe": 0.71,
       "debtToEquity": 0.01,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=a7a0d15c4c5446e864d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:14:02.349Z"
+      "scrapedAt": "2026-09-20T08:30:35.742Z"
     },
     "DITO": {
       "symbol": "DITO",
@@ -1177,7 +1177,7 @@
       "roe": null,
       "debtToEquity": null,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=e8a9f2ba67eb83ae64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:14:05.400Z"
+      "scrapedAt": "2026-09-20T08:30:39.518Z"
     },
     "DIZ": {
       "symbol": "DIZ",
@@ -1193,7 +1193,7 @@
       "roe": null,
       "debtToEquity": 1.45,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=2ac2de5318b9f7cd64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:14:05.396Z"
+      "scrapedAt": "2026-09-20T08:30:39.531Z"
     },
     "DMC": {
       "symbol": "DMC",
@@ -1209,7 +1209,7 @@
       "roe": 5.42,
       "debtToEquity": 0.86,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=567120c41aaf55a464d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:14:05.405Z"
+      "scrapedAt": "2026-09-20T08:30:39.521Z"
     },
     "DMW": {
       "symbol": "DMW",
@@ -1225,7 +1225,7 @@
       "roe": 0.79,
       "debtToEquity": 0.29,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=e26542edac65012264d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:14:08.447Z"
+      "scrapedAt": "2026-09-20T08:30:43.294Z"
     },
     "DNL": {
       "symbol": "DNL",
@@ -1241,7 +1241,7 @@
       "roe": 3.46,
       "debtToEquity": 1.33,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=9f7bcce118971ec064d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:14:08.432Z"
+      "scrapedAt": "2026-09-20T08:30:43.314Z"
     },
     "DWC": {
       "symbol": "DWC",
@@ -1257,7 +1257,7 @@
       "roe": 0,
       "debtToEquity": 1.61,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=915631cb8f44d94664d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:14:08.612Z"
+      "scrapedAt": "2026-09-20T08:30:43.311Z"
     },
     "ECP": {
       "symbol": "ECP",
@@ -1273,7 +1273,7 @@
       "roe": 4.42,
       "debtToEquity": 1.08,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=2c0dc8f1da92bae364d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:14:12.649Z"
+      "scrapedAt": "2026-09-20T08:30:47.046Z"
     },
     "ECVC": {
       "symbol": "ECVC",
@@ -1289,7 +1289,7 @@
       "roe": 9.18,
       "debtToEquity": 0.57,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=a41fd89d785697a364d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:14:11.660Z"
+      "scrapedAt": "2026-09-20T08:30:47.080Z"
     },
     "EEI": {
       "symbol": "EEI",
@@ -1305,7 +1305,7 @@
       "roe": 0.33,
       "debtToEquity": 2.05,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=3765f3dd508a561c64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:14:12.818Z"
+      "scrapedAt": "2026-09-20T08:30:47.077Z"
     },
     "EG": {
       "error": "no_disclosure_found"
@@ -1324,7 +1324,7 @@
       "roe": 0.01,
       "debtToEquity": 0.1,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=28455cd0fc5c0d1764d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:14:15.839Z"
+      "scrapedAt": "2026-09-20T08:30:50.836Z"
     },
     "ELI": {
       "symbol": "ELI",
@@ -1340,7 +1340,7 @@
       "roe": 0.24,
       "debtToEquity": 0.56,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=c39e29418c19a1d264d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:14:15.829Z"
+      "scrapedAt": "2026-09-20T08:30:50.874Z"
     },
     "EMI": {
       "symbol": "EMI",
@@ -1356,7 +1356,7 @@
       "roe": 1.58,
       "debtToEquity": 0.62,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=771fc718d120bf1464d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:14:18.854Z"
+      "scrapedAt": "2026-09-20T08:30:54.609Z"
     },
     "ENEX": {
       "symbol": "ENEX",
@@ -1372,7 +1372,7 @@
       "roe": null,
       "debtToEquity": 3.65,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=ecb299eec67a145a64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:14:21.171Z"
+      "scrapedAt": "2026-09-20T08:30:54.655Z"
     },
     "EURO": {
       "symbol": "EURO",
@@ -1388,7 +1388,7 @@
       "roe": 1.87,
       "debtToEquity": 0.76,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=1f54bb1294150b2764d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:14:18.875Z"
+      "scrapedAt": "2026-09-20T08:30:54.637Z"
     },
     "EW": {
       "symbol": "EW",
@@ -1404,7 +1404,7 @@
       "roe": 1.91,
       "debtToEquity": 6.64,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=6d00f1a0b7b2e2d964d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:14:24.199Z"
+      "scrapedAt": "2026-09-20T08:30:58.461Z"
     },
     "FAF": {
       "symbol": "FAF",
@@ -1420,7 +1420,7 @@
       "roe": null,
       "debtToEquity": 390.86,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=83536ede5fd3ba7564d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:14:24.206Z"
+      "scrapedAt": "2026-09-20T08:30:58.440Z"
     },
     "FB": {
       "symbol": "FB",
@@ -1436,7 +1436,7 @@
       "roe": 5,
       "debtToEquity": 0.9,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=f89371c17b598d8864d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:14:25.196Z"
+      "scrapedAt": "2026-09-20T08:30:58.391Z"
     },
     "FCG": {
       "symbol": "FCG",
@@ -1452,7 +1452,7 @@
       "roe": 2.69,
       "debtToEquity": 0.57,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=86ba42b2fa7edd3664d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:14:29.380Z"
+      "scrapedAt": "2026-09-20T08:31:02.226Z"
     },
     "FDC": {
       "symbol": "FDC",
@@ -1468,7 +1468,7 @@
       "roe": 1.95,
       "debtToEquity": 3.33,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=fe36d2dc50fe705564d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:14:28.230Z"
+      "scrapedAt": "2026-09-20T08:31:02.268Z"
     },
     "FERRO": {
       "symbol": "FERRO",
@@ -1484,7 +1484,7 @@
       "roe": -0.15,
       "debtToEquity": 0.1,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=abbf90ae1994f9d164d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:14:28.221Z"
+      "scrapedAt": "2026-09-20T08:31:02.267Z"
     },
     "FEU": {
       "symbol": "FEU",
@@ -1500,7 +1500,7 @@
       "roe": 3.99,
       "debtToEquity": 0.27,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=344665da2016aaa564d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:14:32.547Z"
+      "scrapedAt": "2026-09-20T08:31:05.992Z"
     },
     "FFI": {
       "symbol": "FFI",
@@ -1516,7 +1516,7 @@
       "roe": 2.1,
       "debtToEquity": 0.01,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=2980cb2454ba31f864d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:14:32.396Z"
+      "scrapedAt": "2026-09-20T08:31:06.020Z"
     },
     "FGEN": {
       "symbol": "FGEN",
@@ -1532,7 +1532,7 @@
       "roe": 3.09,
       "debtToEquity": 0.77,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=9a473c33da0e658964d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:14:32.401Z"
+      "scrapedAt": "2026-09-20T08:31:06.045Z"
     },
     "FILRT": {
       "symbol": "FILRT",
@@ -1548,7 +1548,7 @@
       "roe": 0.9,
       "debtToEquity": 0.17,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=22bab171c060196b64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:14:35.578Z"
+      "scrapedAt": "2026-09-20T08:31:09.797Z"
     },
     "FJP": {
       "symbol": "FJP",
@@ -1564,7 +1564,7 @@
       "roe": 12.05,
       "debtToEquity": 0.02,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=625696855965672164d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:14:35.588Z"
+      "scrapedAt": "2026-09-20T08:31:09.794Z"
     },
     "FLI": {
       "symbol": "FLI",
@@ -1580,7 +1580,7 @@
       "roe": 1.15,
       "debtToEquity": 1.26,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=7d14d71ca9738bd564d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:14:36.752Z"
+      "scrapedAt": "2026-09-20T08:31:09.831Z"
     },
     "FMETF": {
       "symbol": "FMETF",
@@ -1596,7 +1596,7 @@
       "roe": 2.38,
       "debtToEquity": 0,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=8dc6b2297ad431a664d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:14:39.800Z"
+      "scrapedAt": "2026-09-20T08:31:13.602Z"
     },
     "FNI": {
       "symbol": "FNI",
@@ -1612,7 +1612,7 @@
       "roe": 4.82,
       "debtToEquity": 0.17,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=d3add259644e0b1064d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:14:39.806Z"
+      "scrapedAt": "2026-09-20T08:31:13.622Z"
     },
     "FOOD": {
       "symbol": "FOOD",
@@ -1628,7 +1628,7 @@
       "roe": null,
       "debtToEquity": 9.3,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=6bffc390c95165ac64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:14:40.924Z"
+      "scrapedAt": "2026-09-20T08:31:13.603Z"
     },
     "FPH": {
       "symbol": "FPH",
@@ -1644,7 +1644,7 @@
       "roe": 2.79,
       "debtToEquity": 0.94,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=4c8bf6ae563517be64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:14:43.970Z"
+      "scrapedAt": "2026-09-20T08:31:17.351Z"
     },
     "FPI": {
       "symbol": "FPI",
@@ -1660,7 +1660,7 @@
       "roe": null,
       "debtToEquity": 0.03,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=67829e779b29f06464d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:14:46.655Z"
+      "scrapedAt": "2026-09-20T08:31:17.336Z"
     },
     "FRUIT": {
       "symbol": "FRUIT",
@@ -1676,7 +1676,7 @@
       "roe": 1.89,
       "debtToEquity": 0.48,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=432239622729ed1364d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:14:43.956Z"
+      "scrapedAt": "2026-09-20T08:31:17.407Z"
     },
     "FYN": {
       "symbol": "FYN",
@@ -1692,7 +1692,7 @@
       "roe": 4.53,
       "debtToEquity": 0.91,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=67c5eae08933e54f64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:14:49.693Z"
+      "scrapedAt": "2026-09-20T08:31:21.177Z"
     },
     "GEO": {
       "symbol": "GEO",
@@ -1708,7 +1708,7 @@
       "roe": null,
       "debtToEquity": 91.7,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=681becadd5c284f064d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:14:49.686Z"
+      "scrapedAt": "2026-09-20T08:31:21.166Z"
     },
     "GERI": {
       "symbol": "GERI",
@@ -1724,7 +1724,7 @@
       "roe": 0.6,
       "debtToEquity": 0.5,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=9db965ee0912e41464d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:14:49.695Z"
+      "scrapedAt": "2026-09-20T08:31:21.162Z"
     },
     "GLO": {
       "symbol": "GLO",
@@ -1740,7 +1740,7 @@
       "roe": 3.09,
       "debtToEquity": 2.78,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=90589ff337d75b9164d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:14:52.735Z"
+      "scrapedAt": "2026-09-20T08:31:24.956Z"
     },
     "GMA7": {
       "symbol": "GMA7",
@@ -1756,7 +1756,7 @@
       "roe": 0.07,
       "debtToEquity": 1.09,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=fce69555c2c1134a64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:14:52.744Z"
+      "scrapedAt": "2026-09-20T08:31:25.208Z"
     },
     "GMAP": {
       "symbol": "GMAP",
@@ -1772,7 +1772,7 @@
       "roe": 46.1,
       "debtToEquity": 41.2,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=3259f1e0fe67efbe64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:14:52.747Z"
+      "scrapedAt": "2026-09-20T08:31:24.928Z"
     },
     "GPH": {
       "symbol": "GPH",
@@ -1788,7 +1788,7 @@
       "roe": null,
       "debtToEquity": 0.51,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=b9159106d7c57d9b64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:14:55.806Z"
+      "scrapedAt": "2026-09-20T08:31:28.991Z"
     },
     "GREEN": {
       "symbol": "GREEN",
@@ -1804,7 +1804,7 @@
       "roe": 0.85,
       "debtToEquity": 0.25,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=42aff8cad843766064d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:14:55.804Z"
+      "scrapedAt": "2026-09-20T08:31:28.990Z"
     },
     "GSMI": {
       "symbol": "GSMI",
@@ -1820,7 +1820,7 @@
       "roe": 7.47,
       "debtToEquity": 0.35,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=463a6f35027dfb3664d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:14:55.788Z"
+      "scrapedAt": "2026-09-20T08:31:28.978Z"
     },
     "GTCAP": {
       "symbol": "GTCAP",
@@ -1836,7 +1836,7 @@
       "roe": 2.86,
       "debtToEquity": 0.59,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=9c690f13a4d3968164d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:14:58.824Z"
+      "scrapedAt": "2026-09-20T08:31:32.761Z"
     },
     "HI": {
       "symbol": "HI",
@@ -1852,7 +1852,7 @@
       "roe": 2.25,
       "debtToEquity": 2.19,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=4af85e75caeef6bb64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:14:58.831Z"
+      "scrapedAt": "2026-09-20T08:31:32.752Z"
     },
     "HOME": {
       "symbol": "HOME",
@@ -1868,7 +1868,7 @@
       "roe": null,
       "debtToEquity": 0.54,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=6747f9f692a3661aec6e1601ccee8f59",
-      "scrapedAt": "2026-09-13T08:14:58.832Z"
+      "scrapedAt": "2026-09-20T08:31:32.741Z"
     },
     "HTI": {
       "symbol": "HTI",
@@ -1884,7 +1884,7 @@
       "roe": 1.03,
       "debtToEquity": 1.29,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=69b81512c2de422464d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:15:01.837Z"
+      "scrapedAt": "2026-09-20T08:31:36.521Z"
     },
     "I": {
       "symbol": "I",
@@ -1900,7 +1900,7 @@
       "roe": null,
       "debtToEquity": null,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=496f3b30008c702fec6e1601ccee8f59",
-      "scrapedAt": "2026-09-13T08:15:01.869Z"
+      "scrapedAt": "2026-09-20T08:31:36.513Z"
     },
     "ICT": {
       "symbol": "ICT",
@@ -1916,7 +1916,7 @@
       "roe": 13.3,
       "debtToEquity": 3.22,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=f1be49cf9ada040164d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:15:01.861Z"
+      "scrapedAt": "2026-09-20T08:31:36.515Z"
     },
     "IDC": {
       "symbol": "IDC",
@@ -1932,7 +1932,7 @@
       "roe": 0.97,
       "debtToEquity": 1.33,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=6a13ab678e227a2664d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:15:04.894Z"
+      "scrapedAt": "2026-09-20T08:31:40.271Z"
     },
     "IMI": {
       "symbol": "IMI",
@@ -1948,7 +1948,7 @@
       "roe": 3.58,
       "debtToEquity": 1.56,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=f2b7be641afae96664d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:15:04.875Z"
+      "scrapedAt": "2026-09-20T08:31:40.283Z"
     },
     "IMP": {
       "symbol": "IMP",
@@ -1964,7 +1964,7 @@
       "roe": null,
       "debtToEquity": 0.09,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=53ff8273f442994e64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:15:06.076Z"
+      "scrapedAt": "2026-09-20T08:31:40.319Z"
     },
     "INFRA": {
       "symbol": "INFRA",
@@ -1980,7 +1980,7 @@
       "roe": -0.01,
       "debtToEquity": 0.22,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=48b81a80517ca074ec6e1601ccee8f59",
-      "scrapedAt": "2026-09-13T08:15:09.102Z"
+      "scrapedAt": "2026-09-20T08:31:44.046Z"
     },
     "ION": {
       "symbol": "ION",
@@ -1996,7 +1996,7 @@
       "roe": 2.45,
       "debtToEquity": 0.88,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=bc81aaa22738bc7464d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:15:09.123Z"
+      "scrapedAt": "2026-09-20T08:31:44.074Z"
     },
     "IPM": {
       "symbol": "IPM",
@@ -2012,7 +2012,7 @@
       "roe": null,
       "debtToEquity": 0.24,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=58976526454f2c3764d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:15:09.088Z"
+      "scrapedAt": "2026-09-20T08:31:44.064Z"
     },
     "IPO": {
       "symbol": "IPO",
@@ -2028,23 +2028,23 @@
       "roe": 0.4,
       "debtToEquity": 0.29,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=56be6119e1103ff064d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:15:13.327Z"
+      "scrapedAt": "2026-09-20T08:31:47.843Z"
     },
     "IS": {
       "symbol": "IS",
-      "asOfPeriod": "Apr 30, 2026",
-      "totalAssets": 19130393,
-      "totalLiabilities": 129038430,
+      "asOfPeriod": "Jul 31, 2026",
+      "totalAssets": 19218356,
+      "totalLiabilities": 129009738,
       "totalEquity": null,
-      "netIncome": 0,
-      "revenue": 351344.7,
+      "netIncome": 118449.66,
+      "revenue": 357011.55,
       "eps": 0,
       "sharesOutstanding": null,
       "operatingIncome": 0,
       "roe": null,
       "debtToEquity": null,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=66399a90e03a1b3964d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:15:12.182Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=d3d3c3d7a391996f64d70b69f0a3140b",
+      "scrapedAt": "2026-09-20T08:31:47.860Z"
     },
     "JAS": {
       "symbol": "JAS",
@@ -2060,7 +2060,7 @@
       "roe": 0.04,
       "debtToEquity": 1.85,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=25cd8f2c022230de64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:15:12.152Z"
+      "scrapedAt": "2026-09-20T08:31:47.792Z"
     },
     "JFC": {
       "symbol": "JFC",
@@ -2076,7 +2076,7 @@
       "roe": 4.29,
       "debtToEquity": 2.54,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=a17946e452d203f564d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:15:20.831Z"
+      "scrapedAt": "2026-09-20T08:31:51.613Z"
     },
     "JGS": {
       "symbol": "JGS",
@@ -2092,7 +2092,7 @@
       "roe": 1.84,
       "debtToEquity": 1.35,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=27de43cf90bb166f64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:15:16.362Z"
+      "scrapedAt": "2026-09-20T08:31:51.632Z"
     },
     "JOH": {
       "symbol": "JOH",
@@ -2108,7 +2108,7 @@
       "roe": null,
       "debtToEquity": 0.92,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=3778973e2bea869364d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:15:16.374Z"
+      "scrapedAt": "2026-09-20T08:31:51.638Z"
     },
     "KEEPR": {
       "symbol": "KEEPR",
@@ -2124,7 +2124,7 @@
       "roe": 4.81,
       "debtToEquity": 0.26,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=159241aff576c30464d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:15:23.840Z"
+      "scrapedAt": "2026-09-20T08:31:55.397Z"
     },
     "KEP": {
       "symbol": "KEP",
@@ -2140,7 +2140,7 @@
       "roe": 3.04,
       "debtToEquity": 0.14,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=5df2628769684be264d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:15:23.866Z"
+      "scrapedAt": "2026-09-20T08:31:55.415Z"
     },
     "KPPI": {
       "symbol": "KPPI",
@@ -2156,7 +2156,7 @@
       "roe": 1.13,
       "debtToEquity": 0.06,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=e77b778330e2699564d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:15:27.726Z"
+      "scrapedAt": "2026-09-20T08:31:55.404Z"
     },
     "LBC": {
       "symbol": "LBC",
@@ -2172,7 +2172,7 @@
       "roe": 3.26,
       "debtToEquity": 5.83,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=ac795947ba2bbcef64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:15:31.750Z"
+      "scrapedAt": "2026-09-20T08:31:59.210Z"
     },
     "LC": {
       "symbol": "LC",
@@ -2188,7 +2188,7 @@
       "roe": 9.62,
       "debtToEquity": 1.24,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=36112bea079633fd64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:15:30.769Z"
+      "scrapedAt": "2026-09-20T08:31:59.203Z"
     },
     "LFM": {
       "symbol": "LFM",
@@ -2204,7 +2204,7 @@
       "roe": 0.2,
       "debtToEquity": 0.3,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=a202b6efd005afe264d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:15:31.917Z"
+      "scrapedAt": "2026-09-20T08:31:59.201Z"
     },
     "LMG": {
       "symbol": "LMG",
@@ -2220,7 +2220,7 @@
       "roe": 0.32,
       "debtToEquity": 0,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=cc8c7f0a1a8a515464d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:15:34.939Z"
+      "scrapedAt": "2026-09-20T08:32:02.961Z"
     },
     "LODE": {
       "symbol": "LODE",
@@ -2236,7 +2236,7 @@
       "roe": null,
       "debtToEquity": 0,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=2bc053ab3b1339fb64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:15:34.940Z"
+      "scrapedAt": "2026-09-20T08:32:02.958Z"
     },
     "LOTO": {
       "symbol": "LOTO",
@@ -2252,7 +2252,7 @@
       "roe": null,
       "debtToEquity": 0.38,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=3433fd5248ff848864d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:15:34.933Z"
+      "scrapedAt": "2026-09-20T08:32:02.972Z"
     },
     "LPC": {
       "symbol": "LPC",
@@ -2268,7 +2268,7 @@
       "roe": 0.15,
       "debtToEquity": 5.51,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=c5cc89d0b2e743e464d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:15:38.968Z"
+      "scrapedAt": "2026-09-20T08:32:06.760Z"
     },
     "LPZ": {
       "symbol": "LPZ",
@@ -2284,7 +2284,7 @@
       "roe": 2.77,
       "debtToEquity": 0.94,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=90c1b81d6ca09ce164d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:15:37.955Z"
+      "scrapedAt": "2026-09-20T08:32:06.750Z"
     },
     "LSC": {
       "symbol": "LSC",
@@ -2300,7 +2300,7 @@
       "roe": -169.35,
       "debtToEquity": 42.53,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=dfbbb9b615b62a9d64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:15:37.941Z"
+      "scrapedAt": "2026-09-20T08:32:06.753Z"
     },
     "LTG": {
       "symbol": "LTG",
@@ -2316,7 +2316,7 @@
       "roe": 3.56,
       "debtToEquity": 2.97,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=79e00b742cb3ad1d64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:15:42.012Z"
+      "scrapedAt": "2026-09-20T08:32:10.548Z"
     },
     "MA": {
       "symbol": "MA",
@@ -2332,7 +2332,7 @@
       "roe": null,
       "debtToEquity": 0.16,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=2a89273146961cf664d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:15:41.995Z"
+      "scrapedAt": "2026-09-20T08:32:10.528Z"
     },
     "MAC": {
       "symbol": "MAC",
@@ -2348,7 +2348,7 @@
       "roe": 3.69,
       "debtToEquity": 0.86,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=e6ebb3e169606b5d64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:15:42.006Z"
+      "scrapedAt": "2026-09-20T08:32:10.514Z"
     },
     "MACAY": {
       "symbol": "MACAY",
@@ -2364,7 +2364,7 @@
       "roe": 4.17,
       "debtToEquity": 0.34,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=89a4ebdc719b2c7664d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:15:46.211Z"
+      "scrapedAt": "2026-09-20T08:32:14.304Z"
     },
     "MAH": {
       "symbol": "MAH",
@@ -2380,7 +2380,7 @@
       "roe": 0.82,
       "debtToEquity": 16.23,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=45d146997112058364d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:15:45.067Z"
+      "scrapedAt": "2026-09-20T08:32:14.286Z"
     },
     "MARC": {
       "symbol": "MARC",
@@ -2396,7 +2396,7 @@
       "roe": 8.32,
       "debtToEquity": 0.23,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=c82860d045980b7d64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:15:45.049Z"
+      "scrapedAt": "2026-09-20T08:32:14.280Z"
     },
     "MAXS": {
       "symbol": "MAXS",
@@ -2412,7 +2412,7 @@
       "roe": 1.29,
       "debtToEquity": 1.19,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=dc32aa3662674ee664d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:15:49.251Z"
+      "scrapedAt": "2026-09-20T08:32:18.091Z"
     },
     "MB": {
       "symbol": "MB",
@@ -2428,7 +2428,7 @@
       "roe": 0.1,
       "debtToEquity": 0.37,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=7f588549da925b1a64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:15:49.230Z"
+      "scrapedAt": "2026-09-20T08:32:18.075Z"
     },
     "MBC": {
       "symbol": "MBC",
@@ -2444,7 +2444,7 @@
       "roe": 0.65,
       "debtToEquity": 0.6,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=606e4adc963b28ec64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:15:50.249Z"
+      "scrapedAt": "2026-09-20T08:32:18.085Z"
     },
     "MBT": {
       "symbol": "MBT",
@@ -2460,7 +2460,7 @@
       "roe": 2.95,
       "debtToEquity": 8.32,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=9a364974e77941dc64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:15:55.580Z"
+      "scrapedAt": "2026-09-20T08:32:21.875Z"
     },
     "MED": {
       "symbol": "MED",
@@ -2476,7 +2476,7 @@
       "roe": null,
       "debtToEquity": 0.88,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=2cb4c0da444c135464d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:15:53.278Z"
+      "scrapedAt": "2026-09-20T08:32:21.835Z"
     },
     "MEDIC": {
       "symbol": "MEDIC",
@@ -2492,7 +2492,7 @@
       "roe": null,
       "debtToEquity": 0.32,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=3a1c2409616f3d6e64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:15:53.270Z"
+      "scrapedAt": "2026-09-20T08:32:21.837Z"
     },
     "MEG": {
       "symbol": "MEG",
@@ -2508,7 +2508,7 @@
       "roe": 2.03,
       "debtToEquity": 0.57,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=87c0b23a59a886fd64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:15:58.633Z"
+      "scrapedAt": "2026-09-20T08:32:25.624Z"
     },
     "MER": {
       "symbol": "MER",
@@ -2524,7 +2524,7 @@
       "roe": 7.13,
       "debtToEquity": 2.66,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=d4ac855b3fd185e364d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:15:58.616Z"
+      "scrapedAt": "2026-09-20T08:32:25.620Z"
     },
     "MFC": {
       "symbol": "MFC",
@@ -2540,7 +2540,7 @@
       "roe": 4.43,
       "debtToEquity": 19.86,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=74af33dc1e2911c164d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:15:58.594Z"
+      "scrapedAt": "2026-09-20T08:32:25.618Z"
     },
     "MFIN": {
       "symbol": "MFIN",
@@ -2556,7 +2556,7 @@
       "roe": 0.18,
       "debtToEquity": 0.81,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=d7231c3f0818163064d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:16:01.662Z"
+      "scrapedAt": "2026-09-20T08:32:29.365Z"
     },
     "MG": {
       "symbol": "MG",
@@ -2572,7 +2572,7 @@
       "roe": 0.21,
       "debtToEquity": 4.79,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=306cfa01b425531064d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:16:01.671Z"
+      "scrapedAt": "2026-09-20T08:32:29.396Z"
     },
     "MGH": {
       "symbol": "MGH",
@@ -2588,7 +2588,7 @@
       "roe": null,
       "debtToEquity": 0.25,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=be067c3bbf2bec99ec6e1601ccee8f59",
-      "scrapedAt": "2026-09-13T08:16:01.673Z"
+      "scrapedAt": "2026-09-20T08:32:29.384Z"
     },
     "MHC": {
       "symbol": "MHC",
@@ -2604,7 +2604,7 @@
       "roe": null,
       "debtToEquity": 1.2,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=acd7c2e7233f32bc64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:16:04.695Z"
+      "scrapedAt": "2026-09-20T08:32:33.128Z"
     },
     "MJC": {
       "error": "no_disclosure_found"
@@ -2626,7 +2626,7 @@
       "roe": 0.12,
       "debtToEquity": 2.44,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=60417906f80a4af864d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:16:07.741Z"
+      "scrapedAt": "2026-09-20T08:32:36.896Z"
     },
     "MONDE": {
       "symbol": "MONDE",
@@ -2642,7 +2642,7 @@
       "roe": 3.44,
       "debtToEquity": 0.33,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=766e8576aec2540664d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:16:07.739Z"
+      "scrapedAt": "2026-09-20T08:32:36.865Z"
     },
     "MRC": {
       "symbol": "MRC",
@@ -2658,7 +2658,7 @@
       "roe": null,
       "debtToEquity": 0.66,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=0a3636a8cd5047a464d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:16:07.706Z"
+      "scrapedAt": "2026-09-20T08:32:36.913Z"
     },
     "MREIT": {
       "symbol": "MREIT",
@@ -2674,7 +2674,7 @@
       "roe": 1.5,
       "debtToEquity": 0.13,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=821aab7009e2f82664d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:16:10.776Z"
+      "scrapedAt": "2026-09-20T08:32:40.691Z"
     },
     "MRSGI": {
       "symbol": "MRSGI",
@@ -2690,7 +2690,7 @@
       "roe": 1.86,
       "debtToEquity": 1.44,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=9ba985e2edbabe5664d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:16:12.284Z"
+      "scrapedAt": "2026-09-20T08:32:40.686Z"
     },
     "MVC": {
       "symbol": "MVC",
@@ -2706,7 +2706,7 @@
       "roe": 4.16,
       "debtToEquity": 0.12,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=aa12d2fe444b355e64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:16:10.764Z"
+      "scrapedAt": "2026-09-20T08:32:40.698Z"
     },
     "MWC": {
       "symbol": "MWC",
@@ -2722,7 +2722,7 @@
       "roe": 4.32,
       "debtToEquity": 2.06,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=6f708e34c228723564d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:16:15.323Z"
+      "scrapedAt": "2026-09-20T08:32:44.463Z"
     },
     "MWIDE": {
       "symbol": "MWIDE",
@@ -2738,7 +2738,7 @@
       "roe": 1.05,
       "debtToEquity": 1.57,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=5c1ae5f215628d8d64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:16:15.330Z"
+      "scrapedAt": "2026-09-20T08:32:44.483Z"
     },
     "MYNLD": {
       "symbol": "MYNLD",
@@ -2754,7 +2754,7 @@
       "roe": 4.11,
       "debtToEquity": 1.36,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=b43e315fd941221a64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:16:15.298Z"
+      "scrapedAt": "2026-09-20T08:32:44.426Z"
     },
     "NI": {
       "symbol": "NI",
@@ -2770,7 +2770,7 @@
       "roe": null,
       "debtToEquity": 0.04,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=6efc6496d0b3b01c64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:16:18.358Z"
+      "scrapedAt": "2026-09-20T08:32:48.248Z"
     },
     "NIKL": {
       "symbol": "NIKL",
@@ -2786,7 +2786,7 @@
       "roe": 10.03,
       "debtToEquity": 0.48,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=5f4a0f8dcc84312364d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:16:19.352Z"
+      "scrapedAt": "2026-09-20T08:32:48.229Z"
     },
     "NOW": {
       "symbol": "NOW",
@@ -2802,7 +2802,7 @@
       "roe": 0.03,
       "debtToEquity": 0.43,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=19a7560e8b9992df64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:16:20.888Z"
+      "scrapedAt": "2026-09-20T08:32:48.209Z"
     },
     "NRCP": {
       "symbol": "NRCP",
@@ -2818,7 +2818,7 @@
       "roe": 2.88,
       "debtToEquity": 1.97,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=8aea9186c09a8cf364d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:16:24.918Z"
+      "scrapedAt": "2026-09-20T08:32:52.011Z"
     },
     "NXGEN": {
       "symbol": "NXGEN",
@@ -2834,7 +2834,7 @@
       "roe": null,
       "debtToEquity": 2.63,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=961f2839627eda0664d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:16:23.915Z"
+      "scrapedAt": "2026-09-20T08:32:52.040Z"
     },
     "OGP": {
       "symbol": "OGP",
@@ -2850,7 +2850,7 @@
       "roe": 6.18,
       "debtToEquity": 0.37,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=f2c11d79fdffa06b64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:16:23.937Z"
+      "scrapedAt": "2026-09-20T08:32:52.013Z"
     },
     "OM": {
       "symbol": "OM",
@@ -2866,7 +2866,7 @@
       "roe": 0.22,
       "debtToEquity": 0.04,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=110d95759bead17964d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:16:27.986Z"
+      "scrapedAt": "2026-09-20T08:32:55.794Z"
     },
     "OPM": {
       "symbol": "OPM",
@@ -2882,7 +2882,7 @@
       "roe": 0.07,
       "debtToEquity": 0.05,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=997d709af87dcdef64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:16:29.292Z"
+      "scrapedAt": "2026-09-20T08:32:55.854Z"
     },
     "ORE": {
       "symbol": "ORE",
@@ -2898,7 +2898,7 @@
       "roe": null,
       "debtToEquity": 0.33,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=cf2c58b8336d462d64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:16:27.973Z"
+      "scrapedAt": "2026-09-20T08:32:55.799Z"
     },
     "OV": {
       "symbol": "OV",
@@ -2914,7 +2914,7 @@
       "roe": 0.31,
       "debtToEquity": 0.1,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=48f7e7dc05422cbe64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:16:32.319Z"
+      "scrapedAt": "2026-09-20T08:32:59.634Z"
     },
     "PA": {
       "symbol": "PA",
@@ -2930,7 +2930,7 @@
       "roe": null,
       "debtToEquity": 0.02,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=2c7d17162cb9c3e764d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:16:32.317Z"
+      "scrapedAt": "2026-09-20T08:32:59.601Z"
     },
     "PAL": {
       "symbol": "PAL",
@@ -2946,7 +2946,7 @@
       "roe": null,
       "debtToEquity": 5,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=4670701dc164be2e64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:16:32.321Z"
+      "scrapedAt": "2026-09-20T08:32:59.640Z"
     },
     "PAX": {
       "symbol": "PAX",
@@ -2962,7 +2962,7 @@
       "roe": 0.75,
       "debtToEquity": 0.02,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=0e5e37740c3e91f964d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:16:35.371Z"
+      "scrapedAt": "2026-09-20T08:33:03.405Z"
     },
     "PBB": {
       "symbol": "PBB",
@@ -2978,7 +2978,7 @@
       "roe": 1.92,
       "debtToEquity": 6.47,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=9247f0500177173864d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:16:35.369Z"
+      "scrapedAt": "2026-09-20T08:33:03.402Z"
     },
     "PBC": {
       "symbol": "PBC",
@@ -2994,7 +2994,7 @@
       "roe": 2.67,
       "debtToEquity": 7.93,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=f9576b882fd1f28864d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:16:35.367Z"
+      "scrapedAt": "2026-09-20T08:33:03.401Z"
     },
     "PCOR": {
       "symbol": "PCOR",
@@ -3010,7 +3010,7 @@
       "roe": 1.88,
       "debtToEquity": 3.85,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=52b92d3c5834095764d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:16:40.911Z"
+      "scrapedAt": "2026-09-20T08:33:07.169Z"
     },
     "PERC": {
       "symbol": "PERC",
@@ -3026,7 +3026,7 @@
       "roe": 1.75,
       "debtToEquity": 0.76,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=179350cb7fe407e864d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:16:38.407Z"
+      "scrapedAt": "2026-09-20T08:33:07.184Z"
     },
     "PGOLD": {
       "symbol": "PGOLD",
@@ -3042,7 +3042,7 @@
       "roe": 2.53,
       "debtToEquity": 0.88,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=85f16c9a73cfb7d964d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:16:39.541Z"
+      "scrapedAt": "2026-09-20T08:33:07.176Z"
     },
     "PHA": {
       "symbol": "PHA",
@@ -3058,7 +3058,7 @@
       "roe": null,
       "debtToEquity": 0.82,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=ec5ab6d02dee224064d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:16:43.937Z"
+      "scrapedAt": "2026-09-20T08:33:10.930Z"
     },
     "PHC": {
       "symbol": "PHC",
@@ -3074,7 +3074,7 @@
       "roe": 0.6,
       "debtToEquity": 0.03,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=f7463d85566a97fe64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:16:43.932Z"
+      "scrapedAt": "2026-09-20T08:33:10.928Z"
     },
     "PHES": {
       "symbol": "PHES",
@@ -3090,7 +3090,7 @@
       "roe": 3.04,
       "debtToEquity": 0.29,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=a6f94a803570639664d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:16:43.926Z"
+      "scrapedAt": "2026-09-20T08:33:10.951Z"
     },
     "PHN": {
       "symbol": "PHN",
@@ -3106,7 +3106,7 @@
       "roe": -2.8,
       "debtToEquity": 2.3,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=3805e18092711d9764d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:16:46.967Z"
+      "scrapedAt": "2026-09-20T08:33:14.736Z"
     },
     "PHR": {
       "symbol": "PHR",
@@ -3122,7 +3122,7 @@
       "roe": null,
       "debtToEquity": null,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=543b53f14a06e86f64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:16:46.971Z"
+      "scrapedAt": "2026-09-20T08:33:14.734Z"
     },
     "PIZZA": {
       "symbol": "PIZZA",
@@ -3138,7 +3138,7 @@
       "roe": 1.06,
       "debtToEquity": 1.29,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=0cea37808c93a89364d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:16:46.957Z"
+      "scrapedAt": "2026-09-20T08:33:14.721Z"
     },
     "PLUS": {
       "symbol": "PLUS",
@@ -3154,7 +3154,7 @@
       "roe": 14.66,
       "debtToEquity": 0.3,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=2d978bbaa7cad4dc64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:16:49.994Z"
+      "scrapedAt": "2026-09-20T08:33:18.481Z"
     },
     "PMPC": {
       "symbol": "PMPC",
@@ -3170,7 +3170,7 @@
       "roe": 1.63,
       "debtToEquity": 0.73,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=11062ae52c99bf5564d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:16:49.989Z"
+      "scrapedAt": "2026-09-20T08:33:18.434Z"
     },
     "PNB": {
       "symbol": "PNB",
@@ -3186,7 +3186,7 @@
       "roe": 3.37,
       "debtToEquity": 4.51,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=25648ff217c6c48064d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:16:49.986Z"
+      "scrapedAt": "2026-09-20T08:33:18.460Z"
     },
     "PNC": {
       "error": "no_disclosure_found"
@@ -3211,7 +3211,7 @@
       "roe": 3.62,
       "debtToEquity": 0.45,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=38fafa3e2dce515c64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:16:55.050Z"
+      "scrapedAt": "2026-09-20T08:33:24.534Z"
     },
     "PRC": {
       "symbol": "PRC",
@@ -3227,7 +3227,7 @@
       "roe": null,
       "debtToEquity": 0.41,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=55f62d2a10e196da64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:16:55.040Z"
+      "scrapedAt": "2026-09-20T08:33:24.523Z"
     },
     "PREIT": {
       "symbol": "PREIT",
@@ -3243,7 +3243,7 @@
       "roe": 0.79,
       "debtToEquity": 0.05,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=02283c7c646d48ae64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:16:55.045Z"
+      "scrapedAt": "2026-09-20T08:33:24.493Z"
     },
     "PRIM": {
       "symbol": "PRIM",
@@ -3259,7 +3259,7 @@
       "roe": null,
       "debtToEquity": 0.97,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=20cc5153dcf23be764d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:17:00.092Z"
+      "scrapedAt": "2026-09-20T08:33:28.269Z"
     },
     "PRMX": {
       "symbol": "PRMX",
@@ -3275,7 +3275,7 @@
       "roe": null,
       "debtToEquity": 1.79,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=3e887870dddde4db64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:16:58.090Z"
+      "scrapedAt": "2026-09-20T08:33:28.316Z"
     },
     "PSB": {
       "symbol": "PSB",
@@ -3291,7 +3291,7 @@
       "roe": 0.76,
       "debtToEquity": 4.09,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=fcc06323a0ffe12c64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:16:58.070Z"
+      "scrapedAt": "2026-09-20T08:33:28.281Z"
     },
     "PSE": {
       "symbol": "PSE",
@@ -3307,7 +3307,7 @@
       "roe": 4.35,
       "debtToEquity": 0.73,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=63adb810fd489d1064d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:17:03.135Z"
+      "scrapedAt": "2026-09-20T08:33:32.082Z"
     },
     "PTC": {
       "symbol": "PTC",
@@ -3323,7 +3323,7 @@
       "roe": 0.35,
       "debtToEquity": 6.26,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=d905814f471203c964d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:17:03.111Z"
+      "scrapedAt": "2026-09-20T08:33:32.080Z"
     },
     "PTT": {
       "symbol": "PTT",
@@ -3339,7 +3339,7 @@
       "roe": 3.16,
       "debtToEquity": 7.3,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=d31369204ab8d52764d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:17:03.157Z"
+      "scrapedAt": "2026-09-20T08:33:32.084Z"
     },
     "PX": {
       "symbol": "PX",
@@ -3355,7 +3355,7 @@
       "roe": 1.19,
       "debtToEquity": 0.85,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=7eec40ca1da5983b64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:17:06.192Z"
+      "scrapedAt": "2026-09-20T08:33:35.867Z"
     },
     "PXP": {
       "symbol": "PXP",
@@ -3371,7 +3371,7 @@
       "roe": -0.61,
       "debtToEquity": 0.22,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=8e7f51d8fef7554a64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:17:06.340Z"
+      "scrapedAt": "2026-09-20T08:33:35.849Z"
     },
     "RCB": {
       "symbol": "RCB",
@@ -3387,7 +3387,7 @@
       "roe": 0.93,
       "debtToEquity": 8.35,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=b503c215790a77bc64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:17:06.345Z"
+      "scrapedAt": "2026-09-20T08:33:35.843Z"
     },
     "RCI": {
       "symbol": "RCI",
@@ -3403,7 +3403,7 @@
       "roe": null,
       "debtToEquity": 0.3,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=a3c8d924444ff65164d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:17:09.370Z"
+      "scrapedAt": "2026-09-20T08:33:39.654Z"
     },
     "RCR": {
       "symbol": "RCR",
@@ -3419,7 +3419,7 @@
       "roe": 1.57,
       "debtToEquity": 0.05,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=a796393f5438120464d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:17:10.514Z"
+      "scrapedAt": "2026-09-20T08:33:39.660Z"
     },
     "REDC": {
       "symbol": "REDC",
@@ -3435,7 +3435,7 @@
       "roe": 2.9,
       "debtToEquity": 2.12,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=3c6fef94b95aad6a64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:17:10.532Z"
+      "scrapedAt": "2026-09-20T08:33:39.629Z"
     },
     "REG": {
       "symbol": "REG",
@@ -3451,7 +3451,7 @@
       "roe": 0.18,
       "debtToEquity": 0.07,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=547bfe20d4b0010e64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:17:13.562Z"
+      "scrapedAt": "2026-09-20T08:33:43.391Z"
     },
     "RFM": {
       "symbol": "RFM",
@@ -3467,7 +3467,7 @@
       "roe": 3.01,
       "debtToEquity": 0.57,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=f3127ba1cd10a83a64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:17:13.557Z"
+      "scrapedAt": "2026-09-20T08:33:43.416Z"
     },
     "RLC": {
       "symbol": "RLC",
@@ -3483,7 +3483,7 @@
       "roe": 2.38,
       "debtToEquity": 0.45,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=68f56ff134733a3e64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:17:14.696Z"
+      "scrapedAt": "2026-09-20T08:33:43.415Z"
     },
     "RLT": {
       "symbol": "RLT",
@@ -3499,7 +3499,7 @@
       "roe": null,
       "debtToEquity": 0.61,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=d8399d40448f4d8f64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:17:17.885Z"
+      "scrapedAt": "2026-09-20T08:33:47.200Z"
     },
     "ROCK": {
       "symbol": "ROCK",
@@ -3515,7 +3515,7 @@
       "roe": 3.2,
       "debtToEquity": 1.86,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=37722e71fd35256964d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:17:18.707Z"
+      "scrapedAt": "2026-09-20T08:33:47.160Z"
     },
     "ROX": {
       "symbol": "ROX",
@@ -3531,7 +3531,7 @@
       "roe": null,
       "debtToEquity": 4.75,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=4ded4389c68a027bec6e1601ccee8f59",
-      "scrapedAt": "2026-09-13T08:17:17.706Z"
+      "scrapedAt": "2026-09-20T08:33:47.150Z"
     },
     "RRHI": {
       "symbol": "RRHI",
@@ -3547,7 +3547,7 @@
       "roe": 2.22,
       "debtToEquity": 1.35,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=a3b2ace77986e7da64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:17:24.221Z"
+      "scrapedAt": "2026-09-20T08:33:50.973Z"
     },
     "SBS": {
       "symbol": "SBS",
@@ -3563,7 +3563,7 @@
       "roe": 1.66,
       "debtToEquity": 0.32,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=b760dee023925be564d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:17:22.731Z"
+      "scrapedAt": "2026-09-20T08:33:50.928Z"
     },
     "SCC": {
       "symbol": "SCC",
@@ -3579,7 +3579,7 @@
       "roe": 7.39,
       "debtToEquity": 0.25,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=03e3183887072d0b64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:17:22.897Z"
+      "scrapedAt": "2026-09-20T08:33:50.944Z"
     },
     "SECB": {
       "symbol": "SECB",
@@ -3595,7 +3595,7 @@
       "roe": 2.17,
       "debtToEquity": 6.67,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=b0fa5a035aca6edc64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:17:28.237Z"
+      "scrapedAt": "2026-09-20T08:33:54.756Z"
     },
     "SEVN": {
       "symbol": "SEVN",
@@ -3611,7 +3611,7 @@
       "roe": 9.34,
       "debtToEquity": 2.64,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=6984b2e8923ea44164d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:17:27.247Z"
+      "scrapedAt": "2026-09-20T08:33:54.713Z"
     },
     "SFI": {
       "symbol": "SFI",
@@ -3627,7 +3627,7 @@
       "roe": null,
       "debtToEquity": 0.55,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=28b2943c74890fc864d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:17:27.290Z"
+      "scrapedAt": "2026-09-20T08:33:54.754Z"
     },
     "SGI": {
       "symbol": "SGI",
@@ -3643,7 +3643,7 @@
       "roe": 0.92,
       "debtToEquity": 0.22,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=7cc7c19082edab8264d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:17:31.289Z"
+      "scrapedAt": "2026-09-20T08:33:58.550Z"
     },
     "SGP": {
       "symbol": "SGP",
@@ -3659,7 +3659,7 @@
       "roe": 4.64,
       "debtToEquity": 1.55,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=e0669c5184e3f33e64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:17:31.269Z"
+      "scrapedAt": "2026-09-20T08:33:58.541Z"
     },
     "SHLPH": {
       "symbol": "SHLPH",
@@ -3675,7 +3675,7 @@
       "roe": null,
       "debtToEquity": 3.01,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=418492e7357ee62264d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:17:31.309Z"
+      "scrapedAt": "2026-09-20T08:33:58.515Z"
     },
     "SHNG": {
       "symbol": "SHNG",
@@ -3691,7 +3691,7 @@
       "roe": 1.84,
       "debtToEquity": 0.59,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=d231e9f955db564e64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:17:34.328Z"
+      "scrapedAt": "2026-09-20T08:34:02.287Z"
     },
     "SLF": {
       "symbol": "SLF",
@@ -3707,7 +3707,7 @@
       "roe": 4.17,
       "debtToEquity": 15.47,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=f495bbceeac36b5d64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:17:34.326Z"
+      "scrapedAt": "2026-09-20T08:34:02.308Z"
     },
     "SLI": {
       "symbol": "SLI",
@@ -3723,7 +3723,7 @@
       "roe": 1.27,
       "debtToEquity": 1.17,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=ce75363f364ede2964d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:17:34.352Z"
+      "scrapedAt": "2026-09-20T08:34:02.314Z"
     },
     "SM": {
       "symbol": "SM",
@@ -3739,7 +3739,7 @@
       "roe": 3.4,
       "debtToEquity": 0.87,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=277bb5f08026869064d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:17:37.405Z"
+      "scrapedAt": "2026-09-20T08:34:06.093Z"
     },
     "SMC": {
       "symbol": "SMC",
@@ -3755,7 +3755,7 @@
       "roe": 1.92,
       "debtToEquity": 2.77,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=00f2cc8d7ba3d3e264d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:17:37.379Z"
+      "scrapedAt": "2026-09-20T08:34:06.030Z"
     },
     "SMPH": {
       "symbol": "SMPH",
@@ -3771,7 +3771,7 @@
       "roe": 2.71,
       "debtToEquity": 1.31,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=26c49832002f6cb364d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:17:37.391Z"
+      "scrapedAt": "2026-09-20T08:34:06.080Z"
     },
     "SOC": {
       "symbol": "SOC",
@@ -3787,7 +3787,7 @@
       "roe": 0.16,
       "debtToEquity": 0.11,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=75c771cf436fe1a364d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:17:40.435Z"
+      "scrapedAt": "2026-09-20T08:34:09.889Z"
     },
     "SPC": {
       "symbol": "SPC",
@@ -3803,7 +3803,7 @@
       "roe": 3.21,
       "debtToEquity": 0.15,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=6c93c59b73fbb43164d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:17:40.441Z"
+      "scrapedAt": "2026-09-20T08:34:09.859Z"
     },
     "SPM": {
       "symbol": "SPM",
@@ -3819,7 +3819,7 @@
       "roe": 0.28,
       "debtToEquity": 0,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=13ad2e808561d21464d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:17:40.439Z"
+      "scrapedAt": "2026-09-20T08:34:09.851Z"
     },
     "SPNEC": {
       "symbol": "SPNEC",
@@ -3835,7 +3835,7 @@
       "roe": 0.1,
       "debtToEquity": 1.27,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=de6465b7b6b389f764d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:17:43.463Z"
+      "scrapedAt": "2026-09-20T08:34:13.674Z"
     },
     "SRDC": {
       "symbol": "SRDC",
@@ -3851,7 +3851,7 @@
       "roe": -1.14,
       "debtToEquity": 0.18,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=2d0163b2fc4c763b64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:17:43.456Z"
+      "scrapedAt": "2026-09-20T08:34:13.707Z"
     },
     "SSI": {
       "symbol": "SSI",
@@ -3867,7 +3867,7 @@
       "roe": 0.69,
       "debtToEquity": 0.63,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=68be4897367f82d964d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:17:43.454Z"
+      "scrapedAt": "2026-09-20T08:34:13.692Z"
     },
     "STI": {
       "symbol": "STI",
@@ -3883,7 +3883,7 @@
       "roe": 3.9,
       "debtToEquity": 0.31,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=4709f8de9d5948f564d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:17:46.510Z"
+      "scrapedAt": "2026-09-20T08:34:17.494Z"
     },
     "STN": {
       "symbol": "STN",
@@ -3899,7 +3899,7 @@
       "roe": 3.22,
       "debtToEquity": 1.78,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=017b73cd00a1d98664d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:17:46.513Z"
+      "scrapedAt": "2026-09-20T08:34:17.472Z"
     },
     "STR": {
       "symbol": "STR",
@@ -3915,7 +3915,7 @@
       "roe": 4.45,
       "debtToEquity": 1.03,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=72a03a1dc60cbdffec6e1601ccee8f59",
-      "scrapedAt": "2026-09-13T08:17:46.492Z"
+      "scrapedAt": "2026-09-20T08:34:17.461Z"
     },
     "SUN": {
       "symbol": "SUN",
@@ -3931,7 +3931,7 @@
       "roe": null,
       "debtToEquity": null,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=ba645b5803b2227464d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:17:49.535Z"
+      "scrapedAt": "2026-09-20T08:34:21.247Z"
     },
     "T": {
       "symbol": "T",
@@ -3947,7 +3947,7 @@
       "roe": null,
       "debtToEquity": 0.38,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=87e684b678651d9fec6e1601ccee8f59",
-      "scrapedAt": "2026-09-13T08:17:49.531Z"
+      "scrapedAt": "2026-09-20T08:34:21.258Z"
     },
     "TBGI": {
       "symbol": "TBGI",
@@ -3963,7 +3963,7 @@
       "roe": 0.13,
       "debtToEquity": 0.03,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=39c24e66c2e27eb764d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:17:49.516Z"
+      "scrapedAt": "2026-09-20T08:34:21.242Z"
     },
     "TECH": {
       "symbol": "TECH",
@@ -3979,7 +3979,7 @@
       "roe": null,
       "debtToEquity": 0.2,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=4d4aa860c46919dd64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:17:53.566Z"
+      "scrapedAt": "2026-09-20T08:34:25.009Z"
     },
     "TEL": {
       "symbol": "TEL",
@@ -3995,7 +3995,7 @@
       "roe": 5.64,
       "debtToEquity": 3.72,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=f246f3e1a7715d3364d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:17:53.542Z"
+      "scrapedAt": "2026-09-20T08:34:25.040Z"
     },
     "TFC": {
       "symbol": "TFC",
@@ -4011,7 +4011,7 @@
       "roe": 4.77,
       "debtToEquity": 0.12,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=90deb7297bd5d8c664d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:17:52.559Z"
+      "scrapedAt": "2026-09-20T08:34:24.997Z"
     },
     "TFHI": {
       "symbol": "TFHI",
@@ -4027,7 +4027,7 @@
       "roe": 1.79,
       "debtToEquity": 2.57,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=e7b40bc3a58bfa9f64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:17:56.569Z"
+      "scrapedAt": "2026-09-20T08:34:28.822Z"
     },
     "TOP": {
       "symbol": "TOP",
@@ -4043,7 +4043,7 @@
       "roe": 1.85,
       "debtToEquity": 1.23,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=2864ef67581ce82964d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:17:56.578Z"
+      "scrapedAt": "2026-09-20T08:34:28.806Z"
     },
     "TUGS": {
       "symbol": "TUGS",
@@ -4059,7 +4059,7 @@
       "roe": 1.7,
       "debtToEquity": 1.83,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=06e251b8aeabe39c64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:17:56.607Z"
+      "scrapedAt": "2026-09-20T08:34:28.814Z"
     },
     "UBP": {
       "symbol": "UBP",
@@ -4075,7 +4075,7 @@
       "roe": 1.5,
       "debtToEquity": 4.76,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=4fc24543a2073ae364d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:17:59.616Z"
+      "scrapedAt": "2026-09-20T08:34:32.661Z"
     },
     "UNH": {
       "symbol": "UNH",
@@ -4091,7 +4091,7 @@
       "roe": null,
       "debtToEquity": 0.93,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=387faa5709bf017f64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:17:59.654Z"
+      "scrapedAt": "2026-09-20T08:34:32.621Z"
     },
     "UPM": {
       "symbol": "UPM",
@@ -4107,7 +4107,7 @@
       "roe": null,
       "debtToEquity": null,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=e6a066e4db336e1764d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:17:59.647Z"
+      "scrapedAt": "2026-09-20T08:34:32.626Z"
     },
     "UPSON": {
       "symbol": "UPSON",
@@ -4123,7 +4123,7 @@
       "roe": 3.35,
       "debtToEquity": 1.53,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=9cb4e4a13e66d7f764d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:18:02.905Z"
+      "scrapedAt": "2026-09-20T08:34:36.438Z"
     },
     "URC": {
       "symbol": "URC",
@@ -4139,7 +4139,7 @@
       "roe": 2.37,
       "debtToEquity": 0.45,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=6d4e3b3b7aaa07b564d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:18:02.707Z"
+      "scrapedAt": "2026-09-20T08:34:36.440Z"
     },
     "V": {
       "symbol": "V",
@@ -4155,7 +4155,7 @@
       "roe": 1.18,
       "debtToEquity": 0.01,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=ed19a9d6d6e3df3564d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:18:02.704Z"
+      "scrapedAt": "2026-09-20T08:34:36.428Z"
     },
     "VITA": {
       "symbol": "VITA",
@@ -4171,7 +4171,7 @@
       "roe": -15.83,
       "debtToEquity": 2.02,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=837c993e1cca69f264d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:18:05.931Z"
+      "scrapedAt": "2026-09-20T08:34:40.207Z"
     },
     "VLC": {
       "symbol": "VLC",
@@ -4187,7 +4187,7 @@
       "roe": 1.02,
       "debtToEquity": 1.67,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=a2d9781766a39c14ec6e1601ccee8f59",
-      "scrapedAt": "2026-09-13T08:18:05.936Z"
+      "scrapedAt": "2026-09-20T08:34:40.169Z"
     },
     "VLL": {
       "symbol": "VLL",
@@ -4203,7 +4203,7 @@
       "roe": 1.9,
       "debtToEquity": 1.67,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=0df0ef41d5b172d9ec6e1601ccee8f59",
-      "scrapedAt": "2026-09-13T08:18:07.117Z"
+      "scrapedAt": "2026-09-20T08:34:40.210Z"
     },
     "VMC": {
       "symbol": "VMC",
@@ -4219,7 +4219,7 @@
       "roe": 3.12,
       "debtToEquity": 0.17,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=cb25088b063559c964d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:18:10.138Z"
+      "scrapedAt": "2026-09-20T08:34:43.942Z"
     },
     "VREIT": {
       "symbol": "VREIT",
@@ -4235,7 +4235,7 @@
       "roe": 1.23,
       "debtToEquity": 0.06,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=c116c8a5a8186af5ec6e1601ccee8f59",
-      "scrapedAt": "2026-09-13T08:18:10.132Z"
+      "scrapedAt": "2026-09-20T08:34:43.999Z"
     },
     "VVT": {
       "symbol": "VVT",
@@ -4251,7 +4251,7 @@
       "roe": 2.64,
       "debtToEquity": 0.55,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=c2011f7b7f5340d964d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:18:10.142Z"
+      "scrapedAt": "2026-09-20T08:34:44.001Z"
     },
     "WEB": {
       "symbol": "WEB",
@@ -4267,7 +4267,7 @@
       "roe": null,
       "debtToEquity": null,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=a322751024ca6df764d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:18:13.168Z"
+      "scrapedAt": "2026-09-20T08:34:47.760Z"
     },
     "WIN": {
       "symbol": "WIN",
@@ -4283,7 +4283,7 @@
       "roe": null,
       "debtToEquity": 0.31,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=78e315a11222b7d864d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:18:13.166Z"
+      "scrapedAt": "2026-09-20T08:34:47.798Z"
     },
     "WLCON": {
       "symbol": "WLCON",
@@ -4299,7 +4299,7 @@
       "roe": 2.63,
       "debtToEquity": 0.71,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=b56b269baa3c566f64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:18:14.175Z"
+      "scrapedAt": "2026-09-20T08:34:47.753Z"
     },
     "WPI": {
       "symbol": "WPI",
@@ -4315,7 +4315,7 @@
       "roe": 0.31,
       "debtToEquity": 0.49,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=9142dcd1aaa8f2aa64d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:18:18.192Z"
+      "scrapedAt": "2026-09-20T08:34:51.608Z"
     },
     "X": {
       "symbol": "X",
@@ -4331,7 +4331,7 @@
       "roe": null,
       "debtToEquity": null,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=8e6407d05e26266564d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:18:17.190Z"
+      "scrapedAt": "2026-09-20T08:34:51.551Z"
     },
     "XG": {
       "symbol": "XG",
@@ -4347,7 +4347,7 @@
       "roe": null,
       "debtToEquity": 1.41,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=dcad99602471442164d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:18:17.188Z"
+      "scrapedAt": "2026-09-20T08:34:51.549Z"
     },
     "ZHI": {
       "symbol": "ZHI",
@@ -4363,7 +4363,7 @@
       "roe": null,
       "debtToEquity": 0.16,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=27b23e4b0590317064d70b69f0a3140b",
-      "scrapedAt": "2026-09-13T08:18:21.223Z"
+      "scrapedAt": "2026-09-20T08:34:55.350Z"
     }
   }
 }
