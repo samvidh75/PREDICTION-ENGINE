@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-09-20T08:43:19.789Z",
+  "generatedAt": "2026-09-27T09:20:18.206Z",
   "source": "edge.pse.com.ph",
-  "totalCompanies": 282,
+  "totalCompanies": 283,
   "sectorBreakdown": {
     "Holding Firms": 31,
     "Mining and Oil": 24,
@@ -10,7 +10,8 @@
     "Property": 50,
     "Financials": 31,
     "Small, Medium & Emerging Board": 9,
-    "ETF": 1
+    "ETF": 1,
+    "PROPERTY": 1
   },
   "results": {
     "AAA": {
@@ -1501,6 +1502,16 @@
       "cmpyId": 12,
       "securityId": 225,
       "listingDate": "Nov 07, 1947",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "LTL": {
+      "symbol": "LTL",
+      "companyName": "PNB Holdings Corporation",
+      "sector": "PROPERTY",
+      "subsector": "PROPERTY",
+      "cmpyId": 708,
+      "securityId": 751,
+      "listingDate": "Sep 25, 2026",
       "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
     },
     "MA": {
