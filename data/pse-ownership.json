@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-11T10:06:33.576Z",
+  "generatedAt": "2026-10-18T08:10:28.005Z",
   "source": "edge.pse.com.ph",
   "results": {
     "AAA": {
@@ -10,7 +10,7 @@
       "publicOwnershipPercent": 10.12,
       "insiderOwnershipPercent": 89.88,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=9ff2719f88241bb964d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T09:58:41.838Z"
+      "scrapedAt": "2026-10-18T08:02:13.155Z"
     },
     "AB": {
       "symbol": "AB",
@@ -20,177 +20,177 @@
       "publicOwnershipPercent": 14.09,
       "insiderOwnershipPercent": 85.91,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=b287caa25aef2ec164d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T09:58:41.866Z"
+      "scrapedAt": "2026-10-18T08:02:13.316Z"
     },
     "ABA": {
       "symbol": "ABA",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 4504527420,
-      "sharesOwnedByPublic": 2061774376,
-      "publicOwnershipPercent": 45.77,
-      "insiderOwnershipPercent": 54.23,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=5a16ce1ee0b44fdc64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T09:58:41.935Z"
+      "sharesOwnedByPublic": 2056946616,
+      "publicOwnershipPercent": 45.66,
+      "insiderOwnershipPercent": 54.34,
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=f9528b398d6201aa64d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:02:13.263Z"
     },
     "ABG": {
       "symbol": "ABG",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 300000000,
       "sharesOwnedByPublic": 99920798,
       "publicOwnershipPercent": 33.31,
       "insiderOwnershipPercent": 66.69,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=3cf5373ba5f79c9764d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T09:58:46.959Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=090ba2d4a5d7010a64d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:02:18.471Z"
     },
     "ABS": {
       "symbol": "ABS",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 899848111,
-      "sharesOwnedByPublic": 374550049,
-      "publicOwnershipPercent": 41.62,
-      "insiderOwnershipPercent": 58.38,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=c7dc5a68b676d75464d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T09:58:46.954Z"
+      "sharesOwnedByPublic": 374465202,
+      "publicOwnershipPercent": 41.61,
+      "insiderOwnershipPercent": 58.39,
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=aa3968c9909650ca64d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:02:18.606Z"
     },
     "ABSP": {
       "symbol": "ABSP",
-      "reportDate": "Jun 30, 2026",
-      "outstandingShares": 91773670,
-      "sharesOwnedByPublic": 78665378,
-      "publicOwnershipPercent": 85.72,
-      "insiderOwnershipPercent": 14.28,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=9d0a12569faf8e1664d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T09:58:47.004Z"
+      "reportDate": "Sep 30, 2026",
+      "outstandingShares": 85927670,
+      "sharesOwnedByPublic": 72786703,
+      "publicOwnershipPercent": 84.71,
+      "insiderOwnershipPercent": 15.29,
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=48ea76eee8afb4f364d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:02:18.533Z"
     },
     "AC": {
       "symbol": "AC",
-      "reportDate": "Jun 30, 2026",
-      "outstandingShares": 620415577,
-      "sharesOwnedByPublic": 317842468,
-      "publicOwnershipPercent": 51.23,
-      "insiderOwnershipPercent": 48.77,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=84994a906683a52d64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T09:58:52.018Z"
+      "reportDate": "Sep 30, 2026",
+      "outstandingShares": 620417577,
+      "sharesOwnedByPublic": 318898668,
+      "publicOwnershipPercent": 51.4,
+      "insiderOwnershipPercent": 48.6,
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=b89488e7baa74ea564d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:02:23.912Z"
     },
     "ACE": {
       "symbol": "ACE",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 344747520,
       "sharesOwnedByPublic": 152692513,
       "publicOwnershipPercent": 44.29,
       "insiderOwnershipPercent": 55.71,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=01c53870b6caa3b664d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T09:58:52.034Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=88c9766ea93be15464d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:02:23.867Z"
     },
     "ACEN": {
       "symbol": "ACEN",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 39951435064,
       "sharesOwnedByPublic": 9331320140,
       "publicOwnershipPercent": 23.36,
       "insiderOwnershipPercent": 76.64,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=914851df386d4b5064d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T09:58:52.062Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=5ec82f08c5662b8064d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:02:23.876Z"
     },
     "ACR": {
       "symbol": "ACR",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 6291500000,
       "sharesOwnedByPublic": 1260251996,
       "publicOwnershipPercent": 20.03,
       "insiderOwnershipPercent": 79.97,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=453678b11dea6be964d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T09:58:57.081Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=23f8afbf4075c5c864d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:02:29.164Z"
     },
     "AEV": {
       "symbol": "AEV",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 5552805057,
-      "sharesOwnedByPublic": 2446853541,
-      "publicOwnershipPercent": 44.07,
-      "insiderOwnershipPercent": 55.93,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=b447e85f39cb5e3b64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T09:58:57.120Z"
+      "sharesOwnedByPublic": 2573378487,
+      "publicOwnershipPercent": 46.34,
+      "insiderOwnershipPercent": 53.66,
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=56ab4548650de26064d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:02:29.226Z"
     },
     "AGI": {
       "symbol": "AGI",
-      "reportDate": "Jun 30, 2026",
-      "outstandingShares": 8695066279,
-      "sharesOwnedByPublic": 2446609435,
-      "publicOwnershipPercent": 28.14,
-      "insiderOwnershipPercent": 71.86,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=faaee4b1246603dc64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T09:58:57.129Z"
+      "reportDate": "Sep 30, 2026",
+      "outstandingShares": 8688823779,
+      "sharesOwnedByPublic": 2440366935,
+      "publicOwnershipPercent": 28.09,
+      "insiderOwnershipPercent": 71.91,
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=295e23cc037b061964d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:02:29.088Z"
     },
     "ALCO": {
       "symbol": "ALCO",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 5318095199,
       "sharesOwnedByPublic": 1590425134,
-      "publicOwnershipPercent": 29.905,
-      "insiderOwnershipPercent": 70.09,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=e9cf1d2f5657e87c64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T09:59:02.199Z"
+      "publicOwnershipPercent": 29.9,
+      "insiderOwnershipPercent": 70.1,
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=f79a0fae99b2b27864d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:02:34.397Z"
     },
     "ALHI": {
       "symbol": "ALHI",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 1040001000,
       "sharesOwnedByPublic": 261370208,
       "publicOwnershipPercent": 25.13,
       "insiderOwnershipPercent": 74.87,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=4fd5a6b14178181464d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T09:59:02.185Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=27ed3bd8085555c964d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:02:34.518Z"
     },
     "ALI": {
       "symbol": "ALI",
-      "reportDate": "Jun 30, 2026",
-      "outstandingShares": 14291762069,
-      "sharesOwnedByPublic": 6409136845,
-      "publicOwnershipPercent": 44.84,
-      "insiderOwnershipPercent": 55.16,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=e220f4c43f0bea9464d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T09:59:02.205Z"
+      "reportDate": "Sep 30, 2026",
+      "outstandingShares": 14292521069,
+      "sharesOwnedByPublic": 6164090363,
+      "publicOwnershipPercent": 43.13,
+      "insiderOwnershipPercent": 56.87,
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=7a8f7662ed7386e364d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:02:34.511Z"
     },
     "ALLDY": {
       "symbol": "ALLDY",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 22857145000,
-      "sharesOwnedByPublic": 7544648000,
-      "publicOwnershipPercent": 33,
-      "insiderOwnershipPercent": 67,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=4f3204029a3dab9664d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T09:59:07.242Z"
+      "sharesOwnedByPublic": 7544748000,
+      "publicOwnershipPercent": 33.01,
+      "insiderOwnershipPercent": 66.99,
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=f9cc51ad65dfd48b64d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:02:39.743Z"
     },
     "ALLHC": {
       "symbol": "ALLHC",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 6301591987,
       "sharesOwnedByPublic": 1711360384,
       "publicOwnershipPercent": 27.16,
       "insiderOwnershipPercent": 72.84,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=b2983a99218545f164d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T09:59:07.238Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=8ec337df643e599d64d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:02:39.727Z"
     },
     "ALTER": {
       "symbol": "ALTER",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 3933840480,
       "sharesOwnedByPublic": 1326269614,
       "publicOwnershipPercent": 33.71,
       "insiderOwnershipPercent": 66.29,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=f1fbf0d0361a674564d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T09:59:07.227Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=694d49f36b83bfda64d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:02:39.718Z"
     },
     "ANI": {
       "symbol": "ANI",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 1024446888,
       "sharesOwnedByPublic": 668652094,
       "publicOwnershipPercent": 65.27,
       "insiderOwnershipPercent": 34.73,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=5a04ba47d26d230f64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T09:59:12.240Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=f0bfbd94d213dc1f64d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:02:45.044Z"
     },
     "ANS": {
       "symbol": "ANS",
@@ -200,17 +200,17 @@
       "publicOwnershipPercent": 16.52,
       "insiderOwnershipPercent": 83.48,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=35a2ebdc53d0ec5964d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T09:59:12.303Z"
+      "scrapedAt": "2026-10-18T08:02:44.999Z"
     },
     "AP": {
       "symbol": "AP",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 7205854307,
-      "sharesOwnedByPublic": 1259105493,
+      "sharesOwnedByPublic": 1259105393,
       "publicOwnershipPercent": 17.47,
       "insiderOwnershipPercent": 82.53,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=6d71ed3b215e5cc264d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T09:59:12.258Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=a8fe6517708e88a164d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:02:45.027Z"
     },
     "APC": {
       "symbol": "APC",
@@ -220,17 +220,17 @@
       "publicOwnershipPercent": 51.11,
       "insiderOwnershipPercent": 48.89,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=d748b499040d6aba64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T09:59:17.362Z"
+      "scrapedAt": "2026-10-18T08:02:50.276Z"
     },
     "APL": {
       "symbol": "APL",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 292686349297,
       "sharesOwnedByPublic": 198388503792,
       "publicOwnershipPercent": 67.78,
       "insiderOwnershipPercent": 32.22,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=30c232aceab3ca3164d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T09:59:17.350Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=3df39c69ace6b18e64d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:02:50.271Z"
     },
     "APO": {
       "symbol": "APO",
@@ -240,7 +240,7 @@
       "publicOwnershipPercent": 18.25,
       "insiderOwnershipPercent": 81.75,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=7bdeb67f6867372a64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T09:59:17.357Z"
+      "scrapedAt": "2026-10-18T08:02:50.232Z"
     },
     "APVI": {
       "symbol": "APVI",
@@ -250,80 +250,80 @@
       "publicOwnershipPercent": 32.91,
       "insiderOwnershipPercent": 67.09,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=c09031e76a0deeb664d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T09:59:22.392Z"
+      "scrapedAt": "2026-10-18T08:02:55.569Z"
     },
     "APX": {
       "symbol": "APX",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 6227887491,
       "sharesOwnedByPublic": 1485696578,
       "publicOwnershipPercent": 23.86,
       "insiderOwnershipPercent": 76.14,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=dfe162f1e35ae6b264d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T09:59:22.399Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=1761aafa9fe1c77a64d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:02:55.482Z"
     },
     "AR": {
       "error": "no_disclosure_found"
     },
     "ARA": {
       "symbol": "ARA",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 1951387570,
-      "sharesOwnedByPublic": 799131586,
+      "sharesOwnedByPublic": 799131588,
       "publicOwnershipPercent": 40.95,
       "insiderOwnershipPercent": 59.05,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=21bcf829d6f6e2a664d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T09:59:27.467Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=ba3f4640800dffcf64d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:03:00.697Z"
     },
     "AREIT": {
       "symbol": "AREIT",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 4156887818,
-      "sharesOwnedByPublic": 1504146200,
+      "sharesOwnedByPublic": 1504145200,
       "publicOwnershipPercent": 36.18,
       "insiderOwnershipPercent": 63.82,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=ee6ecca1709316f364d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T09:59:27.450Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=806822906bd8ac2364d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:03:00.779Z"
     },
     "ASLAG": {
       "symbol": "ASLAG",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 1500000000,
       "sharesOwnedByPublic": 300087402,
       "publicOwnershipPercent": 20.01,
       "insiderOwnershipPercent": 79.99,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=c1fae7d65e39eeb364d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T09:59:27.443Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=bde5624d992a215464d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:03:00.821Z"
     },
     "AT": {
       "symbol": "AT",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 3559532774,
-      "sharesOwnedByPublic": 918775122,
-      "publicOwnershipPercent": 25.81,
-      "insiderOwnershipPercent": 74.19,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=23f19c5fbc5aa53a64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T09:59:32.563Z"
+      "sharesOwnedByPublic": 926415422,
+      "publicOwnershipPercent": 26.03,
+      "insiderOwnershipPercent": 73.97,
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=8a91cc76c7d7b31a64d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:03:06.054Z"
     },
     "ATN": {
       "symbol": "ATN",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 4025055429,
       "sharesOwnedByPublic": 1601470633,
       "publicOwnershipPercent": 23.46,
       "insiderOwnershipPercent": 76.54,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=a420e4dcc9a6e08e64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T09:59:32.488Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=895f8710e79f8cc264d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:03:06.038Z"
     },
     "AUB": {
       "symbol": "AUB",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 1455931590,
-      "sharesOwnedByPublic": 487801498,
-      "publicOwnershipPercent": 33.5,
-      "insiderOwnershipPercent": 66.5,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=308dee3c8fc6d29864d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T09:59:32.519Z"
+      "sharesOwnedByPublic": 487851498,
+      "publicOwnershipPercent": 33.51,
+      "insiderOwnershipPercent": 66.49,
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=32a9bc4801cb3f8164d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:03:06.051Z"
     },
     "AXLM": {
       "symbol": "AXLM",
@@ -333,17 +333,17 @@
       "publicOwnershipPercent": 23.59,
       "insiderOwnershipPercent": 76.41,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=2f57a779eddf87cb64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T09:59:37.567Z"
+      "scrapedAt": "2026-10-18T08:03:11.325Z"
     },
     "BALAI": {
       "symbol": "BALAI",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 1495005000,
-      "sharesOwnedByPublic": 367655000,
+      "sharesOwnedByPublic": 367656000,
       "publicOwnershipPercent": 24.59,
       "insiderOwnershipPercent": 75.41,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=a5ff3dc1cdcc44f364d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T09:59:37.608Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=be515eb6bdbe275464d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:03:11.212Z"
     },
     "BC": {
       "symbol": "BC",
@@ -353,7 +353,7 @@
       "publicOwnershipPercent": 40.2,
       "insiderOwnershipPercent": 59.8,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=1306e35b57e637dc64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T09:59:37.571Z"
+      "scrapedAt": "2026-10-18T08:03:11.234Z"
     },
     "BCOR": {
       "symbol": "BCOR",
@@ -363,17 +363,17 @@
       "publicOwnershipPercent": 11.74,
       "insiderOwnershipPercent": 88.26,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=5f5844c95fac5ff764d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T09:59:42.638Z"
+      "scrapedAt": "2026-10-18T08:03:16.450Z"
     },
     "BDO": {
       "symbol": "BDO",
-      "reportDate": "Jun 30, 2026",
-      "outstandingShares": 5335097465,
-      "sharesOwnedByPublic": 2358714445,
+      "reportDate": "Sep 30, 2026",
+      "outstandingShares": 5336004930,
+      "sharesOwnedByPublic": 2359030432,
       "publicOwnershipPercent": 44.21,
       "insiderOwnershipPercent": 55.79,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=ec80a22c57a639c664d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T09:59:42.715Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=ab6673170f8b197664d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:03:16.576Z"
     },
     "BEL": {
       "symbol": "BEL",
@@ -383,7 +383,7 @@
       "publicOwnershipPercent": 43.57,
       "insiderOwnershipPercent": 56.43,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=66c9c0467cc4b95464d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T09:59:42.631Z"
+      "scrapedAt": "2026-10-18T08:03:16.485Z"
     },
     "BH": {
       "symbol": "BH",
@@ -393,87 +393,87 @@
       "publicOwnershipPercent": 10.16,
       "insiderOwnershipPercent": 89.84,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=e953000918f516a864d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T09:59:47.792Z"
+      "scrapedAt": "2026-10-18T08:03:21.721Z"
     },
     "BHI": {
       "symbol": "BHI",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 14400000000,
-      "sharesOwnedByPublic": 10245048212,
-      "publicOwnershipPercent": 71.15,
-      "insiderOwnershipPercent": 28.85,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=e0cb49fae74d627864d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T09:59:47.794Z"
+      "sharesOwnedByPublic": 10725048212,
+      "publicOwnershipPercent": 74.48,
+      "insiderOwnershipPercent": 25.52,
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=1687a1405a0f727e64d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:03:21.733Z"
     },
     "BLOOM": {
       "symbol": "BLOOM",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 11525287399,
-      "sharesOwnedByPublic": 3418653826,
-      "publicOwnershipPercent": 29.66,
-      "insiderOwnershipPercent": 70.34,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=427cfd5197d81cda64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T09:59:47.788Z"
+      "sharesOwnedByPublic": 3435140092,
+      "publicOwnershipPercent": 29.81,
+      "insiderOwnershipPercent": 70.19,
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=d1a9770ef8246e0964d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:03:21.787Z"
     },
     "BMM": {
       "symbol": "BMM",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 6000000,
       "sharesOwnedByPublic": 2562036,
       "publicOwnershipPercent": 42.7,
       "insiderOwnershipPercent": 57.3,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=396955a53e71cab964d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T09:59:52.860Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=612fcec95f6f791264d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:03:26.983Z"
     },
     "BNCOM": {
       "symbol": "BNCOM",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 1403013920,
-      "sharesOwnedByPublic": 333605980,
+      "sharesOwnedByPublic": 333605990,
       "publicOwnershipPercent": 23.78,
       "insiderOwnershipPercent": 76.22,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=02d70724eb3dcc6764d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T09:59:52.846Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=e3bcc02a8dded1a764d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:03:26.953Z"
     },
     "BPI": {
       "symbol": "BPI",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 5296362773,
-      "sharesOwnedByPublic": 2574486996,
-      "publicOwnershipPercent": 48.61,
-      "insiderOwnershipPercent": 51.39,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=fbceafaaf598a66164d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T09:59:53.088Z"
+      "sharesOwnedByPublic": 2575479701,
+      "publicOwnershipPercent": 48.63,
+      "insiderOwnershipPercent": 51.37,
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=f11f492bd721150664d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:03:27.226Z"
     },
     "BRN": {
       "symbol": "BRN",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 2287468000,
-      "sharesOwnedByPublic": 694149831,
-      "publicOwnershipPercent": 30.35,
-      "insiderOwnershipPercent": 69.65,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=28402a9b8e61baaa64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T09:59:58.141Z"
+      "sharesOwnedByPublic": 643149831,
+      "publicOwnershipPercent": 28.12,
+      "insiderOwnershipPercent": 71.88,
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=94b1fe54eb7b659d64d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:03:32.453Z"
     },
     "BSC": {
       "symbol": "BSC",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 14668643064,
-      "sharesOwnedByPublic": 4006169424,
+      "sharesOwnedByPublic": 4006159424,
       "publicOwnershipPercent": 27.31,
       "insiderOwnershipPercent": 72.69,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=cbf29665a77479cd64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T09:59:58.102Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=25ae2a8d313b1e9f64d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:03:32.450Z"
     },
     "C": {
       "symbol": "C",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 2274768615,
-      "sharesOwnedByPublic": 544114202,
+      "sharesOwnedByPublic": 544114204,
       "publicOwnershipPercent": 23.92,
       "insiderOwnershipPercent": 76.08,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=6b3689c47dc3080d64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T09:59:58.111Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=c9f0eca8036e128064d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:03:32.484Z"
     },
     "CA": {
       "symbol": "CA",
@@ -483,27 +483,27 @@
       "publicOwnershipPercent": 23.49,
       "insiderOwnershipPercent": 76.51,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=fe54e16204e3ac3a64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:00:03.128Z"
+      "scrapedAt": "2026-10-18T08:03:37.719Z"
     },
     "CAT": {
       "symbol": "CAT",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 238496840,
       "sharesOwnedByPublic": 34453200,
       "publicOwnershipPercent": 14.45,
       "insiderOwnershipPercent": 85.55,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=b4c7295fd189172e64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:00:03.186Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=73bd51a7f9a59d8464d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:03:37.678Z"
     },
     "CBC": {
       "symbol": "CBC",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 2691343012,
-      "sharesOwnedByPublic": 1559217019,
+      "sharesOwnedByPublic": 1559226760,
       "publicOwnershipPercent": 57.935,
       "insiderOwnershipPercent": 42.06,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=92319dbd7a1e969b64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:00:03.219Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=ced9cdd86433a98464d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:03:37.644Z"
     },
     "CDC": {
       "symbol": "CDC",
@@ -513,7 +513,7 @@
       "publicOwnershipPercent": 31.68,
       "insiderOwnershipPercent": 68.32,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=c8d9692b85a2dc2664d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:00:08.250Z"
+      "scrapedAt": "2026-10-18T08:03:43.024Z"
     },
     "CEB": {
       "symbol": "CEB",
@@ -523,77 +523,77 @@
       "publicOwnershipPercent": 31.98,
       "insiderOwnershipPercent": 68.02,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=4a20d72d08b57c7564d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:00:08.322Z"
+      "scrapedAt": "2026-10-18T08:03:42.876Z"
     },
     "CEI": {
       "symbol": "CEI",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 14959999950,
-      "sharesOwnedByPublic": 4573566695,
-      "publicOwnershipPercent": 30.57,
-      "insiderOwnershipPercent": 69.43,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=045574b35ac6cf2664d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:00:08.253Z"
+      "sharesOwnedByPublic": 4969309898,
+      "publicOwnershipPercent": 33.22,
+      "insiderOwnershipPercent": 66.78,
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=6f5fb29a12d7d02564d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:03:42.987Z"
     },
     "CEU": {
       "symbol": "CEU",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 446897323,
       "sharesOwnedByPublic": 119524181,
       "publicOwnershipPercent": 26.745,
       "insiderOwnershipPercent": 73.25,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=e6bb7a5f187ee35e64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:00:13.549Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=34fd86e56fd4513e64d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:03:48.164Z"
     },
     "CHP": {
       "symbol": "CHP",
-      "reportDate": "Aug 31, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 13489226623,
       "sharesOwnedByPublic": 1352871153,
       "publicOwnershipPercent": 10.03,
       "insiderOwnershipPercent": 89.97,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=7fdd664e12b807eb64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:00:13.561Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=3afbccef7caf3e3564d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:03:48.217Z"
     },
     "CIC": {
       "symbol": "CIC",
-      "reportDate": "Jun 30, 2026",
-      "outstandingShares": 393655959,
-      "sharesOwnedByPublic": 106972912,
-      "publicOwnershipPercent": 27.17,
-      "insiderOwnershipPercent": 72.83,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=e486a6a48c695d3c64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:00:13.553Z"
+      "reportDate": "Sep 30, 2026",
+      "outstandingShares": 387647439,
+      "sharesOwnedByPublic": 101064006,
+      "publicOwnershipPercent": 26.07,
+      "insiderOwnershipPercent": 73.93,
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=cf3d39604432d3b764d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:03:48.274Z"
     },
     "CLI": {
       "symbol": "CLI",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 3465201467,
-      "sharesOwnedByPublic": 795064519,
+      "sharesOwnedByPublic": 795056520,
       "publicOwnershipPercent": 22.94,
       "insiderOwnershipPercent": 77.06,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=37cb8f7286b40b9c64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:00:18.599Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=f4c0ccfbc347ea4864d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:03:53.461Z"
     },
     "CNPF": {
       "symbol": "CNPF",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 3542258595,
-      "sharesOwnedByPublic": 1219901459,
-      "publicOwnershipPercent": 34.44,
-      "insiderOwnershipPercent": 65.56,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=418f7360dcf93ad364d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:00:18.624Z"
+      "sharesOwnedByPublic": 1219774059,
+      "publicOwnershipPercent": 34.43,
+      "insiderOwnershipPercent": 65.57,
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=5628192e5d1fa38b64d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:03:53.612Z"
     },
     "CNVRG": {
       "symbol": "CNVRG",
-      "reportDate": "Jun 30, 2026",
-      "outstandingShares": 7241380061,
-      "sharesOwnedByPublic": 2219029742,
-      "publicOwnershipPercent": 30.64,
-      "insiderOwnershipPercent": 69.36,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=936fe42882b193ad64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:00:18.571Z"
+      "reportDate": "Sep 30, 2026",
+      "outstandingShares": 7148280061,
+      "sharesOwnedByPublic": 2125929742,
+      "publicOwnershipPercent": 29.74,
+      "insiderOwnershipPercent": 70.26,
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=2892d12df5f6d80364d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:03:53.531Z"
     },
     "COL": {
       "symbol": "COL",
@@ -603,27 +603,27 @@
       "publicOwnershipPercent": 32.02,
       "insiderOwnershipPercent": 67.98,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=cc87fadaca24ef6a64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:00:23.642Z"
+      "scrapedAt": "2026-10-18T08:03:59.168Z"
     },
     "COSCO": {
       "symbol": "COSCO",
-      "reportDate": "Jun 30, 2026",
-      "outstandingShares": 7029524664,
-      "sharesOwnedByPublic": 1494016631,
+      "reportDate": "Sep 30, 2026",
+      "outstandingShares": 7029316664,
+      "sharesOwnedByPublic": 1493808631,
       "publicOwnershipPercent": 21.25,
       "insiderOwnershipPercent": 78.75,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=d08822686132c18d64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:00:23.722Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=06c57053bc68956a64d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:03:58.736Z"
     },
     "CPG": {
       "symbol": "CPG",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 11599600690,
-      "sharesOwnedByPublic": 3717531935,
-      "publicOwnershipPercent": 32.05,
-      "insiderOwnershipPercent": 67.95,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=4481d86d7a373ec564d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:00:23.654Z"
+      "sharesOwnedByPublic": 4635469565,
+      "publicOwnershipPercent": 39.96,
+      "insiderOwnershipPercent": 60.04,
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=749620d738973baa64d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:03:58.763Z"
     },
     "CPM": {
       "symbol": "CPM",
@@ -633,47 +633,47 @@
       "publicOwnershipPercent": 32.33,
       "insiderOwnershipPercent": 67.67,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=bc93686cc917e15a64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:00:28.715Z"
+      "scrapedAt": "2026-10-18T08:04:04.291Z"
     },
     "CREC": {
       "symbol": "CREC",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 11160715179,
-      "sharesOwnedByPublic": 3236607380,
-      "publicOwnershipPercent": 29,
-      "insiderOwnershipPercent": 71,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=c84d9a757eece9e064d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:00:28.825Z"
+      "sharesOwnedByPublic": 3025166260,
+      "publicOwnershipPercent": 27.11,
+      "insiderOwnershipPercent": 72.89,
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=8b0cb11c81b3cda164d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:04:04.438Z"
     },
     "CREIT": {
       "symbol": "CREIT",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 6545454004,
-      "sharesOwnedByPublic": 2501659000,
-      "publicOwnershipPercent": 38.22,
-      "insiderOwnershipPercent": 61.78,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=4f44f444f29e249164d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:00:28.786Z"
+      "sharesOwnedByPublic": 2494936000,
+      "publicOwnershipPercent": 38.12,
+      "insiderOwnershipPercent": 61.88,
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=6725215137a6f67364d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:04:04.389Z"
     },
     "CROWN": {
       "symbol": "CROWN",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 610639000,
-      "sharesOwnedByPublic": 288746068,
-      "publicOwnershipPercent": 47.29,
-      "insiderOwnershipPercent": 52.71,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=ac886cfac0e3fc1764d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:00:33.905Z"
+      "sharesOwnedByPublic": 289013068,
+      "publicOwnershipPercent": 47.33,
+      "insiderOwnershipPercent": 52.67,
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=563cb857ecac141464d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:04:09.570Z"
     },
     "CSB": {
       "symbol": "CSB",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 173865000,
-      "sharesOwnedByPublic": 54043138,
+      "sharesOwnedByPublic": 54043140,
       "publicOwnershipPercent": 31.08,
       "insiderOwnershipPercent": 68.92,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=b0b3281384e1d83264d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:00:33.853Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=931ea015d6b696d764d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:04:09.613Z"
     },
     "CTS": {
       "symbol": "CTS",
@@ -683,57 +683,57 @@
       "publicOwnershipPercent": 33.84,
       "insiderOwnershipPercent": 66.16,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=51fdf7047e9f474364d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:00:33.818Z"
+      "scrapedAt": "2026-10-18T08:04:09.556Z"
     },
     "CYBR": {
       "symbol": "CYBR",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 6806878853,
       "sharesOwnedByPublic": 2492607229,
       "publicOwnershipPercent": 36.62,
       "insiderOwnershipPercent": 63.38,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=3232ef307dcd537b64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:00:38.946Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=0a2d1389161088b564d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:04:14.902Z"
     },
     "DD": {
       "symbol": "DD",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 2538310669,
       "sharesOwnedByPublic": 698915409,
       "publicOwnershipPercent": 27.53,
       "insiderOwnershipPercent": 72.47,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=1d1eaa5728960c3d64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:00:38.943Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=4c6c6082ad5e80e764d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:04:14.729Z"
     },
     "DDMPR": {
       "symbol": "DDMPR",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 17827465406,
       "sharesOwnedByPublic": 5947066457,
       "publicOwnershipPercent": 33.36,
       "insiderOwnershipPercent": 66.64,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=fcf6b414c67a302064d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:00:38.934Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=3287816e1919ecac64d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:04:14.781Z"
     },
     "DELM": {
       "symbol": "DELM",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 1943960024,
       "sharesOwnedByPublic": 542748625,
       "publicOwnershipPercent": 27.92,
       "insiderOwnershipPercent": 72.08,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=79b8ee906e7abadd64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:00:43.984Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=c09bc0140769b5cb64d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:04:20.174Z"
     },
     "DFNN": {
       "symbol": "DFNN",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 400000000,
-      "sharesOwnedByPublic": 261902671,
-      "publicOwnershipPercent": 65.48,
-      "insiderOwnershipPercent": 34.52,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=def02b36aa6c584164d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:00:43.992Z"
+      "sharesOwnedByPublic": 292042866,
+      "publicOwnershipPercent": 73.01,
+      "insiderOwnershipPercent": 26.99,
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=51f89d36fddd6e8264d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:04:20.172Z"
     },
     "DHI": {
       "symbol": "DHI",
@@ -743,17 +743,17 @@
       "publicOwnershipPercent": 21.12,
       "insiderOwnershipPercent": 78.88,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=42f59bf43b7d23e364d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:00:44.059Z"
+      "scrapedAt": "2026-10-18T08:04:20.080Z"
     },
     "DITO": {
       "symbol": "DITO",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 21488500000,
-      "sharesOwnedByPublic": 6097557062,
-      "publicOwnershipPercent": 28.38,
-      "insiderOwnershipPercent": 71.62,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=be490989e64b4b6864d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:00:49.107Z"
+      "sharesOwnedByPublic": 6097636062,
+      "publicOwnershipPercent": 28.37,
+      "insiderOwnershipPercent": 71.63,
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=62fbb8cecfa90ed564d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:04:25.473Z"
     },
     "DIZ": {
       "symbol": "DIZ",
@@ -763,7 +763,7 @@
       "publicOwnershipPercent": 61.35,
       "insiderOwnershipPercent": 38.65,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=6c738052330cb1e064d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:00:49.138Z"
+      "scrapedAt": "2026-10-18T08:04:25.353Z"
     },
     "DMC": {
       "symbol": "DMC",
@@ -773,110 +773,110 @@
       "publicOwnershipPercent": 25.94,
       "insiderOwnershipPercent": 74.06,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=28f5739e9282655a64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:00:49.093Z"
+      "scrapedAt": "2026-10-18T08:04:25.368Z"
     },
     "DMW": {
       "symbol": "DMW",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 3395864100,
       "sharesOwnedByPublic": 680378216,
       "publicOwnershipPercent": 20.04,
       "insiderOwnershipPercent": 79.96,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=c47fd6a2e931d6e964d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:00:54.163Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=30403f86004c691464d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:04:30.638Z"
     },
     "DNL": {
       "symbol": "DNL",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 7142857990,
-      "sharesOwnedByPublic": 1817742317,
-      "publicOwnershipPercent": 25.45,
-      "insiderOwnershipPercent": 74.55,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=d5786e5660ad778d64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:00:54.174Z"
+      "sharesOwnedByPublic": 1811761917,
+      "publicOwnershipPercent": 25.36,
+      "insiderOwnershipPercent": 74.64,
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=c575ae16e59dee2b64d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:04:30.682Z"
     },
     "DWC": {
       "symbol": "DWC",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 854000000,
-      "sharesOwnedByPublic": 102492004,
-      "publicOwnershipPercent": 12,
-      "insiderOwnershipPercent": 88,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=d2121ad5add5375f64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:00:54.273Z"
+      "sharesOwnedByPublic": 162492004,
+      "publicOwnershipPercent": 19.03,
+      "insiderOwnershipPercent": 80.97,
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=753491e39bc46b6e64d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:04:30.739Z"
     },
     "ECP": {
       "symbol": "ECP",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 150000000,
       "sharesOwnedByPublic": 18498916,
       "publicOwnershipPercent": 12.33,
       "insiderOwnershipPercent": 87.67,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=e94786c5773faea764d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:00:59.307Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=6cfe337fd4d8ebbf64d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:04:35.890Z"
     },
     "ECVC": {
       "symbol": "ECVC",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 6630000000,
       "sharesOwnedByPublic": 1443628350,
       "publicOwnershipPercent": 21.78,
       "insiderOwnershipPercent": 78.22,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=6da55d781dfd7e1164d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:00:59.355Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=04162775e114ca3864d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:04:35.957Z"
     },
     "EEI": {
       "symbol": "EEI",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 1036281485,
-      "sharesOwnedByPublic": 462727112,
+      "sharesOwnedByPublic": 462727113,
       "publicOwnershipPercent": 44.65,
       "insiderOwnershipPercent": 55.35,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=0fa157df8a0be8e264d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:00:59.287Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=429356efb583753764d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:04:35.967Z"
     },
     "EG": {
       "error": "no_disclosure_found"
     },
     "EGRN": {
       "symbol": "EGRN",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 25000000000,
       "sharesOwnedByPublic": 9975396600,
       "publicOwnershipPercent": 39.9,
       "insiderOwnershipPercent": 60.1,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=599c108e76f6ed3064d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:01:04.370Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=5c80e6c5bf4587fe64d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:04:41.176Z"
     },
     "ELI": {
       "symbol": "ELI",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 14676199167,
       "sharesOwnedByPublic": 2425135235,
       "publicOwnershipPercent": 16.52,
       "insiderOwnershipPercent": 83.48,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=576a79212e779f9864d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:01:04.379Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=e3445054ac01be1164d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:04:41.196Z"
     },
     "EMI": {
       "symbol": "EMI",
-      "reportDate": "Jun 30, 2026",
-      "outstandingShares": 15749971238,
-      "sharesOwnedByPublic": 3954530729,
-      "publicOwnershipPercent": 25.11,
-      "insiderOwnershipPercent": 74.89,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=c2c0d277be9f148064d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:01:09.365Z"
+      "reportDate": "Sep 30, 2026",
+      "outstandingShares": 15750471238,
+      "sharesOwnedByPublic": 4004811729,
+      "publicOwnershipPercent": 25.43,
+      "insiderOwnershipPercent": 74.57,
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=e206470cac36f3cd64d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:04:46.388Z"
     },
     "ENEX": {
       "symbol": "ENEX",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 250000001,
       "sharesOwnedByPublic": 59226694,
       "publicOwnershipPercent": 23.69,
       "insiderOwnershipPercent": 76.31,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=38eaf24bfb3a8c7164d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:01:09.409Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=d4ad2c6f2fd177e064d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:04:46.351Z"
     },
     "EURO": {
       "symbol": "EURO",
@@ -886,17 +886,17 @@
       "publicOwnershipPercent": 14.09,
       "insiderOwnershipPercent": 85.91,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=df2ad262639b552764d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:01:09.423Z"
+      "scrapedAt": "2026-10-18T08:04:46.365Z"
     },
     "EW": {
       "symbol": "EW",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 2249975411,
-      "sharesOwnedByPublic": 428437917,
-      "publicOwnershipPercent": 19.04,
-      "insiderOwnershipPercent": 80.96,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=2348e777470602db64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:01:14.427Z"
+      "sharesOwnedByPublic": 428530236,
+      "publicOwnershipPercent": 19.05,
+      "insiderOwnershipPercent": 80.95,
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=6e8c7e4c528b3cce64d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:04:51.550Z"
     },
     "FAF": {
       "symbol": "FAF",
@@ -906,27 +906,27 @@
       "publicOwnershipPercent": 81.619,
       "insiderOwnershipPercent": 18.38,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=0bca5f75ba7c1a0a64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:01:14.420Z"
+      "scrapedAt": "2026-10-18T08:04:51.614Z"
     },
     "FB": {
       "symbol": "FB",
-      "reportDate": "Aug 31, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 5909220090,
       "sharesOwnedByPublic": 663491045,
       "publicOwnershipPercent": 11.23,
       "insiderOwnershipPercent": 88.77,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=e77d5249b90dca9564d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:01:14.464Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=da6994f08e29c1ee64d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:04:51.620Z"
     },
     "FCG": {
       "symbol": "FCG",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 5468455298,
       "sharesOwnedByPublic": 1289353999,
       "publicOwnershipPercent": 23.58,
       "insiderOwnershipPercent": 76.42,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=2caafd636427290b64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:01:19.449Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=fc800c5dcb421a6064d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:04:56.930Z"
     },
     "FDC": {
       "symbol": "FDC",
@@ -936,7 +936,7 @@
       "publicOwnershipPercent": 10.73,
       "insiderOwnershipPercent": 89.27,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=27131fff4958c80964d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:01:19.513Z"
+      "scrapedAt": "2026-10-18T08:04:56.883Z"
     },
     "FERRO": {
       "symbol": "FERRO",
@@ -946,27 +946,27 @@
       "publicOwnershipPercent": 37.53,
       "insiderOwnershipPercent": 62.47,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=5a3f2c5b81e522ae64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:01:19.516Z"
+      "scrapedAt": "2026-10-18T08:04:56.808Z"
     },
     "FEU": {
       "symbol": "FEU",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 24055763,
-      "sharesOwnedByPublic": 8691866,
-      "publicOwnershipPercent": 36.13,
-      "insiderOwnershipPercent": 63.87,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=9bac78994cf0b28964d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:01:24.583Z"
+      "sharesOwnedByPublic": 8689957,
+      "publicOwnershipPercent": 36.12,
+      "insiderOwnershipPercent": 63.88,
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=5593b89ce4ca904764d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:05:02.140Z"
     },
     "FFI": {
       "symbol": "FFI",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 50167397,
-      "sharesOwnedByPublic": 14497437,
-      "publicOwnershipPercent": 28.9,
-      "insiderOwnershipPercent": 71.1,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=114c5b2f944e1abb64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:01:24.546Z"
+      "sharesOwnedByPublic": 14486919,
+      "publicOwnershipPercent": 28.88,
+      "insiderOwnershipPercent": 71.12,
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=cfb2d887b239c2a264d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:05:02.153Z"
     },
     "FGEN": {
       "symbol": "FGEN",
@@ -976,17 +976,17 @@
       "publicOwnershipPercent": 11.67,
       "insiderOwnershipPercent": 88.33,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=2e46e745c303511164d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:01:24.551Z"
+      "scrapedAt": "2026-10-18T08:05:02.121Z"
     },
     "FILRT": {
       "symbol": "FILRT",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 6518781310,
       "sharesOwnedByPublic": 2283690841,
       "publicOwnershipPercent": 35.03,
       "insiderOwnershipPercent": 64.97,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=1cbeb0e08e4e418264d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:01:29.618Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=72b253a8caee62d364d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:05:07.295Z"
     },
     "FJP": {
       "symbol": "FJP",
@@ -996,47 +996,47 @@
       "publicOwnershipPercent": 26.53,
       "insiderOwnershipPercent": 73.47,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=d5f059725d202b7964d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:01:29.641Z"
+      "scrapedAt": "2026-10-18T08:05:07.321Z"
     },
     "FLI": {
       "symbol": "FLI",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 22383759506,
       "sharesOwnedByPublic": 5921086969,
       "publicOwnershipPercent": 26.45,
       "insiderOwnershipPercent": 73.55,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=e2d9e539b498d9e064d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:01:29.633Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=4d9fdbd3ae6160c664d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:05:07.527Z"
     },
     "FMETF": {
       "symbol": "FMETF",
-      "reportDate": "Jun 30, 2026",
-      "outstandingShares": 12181260,
-      "sharesOwnedByPublic": 12181253,
+      "reportDate": "Sep 30, 2026",
+      "outstandingShares": 11791260,
+      "sharesOwnedByPublic": 11791253,
       "publicOwnershipPercent": 100,
       "insiderOwnershipPercent": 0,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=926e2a08882182e064d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:01:34.659Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=23a56c178e50a9ab64d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:05:12.718Z"
     },
     "FNI": {
       "symbol": "FNI",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 5110421196,
-      "sharesOwnedByPublic": 2838959328,
-      "publicOwnershipPercent": 55.55,
-      "insiderOwnershipPercent": 44.45,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=fe463c4b3c4bad6564d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:01:34.692Z"
+      "sharesOwnedByPublic": 2850120937,
+      "publicOwnershipPercent": 55.78,
+      "insiderOwnershipPercent": 44.22,
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=4e5b1951d980397b64d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:05:12.705Z"
     },
     "FOOD": {
       "symbol": "FOOD",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 2499712463,
-      "sharesOwnedByPublic": 1084652270,
+      "sharesOwnedByPublic": 1084642270,
       "publicOwnershipPercent": 43.39,
       "insiderOwnershipPercent": 56.61,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=4ff37351cfdf227264d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:01:34.705Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=6908e067ab162b8764d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:05:12.697Z"
     },
     "FPH": {
       "symbol": "FPH",
@@ -1046,37 +1046,37 @@
       "publicOwnershipPercent": 36.3,
       "insiderOwnershipPercent": 63.7,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=37883e95b098565464d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:01:39.721Z"
+      "scrapedAt": "2026-10-18T08:05:17.936Z"
     },
     "FPI": {
       "symbol": "FPI",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 1838943246,
       "sharesOwnedByPublic": 964684950,
       "publicOwnershipPercent": 52.458,
       "insiderOwnershipPercent": 47.54,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=245c2f75e12b953164d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:01:39.723Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=2a316965f69883a164d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:05:17.875Z"
     },
     "FRUIT": {
       "symbol": "FRUIT",
-      "reportDate": "Jun 30, 2026",
-      "outstandingShares": 2095008000,
-      "sharesOwnedByPublic": 820712990,
-      "publicOwnershipPercent": 39.17,
-      "insiderOwnershipPercent": 60.83,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=0ea5a9f83ca26e1a64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:01:39.713Z"
+      "reportDate": "Sep 30, 2026",
+      "outstandingShares": 2087318000,
+      "sharesOwnedByPublic": 812322990,
+      "publicOwnershipPercent": 38.92,
+      "insiderOwnershipPercent": 61.08,
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=3330458161eef26964d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:05:17.962Z"
     },
     "FYN": {
       "symbol": "FYN",
-      "reportDate": "Jun 30, 2026",
-      "outstandingShares": 123747707,
-      "sharesOwnedByPublic": 53704552,
+      "reportDate": "Sep 30, 2026",
+      "outstandingShares": 172819683,
+      "sharesOwnedByPublic": 53704551,
       "publicOwnershipPercent": 31.08,
       "insiderOwnershipPercent": 68.92,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=5dd501b12c40236764d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:01:44.742Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=bc1bd6b74f43425564d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:05:23.170Z"
     },
     "GEO": {
       "symbol": "GEO",
@@ -1086,27 +1086,27 @@
       "publicOwnershipPercent": 85.927,
       "insiderOwnershipPercent": 14.07,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=c771607ea313fdbf64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:01:44.725Z"
+      "scrapedAt": "2026-10-18T08:05:23.177Z"
     },
     "GERI": {
       "symbol": "GERI",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 10986000000,
       "sharesOwnedByPublic": 1919188849,
       "publicOwnershipPercent": 17.46,
       "insiderOwnershipPercent": 82.54,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=6e9acd183effa82a64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:01:44.737Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=09eed8a64d6de11964d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:05:23.117Z"
     },
     "GLO": {
       "symbol": "GLO",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 144631574,
-      "sharesOwnedByPublic": 31604675,
-      "publicOwnershipPercent": 21.85,
-      "insiderOwnershipPercent": 78.15,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=4be206dc60e0806364d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:01:49.804Z"
+      "sharesOwnedByPublic": 31562845,
+      "publicOwnershipPercent": 21.82,
+      "insiderOwnershipPercent": 78.18,
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=5a1237631584438864d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:05:28.376Z"
     },
     "GMA7": {
       "symbol": "GMA7",
@@ -1116,7 +1116,7 @@
       "publicOwnershipPercent": null,
       "insiderOwnershipPercent": null,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=20ff881d2d04074b64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:01:49.819Z"
+      "scrapedAt": "2026-10-18T08:05:28.450Z"
     },
     "GMAP": {
       "error": "no_disclosure_found"
@@ -1129,87 +1129,87 @@
       "publicOwnershipPercent": 12.77,
       "insiderOwnershipPercent": 87.23,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=4d17fb01d812c22d64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:01:54.801Z"
+      "scrapedAt": "2026-10-18T08:05:33.654Z"
     },
     "GREEN": {
       "symbol": "GREEN",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 4150778574,
       "sharesOwnedByPublic": 1924368353,
       "publicOwnershipPercent": 46.36,
       "insiderOwnershipPercent": 53.64,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=f58df1f6d59a594964d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:01:54.814Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=6f09f390dae6449a64d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:05:33.718Z"
     },
     "GSMI": {
       "symbol": "GSMI",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 286327841,
-      "sharesOwnedByPublic": 68971241,
+      "sharesOwnedByPublic": 68976241,
       "publicOwnershipPercent": 24.09,
       "insiderOwnershipPercent": 75.91,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=20e0ed3063e91d7d64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:01:54.864Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=c65920476f001ce864d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:05:33.622Z"
     },
     "GTCAP": {
       "symbol": "GTCAP",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 215284587,
-      "sharesOwnedByPublic": 94100252,
-      "publicOwnershipPercent": 43.71,
-      "insiderOwnershipPercent": 56.29,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=882c0400026768dc64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:01:59.878Z"
+      "sharesOwnedByPublic": 93897716,
+      "publicOwnershipPercent": 43.62,
+      "insiderOwnershipPercent": 56.38,
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=b0961da762e26f2764d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:05:38.969Z"
     },
     "HI": {
       "symbol": "HI",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 1469302230,
-      "sharesOwnedByPublic": 180294844,
-      "publicOwnershipPercent": 12.27,
-      "insiderOwnershipPercent": 87.73,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=0fec09ab07cf5d6064d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:01:59.974Z"
+      "sharesOwnedByPublic": 179433459,
+      "publicOwnershipPercent": 12.21,
+      "insiderOwnershipPercent": 87.79,
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=119ad4b4b2ee693064d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:05:39.037Z"
     },
     "HOME": {
       "symbol": "HOME",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 3750000002,
-      "sharesOwnedByPublic": 1209869702,
+      "sharesOwnedByPublic": 1209889702,
       "publicOwnershipPercent": 32.26,
       "insiderOwnershipPercent": 67.74,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=272d86dbde409dde64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:01:59.889Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=89bc357493b384d564d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:05:38.912Z"
     },
     "HTI": {
       "symbol": "HTI",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 2500000000,
       "sharesOwnedByPublic": 645958001,
       "publicOwnershipPercent": 25.84,
       "insiderOwnershipPercent": 74.16,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=1badc06df5f75f4c64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:02:05.005Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=3818c6938735820d64d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:05:44.243Z"
     },
     "I": {
       "symbol": "I",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 611639122,
       "sharesOwnedByPublic": 365799473,
       "publicOwnershipPercent": 59.81,
       "insiderOwnershipPercent": 40.19,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=02bb0c96890651bd64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:02:05.039Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=fcfee6fc9df189d264d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:05:44.150Z"
     },
     "ICT": {
       "symbol": "ICT",
-      "reportDate": "Jun 30, 2026",
-      "outstandingShares": 2019242695,
-      "sharesOwnedByPublic": 1027730467,
-      "publicOwnershipPercent": 50.9,
-      "insiderOwnershipPercent": 49.1,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=7c2165e0ce9028e264d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:02:05.032Z"
+      "reportDate": "Sep 30, 2026",
+      "outstandingShares": 2018842695,
+      "sharesOwnedByPublic": 1028241758,
+      "publicOwnershipPercent": 50.93,
+      "insiderOwnershipPercent": 49.07,
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=f2fad7cc0933b44964d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:05:44.223Z"
     },
     "IDC": {
       "symbol": "IDC",
@@ -1219,87 +1219,87 @@
       "publicOwnershipPercent": 39.11,
       "insiderOwnershipPercent": 60.89,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=6d2004a39e73cbb964d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:02:10.046Z"
+      "scrapedAt": "2026-10-18T08:05:49.432Z"
     },
     "IMI": {
       "symbol": "IMI",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 2224503705,
-      "sharesOwnedByPublic": 730079464,
-      "publicOwnershipPercent": 32.82,
-      "insiderOwnershipPercent": 67.18,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=7d48ace57613bb1e64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:02:10.083Z"
+      "sharesOwnedByPublic": 744632695,
+      "publicOwnershipPercent": 33.47,
+      "insiderOwnershipPercent": 66.53,
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=22e0b7abee0a6bd664d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:05:49.425Z"
     },
     "IMP": {
       "symbol": "IMP",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 652500000,
       "sharesOwnedByPublic": 102161430,
       "publicOwnershipPercent": 15.656,
       "insiderOwnershipPercent": 84.34,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=a1b695c23b56541064d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:02:10.124Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=1d084dfb74731be464d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:05:49.583Z"
     },
     "INFRA": {
       "symbol": "INFRA",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 6061560322,
       "sharesOwnedByPublic": 941163672,
       "publicOwnershipPercent": 15.53,
       "insiderOwnershipPercent": 84.47,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=b3845f38ff192a0a64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:02:15.229Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=85e9c2ede298b42464d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:05:54.762Z"
     },
     "ION": {
       "symbol": "ION",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 837130992,
       "sharesOwnedByPublic": 385275268,
       "publicOwnershipPercent": 46.02,
       "insiderOwnershipPercent": 53.98,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=a5ebb1568532c45364d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:02:15.132Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=6c3e63400ec4d46064d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:05:54.857Z"
     },
     "IPM": {
       "symbol": "IPM",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 690000000,
-      "sharesOwnedByPublic": 199213015,
-      "publicOwnershipPercent": 28.87,
-      "insiderOwnershipPercent": 71.13,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=a8ca2097598d59b164d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:02:15.143Z"
+      "sharesOwnedByPublic": 199850815,
+      "publicOwnershipPercent": 28.96,
+      "insiderOwnershipPercent": 71.04,
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=d2c64f2a8b77fe3164d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:05:54.795Z"
     },
     "IPO": {
       "symbol": "IPO",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 1044263197,
-      "sharesOwnedByPublic": 129470216,
+      "sharesOwnedByPublic": 129471511,
       "publicOwnershipPercent": 12.4,
       "insiderOwnershipPercent": 87.6,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=1d8855048e43fcaa64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:02:20.260Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=db16cbf5291ce1c364d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:06:00.006Z"
     },
     "IS": {
       "symbol": "IS",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 4885748685,
       "sharesOwnedByPublic": 3961499783,
       "publicOwnershipPercent": 81.08,
       "insiderOwnershipPercent": 18.92,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=021f407e8d1cc8f664d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:02:20.336Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=77791b4457bbc61864d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:06:00.021Z"
     },
     "JAS": {
       "symbol": "JAS",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 250059097,
       "sharesOwnedByPublic": 51943318,
       "publicOwnershipPercent": 20.77,
       "insiderOwnershipPercent": 79.23,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=7d8adc1ed3d0127064d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:02:20.265Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=155a66ee4fa538d664d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:06:01.354Z"
     },
     "JFC": {
       "symbol": "JFC",
@@ -1309,7 +1309,7 @@
       "publicOwnershipPercent": 45.65,
       "insiderOwnershipPercent": 54.35,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=73a7de1296235e1364d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:02:25.413Z"
+      "scrapedAt": "2026-10-18T08:06:06.657Z"
     },
     "JGS": {
       "symbol": "JGS",
@@ -1319,7 +1319,7 @@
       "publicOwnershipPercent": 41.72,
       "insiderOwnershipPercent": 58.28,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=724a3ff4f29c67b564d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:02:25.380Z"
+      "scrapedAt": "2026-10-18T08:06:06.637Z"
     },
     "JOH": {
       "symbol": "JOH",
@@ -1329,37 +1329,37 @@
       "publicOwnershipPercent": 34.24,
       "insiderOwnershipPercent": 65.76,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=436ee06ff452d9c564d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:02:25.369Z"
+      "scrapedAt": "2026-10-18T08:06:06.688Z"
     },
     "KEEPR": {
       "symbol": "KEEPR",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 14508750313,
       "sharesOwnedByPublic": 3020958222,
       "publicOwnershipPercent": 20.82,
       "insiderOwnershipPercent": 79.18,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=58346c8eefd62fe264d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:02:30.492Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=bd239a4323c64cff64d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:06:11.896Z"
     },
     "KEP": {
       "symbol": "KEP",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 293828900,
       "sharesOwnedByPublic": 38585903,
       "publicOwnershipPercent": 13.13,
       "insiderOwnershipPercent": 86.87,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=bc10e3cd94b8125864d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:02:30.474Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=61f74fa9f7f6478864d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:06:11.836Z"
     },
     "KPPI": {
       "symbol": "KPPI",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 201057609,
       "sharesOwnedByPublic": 66734717,
       "publicOwnershipPercent": 33.19,
       "insiderOwnershipPercent": 66.81,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=35489b8917e8fe7864d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:02:30.437Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=cb218786ef018c2f64d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:06:11.915Z"
     },
     "LBC": {
       "symbol": "LBC",
@@ -1369,17 +1369,17 @@
       "publicOwnershipPercent": 15.39,
       "insiderOwnershipPercent": 84.61,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=f549fb2a13d03d2d64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:02:35.489Z"
+      "scrapedAt": "2026-10-18T08:06:17.041Z"
     },
     "LC": {
       "symbol": "LC",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 39822869196,
       "sharesOwnedByPublic": 42912775728,
       "publicOwnershipPercent": 64.65,
       "insiderOwnershipPercent": 35.35,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=2b896f97f662463264d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:02:35.558Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=6d0681682836193264d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:06:17.183Z"
     },
     "LFM": {
       "symbol": "LFM",
@@ -1389,17 +1389,17 @@
       "publicOwnershipPercent": 59.49,
       "insiderOwnershipPercent": 40.51,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=14be8e598c407ad864d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:02:35.486Z"
+      "scrapedAt": "2026-10-18T08:06:17.174Z"
     },
     "LMG": {
       "symbol": "LMG",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 1935441760,
       "sharesOwnedByPublic": 646107100,
       "publicOwnershipPercent": 33.38,
       "insiderOwnershipPercent": 66.62,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=49d093026f1ebec964d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:02:40.605Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=89b206c228ffcbb764d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:06:22.441Z"
     },
     "LODE": {
       "symbol": "LODE",
@@ -1409,7 +1409,7 @@
       "publicOwnershipPercent": 33.33,
       "insiderOwnershipPercent": 66.67,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=88e4cad51e46e2ac64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:02:40.593Z"
+      "scrapedAt": "2026-10-18T08:06:22.398Z"
     },
     "LOTO": {
       "symbol": "LOTO",
@@ -1419,7 +1419,7 @@
       "publicOwnershipPercent": 34.82,
       "insiderOwnershipPercent": 65.18,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=55d6ea85a891c9e864d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:02:40.580Z"
+      "scrapedAt": "2026-10-18T08:06:22.346Z"
     },
     "LPC": {
       "symbol": "LPC",
@@ -1429,27 +1429,27 @@
       "publicOwnershipPercent": 59.66,
       "insiderOwnershipPercent": 40.34,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=102c060356d3efdf64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:02:45.670Z"
+      "scrapedAt": "2026-10-18T08:06:27.615Z"
     },
     "LPZ": {
       "symbol": "LPZ",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 4519406911,
-      "sharesOwnedByPublic": 1332065777,
-      "publicOwnershipPercent": 29.47,
-      "insiderOwnershipPercent": 70.53,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=af7c128777b88f1164d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:02:45.616Z"
+      "sharesOwnedByPublic": 1331205848,
+      "publicOwnershipPercent": 29.46,
+      "insiderOwnershipPercent": 70.54,
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=5a33ad651e77bbcc64d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:06:27.626Z"
     },
     "LSC": {
       "symbol": "LSC",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 990173999,
-      "sharesOwnedByPublic": 176014442,
-      "publicOwnershipPercent": 17.776,
+      "sharesOwnedByPublic": 176061692,
+      "publicOwnershipPercent": 17.78,
       "insiderOwnershipPercent": 82.22,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=5efc538f0975f46964d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:02:45.650Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=f7b2f16cb9768a0864d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:06:27.581Z"
     },
     "LTG": {
       "symbol": "LTG",
@@ -1459,37 +1459,37 @@
       "publicOwnershipPercent": 25.63,
       "insiderOwnershipPercent": 74.37,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=08638b53d750b04564d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:02:50.690Z"
+      "scrapedAt": "2026-10-18T08:06:32.806Z"
     },
     "MA": {
       "symbol": "MA",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 186955303646,
       "sharesOwnedByPublic": 252988772252,
       "publicOwnershipPercent": 81.22,
       "insiderOwnershipPercent": 18.78,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=ef05383db430711f64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:02:50.648Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=9f2c67b1569ba79e64d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:06:32.820Z"
     },
     "MAC": {
       "symbol": "MAC",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 1890958323,
-      "sharesOwnedByPublic": 552694774,
-      "publicOwnershipPercent": 29.23,
-      "insiderOwnershipPercent": 70.77,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=b7d685f895ea3ff564d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:02:50.714Z"
+      "sharesOwnedByPublic": 558694774,
+      "publicOwnershipPercent": 29.55,
+      "insiderOwnershipPercent": 70.45,
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=8bb5dd7bc513aaa864d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:06:32.817Z"
     },
     "MACAY": {
       "symbol": "MACAY",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 1292755794,
       "sharesOwnedByPublic": 187829767,
       "publicOwnershipPercent": 14.53,
       "insiderOwnershipPercent": 85.47,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=e195a3e04d23c91664d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:02:55.697Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=044709725af1087164d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:06:38.106Z"
     },
     "MAH": {
       "symbol": "MAH",
@@ -1499,37 +1499,37 @@
       "publicOwnershipPercent": 31.29,
       "insiderOwnershipPercent": 68.71,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=0d08bab938ec795a64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:02:55.809Z"
+      "scrapedAt": "2026-10-18T08:06:37.967Z"
     },
     "MARC": {
       "symbol": "MARC",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 3014820305,
-      "sharesOwnedByPublic": 1238448757,
+      "sharesOwnedByPublic": 1238449746,
       "publicOwnershipPercent": 41.08,
       "insiderOwnershipPercent": 58.92,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=cc588b27d1efab0c64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:02:55.777Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=f78dae2d4889116864d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:06:38.062Z"
     },
     "MAXS": {
       "symbol": "MAXS",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 1036414624,
       "sharesOwnedByPublic": 266485889,
       "publicOwnershipPercent": 25.71,
       "insiderOwnershipPercent": 74.29,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=326ad15ed69d817d64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:03:00.827Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=cb32edd07b392a8f64d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:06:43.351Z"
     },
     "MB": {
       "symbol": "MB",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 3466139072,
-      "sharesOwnedByPublic": 756535795,
-      "publicOwnershipPercent": 21.83,
-      "insiderOwnershipPercent": 78.17,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=6dd3c3160696ea5164d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:03:00.856Z"
+      "sharesOwnedByPublic": 756527067,
+      "publicOwnershipPercent": 10,
+      "insiderOwnershipPercent": 90,
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=b7b522bfccfdc5fc64d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:06:43.274Z"
     },
     "MBC": {
       "symbol": "MBC",
@@ -1539,17 +1539,17 @@
       "publicOwnershipPercent": 10.22,
       "insiderOwnershipPercent": 89.78,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=6bdf615dc29575f164d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:03:00.907Z"
+      "scrapedAt": "2026-10-18T08:06:43.406Z"
     },
     "MBT": {
       "symbol": "MBT",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 4497415555,
-      "sharesOwnedByPublic": 2151048223,
-      "publicOwnershipPercent": 47.83,
-      "insiderOwnershipPercent": 52.17,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=b4897e04aa00369164d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:03:05.990Z"
+      "sharesOwnedByPublic": 2150709572,
+      "publicOwnershipPercent": 47.82,
+      "insiderOwnershipPercent": 52.18,
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=c445689957438b2c64d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:06:48.614Z"
     },
     "MED": {
       "symbol": "MED",
@@ -1559,7 +1559,7 @@
       "publicOwnershipPercent": 20.116,
       "insiderOwnershipPercent": 79.88,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=a631f18e599d629164d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:03:05.950Z"
+      "scrapedAt": "2026-10-18T08:06:48.576Z"
     },
     "MEDIC": {
       "symbol": "MEDIC",
@@ -1569,60 +1569,60 @@
       "publicOwnershipPercent": 25.53,
       "insiderOwnershipPercent": 74.47,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=03f7be2ba385564164d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:03:05.927Z"
+      "scrapedAt": "2026-10-18T08:06:48.587Z"
     },
     "MEG": {
       "symbol": "MEG",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 32429882872,
-      "sharesOwnedByPublic": 8310490482,
-      "publicOwnershipPercent": 25.63,
-      "insiderOwnershipPercent": 74.37,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=0a0b00dfcdb95ea264d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:03:10.982Z"
+      "sharesOwnedByPublic": 8299107483,
+      "publicOwnershipPercent": 25.59,
+      "insiderOwnershipPercent": 74.41,
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=8518371fa4299ca864d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:06:53.806Z"
     },
     "MER": {
       "symbol": "MER",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 1127092509,
-      "sharesOwnedByPublic": 294106863,
-      "publicOwnershipPercent": 26.09,
-      "insiderOwnershipPercent": 73.91,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=23bd62583ea3910864d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:03:10.986Z"
+      "sharesOwnedByPublic": 293975692,
+      "publicOwnershipPercent": 26.08,
+      "insiderOwnershipPercent": 73.92,
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=b937f92dbac52dc864d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:06:53.814Z"
     },
     "MFC": {
       "error": "no_disclosure_found"
     },
     "MFIN": {
       "symbol": "MFIN",
-      "reportDate": "Jun 30, 2026",
-      "outstandingShares": 276069441,
-      "sharesOwnedByPublic": 75378031,
+      "reportDate": "Sep 30, 2026",
+      "outstandingShares": 277616919,
+      "sharesOwnedByPublic": 75800524,
       "publicOwnershipPercent": 27.3,
       "insiderOwnershipPercent": 72.7,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=59c4b604665c69bc64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:03:16.072Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=c1ce646013e6ff5764d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:06:59.048Z"
     },
     "MG": {
       "symbol": "MG",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 2369684619,
       "sharesOwnedByPublic": 1200803031,
       "publicOwnershipPercent": 50.67,
       "insiderOwnershipPercent": 49.33,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=08e3b44a243f769064d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:03:16.017Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=6378d7d2188e0cb964d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:06:58.932Z"
     },
     "MGH": {
       "symbol": "MGH",
-      "reportDate": "Aug 31, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 2750000000,
-      "sharesOwnedByPublic": 293484302,
+      "sharesOwnedByPublic": 293485302,
       "publicOwnershipPercent": 10.67,
       "insiderOwnershipPercent": 89.33,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=895f14b0fba3c68164d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:03:16.125Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=b93a86ef0c91cba564d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:06:59.022Z"
     },
     "MHC": {
       "symbol": "MHC",
@@ -1632,7 +1632,7 @@
       "publicOwnershipPercent": 35.87,
       "insiderOwnershipPercent": 64.13,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=fd463b22c38db26964d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:03:21.142Z"
+      "scrapedAt": "2026-10-18T08:07:04.159Z"
     },
     "MJC": {
       "symbol": "MJC",
@@ -1642,7 +1642,7 @@
       "publicOwnershipPercent": 54.94,
       "insiderOwnershipPercent": 45.06,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=2ebd667410433a4f64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:03:21.146Z"
+      "scrapedAt": "2026-10-18T08:07:04.384Z"
     },
     "MJIC": {
       "symbol": "MJIC",
@@ -1652,17 +1652,17 @@
       "publicOwnershipPercent": 13.45,
       "insiderOwnershipPercent": 86.55,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=5bb058922d807ea964d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:03:21.127Z"
+      "scrapedAt": "2026-10-18T08:07:04.270Z"
     },
     "MM": {
       "symbol": "MM",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 7594936709,
       "sharesOwnedByPublic": 103994331,
       "publicOwnershipPercent": 1.37,
       "insiderOwnershipPercent": 98.63,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=0ca9d720b5559ffe64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:03:26.132Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=1f07f2b348c5974f64d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:07:09.563Z"
     },
     "MONDE": {
       "symbol": "MONDE",
@@ -1672,7 +1672,7 @@
       "publicOwnershipPercent": 40.16,
       "insiderOwnershipPercent": 59.84,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=11b2a91841e8df1164d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:03:26.181Z"
+      "scrapedAt": "2026-10-18T08:07:09.508Z"
     },
     "MRC": {
       "symbol": "MRC",
@@ -1682,7 +1682,7 @@
       "publicOwnershipPercent": 56.67,
       "insiderOwnershipPercent": 43.33,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=fa7451d18bc9b82164d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:03:26.146Z"
+      "scrapedAt": "2026-10-18T08:07:09.692Z"
     },
     "MREIT": {
       "symbol": "MREIT",
@@ -1692,17 +1692,17 @@
       "publicOwnershipPercent": 33.95,
       "insiderOwnershipPercent": 66.05,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=536b4a957396b91c64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:03:31.202Z"
+      "scrapedAt": "2026-10-18T08:07:14.978Z"
     },
     "MRSGI": {
       "symbol": "MRSGI",
-      "reportDate": "Jun 30, 2026",
-      "outstandingShares": 3233346000,
-      "sharesOwnedByPublic": 571493104,
+      "reportDate": "Sep 30, 2026",
+      "outstandingShares": 3232989000,
+      "sharesOwnedByPublic": 571136104,
       "publicOwnershipPercent": 17.67,
       "insiderOwnershipPercent": 82.33,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=08d9e35067ab8df264d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:03:31.260Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=45b54ad147b864c964d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:07:14.847Z"
     },
     "MVC": {
       "symbol": "MVC",
@@ -1712,37 +1712,37 @@
       "publicOwnershipPercent": 11.99,
       "insiderOwnershipPercent": 88.01,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=6d2b7b983275356464d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:03:31.199Z"
+      "scrapedAt": "2026-10-18T08:07:14.872Z"
     },
     "MWC": {
       "symbol": "MWC",
-      "reportDate": "Jun 30, 2026",
-      "outstandingShares": 2608405172,
-      "sharesOwnedByPublic": 1092275732,
-      "publicOwnershipPercent": 41.88,
-      "insiderOwnershipPercent": 58.12,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=68ec66657635d14464d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:03:36.294Z"
+      "reportDate": "Sep 30, 2026",
+      "outstandingShares": 2605910172,
+      "sharesOwnedByPublic": 1090498219,
+      "publicOwnershipPercent": 41.85,
+      "insiderOwnershipPercent": 58.15,
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=a1618625eff53a1a64d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:07:20.162Z"
     },
     "MWIDE": {
       "symbol": "MWIDE",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 2018409718,
-      "sharesOwnedByPublic": 681940660,
-      "publicOwnershipPercent": 33.79,
-      "insiderOwnershipPercent": 66.21,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=3197f873dc0d37df64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:03:36.348Z"
+      "sharesOwnedByPublic": 758614860,
+      "publicOwnershipPercent": 37.58,
+      "insiderOwnershipPercent": 62.42,
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=8971f3a581a6176164d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:07:20.217Z"
     },
     "MYNLD": {
       "symbol": "MYNLD",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 7402603600,
-      "sharesOwnedByPublic": 2144610784,
-      "publicOwnershipPercent": 28.97,
-      "insiderOwnershipPercent": 71.03,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=67e98753f771074c64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:03:36.253Z"
+      "sharesOwnedByPublic": 2145108784,
+      "publicOwnershipPercent": 28.98,
+      "insiderOwnershipPercent": 71.02,
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=9e17e3c51490629464d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:07:20.158Z"
     },
     "NI": {
       "symbol": "NI",
@@ -1752,27 +1752,27 @@
       "publicOwnershipPercent": 31.82,
       "insiderOwnershipPercent": 68.18,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=3bb68564f411807a64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:03:41.384Z"
+      "scrapedAt": "2026-10-18T08:07:25.382Z"
     },
     "NIKL": {
       "symbol": "NIKL",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 13931125094,
-      "sharesOwnedByPublic": 3728481543,
-      "publicOwnershipPercent": 26.76,
-      "insiderOwnershipPercent": 73.24,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=7cb31ba1bd242ea864d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:03:41.405Z"
+      "sharesOwnedByPublic": 3729203978,
+      "publicOwnershipPercent": 26.77,
+      "insiderOwnershipPercent": 73.23,
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=7f5ebf9b72d3fd9464d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:07:25.380Z"
     },
     "NOW": {
       "symbol": "NOW",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 1806726314,
-      "sharesOwnedByPublic": 492844964,
-      "publicOwnershipPercent": 27.28,
-      "insiderOwnershipPercent": 72.72,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=b0af4348a4264cd364d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:03:41.402Z"
+      "sharesOwnedByPublic": 493035964,
+      "publicOwnershipPercent": 27.29,
+      "insiderOwnershipPercent": 72.71,
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=1fdb8215294ab70764d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:07:25.490Z"
     },
     "NRCP": {
       "symbol": "NRCP",
@@ -1782,17 +1782,17 @@
       "publicOwnershipPercent": 47.54,
       "insiderOwnershipPercent": 52.46,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=9788453093882f3b64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:03:46.441Z"
+      "scrapedAt": "2026-10-18T08:07:30.617Z"
     },
     "NXGEN": {
       "symbol": "NXGEN",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 104013225,
       "sharesOwnedByPublic": 33836623,
       "publicOwnershipPercent": 32.53,
       "insiderOwnershipPercent": 67.47,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=760f3e7f13bc1f7164d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:03:46.475Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=42180b91d54c3b8864d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:07:30.819Z"
     },
     "OGP": {
       "symbol": "OGP",
@@ -1802,47 +1802,47 @@
       "publicOwnershipPercent": 20,
       "insiderOwnershipPercent": 80,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=3fa97830cfa7ee9264d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:03:46.444Z"
+      "scrapedAt": "2026-10-18T08:07:30.620Z"
     },
     "OM": {
       "symbol": "OM",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 1050461673,
       "sharesOwnedByPublic": 836368590,
       "publicOwnershipPercent": 79.619,
       "insiderOwnershipPercent": 20.38,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=48494f6e4021d41964d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:03:51.442Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=1c13a6e996c532da64d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:07:35.995Z"
     },
     "OPM": {
       "symbol": "OPM",
-      "reportDate": "Jun 30, 2026",
-      "outstandingShares": 115174500000,
-      "sharesOwnedByPublic": 116230379953,
-      "publicOwnershipPercent": 59.91,
-      "insiderOwnershipPercent": 40.09,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=2b781696053478ec64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:03:51.472Z"
+      "reportDate": "Sep 30, 2026",
+      "outstandingShares": 113592500000,
+      "sharesOwnedByPublic": 114219079953,
+      "publicOwnershipPercent": 59.49,
+      "insiderOwnershipPercent": 40.51,
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=4500db3bbe3d6f4b64d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:07:36.026Z"
     },
     "ORE": {
       "symbol": "ORE",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 2878500005,
       "sharesOwnedByPublic": 1275543803,
       "publicOwnershipPercent": 44.31,
       "insiderOwnershipPercent": 55.69,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=5332647b300a7fe764d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:03:51.543Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=1dc0a563f566c6da64d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:07:36.017Z"
     },
     "OV": {
       "symbol": "OV",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 191868805358,
-      "sharesOwnedByPublic": 89959607505,
+      "sharesOwnedByPublic": 89969241841,
       "publicOwnershipPercent": 46.89,
       "insiderOwnershipPercent": 53.11,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=1b7d3e3c64a2317d64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:03:56.600Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=77de03cd69660a8164d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:07:41.185Z"
     },
     "PA": {
       "symbol": "PA",
@@ -1852,7 +1852,7 @@
       "publicOwnershipPercent": 22.05,
       "insiderOwnershipPercent": 77.95,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=5b2c0243bda491c164d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:03:56.596Z"
+      "scrapedAt": "2026-10-18T08:07:41.225Z"
     },
     "PAL": {
       "symbol": "PAL",
@@ -1862,7 +1862,7 @@
       "publicOwnershipPercent": 22.06,
       "insiderOwnershipPercent": 77.94,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=bafd009e3135fab864d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:03:56.607Z"
+      "scrapedAt": "2026-10-18T08:07:41.255Z"
     },
     "PAX": {
       "symbol": "PAX",
@@ -1872,67 +1872,67 @@
       "publicOwnershipPercent": 14.96,
       "insiderOwnershipPercent": 85.04,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=ff4bbe12882840d164d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:04:01.591Z"
+      "scrapedAt": "2026-10-18T08:07:46.439Z"
     },
     "PBB": {
       "symbol": "PBB",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 818750094,
-      "sharesOwnedByPublic": 247049489,
+      "sharesOwnedByPublic": 247036309,
       "publicOwnershipPercent": 30.17,
       "insiderOwnershipPercent": 69.83,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=09099115b791c65264d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:04:01.662Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=d9cdb2bba230c2f564d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:07:46.450Z"
     },
     "PBC": {
       "symbol": "PBC",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 480645163,
       "sharesOwnedByPublic": 101127750,
       "publicOwnershipPercent": 21.04,
       "insiderOwnershipPercent": 78.96,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=0c3f708c3d30247064d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:04:01.707Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=a5a2a0814056500864d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:07:46.378Z"
     },
     "PCOR": {
       "symbol": "PCOR",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 8911446400,
-      "sharesOwnedByPublic": 2498951561,
+      "sharesOwnedByPublic": 2498892508,
       "publicOwnershipPercent": 28.04,
       "insiderOwnershipPercent": 71.96,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=c111305fd7ddc03d64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:04:06.706Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=5de2cc71409ded3564d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:07:51.742Z"
     },
     "PERC": {
       "symbol": "PERC",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 568711842,
       "sharesOwnedByPublic": 211296149,
       "publicOwnershipPercent": 37.15,
       "insiderOwnershipPercent": 62.85,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=0b22ecdb7c7c2b9964d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:04:06.718Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=8264fb2751702cad64d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:07:51.568Z"
     },
     "PGOLD": {
       "symbol": "PGOLD",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 2880137615,
       "sharesOwnedByPublic": 1001858807,
       "publicOwnershipPercent": 34.79,
       "insiderOwnershipPercent": 65.21,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=e8386913e4cda91664d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:04:06.702Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=4f5aaac724eab07a64d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:07:51.657Z"
     },
     "PHA": {
       "symbol": "PHA",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 5708359504,
       "sharesOwnedByPublic": 2878504061,
       "publicOwnershipPercent": 50.43,
       "insiderOwnershipPercent": 49.57,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=5a4f9062f03169f364d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:04:11.778Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=ef2c5e542d1a182364d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:07:56.922Z"
     },
     "PHC": {
       "symbol": "PHC",
@@ -1942,7 +1942,7 @@
       "publicOwnershipPercent": 10.4,
       "insiderOwnershipPercent": 89.6,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=37bc287c71cc4c5a64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:04:11.789Z"
+      "scrapedAt": "2026-10-18T08:07:56.871Z"
     },
     "PHES": {
       "symbol": "PHES",
@@ -1952,87 +1952,87 @@
       "publicOwnershipPercent": 26.48,
       "insiderOwnershipPercent": 73.52,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=2f48a441ac7e34e364d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:04:11.858Z"
+      "scrapedAt": "2026-10-18T08:07:57.021Z"
     },
     "PHN": {
       "symbol": "PHN",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 336325265,
-      "sharesOwnedByPublic": 68793988,
-      "publicOwnershipPercent": 20.45,
-      "insiderOwnershipPercent": 79.55,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=91d1e9ae84e106bf64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:04:16.858Z"
+      "sharesOwnedByPublic": 69500472,
+      "publicOwnershipPercent": 20.66,
+      "insiderOwnershipPercent": 79.34,
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=d798ac8043da365b64d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:08:02.284Z"
     },
     "PHR": {
       "symbol": "PHR",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 7282017027,
-      "sharesOwnedByPublic": 2059151263,
+      "sharesOwnedByPublic": 2059152263,
       "publicOwnershipPercent": 28.28,
       "insiderOwnershipPercent": 71.72,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=751c9c768888830864d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:04:16.984Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=7af58ee1410e846564d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:08:02.205Z"
     },
     "PIZZA": {
       "symbol": "PIZZA",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 1683760178,
-      "sharesOwnedByPublic": 352584370,
-      "publicOwnershipPercent": 20.94,
-      "insiderOwnershipPercent": 79.06,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=80cc6af3e5e8e85964d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:04:16.866Z"
+      "sharesOwnedByPublic": 352377670,
+      "publicOwnershipPercent": 20.93,
+      "insiderOwnershipPercent": 79.07,
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=7e5b6af6a09ff4ac64d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:08:02.321Z"
     },
     "PLUS": {
       "symbol": "PLUS",
-      "reportDate": "Sep 18, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 4564653946,
       "sharesOwnedByPublic": 2305494171,
       "publicOwnershipPercent": 50.51,
       "insiderOwnershipPercent": 49.49,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=834141c71a503fc164d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:04:22.012Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=bd31e551ee509d5464d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:08:07.569Z"
     },
     "PMPC": {
       "symbol": "PMPC",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 84723432,
       "sharesOwnedByPublic": 63132686,
       "publicOwnershipPercent": 14.93,
       "insiderOwnershipPercent": 85.07,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=b5831297868a8e8264d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:04:22.054Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=78d98bf110ad00cf64d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:08:07.583Z"
     },
     "PNB": {
       "symbol": "PNB",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 1525764850,
-      "sharesOwnedByPublic": 338374132,
+      "sharesOwnedByPublic": 338368212,
       "publicOwnershipPercent": 22.18,
       "insiderOwnershipPercent": 77.82,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=ecdcaba8e139834964d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:04:21.998Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=ce3ee0b8b0aa60df64d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:08:07.544Z"
     },
     "PNC": {
       "symbol": "PNC",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 174444759,
       "sharesOwnedByPublic": 22902078,
       "publicOwnershipPercent": 13.12,
       "insiderOwnershipPercent": 86.88,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=dc8417c3d8a7c19264d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:04:27.061Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=598d571f6cad8f6f64d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:08:14.086Z"
     },
     "PNX": {
       "symbol": "PNX",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 1442866332,
       "sharesOwnedByPublic": 216235430,
       "publicOwnershipPercent": 14.99,
       "insiderOwnershipPercent": 85.01,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=b51c688245c91ccb64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:04:27.098Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=fdd44c3ccf91526464d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:08:12.692Z"
     },
     "PORT": {
       "symbol": "PORT",
@@ -2042,7 +2042,7 @@
       "publicOwnershipPercent": 10,
       "insiderOwnershipPercent": 90,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=36aa1a18d6480fd264d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:04:27.088Z"
+      "scrapedAt": "2026-10-18T08:08:12.758Z"
     },
     "PPC": {
       "symbol": "PPC",
@@ -2052,47 +2052,47 @@
       "publicOwnershipPercent": 72.31,
       "insiderOwnershipPercent": 27.69,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=0945bbab2dd09fb564d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:04:32.114Z"
+      "scrapedAt": "2026-10-18T08:08:21.581Z"
     },
     "PRC": {
       "symbol": "PRC",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 546706156,
       "sharesOwnedByPublic": 315837262,
       "publicOwnershipPercent": 57.77,
       "insiderOwnershipPercent": 42.23,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=21c6b4e16379e70e64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:04:32.116Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=7499fcfd12a5a52864d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:08:19.763Z"
     },
     "PREIT": {
       "symbol": "PREIT",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 3288669000,
       "sharesOwnedByPublic": 1608234000,
       "publicOwnershipPercent": 48.9,
       "insiderOwnershipPercent": 51.1,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=c130f5e57fa4116864d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:04:32.120Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=f191b7885583b46464d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:08:19.706Z"
     },
     "PRIM": {
       "symbol": "PRIM",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 940403854,
-      "sharesOwnedByPublic": 199549864,
+      "sharesOwnedByPublic": 199547866,
       "publicOwnershipPercent": 21.22,
       "insiderOwnershipPercent": 78.78,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=aa00102f9bd5a01a64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:04:37.143Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=1f468186a454a03464d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:08:26.702Z"
     },
     "PRMX": {
       "symbol": "PRMX",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 2303331472,
-      "sharesOwnedByPublic": 554065670,
-      "publicOwnershipPercent": 24.05,
-      "insiderOwnershipPercent": 75.95,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=9d14e502ccc6c83864d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:04:37.174Z"
+      "sharesOwnedByPublic": 555716670,
+      "publicOwnershipPercent": 24.13,
+      "insiderOwnershipPercent": 75.87,
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=d935c530415f06f664d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:08:26.762Z"
     },
     "PSB": {
       "symbol": "PSB",
@@ -2102,17 +2102,17 @@
       "publicOwnershipPercent": 11.61,
       "insiderOwnershipPercent": 88.39,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=eb723feaf3f640de64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:04:37.146Z"
+      "scrapedAt": "2026-10-18T08:08:26.883Z"
     },
     "PSE": {
       "symbol": "PSE",
-      "reportDate": "Jun 30, 2026",
-      "outstandingShares": 82367207,
-      "sharesOwnedByPublic": 53866133,
-      "publicOwnershipPercent": 65.4,
-      "insiderOwnershipPercent": 34.6,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=626070134f6f5c7e64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:04:42.210Z"
+      "reportDate": "Sep 30, 2026",
+      "outstandingShares": 82358139,
+      "sharesOwnedByPublic": 53877130,
+      "publicOwnershipPercent": 65.42,
+      "insiderOwnershipPercent": 34.58,
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=633f2eef807b961064d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:08:32.118Z"
     },
     "PTC": {
       "symbol": "PTC",
@@ -2122,57 +2122,57 @@
       "publicOwnershipPercent": 14.071,
       "insiderOwnershipPercent": 85.93,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=56a55a60e2e31c2164d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:04:42.192Z"
+      "scrapedAt": "2026-10-18T08:08:32.194Z"
     },
     "PTT": {
       "symbol": "PTT",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 1500000000,
       "sharesOwnedByPublic": 239990738,
       "publicOwnershipPercent": 15.99,
       "insiderOwnershipPercent": 84.01,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=ab917c5564dc254764d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:04:42.208Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=aa08acc2b8ab031564d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:08:32.024Z"
     },
     "PX": {
       "symbol": "PX",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 5782399068,
-      "sharesOwnedByPublic": 2102467253,
-      "publicOwnershipPercent": 36.36,
-      "insiderOwnershipPercent": 63.64,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=59f9a9a7b3ebe99c64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:04:47.234Z"
+      "sharesOwnedByPublic": 2103927252,
+      "publicOwnershipPercent": 36.39,
+      "insiderOwnershipPercent": 63.61,
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=ff6f02b5ddcafa1364d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:08:37.459Z"
     },
     "PXP": {
       "symbol": "PXP",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 2390243903,
       "sharesOwnedByPublic": 618357941,
       "publicOwnershipPercent": 25.87,
       "insiderOwnershipPercent": 74.13,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=49e6b2f400ab775264d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:04:47.265Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=f348fb0da601336264d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:08:37.397Z"
     },
     "RCB": {
       "symbol": "RCB",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 2419536530,
-      "sharesOwnedByPublic": 344222229,
-      "publicOwnershipPercent": 14.23,
-      "insiderOwnershipPercent": 85.77,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=0a27098b4cb435a964d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:04:47.304Z"
+      "sharesOwnedByPublic": 344124529,
+      "publicOwnershipPercent": 14.22,
+      "insiderOwnershipPercent": 85.78,
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=f21a17f435620e1164d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:08:37.359Z"
     },
     "RCI": {
       "symbol": "RCI",
-      "reportDate": "Jun 30, 2026",
-      "outstandingShares": 2804237369,
-      "sharesOwnedByPublic": 798483058,
+      "reportDate": "Sep 30, 2026",
+      "outstandingShares": 2804433930,
+      "sharesOwnedByPublic": 798491422,
       "publicOwnershipPercent": 28.47,
       "insiderOwnershipPercent": 71.53,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=f4ef666f5e46d7cd64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:04:52.300Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=2d61b4860ccf38bc64d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:08:42.654Z"
     },
     "RCR": {
       "symbol": "RCR",
@@ -2182,7 +2182,7 @@
       "publicOwnershipPercent": 41.45,
       "insiderOwnershipPercent": 58.55,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=8104f565dc7d4e8564d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:04:52.329Z"
+      "scrapedAt": "2026-10-18T08:08:42.736Z"
     },
     "REDC": {
       "symbol": "REDC",
@@ -2192,7 +2192,7 @@
       "publicOwnershipPercent": 22.31,
       "insiderOwnershipPercent": 77.69,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=6ec3c62ab0f5d88664d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:04:52.351Z"
+      "scrapedAt": "2026-10-18T08:08:42.704Z"
     },
     "REG": {
       "symbol": "REG",
@@ -2202,57 +2202,57 @@
       "publicOwnershipPercent": 22.18,
       "insiderOwnershipPercent": 77.82,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=1f33014700143dd864d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:04:57.369Z"
+      "scrapedAt": "2026-10-18T08:08:47.935Z"
     },
     "RFM": {
       "symbol": "RFM",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 3369549358,
-      "sharesOwnedByPublic": 1447513308,
-      "publicOwnershipPercent": 42.96,
-      "insiderOwnershipPercent": 57.04,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=daf366e00edb9fe064d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:04:57.380Z"
+      "sharesOwnedByPublic": 1446118508,
+      "publicOwnershipPercent": 42.92,
+      "insiderOwnershipPercent": 57.08,
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=9ffe8d081ca1fa2b64d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:08:47.918Z"
     },
     "RLC": {
       "symbol": "RLC",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 4805105288,
-      "sharesOwnedByPublic": 1618472984,
+      "sharesOwnedByPublic": 1618462984,
       "publicOwnershipPercent": 33.68,
       "insiderOwnershipPercent": 66.32,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=b7b97850eeded3a364d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:04:57.409Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=6d4f2efa100d832c64d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:08:47.993Z"
     },
     "RLT": {
       "symbol": "RLT",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 9100102685,
-      "sharesOwnedByPublic": 2628237480,
-      "publicOwnershipPercent": 28.88,
-      "insiderOwnershipPercent": 71.12,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=4f4251956bcab6e164d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:05:02.448Z"
+      "sharesOwnedByPublic": 6806235238,
+      "publicOwnershipPercent": 74.79,
+      "insiderOwnershipPercent": 25.21,
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=1868a7dd9c5e572d64d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:08:53.269Z"
     },
     "ROCK": {
       "symbol": "ROCK",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 6116762198,
-      "sharesOwnedByPublic": 798178285,
+      "sharesOwnedByPublic": 798064405,
       "publicOwnershipPercent": 13.05,
       "insiderOwnershipPercent": 86.95,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=2de4d048ba2704e264d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:05:02.507Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=e09a264ed66faf1164d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:08:53.165Z"
     },
     "ROX": {
       "symbol": "ROX",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 1547935799,
       "sharesOwnedByPublic": 254771960,
       "publicOwnershipPercent": 16.45,
       "insiderOwnershipPercent": 83.55,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=5d99ab76e807bc2964d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:05:02.484Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=82e29a69520925c264d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:08:53.200Z"
     },
     "RRHI": {
       "symbol": "RRHI",
@@ -2262,47 +2262,47 @@
       "publicOwnershipPercent": 0.28,
       "insiderOwnershipPercent": 99.72,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=65e4eed6d1cdd5c364d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:05:07.521Z"
+      "scrapedAt": "2026-10-18T08:08:58.500Z"
     },
     "SBS": {
       "symbol": "SBS",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 1890999999,
       "sharesOwnedByPublic": 450612665,
       "publicOwnershipPercent": 23.83,
       "insiderOwnershipPercent": 76.17,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=d302a1c4b126606f64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:05:07.524Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=fcf5e9a44286349e64d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:08:58.471Z"
     },
     "SCC": {
       "symbol": "SCC",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 4250547620,
       "sharesOwnedByPublic": 1024208319,
       "publicOwnershipPercent": 24.1,
       "insiderOwnershipPercent": 75.9,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=72903f0929d9a1bf64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:05:07.518Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=665eb3e54f41aaec64d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:08:58.535Z"
     },
     "SECB": {
       "symbol": "SECB",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 753538887,
-      "sharesOwnedByPublic": 392514353,
+      "sharesOwnedByPublic": 392514103,
       "publicOwnershipPercent": 52.09,
       "insiderOwnershipPercent": 47.91,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=5a2543a703857dd764d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:05:12.587Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=0e4de7d54984619664d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:09:03.944Z"
     },
     "SEVN": {
       "symbol": "SEVN",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 1512836566,
       "sharesOwnedByPublic": 614923161,
       "publicOwnershipPercent": 40.65,
       "insiderOwnershipPercent": 59.35,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=972313a7b8ad430a64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:05:12.589Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=f72f0048a9f40e6764d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:09:03.653Z"
     },
     "SFI": {
       "symbol": "SFI",
@@ -2312,7 +2312,7 @@
       "publicOwnershipPercent": 99.79,
       "insiderOwnershipPercent": 0.21,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=62934083b8371fd164d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:05:12.648Z"
+      "scrapedAt": "2026-10-18T08:09:03.647Z"
     },
     "SGI": {
       "symbol": "SGI",
@@ -2322,37 +2322,37 @@
       "publicOwnershipPercent": 25.74,
       "insiderOwnershipPercent": 74.26,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=febdaf459dda54cf64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:05:17.693Z"
+      "scrapedAt": "2026-10-18T08:09:09.131Z"
     },
     "SGP": {
       "symbol": "SGP",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 5265866000,
       "sharesOwnedByPublic": 1165133229,
       "publicOwnershipPercent": 22.13,
       "insiderOwnershipPercent": 77.87,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=72b854043b04471164d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:05:17.721Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=37b07a431bd2cec264d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:09:09.129Z"
     },
     "SHLPH": {
       "symbol": "SHLPH",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 1613444202,
-      "sharesOwnedByPublic": 384362920,
-      "publicOwnershipPercent": 23.822,
-      "insiderOwnershipPercent": 76.18,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=d271fa7a297aa34d64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:05:17.685Z"
+      "sharesOwnedByPublic": 398131821,
+      "publicOwnershipPercent": 24.68,
+      "insiderOwnershipPercent": 75.32,
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=7ce97d752a7e952764d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:09:09.161Z"
     },
     "SHNG": {
       "symbol": "SHNG",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 4764056287,
       "sharesOwnedByPublic": 1648288271,
       "publicOwnershipPercent": 34.6,
       "insiderOwnershipPercent": 65.4,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=6ed154d817626ae664d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:05:22.771Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=cd1b9578cf70bf6764d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:09:14.322Z"
     },
     "SLF": {
       "error": "no_disclosure_found"
@@ -2365,7 +2365,7 @@
       "publicOwnershipPercent": 19.21,
       "insiderOwnershipPercent": 80.79,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=4500b8af1f525bda64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:05:22.729Z"
+      "scrapedAt": "2026-10-18T08:09:14.460Z"
     },
     "SM": {
       "symbol": "SM",
@@ -2375,27 +2375,27 @@
       "publicOwnershipPercent": 46.49,
       "insiderOwnershipPercent": 53.51,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=66954c206b2c968c64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:05:27.830Z"
+      "scrapedAt": "2026-10-18T08:09:19.647Z"
     },
     "SMC": {
       "symbol": "SMC",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 2383896588,
-      "sharesOwnedByPublic": 490885751,
-      "publicOwnershipPercent": 20.59,
-      "insiderOwnershipPercent": 79.41,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=f1db2bcb84beb5ee64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:05:27.827Z"
+      "sharesOwnedByPublic": 493196721,
+      "publicOwnershipPercent": 20.69,
+      "insiderOwnershipPercent": 79.31,
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=e6c31445433f6f1664d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:09:19.644Z"
     },
     "SMPH": {
       "symbol": "SMPH",
-      "reportDate": "Jun 30, 2026",
-      "outstandingShares": 28640323894,
-      "sharesOwnedByPublic": 10498244479,
-      "publicOwnershipPercent": 36.66,
-      "insiderOwnershipPercent": 63.34,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=651ee6c697c7538c64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:05:27.796Z"
+      "reportDate": "Sep 30, 2026",
+      "outstandingShares": 28450129294,
+      "sharesOwnedByPublic": 10308049879,
+      "publicOwnershipPercent": 36.23,
+      "insiderOwnershipPercent": 63.77,
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=64cc3d9172fca74e64d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:09:19.759Z"
     },
     "SOC": {
       "symbol": "SOC",
@@ -2405,77 +2405,77 @@
       "publicOwnershipPercent": 23.68,
       "insiderOwnershipPercent": 76.32,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=4563586d68d0e2a364d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:05:32.871Z"
+      "scrapedAt": "2026-10-18T08:09:24.890Z"
     },
     "SPC": {
       "symbol": "SPC",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 1496551803,
       "sharesOwnedByPublic": 198851627,
       "publicOwnershipPercent": 13.29,
       "insiderOwnershipPercent": 86.71,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=cf274141ca78075064d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:05:32.931Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=6f38752e2537991b64d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:09:24.882Z"
     },
     "SPM": {
       "symbol": "SPM",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 133074040,
       "sharesOwnedByPublic": 71270636,
-      "publicOwnershipPercent": 53.55,
-      "insiderOwnershipPercent": 46.45,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=860f58b49c4dd55e64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:05:32.878Z"
+      "publicOwnershipPercent": 53.56,
+      "insiderOwnershipPercent": 46.44,
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=ddfb96827af50ff164d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:09:24.929Z"
     },
     "SPNEC": {
       "symbol": "SPNEC",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 50073050000,
-      "sharesOwnedByPublic": 10017152996,
-      "publicOwnershipPercent": 20.005,
-      "insiderOwnershipPercent": 80,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=3ac20f1807d01ca664d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:05:37.971Z"
+      "sharesOwnedByPublic": 12416720996,
+      "publicOwnershipPercent": 24.8,
+      "insiderOwnershipPercent": 75.2,
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=5bc532a38c8965e364d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:09:30.148Z"
     },
     "SRDC": {
       "symbol": "SRDC",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 110000000,
       "sharesOwnedByPublic": 58780000,
       "publicOwnershipPercent": 53.44,
       "insiderOwnershipPercent": 46.56,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=c52244fe15e6de9f64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:05:37.969Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=b7eed006201a3c3564d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:09:30.193Z"
     },
     "SSI": {
       "symbol": "SSI",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 3270177930,
-      "sharesOwnedByPublic": 924139020,
-      "publicOwnershipPercent": 28.26,
-      "insiderOwnershipPercent": 71.74,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=66af4bbcf3c0d84f64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:05:37.962Z"
+      "sharesOwnedByPublic": 924803982,
+      "publicOwnershipPercent": 28.28,
+      "insiderOwnershipPercent": 71.72,
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=5bd530bd4300728064d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:09:30.091Z"
     },
     "STI": {
       "symbol": "STI",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 9904806924,
       "sharesOwnedByPublic": 3337524687,
       "publicOwnershipPercent": 33.7,
       "insiderOwnershipPercent": 66.3,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=ec72bf8c1a0cd14764d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:05:42.997Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=4b58bed05445df0f64d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:09:35.350Z"
     },
     "STN": {
       "symbol": "STN",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 1576460000,
       "sharesOwnedByPublic": 454173359,
       "publicOwnershipPercent": 28.81,
       "insiderOwnershipPercent": 71.19,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=a69c9312e06a081064d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:05:43.032Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=9ff27617d6a6ab8d64d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:09:35.502Z"
     },
     "STR": {
       "symbol": "STR",
@@ -2485,37 +2485,37 @@
       "publicOwnershipPercent": 10.3,
       "insiderOwnershipPercent": 89.7,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=79327eb674642e6864d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:05:43.019Z"
+      "scrapedAt": "2026-10-18T08:09:35.360Z"
     },
     "SUN": {
       "symbol": "SUN",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 7250000000,
       "sharesOwnedByPublic": 3552494999,
       "publicOwnershipPercent": 49,
       "insiderOwnershipPercent": 51,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=f1665c8721233ccc64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:05:48.019Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=b4b33ff8f3d4fa6e64d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:09:40.661Z"
     },
     "T": {
       "symbol": "T",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 1690000000,
       "sharesOwnedByPublic": 272999395,
       "publicOwnershipPercent": 16.15,
       "insiderOwnershipPercent": 83.85,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=a4a7e44f4d4b5ecb64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:05:48.072Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=7b7474cbee8a58fe64d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:09:40.726Z"
     },
     "TBGI": {
       "symbol": "TBGI",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 3795622000,
       "sharesOwnedByPublic": 1386504930,
       "publicOwnershipPercent": 36.53,
       "insiderOwnershipPercent": 63.47,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=afeeee52b21de33264d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:05:48.079Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=d5ab3a3a169f09de64d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:09:40.686Z"
     },
     "TECH": {
       "symbol": "TECH",
@@ -2525,17 +2525,17 @@
       "publicOwnershipPercent": 69.13,
       "insiderOwnershipPercent": 30.87,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=5a7f8e35f4029a6864d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:05:53.075Z"
+      "scrapedAt": "2026-10-18T08:09:45.928Z"
     },
     "TEL": {
       "symbol": "TEL",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 216055775,
-      "sharesOwnedByPublic": 90931854,
-      "publicOwnershipPercent": 42.09,
-      "insiderOwnershipPercent": 57.91,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=f567a32cd96ee0c164d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:05:53.128Z"
+      "sharesOwnedByPublic": 90913944,
+      "publicOwnershipPercent": 42.08,
+      "insiderOwnershipPercent": 57.92,
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=f7b3e5ef6ea9966064d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:09:45.909Z"
     },
     "TFC": {
       "symbol": "TFC",
@@ -2545,37 +2545,37 @@
       "publicOwnershipPercent": 55.51,
       "insiderOwnershipPercent": 44.49,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=62860a48f38d4be864d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:05:53.116Z"
+      "scrapedAt": "2026-10-18T08:09:45.952Z"
     },
     "TFHI": {
       "symbol": "TFHI",
-      "reportDate": "Aug 31, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 377886167,
-      "sharesOwnedByPublic": 39933844,
+      "sharesOwnedByPublic": 39930648,
       "publicOwnershipPercent": 10.57,
       "insiderOwnershipPercent": 89.43,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=4a446b0bbcb2140264d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:05:58.199Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=e72a63b98b91a29164d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:09:51.174Z"
     },
     "TOP": {
       "symbol": "TOP",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 10742193000,
       "sharesOwnedByPublic": 2817325000,
       "publicOwnershipPercent": 26.23,
       "insiderOwnershipPercent": 73.77,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=173bacec6262f3ee64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:05:58.205Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=563e40bd7af2eb3764d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:09:51.123Z"
     },
     "TUGS": {
       "symbol": "TUGS",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 894586870,
       "sharesOwnedByPublic": 270148740,
       "publicOwnershipPercent": 30.198,
       "insiderOwnershipPercent": 69.8,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=d4713587bca03ec064d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:05:58.168Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=ecb229a6b864adad64d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:09:51.222Z"
     },
     "UBP": {
       "symbol": "UBP",
@@ -2585,17 +2585,17 @@
       "publicOwnershipPercent": 17.12,
       "insiderOwnershipPercent": 82.88,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=81b328996508b98764d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:06:03.245Z"
+      "scrapedAt": "2026-10-18T08:09:56.376Z"
     },
     "UNH": {
       "symbol": "UNH",
-      "reportDate": "Aug 31, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 70765401,
       "sharesOwnedByPublic": 2067842,
       "publicOwnershipPercent": 2.92,
       "insiderOwnershipPercent": 97.08,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=50028a679ec583e864d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:06:03.235Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=9e143dd146769bc764d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:09:56.424Z"
     },
     "UPM": {
       "symbol": "UPM",
@@ -2605,7 +2605,7 @@
       "publicOwnershipPercent": 20.56,
       "insiderOwnershipPercent": 79.44,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=33808bf58626528664d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:06:03.206Z"
+      "scrapedAt": "2026-10-18T08:09:56.384Z"
     },
     "UPSON": {
       "symbol": "UPSON",
@@ -2615,27 +2615,27 @@
       "publicOwnershipPercent": 25.63,
       "insiderOwnershipPercent": 74.37,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=3365f117bf331d0464d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:06:08.303Z"
+      "scrapedAt": "2026-10-18T08:10:01.718Z"
     },
     "URC": {
       "symbol": "URC",
-      "reportDate": "Jun 30, 2026",
-      "outstandingShares": 2134781038,
-      "sharesOwnedByPublic": 909030809,
-      "publicOwnershipPercent": 42.58,
-      "insiderOwnershipPercent": 57.42,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=45808fed148c3b6564d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:06:08.319Z"
+      "reportDate": "Sep 30, 2026",
+      "outstandingShares": 2121528998,
+      "sharesOwnedByPublic": 895397004,
+      "publicOwnershipPercent": 42.21,
+      "insiderOwnershipPercent": 57.79,
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=135f4bcebafaaa8e64d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:10:01.688Z"
     },
     "V": {
       "symbol": "V",
-      "reportDate": "Jun 30, 2026",
-      "outstandingShares": 4199582266,
-      "sharesOwnedByPublic": 1250975380,
-      "publicOwnershipPercent": 29.79,
-      "insiderOwnershipPercent": 70.21,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=0dba0ff7e1234a6764d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:06:08.305Z"
+      "reportDate": "Sep 30, 2026",
+      "outstandingShares": 4167633266,
+      "sharesOwnedByPublic": 844612004,
+      "publicOwnershipPercent": 20.27,
+      "insiderOwnershipPercent": 79.73,
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=168886862dbfbb1c64d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:10:01.586Z"
     },
     "VITA": {
       "symbol": "VITA",
@@ -2645,7 +2645,7 @@
       "publicOwnershipPercent": 25.19,
       "insiderOwnershipPercent": 74.81,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=f3ca85944708612864d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:06:13.343Z"
+      "scrapedAt": "2026-10-18T08:10:06.930Z"
     },
     "VLC": {
       "symbol": "VLC",
@@ -2655,27 +2655,27 @@
       "publicOwnershipPercent": 11.38,
       "insiderOwnershipPercent": 88.62,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=8ff22e52f0d22cb764d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:06:13.346Z"
+      "scrapedAt": "2026-10-18T08:10:06.960Z"
     },
     "VLL": {
       "symbol": "VLL",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 12698007676,
       "sharesOwnedByPublic": 3068185829,
       "publicOwnershipPercent": 24.16,
       "insiderOwnershipPercent": 75.84,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=091e7af41797807964d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:06:13.358Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=f2806eb11704e85664d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:10:06.924Z"
     },
     "VMC": {
       "symbol": "VMC",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 5484101128,
       "sharesOwnedByPublic": 1373447596,
       "publicOwnershipPercent": 25.04,
       "insiderOwnershipPercent": 74.96,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=2aa71dfa37130a6564d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:06:18.392Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=e5656de22fc94e3e64d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:10:12.187Z"
     },
     "VREIT": {
       "symbol": "VREIT",
@@ -2685,17 +2685,17 @@
       "publicOwnershipPercent": 35.29,
       "insiderOwnershipPercent": 64.71,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=e9c77ac5cffb1a5064d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:06:18.377Z"
+      "scrapedAt": "2026-10-18T08:10:12.290Z"
     },
     "VVT": {
       "symbol": "VVT",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 1023456698,
-      "sharesOwnedByPublic": 246807846,
-      "publicOwnershipPercent": 24.115,
-      "insiderOwnershipPercent": 75.89,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=2a9167e33b5e1e2564d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:06:18.374Z"
+      "sharesOwnedByPublic": 246817112,
+      "publicOwnershipPercent": 24.116,
+      "insiderOwnershipPercent": 75.88,
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=4e3e0cc4ab32d73664d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:10:12.153Z"
     },
     "WEB": {
       "symbol": "WEB",
@@ -2705,7 +2705,7 @@
       "publicOwnershipPercent": 27.59,
       "insiderOwnershipPercent": 72.41,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=d89846e71b508a5264d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:06:23.434Z"
+      "scrapedAt": "2026-10-18T08:10:17.428Z"
     },
     "WIN": {
       "symbol": "WIN",
@@ -2715,7 +2715,7 @@
       "publicOwnershipPercent": 43.28,
       "insiderOwnershipPercent": 56.72,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=fbeeffafa5cf1b5f64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:06:23.422Z"
+      "scrapedAt": "2026-10-18T08:10:17.557Z"
     },
     "WLCON": {
       "symbol": "WLCON",
@@ -2725,27 +2725,27 @@
       "publicOwnershipPercent": 32.78,
       "insiderOwnershipPercent": 67.22,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=4ca9ce1d018ee2fd64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:06:23.488Z"
+      "scrapedAt": "2026-10-18T08:10:17.482Z"
     },
     "WPI": {
       "symbol": "WPI",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 2498991753,
-      "sharesOwnedByPublic": 1360156423,
+      "sharesOwnedByPublic": 1360155423,
       "publicOwnershipPercent": 54.42,
       "insiderOwnershipPercent": 45.58,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=d47879ac299987d864d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:06:28.538Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=8ed49af42526e36164d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:10:22.787Z"
     },
     "X": {
       "symbol": "X",
-      "reportDate": "Aug 28, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 2713603812,
       "sharesOwnedByPublic": 802415776,
       "publicOwnershipPercent": 29.57,
       "insiderOwnershipPercent": 70.43,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=f0b543b2eca2df2e64d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:06:28.541Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=00fb45341f24b60f64d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:10:22.782Z"
     },
     "XG": {
       "symbol": "XG",
@@ -2755,17 +2755,17 @@
       "publicOwnershipPercent": 21.14,
       "insiderOwnershipPercent": 78.86,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=9b525468417eaaa364d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:06:28.530Z"
+      "scrapedAt": "2026-10-18T08:10:22.743Z"
     },
     "ZHI": {
       "symbol": "ZHI",
-      "reportDate": "Jun 30, 2026",
+      "reportDate": "Sep 30, 2026",
       "outstandingShares": 2737044807,
       "sharesOwnedByPublic": 1607217487,
       "publicOwnershipPercent": 58.72,
       "insiderOwnershipPercent": 41.28,
-      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=c5e1e15ffd66b00664d70b69f0a3140b",
-      "scrapedAt": "2026-10-11T10:06:33.576Z"
+      "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=33140ee193753cd264d70b69f0a3140b",
+      "scrapedAt": "2026-10-18T08:10:28.005Z"
     }
   }
 }

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-11T10:06:41.731Z",
+  "generatedAt": "2026-10-18T08:10:35.938Z",
   "source": "edge.pse.com.ph",
   "totalCompanies": 283,
   "sectorBreakdown": {
@@ -7,10 +7,10 @@
     "Mining and Oil": 24,
     "Services": 62,
     "Industrial": 74,
+    "ETF": 1,
     "Property": 50,
     "Financials": 31,
     "Small, Medium & Emerging Board": 9,
-    "ETF": 1,
     "PROPERTY": 1
   },
   "results": {
@@ -112,6 +112,16 @@
       "cmpyId": 121,
       "securityId": 170,
       "listingDate": "Apr 12, 1993",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "AETF": {
+      "symbol": "AETF",
+      "companyName": "ATR FAMI Philippine Equity Exchange Traded Fund, Inc.",
+      "sector": "ETF",
+      "subsector": "ETF-Equity",
+      "cmpyId": 649,
+      "securityId": 592,
+      "listingDate": "Dec 02, 2013",
       "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
     },
     "AEV": {
@@ -1042,16 +1052,6 @@
       "cmpyId": 226,
       "securityId": 302,
       "listingDate": "Oct 25, 1993",
-      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
-    },
-    "FMETF": {
-      "symbol": "FMETF",
-      "companyName": "ATR FAMI Philippine Equity Exchange Traded Fund, Inc.",
-      "sector": "ETF",
-      "subsector": "ETF-Equity",
-      "cmpyId": 649,
-      "securityId": 592,
-      "listingDate": "Dec 02, 2013",
       "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
     },
     "FNI": {
