@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-18T08:13:10.023Z",
+  "generatedAt": "2026-10-25T08:34:31.389Z",
   "source": "edge.pse.com.ph",
   "totalDisclosures": 2232,
   "companiesWithDisclosures": 279,
@@ -452,6 +452,15 @@
       {
         "symbol": "AC",
         "companyName": "AC",
+        "formType": "14-1",
+        "title": "Notice of Analysts'/Investors' Briefing",
+        "filingDate": "Oct 21, 2026 07:54 AM",
+        "edgeNo": "1405214af049a32164d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=1405214af049a32164d70b69f0a3140b"
+      },
+      {
+        "symbol": "AC",
+        "companyName": "AC",
         "formType": "17-12-B",
         "title": "List of Top 100 Stockholders (Preferred Shares)",
         "filingDate": "Oct 16, 2026 09:55 AM",
@@ -511,15 +520,6 @@
         "filingDate": "Oct 06, 2026 04:13 PM",
         "edgeNo": "9f45da75e159152964d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=9f45da75e159152964d70b69f0a3140b"
-      },
-      {
-        "symbol": "AC",
-        "companyName": "AC",
-        "formType": "17-5",
-        "title": "Information Statement",
-        "filingDate": "Oct 06, 2026 02:19 PM",
-        "edgeNo": "ba00192a1d41d17964d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=ba00192a1d41d17964d70b69f0a3140b"
       }
     ],
     "ACE": [
@@ -600,6 +600,15 @@
       {
         "symbol": "ACEN",
         "companyName": "ACEN",
+        "formType": "4-31",
+        "title": "Press Release",
+        "filingDate": "Oct 19, 2026 03:16 PM",
+        "edgeNo": "cd07cf7a2348dfc464d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=cd07cf7a2348dfc464d70b69f0a3140b"
+      },
+      {
+        "symbol": "ACEN",
+        "companyName": "ACEN",
         "formType": "4-2",
         "title": "Acquisition or Disposition of Shares of Another Corporation",
         "filingDate": "Oct 16, 2026 12:49 PM",
@@ -659,15 +668,6 @@
         "filingDate": "Oct 09, 2026 11:08 AM",
         "edgeNo": "4107a191483640f564d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=4107a191483640f564d70b69f0a3140b"
-      },
-      {
-        "symbol": "ACEN",
-        "companyName": "ACEN",
-        "formType": "17-7",
-        "title": "Statement of Changes in Beneficial Ownership of Securities",
-        "filingDate": "Oct 09, 2026 11:08 AM",
-        "edgeNo": "0336bb7340dca4f764d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=0336bb7340dca4f764d70b69f0a3140b"
       }
     ],
     "ACR": [
@@ -896,6 +896,15 @@
       {
         "symbol": "ALCO",
         "companyName": "ALCO",
+        "formType": "6-1",
+        "title": "Declaration of Cash Dividends",
+        "filingDate": "Oct 22, 2026 08:07 AM",
+        "edgeNo": "dcb60a235e76181964d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=dcb60a235e76181964d70b69f0a3140b"
+      },
+      {
+        "symbol": "ALCO",
+        "companyName": "ALCO",
         "formType": "POR-1",
         "title": "Public Ownership Report",
         "filingDate": "Oct 15, 2026 12:09 PM",
@@ -955,15 +964,6 @@
         "filingDate": "Sep 25, 2026 04:07 PM",
         "edgeNo": "465cdb7fc170402e64d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=465cdb7fc170402e64d70b69f0a3140b"
-      },
-      {
-        "symbol": "ALCO",
-        "companyName": "ALCO",
-        "formType": "16-1",
-        "title": "Update on Corporate Actions/Material Transactions/Agreements",
-        "filingDate": "Sep 25, 2026 03:06 PM",
-        "edgeNo": "694805038fa596dd64d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=694805038fa596dd64d70b69f0a3140b"
       }
     ],
     "ALHI": [
@@ -1192,6 +1192,15 @@
       {
         "symbol": "ALLHC",
         "companyName": "ALLHC",
+        "formType": "17-18",
+        "title": "[Amend-1]Other SEC Forms, Reports and Requirements",
+        "filingDate": "Oct 21, 2026 08:02 AM",
+        "edgeNo": "eac1710ab9c1e7a664d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=eac1710ab9c1e7a664d70b69f0a3140b"
+      },
+      {
+        "symbol": "ALLHC",
+        "companyName": "ALLHC",
         "formType": "17-12-A",
         "title": "List of Top 100 Stockholders (Common Shares)",
         "filingDate": "Oct 15, 2026 05:22 PM",
@@ -1251,15 +1260,6 @@
         "filingDate": "Aug 11, 2026 11:00 AM",
         "edgeNo": "91ef052f3d268f7264d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=91ef052f3d268f7264d70b69f0a3140b"
-      },
-      {
-        "symbol": "ALLHC",
-        "companyName": "ALLHC",
-        "formType": "17-12-A",
-        "title": "List of Top 100 Stockholders (Common Shares)",
-        "filingDate": "Jul 15, 2026 05:07 PM",
-        "edgeNo": "0f48c0779b5bd90764d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=0f48c0779b5bd90764d70b69f0a3140b"
       }
     ],
     "ALTER": [
@@ -1564,6 +1564,24 @@
         "companyName": "APC",
         "formType": "17-18",
         "title": "Other SEC Forms, Reports and Requirements",
+        "filingDate": "Oct 21, 2026 01:49 PM",
+        "edgeNo": "b3773d637e49187864d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=b3773d637e49187864d70b69f0a3140b"
+      },
+      {
+        "symbol": "APC",
+        "companyName": "APC",
+        "formType": "17-18",
+        "title": "Other SEC Forms, Reports and Requirements",
+        "filingDate": "Oct 19, 2026 02:52 PM",
+        "edgeNo": "983c3105e484ff8264d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=983c3105e484ff8264d70b69f0a3140b"
+      },
+      {
+        "symbol": "APC",
+        "companyName": "APC",
+        "formType": "17-18",
+        "title": "Other SEC Forms, Reports and Requirements",
         "filingDate": "Oct 14, 2026 09:50 AM",
         "edgeNo": "194a026f7aa8f07e64d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=194a026f7aa8f07e64d70b69f0a3140b"
@@ -1612,24 +1630,6 @@
         "filingDate": "Jul 07, 2026 10:27 AM",
         "edgeNo": "76278db41a63829164d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=76278db41a63829164d70b69f0a3140b"
-      },
-      {
-        "symbol": "APC",
-        "companyName": "APC",
-        "formType": "POR-1",
-        "title": "Public Ownership Report",
-        "filingDate": "Jul 06, 2026 05:12 PM",
-        "edgeNo": "c73ba61551e26ba164d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=c73ba61551e26ba164d70b69f0a3140b"
-      },
-      {
-        "symbol": "APC",
-        "companyName": "APC",
-        "formType": "17-12-A",
-        "title": "List of Top 100 Stockholders (Common Shares)",
-        "filingDate": "Jul 06, 2026 03:57 PM",
-        "edgeNo": "f3e9ccd7c970116464d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=f3e9ccd7c970116464d70b69f0a3140b"
       }
     ],
     "APL": [
@@ -1858,6 +1858,15 @@
       {
         "symbol": "APX",
         "companyName": "APX",
+        "formType": "4-30",
+        "title": "Material Information/Transactions",
+        "filingDate": "Oct 20, 2026 11:47 AM",
+        "edgeNo": "44a6bb301a5a3c8364d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=44a6bb301a5a3c8364d70b69f0a3140b"
+      },
+      {
+        "symbol": "APX",
+        "companyName": "APX",
         "formType": "POR-1",
         "title": "Public Ownership Report",
         "filingDate": "Oct 14, 2026 01:18 PM",
@@ -1917,19 +1926,37 @@
         "filingDate": "Jul 15, 2026 02:37 PM",
         "edgeNo": "76657ccfe8bdbb0064d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=76657ccfe8bdbb0064d70b69f0a3140b"
-      },
-      {
-        "symbol": "APX",
-        "companyName": "APX",
-        "formType": "POR-1",
-        "title": "Public Ownership Report",
-        "filingDate": "Jul 15, 2026 11:10 AM",
-        "edgeNo": "dfe162f1e35ae6b264d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=dfe162f1e35ae6b264d70b69f0a3140b"
       }
     ],
     "AR": [],
     "ARA": [
+      {
+        "symbol": "ARA",
+        "companyName": "ARA",
+        "formType": "4-30",
+        "title": "Material Information/Transactions",
+        "filingDate": "Oct 22, 2026 02:57 PM",
+        "edgeNo": "fccd8af414bb322f64d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=fccd8af414bb322f64d70b69f0a3140b"
+      },
+      {
+        "symbol": "ARA",
+        "companyName": "ARA",
+        "formType": "7-1",
+        "title": "[Amend-2]Notice of Annual or Special Stockholders' Meeting",
+        "filingDate": "Oct 22, 2026 12:38 PM",
+        "edgeNo": "c653098c296a9e0164d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=c653098c296a9e0164d70b69f0a3140b"
+      },
+      {
+        "symbol": "ARA",
+        "companyName": "ARA",
+        "formType": "7-2",
+        "title": "Postponement of Annual Stockholders' Meeting",
+        "filingDate": "Oct 22, 2026 12:37 PM",
+        "edgeNo": "c7397003d56d393364d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=c7397003d56d393364d70b69f0a3140b"
+      },
       {
         "symbol": "ARA",
         "companyName": "ARA",
@@ -1974,33 +2001,6 @@
         "filingDate": "Aug 24, 2026 02:52 PM",
         "edgeNo": "ddfa0ef56392db8964d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=ddfa0ef56392db8964d70b69f0a3140b"
-      },
-      {
-        "symbol": "ARA",
-        "companyName": "ARA",
-        "formType": "17-2",
-        "title": "Quarterly Report",
-        "filingDate": "Aug 14, 2026 03:26 PM",
-        "edgeNo": "c7ea3f393af8aa8464d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=c7ea3f393af8aa8464d70b69f0a3140b"
-      },
-      {
-        "symbol": "ARA",
-        "companyName": "ARA",
-        "formType": "7-1",
-        "title": "Notice of Annual or Special Stockholders' Meeting",
-        "filingDate": "Aug 13, 2026 03:46 PM",
-        "edgeNo": "b2bbfa9ffda1102764d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=b2bbfa9ffda1102764d70b69f0a3140b"
-      },
-      {
-        "symbol": "ARA",
-        "companyName": "ARA",
-        "formType": "4-4",
-        "title": "Amendments to By-Laws",
-        "filingDate": "Aug 13, 2026 03:45 PM",
-        "edgeNo": "247e641ade351d6c64d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=247e641ade351d6c64d70b69f0a3140b"
       }
     ],
     "AREIT": [
@@ -2081,6 +2081,24 @@
       {
         "symbol": "ASLAG",
         "companyName": "ASLAG",
+        "formType": "17-18",
+        "title": "Other SEC Forms, Reports and Requirements",
+        "filingDate": "Oct 22, 2026 11:34 AM",
+        "edgeNo": "94c9e0ed3a65296764d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=94c9e0ed3a65296764d70b69f0a3140b"
+      },
+      {
+        "symbol": "ASLAG",
+        "companyName": "ASLAG",
+        "formType": "17-18",
+        "title": "Other SEC Forms, Reports and Requirements",
+        "filingDate": "Oct 21, 2026 08:03 AM",
+        "edgeNo": "c3a53d2ef5f1f71964d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=c3a53d2ef5f1f71964d70b69f0a3140b"
+      },
+      {
+        "symbol": "ASLAG",
+        "companyName": "ASLAG",
         "formType": "17-12-B",
         "title": "List of Top 100 Stockholders (Preferred Shares)",
         "filingDate": "Oct 15, 2026 01:46 PM",
@@ -2131,27 +2149,27 @@
         "filingDate": "Oct 09, 2026 08:10 AM",
         "edgeNo": "851fd5f10c57e90764d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=851fd5f10c57e90764d70b69f0a3140b"
-      },
-      {
-        "symbol": "ASLAG",
-        "companyName": "ASLAG",
-        "formType": "17-18",
-        "title": "Other SEC Forms, Reports and Requirements",
-        "filingDate": "Oct 09, 2026 08:09 AM",
-        "edgeNo": "ab34f83e390df51a64d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=ab34f83e390df51a64d70b69f0a3140b"
-      },
-      {
-        "symbol": "ASLAG",
-        "companyName": "ASLAG",
-        "formType": "17-18",
-        "title": "Other SEC Forms, Reports and Requirements",
-        "filingDate": "Oct 05, 2026 01:09 PM",
-        "edgeNo": "b447562c5317e7b464d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=b447562c5317e7b464d70b69f0a3140b"
       }
     ],
     "AT": [
+      {
+        "symbol": "AT",
+        "companyName": "AT",
+        "formType": "6-1",
+        "title": "Declaration of Cash Dividends",
+        "filingDate": "Oct 19, 2026 08:10 AM",
+        "edgeNo": "7bceb31f6f38c23664d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=7bceb31f6f38c23664d70b69f0a3140b"
+      },
+      {
+        "symbol": "AT",
+        "companyName": "AT",
+        "formType": "4-30",
+        "title": "Material Information/Transactions",
+        "filingDate": "Oct 19, 2026 08:09 AM",
+        "edgeNo": "db2802b8412a712564d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=db2802b8412a712564d70b69f0a3140b"
+      },
       {
         "symbol": "AT",
         "companyName": "AT",
@@ -2205,24 +2223,6 @@
         "filingDate": "Sep 10, 2026 08:05 AM",
         "edgeNo": "14153b70ccab1d0064d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=14153b70ccab1d0064d70b69f0a3140b"
-      },
-      {
-        "symbol": "AT",
-        "companyName": "AT",
-        "formType": "17-7",
-        "title": "Statement of Changes in Beneficial Ownership of Securities",
-        "filingDate": "Aug 27, 2026 10:29 AM",
-        "edgeNo": "c9c751d71983a70364d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=c9c751d71983a70364d70b69f0a3140b"
-      },
-      {
-        "symbol": "AT",
-        "companyName": "AT",
-        "formType": "17-7",
-        "title": "Statement of Changes in Beneficial Ownership of Securities",
-        "filingDate": "Aug 27, 2026 07:33 AM",
-        "edgeNo": "d4d6f05ce426529d64d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=d4d6f05ce426529d64d70b69f0a3140b"
       }
     ],
     "ATN": [
@@ -2673,6 +2673,33 @@
       {
         "symbol": "BDO",
         "companyName": "BDO",
+        "formType": "14-1",
+        "title": "Notice of Analysts'/Investors' Briefing",
+        "filingDate": "Oct 19, 2026 11:19 AM",
+        "edgeNo": "9b30bae38cf0373964d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=9b30bae38cf0373964d70b69f0a3140b"
+      },
+      {
+        "symbol": "BDO",
+        "companyName": "BDO",
+        "formType": "13-1",
+        "title": "Change in Shareholdings of Directors and Principal Officers",
+        "filingDate": "Oct 19, 2026 10:23 AM",
+        "edgeNo": "8fbc790c6b53488f64d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=8fbc790c6b53488f64d70b69f0a3140b"
+      },
+      {
+        "symbol": "BDO",
+        "companyName": "BDO",
+        "formType": "13-1",
+        "title": "Change in Shareholdings of Directors and Principal Officers",
+        "filingDate": "Oct 19, 2026 08:18 AM",
+        "edgeNo": "0e8e956ff532f14a64d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=0e8e956ff532f14a64d70b69f0a3140b"
+      },
+      {
+        "symbol": "BDO",
+        "companyName": "BDO",
         "formType": "17-18",
         "title": "[Amend-9]Other SEC Forms, Reports and Requirements",
         "filingDate": "Oct 13, 2026 08:24 AM",
@@ -2714,36 +2741,36 @@
         "filingDate": "Oct 12, 2026 09:26 AM",
         "edgeNo": "ab6673170f8b197664d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=ab6673170f8b197664d70b69f0a3140b"
-      },
-      {
-        "symbol": "BDO",
-        "companyName": "BDO",
-        "formType": "4-11",
-        "title": "Change in Number of Issued and/or Outstanding Shares",
-        "filingDate": "Oct 12, 2026 09:16 AM",
-        "edgeNo": "f82b42dd03b9fe9764d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=f82b42dd03b9fe9764d70b69f0a3140b"
-      },
-      {
-        "symbol": "BDO",
-        "companyName": "BDO",
-        "formType": "17-7",
-        "title": "Statement of Changes in Beneficial Ownership of Securities",
-        "filingDate": "Oct 08, 2026 11:18 AM",
-        "edgeNo": "42cea1227f48055664d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=42cea1227f48055664d70b69f0a3140b"
-      },
-      {
-        "symbol": "BDO",
-        "companyName": "BDO",
-        "formType": "17-7",
-        "title": "Statement of Changes in Beneficial Ownership of Securities",
-        "filingDate": "Oct 08, 2026 11:17 AM",
-        "edgeNo": "cbcdf7992f60c16664d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=cbcdf7992f60c16664d70b69f0a3140b"
       }
     ],
     "BEL": [
+      {
+        "symbol": "BEL",
+        "companyName": "BEL",
+        "formType": "17-18",
+        "title": "Other SEC Forms, Reports and Requirements",
+        "filingDate": "Oct 22, 2026 02:51 PM",
+        "edgeNo": "8a9c6f78d44e57bb64d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=8a9c6f78d44e57bb64d70b69f0a3140b"
+      },
+      {
+        "symbol": "BEL",
+        "companyName": "BEL",
+        "formType": "17-7",
+        "title": "Statement of Changes in Beneficial Ownership of Securities",
+        "filingDate": "Oct 21, 2026 09:37 AM",
+        "edgeNo": "f5d7d05cd98e7acd64d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=f5d7d05cd98e7acd64d70b69f0a3140b"
+      },
+      {
+        "symbol": "BEL",
+        "companyName": "BEL",
+        "formType": "17-18",
+        "title": "Other SEC Forms, Reports and Requirements",
+        "filingDate": "Oct 20, 2026 09:59 AM",
+        "edgeNo": "0fb37ef75075f4b364d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=0fb37ef75075f4b364d70b69f0a3140b"
+      },
       {
         "symbol": "BEL",
         "companyName": "BEL",
@@ -2788,33 +2815,6 @@
         "filingDate": "Oct 07, 2026 08:14 AM",
         "edgeNo": "e67b2208b52b656664d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=e67b2208b52b656664d70b69f0a3140b"
-      },
-      {
-        "symbol": "BEL",
-        "companyName": "BEL",
-        "formType": "17-7",
-        "title": "Statement of Changes in Beneficial Ownership of Securities",
-        "filingDate": "Oct 05, 2026 03:05 PM",
-        "edgeNo": "a360aba01e71ce1364d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=a360aba01e71ce1364d70b69f0a3140b"
-      },
-      {
-        "symbol": "BEL",
-        "companyName": "BEL",
-        "formType": "17-7",
-        "title": "Statement of Changes in Beneficial Ownership of Securities",
-        "filingDate": "Oct 01, 2026 10:03 AM",
-        "edgeNo": "e448555086f66ebd64d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=e448555086f66ebd64d70b69f0a3140b"
-      },
-      {
-        "symbol": "BEL",
-        "companyName": "BEL",
-        "formType": "17-18",
-        "title": "Other SEC Forms, Reports and Requirements",
-        "filingDate": "Oct 01, 2026 08:06 AM",
-        "edgeNo": "66e560599a536d1864d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=66e560599a536d1864d70b69f0a3140b"
       }
     ],
     "BH": [
@@ -2895,6 +2895,24 @@
       {
         "symbol": "BHI",
         "companyName": "BHI",
+        "formType": "17-7",
+        "title": "Statement of Changes in Beneficial Ownership of Securities",
+        "filingDate": "Oct 21, 2026 01:49 PM",
+        "edgeNo": "1a1c8eaabb34e45564d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=1a1c8eaabb34e45564d70b69f0a3140b"
+      },
+      {
+        "symbol": "BHI",
+        "companyName": "BHI",
+        "formType": "17-7",
+        "title": "Statement of Changes in Beneficial Ownership of Securities",
+        "filingDate": "Oct 21, 2026 01:47 PM",
+        "edgeNo": "eb9e6d325643c2f464d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=eb9e6d325643c2f464d70b69f0a3140b"
+      },
+      {
+        "symbol": "BHI",
+        "companyName": "BHI",
         "formType": "7-2",
         "title": "Postponement of Annual Stockholders' Meeting",
         "filingDate": "Oct 16, 2026 02:05 PM",
@@ -2945,24 +2963,6 @@
         "filingDate": "Oct 14, 2026 02:41 PM",
         "edgeNo": "49596582bea8a68b64d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=49596582bea8a68b64d70b69f0a3140b"
-      },
-      {
-        "symbol": "BHI",
-        "companyName": "BHI",
-        "formType": "17-7",
-        "title": "Statement of Changes in Beneficial Ownership of Securities",
-        "filingDate": "Oct 06, 2026 02:22 PM",
-        "edgeNo": "fd165a959636fb5164d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=fd165a959636fb5164d70b69f0a3140b"
-      },
-      {
-        "symbol": "BHI",
-        "companyName": "BHI",
-        "formType": "17-7",
-        "title": "Statement of Changes in Beneficial Ownership of Securities",
-        "filingDate": "Oct 06, 2026 02:20 PM",
-        "edgeNo": "3ced96414d0bae6764d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=3ced96414d0bae6764d70b69f0a3140b"
       }
     ],
     "BLOOM": [
@@ -3191,6 +3191,51 @@
       {
         "symbol": "BPI",
         "companyName": "BPI",
+        "formType": "4-30",
+        "title": "Material Information/Transactions",
+        "filingDate": "Oct 22, 2026 08:07 AM",
+        "edgeNo": "b4917a4c1f4c1d9964d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=b4917a4c1f4c1d9964d70b69f0a3140b"
+      },
+      {
+        "symbol": "BPI",
+        "companyName": "BPI",
+        "formType": "4-31",
+        "title": "Press Release",
+        "filingDate": "Oct 22, 2026 08:07 AM",
+        "edgeNo": "809a85ec0c8abe9364d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=809a85ec0c8abe9364d70b69f0a3140b"
+      },
+      {
+        "symbol": "BPI",
+        "companyName": "BPI",
+        "formType": "4-30",
+        "title": "Material Information/Transactions",
+        "filingDate": "Oct 22, 2026 08:06 AM",
+        "edgeNo": "5e74bef94ee8af4064d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=5e74bef94ee8af4064d70b69f0a3140b"
+      },
+      {
+        "symbol": "BPI",
+        "companyName": "BPI",
+        "formType": "4-31",
+        "title": "Press Release",
+        "filingDate": "Oct 22, 2026 08:06 AM",
+        "edgeNo": "0146ef5f2556d2be64d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=0146ef5f2556d2be64d70b69f0a3140b"
+      },
+      {
+        "symbol": "BPI",
+        "companyName": "BPI",
+        "formType": "14-1",
+        "title": "Notice of Analysts'/Investors' Briefing",
+        "filingDate": "Oct 19, 2026 09:45 AM",
+        "edgeNo": "50a8a192ab34856664d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=50a8a192ab34856664d70b69f0a3140b"
+      },
+      {
+        "symbol": "BPI",
+        "companyName": "BPI",
         "formType": "POR-1",
         "title": "Public Ownership Report",
         "filingDate": "Oct 15, 2026 01:11 PM",
@@ -3214,51 +3259,6 @@
         "filingDate": "Oct 08, 2026 10:09 AM",
         "edgeNo": "915d9e5bab9243b064d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=915d9e5bab9243b064d70b69f0a3140b"
-      },
-      {
-        "symbol": "BPI",
-        "companyName": "BPI",
-        "formType": "17-18",
-        "title": "[Amend-5]Other SEC Forms, Reports and Requirements",
-        "filingDate": "Oct 08, 2026 08:35 AM",
-        "edgeNo": "391523b842e6514564d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=391523b842e6514564d70b69f0a3140b"
-      },
-      {
-        "symbol": "BPI",
-        "companyName": "BPI",
-        "formType": "17-6",
-        "title": "Initial Statement of Beneficial Ownership of Securities",
-        "filingDate": "Oct 02, 2026 08:27 AM",
-        "edgeNo": "1d7d28027a5923e364d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=1d7d28027a5923e364d70b69f0a3140b"
-      },
-      {
-        "symbol": "BPI",
-        "companyName": "BPI",
-        "formType": "17-6",
-        "title": "Initial Statement of Beneficial Ownership of Securities",
-        "filingDate": "Sep 21, 2026 01:54 PM",
-        "edgeNo": "b4258f11ec66095864d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=b4258f11ec66095864d70b69f0a3140b"
-      },
-      {
-        "symbol": "BPI",
-        "companyName": "BPI",
-        "formType": "17-6",
-        "title": "Initial Statement of Beneficial Ownership of Securities",
-        "filingDate": "Sep 18, 2026 03:06 PM",
-        "edgeNo": "35614f00f3b1ef4964d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=35614f00f3b1ef4964d70b69f0a3140b"
-      },
-      {
-        "symbol": "BPI",
-        "companyName": "BPI",
-        "formType": "17-7",
-        "title": "Statement of Changes in Beneficial Ownership of Securities",
-        "filingDate": "Sep 11, 2026 02:28 PM",
-        "edgeNo": "88e84e983a8ae55364d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=88e84e983a8ae55364d70b69f0a3140b"
       }
     ],
     "BRN": [
@@ -3637,6 +3637,15 @@
         "companyName": "CBC",
         "formType": "13-1",
         "title": "Change in Shareholdings of Directors and Principal Officers",
+        "filingDate": "Oct 22, 2026 08:21 AM",
+        "edgeNo": "4c4eeb0df5f2afd864d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=4c4eeb0df5f2afd864d70b69f0a3140b"
+      },
+      {
+        "symbol": "CBC",
+        "companyName": "CBC",
+        "formType": "13-1",
+        "title": "Change in Shareholdings of Directors and Principal Officers",
         "filingDate": "Oct 16, 2026 08:47 AM",
         "edgeNo": "51122980b4519ab064d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=51122980b4519ab064d70b69f0a3140b"
@@ -3694,15 +3703,6 @@
         "filingDate": "Oct 08, 2026 07:57 AM",
         "edgeNo": "5c4968a7841b3e9064d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=5c4968a7841b3e9064d70b69f0a3140b"
-      },
-      {
-        "symbol": "CBC",
-        "companyName": "CBC",
-        "formType": "4-30",
-        "title": "Material Information/Transactions",
-        "filingDate": "Oct 08, 2026 07:37 AM",
-        "edgeNo": "543e03ac92999d7864d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=543e03ac92999d7864d70b69f0a3140b"
       }
     ],
     "CDC": [
@@ -3785,72 +3785,72 @@
         "companyName": "CEB",
         "formType": "9-1",
         "title": "Share Buy-Back Transactions",
+        "filingDate": "Oct 23, 2026 07:46 AM",
+        "edgeNo": "d9d1294ce579509464d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=d9d1294ce579509464d70b69f0a3140b"
+      },
+      {
+        "symbol": "CEB",
+        "companyName": "CEB",
+        "formType": "9-1",
+        "title": "Share Buy-Back Transactions",
+        "filingDate": "Oct 23, 2026 07:45 AM",
+        "edgeNo": "5fdec62074ceda0264d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=5fdec62074ceda0264d70b69f0a3140b"
+      },
+      {
+        "symbol": "CEB",
+        "companyName": "CEB",
+        "formType": "9-1",
+        "title": "Share Buy-Back Transactions",
+        "filingDate": "Oct 22, 2026 07:56 AM",
+        "edgeNo": "8c022f1468b4f9d564d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=8c022f1468b4f9d564d70b69f0a3140b"
+      },
+      {
+        "symbol": "CEB",
+        "companyName": "CEB",
+        "formType": "9-1",
+        "title": "Share Buy-Back Transactions",
+        "filingDate": "Oct 21, 2026 07:49 AM",
+        "edgeNo": "be91a6f2ab455fef64d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=be91a6f2ab455fef64d70b69f0a3140b"
+      },
+      {
+        "symbol": "CEB",
+        "companyName": "CEB",
+        "formType": "9-1",
+        "title": "Share Buy-Back Transactions",
+        "filingDate": "Oct 20, 2026 07:36 AM",
+        "edgeNo": "baa5dcf966858dc364d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=baa5dcf966858dc364d70b69f0a3140b"
+      },
+      {
+        "symbol": "CEB",
+        "companyName": "CEB",
+        "formType": "9-1",
+        "title": "Share Buy-Back Transactions",
+        "filingDate": "Oct 19, 2026 07:52 AM",
+        "edgeNo": "f82f1393476b39e364d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=f82f1393476b39e364d70b69f0a3140b"
+      },
+      {
+        "symbol": "CEB",
+        "companyName": "CEB",
+        "formType": "9-1",
+        "title": "Share Buy-Back Transactions",
+        "filingDate": "Oct 19, 2026 07:50 AM",
+        "edgeNo": "702529b03926566c64d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=702529b03926566c64d70b69f0a3140b"
+      },
+      {
+        "symbol": "CEB",
+        "companyName": "CEB",
+        "formType": "9-1",
+        "title": "Share Buy-Back Transactions",
         "filingDate": "Oct 16, 2026 08:42 AM",
         "edgeNo": "ff47802d451c825364d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=ff47802d451c825364d70b69f0a3140b"
-      },
-      {
-        "symbol": "CEB",
-        "companyName": "CEB",
-        "formType": "9-1",
-        "title": "Share Buy-Back Transactions",
-        "filingDate": "Oct 16, 2026 08:40 AM",
-        "edgeNo": "a281ace6799b2bc664d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=a281ace6799b2bc664d70b69f0a3140b"
-      },
-      {
-        "symbol": "CEB",
-        "companyName": "CEB",
-        "formType": "4-31",
-        "title": "Press Release",
-        "filingDate": "Oct 15, 2026 01:35 PM",
-        "edgeNo": "87bd358ab58b3b3d64d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=87bd358ab58b3b3d64d70b69f0a3140b"
-      },
-      {
-        "symbol": "CEB",
-        "companyName": "CEB",
-        "formType": "9-1",
-        "title": "Share Buy-Back Transactions",
-        "filingDate": "Oct 15, 2026 07:40 AM",
-        "edgeNo": "b4d37787d02ed78f64d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=b4d37787d02ed78f64d70b69f0a3140b"
-      },
-      {
-        "symbol": "CEB",
-        "companyName": "CEB",
-        "formType": "9-1",
-        "title": "Share Buy-Back Transactions",
-        "filingDate": "Oct 14, 2026 07:48 AM",
-        "edgeNo": "d81b486ac563786e64d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=d81b486ac563786e64d70b69f0a3140b"
-      },
-      {
-        "symbol": "CEB",
-        "companyName": "CEB",
-        "formType": "9-1",
-        "title": "Share Buy-Back Transactions",
-        "filingDate": "Oct 13, 2026 08:03 AM",
-        "edgeNo": "41e71738449cf67864d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=41e71738449cf67864d70b69f0a3140b"
-      },
-      {
-        "symbol": "CEB",
-        "companyName": "CEB",
-        "formType": "9-1",
-        "title": "Share Buy-Back Transactions",
-        "filingDate": "Oct 13, 2026 08:01 AM",
-        "edgeNo": "1c16a537a61367f464d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=1c16a537a61367f464d70b69f0a3140b"
-      },
-      {
-        "symbol": "CEB",
-        "companyName": "CEB",
-        "formType": "9-1",
-        "title": "Share Buy-Back Transactions",
-        "filingDate": "Oct 12, 2026 08:13 AM",
-        "edgeNo": "f0e3b59bc33795db64d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=f0e3b59bc33795db64d70b69f0a3140b"
       }
     ],
     "CEI": [
@@ -4079,6 +4079,15 @@
       {
         "symbol": "CIC",
         "companyName": "CIC",
+        "formType": "14-1",
+        "title": "Notice of Analysts'/Investors' Briefing",
+        "filingDate": "Oct 20, 2026 12:14 PM",
+        "edgeNo": "feb1d625d4bb691364d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=feb1d625d4bb691364d70b69f0a3140b"
+      },
+      {
+        "symbol": "CIC",
+        "companyName": "CIC",
         "formType": "17-12-A",
         "title": "List of Top 100 Stockholders (Common Shares)",
         "filingDate": "Oct 15, 2026 09:15 AM",
@@ -4138,18 +4147,36 @@
         "filingDate": "Jul 28, 2026 11:00 AM",
         "edgeNo": "d0670d2e3110463164d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=d0670d2e3110463164d70b69f0a3140b"
-      },
-      {
-        "symbol": "CIC",
-        "companyName": "CIC",
-        "formType": "17-2",
-        "title": "Quarterly Report",
-        "filingDate": "Jul 24, 2026 03:26 PM",
-        "edgeNo": "542ae7d1e3bba95764d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=542ae7d1e3bba95764d70b69f0a3140b"
       }
     ],
     "CLI": [
+      {
+        "symbol": "CLI",
+        "companyName": "CLI",
+        "formType": "4-30",
+        "title": "Material Information/Transactions",
+        "filingDate": "Oct 23, 2026 03:21 PM",
+        "edgeNo": "2aac263adeb2bfd964d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=2aac263adeb2bfd964d70b69f0a3140b"
+      },
+      {
+        "symbol": "CLI",
+        "companyName": "CLI",
+        "formType": "4-30",
+        "title": "Material Information/Transactions",
+        "filingDate": "Oct 23, 2026 01:19 PM",
+        "edgeNo": "cee0d85df77d1b4964d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=cee0d85df77d1b4964d70b69f0a3140b"
+      },
+      {
+        "symbol": "CLI",
+        "companyName": "CLI",
+        "formType": "4-31",
+        "title": "Press Release",
+        "filingDate": "Oct 23, 2026 01:18 PM",
+        "edgeNo": "49e6ae86ee25723a64d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=49e6ae86ee25723a64d70b69f0a3140b"
+      },
       {
         "symbol": "CLI",
         "companyName": "CLI",
@@ -4194,36 +4221,27 @@
         "filingDate": "Oct 13, 2026 10:00 AM",
         "edgeNo": "5752c80a06746e8c64d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=5752c80a06746e8c64d70b69f0a3140b"
-      },
-      {
-        "symbol": "CLI",
-        "companyName": "CLI",
-        "formType": "4-31",
-        "title": "Press Release",
-        "filingDate": "Oct 13, 2026 09:55 AM",
-        "edgeNo": "7044c986cfb2558964d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=7044c986cfb2558964d70b69f0a3140b"
-      },
-      {
-        "symbol": "CLI",
-        "companyName": "CLI",
-        "formType": "17-18",
-        "title": "[Amend-2]Other SEC Forms, Reports and Requirements",
-        "filingDate": "Sep 22, 2026 03:16 PM",
-        "edgeNo": "1c3327ff51c84ad664d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=1c3327ff51c84ad664d70b69f0a3140b"
-      },
-      {
-        "symbol": "CLI",
-        "companyName": "CLI",
-        "formType": "17-6",
-        "title": "Initial Statement of Beneficial Ownership of Securities",
-        "filingDate": "Sep 22, 2026 10:49 AM",
-        "edgeNo": "e5ca321c19ab0ea564d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=e5ca321c19ab0ea564d70b69f0a3140b"
       }
     ],
     "CNPF": [
+      {
+        "symbol": "CNPF",
+        "companyName": "CNPF",
+        "formType": "4-31",
+        "title": "Press Release",
+        "filingDate": "Oct 20, 2026 02:42 PM",
+        "edgeNo": "b3bc331a016e2dc964d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=b3bc331a016e2dc964d70b69f0a3140b"
+      },
+      {
+        "symbol": "CNPF",
+        "companyName": "CNPF",
+        "formType": "17-6",
+        "title": "Initial Statement of Beneficial Ownership of Securities",
+        "filingDate": "Oct 20, 2026 08:41 AM",
+        "edgeNo": "beced6af2b23ed9664d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=beced6af2b23ed9664d70b69f0a3140b"
+      },
       {
         "symbol": "CNPF",
         "companyName": "CNPF",
@@ -4277,27 +4295,18 @@
         "filingDate": "Aug 06, 2026 11:20 AM",
         "edgeNo": "3884ad9712e1e43864d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=3884ad9712e1e43864d70b69f0a3140b"
-      },
-      {
-        "symbol": "CNPF",
-        "companyName": "CNPF",
-        "formType": "14-1",
-        "title": "Notice of Analysts'/Investors' Briefing",
-        "filingDate": "Aug 04, 2026 06:46 AM",
-        "edgeNo": "39c7ab005e3874b664d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=39c7ab005e3874b664d70b69f0a3140b"
-      },
-      {
-        "symbol": "CNPF",
-        "companyName": "CNPF",
-        "formType": "17-7",
-        "title": "Statement of Changes in Beneficial Ownership of Securities",
-        "filingDate": "Jul 30, 2026 01:09 PM",
-        "edgeNo": "5f20abe283ac8a0a64d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=5f20abe283ac8a0a64d70b69f0a3140b"
       }
     ],
     "CNVRG": [
+      {
+        "symbol": "CNVRG",
+        "companyName": "CNVRG",
+        "formType": "14-1",
+        "title": "Notice of Analysts'/Investors' Briefing",
+        "filingDate": "Oct 22, 2026 08:05 AM",
+        "edgeNo": "2fcebe8c01195e8664d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=2fcebe8c01195e8664d70b69f0a3140b"
+      },
       {
         "symbol": "CNVRG",
         "companyName": "CNVRG",
@@ -4360,15 +4369,6 @@
         "filingDate": "Sep 21, 2026 08:04 AM",
         "edgeNo": "cd4eb6f86bbd3daa64d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=cd4eb6f86bbd3daa64d70b69f0a3140b"
-      },
-      {
-        "symbol": "CNVRG",
-        "companyName": "CNVRG",
-        "formType": "9-1",
-        "title": "Share Buy-Back Transactions",
-        "filingDate": "Sep 11, 2026 03:44 PM",
-        "edgeNo": "3f32565da93bbc1964d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=3f32565da93bbc1964d70b69f0a3140b"
       }
     ],
     "COL": [
@@ -4449,6 +4449,33 @@
       {
         "symbol": "COSCO",
         "companyName": "COSCO",
+        "formType": "9-1",
+        "title": "Share Buy-Back Transactions",
+        "filingDate": "Oct 22, 2026 07:54 AM",
+        "edgeNo": "65bf14bec32ca3ee64d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=65bf14bec32ca3ee64d70b69f0a3140b"
+      },
+      {
+        "symbol": "COSCO",
+        "companyName": "COSCO",
+        "formType": "9-1",
+        "title": "Share Buy-Back Transactions",
+        "filingDate": "Oct 21, 2026 07:46 AM",
+        "edgeNo": "92a0ebcd5d90b57e64d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=92a0ebcd5d90b57e64d70b69f0a3140b"
+      },
+      {
+        "symbol": "COSCO",
+        "companyName": "COSCO",
+        "formType": "9-1",
+        "title": "Share Buy-Back Transactions",
+        "filingDate": "Oct 20, 2026 07:33 AM",
+        "edgeNo": "1e33c3b862220b2164d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=1e33c3b862220b2164d70b69f0a3140b"
+      },
+      {
+        "symbol": "COSCO",
+        "companyName": "COSCO",
         "formType": "POR-1",
         "title": "Public Ownership Report",
         "filingDate": "Oct 13, 2026 04:09 PM",
@@ -4490,33 +4517,6 @@
         "filingDate": "Oct 09, 2026 07:56 AM",
         "edgeNo": "05accb2919d9958564d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=05accb2919d9958564d70b69f0a3140b"
-      },
-      {
-        "symbol": "COSCO",
-        "companyName": "COSCO",
-        "formType": "9-1",
-        "title": "Share Buy-Back Transactions",
-        "filingDate": "Oct 08, 2026 07:44 AM",
-        "edgeNo": "5b351a531fb5c54464d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=5b351a531fb5c54464d70b69f0a3140b"
-      },
-      {
-        "symbol": "COSCO",
-        "companyName": "COSCO",
-        "formType": "17-8",
-        "title": "Report by Owner of More Than Five Percent",
-        "filingDate": "Oct 06, 2026 04:17 PM",
-        "edgeNo": "6deaf0f6b7d851da64d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=6deaf0f6b7d851da64d70b69f0a3140b"
-      },
-      {
-        "symbol": "COSCO",
-        "companyName": "COSCO",
-        "formType": "9-1",
-        "title": "Share Buy-Back Transactions",
-        "filingDate": "Oct 06, 2026 07:46 AM",
-        "edgeNo": "2d8518a23728b02a64d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=2d8518a23728b02a64d70b69f0a3140b"
       }
     ],
     "CPG": [
@@ -4819,6 +4819,24 @@
       {
         "symbol": "CROWN",
         "companyName": "CROWN",
+        "formType": "17-7",
+        "title": "Statement of Changes in Beneficial Ownership of Securities",
+        "filingDate": "Oct 23, 2026 11:53 AM",
+        "edgeNo": "0f745667fd3c239264d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=0f745667fd3c239264d70b69f0a3140b"
+      },
+      {
+        "symbol": "CROWN",
+        "companyName": "CROWN",
+        "formType": "17-7",
+        "title": "Statement of Changes in Beneficial Ownership of Securities",
+        "filingDate": "Oct 21, 2026 04:00 PM",
+        "edgeNo": "4fa2325bcfe26b2064d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=4fa2325bcfe26b2064d70b69f0a3140b"
+      },
+      {
+        "symbol": "CROWN",
+        "companyName": "CROWN",
         "formType": "17-12-A",
         "title": "List of Top 100 Stockholders (Common Shares)",
         "filingDate": "Oct 15, 2026 11:16 AM",
@@ -4869,27 +4887,18 @@
         "filingDate": "Oct 05, 2026 02:47 PM",
         "edgeNo": "d4db4c9b7153e6f864d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=d4db4c9b7153e6f864d70b69f0a3140b"
-      },
-      {
-        "symbol": "CROWN",
-        "companyName": "CROWN",
-        "formType": "17-18",
-        "title": "Other SEC Forms, Reports and Requirements",
-        "filingDate": "Sep 23, 2026 08:02 AM",
-        "edgeNo": "e005c365449f462664d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=e005c365449f462664d70b69f0a3140b"
-      },
-      {
-        "symbol": "CROWN",
-        "companyName": "CROWN",
-        "formType": "17-7",
-        "title": "Statement of Changes in Beneficial Ownership of Securities",
-        "filingDate": "Sep 18, 2026 03:53 PM",
-        "edgeNo": "5600a64ab7e8caa864d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=5600a64ab7e8caa864d70b69f0a3140b"
       }
     ],
     "CSB": [
+      {
+        "symbol": "CSB",
+        "companyName": "CSB",
+        "formType": "4-30",
+        "title": "Material Information/Transactions",
+        "filingDate": "Oct 23, 2026 12:39 PM",
+        "edgeNo": "df587d889aacecec64d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=df587d889aacecec64d70b69f0a3140b"
+      },
       {
         "symbol": "CSB",
         "companyName": "CSB",
@@ -4952,18 +4961,27 @@
         "filingDate": "Aug 27, 2026 09:01 AM",
         "edgeNo": "e36010b315b4c38e64d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=e36010b315b4c38e64d70b69f0a3140b"
-      },
-      {
-        "symbol": "CSB",
-        "companyName": "CSB",
-        "formType": "4-30",
-        "title": "Material Information/Transactions",
-        "filingDate": "Aug 27, 2026 07:42 AM",
-        "edgeNo": "772d2b94c878095164d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=772d2b94c878095164d70b69f0a3140b"
       }
     ],
     "CTS": [
+      {
+        "symbol": "CTS",
+        "companyName": "CTS",
+        "formType": "13-1",
+        "title": "Change in Shareholdings of Directors and Principal Officers",
+        "filingDate": "Oct 19, 2026 12:29 PM",
+        "edgeNo": "77a10cce881701e964d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=77a10cce881701e964d70b69f0a3140b"
+      },
+      {
+        "symbol": "CTS",
+        "companyName": "CTS",
+        "formType": "13-1",
+        "title": "Change in Shareholdings of Directors and Principal Officers",
+        "filingDate": "Oct 19, 2026 12:28 PM",
+        "edgeNo": "98110b20cba6ee6464d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=98110b20cba6ee6464d70b69f0a3140b"
+      },
       {
         "symbol": "CTS",
         "companyName": "CTS",
@@ -5017,24 +5035,6 @@
         "filingDate": "Sep 25, 2026 01:51 PM",
         "edgeNo": "1abe8dbf6eda5d4564d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=1abe8dbf6eda5d4564d70b69f0a3140b"
-      },
-      {
-        "symbol": "CTS",
-        "companyName": "CTS",
-        "formType": "17-18",
-        "title": "Other SEC Forms, Reports and Requirements",
-        "filingDate": "Sep 23, 2026 07:47 AM",
-        "edgeNo": "b9a1a33fa1754d5a64d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=b9a1a33fa1754d5a64d70b69f0a3140b"
-      },
-      {
-        "symbol": "CTS",
-        "companyName": "CTS",
-        "formType": "17-7",
-        "title": "Statement of Changes in Beneficial Ownership of Securities",
-        "filingDate": "Sep 09, 2026 09:41 AM",
-        "edgeNo": "63753e805fe7507064d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=63753e805fe7507064d70b69f0a3140b"
       }
     ],
     "CYBR": [
@@ -5115,6 +5115,24 @@
       {
         "symbol": "DD",
         "companyName": "DD",
+        "formType": "4-30",
+        "title": "Material Information/Transactions",
+        "filingDate": "Oct 21, 2026 07:53 AM",
+        "edgeNo": "c372de42d2d2dc2f64d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=c372de42d2d2dc2f64d70b69f0a3140b"
+      },
+      {
+        "symbol": "DD",
+        "companyName": "DD",
+        "formType": "4-31",
+        "title": "Press Release",
+        "filingDate": "Oct 21, 2026 07:52 AM",
+        "edgeNo": "b70fcc730cc4d50764d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=b70fcc730cc4d50764d70b69f0a3140b"
+      },
+      {
+        "symbol": "DD",
+        "companyName": "DD",
         "formType": "17-12-A",
         "title": "List of Top 100 Stockholders (Common Shares)",
         "filingDate": "Oct 16, 2026 11:47 AM",
@@ -5165,24 +5183,6 @@
         "filingDate": "Aug 17, 2026 08:42 AM",
         "edgeNo": "7a263ba201096d9764d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=7a263ba201096d9764d70b69f0a3140b"
-      },
-      {
-        "symbol": "DD",
-        "companyName": "DD",
-        "formType": "4-31",
-        "title": "Press Release",
-        "filingDate": "Aug 17, 2026 08:42 AM",
-        "edgeNo": "68534b34b580f73c64d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=68534b34b580f73c64d70b69f0a3140b"
-      },
-      {
-        "symbol": "DD",
-        "companyName": "DD",
-        "formType": "17-4",
-        "title": "Request for extension to file SEC Form 17-Q",
-        "filingDate": "Aug 17, 2026 08:41 AM",
-        "edgeNo": "08f35f1d96c35ddb64d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=08f35f1d96c35ddb64d70b69f0a3140b"
       }
     ],
     "DDMPR": [
@@ -5485,6 +5485,51 @@
       {
         "symbol": "DITO",
         "companyName": "DITO",
+        "formType": "17-7",
+        "title": "Statement of Changes in Beneficial Ownership of Securities",
+        "filingDate": "Oct 23, 2026 12:40 PM",
+        "edgeNo": "7acc2dbb76f7c63f64d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=7acc2dbb76f7c63f64d70b69f0a3140b"
+      },
+      {
+        "symbol": "DITO",
+        "companyName": "DITO",
+        "formType": "4-25",
+        "title": "[Amend-1]Results of Organizational Meeting of Board of Directors",
+        "filingDate": "Oct 22, 2026 08:28 AM",
+        "edgeNo": "278e70d220bb992364d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=278e70d220bb992364d70b69f0a3140b"
+      },
+      {
+        "symbol": "DITO",
+        "companyName": "DITO",
+        "formType": "4-8",
+        "title": "Change in Directors and/or Officers (Resignation, Removal or Appointment, Election and/or Promotion)",
+        "filingDate": "Oct 22, 2026 08:27 AM",
+        "edgeNo": "9f42585b1011082a64d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=9f42585b1011082a64d70b69f0a3140b"
+      },
+      {
+        "symbol": "DITO",
+        "companyName": "DITO",
+        "formType": "4-25",
+        "title": "Results of Organizational Meeting of Board of Directors",
+        "filingDate": "Oct 22, 2026 08:10 AM",
+        "edgeNo": "cc11ffb8b914353964d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=cc11ffb8b914353964d70b69f0a3140b"
+      },
+      {
+        "symbol": "DITO",
+        "companyName": "DITO",
+        "formType": "4-24",
+        "title": "Results of Annual or Special Stockholders' Meeting",
+        "filingDate": "Oct 22, 2026 08:09 AM",
+        "edgeNo": "68ce9fc7a39dd84f64d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=68ce9fc7a39dd84f64d70b69f0a3140b"
+      },
+      {
+        "symbol": "DITO",
+        "companyName": "DITO",
         "formType": "POR-1",
         "title": "Public Ownership Report",
         "filingDate": "Oct 13, 2026 08:24 AM",
@@ -5508,54 +5553,27 @@
         "filingDate": "Oct 02, 2026 11:24 AM",
         "edgeNo": "f688b1bf30a3e7ac64d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=f688b1bf30a3e7ac64d70b69f0a3140b"
-      },
-      {
-        "symbol": "DITO",
-        "companyName": "DITO",
-        "formType": "4-13",
-        "title": "[Amend-1]Clarification of News Reports",
-        "filingDate": "Sep 29, 2026 01:34 PM",
-        "edgeNo": "f972488eb94287c064d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=f972488eb94287c064d70b69f0a3140b"
-      },
-      {
-        "symbol": "DITO",
-        "companyName": "DITO",
-        "formType": "17-5",
-        "title": "Information Statement",
-        "filingDate": "Sep 29, 2026 12:12 PM",
-        "edgeNo": "0ca563bb2fe0f18f64d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=0ca563bb2fe0f18f64d70b69f0a3140b"
-      },
-      {
-        "symbol": "DITO",
-        "companyName": "DITO",
-        "formType": "4-13",
-        "title": "Clarification of News Reports",
-        "filingDate": "Sep 28, 2026 11:21 AM",
-        "edgeNo": "40e56c837a24c8d664d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=40e56c837a24c8d664d70b69f0a3140b"
-      },
-      {
-        "symbol": "DITO",
-        "companyName": "DITO",
-        "formType": "17-5",
-        "title": "Information Statement",
-        "filingDate": "Sep 18, 2026 07:54 AM",
-        "edgeNo": "c71c3f3b2b8bb49c64d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=c71c3f3b2b8bb49c64d70b69f0a3140b"
-      },
-      {
-        "symbol": "DITO",
-        "companyName": "DITO",
-        "formType": "7-1",
-        "title": "Notice of Annual or Special Stockholders' Meeting",
-        "filingDate": "Sep 15, 2026 09:50 AM",
-        "edgeNo": "6fd818403ccb133664d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=6fd818403ccb133664d70b69f0a3140b"
       }
     ],
     "DIZ": [
+      {
+        "symbol": "DIZ",
+        "companyName": "DIZ",
+        "formType": "17-6",
+        "title": "Initial Statement of Beneficial Ownership of Securities",
+        "filingDate": "Oct 19, 2026 08:31 AM",
+        "edgeNo": "fbddcf42209b21c564d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=fbddcf42209b21c564d70b69f0a3140b"
+      },
+      {
+        "symbol": "DIZ",
+        "companyName": "DIZ",
+        "formType": "17-6",
+        "title": "Initial Statement of Beneficial Ownership of Securities",
+        "filingDate": "Oct 19, 2026 08:16 AM",
+        "edgeNo": "7109482fd446ebe664d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=7109482fd446ebe664d70b69f0a3140b"
+      },
       {
         "symbol": "DIZ",
         "companyName": "DIZ",
@@ -5609,24 +5627,6 @@
         "filingDate": "Sep 18, 2026 08:30 AM",
         "edgeNo": "9fcabdb75793992464d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=9fcabdb75793992464d70b69f0a3140b"
-      },
-      {
-        "symbol": "DIZ",
-        "companyName": "DIZ",
-        "formType": "4-30",
-        "title": "Material Information/Transactions",
-        "filingDate": "Sep 15, 2026 12:13 PM",
-        "edgeNo": "862a405d6475b41d64d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=862a405d6475b41d64d70b69f0a3140b"
-      },
-      {
-        "symbol": "DIZ",
-        "companyName": "DIZ",
-        "formType": "17-5",
-        "title": "Information Statement",
-        "filingDate": "Aug 19, 2026 01:58 PM",
-        "edgeNo": "6df0092e7e7174b564d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=6df0092e7e7174b564d70b69f0a3140b"
       }
     ],
     "DMC": [
@@ -5855,6 +5855,24 @@
       {
         "symbol": "DWC",
         "companyName": "DWC",
+        "formType": "17-7",
+        "title": "Statement of Changes in Beneficial Ownership of Securities",
+        "filingDate": "Oct 23, 2026 12:12 PM",
+        "edgeNo": "b515b7a2b189055964d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=b515b7a2b189055964d70b69f0a3140b"
+      },
+      {
+        "symbol": "DWC",
+        "companyName": "DWC",
+        "formType": "13-1",
+        "title": "Change in Shareholdings of Directors and Principal Officers",
+        "filingDate": "Oct 23, 2026 11:13 AM",
+        "edgeNo": "fa82e1f1feab114c64d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=fa82e1f1feab114c64d70b69f0a3140b"
+      },
+      {
+        "symbol": "DWC",
+        "companyName": "DWC",
         "formType": "17-12-A",
         "title": "List of Top 100 Stockholders (Common Shares)",
         "filingDate": "Oct 15, 2026 04:41 PM",
@@ -5905,24 +5923,6 @@
         "filingDate": "Jul 27, 2026 03:22 PM",
         "edgeNo": "bcde6f7f1877860764d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=bcde6f7f1877860764d70b69f0a3140b"
-      },
-      {
-        "symbol": "DWC",
-        "companyName": "DWC",
-        "formType": "17-18",
-        "title": "Other SEC Forms, Reports and Requirements",
-        "filingDate": "Jul 17, 2026 04:47 PM",
-        "edgeNo": "134c331ef326e8b964d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=134c331ef326e8b964d70b69f0a3140b"
-      },
-      {
-        "symbol": "DWC",
-        "companyName": "DWC",
-        "formType": "17-12-A",
-        "title": "List of Top 100 Stockholders (Common Shares)",
-        "filingDate": "Jul 15, 2026 11:00 AM",
-        "edgeNo": "8afd9e5938ca2f1a64d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=8afd9e5938ca2f1a64d70b69f0a3140b"
       }
     ],
     "ECP": [
@@ -6077,74 +6077,74 @@
       {
         "symbol": "EEI",
         "companyName": "EEI",
-        "formType": "17-12-B",
-        "title": "List of Top 100 Stockholders (Preferred Shares)",
-        "filingDate": "Oct 15, 2026 01:11 PM",
-        "edgeNo": "4b2119aa1735f5ba64d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=4b2119aa1735f5ba64d70b69f0a3140b"
+        "formType": "17-6",
+        "title": "Initial Statement of Beneficial Ownership of Securities",
+        "filingDate": "Oct 23, 2026 08:04 AM",
+        "edgeNo": "06cb0233898f4b3064d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=06cb0233898f4b3064d70b69f0a3140b"
       },
       {
         "symbol": "EEI",
         "companyName": "EEI",
-        "formType": "17-12-B",
-        "title": "List of Top 100 Stockholders (Preferred Shares)",
-        "filingDate": "Oct 15, 2026 01:10 PM",
-        "edgeNo": "5479fe9d15560ca864d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=5479fe9d15560ca864d70b69f0a3140b"
+        "formType": "17-6",
+        "title": "Initial Statement of Beneficial Ownership of Securities",
+        "filingDate": "Oct 23, 2026 08:03 AM",
+        "edgeNo": "4dd94b8587cdb51a64d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=4dd94b8587cdb51a64d70b69f0a3140b"
       },
       {
         "symbol": "EEI",
         "companyName": "EEI",
-        "formType": "17-12-B",
-        "title": "List of Top 100 Stockholders (Preferred Shares)",
-        "filingDate": "Oct 15, 2026 01:09 PM",
-        "edgeNo": "7e6cdfb90cd455a164d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=7e6cdfb90cd455a164d70b69f0a3140b"
-      },
-      {
-        "symbol": "EEI",
-        "companyName": "EEI",
-        "formType": "17-12-A",
-        "title": "List of Top 100 Stockholders (Common Shares)",
-        "filingDate": "Oct 15, 2026 01:07 PM",
-        "edgeNo": "1b6a5167c445c8fe64d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=1b6a5167c445c8fe64d70b69f0a3140b"
+        "formType": "17-6",
+        "title": "Initial Statement of Beneficial Ownership of Securities",
+        "filingDate": "Oct 20, 2026 03:16 PM",
+        "edgeNo": "8147033ca5f7ecc964d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=8147033ca5f7ecc964d70b69f0a3140b"
       },
       {
         "symbol": "EEI",
         "companyName": "EEI",
         "formType": "17-18",
-        "title": "[Amend-9]Other SEC Forms, Reports and Requirements",
-        "filingDate": "Oct 13, 2026 08:49 AM",
-        "edgeNo": "da1793dc80a5ba1e64d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=da1793dc80a5ba1e64d70b69f0a3140b"
-      },
-      {
-        "symbol": "EEI",
-        "companyName": "EEI",
-        "formType": "POR-1",
-        "title": "Public Ownership Report",
-        "filingDate": "Oct 12, 2026 08:33 AM",
-        "edgeNo": "429356efb583753764d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=429356efb583753764d70b69f0a3140b"
+        "title": "Other SEC Forms, Reports and Requirements",
+        "filingDate": "Oct 19, 2026 03:01 PM",
+        "edgeNo": "7986efecc52cda5764d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=7986efecc52cda5764d70b69f0a3140b"
       },
       {
         "symbol": "EEI",
         "companyName": "EEI",
         "formType": "4-8",
         "title": "Change in Directors and/or Officers (Resignation, Removal or Appointment, Election and/or Promotion)",
-        "filingDate": "Oct 05, 2026 08:52 AM",
-        "edgeNo": "a747b8cbadc9de7364d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=a747b8cbadc9de7364d70b69f0a3140b"
+        "filingDate": "Oct 19, 2026 01:35 PM",
+        "edgeNo": "065068a8b98ec3f264d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=065068a8b98ec3f264d70b69f0a3140b"
       },
       {
         "symbol": "EEI",
         "companyName": "EEI",
-        "formType": "4-30",
-        "title": "Material Information/Transactions",
-        "filingDate": "Oct 05, 2026 08:51 AM",
-        "edgeNo": "9404235b538a290d64d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=9404235b538a290d64d70b69f0a3140b"
+        "formType": "4-25",
+        "title": "Results of Organizational Meeting of Board of Directors",
+        "filingDate": "Oct 19, 2026 08:34 AM",
+        "edgeNo": "7f2986f64d308df864d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=7f2986f64d308df864d70b69f0a3140b"
+      },
+      {
+        "symbol": "EEI",
+        "companyName": "EEI",
+        "formType": "4-24",
+        "title": "Results of Annual or Special Stockholders' Meeting",
+        "filingDate": "Oct 19, 2026 08:34 AM",
+        "edgeNo": "efce145f64f1ea6064d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=efce145f64f1ea6064d70b69f0a3140b"
+      },
+      {
+        "symbol": "EEI",
+        "companyName": "EEI",
+        "formType": "17-12-B",
+        "title": "List of Top 100 Stockholders (Preferred Shares)",
+        "filingDate": "Oct 15, 2026 01:11 PM",
+        "edgeNo": "4b2119aa1735f5ba64d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=4b2119aa1735f5ba64d70b69f0a3140b"
       }
     ],
     "EG": [
@@ -6817,6 +6817,15 @@
       {
         "symbol": "FCG",
         "companyName": "FCG",
+        "formType": "17-5",
+        "title": "Information Statement",
+        "filingDate": "Oct 19, 2026 02:50 PM",
+        "edgeNo": "20965831cdb7ce5564d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=20965831cdb7ce5564d70b69f0a3140b"
+      },
+      {
+        "symbol": "FCG",
+        "companyName": "FCG",
         "formType": "POR-1",
         "title": "Public Ownership Report",
         "filingDate": "Oct 14, 2026 01:01 PM",
@@ -6876,15 +6885,6 @@
         "filingDate": "Oct 08, 2026 08:58 AM",
         "edgeNo": "72e8dbcc7b0b9ad364d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=72e8dbcc7b0b9ad364d70b69f0a3140b"
-      },
-      {
-        "symbol": "FCG",
-        "companyName": "FCG",
-        "formType": "4-34",
-        "title": "Voluntary Trading Suspension",
-        "filingDate": "Oct 08, 2026 08:57 AM",
-        "edgeNo": "c9754c3ea29498c864d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=c9754c3ea29498c864d70b69f0a3140b"
       }
     ],
     "FDC": [
@@ -7039,6 +7039,33 @@
       {
         "symbol": "FEU",
         "companyName": "FEU",
+        "formType": "17-7",
+        "title": "Statement of Changes in Beneficial Ownership of Securities",
+        "filingDate": "Oct 21, 2026 08:10 AM",
+        "edgeNo": "65ace6953dc5a83964d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=65ace6953dc5a83964d70b69f0a3140b"
+      },
+      {
+        "symbol": "FEU",
+        "companyName": "FEU",
+        "formType": "4-25",
+        "title": "Results of Organizational Meeting of Board of Directors",
+        "filingDate": "Oct 19, 2026 08:32 AM",
+        "edgeNo": "51bfaa9713e7cd7264d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=51bfaa9713e7cd7264d70b69f0a3140b"
+      },
+      {
+        "symbol": "FEU",
+        "companyName": "FEU",
+        "formType": "4-24",
+        "title": "Results of Annual or Special Stockholders' Meeting",
+        "filingDate": "Oct 19, 2026 08:32 AM",
+        "edgeNo": "ac7c01d8266ce76a64d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=ac7c01d8266ce76a64d70b69f0a3140b"
+      },
+      {
+        "symbol": "FEU",
+        "companyName": "FEU",
         "formType": "POR-1",
         "title": "Public Ownership Report",
         "filingDate": "Oct 15, 2026 08:52 AM",
@@ -7080,33 +7107,6 @@
         "filingDate": "Sep 28, 2026 08:00 AM",
         "edgeNo": "ff523e75f439395a64d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=ff523e75f439395a64d70b69f0a3140b"
-      },
-      {
-        "symbol": "FEU",
-        "companyName": "FEU",
-        "formType": "6-1",
-        "title": "Declaration of Cash Dividends",
-        "filingDate": "Sep 16, 2026 08:38 AM",
-        "edgeNo": "35a7c63263bba50264d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=35a7c63263bba50264d70b69f0a3140b"
-      },
-      {
-        "symbol": "FEU",
-        "companyName": "FEU",
-        "formType": "17-5",
-        "title": "Information Statement",
-        "filingDate": "Sep 14, 2026 01:46 PM",
-        "edgeNo": "950a2c9e89b47b8f64d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=950a2c9e89b47b8f64d70b69f0a3140b"
-      },
-      {
-        "symbol": "FEU",
-        "companyName": "FEU",
-        "formType": "7-1",
-        "title": "Notice of Annual or Special Stockholders' Meeting",
-        "filingDate": "Sep 11, 2026 03:46 PM",
-        "edgeNo": "9f02fc96a10b03d264d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=9f02fc96a10b03d264d70b69f0a3140b"
       }
     ],
     "FFI": [
@@ -7188,6 +7188,15 @@
         "symbol": "FGEN",
         "companyName": "FGEN",
         "formType": "17-7",
+        "title": "Statement of Changes in Beneficial Ownership of Securities",
+        "filingDate": "Oct 23, 2026 08:48 AM",
+        "edgeNo": "5f772777290c158464d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=5f772777290c158464d70b69f0a3140b"
+      },
+      {
+        "symbol": "FGEN",
+        "companyName": "FGEN",
+        "formType": "17-7",
         "title": "[Amend-1]Statement of Changes in Beneficial Ownership of Securities",
         "filingDate": "Oct 14, 2026 09:01 AM",
         "edgeNo": "6d3096baa129154464d70b69f0a3140b",
@@ -7246,15 +7255,6 @@
         "filingDate": "Sep 14, 2026 08:53 AM",
         "edgeNo": "6fc9d84b4388968d64d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=6fc9d84b4388968d64d70b69f0a3140b"
-      },
-      {
-        "symbol": "FGEN",
-        "companyName": "FGEN",
-        "formType": "17-7",
-        "title": "Statement of Changes in Beneficial Ownership of Securities",
-        "filingDate": "Sep 14, 2026 07:11 AM",
-        "edgeNo": "55af09144cb41ef364d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=55af09144cb41ef364d70b69f0a3140b"
       }
     ],
     "FILRT": [
@@ -7485,6 +7485,51 @@
         "companyName": "FMETF",
         "formType": "ETF-1",
         "title": "Daily Trading Information",
+        "filingDate": "Oct 23, 2026 06:04 PM",
+        "edgeNo": "0e525e970415a95064d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=0e525e970415a95064d70b69f0a3140b"
+      },
+      {
+        "symbol": "FMETF",
+        "companyName": "FMETF",
+        "formType": "ETF-1",
+        "title": "Daily Trading Information",
+        "filingDate": "Oct 22, 2026 06:38 PM",
+        "edgeNo": "d3e2d5d6f8a3772864d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=d3e2d5d6f8a3772864d70b69f0a3140b"
+      },
+      {
+        "symbol": "FMETF",
+        "companyName": "FMETF",
+        "formType": "ETF-1",
+        "title": "Daily Trading Information",
+        "filingDate": "Oct 21, 2026 06:05 PM",
+        "edgeNo": "57a6bde447dc780864d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=57a6bde447dc780864d70b69f0a3140b"
+      },
+      {
+        "symbol": "FMETF",
+        "companyName": "FMETF",
+        "formType": "ETF-1",
+        "title": "Daily Trading Information",
+        "filingDate": "Oct 20, 2026 06:00 PM",
+        "edgeNo": "ab2841da8d2b8e0364d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=ab2841da8d2b8e0364d70b69f0a3140b"
+      },
+      {
+        "symbol": "FMETF",
+        "companyName": "FMETF",
+        "formType": "ETF-1",
+        "title": "Daily Trading Information",
+        "filingDate": "Oct 19, 2026 05:54 PM",
+        "edgeNo": "54132fe5f5d7546364d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=54132fe5f5d7546364d70b69f0a3140b"
+      },
+      {
+        "symbol": "FMETF",
+        "companyName": "FMETF",
+        "formType": "ETF-1",
+        "title": "Daily Trading Information",
         "filingDate": "Oct 16, 2026 06:21 PM",
         "edgeNo": "38b66bafcb536c2564d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=38b66bafcb536c2564d70b69f0a3140b"
@@ -7506,51 +7551,6 @@
         "filingDate": "Oct 15, 2026 06:52 PM",
         "edgeNo": "3c339e69e12733cc64d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=3c339e69e12733cc64d70b69f0a3140b"
-      },
-      {
-        "symbol": "FMETF",
-        "companyName": "FMETF",
-        "formType": "POR-1",
-        "title": "Public Ownership Report",
-        "filingDate": "Oct 15, 2026 09:44 AM",
-        "edgeNo": "23a56c178e50a9ab64d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=23a56c178e50a9ab64d70b69f0a3140b"
-      },
-      {
-        "symbol": "FMETF",
-        "companyName": "FMETF",
-        "formType": "ETF-1",
-        "title": "Daily Trading Information",
-        "filingDate": "Oct 14, 2026 05:43 PM",
-        "edgeNo": "10cad065f5838c7964d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=10cad065f5838c7964d70b69f0a3140b"
-      },
-      {
-        "symbol": "FMETF",
-        "companyName": "FMETF",
-        "formType": "ETF-1",
-        "title": "Daily Trading Information",
-        "filingDate": "Oct 13, 2026 05:06 PM",
-        "edgeNo": "fa01fa7466e5e56f64d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=fa01fa7466e5e56f64d70b69f0a3140b"
-      },
-      {
-        "symbol": "FMETF",
-        "companyName": "FMETF",
-        "formType": "ETF-1",
-        "title": "Daily Trading Information",
-        "filingDate": "Oct 12, 2026 05:35 PM",
-        "edgeNo": "8735659d32f6864164d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=8735659d32f6864164d70b69f0a3140b"
-      },
-      {
-        "symbol": "FMETF",
-        "companyName": "FMETF",
-        "formType": "ETF-1",
-        "title": "Daily Trading Information",
-        "filingDate": "Oct 09, 2026 05:33 PM",
-        "edgeNo": "b334925241944ca464d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=b334925241944ca464d70b69f0a3140b"
       }
     ],
     "FNI": [
@@ -7705,6 +7705,15 @@
       {
         "symbol": "FPH",
         "companyName": "FPH",
+        "formType": "17-18",
+        "title": "Other SEC Forms, Reports and Requirements",
+        "filingDate": "Oct 22, 2026 03:29 PM",
+        "edgeNo": "d638db47bf2db9f564d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=d638db47bf2db9f564d70b69f0a3140b"
+      },
+      {
+        "symbol": "FPH",
+        "companyName": "FPH",
         "formType": "4-30",
         "title": "Material Information/Transactions",
         "filingDate": "Oct 08, 2026 11:22 AM",
@@ -7764,18 +7773,18 @@
         "filingDate": "Oct 02, 2026 08:13 AM",
         "edgeNo": "19504292781ea57a64d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=19504292781ea57a64d70b69f0a3140b"
-      },
-      {
-        "symbol": "FPH",
-        "companyName": "FPH",
-        "formType": "17-6",
-        "title": "Initial Statement of Beneficial Ownership of Securities",
-        "filingDate": "Sep 28, 2026 08:10 AM",
-        "edgeNo": "499deda8bc9ce9f364d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=499deda8bc9ce9f364d70b69f0a3140b"
       }
     ],
     "FPI": [
+      {
+        "symbol": "FPI",
+        "companyName": "FPI",
+        "formType": "17-18",
+        "title": "Other SEC Forms, Reports and Requirements",
+        "filingDate": "Oct 22, 2026 01:41 PM",
+        "edgeNo": "19cbf140d186af5e64d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=19cbf140d186af5e64d70b69f0a3140b"
+      },
       {
         "symbol": "FPI",
         "companyName": "FPI",
@@ -7838,18 +7847,45 @@
         "filingDate": "Jul 08, 2026 12:54 PM",
         "edgeNo": "245c2f75e12b953164d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=245c2f75e12b953164d70b69f0a3140b"
-      },
-      {
-        "symbol": "FPI",
-        "companyName": "FPI",
-        "formType": "17-12-A",
-        "title": "List of Top 100 Stockholders (Common Shares)",
-        "filingDate": "Jul 08, 2026 12:04 PM",
-        "edgeNo": "611c22d55f67721a64d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=611c22d55f67721a64d70b69f0a3140b"
       }
     ],
     "FRUIT": [
+      {
+        "symbol": "FRUIT",
+        "companyName": "FRUIT",
+        "formType": "9-1",
+        "title": "Share Buy-Back Transactions",
+        "filingDate": "Oct 23, 2026 07:42 AM",
+        "edgeNo": "498ff39c1d8e438f64d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=498ff39c1d8e438f64d70b69f0a3140b"
+      },
+      {
+        "symbol": "FRUIT",
+        "companyName": "FRUIT",
+        "formType": "9-1",
+        "title": "Share Buy-Back Transactions",
+        "filingDate": "Oct 22, 2026 07:48 AM",
+        "edgeNo": "9d8f3e5b759711c664d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=9d8f3e5b759711c664d70b69f0a3140b"
+      },
+      {
+        "symbol": "FRUIT",
+        "companyName": "FRUIT",
+        "formType": "9-1",
+        "title": "Share Buy-Back Transactions",
+        "filingDate": "Oct 21, 2026 07:44 AM",
+        "edgeNo": "b40e2345b841ad3b64d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=b40e2345b841ad3b64d70b69f0a3140b"
+      },
+      {
+        "symbol": "FRUIT",
+        "companyName": "FRUIT",
+        "formType": "9-1",
+        "title": "Share Buy-Back Transactions",
+        "filingDate": "Oct 19, 2026 07:45 AM",
+        "edgeNo": "b99f4aa6254787e564d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=b99f4aa6254787e564d70b69f0a3140b"
+      },
       {
         "symbol": "FRUIT",
         "companyName": "FRUIT",
@@ -7885,42 +7921,6 @@
         "filingDate": "Oct 13, 2026 04:15 PM",
         "edgeNo": "48ac39b990da4ba364d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=48ac39b990da4ba364d70b69f0a3140b"
-      },
-      {
-        "symbol": "FRUIT",
-        "companyName": "FRUIT",
-        "formType": "9-1",
-        "title": "Share Buy-Back Transactions",
-        "filingDate": "Oct 13, 2026 07:56 AM",
-        "edgeNo": "154fa0f2fa7d289564d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=154fa0f2fa7d289564d70b69f0a3140b"
-      },
-      {
-        "symbol": "FRUIT",
-        "companyName": "FRUIT",
-        "formType": "9-1",
-        "title": "Share Buy-Back Transactions",
-        "filingDate": "Oct 09, 2026 08:28 AM",
-        "edgeNo": "b84f698d41ab533264d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=b84f698d41ab533264d70b69f0a3140b"
-      },
-      {
-        "symbol": "FRUIT",
-        "companyName": "FRUIT",
-        "formType": "9-1",
-        "title": "Share Buy-Back Transactions",
-        "filingDate": "Oct 08, 2026 07:32 AM",
-        "edgeNo": "9b640dd038ceb4a464d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=9b640dd038ceb4a464d70b69f0a3140b"
-      },
-      {
-        "symbol": "FRUIT",
-        "companyName": "FRUIT",
-        "formType": "9-1",
-        "title": "Share Buy-Back Transactions",
-        "filingDate": "Oct 07, 2026 08:45 AM",
-        "edgeNo": "95bd89854139cbe064d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=95bd89854139cbe064d70b69f0a3140b"
       }
     ],
     "FYN": [
@@ -8149,6 +8149,15 @@
       {
         "symbol": "GLO",
         "companyName": "GLO",
+        "formType": "14-1",
+        "title": "Notice of Analysts'/Investors' Briefing",
+        "filingDate": "Oct 21, 2026 11:45 AM",
+        "edgeNo": "9d8f5307e3eb34e164d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=9d8f5307e3eb34e164d70b69f0a3140b"
+      },
+      {
+        "symbol": "GLO",
+        "companyName": "GLO",
         "formType": "17-12-B",
         "title": "List of Top 100 Stockholders (Preferred Shares)",
         "filingDate": "Oct 16, 2026 09:52 AM",
@@ -8208,18 +8217,18 @@
         "filingDate": "Oct 09, 2026 09:58 AM",
         "edgeNo": "c10689b53b26b9ab64d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=c10689b53b26b9ab64d70b69f0a3140b"
-      },
-      {
-        "symbol": "GLO",
-        "companyName": "GLO",
-        "formType": "4-30",
-        "title": "[Amend-5]Material Information/Transactions",
-        "filingDate": "Oct 06, 2026 12:32 PM",
-        "edgeNo": "80e649556d4826b664d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=80e649556d4826b664d70b69f0a3140b"
       }
     ],
     "GMA7": [
+      {
+        "symbol": "GMA7",
+        "companyName": "GMA7",
+        "formType": "4-30",
+        "title": "Material Information/Transactions",
+        "filingDate": "Oct 23, 2026 07:56 AM",
+        "edgeNo": "013acafcda85d52764d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=013acafcda85d52764d70b69f0a3140b"
+      },
       {
         "symbol": "GMA7",
         "companyName": "GMA7",
@@ -8282,15 +8291,6 @@
         "filingDate": "Jul 17, 2026 02:06 PM",
         "edgeNo": "196f8fe5aa6c91e664d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=196f8fe5aa6c91e664d70b69f0a3140b"
-      },
-      {
-        "symbol": "GMA7",
-        "companyName": "GMA7",
-        "formType": "4-24",
-        "title": "Results of Annual or Special Stockholders' Meeting",
-        "filingDate": "Jul 17, 2026 12:17 PM",
-        "edgeNo": "a13ee5757e347b3664d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=a13ee5757e347b3664d70b69f0a3140b"
       }
     ],
     "GMAP": [
@@ -8667,6 +8667,15 @@
       {
         "symbol": "HI",
         "companyName": "HI",
+        "formType": "4-8",
+        "title": "Change in Directors and/or Officers (Resignation, Removal or Appointment, Election and/or Promotion)",
+        "filingDate": "Oct 21, 2026 01:48 PM",
+        "edgeNo": "90fbcf21a48131b564d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=90fbcf21a48131b564d70b69f0a3140b"
+      },
+      {
+        "symbol": "HI",
+        "companyName": "HI",
         "formType": "POR-1",
         "title": "Public Ownership Report",
         "filingDate": "Oct 15, 2026 12:44 PM",
@@ -8726,15 +8735,6 @@
         "filingDate": "Oct 01, 2026 11:35 AM",
         "edgeNo": "09d9fd847912e70364d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=09d9fd847912e70364d70b69f0a3140b"
-      },
-      {
-        "symbol": "HI",
-        "companyName": "HI",
-        "formType": "17-18",
-        "title": "Other SEC Forms, Reports and Requirements",
-        "filingDate": "Sep 14, 2026 08:34 AM",
-        "edgeNo": "bfeb1099a34d9bc464d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=bfeb1099a34d9bc464d70b69f0a3140b"
       }
     ],
     "HOME": [
@@ -8963,6 +8963,24 @@
       {
         "symbol": "ICT",
         "companyName": "ICT",
+        "formType": "9-1",
+        "title": "Share Buy-Back Transactions",
+        "filingDate": "Oct 22, 2026 03:45 PM",
+        "edgeNo": "c64e43e1b5bc88f264d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=c64e43e1b5bc88f264d70b69f0a3140b"
+      },
+      {
+        "symbol": "ICT",
+        "companyName": "ICT",
+        "formType": "9-1",
+        "title": "Share Buy-Back Transactions",
+        "filingDate": "Oct 20, 2026 04:10 PM",
+        "edgeNo": "3c11381801b1153664d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=3c11381801b1153664d70b69f0a3140b"
+      },
+      {
+        "symbol": "ICT",
+        "companyName": "ICT",
         "formType": "14-1",
         "title": "Notice of Analysts'/Investors' Briefing",
         "filingDate": "Oct 16, 2026 08:43 AM",
@@ -9013,24 +9031,6 @@
         "filingDate": "Oct 09, 2026 03:58 PM",
         "edgeNo": "cf38e2e3d55aba8164d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=cf38e2e3d55aba8164d70b69f0a3140b"
-      },
-      {
-        "symbol": "ICT",
-        "companyName": "ICT",
-        "formType": "9-1",
-        "title": "Share Buy-Back Transactions",
-        "filingDate": "Oct 05, 2026 08:41 AM",
-        "edgeNo": "7ce33f4f3d1198e064d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=7ce33f4f3d1198e064d70b69f0a3140b"
-      },
-      {
-        "symbol": "ICT",
-        "companyName": "ICT",
-        "formType": "9-1",
-        "title": "Share Buy-Back Transactions",
-        "filingDate": "Oct 02, 2026 08:25 AM",
-        "edgeNo": "7452161645f7f94864d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=7452161645f7f94864d70b69f0a3140b"
       }
     ],
     "IDC": [
@@ -9703,6 +9703,24 @@
       {
         "symbol": "JFC",
         "companyName": "JFC",
+        "formType": "13-1",
+        "title": "Change in Shareholdings of Directors and Principal Officers",
+        "filingDate": "Oct 21, 2026 12:15 PM",
+        "edgeNo": "e888afdcbdb9988e64d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=e888afdcbdb9988e64d70b69f0a3140b"
+      },
+      {
+        "symbol": "JFC",
+        "companyName": "JFC",
+        "formType": "4-13",
+        "title": "Clarification of News Reports",
+        "filingDate": "Oct 20, 2026 09:57 AM",
+        "edgeNo": "ac71c6918e0032c464d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=ac71c6918e0032c464d70b69f0a3140b"
+      },
+      {
+        "symbol": "JFC",
+        "companyName": "JFC",
         "formType": "16-1",
         "title": "Update on Corporate Actions/Material Transactions/Agreements",
         "filingDate": "Oct 14, 2026 01:55 PM",
@@ -9753,27 +9771,18 @@
         "filingDate": "Oct 08, 2026 12:07 PM",
         "edgeNo": "73a7de1296235e1364d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=73a7de1296235e1364d70b69f0a3140b"
-      },
-      {
-        "symbol": "JFC",
-        "companyName": "JFC",
-        "formType": "10-1",
-        "title": "Acquisition or Disposition of Shares by Subsidiaries/Affiliates",
-        "filingDate": "Oct 08, 2026 08:09 AM",
-        "edgeNo": "5d1c02e2aded281564d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=5d1c02e2aded281564d70b69f0a3140b"
-      },
-      {
-        "symbol": "JFC",
-        "companyName": "JFC",
-        "formType": "10-1",
-        "title": "Acquisition or Disposition of Shares by Subsidiaries/Affiliates",
-        "filingDate": "Oct 07, 2026 08:35 AM",
-        "edgeNo": "9db39c449d7668f664d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=9db39c449d7668f664d70b69f0a3140b"
       }
     ],
     "JGS": [
+      {
+        "symbol": "JGS",
+        "companyName": "JGS",
+        "formType": "4-30",
+        "title": "Material Information/Transactions",
+        "filingDate": "Oct 23, 2026 07:56 AM",
+        "edgeNo": "4657500e22c8421564d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=4657500e22c8421564d70b69f0a3140b"
+      },
       {
         "symbol": "JGS",
         "companyName": "JGS",
@@ -9836,15 +9845,6 @@
         "filingDate": "Aug 12, 2026 12:08 PM",
         "edgeNo": "8fb391dfe81df89364d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=8fb391dfe81df89364d70b69f0a3140b"
-      },
-      {
-        "symbol": "JGS",
-        "companyName": "JGS",
-        "formType": "14-1",
-        "title": "Notice of Analysts'/Investors' Briefing",
-        "filingDate": "Aug 06, 2026 01:37 PM",
-        "edgeNo": "fe9153c8fee1f41664d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=fe9153c8fee1f41664d70b69f0a3140b"
       }
     ],
     "JOH": [
@@ -10147,6 +10147,15 @@
       {
         "symbol": "LBC",
         "companyName": "LBC",
+        "formType": "17-5",
+        "title": "Information Statement",
+        "filingDate": "Oct 20, 2026 07:44 AM",
+        "edgeNo": "1bea8304f972beae64d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=1bea8304f972beae64d70b69f0a3140b"
+      },
+      {
+        "symbol": "LBC",
+        "companyName": "LBC",
         "formType": "7-1",
         "title": "Notice of Annual or Special Stockholders' Meeting",
         "filingDate": "Oct 13, 2026 11:02 AM",
@@ -10206,15 +10215,6 @@
         "filingDate": "Jul 15, 2026 12:46 PM",
         "edgeNo": "e2f46089dd9e861764d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=e2f46089dd9e861764d70b69f0a3140b"
-      },
-      {
-        "symbol": "LBC",
-        "companyName": "LBC",
-        "formType": "POR-1",
-        "title": "Public Ownership Report",
-        "filingDate": "Jul 15, 2026 06:35 AM",
-        "edgeNo": "3db8d5f69d06b7d964d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=3db8d5f69d06b7d964d70b69f0a3140b"
       }
     ],
     "LC": [
@@ -10443,6 +10443,15 @@
       {
         "symbol": "LODE",
         "companyName": "LODE",
+        "formType": "17-2",
+        "title": "Quarterly Report",
+        "filingDate": "Oct 23, 2026 12:42 PM",
+        "edgeNo": "3855770717968e7664d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=3855770717968e7664d70b69f0a3140b"
+      },
+      {
+        "symbol": "LODE",
+        "companyName": "LODE",
         "formType": "17-12-A",
         "title": "List of Top 100 Stockholders (Common Shares)",
         "filingDate": "Oct 08, 2026 04:34 PM",
@@ -10502,18 +10511,27 @@
         "filingDate": "Jun 30, 2026 03:53 PM",
         "edgeNo": "3c4bbf50231f499c64d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=3c4bbf50231f499c64d70b69f0a3140b"
-      },
-      {
-        "symbol": "LODE",
-        "companyName": "LODE",
-        "formType": "4-24",
-        "title": "Results of Annual or Special Stockholders' Meeting",
-        "filingDate": "Jun 30, 2026 03:47 PM",
-        "edgeNo": "83776df80ea20cba64d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=83776df80ea20cba64d70b69f0a3140b"
       }
     ],
     "LOTO": [
+      {
+        "symbol": "LOTO",
+        "companyName": "LOTO",
+        "formType": "17-18",
+        "title": "Other SEC Forms, Reports and Requirements",
+        "filingDate": "Oct 22, 2026 02:52 PM",
+        "edgeNo": "69f3897416e1f4f464d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=69f3897416e1f4f464d70b69f0a3140b"
+      },
+      {
+        "symbol": "LOTO",
+        "companyName": "LOTO",
+        "formType": "17-18",
+        "title": "Other SEC Forms, Reports and Requirements",
+        "filingDate": "Oct 20, 2026 10:09 AM",
+        "edgeNo": "748cf0bc37449e2664d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=748cf0bc37449e2664d70b69f0a3140b"
+      },
       {
         "symbol": "LOTO",
         "companyName": "LOTO",
@@ -10567,24 +10585,6 @@
         "filingDate": "Jul 30, 2026 12:14 PM",
         "edgeNo": "3433fd5248ff848864d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=3433fd5248ff848864d70b69f0a3140b"
-      },
-      {
-        "symbol": "LOTO",
-        "companyName": "LOTO",
-        "formType": "17-12-A",
-        "title": "List of Top 100 Stockholders (Common Shares)",
-        "filingDate": "Jul 06, 2026 11:17 AM",
-        "edgeNo": "6027d6026c97279164d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=6027d6026c97279164d70b69f0a3140b"
-      },
-      {
-        "symbol": "LOTO",
-        "companyName": "LOTO",
-        "formType": "POR-1",
-        "title": "Public Ownership Report",
-        "filingDate": "Jul 03, 2026 09:51 AM",
-        "edgeNo": "e1438100ae05636a64d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=e1438100ae05636a64d70b69f0a3140b"
       }
     ],
     "LPC": [
@@ -11109,6 +11109,15 @@
       {
         "symbol": "MAH",
         "companyName": "MAH",
+        "formType": "17-18",
+        "title": "Other SEC Forms, Reports and Requirements",
+        "filingDate": "Oct 22, 2026 01:36 PM",
+        "edgeNo": "f453f2f6acee7c6e64d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=f453f2f6acee7c6e64d70b69f0a3140b"
+      },
+      {
+        "symbol": "MAH",
+        "companyName": "MAH",
         "formType": "POR-1",
         "title": "Public Ownership Report",
         "filingDate": "Oct 08, 2026 09:49 AM",
@@ -11168,18 +11177,18 @@
         "filingDate": "Aug 04, 2026 11:12 AM",
         "edgeNo": "45d146997112058364d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=45d146997112058364d70b69f0a3140b"
-      },
-      {
-        "symbol": "MAH",
-        "companyName": "MAH",
-        "formType": "17-18",
-        "title": "Other SEC Forms, Reports and Requirements",
-        "filingDate": "Jul 22, 2026 01:37 PM",
-        "edgeNo": "a67762e285c69f3864d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=a67762e285c69f3864d70b69f0a3140b"
       }
     ],
     "MARC": [
+      {
+        "symbol": "MARC",
+        "companyName": "MARC",
+        "formType": "17-18",
+        "title": "[Amend-1]Other SEC Forms, Reports and Requirements",
+        "filingDate": "Oct 19, 2026 08:17 AM",
+        "edgeNo": "3598d2328dd1503e64d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=3598d2328dd1503e64d70b69f0a3140b"
+      },
       {
         "symbol": "MARC",
         "companyName": "MARC",
@@ -11242,15 +11251,6 @@
         "filingDate": "Sep 25, 2026 07:54 AM",
         "edgeNo": "53685deaa142d6a064d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=53685deaa142d6a064d70b69f0a3140b"
-      },
-      {
-        "symbol": "MARC",
-        "companyName": "MARC",
-        "formType": "17-5",
-        "title": "Information Statement",
-        "filingDate": "Sep 10, 2026 08:22 AM",
-        "edgeNo": "df5b4015d38d13e064d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=df5b4015d38d13e064d70b69f0a3140b"
       }
     ],
     "MAXS": [
@@ -11479,6 +11479,33 @@
       {
         "symbol": "MBT",
         "companyName": "MBT",
+        "formType": "14-1",
+        "title": "Notice of Analysts'/Investors' Briefing",
+        "filingDate": "Oct 21, 2026 02:52 PM",
+        "edgeNo": "69303c6d4094d2dc64d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=69303c6d4094d2dc64d70b69f0a3140b"
+      },
+      {
+        "symbol": "MBT",
+        "companyName": "MBT",
+        "formType": "17-7",
+        "title": "Statement of Changes in Beneficial Ownership of Securities",
+        "filingDate": "Oct 20, 2026 12:31 PM",
+        "edgeNo": "049de6b7990acbad64d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=049de6b7990acbad64d70b69f0a3140b"
+      },
+      {
+        "symbol": "MBT",
+        "companyName": "MBT",
+        "formType": "17-7",
+        "title": "Statement of Changes in Beneficial Ownership of Securities",
+        "filingDate": "Oct 20, 2026 12:30 PM",
+        "edgeNo": "7d1f945f286dc0dd64d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=7d1f945f286dc0dd64d70b69f0a3140b"
+      },
+      {
+        "symbol": "MBT",
+        "companyName": "MBT",
         "formType": "17-7",
         "title": "Statement of Changes in Beneficial Ownership of Securities",
         "filingDate": "Oct 14, 2026 04:29 PM",
@@ -11520,33 +11547,6 @@
         "filingDate": "Sep 30, 2026 11:53 AM",
         "edgeNo": "6f9eafac753e319d64d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=6f9eafac753e319d64d70b69f0a3140b"
-      },
-      {
-        "symbol": "MBT",
-        "companyName": "MBT",
-        "formType": "4-8",
-        "title": "Change in Directors and/or Officers (Resignation, Removal or Appointment, Election and/or Promotion)",
-        "filingDate": "Sep 17, 2026 08:51 AM",
-        "edgeNo": "0b0420f8a9f0149564d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=0b0420f8a9f0149564d70b69f0a3140b"
-      },
-      {
-        "symbol": "MBT",
-        "companyName": "MBT",
-        "formType": "17-18",
-        "title": "Other SEC Forms, Reports and Requirements",
-        "filingDate": "Aug 26, 2026 10:19 AM",
-        "edgeNo": "a55bd0247f64deb364d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=a55bd0247f64deb364d70b69f0a3140b"
-      },
-      {
-        "symbol": "MBT",
-        "companyName": "MBT",
-        "formType": "6-1",
-        "title": "Declaration of Cash Dividends",
-        "filingDate": "Aug 20, 2026 06:46 AM",
-        "edgeNo": "ad5a6bbae8b4e91364d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=ad5a6bbae8b4e91364d70b69f0a3140b"
       }
     ],
     "MED": [
@@ -11629,6 +11629,24 @@
         "companyName": "MEDIC",
         "formType": "17-7",
         "title": "Statement of Changes in Beneficial Ownership of Securities",
+        "filingDate": "Oct 23, 2026 12:10 PM",
+        "edgeNo": "e998c6cfc75476ea64d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=e998c6cfc75476ea64d70b69f0a3140b"
+      },
+      {
+        "symbol": "MEDIC",
+        "companyName": "MEDIC",
+        "formType": "13-1",
+        "title": "Change in Shareholdings of Directors and Principal Officers",
+        "filingDate": "Oct 23, 2026 12:10 PM",
+        "edgeNo": "b0a1f2ac85ba7d7864d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=b0a1f2ac85ba7d7864d70b69f0a3140b"
+      },
+      {
+        "symbol": "MEDIC",
+        "companyName": "MEDIC",
+        "formType": "17-7",
+        "title": "Statement of Changes in Beneficial Ownership of Securities",
         "filingDate": "Oct 15, 2026 04:07 PM",
         "edgeNo": "bd1b5945aeb1b6e864d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=bd1b5945aeb1b6e864d70b69f0a3140b"
@@ -11677,27 +11695,27 @@
         "filingDate": "Oct 07, 2026 09:34 AM",
         "edgeNo": "c117e5a4b4449e8d64d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=c117e5a4b4449e8d64d70b69f0a3140b"
-      },
-      {
-        "symbol": "MEDIC",
-        "companyName": "MEDIC",
-        "formType": "17-7",
-        "title": "Statement of Changes in Beneficial Ownership of Securities",
-        "filingDate": "Oct 06, 2026 02:24 PM",
-        "edgeNo": "52c264b0ffa25cd364d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=52c264b0ffa25cd364d70b69f0a3140b"
-      },
-      {
-        "symbol": "MEDIC",
-        "companyName": "MEDIC",
-        "formType": "13-1",
-        "title": "Change in Shareholdings of Directors and Principal Officers",
-        "filingDate": "Oct 06, 2026 02:24 PM",
-        "edgeNo": "a4cbc4e478db7dd464d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=a4cbc4e478db7dd464d70b69f0a3140b"
       }
     ],
     "MEG": [
+      {
+        "symbol": "MEG",
+        "companyName": "MEG",
+        "formType": "4-30",
+        "title": "Material Information/Transactions",
+        "filingDate": "Oct 19, 2026 10:47 AM",
+        "edgeNo": "df306e5969e27c2a64d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=df306e5969e27c2a64d70b69f0a3140b"
+      },
+      {
+        "symbol": "MEG",
+        "companyName": "MEG",
+        "formType": "4-31",
+        "title": "Press Release",
+        "filingDate": "Oct 19, 2026 10:47 AM",
+        "edgeNo": "12f44fc5b3e1193f64d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=12f44fc5b3e1193f64d70b69f0a3140b"
+      },
       {
         "symbol": "MEG",
         "companyName": "MEG",
@@ -11751,27 +11769,27 @@
         "filingDate": "Oct 15, 2026 08:54 AM",
         "edgeNo": "92527e5f38514f0d64d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=92527e5f38514f0d64d70b69f0a3140b"
-      },
-      {
-        "symbol": "MEG",
-        "companyName": "MEG",
-        "formType": "REIT-2",
-        "title": "Reinvestment Plan Progress Report",
-        "filingDate": "Oct 15, 2026 08:45 AM",
-        "edgeNo": "7cd0815988ed672f64d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=7cd0815988ed672f64d70b69f0a3140b"
-      },
-      {
-        "symbol": "MEG",
-        "companyName": "MEG",
-        "formType": "REIT-2",
-        "title": "Reinvestment Plan Progress Report",
-        "filingDate": "Oct 15, 2026 08:34 AM",
-        "edgeNo": "d8fbb403c530b4d064d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=d8fbb403c530b4d064d70b69f0a3140b"
       }
     ],
     "MER": [
+      {
+        "symbol": "MER",
+        "companyName": "MER",
+        "formType": "17-18",
+        "title": "Other SEC Forms, Reports and Requirements",
+        "filingDate": "Oct 21, 2026 12:46 PM",
+        "edgeNo": "ac96de9128f1a66464d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=ac96de9128f1a66464d70b69f0a3140b"
+      },
+      {
+        "symbol": "MER",
+        "companyName": "MER",
+        "formType": "13-1",
+        "title": "Change in Shareholdings of Directors and Principal Officers",
+        "filingDate": "Oct 20, 2026 07:50 AM",
+        "edgeNo": "50218905347f376264d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=50218905347f376264d70b69f0a3140b"
+      },
       {
         "symbol": "MER",
         "companyName": "MER",
@@ -11825,27 +11843,18 @@
         "filingDate": "Oct 12, 2026 03:07 PM",
         "edgeNo": "787abb55e029802364d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=787abb55e029802364d70b69f0a3140b"
-      },
-      {
-        "symbol": "MER",
-        "companyName": "MER",
-        "formType": "17-7",
-        "title": "Statement of Changes in Beneficial Ownership of Securities",
-        "filingDate": "Oct 12, 2026 10:11 AM",
-        "edgeNo": "add0493cf6a7688264d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=add0493cf6a7688264d70b69f0a3140b"
-      },
-      {
-        "symbol": "MER",
-        "companyName": "MER",
-        "formType": "17-7",
-        "title": "[Amend-1]Statement of Changes in Beneficial Ownership of Securities",
-        "filingDate": "Oct 09, 2026 12:08 PM",
-        "edgeNo": "edf4717c05e1627f64d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=edf4717c05e1627f64d70b69f0a3140b"
       }
     ],
     "MFC": [
+      {
+        "symbol": "MFC",
+        "companyName": "MFC",
+        "formType": "4-8",
+        "title": "Change in Directors and/or Officers (Resignation, Removal or Appointment, Election and/or Promotion)",
+        "filingDate": "Oct 20, 2026 07:56 AM",
+        "edgeNo": "14643dc28176d21264d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=14643dc28176d21264d70b69f0a3140b"
+      },
       {
         "symbol": "MFC",
         "companyName": "MFC",
@@ -11908,15 +11917,6 @@
         "filingDate": "Aug 13, 2026 08:10 AM",
         "edgeNo": "ed91f918f89dcbaa64d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=ed91f918f89dcbaa64d70b69f0a3140b"
-      },
-      {
-        "symbol": "MFC",
-        "companyName": "MFC",
-        "formType": "4-11",
-        "title": "Change in Number of Issued and/or Outstanding Shares",
-        "filingDate": "Aug 07, 2026 07:39 AM",
-        "edgeNo": "c75bd2b4324f1ef064d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=c75bd2b4324f1ef064d70b69f0a3140b"
       }
     ],
     "MFIN": [
@@ -12589,6 +12589,15 @@
       {
         "symbol": "MREIT",
         "companyName": "MREIT",
+        "formType": "14-1",
+        "title": "Notice of Analysts'/Investors' Briefing",
+        "filingDate": "Oct 19, 2026 09:08 AM",
+        "edgeNo": "76b2c4711d7ea1b464d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=76b2c4711d7ea1b464d70b69f0a3140b"
+      },
+      {
+        "symbol": "MREIT",
+        "companyName": "MREIT",
         "formType": "REIT-2",
         "title": "Reinvestment Plan Progress Report",
         "filingDate": "Oct 15, 2026 06:36 AM",
@@ -12648,18 +12657,18 @@
         "filingDate": "Oct 14, 2026 04:23 PM",
         "edgeNo": "76860f4ac7767e7664d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=76860f4ac7767e7664d70b69f0a3140b"
-      },
-      {
-        "symbol": "MREIT",
-        "companyName": "MREIT",
-        "formType": "17-12-A",
-        "title": "List of Top 100 Stockholders (Common Shares)",
-        "filingDate": "Oct 13, 2026 11:08 AM",
-        "edgeNo": "5144a181f35b1dfb64d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=5144a181f35b1dfb64d70b69f0a3140b"
       }
     ],
     "MRSGI": [
+      {
+        "symbol": "MRSGI",
+        "companyName": "MRSGI",
+        "formType": "9-1",
+        "title": "Share Buy-Back Transactions",
+        "filingDate": "Oct 20, 2026 07:39 AM",
+        "edgeNo": "589c51f12b77e89d64d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=589c51f12b77e89d64d70b69f0a3140b"
+      },
       {
         "symbol": "MRSGI",
         "companyName": "MRSGI",
@@ -12722,15 +12731,6 @@
         "filingDate": "Sep 30, 2026 02:07 PM",
         "edgeNo": "77f0da3b5483231a64d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=77f0da3b5483231a64d70b69f0a3140b"
-      },
-      {
-        "symbol": "MRSGI",
-        "companyName": "MRSGI",
-        "formType": "4-8",
-        "title": "Change in Directors and/or Officers (Resignation, Removal or Appointment, Election and/or Promotion)",
-        "filingDate": "Sep 23, 2026 03:08 PM",
-        "edgeNo": "3514db84e838b45164d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=3514db84e838b45164d70b69f0a3140b"
       }
     ],
     "MVC": [
@@ -12811,6 +12811,15 @@
       {
         "symbol": "MWC",
         "companyName": "MWC",
+        "formType": "4-8",
+        "title": "Change in Directors and/or Officers (Resignation, Removal or Appointment, Election and/or Promotion)",
+        "filingDate": "Oct 22, 2026 08:39 AM",
+        "edgeNo": "ffb0bbb1d506786164d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=ffb0bbb1d506786164d70b69f0a3140b"
+      },
+      {
+        "symbol": "MWC",
+        "companyName": "MWC",
         "formType": "17-12-A",
         "title": "[Amend-1]List of Top 100 Stockholders (Common Shares)",
         "filingDate": "Oct 16, 2026 11:42 AM",
@@ -12870,18 +12879,27 @@
         "filingDate": "Aug 26, 2026 09:15 AM",
         "edgeNo": "a45f059af6be147c64d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=a45f059af6be147c64d70b69f0a3140b"
-      },
-      {
-        "symbol": "MWC",
-        "companyName": "MWC",
-        "formType": "4-30",
-        "title": "Material Information/Transactions",
-        "filingDate": "Aug 26, 2026 07:44 AM",
-        "edgeNo": "aa86f53a5bbcb2a664d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=aa86f53a5bbcb2a664d70b69f0a3140b"
       }
     ],
     "MWIDE": [
+      {
+        "symbol": "MWIDE",
+        "companyName": "MWIDE",
+        "formType": "6-1",
+        "title": "Declaration of Cash Dividends",
+        "filingDate": "Oct 19, 2026 08:14 AM",
+        "edgeNo": "c4b2346e0bd20cc264d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=c4b2346e0bd20cc264d70b69f0a3140b"
+      },
+      {
+        "symbol": "MWIDE",
+        "companyName": "MWIDE",
+        "formType": "6-1",
+        "title": "Declaration of Cash Dividends",
+        "filingDate": "Oct 19, 2026 08:12 AM",
+        "edgeNo": "eff3aedaed9804db64d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=eff3aedaed9804db64d70b69f0a3140b"
+      },
       {
         "symbol": "MWIDE",
         "companyName": "MWIDE",
@@ -12935,27 +12953,27 @@
         "filingDate": "Oct 15, 2026 10:23 AM",
         "edgeNo": "8c36255a0b21762e64d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=8c36255a0b21762e64d70b69f0a3140b"
-      },
-      {
-        "symbol": "MWIDE",
-        "companyName": "MWIDE",
-        "formType": "17-12-B",
-        "title": "List of Top 100 Stockholders (Preferred Shares)",
-        "filingDate": "Oct 15, 2026 10:21 AM",
-        "edgeNo": "9bc5abf550552cfe64d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=9bc5abf550552cfe64d70b69f0a3140b"
-      },
-      {
-        "symbol": "MWIDE",
-        "companyName": "MWIDE",
-        "formType": "17-12-A",
-        "title": "List of Top 100 Stockholders (Common Shares)",
-        "filingDate": "Oct 15, 2026 10:11 AM",
-        "edgeNo": "28ba23cf5421366b64d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=28ba23cf5421366b64d70b69f0a3140b"
       }
     ],
     "MYNLD": [
+      {
+        "symbol": "MYNLD",
+        "companyName": "MYNLD",
+        "formType": "14-1",
+        "title": "Notice of Analysts'/Investors' Briefing",
+        "filingDate": "Oct 23, 2026 02:13 PM",
+        "edgeNo": "b25941dbb9f5ef5264d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=b25941dbb9f5ef5264d70b69f0a3140b"
+      },
+      {
+        "symbol": "MYNLD",
+        "companyName": "MYNLD",
+        "formType": "13-1",
+        "title": "Change in Shareholdings of Directors and Principal Officers",
+        "filingDate": "Oct 21, 2026 12:16 PM",
+        "edgeNo": "a6eab496570fec9964d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=a6eab496570fec9964d70b69f0a3140b"
+      },
       {
         "symbol": "MYNLD",
         "companyName": "MYNLD",
@@ -13009,27 +13027,27 @@
         "filingDate": "Oct 01, 2026 04:13 PM",
         "edgeNo": "774747269f9e0d6864d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=774747269f9e0d6864d70b69f0a3140b"
-      },
-      {
-        "symbol": "MYNLD",
-        "companyName": "MYNLD",
-        "formType": "13-1",
-        "title": "Change in Shareholdings of Directors and Principal Officers",
-        "filingDate": "Sep 30, 2026 04:07 PM",
-        "edgeNo": "850cf77a9f4c462f64d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=850cf77a9f4c462f64d70b69f0a3140b"
-      },
-      {
-        "symbol": "MYNLD",
-        "companyName": "MYNLD",
-        "formType": "4-30",
-        "title": "Material Information/Transactions",
-        "filingDate": "Sep 29, 2026 03:26 PM",
-        "edgeNo": "0895f1f3675ac88764d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=0895f1f3675ac88764d70b69f0a3140b"
       }
     ],
     "NI": [
+      {
+        "symbol": "NI",
+        "companyName": "NI",
+        "formType": "4-30",
+        "title": "Material Information/Transactions",
+        "filingDate": "Oct 21, 2026 02:47 PM",
+        "edgeNo": "fed1758374829d4d64d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=fed1758374829d4d64d70b69f0a3140b"
+      },
+      {
+        "symbol": "NI",
+        "companyName": "NI",
+        "formType": "17-2",
+        "title": "Quarterly Report",
+        "filingDate": "Oct 21, 2026 10:29 AM",
+        "edgeNo": "1a54bada6e782cd064d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=1a54bada6e782cd064d70b69f0a3140b"
+      },
       {
         "symbol": "NI",
         "companyName": "NI",
@@ -13083,27 +13101,18 @@
         "filingDate": "Jul 15, 2026 03:46 PM",
         "edgeNo": "27eff632ac92867464d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=27eff632ac92867464d70b69f0a3140b"
-      },
-      {
-        "symbol": "NI",
-        "companyName": "NI",
-        "formType": "4-24",
-        "title": "Results of Annual or Special Stockholders' Meeting",
-        "filingDate": "Jul 15, 2026 12:13 PM",
-        "edgeNo": "7318c8d96b669d9a64d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=7318c8d96b669d9a64d70b69f0a3140b"
-      },
-      {
-        "symbol": "NI",
-        "companyName": "NI",
-        "formType": "17-12-A",
-        "title": "List of Top 100 Stockholders (Common Shares)",
-        "filingDate": "Jul 07, 2026 11:27 AM",
-        "edgeNo": "ea2c03144e8b3fc664d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=ea2c03144e8b3fc664d70b69f0a3140b"
       }
     ],
     "NIKL": [
+      {
+        "symbol": "NIKL",
+        "companyName": "NIKL",
+        "formType": "14-1",
+        "title": "Notice of Analysts'/Investors' Briefing",
+        "filingDate": "Oct 22, 2026 08:09 AM",
+        "edgeNo": "a7e3be5c67a371a664d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=a7e3be5c67a371a664d70b69f0a3140b"
+      },
       {
         "symbol": "NIKL",
         "companyName": "NIKL",
@@ -13166,15 +13175,6 @@
         "filingDate": "Aug 06, 2026 05:06 PM",
         "edgeNo": "5f4a0f8dcc84312364d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=5f4a0f8dcc84312364d70b69f0a3140b"
-      },
-      {
-        "symbol": "NIKL",
-        "companyName": "NIKL",
-        "formType": "4-31",
-        "title": "Press Release",
-        "filingDate": "Aug 06, 2026 04:15 PM",
-        "edgeNo": "a9ec9d8ee3b3c22f64d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=a9ec9d8ee3b3c22f64d70b69f0a3140b"
       }
     ],
     "NOW": [
@@ -13553,6 +13553,60 @@
         "companyName": "OPM",
         "formType": "9-1",
         "title": "Share Buy-Back Transactions",
+        "filingDate": "Oct 23, 2026 07:40 AM",
+        "edgeNo": "731047221ad3a52064d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=731047221ad3a52064d70b69f0a3140b"
+      },
+      {
+        "symbol": "OPM",
+        "companyName": "OPM",
+        "formType": "9-1",
+        "title": "[Amend-1]Share Buy-Back Transactions",
+        "filingDate": "Oct 22, 2026 07:57 AM",
+        "edgeNo": "63fb66de25c1420364d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=63fb66de25c1420364d70b69f0a3140b"
+      },
+      {
+        "symbol": "OPM",
+        "companyName": "OPM",
+        "formType": "9-1",
+        "title": "[Amend-1]Share Buy-Back Transactions",
+        "filingDate": "Oct 22, 2026 07:57 AM",
+        "edgeNo": "503beea6d55d803064d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=503beea6d55d803064d70b69f0a3140b"
+      },
+      {
+        "symbol": "OPM",
+        "companyName": "OPM",
+        "formType": "9-1",
+        "title": "Share Buy-Back Transactions",
+        "filingDate": "Oct 21, 2026 07:51 AM",
+        "edgeNo": "bb6d6aabab4d071b64d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=bb6d6aabab4d071b64d70b69f0a3140b"
+      },
+      {
+        "symbol": "OPM",
+        "companyName": "OPM",
+        "formType": "9-1",
+        "title": "Share Buy-Back Transactions",
+        "filingDate": "Oct 20, 2026 07:31 AM",
+        "edgeNo": "7a84222e800d0a1464d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=7a84222e800d0a1464d70b69f0a3140b"
+      },
+      {
+        "symbol": "OPM",
+        "companyName": "OPM",
+        "formType": "9-1",
+        "title": "Share Buy-Back Transactions",
+        "filingDate": "Oct 19, 2026 07:53 AM",
+        "edgeNo": "49b907ed84298bb764d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=49b907ed84298bb764d70b69f0a3140b"
+      },
+      {
+        "symbol": "OPM",
+        "companyName": "OPM",
+        "formType": "9-1",
+        "title": "Share Buy-Back Transactions",
         "filingDate": "Oct 15, 2026 06:35 AM",
         "edgeNo": "a18f871bef5bff8464d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=a18f871bef5bff8464d70b69f0a3140b"
@@ -13565,60 +13619,6 @@
         "filingDate": "Oct 14, 2026 07:50 AM",
         "edgeNo": "bb93ec6f23e6e41564d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=bb93ec6f23e6e41564d70b69f0a3140b"
-      },
-      {
-        "symbol": "OPM",
-        "companyName": "OPM",
-        "formType": "POR-2",
-        "title": "Public Ownership Report (Classified Shares)",
-        "filingDate": "Oct 12, 2026 02:38 PM",
-        "edgeNo": "4500db3bbe3d6f4b64d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=4500db3bbe3d6f4b64d70b69f0a3140b"
-      },
-      {
-        "symbol": "OPM",
-        "companyName": "OPM",
-        "formType": "9-1",
-        "title": "Share Buy-Back Transactions",
-        "filingDate": "Oct 12, 2026 08:05 AM",
-        "edgeNo": "92e51be67b16301864d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=92e51be67b16301864d70b69f0a3140b"
-      },
-      {
-        "symbol": "OPM",
-        "companyName": "OPM",
-        "formType": "9-1",
-        "title": "Share Buy-Back Transactions",
-        "filingDate": "Oct 09, 2026 08:02 AM",
-        "edgeNo": "275e0241a825ecec64d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=275e0241a825ecec64d70b69f0a3140b"
-      },
-      {
-        "symbol": "OPM",
-        "companyName": "OPM",
-        "formType": "9-1",
-        "title": "Share Buy-Back Transactions",
-        "filingDate": "Oct 09, 2026 08:01 AM",
-        "edgeNo": "23a9d8c6f11fb87764d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=23a9d8c6f11fb87764d70b69f0a3140b"
-      },
-      {
-        "symbol": "OPM",
-        "companyName": "OPM",
-        "formType": "17-12-A",
-        "title": "List of Top 100 Stockholders (Common Shares)",
-        "filingDate": "Oct 08, 2026 12:39 PM",
-        "edgeNo": "998f36771bccbfb664d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=998f36771bccbfb664d70b69f0a3140b"
-      },
-      {
-        "symbol": "OPM",
-        "companyName": "OPM",
-        "formType": "9-1",
-        "title": "Share Buy-Back Transactions",
-        "filingDate": "Oct 08, 2026 07:34 AM",
-        "edgeNo": "203b525dc8f8963a64d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=203b525dc8f8963a64d70b69f0a3140b"
       }
     ],
     "ORE": [
@@ -14069,6 +14069,15 @@
       {
         "symbol": "PBC",
         "companyName": "PBC",
+        "formType": "17-6",
+        "title": "Initial Statement of Beneficial Ownership of Securities",
+        "filingDate": "Oct 19, 2026 08:30 AM",
+        "edgeNo": "ec39d9f9479b4eb564d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=ec39d9f9479b4eb564d70b69f0a3140b"
+      },
+      {
+        "symbol": "PBC",
+        "companyName": "PBC",
         "formType": "POR-1",
         "title": "Public Ownership Report",
         "filingDate": "Oct 14, 2026 01:18 PM",
@@ -14128,15 +14137,6 @@
         "filingDate": "Oct 02, 2026 01:49 PM",
         "edgeNo": "858ff3e65a60755c64d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=858ff3e65a60755c64d70b69f0a3140b"
-      },
-      {
-        "symbol": "PBC",
-        "companyName": "PBC",
-        "formType": "4-8",
-        "title": "[Amend-1]Change in Directors and/or Officers (Resignation, Removal or Appointment, Election and/or Promotion)",
-        "filingDate": "Oct 01, 2026 08:02 AM",
-        "edgeNo": "9e4eda22c8fa00f064d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=9e4eda22c8fa00f064d70b69f0a3140b"
       }
     ],
     "PCOR": [
@@ -14439,6 +14439,15 @@
       {
         "symbol": "PHC",
         "companyName": "PHC",
+        "formType": "17-5",
+        "title": "Information Statement",
+        "filingDate": "Oct 20, 2026 03:37 PM",
+        "edgeNo": "1d158d7a89448dfe64d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=1d158d7a89448dfe64d70b69f0a3140b"
+      },
+      {
+        "symbol": "PHC",
+        "companyName": "PHC",
         "formType": "17-12-A",
         "title": "List of Top 100 Stockholders (Common Shares)",
         "filingDate": "Oct 08, 2026 02:46 PM",
@@ -14498,18 +14507,18 @@
         "filingDate": "Sep 01, 2026 03:29 PM",
         "edgeNo": "ac6493c61a5b8eec64d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=ac6493c61a5b8eec64d70b69f0a3140b"
-      },
-      {
-        "symbol": "PHC",
-        "companyName": "PHC",
-        "formType": "17-2",
-        "title": "Quarterly Report",
-        "filingDate": "Aug 14, 2026 04:09 PM",
-        "edgeNo": "f7463d85566a97fe64d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=f7463d85566a97fe64d70b69f0a3140b"
       }
     ],
     "PHES": [
+      {
+        "symbol": "PHES",
+        "companyName": "PHES",
+        "formType": "17-18",
+        "title": "Other SEC Forms, Reports and Requirements",
+        "filingDate": "Oct 23, 2026 11:54 AM",
+        "edgeNo": "36e1d2da64e83cbb64d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=36e1d2da64e83cbb64d70b69f0a3140b"
+      },
       {
         "symbol": "PHES",
         "companyName": "PHES",
@@ -14572,15 +14581,6 @@
         "filingDate": "Sep 08, 2026 01:58 PM",
         "edgeNo": "309fe72caf4db47a64d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=309fe72caf4db47a64d70b69f0a3140b"
-      },
-      {
-        "symbol": "PHES",
-        "companyName": "PHES",
-        "formType": "17-5",
-        "title": "Information Statement",
-        "filingDate": "Aug 28, 2026 11:53 AM",
-        "edgeNo": "61c76ee8d26eebc164d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=61c76ee8d26eebc164d70b69f0a3140b"
       }
     ],
     "PHN": [
@@ -14661,6 +14661,42 @@
       {
         "symbol": "PHR",
         "companyName": "PHR",
+        "formType": "4-8",
+        "title": "Change in Directors and/or Officers (Resignation, Removal or Appointment, Election and/or Promotion)",
+        "filingDate": "Oct 22, 2026 08:32 AM",
+        "edgeNo": "7ae4117435008f6264d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=7ae4117435008f6264d70b69f0a3140b"
+      },
+      {
+        "symbol": "PHR",
+        "companyName": "PHR",
+        "formType": "4-25",
+        "title": "Results of Organizational Meeting of Board of Directors",
+        "filingDate": "Oct 22, 2026 08:31 AM",
+        "edgeNo": "f20fc85117c3bee564d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=f20fc85117c3bee564d70b69f0a3140b"
+      },
+      {
+        "symbol": "PHR",
+        "companyName": "PHR",
+        "formType": "4-3",
+        "title": "[Amend-5]Amendments to Articles of Incorporation",
+        "filingDate": "Oct 22, 2026 08:30 AM",
+        "edgeNo": "b3ec1feb83184f8464d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=b3ec1feb83184f8464d70b69f0a3140b"
+      },
+      {
+        "symbol": "PHR",
+        "companyName": "PHR",
+        "formType": "4-24",
+        "title": "Results of Annual or Special Stockholders' Meeting",
+        "filingDate": "Oct 22, 2026 08:25 AM",
+        "edgeNo": "e82df92ff450fb8b64d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=e82df92ff450fb8b64d70b69f0a3140b"
+      },
+      {
+        "symbol": "PHR",
+        "companyName": "PHR",
         "formType": "SD-2",
         "title": "Reply to Inquiry of Unusual Price Movement",
         "filingDate": "Oct 14, 2026 03:24 PM",
@@ -14693,42 +14729,6 @@
         "filingDate": "Oct 02, 2026 10:38 AM",
         "edgeNo": "4f6b9abd8b7a350964d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=4f6b9abd8b7a350964d70b69f0a3140b"
-      },
-      {
-        "symbol": "PHR",
-        "companyName": "PHR",
-        "formType": "4-30",
-        "title": "Material Information/Transactions",
-        "filingDate": "Oct 01, 2026 08:02 AM",
-        "edgeNo": "9d0b5adbc390724e64d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=9d0b5adbc390724e64d70b69f0a3140b"
-      },
-      {
-        "symbol": "PHR",
-        "companyName": "PHR",
-        "formType": "17-5",
-        "title": "Information Statement",
-        "filingDate": "Sep 29, 2026 01:18 PM",
-        "edgeNo": "fa810c04b0ad2e0e64d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=fa810c04b0ad2e0e64d70b69f0a3140b"
-      },
-      {
-        "symbol": "PHR",
-        "companyName": "PHR",
-        "formType": "4-32",
-        "title": "Reply to Exchange's Query",
-        "filingDate": "Sep 23, 2026 09:34 AM",
-        "edgeNo": "554eef32f3ff997c64d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=554eef32f3ff997c64d70b69f0a3140b"
-      },
-      {
-        "symbol": "PHR",
-        "companyName": "PHR",
-        "formType": "17-5",
-        "title": "[Amend-2]Information Statement",
-        "filingDate": "Sep 21, 2026 08:18 AM",
-        "edgeNo": "edf42f3180a81a9864d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=edf42f3180a81a9864d70b69f0a3140b"
       }
     ],
     "PIZZA": [
@@ -14957,6 +14957,42 @@
       {
         "symbol": "PNB",
         "companyName": "PNB",
+        "formType": "4-8",
+        "title": "Change in Directors and/or Officers (Resignation, Removal or Appointment, Election and/or Promotion)",
+        "filingDate": "Oct 23, 2026 01:18 PM",
+        "edgeNo": "72ec27422fd9323564d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=72ec27422fd9323564d70b69f0a3140b"
+      },
+      {
+        "symbol": "PNB",
+        "companyName": "PNB",
+        "formType": "4-30",
+        "title": "Material Information/Transactions",
+        "filingDate": "Oct 23, 2026 01:18 PM",
+        "edgeNo": "f4adf41e573c324f64d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=f4adf41e573c324f64d70b69f0a3140b"
+      },
+      {
+        "symbol": "PNB",
+        "companyName": "PNB",
+        "formType": "4-31",
+        "title": "Press Release",
+        "filingDate": "Oct 23, 2026 11:16 AM",
+        "edgeNo": "d172de3ab819e27764d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=d172de3ab819e27764d70b69f0a3140b"
+      },
+      {
+        "symbol": "PNB",
+        "companyName": "PNB",
+        "formType": "4-30",
+        "title": "Material Information/Transactions",
+        "filingDate": "Oct 23, 2026 11:15 AM",
+        "edgeNo": "6f4b4a2ee31fae6264d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=6f4b4a2ee31fae6264d70b69f0a3140b"
+      },
+      {
+        "symbol": "PNB",
+        "companyName": "PNB",
         "formType": "POR-1",
         "title": "Public Ownership Report",
         "filingDate": "Oct 15, 2026 03:15 PM",
@@ -14989,42 +15025,6 @@
         "filingDate": "Oct 13, 2026 03:06 PM",
         "edgeNo": "d3dafd112d50a56064d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=d3dafd112d50a56064d70b69f0a3140b"
-      },
-      {
-        "symbol": "PNB",
-        "companyName": "PNB",
-        "formType": "17-7",
-        "title": "Statement of Changes in Beneficial Ownership of Securities",
-        "filingDate": "Oct 08, 2026 07:41 AM",
-        "edgeNo": "8fa3223a7ef4bc2464d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=8fa3223a7ef4bc2464d70b69f0a3140b"
-      },
-      {
-        "symbol": "PNB",
-        "companyName": "PNB",
-        "formType": "17-6",
-        "title": "Initial Statement of Beneficial Ownership of Securities",
-        "filingDate": "Sep 25, 2026 03:06 PM",
-        "edgeNo": "da69a5a0526e213964d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=da69a5a0526e213964d70b69f0a3140b"
-      },
-      {
-        "symbol": "PNB",
-        "companyName": "PNB",
-        "formType": "4-31",
-        "title": "Press Release",
-        "filingDate": "Sep 25, 2026 10:47 AM",
-        "edgeNo": "8013644a250da4d164d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=8013644a250da4d164d70b69f0a3140b"
-      },
-      {
-        "symbol": "PNB",
-        "companyName": "PNB",
-        "formType": "17-18",
-        "title": "[Amend-3]Other SEC Forms, Reports and Requirements",
-        "filingDate": "Sep 21, 2026 04:14 PM",
-        "edgeNo": "bf131b5fa224315a64d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=bf131b5fa224315a64d70b69f0a3140b"
       }
     ],
     "PNC": [
@@ -15255,6 +15255,24 @@
         "companyName": "PPC",
         "formType": "4-30",
         "title": "Material Information/Transactions",
+        "filingDate": "Oct 20, 2026 10:18 AM",
+        "edgeNo": "f9b180411ae1883c64d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=f9b180411ae1883c64d70b69f0a3140b"
+      },
+      {
+        "symbol": "PPC",
+        "companyName": "PPC",
+        "formType": "4-31",
+        "title": "Press Release",
+        "filingDate": "Oct 20, 2026 10:17 AM",
+        "edgeNo": "042f50a6dd19aa2d64d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=042f50a6dd19aa2d64d70b69f0a3140b"
+      },
+      {
+        "symbol": "PPC",
+        "companyName": "PPC",
+        "formType": "4-30",
+        "title": "Material Information/Transactions",
         "filingDate": "Oct 16, 2026 01:48 PM",
         "edgeNo": "4046895d84afad7f64d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=4046895d84afad7f64d70b69f0a3140b"
@@ -15303,24 +15321,6 @@
         "filingDate": "Oct 07, 2026 01:39 PM",
         "edgeNo": "280d2c35b36c73d364d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=280d2c35b36c73d364d70b69f0a3140b"
-      },
-      {
-        "symbol": "PPC",
-        "companyName": "PPC",
-        "formType": "4-2",
-        "title": "[Amend-2]Acquisition or Disposition of Shares of Another Corporation",
-        "filingDate": "Oct 07, 2026 01:28 PM",
-        "edgeNo": "7ef53d58e30d992364d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=7ef53d58e30d992364d70b69f0a3140b"
-      },
-      {
-        "symbol": "PPC",
-        "companyName": "PPC",
-        "formType": "4-2",
-        "title": "[Amend-1]Acquisition or Disposition of Shares of Another Corporation",
-        "filingDate": "Oct 01, 2026 01:08 PM",
-        "edgeNo": "08d218eeaee377c764d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=08d218eeaee377c764d70b69f0a3140b"
       }
     ],
     "PRC": [
@@ -15623,6 +15623,24 @@
       {
         "symbol": "PSB",
         "companyName": "PSB",
+        "formType": "6-1",
+        "title": "Declaration of Cash Dividends",
+        "filingDate": "Oct 23, 2026 07:58 AM",
+        "edgeNo": "8934490e67dd03aa64d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=8934490e67dd03aa64d70b69f0a3140b"
+      },
+      {
+        "symbol": "PSB",
+        "companyName": "PSB",
+        "formType": "4-30",
+        "title": "Material Information/Transactions",
+        "filingDate": "Oct 23, 2026 07:52 AM",
+        "edgeNo": "7e9d0dfc52b8cf7b64d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=7e9d0dfc52b8cf7b64d70b69f0a3140b"
+      },
+      {
+        "symbol": "PSB",
+        "companyName": "PSB",
         "formType": "17-12-A",
         "title": "List of Top 100 Stockholders (Common Shares)",
         "filingDate": "Oct 13, 2026 08:57 AM",
@@ -15673,24 +15691,6 @@
         "filingDate": "Aug 13, 2026 01:42 PM",
         "edgeNo": "bfd9a61d7bb0688664d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=bfd9a61d7bb0688664d70b69f0a3140b"
-      },
-      {
-        "symbol": "PSB",
-        "companyName": "PSB",
-        "formType": "4-30",
-        "title": "Material Information/Transactions",
-        "filingDate": "Aug 07, 2026 03:07 PM",
-        "edgeNo": "c2fbce4e36f8332264d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=c2fbce4e36f8332264d70b69f0a3140b"
-      },
-      {
-        "symbol": "PSB",
-        "companyName": "PSB",
-        "formType": "4-31",
-        "title": "Press Release",
-        "filingDate": "Aug 07, 2026 03:05 PM",
-        "edgeNo": "8a7daa97b5cad44d64d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=8a7daa97b5cad44d64d70b69f0a3140b"
       }
     ],
     "PSE": [
@@ -16289,6 +16289,15 @@
       {
         "symbol": "REDC",
         "companyName": "REDC",
+        "formType": "17-18",
+        "title": "[Amend-1]Other SEC Forms, Reports and Requirements",
+        "filingDate": "Oct 20, 2026 07:55 AM",
+        "edgeNo": "b4904c87a57aff2164d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=b4904c87a57aff2164d70b69f0a3140b"
+      },
+      {
+        "symbol": "REDC",
+        "companyName": "REDC",
         "formType": "17-5",
         "title": "Information Statement",
         "filingDate": "Oct 14, 2026 09:05 AM",
@@ -16348,18 +16357,27 @@
         "filingDate": "Aug 27, 2026 07:36 AM",
         "edgeNo": "7e02742fe90589e864d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=7e02742fe90589e864d70b69f0a3140b"
-      },
-      {
-        "symbol": "REDC",
-        "companyName": "REDC",
-        "formType": "4-30",
-        "title": "[Amend-1]Material Information/Transactions",
-        "filingDate": "Aug 26, 2026 04:19 PM",
-        "edgeNo": "92d6be5554ba83ff64d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=92d6be5554ba83ff64d70b69f0a3140b"
       }
     ],
     "REG": [
+      {
+        "symbol": "REG",
+        "companyName": "REG",
+        "formType": "17-18",
+        "title": "Other SEC Forms, Reports and Requirements",
+        "filingDate": "Oct 20, 2026 12:24 PM",
+        "edgeNo": "656cd1a9d7b82b7c64d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=656cd1a9d7b82b7c64d70b69f0a3140b"
+      },
+      {
+        "symbol": "REG",
+        "companyName": "REG",
+        "formType": "17-2",
+        "title": "Quarterly Report",
+        "filingDate": "Oct 19, 2026 09:11 AM",
+        "edgeNo": "70d986a40b4256ae64d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=70d986a40b4256ae64d70b69f0a3140b"
+      },
       {
         "symbol": "REG",
         "companyName": "REG",
@@ -16413,27 +16431,36 @@
         "filingDate": "Oct 07, 2026 09:02 AM",
         "edgeNo": "266d2108ed07b34264d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=266d2108ed07b34264d70b69f0a3140b"
-      },
-      {
-        "symbol": "REG",
-        "companyName": "REG",
-        "formType": "17-18",
-        "title": "[Amend-13]Other SEC Forms, Reports and Requirements",
-        "filingDate": "Oct 06, 2026 03:29 PM",
-        "edgeNo": "1341a903d0fe649264d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=1341a903d0fe649264d70b69f0a3140b"
-      },
-      {
-        "symbol": "REG",
-        "companyName": "REG",
-        "formType": "POR-1",
-        "title": "Public Ownership Report",
-        "filingDate": "Oct 06, 2026 02:10 PM",
-        "edgeNo": "1f33014700143dd864d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=1f33014700143dd864d70b69f0a3140b"
       }
     ],
     "RFM": [
+      {
+        "symbol": "RFM",
+        "companyName": "RFM",
+        "formType": "17-2",
+        "title": "Quarterly Report",
+        "filingDate": "Oct 21, 2026 04:13 PM",
+        "edgeNo": "45be30e3ed0ea5b464d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=45be30e3ed0ea5b464d70b69f0a3140b"
+      },
+      {
+        "symbol": "RFM",
+        "companyName": "RFM",
+        "formType": "4-31",
+        "title": "Press Release",
+        "filingDate": "Oct 21, 2026 03:54 PM",
+        "edgeNo": "11918e700dbdbf3464d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=11918e700dbdbf3464d70b69f0a3140b"
+      },
+      {
+        "symbol": "RFM",
+        "companyName": "RFM",
+        "formType": "6-1",
+        "title": "Declaration of Cash Dividends",
+        "filingDate": "Oct 21, 2026 03:42 PM",
+        "edgeNo": "a3fa7d050baab90d64d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=a3fa7d050baab90d64d70b69f0a3140b"
+      },
       {
         "symbol": "RFM",
         "companyName": "RFM",
@@ -16478,33 +16505,6 @@
         "filingDate": "Aug 04, 2026 01:54 PM",
         "edgeNo": "f3127ba1cd10a83a64d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=f3127ba1cd10a83a64d70b69f0a3140b"
-      },
-      {
-        "symbol": "RFM",
-        "companyName": "RFM",
-        "formType": "17-12-A",
-        "title": "List of Top 100 Stockholders (Common Shares)",
-        "filingDate": "Jul 13, 2026 09:03 AM",
-        "edgeNo": "7a8320c41d17943464d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=7a8320c41d17943464d70b69f0a3140b"
-      },
-      {
-        "symbol": "RFM",
-        "companyName": "RFM",
-        "formType": "13-1",
-        "title": "Change in Shareholdings of Directors and Principal Officers",
-        "filingDate": "Jul 13, 2026 08:35 AM",
-        "edgeNo": "5a6d0ef7ecda619864d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=5a6d0ef7ecda619864d70b69f0a3140b"
-      },
-      {
-        "symbol": "RFM",
-        "companyName": "RFM",
-        "formType": "POR-1",
-        "title": "Public Ownership Report",
-        "filingDate": "Jul 10, 2026 02:04 PM",
-        "edgeNo": "daf366e00edb9fe064d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=daf366e00edb9fe064d70b69f0a3140b"
       }
     ],
     "RLC": [
@@ -16955,6 +16955,15 @@
       {
         "symbol": "SCC",
         "companyName": "SCC",
+        "formType": "14-1",
+        "title": "Notice of Analysts'/Investors' Briefing",
+        "filingDate": "Oct 22, 2026 03:16 PM",
+        "edgeNo": "95a62d1cb385f65064d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=95a62d1cb385f65064d70b69f0a3140b"
+      },
+      {
+        "symbol": "SCC",
+        "companyName": "SCC",
         "formType": "POR-1",
         "title": "Public Ownership Report",
         "filingDate": "Oct 13, 2026 11:25 AM",
@@ -17014,15 +17023,6 @@
         "filingDate": "Aug 13, 2026 08:18 AM",
         "edgeNo": "517b692e59e77ad664d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=517b692e59e77ad664d70b69f0a3140b"
-      },
-      {
-        "symbol": "SCC",
-        "companyName": "SCC",
-        "formType": "17-6",
-        "title": "Initial Statement of Beneficial Ownership of Securities",
-        "filingDate": "Aug 12, 2026 08:24 AM",
-        "edgeNo": "e2105806284d680f64d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=e2105806284d680f64d70b69f0a3140b"
       }
     ],
     "SECB": [
@@ -17621,6 +17621,42 @@
       {
         "symbol": "SLI",
         "companyName": "SLI",
+        "formType": "6-1",
+        "title": "Declaration of Cash Dividends",
+        "filingDate": "Oct 22, 2026 08:28 AM",
+        "edgeNo": "aebf01bd65fe209c64d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=aebf01bd65fe209c64d70b69f0a3140b"
+      },
+      {
+        "symbol": "SLI",
+        "companyName": "SLI",
+        "formType": "7-1",
+        "title": "Notice of Annual or Special Stockholders' Meeting",
+        "filingDate": "Oct 22, 2026 08:02 AM",
+        "edgeNo": "bcbba4ab97deb13764d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=bcbba4ab97deb13764d70b69f0a3140b"
+      },
+      {
+        "symbol": "SLI",
+        "companyName": "SLI",
+        "formType": "4-9",
+        "title": "Change in External Auditor",
+        "filingDate": "Oct 21, 2026 04:15 PM",
+        "edgeNo": "d6e63ee126fb685464d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=d6e63ee126fb685464d70b69f0a3140b"
+      },
+      {
+        "symbol": "SLI",
+        "companyName": "SLI",
+        "formType": "4-30",
+        "title": "Material Information/Transactions",
+        "filingDate": "Oct 21, 2026 04:15 PM",
+        "edgeNo": "84f99e3d0819d94e64d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=84f99e3d0819d94e64d70b69f0a3140b"
+      },
+      {
+        "symbol": "SLI",
+        "companyName": "SLI",
         "formType": "17-12-A",
         "title": "List of Top 100 Stockholders (Common Shares)",
         "filingDate": "Oct 09, 2026 11:30 AM",
@@ -17653,45 +17689,18 @@
         "filingDate": "Aug 14, 2026 02:35 PM",
         "edgeNo": "9f21352889277c0c64d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=9f21352889277c0c64d70b69f0a3140b"
-      },
-      {
-        "symbol": "SLI",
-        "companyName": "SLI",
-        "formType": "17-12-A",
-        "title": "List of Top 100 Stockholders (Common Shares)",
-        "filingDate": "Jul 06, 2026 03:23 PM",
-        "edgeNo": "7b7c489a5d607f0164d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=7b7c489a5d607f0164d70b69f0a3140b"
-      },
-      {
-        "symbol": "SLI",
-        "companyName": "SLI",
-        "formType": "POR-1",
-        "title": "Public Ownership Report",
-        "filingDate": "Jul 03, 2026 09:49 AM",
-        "edgeNo": "daca57b4464e385364d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=daca57b4464e385364d70b69f0a3140b"
-      },
-      {
-        "symbol": "SLI",
-        "companyName": "SLI",
-        "formType": "17-18",
-        "title": "Other SEC Forms, Reports and Requirements",
-        "filingDate": "Jul 01, 2026 07:44 AM",
-        "edgeNo": "1d1586d26098180f64d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=1d1586d26098180f64d70b69f0a3140b"
-      },
-      {
-        "symbol": "SLI",
-        "companyName": "SLI",
-        "formType": "4-25",
-        "title": "Results of Organizational Meeting of Board of Directors",
-        "filingDate": "Jun 19, 2026 04:34 PM",
-        "edgeNo": "28727ea8ef6ceebf64d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=28727ea8ef6ceebf64d70b69f0a3140b"
       }
     ],
     "SM": [
+      {
+        "symbol": "SM",
+        "companyName": "SM",
+        "formType": "17-18",
+        "title": "[Amend-15]Other SEC Forms, Reports and Requirements",
+        "filingDate": "Oct 19, 2026 12:39 PM",
+        "edgeNo": "2a49ee5ee05cde2464d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=2a49ee5ee05cde2464d70b69f0a3140b"
+      },
       {
         "symbol": "SM",
         "companyName": "SM",
@@ -17754,15 +17763,6 @@
         "filingDate": "Oct 02, 2026 08:03 AM",
         "edgeNo": "425672641cd347cb64d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=425672641cd347cb64d70b69f0a3140b"
-      },
-      {
-        "symbol": "SM",
-        "companyName": "SM",
-        "formType": "4-13",
-        "title": "Clarification of News Reports",
-        "filingDate": "Oct 01, 2026 11:03 AM",
-        "edgeNo": "444484567ba9707964d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=444484567ba9707964d70b69f0a3140b"
       }
     ],
     "SMC": [
@@ -17917,6 +17917,15 @@
       {
         "symbol": "SOC",
         "companyName": "SOC",
+        "formType": "7-2",
+        "title": "Postponement of Annual Stockholders' Meeting",
+        "filingDate": "Oct 22, 2026 01:58 PM",
+        "edgeNo": "18612dfbfe91fd5664d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=18612dfbfe91fd5664d70b69f0a3140b"
+      },
+      {
+        "symbol": "SOC",
+        "companyName": "SOC",
         "formType": "17-12-A",
         "title": "List of Top 100 Stockholders (Common Shares)",
         "filingDate": "Oct 09, 2026 01:05 PM",
@@ -17976,15 +17985,6 @@
         "filingDate": "Aug 06, 2026 03:12 PM",
         "edgeNo": "873caff68e31d41c64d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=873caff68e31d41c64d70b69f0a3140b"
-      },
-      {
-        "symbol": "SOC",
-        "companyName": "SOC",
-        "formType": "17-5",
-        "title": "Information Statement",
-        "filingDate": "Jul 27, 2026 09:55 AM",
-        "edgeNo": "66cc1822b781bd2664d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=66cc1822b781bd2664d70b69f0a3140b"
       }
     ],
     "SPC": [
@@ -18139,6 +18139,15 @@
       {
         "symbol": "SPNEC",
         "companyName": "SPNEC",
+        "formType": "13-1",
+        "title": "Change in Shareholdings of Directors and Principal Officers",
+        "filingDate": "Oct 19, 2026 08:21 AM",
+        "edgeNo": "250c720fee950e2864d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=250c720fee950e2864d70b69f0a3140b"
+      },
+      {
+        "symbol": "SPNEC",
+        "companyName": "SPNEC",
         "formType": "17-12-A",
         "title": "List of Top 100 Stockholders (Common Shares)",
         "filingDate": "Oct 16, 2026 10:17 AM",
@@ -18198,15 +18207,6 @@
         "filingDate": "Sep 07, 2026 09:03 AM",
         "edgeNo": "2e47736fb468b4b764d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=2e47736fb468b4b764d70b69f0a3140b"
-      },
-      {
-        "symbol": "SPNEC",
-        "companyName": "SPNEC",
-        "formType": "17-6",
-        "title": "Initial Statement of Beneficial Ownership of Securities",
-        "filingDate": "Sep 07, 2026 09:02 AM",
-        "edgeNo": "5f3d855b525463e964d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=5f3d855b525463e964d70b69f0a3140b"
       }
     ],
     "SRDC": [
@@ -19249,6 +19249,33 @@
       {
         "symbol": "UBP",
         "companyName": "UBP",
+        "formType": "4-30",
+        "title": "Material Information/Transactions",
+        "filingDate": "Oct 23, 2026 02:02 PM",
+        "edgeNo": "7fe35c1a1c90edce64d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=7fe35c1a1c90edce64d70b69f0a3140b"
+      },
+      {
+        "symbol": "UBP",
+        "companyName": "UBP",
+        "formType": "4-30",
+        "title": "Material Information/Transactions",
+        "filingDate": "Oct 23, 2026 02:00 PM",
+        "edgeNo": "35debe08f0fa6fd864d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=35debe08f0fa6fd864d70b69f0a3140b"
+      },
+      {
+        "symbol": "UBP",
+        "companyName": "UBP",
+        "formType": "4-31",
+        "title": "Press Release",
+        "filingDate": "Oct 23, 2026 02:00 PM",
+        "edgeNo": "24e6a4c0decdcc7664d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=24e6a4c0decdcc7664d70b69f0a3140b"
+      },
+      {
+        "symbol": "UBP",
+        "companyName": "UBP",
         "formType": "4-8",
         "title": "Change in Directors and/or Officers (Resignation, Removal or Appointment, Election and/or Promotion)",
         "filingDate": "Oct 16, 2026 08:50 AM",
@@ -19290,33 +19317,6 @@
         "filingDate": "Sep 22, 2026 04:10 PM",
         "edgeNo": "c5003fff05cb69d564d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=c5003fff05cb69d564d70b69f0a3140b"
-      },
-      {
-        "symbol": "UBP",
-        "companyName": "UBP",
-        "formType": "17-7",
-        "title": "Statement of Changes in Beneficial Ownership of Securities",
-        "filingDate": "Sep 17, 2026 07:44 AM",
-        "edgeNo": "16b783087ca9fe4664d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=16b783087ca9fe4664d70b69f0a3140b"
-      },
-      {
-        "symbol": "UBP",
-        "companyName": "UBP",
-        "formType": "4-4",
-        "title": "[Amend-4]Amendments to By-Laws",
-        "filingDate": "Sep 10, 2026 07:59 AM",
-        "edgeNo": "9642c20dfd3629ff64d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=9642c20dfd3629ff64d70b69f0a3140b"
-      },
-      {
-        "symbol": "UBP",
-        "companyName": "UBP",
-        "formType": "4-30",
-        "title": "Material Information/Transactions",
-        "filingDate": "Aug 28, 2026 04:29 PM",
-        "edgeNo": "79089b2f23fe3d3064d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=79089b2f23fe3d3064d70b69f0a3140b"
       }
     ],
     "UNH": [
@@ -19397,6 +19397,15 @@
       {
         "symbol": "UPM",
         "companyName": "UPM",
+        "formType": "4-30",
+        "title": "Material Information/Transactions",
+        "filingDate": "Oct 21, 2026 02:59 PM",
+        "edgeNo": "27c02df032f3c91564d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=27c02df032f3c91564d70b69f0a3140b"
+      },
+      {
+        "symbol": "UPM",
+        "companyName": "UPM",
         "formType": "POR-1",
         "title": "Public Ownership Report",
         "filingDate": "Oct 09, 2026 11:23 AM",
@@ -19456,18 +19465,18 @@
         "filingDate": "Aug 13, 2026 05:47 PM",
         "edgeNo": "e6a066e4db336e1764d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=e6a066e4db336e1764d70b69f0a3140b"
-      },
-      {
-        "symbol": "UPM",
-        "companyName": "UPM",
-        "formType": "17-6",
-        "title": "Initial Statement of Beneficial Ownership of Securities",
-        "filingDate": "Aug 05, 2026 12:56 PM",
-        "edgeNo": "7314335f62cf3bf964d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=7314335f62cf3bf964d70b69f0a3140b"
       }
     ],
     "UPSON": [
+      {
+        "symbol": "UPSON",
+        "companyName": "UPSON",
+        "formType": "17-12-A",
+        "title": "[Amend-1]List of Top 100 Stockholders (Common Shares)",
+        "filingDate": "Oct 22, 2026 09:09 AM",
+        "edgeNo": "1bffe352077e411864d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=1bffe352077e411864d70b69f0a3140b"
+      },
       {
         "symbol": "UPSON",
         "companyName": "UPSON",
@@ -19530,18 +19539,54 @@
         "filingDate": "Aug 07, 2026 07:55 AM",
         "edgeNo": "2431305b024f84df64d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=2431305b024f84df64d70b69f0a3140b"
-      },
-      {
-        "symbol": "UPSON",
-        "companyName": "UPSON",
-        "formType": "17-12-A",
-        "title": "List of Top 100 Stockholders (Common Shares)",
-        "filingDate": "Jul 15, 2026 11:26 AM",
-        "edgeNo": "e227f1f53993106c64d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=e227f1f53993106c64d70b69f0a3140b"
       }
     ],
     "URC": [
+      {
+        "symbol": "URC",
+        "companyName": "URC",
+        "formType": "13-1",
+        "title": "Change in Shareholdings of Directors and Principal Officers",
+        "filingDate": "Oct 22, 2026 02:33 PM",
+        "edgeNo": "00f86a08c6372c6c64d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=00f86a08c6372c6c64d70b69f0a3140b"
+      },
+      {
+        "symbol": "URC",
+        "companyName": "URC",
+        "formType": "13-1",
+        "title": "Change in Shareholdings of Directors and Principal Officers",
+        "filingDate": "Oct 22, 2026 08:17 AM",
+        "edgeNo": "651294a22c8731ce64d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=651294a22c8731ce64d70b69f0a3140b"
+      },
+      {
+        "symbol": "URC",
+        "companyName": "URC",
+        "formType": "9-1",
+        "title": "Share Buy-Back Transactions",
+        "filingDate": "Oct 21, 2026 07:52 AM",
+        "edgeNo": "94ba51ac8b40864964d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=94ba51ac8b40864964d70b69f0a3140b"
+      },
+      {
+        "symbol": "URC",
+        "companyName": "URC",
+        "formType": "9-1",
+        "title": "Share Buy-Back Transactions",
+        "filingDate": "Oct 20, 2026 07:54 AM",
+        "edgeNo": "27fd48139240902864d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=27fd48139240902864d70b69f0a3140b"
+      },
+      {
+        "symbol": "URC",
+        "companyName": "URC",
+        "formType": "9-1",
+        "title": "Share Buy-Back Transactions",
+        "filingDate": "Oct 19, 2026 07:55 AM",
+        "edgeNo": "c114219b16456bbd64d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=c114219b16456bbd64d70b69f0a3140b"
+      },
       {
         "symbol": "URC",
         "companyName": "URC",
@@ -19568,54 +19613,18 @@
         "filingDate": "Oct 15, 2026 11:35 AM",
         "edgeNo": "965d95a8da7f452064d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=965d95a8da7f452064d70b69f0a3140b"
-      },
-      {
-        "symbol": "URC",
-        "companyName": "URC",
-        "formType": "POR-1",
-        "title": "Public Ownership Report",
-        "filingDate": "Oct 15, 2026 11:33 AM",
-        "edgeNo": "135f4bcebafaaa8e64d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=135f4bcebafaaa8e64d70b69f0a3140b"
-      },
-      {
-        "symbol": "URC",
-        "companyName": "URC",
-        "formType": "9-1",
-        "title": "Share Buy-Back Transactions",
-        "filingDate": "Oct 15, 2026 07:43 AM",
-        "edgeNo": "0554033264f515f464d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=0554033264f515f464d70b69f0a3140b"
-      },
-      {
-        "symbol": "URC",
-        "companyName": "URC",
-        "formType": "9-1",
-        "title": "Share Buy-Back Transactions",
-        "filingDate": "Oct 14, 2026 07:53 AM",
-        "edgeNo": "9552656c0d4a64ac64d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=9552656c0d4a64ac64d70b69f0a3140b"
-      },
-      {
-        "symbol": "URC",
-        "companyName": "URC",
-        "formType": "9-1",
-        "title": "Share Buy-Back Transactions",
-        "filingDate": "Oct 13, 2026 08:08 AM",
-        "edgeNo": "329e84267e516edc64d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=329e84267e516edc64d70b69f0a3140b"
-      },
-      {
-        "symbol": "URC",
-        "companyName": "URC",
-        "formType": "9-1",
-        "title": "Share Buy-Back Transactions",
-        "filingDate": "Oct 12, 2026 08:11 AM",
-        "edgeNo": "f1b39c9d7a61d1a164d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=f1b39c9d7a61d1a164d70b69f0a3140b"
       }
     ],
     "V": [
+      {
+        "symbol": "V",
+        "companyName": "V",
+        "formType": "17-18",
+        "title": "Other SEC Forms, Reports and Requirements",
+        "filingDate": "Oct 21, 2026 08:04 AM",
+        "edgeNo": "1e5c0ad5b3535fcb64d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=1e5c0ad5b3535fcb64d70b69f0a3140b"
+      },
       {
         "symbol": "V",
         "companyName": "V",
@@ -19678,15 +19687,6 @@
         "filingDate": "Oct 07, 2026 04:03 PM",
         "edgeNo": "dfc2d6549773269964d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=dfc2d6549773269964d70b69f0a3140b"
-      },
-      {
-        "symbol": "V",
-        "companyName": "V",
-        "formType": "9-1",
-        "title": "Share Buy-Back Transactions",
-        "filingDate": "Oct 06, 2026 03:59 PM",
-        "edgeNo": "44b7e72c5bfe443864d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=44b7e72c5bfe443864d70b69f0a3140b"
       }
     ],
     "VITA": [
@@ -20211,6 +20211,15 @@
       {
         "symbol": "WIN",
         "companyName": "WIN",
+        "formType": "17-18",
+        "title": "Other SEC Forms, Reports and Requirements",
+        "filingDate": "Oct 22, 2026 01:41 PM",
+        "edgeNo": "0b59c8134d01bd3164d70b69f0a3140b",
+        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=0b59c8134d01bd3164d70b69f0a3140b"
+      },
+      {
+        "symbol": "WIN",
+        "companyName": "WIN",
         "formType": "POR-1",
         "title": "Public Ownership Report",
         "filingDate": "Oct 09, 2026 02:27 PM",
@@ -20270,15 +20279,6 @@
         "filingDate": "Jul 20, 2026 11:01 AM",
         "edgeNo": "c7fd471c631118bc64d70b69f0a3140b",
         "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=c7fd471c631118bc64d70b69f0a3140b"
-      },
-      {
-        "symbol": "WIN",
-        "companyName": "WIN",
-        "formType": "POR-1",
-        "title": "Public Ownership Report",
-        "filingDate": "Jul 08, 2026 03:22 PM",
-        "edgeNo": "c5a40f089fb620d364d70b69f0a3140b",
-        "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=c5a40f089fb620d364d70b69f0a3140b"
       }
     ],
     "WLCON": [

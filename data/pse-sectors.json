@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-10-18T08:10:35.938Z",
+  "generatedAt": "2026-10-25T08:31:56.479Z",
   "source": "edge.pse.com.ph",
-  "totalCompanies": 283,
+  "totalCompanies": 284,
   "sectorBreakdown": {
     "Holding Firms": 31,
     "Mining and Oil": 24,
@@ -9,7 +9,7 @@
     "Industrial": 74,
     "ETF": 1,
     "Property": 50,
-    "Financials": 31,
+    "Financials": 32,
     "Small, Medium & Emerging Board": 9,
     "PROPERTY": 1
   },
@@ -1112,6 +1112,16 @@
       "cmpyId": 80,
       "securityId": 372,
       "listingDate": "Jun 03, 1975",
+      "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
+    },
+    "GCASH": {
+      "symbol": "GCASH",
+      "companyName": "Mynt, Inc.",
+      "sector": "Financials",
+      "subsector": "Other Financial Institutions",
+      "cmpyId": 709,
+      "securityId": 754,
+      "listingDate": "Oct 20, 2026",
       "sourceUrl": "https://edge.pse.com.ph/companyDirectory/search.ax"
     },
     "GEO": {

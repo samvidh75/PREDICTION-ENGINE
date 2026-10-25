@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-18T08:10:28.005Z",
+  "generatedAt": "2026-10-25T08:31:48.016Z",
   "source": "edge.pse.com.ph",
   "results": {
     "AAA": {
@@ -10,7 +10,7 @@
       "publicOwnershipPercent": 10.12,
       "insiderOwnershipPercent": 89.88,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=9ff2719f88241bb964d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:02:13.155Z"
+      "scrapedAt": "2026-10-25T08:23:42.629Z"
     },
     "AB": {
       "symbol": "AB",
@@ -20,7 +20,7 @@
       "publicOwnershipPercent": 14.09,
       "insiderOwnershipPercent": 85.91,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=b287caa25aef2ec164d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:02:13.316Z"
+      "scrapedAt": "2026-10-25T08:23:42.619Z"
     },
     "ABA": {
       "symbol": "ABA",
@@ -30,7 +30,7 @@
       "publicOwnershipPercent": 45.66,
       "insiderOwnershipPercent": 54.34,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=f9528b398d6201aa64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:02:13.263Z"
+      "scrapedAt": "2026-10-25T08:23:42.608Z"
     },
     "ABG": {
       "symbol": "ABG",
@@ -40,7 +40,7 @@
       "publicOwnershipPercent": 33.31,
       "insiderOwnershipPercent": 66.69,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=090ba2d4a5d7010a64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:02:18.471Z"
+      "scrapedAt": "2026-10-25T08:23:47.874Z"
     },
     "ABS": {
       "symbol": "ABS",
@@ -50,7 +50,7 @@
       "publicOwnershipPercent": 41.61,
       "insiderOwnershipPercent": 58.39,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=aa3968c9909650ca64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:02:18.606Z"
+      "scrapedAt": "2026-10-25T08:23:47.851Z"
     },
     "ABSP": {
       "symbol": "ABSP",
@@ -60,7 +60,7 @@
       "publicOwnershipPercent": 84.71,
       "insiderOwnershipPercent": 15.29,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=48ea76eee8afb4f364d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:02:18.533Z"
+      "scrapedAt": "2026-10-25T08:23:47.840Z"
     },
     "AC": {
       "symbol": "AC",
@@ -70,7 +70,7 @@
       "publicOwnershipPercent": 51.4,
       "insiderOwnershipPercent": 48.6,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=b89488e7baa74ea564d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:02:23.912Z"
+      "scrapedAt": "2026-10-25T08:23:53.111Z"
     },
     "ACE": {
       "symbol": "ACE",
@@ -80,7 +80,7 @@
       "publicOwnershipPercent": 44.29,
       "insiderOwnershipPercent": 55.71,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=88c9766ea93be15464d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:02:23.867Z"
+      "scrapedAt": "2026-10-25T08:23:53.049Z"
     },
     "ACEN": {
       "symbol": "ACEN",
@@ -90,7 +90,7 @@
       "publicOwnershipPercent": 23.36,
       "insiderOwnershipPercent": 76.64,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=5ec82f08c5662b8064d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:02:23.876Z"
+      "scrapedAt": "2026-10-25T08:23:53.085Z"
     },
     "ACR": {
       "symbol": "ACR",
@@ -100,7 +100,7 @@
       "publicOwnershipPercent": 20.03,
       "insiderOwnershipPercent": 79.97,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=23f8afbf4075c5c864d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:02:29.164Z"
+      "scrapedAt": "2026-10-25T08:23:58.311Z"
     },
     "AEV": {
       "symbol": "AEV",
@@ -110,7 +110,7 @@
       "publicOwnershipPercent": 46.34,
       "insiderOwnershipPercent": 53.66,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=56ab4548650de26064d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:02:29.226Z"
+      "scrapedAt": "2026-10-25T08:23:58.301Z"
     },
     "AGI": {
       "symbol": "AGI",
@@ -120,7 +120,7 @@
       "publicOwnershipPercent": 28.09,
       "insiderOwnershipPercent": 71.91,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=295e23cc037b061964d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:02:29.088Z"
+      "scrapedAt": "2026-10-25T08:23:58.334Z"
     },
     "ALCO": {
       "symbol": "ALCO",
@@ -130,7 +130,7 @@
       "publicOwnershipPercent": 29.9,
       "insiderOwnershipPercent": 70.1,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=f79a0fae99b2b27864d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:02:34.397Z"
+      "scrapedAt": "2026-10-25T08:24:03.551Z"
     },
     "ALHI": {
       "symbol": "ALHI",
@@ -140,7 +140,7 @@
       "publicOwnershipPercent": 25.13,
       "insiderOwnershipPercent": 74.87,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=27ed3bd8085555c964d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:02:34.518Z"
+      "scrapedAt": "2026-10-25T08:24:03.522Z"
     },
     "ALI": {
       "symbol": "ALI",
@@ -150,7 +150,7 @@
       "publicOwnershipPercent": 43.13,
       "insiderOwnershipPercent": 56.87,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=7a8f7662ed7386e364d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:02:34.511Z"
+      "scrapedAt": "2026-10-25T08:24:03.494Z"
     },
     "ALLDY": {
       "symbol": "ALLDY",
@@ -160,7 +160,7 @@
       "publicOwnershipPercent": 33.01,
       "insiderOwnershipPercent": 66.99,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=f9cc51ad65dfd48b64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:02:39.743Z"
+      "scrapedAt": "2026-10-25T08:24:08.856Z"
     },
     "ALLHC": {
       "symbol": "ALLHC",
@@ -170,7 +170,7 @@
       "publicOwnershipPercent": 27.16,
       "insiderOwnershipPercent": 72.84,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=8ec337df643e599d64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:02:39.727Z"
+      "scrapedAt": "2026-10-25T08:24:08.737Z"
     },
     "ALTER": {
       "symbol": "ALTER",
@@ -180,7 +180,7 @@
       "publicOwnershipPercent": 33.71,
       "insiderOwnershipPercent": 66.29,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=694d49f36b83bfda64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:02:39.718Z"
+      "scrapedAt": "2026-10-25T08:24:08.681Z"
     },
     "ANI": {
       "symbol": "ANI",
@@ -190,7 +190,7 @@
       "publicOwnershipPercent": 65.27,
       "insiderOwnershipPercent": 34.73,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=f0bfbd94d213dc1f64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:02:45.044Z"
+      "scrapedAt": "2026-10-25T08:24:14.106Z"
     },
     "ANS": {
       "symbol": "ANS",
@@ -200,7 +200,7 @@
       "publicOwnershipPercent": 16.52,
       "insiderOwnershipPercent": 83.48,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=35a2ebdc53d0ec5964d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:02:44.999Z"
+      "scrapedAt": "2026-10-25T08:24:14.056Z"
     },
     "AP": {
       "symbol": "AP",
@@ -210,7 +210,7 @@
       "publicOwnershipPercent": 17.47,
       "insiderOwnershipPercent": 82.53,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=a8fe6517708e88a164d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:02:45.027Z"
+      "scrapedAt": "2026-10-25T08:24:14.042Z"
     },
     "APC": {
       "symbol": "APC",
@@ -220,7 +220,7 @@
       "publicOwnershipPercent": 51.11,
       "insiderOwnershipPercent": 48.89,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=d748b499040d6aba64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:02:50.276Z"
+      "scrapedAt": "2026-10-25T08:24:19.297Z"
     },
     "APL": {
       "symbol": "APL",
@@ -230,7 +230,7 @@
       "publicOwnershipPercent": 67.78,
       "insiderOwnershipPercent": 32.22,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=3df39c69ace6b18e64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:02:50.271Z"
+      "scrapedAt": "2026-10-25T08:24:19.337Z"
     },
     "APO": {
       "symbol": "APO",
@@ -240,7 +240,7 @@
       "publicOwnershipPercent": 18.25,
       "insiderOwnershipPercent": 81.75,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=7bdeb67f6867372a64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:02:50.232Z"
+      "scrapedAt": "2026-10-25T08:24:19.283Z"
     },
     "APVI": {
       "symbol": "APVI",
@@ -250,7 +250,7 @@
       "publicOwnershipPercent": 32.91,
       "insiderOwnershipPercent": 67.09,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=c09031e76a0deeb664d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:02:55.569Z"
+      "scrapedAt": "2026-10-25T08:24:24.555Z"
     },
     "APX": {
       "symbol": "APX",
@@ -260,7 +260,7 @@
       "publicOwnershipPercent": 23.86,
       "insiderOwnershipPercent": 76.14,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=1761aafa9fe1c77a64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:02:55.482Z"
+      "scrapedAt": "2026-10-25T08:24:24.525Z"
     },
     "AR": {
       "error": "no_disclosure_found"
@@ -273,7 +273,7 @@
       "publicOwnershipPercent": 40.95,
       "insiderOwnershipPercent": 59.05,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=ba3f4640800dffcf64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:03:00.697Z"
+      "scrapedAt": "2026-10-25T08:24:29.753Z"
     },
     "AREIT": {
       "symbol": "AREIT",
@@ -283,7 +283,7 @@
       "publicOwnershipPercent": 36.18,
       "insiderOwnershipPercent": 63.82,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=806822906bd8ac2364d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:03:00.779Z"
+      "scrapedAt": "2026-10-25T08:24:29.741Z"
     },
     "ASLAG": {
       "symbol": "ASLAG",
@@ -293,7 +293,7 @@
       "publicOwnershipPercent": 20.01,
       "insiderOwnershipPercent": 79.99,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=bde5624d992a215464d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:03:00.821Z"
+      "scrapedAt": "2026-10-25T08:24:29.763Z"
     },
     "AT": {
       "symbol": "AT",
@@ -303,7 +303,7 @@
       "publicOwnershipPercent": 26.03,
       "insiderOwnershipPercent": 73.97,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=8a91cc76c7d7b31a64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:03:06.054Z"
+      "scrapedAt": "2026-10-25T08:24:35.035Z"
     },
     "ATN": {
       "symbol": "ATN",
@@ -313,7 +313,7 @@
       "publicOwnershipPercent": 23.46,
       "insiderOwnershipPercent": 76.54,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=895f8710e79f8cc264d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:03:06.038Z"
+      "scrapedAt": "2026-10-25T08:24:34.884Z"
     },
     "AUB": {
       "symbol": "AUB",
@@ -323,7 +323,7 @@
       "publicOwnershipPercent": 33.51,
       "insiderOwnershipPercent": 66.49,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=32a9bc4801cb3f8164d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:03:06.051Z"
+      "scrapedAt": "2026-10-25T08:24:34.983Z"
     },
     "AXLM": {
       "symbol": "AXLM",
@@ -333,7 +333,7 @@
       "publicOwnershipPercent": 23.59,
       "insiderOwnershipPercent": 76.41,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=2f57a779eddf87cb64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:03:11.325Z"
+      "scrapedAt": "2026-10-25T08:24:40.211Z"
     },
     "BALAI": {
       "symbol": "BALAI",
@@ -343,7 +343,7 @@
       "publicOwnershipPercent": 24.59,
       "insiderOwnershipPercent": 75.41,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=be515eb6bdbe275464d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:03:11.212Z"
+      "scrapedAt": "2026-10-25T08:24:40.190Z"
     },
     "BC": {
       "symbol": "BC",
@@ -353,7 +353,7 @@
       "publicOwnershipPercent": 40.2,
       "insiderOwnershipPercent": 59.8,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=1306e35b57e637dc64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:03:11.234Z"
+      "scrapedAt": "2026-10-25T08:24:40.207Z"
     },
     "BCOR": {
       "symbol": "BCOR",
@@ -363,7 +363,7 @@
       "publicOwnershipPercent": 11.74,
       "insiderOwnershipPercent": 88.26,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=5f5844c95fac5ff764d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:03:16.450Z"
+      "scrapedAt": "2026-10-25T08:24:45.411Z"
     },
     "BDO": {
       "symbol": "BDO",
@@ -373,7 +373,7 @@
       "publicOwnershipPercent": 44.21,
       "insiderOwnershipPercent": 55.79,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=ab6673170f8b197664d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:03:16.576Z"
+      "scrapedAt": "2026-10-25T08:24:45.401Z"
     },
     "BEL": {
       "symbol": "BEL",
@@ -383,7 +383,7 @@
       "publicOwnershipPercent": 43.57,
       "insiderOwnershipPercent": 56.43,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=66c9c0467cc4b95464d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:03:16.485Z"
+      "scrapedAt": "2026-10-25T08:24:45.423Z"
     },
     "BH": {
       "symbol": "BH",
@@ -393,7 +393,7 @@
       "publicOwnershipPercent": 10.16,
       "insiderOwnershipPercent": 89.84,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=e953000918f516a864d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:03:21.721Z"
+      "scrapedAt": "2026-10-25T08:24:50.640Z"
     },
     "BHI": {
       "symbol": "BHI",
@@ -403,7 +403,7 @@
       "publicOwnershipPercent": 74.48,
       "insiderOwnershipPercent": 25.52,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=1687a1405a0f727e64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:03:21.733Z"
+      "scrapedAt": "2026-10-25T08:24:50.631Z"
     },
     "BLOOM": {
       "symbol": "BLOOM",
@@ -413,7 +413,7 @@
       "publicOwnershipPercent": 29.81,
       "insiderOwnershipPercent": 70.19,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=d1a9770ef8246e0964d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:03:21.787Z"
+      "scrapedAt": "2026-10-25T08:24:50.635Z"
     },
     "BMM": {
       "symbol": "BMM",
@@ -423,7 +423,7 @@
       "publicOwnershipPercent": 42.7,
       "insiderOwnershipPercent": 57.3,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=612fcec95f6f791264d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:03:26.983Z"
+      "scrapedAt": "2026-10-25T08:24:55.860Z"
     },
     "BNCOM": {
       "symbol": "BNCOM",
@@ -433,7 +433,7 @@
       "publicOwnershipPercent": 23.78,
       "insiderOwnershipPercent": 76.22,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=e3bcc02a8dded1a764d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:03:26.953Z"
+      "scrapedAt": "2026-10-25T08:24:55.820Z"
     },
     "BPI": {
       "symbol": "BPI",
@@ -443,7 +443,7 @@
       "publicOwnershipPercent": 48.63,
       "insiderOwnershipPercent": 51.37,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=f11f492bd721150664d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:03:27.226Z"
+      "scrapedAt": "2026-10-25T08:24:56.061Z"
     },
     "BRN": {
       "symbol": "BRN",
@@ -453,7 +453,7 @@
       "publicOwnershipPercent": 28.12,
       "insiderOwnershipPercent": 71.88,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=94b1fe54eb7b659d64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:03:32.453Z"
+      "scrapedAt": "2026-10-25T08:25:01.248Z"
     },
     "BSC": {
       "symbol": "BSC",
@@ -463,7 +463,7 @@
       "publicOwnershipPercent": 27.31,
       "insiderOwnershipPercent": 72.69,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=25ae2a8d313b1e9f64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:03:32.450Z"
+      "scrapedAt": "2026-10-25T08:25:01.253Z"
     },
     "C": {
       "symbol": "C",
@@ -473,7 +473,7 @@
       "publicOwnershipPercent": 23.92,
       "insiderOwnershipPercent": 76.08,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=c9f0eca8036e128064d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:03:32.484Z"
+      "scrapedAt": "2026-10-25T08:25:01.211Z"
     },
     "CA": {
       "symbol": "CA",
@@ -483,7 +483,7 @@
       "publicOwnershipPercent": 23.49,
       "insiderOwnershipPercent": 76.51,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=fe54e16204e3ac3a64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:03:37.719Z"
+      "scrapedAt": "2026-10-25T08:25:06.413Z"
     },
     "CAT": {
       "symbol": "CAT",
@@ -493,7 +493,7 @@
       "publicOwnershipPercent": 14.45,
       "insiderOwnershipPercent": 85.55,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=73bd51a7f9a59d8464d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:03:37.678Z"
+      "scrapedAt": "2026-10-25T08:25:06.402Z"
     },
     "CBC": {
       "symbol": "CBC",
@@ -503,7 +503,7 @@
       "publicOwnershipPercent": 57.935,
       "insiderOwnershipPercent": 42.06,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=ced9cdd86433a98464d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:03:37.644Z"
+      "scrapedAt": "2026-10-25T08:25:06.432Z"
     },
     "CDC": {
       "symbol": "CDC",
@@ -513,7 +513,7 @@
       "publicOwnershipPercent": 31.68,
       "insiderOwnershipPercent": 68.32,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=c8d9692b85a2dc2664d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:03:43.024Z"
+      "scrapedAt": "2026-10-25T08:25:11.654Z"
     },
     "CEB": {
       "symbol": "CEB",
@@ -523,7 +523,7 @@
       "publicOwnershipPercent": 31.98,
       "insiderOwnershipPercent": 68.02,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=4a20d72d08b57c7564d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:03:42.876Z"
+      "scrapedAt": "2026-10-25T08:25:11.613Z"
     },
     "CEI": {
       "symbol": "CEI",
@@ -533,7 +533,7 @@
       "publicOwnershipPercent": 33.22,
       "insiderOwnershipPercent": 66.78,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=6f5fb29a12d7d02564d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:03:42.987Z"
+      "scrapedAt": "2026-10-25T08:25:11.599Z"
     },
     "CEU": {
       "symbol": "CEU",
@@ -543,7 +543,7 @@
       "publicOwnershipPercent": 26.745,
       "insiderOwnershipPercent": 73.25,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=34fd86e56fd4513e64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:03:48.164Z"
+      "scrapedAt": "2026-10-25T08:25:16.832Z"
     },
     "CHP": {
       "symbol": "CHP",
@@ -553,7 +553,7 @@
       "publicOwnershipPercent": 10.03,
       "insiderOwnershipPercent": 89.97,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=3afbccef7caf3e3564d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:03:48.217Z"
+      "scrapedAt": "2026-10-25T08:25:16.815Z"
     },
     "CIC": {
       "symbol": "CIC",
@@ -563,7 +563,7 @@
       "publicOwnershipPercent": 26.07,
       "insiderOwnershipPercent": 73.93,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=cf3d39604432d3b764d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:03:48.274Z"
+      "scrapedAt": "2026-10-25T08:25:16.813Z"
     },
     "CLI": {
       "symbol": "CLI",
@@ -573,7 +573,7 @@
       "publicOwnershipPercent": 22.94,
       "insiderOwnershipPercent": 77.06,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=f4c0ccfbc347ea4864d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:03:53.461Z"
+      "scrapedAt": "2026-10-25T08:25:22.076Z"
     },
     "CNPF": {
       "symbol": "CNPF",
@@ -583,7 +583,7 @@
       "publicOwnershipPercent": 34.43,
       "insiderOwnershipPercent": 65.57,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=5628192e5d1fa38b64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:03:53.612Z"
+      "scrapedAt": "2026-10-25T08:25:22.001Z"
     },
     "CNVRG": {
       "symbol": "CNVRG",
@@ -593,7 +593,7 @@
       "publicOwnershipPercent": 29.74,
       "insiderOwnershipPercent": 70.26,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=2892d12df5f6d80364d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:03:53.531Z"
+      "scrapedAt": "2026-10-25T08:25:22.047Z"
     },
     "COL": {
       "symbol": "COL",
@@ -603,7 +603,7 @@
       "publicOwnershipPercent": 32.02,
       "insiderOwnershipPercent": 67.98,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=cc87fadaca24ef6a64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:03:59.168Z"
+      "scrapedAt": "2026-10-25T08:25:27.351Z"
     },
     "COSCO": {
       "symbol": "COSCO",
@@ -613,7 +613,7 @@
       "publicOwnershipPercent": 21.25,
       "insiderOwnershipPercent": 78.75,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=06c57053bc68956a64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:03:58.736Z"
+      "scrapedAt": "2026-10-25T08:25:27.219Z"
     },
     "CPG": {
       "symbol": "CPG",
@@ -623,7 +623,7 @@
       "publicOwnershipPercent": 39.96,
       "insiderOwnershipPercent": 60.04,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=749620d738973baa64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:03:58.763Z"
+      "scrapedAt": "2026-10-25T08:25:27.241Z"
     },
     "CPM": {
       "symbol": "CPM",
@@ -633,7 +633,7 @@
       "publicOwnershipPercent": 32.33,
       "insiderOwnershipPercent": 67.67,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=bc93686cc917e15a64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:04:04.291Z"
+      "scrapedAt": "2026-10-25T08:25:32.583Z"
     },
     "CREC": {
       "symbol": "CREC",
@@ -643,7 +643,7 @@
       "publicOwnershipPercent": 27.11,
       "insiderOwnershipPercent": 72.89,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=8b0cb11c81b3cda164d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:04:04.438Z"
+      "scrapedAt": "2026-10-25T08:25:32.495Z"
     },
     "CREIT": {
       "symbol": "CREIT",
@@ -653,7 +653,7 @@
       "publicOwnershipPercent": 38.12,
       "insiderOwnershipPercent": 61.88,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=6725215137a6f67364d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:04:04.389Z"
+      "scrapedAt": "2026-10-25T08:25:32.515Z"
     },
     "CROWN": {
       "symbol": "CROWN",
@@ -663,7 +663,7 @@
       "publicOwnershipPercent": 47.33,
       "insiderOwnershipPercent": 52.67,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=563cb857ecac141464d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:04:09.570Z"
+      "scrapedAt": "2026-10-25T08:25:37.797Z"
     },
     "CSB": {
       "symbol": "CSB",
@@ -673,7 +673,7 @@
       "publicOwnershipPercent": 31.08,
       "insiderOwnershipPercent": 68.92,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=931ea015d6b696d764d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:04:09.613Z"
+      "scrapedAt": "2026-10-25T08:25:37.753Z"
     },
     "CTS": {
       "symbol": "CTS",
@@ -683,7 +683,7 @@
       "publicOwnershipPercent": 33.84,
       "insiderOwnershipPercent": 66.16,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=51fdf7047e9f474364d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:04:09.556Z"
+      "scrapedAt": "2026-10-25T08:25:37.756Z"
     },
     "CYBR": {
       "symbol": "CYBR",
@@ -693,7 +693,7 @@
       "publicOwnershipPercent": 36.62,
       "insiderOwnershipPercent": 63.38,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=0a2d1389161088b564d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:04:14.902Z"
+      "scrapedAt": "2026-10-25T08:25:43.038Z"
     },
     "DD": {
       "symbol": "DD",
@@ -703,7 +703,7 @@
       "publicOwnershipPercent": 27.53,
       "insiderOwnershipPercent": 72.47,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=4c6c6082ad5e80e764d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:04:14.729Z"
+      "scrapedAt": "2026-10-25T08:25:43.022Z"
     },
     "DDMPR": {
       "symbol": "DDMPR",
@@ -713,7 +713,7 @@
       "publicOwnershipPercent": 33.36,
       "insiderOwnershipPercent": 66.64,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=3287816e1919ecac64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:04:14.781Z"
+      "scrapedAt": "2026-10-25T08:25:42.929Z"
     },
     "DELM": {
       "symbol": "DELM",
@@ -723,7 +723,7 @@
       "publicOwnershipPercent": 27.92,
       "insiderOwnershipPercent": 72.08,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=c09bc0140769b5cb64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:04:20.174Z"
+      "scrapedAt": "2026-10-25T08:25:48.236Z"
     },
     "DFNN": {
       "symbol": "DFNN",
@@ -733,7 +733,7 @@
       "publicOwnershipPercent": 73.01,
       "insiderOwnershipPercent": 26.99,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=51f89d36fddd6e8264d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:04:20.172Z"
+      "scrapedAt": "2026-10-25T08:25:48.189Z"
     },
     "DHI": {
       "symbol": "DHI",
@@ -743,7 +743,7 @@
       "publicOwnershipPercent": 21.12,
       "insiderOwnershipPercent": 78.88,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=42f59bf43b7d23e364d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:04:20.080Z"
+      "scrapedAt": "2026-10-25T08:25:48.180Z"
     },
     "DITO": {
       "symbol": "DITO",
@@ -753,7 +753,7 @@
       "publicOwnershipPercent": 28.37,
       "insiderOwnershipPercent": 71.63,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=62fbb8cecfa90ed564d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:04:25.473Z"
+      "scrapedAt": "2026-10-25T08:25:53.461Z"
     },
     "DIZ": {
       "symbol": "DIZ",
@@ -763,7 +763,7 @@
       "publicOwnershipPercent": 61.35,
       "insiderOwnershipPercent": 38.65,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=6c738052330cb1e064d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:04:25.353Z"
+      "scrapedAt": "2026-10-25T08:25:53.414Z"
     },
     "DMC": {
       "symbol": "DMC",
@@ -773,7 +773,7 @@
       "publicOwnershipPercent": 25.94,
       "insiderOwnershipPercent": 74.06,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=28f5739e9282655a64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:04:25.368Z"
+      "scrapedAt": "2026-10-25T08:25:53.420Z"
     },
     "DMW": {
       "symbol": "DMW",
@@ -783,7 +783,7 @@
       "publicOwnershipPercent": 20.04,
       "insiderOwnershipPercent": 79.96,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=30403f86004c691464d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:04:30.638Z"
+      "scrapedAt": "2026-10-25T08:25:58.664Z"
     },
     "DNL": {
       "symbol": "DNL",
@@ -793,7 +793,7 @@
       "publicOwnershipPercent": 25.36,
       "insiderOwnershipPercent": 74.64,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=c575ae16e59dee2b64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:04:30.682Z"
+      "scrapedAt": "2026-10-25T08:25:58.621Z"
     },
     "DWC": {
       "symbol": "DWC",
@@ -803,7 +803,7 @@
       "publicOwnershipPercent": 19.03,
       "insiderOwnershipPercent": 80.97,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=753491e39bc46b6e64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:04:30.739Z"
+      "scrapedAt": "2026-10-25T08:25:58.611Z"
     },
     "ECP": {
       "symbol": "ECP",
@@ -813,7 +813,7 @@
       "publicOwnershipPercent": 12.33,
       "insiderOwnershipPercent": 87.67,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=6cfe337fd4d8ebbf64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:04:35.890Z"
+      "scrapedAt": "2026-10-25T08:26:03.882Z"
     },
     "ECVC": {
       "symbol": "ECVC",
@@ -823,7 +823,7 @@
       "publicOwnershipPercent": 21.78,
       "insiderOwnershipPercent": 78.22,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=04162775e114ca3864d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:04:35.957Z"
+      "scrapedAt": "2026-10-25T08:26:03.909Z"
     },
     "EEI": {
       "symbol": "EEI",
@@ -833,7 +833,7 @@
       "publicOwnershipPercent": 44.65,
       "insiderOwnershipPercent": 55.35,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=429356efb583753764d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:04:35.967Z"
+      "scrapedAt": "2026-10-25T08:26:03.830Z"
     },
     "EG": {
       "error": "no_disclosure_found"
@@ -846,7 +846,7 @@
       "publicOwnershipPercent": 39.9,
       "insiderOwnershipPercent": 60.1,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=5c80e6c5bf4587fe64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:04:41.176Z"
+      "scrapedAt": "2026-10-25T08:26:09.034Z"
     },
     "ELI": {
       "symbol": "ELI",
@@ -856,7 +856,7 @@
       "publicOwnershipPercent": 16.52,
       "insiderOwnershipPercent": 83.48,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=e3445054ac01be1164d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:04:41.196Z"
+      "scrapedAt": "2026-10-25T08:26:09.088Z"
     },
     "EMI": {
       "symbol": "EMI",
@@ -866,7 +866,7 @@
       "publicOwnershipPercent": 25.43,
       "insiderOwnershipPercent": 74.57,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=e206470cac36f3cd64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:04:46.388Z"
+      "scrapedAt": "2026-10-25T08:26:14.292Z"
     },
     "ENEX": {
       "symbol": "ENEX",
@@ -876,7 +876,7 @@
       "publicOwnershipPercent": 23.69,
       "insiderOwnershipPercent": 76.31,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=d4ad2c6f2fd177e064d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:04:46.351Z"
+      "scrapedAt": "2026-10-25T08:26:14.218Z"
     },
     "EURO": {
       "symbol": "EURO",
@@ -886,7 +886,7 @@
       "publicOwnershipPercent": 14.09,
       "insiderOwnershipPercent": 85.91,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=df2ad262639b552764d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:04:46.365Z"
+      "scrapedAt": "2026-10-25T08:26:14.277Z"
     },
     "EW": {
       "symbol": "EW",
@@ -896,7 +896,7 @@
       "publicOwnershipPercent": 19.05,
       "insiderOwnershipPercent": 80.95,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=6e8c7e4c528b3cce64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:04:51.550Z"
+      "scrapedAt": "2026-10-25T08:26:19.519Z"
     },
     "FAF": {
       "symbol": "FAF",
@@ -906,7 +906,7 @@
       "publicOwnershipPercent": 81.619,
       "insiderOwnershipPercent": 18.38,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=0bca5f75ba7c1a0a64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:04:51.614Z"
+      "scrapedAt": "2026-10-25T08:26:19.484Z"
     },
     "FB": {
       "symbol": "FB",
@@ -916,7 +916,7 @@
       "publicOwnershipPercent": 11.23,
       "insiderOwnershipPercent": 88.77,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=da6994f08e29c1ee64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:04:51.620Z"
+      "scrapedAt": "2026-10-25T08:26:19.452Z"
     },
     "FCG": {
       "symbol": "FCG",
@@ -926,7 +926,7 @@
       "publicOwnershipPercent": 23.58,
       "insiderOwnershipPercent": 76.42,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=fc800c5dcb421a6064d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:04:56.930Z"
+      "scrapedAt": "2026-10-25T08:26:24.751Z"
     },
     "FDC": {
       "symbol": "FDC",
@@ -936,7 +936,7 @@
       "publicOwnershipPercent": 10.73,
       "insiderOwnershipPercent": 89.27,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=27131fff4958c80964d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:04:56.883Z"
+      "scrapedAt": "2026-10-25T08:26:24.693Z"
     },
     "FERRO": {
       "symbol": "FERRO",
@@ -946,7 +946,7 @@
       "publicOwnershipPercent": 37.53,
       "insiderOwnershipPercent": 62.47,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=5a3f2c5b81e522ae64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:04:56.808Z"
+      "scrapedAt": "2026-10-25T08:26:24.666Z"
     },
     "FEU": {
       "symbol": "FEU",
@@ -956,7 +956,7 @@
       "publicOwnershipPercent": 36.12,
       "insiderOwnershipPercent": 63.88,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=5593b89ce4ca904764d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:05:02.140Z"
+      "scrapedAt": "2026-10-25T08:26:29.980Z"
     },
     "FFI": {
       "symbol": "FFI",
@@ -966,7 +966,7 @@
       "publicOwnershipPercent": 28.88,
       "insiderOwnershipPercent": 71.12,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=cfb2d887b239c2a264d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:05:02.153Z"
+      "scrapedAt": "2026-10-25T08:26:29.932Z"
     },
     "FGEN": {
       "symbol": "FGEN",
@@ -976,7 +976,7 @@
       "publicOwnershipPercent": 11.67,
       "insiderOwnershipPercent": 88.33,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=2e46e745c303511164d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:05:02.121Z"
+      "scrapedAt": "2026-10-25T08:26:29.928Z"
     },
     "FILRT": {
       "symbol": "FILRT",
@@ -986,7 +986,7 @@
       "publicOwnershipPercent": 35.03,
       "insiderOwnershipPercent": 64.97,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=72b253a8caee62d364d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:05:07.295Z"
+      "scrapedAt": "2026-10-25T08:26:35.123Z"
     },
     "FJP": {
       "symbol": "FJP",
@@ -996,7 +996,7 @@
       "publicOwnershipPercent": 26.53,
       "insiderOwnershipPercent": 73.47,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=d5f059725d202b7964d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:05:07.321Z"
+      "scrapedAt": "2026-10-25T08:26:35.190Z"
     },
     "FLI": {
       "symbol": "FLI",
@@ -1006,7 +1006,7 @@
       "publicOwnershipPercent": 26.45,
       "insiderOwnershipPercent": 73.55,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=4d9fdbd3ae6160c664d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:05:07.527Z"
+      "scrapedAt": "2026-10-25T08:26:35.165Z"
     },
     "FMETF": {
       "symbol": "FMETF",
@@ -1016,7 +1016,7 @@
       "publicOwnershipPercent": 100,
       "insiderOwnershipPercent": 0,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=23a56c178e50a9ab64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:05:12.718Z"
+      "scrapedAt": "2026-10-25T08:26:40.377Z"
     },
     "FNI": {
       "symbol": "FNI",
@@ -1026,7 +1026,7 @@
       "publicOwnershipPercent": 55.78,
       "insiderOwnershipPercent": 44.22,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=4e5b1951d980397b64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:05:12.705Z"
+      "scrapedAt": "2026-10-25T08:26:40.371Z"
     },
     "FOOD": {
       "symbol": "FOOD",
@@ -1036,7 +1036,7 @@
       "publicOwnershipPercent": 43.39,
       "insiderOwnershipPercent": 56.61,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=6908e067ab162b8764d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:05:12.697Z"
+      "scrapedAt": "2026-10-25T08:26:40.355Z"
     },
     "FPH": {
       "symbol": "FPH",
@@ -1046,7 +1046,7 @@
       "publicOwnershipPercent": 36.3,
       "insiderOwnershipPercent": 63.7,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=37883e95b098565464d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:05:17.936Z"
+      "scrapedAt": "2026-10-25T08:26:45.568Z"
     },
     "FPI": {
       "symbol": "FPI",
@@ -1056,7 +1056,7 @@
       "publicOwnershipPercent": 52.458,
       "insiderOwnershipPercent": 47.54,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=2a316965f69883a164d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:05:17.875Z"
+      "scrapedAt": "2026-10-25T08:26:45.508Z"
     },
     "FRUIT": {
       "symbol": "FRUIT",
@@ -1066,7 +1066,7 @@
       "publicOwnershipPercent": 38.92,
       "insiderOwnershipPercent": 61.08,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=3330458161eef26964d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:05:17.962Z"
+      "scrapedAt": "2026-10-25T08:26:45.578Z"
     },
     "FYN": {
       "symbol": "FYN",
@@ -1076,7 +1076,7 @@
       "publicOwnershipPercent": 31.08,
       "insiderOwnershipPercent": 68.92,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=bc1bd6b74f43425564d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:05:23.170Z"
+      "scrapedAt": "2026-10-25T08:26:50.765Z"
     },
     "GEO": {
       "symbol": "GEO",
@@ -1086,7 +1086,7 @@
       "publicOwnershipPercent": 85.927,
       "insiderOwnershipPercent": 14.07,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=c771607ea313fdbf64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:05:23.177Z"
+      "scrapedAt": "2026-10-25T08:26:50.740Z"
     },
     "GERI": {
       "symbol": "GERI",
@@ -1096,7 +1096,7 @@
       "publicOwnershipPercent": 17.46,
       "insiderOwnershipPercent": 82.54,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=09eed8a64d6de11964d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:05:23.117Z"
+      "scrapedAt": "2026-10-25T08:26:50.781Z"
     },
     "GLO": {
       "symbol": "GLO",
@@ -1106,7 +1106,7 @@
       "publicOwnershipPercent": 21.82,
       "insiderOwnershipPercent": 78.18,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=5a1237631584438864d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:05:28.376Z"
+      "scrapedAt": "2026-10-25T08:26:56.001Z"
     },
     "GMA7": {
       "symbol": "GMA7",
@@ -1116,7 +1116,7 @@
       "publicOwnershipPercent": null,
       "insiderOwnershipPercent": null,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=20ff881d2d04074b64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:05:28.450Z"
+      "scrapedAt": "2026-10-25T08:26:55.931Z"
     },
     "GMAP": {
       "error": "no_disclosure_found"
@@ -1129,7 +1129,7 @@
       "publicOwnershipPercent": 12.77,
       "insiderOwnershipPercent": 87.23,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=4d17fb01d812c22d64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:05:33.654Z"
+      "scrapedAt": "2026-10-25T08:27:01.215Z"
     },
     "GREEN": {
       "symbol": "GREEN",
@@ -1139,7 +1139,7 @@
       "publicOwnershipPercent": 46.36,
       "insiderOwnershipPercent": 53.64,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=6f09f390dae6449a64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:05:33.718Z"
+      "scrapedAt": "2026-10-25T08:27:01.152Z"
     },
     "GSMI": {
       "symbol": "GSMI",
@@ -1149,7 +1149,7 @@
       "publicOwnershipPercent": 24.09,
       "insiderOwnershipPercent": 75.91,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=c65920476f001ce864d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:05:33.622Z"
+      "scrapedAt": "2026-10-25T08:27:01.171Z"
     },
     "GTCAP": {
       "symbol": "GTCAP",
@@ -1159,7 +1159,7 @@
       "publicOwnershipPercent": 43.62,
       "insiderOwnershipPercent": 56.38,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=b0961da762e26f2764d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:05:38.969Z"
+      "scrapedAt": "2026-10-25T08:27:06.388Z"
     },
     "HI": {
       "symbol": "HI",
@@ -1169,7 +1169,7 @@
       "publicOwnershipPercent": 12.21,
       "insiderOwnershipPercent": 87.79,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=119ad4b4b2ee693064d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:05:39.037Z"
+      "scrapedAt": "2026-10-25T08:27:06.394Z"
     },
     "HOME": {
       "symbol": "HOME",
@@ -1179,7 +1179,7 @@
       "publicOwnershipPercent": 32.26,
       "insiderOwnershipPercent": 67.74,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=89bc357493b384d564d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:05:38.912Z"
+      "scrapedAt": "2026-10-25T08:27:06.510Z"
     },
     "HTI": {
       "symbol": "HTI",
@@ -1189,7 +1189,7 @@
       "publicOwnershipPercent": 25.84,
       "insiderOwnershipPercent": 74.16,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=3818c6938735820d64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:05:44.243Z"
+      "scrapedAt": "2026-10-25T08:27:11.748Z"
     },
     "I": {
       "symbol": "I",
@@ -1199,7 +1199,7 @@
       "publicOwnershipPercent": 59.81,
       "insiderOwnershipPercent": 40.19,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=fcfee6fc9df189d264d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:05:44.150Z"
+      "scrapedAt": "2026-10-25T08:27:11.767Z"
     },
     "ICT": {
       "symbol": "ICT",
@@ -1209,7 +1209,7 @@
       "publicOwnershipPercent": 50.93,
       "insiderOwnershipPercent": 49.07,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=f2fad7cc0933b44964d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:05:44.223Z"
+      "scrapedAt": "2026-10-25T08:27:11.727Z"
     },
     "IDC": {
       "symbol": "IDC",
@@ -1219,7 +1219,7 @@
       "publicOwnershipPercent": 39.11,
       "insiderOwnershipPercent": 60.89,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=6d2004a39e73cbb964d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:05:49.432Z"
+      "scrapedAt": "2026-10-25T08:27:17.038Z"
     },
     "IMI": {
       "symbol": "IMI",
@@ -1229,7 +1229,7 @@
       "publicOwnershipPercent": 33.47,
       "insiderOwnershipPercent": 66.53,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=22e0b7abee0a6bd664d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:05:49.425Z"
+      "scrapedAt": "2026-10-25T08:27:16.941Z"
     },
     "IMP": {
       "symbol": "IMP",
@@ -1239,7 +1239,7 @@
       "publicOwnershipPercent": 15.656,
       "insiderOwnershipPercent": 84.34,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=1d084dfb74731be464d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:05:49.583Z"
+      "scrapedAt": "2026-10-25T08:27:16.956Z"
     },
     "INFRA": {
       "symbol": "INFRA",
@@ -1249,7 +1249,7 @@
       "publicOwnershipPercent": 15.53,
       "insiderOwnershipPercent": 84.47,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=85e9c2ede298b42464d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:05:54.762Z"
+      "scrapedAt": "2026-10-25T08:27:22.218Z"
     },
     "ION": {
       "symbol": "ION",
@@ -1259,7 +1259,7 @@
       "publicOwnershipPercent": 46.02,
       "insiderOwnershipPercent": 53.98,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=6c3e63400ec4d46064d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:05:54.857Z"
+      "scrapedAt": "2026-10-25T08:27:22.224Z"
     },
     "IPM": {
       "symbol": "IPM",
@@ -1269,7 +1269,7 @@
       "publicOwnershipPercent": 28.96,
       "insiderOwnershipPercent": 71.04,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=d2c64f2a8b77fe3164d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:05:54.795Z"
+      "scrapedAt": "2026-10-25T08:27:22.165Z"
     },
     "IPO": {
       "symbol": "IPO",
@@ -1279,7 +1279,7 @@
       "publicOwnershipPercent": 12.4,
       "insiderOwnershipPercent": 87.6,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=db16cbf5291ce1c364d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:06:00.006Z"
+      "scrapedAt": "2026-10-25T08:27:27.408Z"
     },
     "IS": {
       "symbol": "IS",
@@ -1289,7 +1289,7 @@
       "publicOwnershipPercent": 81.08,
       "insiderOwnershipPercent": 18.92,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=77791b4457bbc61864d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:06:00.021Z"
+      "scrapedAt": "2026-10-25T08:27:27.478Z"
     },
     "JAS": {
       "symbol": "JAS",
@@ -1299,7 +1299,7 @@
       "publicOwnershipPercent": 20.77,
       "insiderOwnershipPercent": 79.23,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=155a66ee4fa538d664d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:06:01.354Z"
+      "scrapedAt": "2026-10-25T08:27:27.431Z"
     },
     "JFC": {
       "symbol": "JFC",
@@ -1309,7 +1309,7 @@
       "publicOwnershipPercent": 45.65,
       "insiderOwnershipPercent": 54.35,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=73a7de1296235e1364d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:06:06.657Z"
+      "scrapedAt": "2026-10-25T08:27:32.672Z"
     },
     "JGS": {
       "symbol": "JGS",
@@ -1319,7 +1319,7 @@
       "publicOwnershipPercent": 41.72,
       "insiderOwnershipPercent": 58.28,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=724a3ff4f29c67b564d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:06:06.637Z"
+      "scrapedAt": "2026-10-25T08:27:32.656Z"
     },
     "JOH": {
       "symbol": "JOH",
@@ -1329,7 +1329,7 @@
       "publicOwnershipPercent": 34.24,
       "insiderOwnershipPercent": 65.76,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=436ee06ff452d9c564d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:06:06.688Z"
+      "scrapedAt": "2026-10-25T08:27:32.629Z"
     },
     "KEEPR": {
       "symbol": "KEEPR",
@@ -1339,7 +1339,7 @@
       "publicOwnershipPercent": 20.82,
       "insiderOwnershipPercent": 79.18,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=bd239a4323c64cff64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:06:11.896Z"
+      "scrapedAt": "2026-10-25T08:27:37.899Z"
     },
     "KEP": {
       "symbol": "KEP",
@@ -1349,7 +1349,7 @@
       "publicOwnershipPercent": 13.13,
       "insiderOwnershipPercent": 86.87,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=61f74fa9f7f6478864d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:06:11.836Z"
+      "scrapedAt": "2026-10-25T08:27:37.819Z"
     },
     "KPPI": {
       "symbol": "KPPI",
@@ -1359,7 +1359,7 @@
       "publicOwnershipPercent": 33.19,
       "insiderOwnershipPercent": 66.81,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=cb218786ef018c2f64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:06:11.915Z"
+      "scrapedAt": "2026-10-25T08:27:37.845Z"
     },
     "LBC": {
       "symbol": "LBC",
@@ -1369,7 +1369,7 @@
       "publicOwnershipPercent": 15.39,
       "insiderOwnershipPercent": 84.61,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=f549fb2a13d03d2d64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:06:17.041Z"
+      "scrapedAt": "2026-10-25T08:27:43.058Z"
     },
     "LC": {
       "symbol": "LC",
@@ -1379,7 +1379,7 @@
       "publicOwnershipPercent": 64.65,
       "insiderOwnershipPercent": 35.35,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=6d0681682836193264d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:06:17.183Z"
+      "scrapedAt": "2026-10-25T08:27:43.157Z"
     },
     "LFM": {
       "symbol": "LFM",
@@ -1389,7 +1389,7 @@
       "publicOwnershipPercent": 59.49,
       "insiderOwnershipPercent": 40.51,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=14be8e598c407ad864d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:06:17.174Z"
+      "scrapedAt": "2026-10-25T08:27:43.074Z"
     },
     "LMG": {
       "symbol": "LMG",
@@ -1399,7 +1399,7 @@
       "publicOwnershipPercent": 33.38,
       "insiderOwnershipPercent": 66.62,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=89b206c228ffcbb764d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:06:22.441Z"
+      "scrapedAt": "2026-10-25T08:27:48.335Z"
     },
     "LODE": {
       "symbol": "LODE",
@@ -1409,7 +1409,7 @@
       "publicOwnershipPercent": 33.33,
       "insiderOwnershipPercent": 66.67,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=88e4cad51e46e2ac64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:06:22.398Z"
+      "scrapedAt": "2026-10-25T08:27:48.292Z"
     },
     "LOTO": {
       "symbol": "LOTO",
@@ -1419,7 +1419,7 @@
       "publicOwnershipPercent": 34.82,
       "insiderOwnershipPercent": 65.18,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=55d6ea85a891c9e864d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:06:22.346Z"
+      "scrapedAt": "2026-10-25T08:27:48.332Z"
     },
     "LPC": {
       "symbol": "LPC",
@@ -1429,7 +1429,7 @@
       "publicOwnershipPercent": 59.66,
       "insiderOwnershipPercent": 40.34,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=102c060356d3efdf64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:06:27.615Z"
+      "scrapedAt": "2026-10-25T08:27:53.491Z"
     },
     "LPZ": {
       "symbol": "LPZ",
@@ -1439,7 +1439,7 @@
       "publicOwnershipPercent": 29.46,
       "insiderOwnershipPercent": 70.54,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=5a33ad651e77bbcc64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:06:27.626Z"
+      "scrapedAt": "2026-10-25T08:27:53.507Z"
     },
     "LSC": {
       "symbol": "LSC",
@@ -1449,7 +1449,7 @@
       "publicOwnershipPercent": 17.78,
       "insiderOwnershipPercent": 82.22,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=f7b2f16cb9768a0864d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:06:27.581Z"
+      "scrapedAt": "2026-10-25T08:27:53.483Z"
     },
     "LTG": {
       "symbol": "LTG",
@@ -1459,7 +1459,7 @@
       "publicOwnershipPercent": 25.63,
       "insiderOwnershipPercent": 74.37,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=08638b53d750b04564d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:06:32.806Z"
+      "scrapedAt": "2026-10-25T08:27:58.707Z"
     },
     "MA": {
       "symbol": "MA",
@@ -1469,7 +1469,7 @@
       "publicOwnershipPercent": 81.22,
       "insiderOwnershipPercent": 18.78,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=9f2c67b1569ba79e64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:06:32.820Z"
+      "scrapedAt": "2026-10-25T08:27:58.672Z"
     },
     "MAC": {
       "symbol": "MAC",
@@ -1479,7 +1479,7 @@
       "publicOwnershipPercent": 29.55,
       "insiderOwnershipPercent": 70.45,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=8bb5dd7bc513aaa864d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:06:32.817Z"
+      "scrapedAt": "2026-10-25T08:27:58.715Z"
     },
     "MACAY": {
       "symbol": "MACAY",
@@ -1489,7 +1489,7 @@
       "publicOwnershipPercent": 14.53,
       "insiderOwnershipPercent": 85.47,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=044709725af1087164d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:06:38.106Z"
+      "scrapedAt": "2026-10-25T08:28:03.953Z"
     },
     "MAH": {
       "symbol": "MAH",
@@ -1499,7 +1499,7 @@
       "publicOwnershipPercent": 31.29,
       "insiderOwnershipPercent": 68.71,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=0d08bab938ec795a64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:06:37.967Z"
+      "scrapedAt": "2026-10-25T08:28:03.922Z"
     },
     "MARC": {
       "symbol": "MARC",
@@ -1509,7 +1509,7 @@
       "publicOwnershipPercent": 41.08,
       "insiderOwnershipPercent": 58.92,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=f78dae2d4889116864d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:06:38.062Z"
+      "scrapedAt": "2026-10-25T08:28:03.933Z"
     },
     "MAXS": {
       "symbol": "MAXS",
@@ -1519,7 +1519,7 @@
       "publicOwnershipPercent": 25.71,
       "insiderOwnershipPercent": 74.29,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=cb32edd07b392a8f64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:06:43.351Z"
+      "scrapedAt": "2026-10-25T08:28:09.206Z"
     },
     "MB": {
       "symbol": "MB",
@@ -1529,7 +1529,7 @@
       "publicOwnershipPercent": 10,
       "insiderOwnershipPercent": 90,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=b7b522bfccfdc5fc64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:06:43.274Z"
+      "scrapedAt": "2026-10-25T08:28:09.148Z"
     },
     "MBC": {
       "symbol": "MBC",
@@ -1539,7 +1539,7 @@
       "publicOwnershipPercent": 10.22,
       "insiderOwnershipPercent": 89.78,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=6bdf615dc29575f164d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:06:43.406Z"
+      "scrapedAt": "2026-10-25T08:28:09.200Z"
     },
     "MBT": {
       "symbol": "MBT",
@@ -1549,7 +1549,7 @@
       "publicOwnershipPercent": 47.82,
       "insiderOwnershipPercent": 52.18,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=c445689957438b2c64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:06:48.614Z"
+      "scrapedAt": "2026-10-25T08:28:14.363Z"
     },
     "MED": {
       "symbol": "MED",
@@ -1559,7 +1559,7 @@
       "publicOwnershipPercent": 20.116,
       "insiderOwnershipPercent": 79.88,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=a631f18e599d629164d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:06:48.576Z"
+      "scrapedAt": "2026-10-25T08:28:14.342Z"
     },
     "MEDIC": {
       "symbol": "MEDIC",
@@ -1569,7 +1569,7 @@
       "publicOwnershipPercent": 25.53,
       "insiderOwnershipPercent": 74.47,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=03f7be2ba385564164d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:06:48.587Z"
+      "scrapedAt": "2026-10-25T08:28:14.338Z"
     },
     "MEG": {
       "symbol": "MEG",
@@ -1579,7 +1579,7 @@
       "publicOwnershipPercent": 25.59,
       "insiderOwnershipPercent": 74.41,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=8518371fa4299ca864d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:06:53.806Z"
+      "scrapedAt": "2026-10-25T08:28:19.592Z"
     },
     "MER": {
       "symbol": "MER",
@@ -1589,7 +1589,7 @@
       "publicOwnershipPercent": 26.08,
       "insiderOwnershipPercent": 73.92,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=b937f92dbac52dc864d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:06:53.814Z"
+      "scrapedAt": "2026-10-25T08:28:19.536Z"
     },
     "MFC": {
       "error": "no_disclosure_found"
@@ -1602,7 +1602,7 @@
       "publicOwnershipPercent": 27.3,
       "insiderOwnershipPercent": 72.7,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=c1ce646013e6ff5764d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:06:59.048Z"
+      "scrapedAt": "2026-10-25T08:28:24.834Z"
     },
     "MG": {
       "symbol": "MG",
@@ -1612,7 +1612,7 @@
       "publicOwnershipPercent": 50.67,
       "insiderOwnershipPercent": 49.33,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=6378d7d2188e0cb964d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:06:58.932Z"
+      "scrapedAt": "2026-10-25T08:28:24.797Z"
     },
     "MGH": {
       "symbol": "MGH",
@@ -1622,7 +1622,7 @@
       "publicOwnershipPercent": 10.67,
       "insiderOwnershipPercent": 89.33,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=b93a86ef0c91cba564d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:06:59.022Z"
+      "scrapedAt": "2026-10-25T08:28:24.756Z"
     },
     "MHC": {
       "symbol": "MHC",
@@ -1632,7 +1632,7 @@
       "publicOwnershipPercent": 35.87,
       "insiderOwnershipPercent": 64.13,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=fd463b22c38db26964d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:07:04.159Z"
+      "scrapedAt": "2026-10-25T08:28:29.957Z"
     },
     "MJC": {
       "symbol": "MJC",
@@ -1642,7 +1642,7 @@
       "publicOwnershipPercent": 54.94,
       "insiderOwnershipPercent": 45.06,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=2ebd667410433a4f64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:07:04.384Z"
+      "scrapedAt": "2026-10-25T08:28:29.981Z"
     },
     "MJIC": {
       "symbol": "MJIC",
@@ -1652,7 +1652,7 @@
       "publicOwnershipPercent": 13.45,
       "insiderOwnershipPercent": 86.55,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=5bb058922d807ea964d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:07:04.270Z"
+      "scrapedAt": "2026-10-25T08:28:29.974Z"
     },
     "MM": {
       "symbol": "MM",
@@ -1662,7 +1662,7 @@
       "publicOwnershipPercent": 1.37,
       "insiderOwnershipPercent": 98.63,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=1f07f2b348c5974f64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:07:09.563Z"
+      "scrapedAt": "2026-10-25T08:28:35.177Z"
     },
     "MONDE": {
       "symbol": "MONDE",
@@ -1672,7 +1672,7 @@
       "publicOwnershipPercent": 40.16,
       "insiderOwnershipPercent": 59.84,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=11b2a91841e8df1164d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:07:09.508Z"
+      "scrapedAt": "2026-10-25T08:28:35.163Z"
     },
     "MRC": {
       "symbol": "MRC",
@@ -1682,7 +1682,7 @@
       "publicOwnershipPercent": 56.67,
       "insiderOwnershipPercent": 43.33,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=fa7451d18bc9b82164d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:07:09.692Z"
+      "scrapedAt": "2026-10-25T08:28:35.168Z"
     },
     "MREIT": {
       "symbol": "MREIT",
@@ -1692,7 +1692,7 @@
       "publicOwnershipPercent": 33.95,
       "insiderOwnershipPercent": 66.05,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=536b4a957396b91c64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:07:14.978Z"
+      "scrapedAt": "2026-10-25T08:28:40.405Z"
     },
     "MRSGI": {
       "symbol": "MRSGI",
@@ -1702,7 +1702,7 @@
       "publicOwnershipPercent": 17.67,
       "insiderOwnershipPercent": 82.33,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=45b54ad147b864c964d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:07:14.847Z"
+      "scrapedAt": "2026-10-25T08:28:40.376Z"
     },
     "MVC": {
       "symbol": "MVC",
@@ -1712,7 +1712,7 @@
       "publicOwnershipPercent": 11.99,
       "insiderOwnershipPercent": 88.01,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=6d2b7b983275356464d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:07:14.872Z"
+      "scrapedAt": "2026-10-25T08:28:40.353Z"
     },
     "MWC": {
       "symbol": "MWC",
@@ -1722,7 +1722,7 @@
       "publicOwnershipPercent": 41.85,
       "insiderOwnershipPercent": 58.15,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=a1618625eff53a1a64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:07:20.162Z"
+      "scrapedAt": "2026-10-25T08:28:45.636Z"
     },
     "MWIDE": {
       "symbol": "MWIDE",
@@ -1732,7 +1732,7 @@
       "publicOwnershipPercent": 37.58,
       "insiderOwnershipPercent": 62.42,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=8971f3a581a6176164d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:07:20.217Z"
+      "scrapedAt": "2026-10-25T08:28:45.559Z"
     },
     "MYNLD": {
       "symbol": "MYNLD",
@@ -1742,7 +1742,7 @@
       "publicOwnershipPercent": 28.98,
       "insiderOwnershipPercent": 71.02,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=9e17e3c51490629464d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:07:20.158Z"
+      "scrapedAt": "2026-10-25T08:28:45.608Z"
     },
     "NI": {
       "symbol": "NI",
@@ -1752,7 +1752,7 @@
       "publicOwnershipPercent": 31.82,
       "insiderOwnershipPercent": 68.18,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=3bb68564f411807a64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:07:25.382Z"
+      "scrapedAt": "2026-10-25T08:28:50.845Z"
     },
     "NIKL": {
       "symbol": "NIKL",
@@ -1762,7 +1762,7 @@
       "publicOwnershipPercent": 26.77,
       "insiderOwnershipPercent": 73.23,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=7f5ebf9b72d3fd9464d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:07:25.380Z"
+      "scrapedAt": "2026-10-25T08:28:50.801Z"
     },
     "NOW": {
       "symbol": "NOW",
@@ -1772,7 +1772,7 @@
       "publicOwnershipPercent": 27.29,
       "insiderOwnershipPercent": 72.71,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=1fdb8215294ab70764d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:07:25.490Z"
+      "scrapedAt": "2026-10-25T08:28:50.780Z"
     },
     "NRCP": {
       "symbol": "NRCP",
@@ -1782,7 +1782,7 @@
       "publicOwnershipPercent": 47.54,
       "insiderOwnershipPercent": 52.46,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=9788453093882f3b64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:07:30.617Z"
+      "scrapedAt": "2026-10-25T08:28:56.093Z"
     },
     "NXGEN": {
       "symbol": "NXGEN",
@@ -1792,7 +1792,7 @@
       "publicOwnershipPercent": 32.53,
       "insiderOwnershipPercent": 67.47,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=42180b91d54c3b8864d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:07:30.819Z"
+      "scrapedAt": "2026-10-25T08:28:56.102Z"
     },
     "OGP": {
       "symbol": "OGP",
@@ -1802,7 +1802,7 @@
       "publicOwnershipPercent": 20,
       "insiderOwnershipPercent": 80,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=3fa97830cfa7ee9264d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:07:30.620Z"
+      "scrapedAt": "2026-10-25T08:28:56.043Z"
     },
     "OM": {
       "symbol": "OM",
@@ -1812,7 +1812,7 @@
       "publicOwnershipPercent": 79.619,
       "insiderOwnershipPercent": 20.38,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=1c13a6e996c532da64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:07:35.995Z"
+      "scrapedAt": "2026-10-25T08:29:01.258Z"
     },
     "OPM": {
       "symbol": "OPM",
@@ -1822,7 +1822,7 @@
       "publicOwnershipPercent": 59.49,
       "insiderOwnershipPercent": 40.51,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=4500db3bbe3d6f4b64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:07:36.026Z"
+      "scrapedAt": "2026-10-25T08:29:01.281Z"
     },
     "ORE": {
       "symbol": "ORE",
@@ -1832,7 +1832,7 @@
       "publicOwnershipPercent": 44.31,
       "insiderOwnershipPercent": 55.69,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=1dc0a563f566c6da64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:07:36.017Z"
+      "scrapedAt": "2026-10-25T08:29:01.251Z"
     },
     "OV": {
       "symbol": "OV",
@@ -1842,7 +1842,7 @@
       "publicOwnershipPercent": 46.89,
       "insiderOwnershipPercent": 53.11,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=77de03cd69660a8164d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:07:41.185Z"
+      "scrapedAt": "2026-10-25T08:29:06.471Z"
     },
     "PA": {
       "symbol": "PA",
@@ -1852,7 +1852,7 @@
       "publicOwnershipPercent": 22.05,
       "insiderOwnershipPercent": 77.95,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=5b2c0243bda491c164d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:07:41.225Z"
+      "scrapedAt": "2026-10-25T08:29:06.473Z"
     },
     "PAL": {
       "symbol": "PAL",
@@ -1862,7 +1862,7 @@
       "publicOwnershipPercent": 22.06,
       "insiderOwnershipPercent": 77.94,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=bafd009e3135fab864d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:07:41.255Z"
+      "scrapedAt": "2026-10-25T08:29:06.448Z"
     },
     "PAX": {
       "symbol": "PAX",
@@ -1872,7 +1872,7 @@
       "publicOwnershipPercent": 14.96,
       "insiderOwnershipPercent": 85.04,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=ff4bbe12882840d164d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:07:46.439Z"
+      "scrapedAt": "2026-10-25T08:29:11.669Z"
     },
     "PBB": {
       "symbol": "PBB",
@@ -1882,7 +1882,7 @@
       "publicOwnershipPercent": 30.17,
       "insiderOwnershipPercent": 69.83,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=d9cdb2bba230c2f564d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:07:46.450Z"
+      "scrapedAt": "2026-10-25T08:29:11.646Z"
     },
     "PBC": {
       "symbol": "PBC",
@@ -1892,7 +1892,7 @@
       "publicOwnershipPercent": 21.04,
       "insiderOwnershipPercent": 78.96,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=a5a2a0814056500864d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:07:46.378Z"
+      "scrapedAt": "2026-10-25T08:29:11.675Z"
     },
     "PCOR": {
       "symbol": "PCOR",
@@ -1902,7 +1902,7 @@
       "publicOwnershipPercent": 28.04,
       "insiderOwnershipPercent": 71.96,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=5de2cc71409ded3564d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:07:51.742Z"
+      "scrapedAt": "2026-10-25T08:29:16.863Z"
     },
     "PERC": {
       "symbol": "PERC",
@@ -1912,7 +1912,7 @@
       "publicOwnershipPercent": 37.15,
       "insiderOwnershipPercent": 62.85,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=8264fb2751702cad64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:07:51.568Z"
+      "scrapedAt": "2026-10-25T08:29:16.853Z"
     },
     "PGOLD": {
       "symbol": "PGOLD",
@@ -1922,7 +1922,7 @@
       "publicOwnershipPercent": 34.79,
       "insiderOwnershipPercent": 65.21,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=4f5aaac724eab07a64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:07:51.657Z"
+      "scrapedAt": "2026-10-25T08:29:16.829Z"
     },
     "PHA": {
       "symbol": "PHA",
@@ -1932,7 +1932,7 @@
       "publicOwnershipPercent": 50.43,
       "insiderOwnershipPercent": 49.57,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=ef2c5e542d1a182364d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:07:56.922Z"
+      "scrapedAt": "2026-10-25T08:29:22.026Z"
     },
     "PHC": {
       "symbol": "PHC",
@@ -1942,7 +1942,7 @@
       "publicOwnershipPercent": 10.4,
       "insiderOwnershipPercent": 89.6,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=37bc287c71cc4c5a64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:07:56.871Z"
+      "scrapedAt": "2026-10-25T08:29:22.016Z"
     },
     "PHES": {
       "symbol": "PHES",
@@ -1952,7 +1952,7 @@
       "publicOwnershipPercent": 26.48,
       "insiderOwnershipPercent": 73.52,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=2f48a441ac7e34e364d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:07:57.021Z"
+      "scrapedAt": "2026-10-25T08:29:22.054Z"
     },
     "PHN": {
       "symbol": "PHN",
@@ -1962,7 +1962,7 @@
       "publicOwnershipPercent": 20.66,
       "insiderOwnershipPercent": 79.34,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=d798ac8043da365b64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:08:02.284Z"
+      "scrapedAt": "2026-10-25T08:29:27.244Z"
     },
     "PHR": {
       "symbol": "PHR",
@@ -1972,7 +1972,7 @@
       "publicOwnershipPercent": 28.28,
       "insiderOwnershipPercent": 71.72,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=7af58ee1410e846564d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:08:02.205Z"
+      "scrapedAt": "2026-10-25T08:29:27.253Z"
     },
     "PIZZA": {
       "symbol": "PIZZA",
@@ -1982,7 +1982,7 @@
       "publicOwnershipPercent": 20.93,
       "insiderOwnershipPercent": 79.07,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=7e5b6af6a09ff4ac64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:08:02.321Z"
+      "scrapedAt": "2026-10-25T08:29:27.201Z"
     },
     "PLUS": {
       "symbol": "PLUS",
@@ -1992,7 +1992,7 @@
       "publicOwnershipPercent": 50.51,
       "insiderOwnershipPercent": 49.49,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=bd31e551ee509d5464d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:08:07.569Z"
+      "scrapedAt": "2026-10-25T08:29:32.483Z"
     },
     "PMPC": {
       "symbol": "PMPC",
@@ -2002,7 +2002,7 @@
       "publicOwnershipPercent": 14.93,
       "insiderOwnershipPercent": 85.07,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=78d98bf110ad00cf64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:08:07.583Z"
+      "scrapedAt": "2026-10-25T08:29:32.454Z"
     },
     "PNB": {
       "symbol": "PNB",
@@ -2012,7 +2012,7 @@
       "publicOwnershipPercent": 22.18,
       "insiderOwnershipPercent": 77.82,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=ce3ee0b8b0aa60df64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:08:07.544Z"
+      "scrapedAt": "2026-10-25T08:29:32.409Z"
     },
     "PNC": {
       "symbol": "PNC",
@@ -2022,7 +2022,7 @@
       "publicOwnershipPercent": 13.12,
       "insiderOwnershipPercent": 86.88,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=598d571f6cad8f6f64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:08:14.086Z"
+      "scrapedAt": "2026-10-25T08:29:37.702Z"
     },
     "PNX": {
       "symbol": "PNX",
@@ -2032,7 +2032,7 @@
       "publicOwnershipPercent": 14.99,
       "insiderOwnershipPercent": 85.01,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=fdd44c3ccf91526464d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:08:12.692Z"
+      "scrapedAt": "2026-10-25T08:29:37.672Z"
     },
     "PORT": {
       "symbol": "PORT",
@@ -2042,7 +2042,7 @@
       "publicOwnershipPercent": 10,
       "insiderOwnershipPercent": 90,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=36aa1a18d6480fd264d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:08:12.758Z"
+      "scrapedAt": "2026-10-25T08:29:37.661Z"
     },
     "PPC": {
       "symbol": "PPC",
@@ -2052,7 +2052,7 @@
       "publicOwnershipPercent": 72.31,
       "insiderOwnershipPercent": 27.69,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=0945bbab2dd09fb564d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:08:21.581Z"
+      "scrapedAt": "2026-10-25T08:29:42.872Z"
     },
     "PRC": {
       "symbol": "PRC",
@@ -2062,7 +2062,7 @@
       "publicOwnershipPercent": 57.77,
       "insiderOwnershipPercent": 42.23,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=7499fcfd12a5a52864d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:08:19.763Z"
+      "scrapedAt": "2026-10-25T08:29:42.846Z"
     },
     "PREIT": {
       "symbol": "PREIT",
@@ -2072,7 +2072,7 @@
       "publicOwnershipPercent": 48.9,
       "insiderOwnershipPercent": 51.1,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=f191b7885583b46464d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:08:19.706Z"
+      "scrapedAt": "2026-10-25T08:29:42.869Z"
     },
     "PRIM": {
       "symbol": "PRIM",
@@ -2082,7 +2082,7 @@
       "publicOwnershipPercent": 21.22,
       "insiderOwnershipPercent": 78.78,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=1f468186a454a03464d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:08:26.702Z"
+      "scrapedAt": "2026-10-25T08:29:48.059Z"
     },
     "PRMX": {
       "symbol": "PRMX",
@@ -2092,7 +2092,7 @@
       "publicOwnershipPercent": 24.13,
       "insiderOwnershipPercent": 75.87,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=d935c530415f06f664d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:08:26.762Z"
+      "scrapedAt": "2026-10-25T08:29:48.097Z"
     },
     "PSB": {
       "symbol": "PSB",
@@ -2102,7 +2102,7 @@
       "publicOwnershipPercent": 11.61,
       "insiderOwnershipPercent": 88.39,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=eb723feaf3f640de64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:08:26.883Z"
+      "scrapedAt": "2026-10-25T08:29:48.026Z"
     },
     "PSE": {
       "symbol": "PSE",
@@ -2112,7 +2112,7 @@
       "publicOwnershipPercent": 65.42,
       "insiderOwnershipPercent": 34.58,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=633f2eef807b961064d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:08:32.118Z"
+      "scrapedAt": "2026-10-25T08:29:53.308Z"
     },
     "PTC": {
       "symbol": "PTC",
@@ -2122,7 +2122,7 @@
       "publicOwnershipPercent": 14.071,
       "insiderOwnershipPercent": 85.93,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=56a55a60e2e31c2164d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:08:32.194Z"
+      "scrapedAt": "2026-10-25T08:29:53.328Z"
     },
     "PTT": {
       "symbol": "PTT",
@@ -2132,7 +2132,7 @@
       "publicOwnershipPercent": 15.99,
       "insiderOwnershipPercent": 84.01,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=aa08acc2b8ab031564d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:08:32.024Z"
+      "scrapedAt": "2026-10-25T08:29:53.267Z"
     },
     "PX": {
       "symbol": "PX",
@@ -2142,7 +2142,7 @@
       "publicOwnershipPercent": 36.39,
       "insiderOwnershipPercent": 63.61,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=ff6f02b5ddcafa1364d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:08:37.459Z"
+      "scrapedAt": "2026-10-25T08:29:58.537Z"
     },
     "PXP": {
       "symbol": "PXP",
@@ -2152,7 +2152,7 @@
       "publicOwnershipPercent": 25.87,
       "insiderOwnershipPercent": 74.13,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=f348fb0da601336264d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:08:37.397Z"
+      "scrapedAt": "2026-10-25T08:29:58.495Z"
     },
     "RCB": {
       "symbol": "RCB",
@@ -2162,7 +2162,7 @@
       "publicOwnershipPercent": 14.22,
       "insiderOwnershipPercent": 85.78,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=f21a17f435620e1164d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:08:37.359Z"
+      "scrapedAt": "2026-10-25T08:29:58.472Z"
     },
     "RCI": {
       "symbol": "RCI",
@@ -2172,7 +2172,7 @@
       "publicOwnershipPercent": 28.47,
       "insiderOwnershipPercent": 71.53,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=2d61b4860ccf38bc64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:08:42.654Z"
+      "scrapedAt": "2026-10-25T08:30:03.735Z"
     },
     "RCR": {
       "symbol": "RCR",
@@ -2182,7 +2182,7 @@
       "publicOwnershipPercent": 41.45,
       "insiderOwnershipPercent": 58.55,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=8104f565dc7d4e8564d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:08:42.736Z"
+      "scrapedAt": "2026-10-25T08:30:03.755Z"
     },
     "REDC": {
       "symbol": "REDC",
@@ -2192,7 +2192,7 @@
       "publicOwnershipPercent": 22.31,
       "insiderOwnershipPercent": 77.69,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=6ec3c62ab0f5d88664d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:08:42.704Z"
+      "scrapedAt": "2026-10-25T08:30:03.689Z"
     },
     "REG": {
       "symbol": "REG",
@@ -2202,7 +2202,7 @@
       "publicOwnershipPercent": 22.18,
       "insiderOwnershipPercent": 77.82,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=1f33014700143dd864d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:08:47.935Z"
+      "scrapedAt": "2026-10-25T08:30:08.955Z"
     },
     "RFM": {
       "symbol": "RFM",
@@ -2212,7 +2212,7 @@
       "publicOwnershipPercent": 42.92,
       "insiderOwnershipPercent": 57.08,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=9ffe8d081ca1fa2b64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:08:47.918Z"
+      "scrapedAt": "2026-10-25T08:30:08.945Z"
     },
     "RLC": {
       "symbol": "RLC",
@@ -2222,7 +2222,7 @@
       "publicOwnershipPercent": 33.68,
       "insiderOwnershipPercent": 66.32,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=6d4f2efa100d832c64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:08:47.993Z"
+      "scrapedAt": "2026-10-25T08:30:08.916Z"
     },
     "RLT": {
       "symbol": "RLT",
@@ -2232,7 +2232,7 @@
       "publicOwnershipPercent": 74.79,
       "insiderOwnershipPercent": 25.21,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=1868a7dd9c5e572d64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:08:53.269Z"
+      "scrapedAt": "2026-10-25T08:30:14.181Z"
     },
     "ROCK": {
       "symbol": "ROCK",
@@ -2242,7 +2242,7 @@
       "publicOwnershipPercent": 13.05,
       "insiderOwnershipPercent": 86.95,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=e09a264ed66faf1164d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:08:53.165Z"
+      "scrapedAt": "2026-10-25T08:30:14.103Z"
     },
     "ROX": {
       "symbol": "ROX",
@@ -2252,7 +2252,7 @@
       "publicOwnershipPercent": 16.45,
       "insiderOwnershipPercent": 83.55,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=82e29a69520925c264d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:08:53.200Z"
+      "scrapedAt": "2026-10-25T08:30:14.143Z"
     },
     "RRHI": {
       "symbol": "RRHI",
@@ -2262,7 +2262,7 @@
       "publicOwnershipPercent": 0.28,
       "insiderOwnershipPercent": 99.72,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=65e4eed6d1cdd5c364d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:08:58.500Z"
+      "scrapedAt": "2026-10-25T08:30:19.409Z"
     },
     "SBS": {
       "symbol": "SBS",
@@ -2272,7 +2272,7 @@
       "publicOwnershipPercent": 23.83,
       "insiderOwnershipPercent": 76.17,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=fcf5e9a44286349e64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:08:58.471Z"
+      "scrapedAt": "2026-10-25T08:30:19.347Z"
     },
     "SCC": {
       "symbol": "SCC",
@@ -2282,7 +2282,7 @@
       "publicOwnershipPercent": 24.1,
       "insiderOwnershipPercent": 75.9,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=665eb3e54f41aaec64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:08:58.535Z"
+      "scrapedAt": "2026-10-25T08:30:19.394Z"
     },
     "SECB": {
       "symbol": "SECB",
@@ -2292,7 +2292,7 @@
       "publicOwnershipPercent": 52.09,
       "insiderOwnershipPercent": 47.91,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=0e4de7d54984619664d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:09:03.944Z"
+      "scrapedAt": "2026-10-25T08:30:24.567Z"
     },
     "SEVN": {
       "symbol": "SEVN",
@@ -2302,7 +2302,7 @@
       "publicOwnershipPercent": 40.65,
       "insiderOwnershipPercent": 59.35,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=f72f0048a9f40e6764d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:09:03.653Z"
+      "scrapedAt": "2026-10-25T08:30:24.595Z"
     },
     "SFI": {
       "symbol": "SFI",
@@ -2312,7 +2312,7 @@
       "publicOwnershipPercent": 99.79,
       "insiderOwnershipPercent": 0.21,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=62934083b8371fd164d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:09:03.647Z"
+      "scrapedAt": "2026-10-25T08:30:24.571Z"
     },
     "SGI": {
       "symbol": "SGI",
@@ -2322,7 +2322,7 @@
       "publicOwnershipPercent": 25.74,
       "insiderOwnershipPercent": 74.26,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=febdaf459dda54cf64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:09:09.131Z"
+      "scrapedAt": "2026-10-25T08:30:29.790Z"
     },
     "SGP": {
       "symbol": "SGP",
@@ -2332,7 +2332,7 @@
       "publicOwnershipPercent": 22.13,
       "insiderOwnershipPercent": 77.87,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=37b07a431bd2cec264d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:09:09.129Z"
+      "scrapedAt": "2026-10-25T08:30:29.765Z"
     },
     "SHLPH": {
       "symbol": "SHLPH",
@@ -2342,7 +2342,7 @@
       "publicOwnershipPercent": 24.68,
       "insiderOwnershipPercent": 75.32,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=7ce97d752a7e952764d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:09:09.161Z"
+      "scrapedAt": "2026-10-25T08:30:29.752Z"
     },
     "SHNG": {
       "symbol": "SHNG",
@@ -2352,7 +2352,7 @@
       "publicOwnershipPercent": 34.6,
       "insiderOwnershipPercent": 65.4,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=cd1b9578cf70bf6764d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:09:14.322Z"
+      "scrapedAt": "2026-10-25T08:30:34.989Z"
     },
     "SLF": {
       "error": "no_disclosure_found"
@@ -2365,7 +2365,7 @@
       "publicOwnershipPercent": 19.21,
       "insiderOwnershipPercent": 80.79,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=4500b8af1f525bda64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:09:14.460Z"
+      "scrapedAt": "2026-10-25T08:30:34.978Z"
     },
     "SM": {
       "symbol": "SM",
@@ -2375,7 +2375,7 @@
       "publicOwnershipPercent": 46.49,
       "insiderOwnershipPercent": 53.51,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=66954c206b2c968c64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:09:19.647Z"
+      "scrapedAt": "2026-10-25T08:30:40.202Z"
     },
     "SMC": {
       "symbol": "SMC",
@@ -2385,7 +2385,7 @@
       "publicOwnershipPercent": 20.69,
       "insiderOwnershipPercent": 79.31,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=e6c31445433f6f1664d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:09:19.644Z"
+      "scrapedAt": "2026-10-25T08:30:40.137Z"
     },
     "SMPH": {
       "symbol": "SMPH",
@@ -2395,7 +2395,7 @@
       "publicOwnershipPercent": 36.23,
       "insiderOwnershipPercent": 63.77,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=64cc3d9172fca74e64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:09:19.759Z"
+      "scrapedAt": "2026-10-25T08:30:40.191Z"
     },
     "SOC": {
       "symbol": "SOC",
@@ -2405,7 +2405,7 @@
       "publicOwnershipPercent": 23.68,
       "insiderOwnershipPercent": 76.32,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=4563586d68d0e2a364d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:09:24.890Z"
+      "scrapedAt": "2026-10-25T08:30:45.418Z"
     },
     "SPC": {
       "symbol": "SPC",
@@ -2415,7 +2415,7 @@
       "publicOwnershipPercent": 13.29,
       "insiderOwnershipPercent": 86.71,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=6f38752e2537991b64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:09:24.882Z"
+      "scrapedAt": "2026-10-25T08:30:45.411Z"
     },
     "SPM": {
       "symbol": "SPM",
@@ -2425,7 +2425,7 @@
       "publicOwnershipPercent": 53.56,
       "insiderOwnershipPercent": 46.44,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=ddfb96827af50ff164d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:09:24.929Z"
+      "scrapedAt": "2026-10-25T08:30:45.371Z"
     },
     "SPNEC": {
       "symbol": "SPNEC",
@@ -2435,7 +2435,7 @@
       "publicOwnershipPercent": 24.8,
       "insiderOwnershipPercent": 75.2,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=5bc532a38c8965e364d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:09:30.148Z"
+      "scrapedAt": "2026-10-25T08:30:50.590Z"
     },
     "SRDC": {
       "symbol": "SRDC",
@@ -2445,7 +2445,7 @@
       "publicOwnershipPercent": 53.44,
       "insiderOwnershipPercent": 46.56,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=b7eed006201a3c3564d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:09:30.193Z"
+      "scrapedAt": "2026-10-25T08:30:50.581Z"
     },
     "SSI": {
       "symbol": "SSI",
@@ -2455,7 +2455,7 @@
       "publicOwnershipPercent": 28.28,
       "insiderOwnershipPercent": 71.72,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=5bd530bd4300728064d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:09:30.091Z"
+      "scrapedAt": "2026-10-25T08:30:50.595Z"
     },
     "STI": {
       "symbol": "STI",
@@ -2465,7 +2465,7 @@
       "publicOwnershipPercent": 33.7,
       "insiderOwnershipPercent": 66.3,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=4b58bed05445df0f64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:09:35.350Z"
+      "scrapedAt": "2026-10-25T08:30:55.737Z"
     },
     "STN": {
       "symbol": "STN",
@@ -2475,7 +2475,7 @@
       "publicOwnershipPercent": 28.81,
       "insiderOwnershipPercent": 71.19,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=9ff27617d6a6ab8d64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:09:35.502Z"
+      "scrapedAt": "2026-10-25T08:30:55.718Z"
     },
     "STR": {
       "symbol": "STR",
@@ -2485,7 +2485,7 @@
       "publicOwnershipPercent": 10.3,
       "insiderOwnershipPercent": 89.7,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=79327eb674642e6864d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:09:35.360Z"
+      "scrapedAt": "2026-10-25T08:30:55.784Z"
     },
     "SUN": {
       "symbol": "SUN",
@@ -2495,7 +2495,7 @@
       "publicOwnershipPercent": 49,
       "insiderOwnershipPercent": 51,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=b4b33ff8f3d4fa6e64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:09:40.661Z"
+      "scrapedAt": "2026-10-25T08:31:00.991Z"
     },
     "T": {
       "symbol": "T",
@@ -2505,7 +2505,7 @@
       "publicOwnershipPercent": 16.15,
       "insiderOwnershipPercent": 83.85,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=7b7474cbee8a58fe64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:09:40.726Z"
+      "scrapedAt": "2026-10-25T08:31:01.003Z"
     },
     "TBGI": {
       "symbol": "TBGI",
@@ -2515,7 +2515,7 @@
       "publicOwnershipPercent": 36.53,
       "insiderOwnershipPercent": 63.47,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=d5ab3a3a169f09de64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:09:40.686Z"
+      "scrapedAt": "2026-10-25T08:31:00.934Z"
     },
     "TECH": {
       "symbol": "TECH",
@@ -2525,7 +2525,7 @@
       "publicOwnershipPercent": 69.13,
       "insiderOwnershipPercent": 30.87,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=5a7f8e35f4029a6864d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:09:45.928Z"
+      "scrapedAt": "2026-10-25T08:31:06.175Z"
     },
     "TEL": {
       "symbol": "TEL",
@@ -2535,7 +2535,7 @@
       "publicOwnershipPercent": 42.08,
       "insiderOwnershipPercent": 57.92,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=f7b3e5ef6ea9966064d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:09:45.909Z"
+      "scrapedAt": "2026-10-25T08:31:06.195Z"
     },
     "TFC": {
       "symbol": "TFC",
@@ -2545,7 +2545,7 @@
       "publicOwnershipPercent": 55.51,
       "insiderOwnershipPercent": 44.49,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=62860a48f38d4be864d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:09:45.952Z"
+      "scrapedAt": "2026-10-25T08:31:06.173Z"
     },
     "TFHI": {
       "symbol": "TFHI",
@@ -2555,7 +2555,7 @@
       "publicOwnershipPercent": 10.57,
       "insiderOwnershipPercent": 89.43,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=e72a63b98b91a29164d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:09:51.174Z"
+      "scrapedAt": "2026-10-25T08:31:11.446Z"
     },
     "TOP": {
       "symbol": "TOP",
@@ -2565,7 +2565,7 @@
       "publicOwnershipPercent": 26.23,
       "insiderOwnershipPercent": 73.77,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=563e40bd7af2eb3764d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:09:51.123Z"
+      "scrapedAt": "2026-10-25T08:31:11.376Z"
     },
     "TUGS": {
       "symbol": "TUGS",
@@ -2575,7 +2575,7 @@
       "publicOwnershipPercent": 30.198,
       "insiderOwnershipPercent": 69.8,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=ecb229a6b864adad64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:09:51.222Z"
+      "scrapedAt": "2026-10-25T08:31:11.390Z"
     },
     "UBP": {
       "symbol": "UBP",
@@ -2585,7 +2585,7 @@
       "publicOwnershipPercent": 17.12,
       "insiderOwnershipPercent": 82.88,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=81b328996508b98764d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:09:56.376Z"
+      "scrapedAt": "2026-10-25T08:31:16.648Z"
     },
     "UNH": {
       "symbol": "UNH",
@@ -2595,7 +2595,7 @@
       "publicOwnershipPercent": 2.92,
       "insiderOwnershipPercent": 97.08,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=9e143dd146769bc764d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:09:56.424Z"
+      "scrapedAt": "2026-10-25T08:31:16.600Z"
     },
     "UPM": {
       "symbol": "UPM",
@@ -2605,7 +2605,7 @@
       "publicOwnershipPercent": 20.56,
       "insiderOwnershipPercent": 79.44,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=33808bf58626528664d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:09:56.384Z"
+      "scrapedAt": "2026-10-25T08:31:16.591Z"
     },
     "UPSON": {
       "symbol": "UPSON",
@@ -2615,7 +2615,7 @@
       "publicOwnershipPercent": 25.63,
       "insiderOwnershipPercent": 74.37,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=3365f117bf331d0464d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:10:01.718Z"
+      "scrapedAt": "2026-10-25T08:31:21.804Z"
     },
     "URC": {
       "symbol": "URC",
@@ -2625,7 +2625,7 @@
       "publicOwnershipPercent": 42.21,
       "insiderOwnershipPercent": 57.79,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=135f4bcebafaaa8e64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:10:01.688Z"
+      "scrapedAt": "2026-10-25T08:31:21.836Z"
     },
     "V": {
       "symbol": "V",
@@ -2635,7 +2635,7 @@
       "publicOwnershipPercent": 20.27,
       "insiderOwnershipPercent": 79.73,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=168886862dbfbb1c64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:10:01.586Z"
+      "scrapedAt": "2026-10-25T08:31:21.853Z"
     },
     "VITA": {
       "symbol": "VITA",
@@ -2645,7 +2645,7 @@
       "publicOwnershipPercent": 25.19,
       "insiderOwnershipPercent": 74.81,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=f3ca85944708612864d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:10:06.930Z"
+      "scrapedAt": "2026-10-25T08:31:27.039Z"
     },
     "VLC": {
       "symbol": "VLC",
@@ -2655,7 +2655,7 @@
       "publicOwnershipPercent": 11.38,
       "insiderOwnershipPercent": 88.62,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=8ff22e52f0d22cb764d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:10:06.960Z"
+      "scrapedAt": "2026-10-25T08:31:27.082Z"
     },
     "VLL": {
       "symbol": "VLL",
@@ -2665,7 +2665,7 @@
       "publicOwnershipPercent": 24.16,
       "insiderOwnershipPercent": 75.84,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=f2806eb11704e85664d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:10:06.924Z"
+      "scrapedAt": "2026-10-25T08:31:27.027Z"
     },
     "VMC": {
       "symbol": "VMC",
@@ -2675,7 +2675,7 @@
       "publicOwnershipPercent": 25.04,
       "insiderOwnershipPercent": 74.96,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=e5656de22fc94e3e64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:10:12.187Z"
+      "scrapedAt": "2026-10-25T08:31:32.296Z"
     },
     "VREIT": {
       "symbol": "VREIT",
@@ -2685,7 +2685,7 @@
       "publicOwnershipPercent": 35.29,
       "insiderOwnershipPercent": 64.71,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=e9c77ac5cffb1a5064d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:10:12.290Z"
+      "scrapedAt": "2026-10-25T08:31:32.238Z"
     },
     "VVT": {
       "symbol": "VVT",
@@ -2695,7 +2695,7 @@
       "publicOwnershipPercent": 24.116,
       "insiderOwnershipPercent": 75.88,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=4e3e0cc4ab32d73664d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:10:12.153Z"
+      "scrapedAt": "2026-10-25T08:31:32.222Z"
     },
     "WEB": {
       "symbol": "WEB",
@@ -2705,7 +2705,7 @@
       "publicOwnershipPercent": 27.59,
       "insiderOwnershipPercent": 72.41,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=d89846e71b508a5264d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:10:17.428Z"
+      "scrapedAt": "2026-10-25T08:31:37.550Z"
     },
     "WIN": {
       "symbol": "WIN",
@@ -2715,7 +2715,7 @@
       "publicOwnershipPercent": 43.28,
       "insiderOwnershipPercent": 56.72,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=fbeeffafa5cf1b5f64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:10:17.557Z"
+      "scrapedAt": "2026-10-25T08:31:37.432Z"
     },
     "WLCON": {
       "symbol": "WLCON",
@@ -2725,7 +2725,7 @@
       "publicOwnershipPercent": 32.78,
       "insiderOwnershipPercent": 67.22,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=4ca9ce1d018ee2fd64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:10:17.482Z"
+      "scrapedAt": "2026-10-25T08:31:37.468Z"
     },
     "WPI": {
       "symbol": "WPI",
@@ -2735,7 +2735,7 @@
       "publicOwnershipPercent": 54.42,
       "insiderOwnershipPercent": 45.58,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=8ed49af42526e36164d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:10:22.787Z"
+      "scrapedAt": "2026-10-25T08:31:42.783Z"
     },
     "X": {
       "symbol": "X",
@@ -2745,7 +2745,7 @@
       "publicOwnershipPercent": 29.57,
       "insiderOwnershipPercent": 70.43,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=00fb45341f24b60f64d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:10:22.782Z"
+      "scrapedAt": "2026-10-25T08:31:42.749Z"
     },
     "XG": {
       "symbol": "XG",
@@ -2755,7 +2755,7 @@
       "publicOwnershipPercent": 21.14,
       "insiderOwnershipPercent": 78.86,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=9b525468417eaaa364d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:10:22.743Z"
+      "scrapedAt": "2026-10-25T08:31:42.680Z"
     },
     "ZHI": {
       "symbol": "ZHI",
@@ -2765,7 +2765,7 @@
       "publicOwnershipPercent": 58.72,
       "insiderOwnershipPercent": 41.28,
       "sourceUrl": "https://edge.pse.com.ph/openDiscViewer.do?edge_no=33140ee193753cd264d70b69f0a3140b",
-      "scrapedAt": "2026-10-18T08:10:28.005Z"
+      "scrapedAt": "2026-10-25T08:31:48.016Z"
     }
   }
 }
